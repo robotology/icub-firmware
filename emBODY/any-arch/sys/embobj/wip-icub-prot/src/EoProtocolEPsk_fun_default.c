@@ -92,20 +92,26 @@ __weak extern void eoprot_ep_sk_fun_INITIALISE(eOnvEP_t ep, void *ram) {}
 #endif
 
 
-
-#if !defined(OVERRIDE_eoprot_ep_sk_fun_INIT_skin_config__sigmode)
-__weak extern void eoprot_ep_sk_fun_INIT_skin_config__sigmode(const EOnv* nv) {}
+#if !defined(OVERRIDE_eoprot_ep_sk_fun_INIT_skin_wholeitem)
+__weak extern void eoprot_ep_sk_fun_INIT_skin_wholeitem(const EOnv* nv) {}
 #endif
-#if !defined(OVERRIDE_eoprot_ep_sk_fun_UPDT_skin_config__sigmode)
-__weak extern void eoprot_ep_sk_fun_UPDT_skin_config__sigmode(const EOnv* nv, const eOropdescriptor_t* rd) {}
+#if !defined(OVERRIDE_eoprot_ep_sk_fun_UPDT_skin_wholeitem)
+__weak extern void eoprot_ep_sk_fun_UPDT_skin_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_ep_sk_fun_INIT_skin_config_sigmode)
+__weak extern void eoprot_ep_sk_fun_INIT_skin_config_sigmode(const EOnv* nv) {}
+#endif
+#if !defined(OVERRIDE_eoprot_ep_sk_fun_UPDT_skin_config_sigmode)
+__weak extern void eoprot_ep_sk_fun_UPDT_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 
-#if !defined(OVERRIDE_eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes)
-__weak extern void eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes(const EOnv* nv) {}
+#if !defined(OVERRIDE_eoprot_ep_sk_fun_INIT_skin_status_arrayof10canframes)
+__weak extern void eoprot_ep_sk_fun_INIT_skin_status_arrayof10canframes(const EOnv* nv) {}
 #endif
-#if !defined(OVERRIDE_eoprot_ep_sk_fun_UPDT_skin_status__arrayof10canframes)
-__weak extern void eoprot_ep_sk_fun_UPDT_skin_status__arrayof10canframes(const EOnv* nv, const eOropdescriptor_t* rd) {}
+#if !defined(OVERRIDE_eoprot_ep_sk_fun_UPDT_skin_status_arrayof10canframes)
+__weak extern void eoprot_ep_sk_fun_UPDT_skin_status_arrayof10canframes(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 

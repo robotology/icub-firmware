@@ -68,60 +68,64 @@ enum { eoprot_ep_mn_entities_numberof = eomn_entities_numberof };
 // - definition of the comm
 
 
-/** @typedef    typedef enum eOprot_ep_mn_comm_tag_t
+/** @typedef    typedef enum eOprot_ep_mn_tag_comm_t
     @brief      It contains the tags for all variables in the management of the communication.
                 See definition of eOmn_comm_t (and its fields) in file EoManagement.h for explanation of the variables.
  **/
 typedef enum
 {
-     eoprot_ep_mn_comm_tag_cmmnds__ropsigcfg    = 0
-} eOprot_ep_mn_comm_tag_t;
+    eoprot_ep_mn_tag_comm_wholeitem                                     = 0,    
+    eoprot_ep_mn_tag_comm_cmmnds_ropsigcfg                              = 1
+} eOprot_ep_mn_tag_comm_t;
 
-enum { eoprot_ep_mn_comm_tags_numberof = 1 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_tags_comm_numberof = 2 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_mn_comm_rwmode_t
+/** @typedef    typedef enum eOprot_ep_mn_rwmode_comm_t
     @brief      It contains the rw mode for all the network variables. There must be a one-to-one
-                correspondence to the values in eOprot_ep_mn_comm_tag_t.
+                correspondence to the values in eOprot_ep_mn_tag_comm_t.
  **/
 typedef enum
 {
-    eoprot_ep_mn_comm_rwmode_cmmnds__ropsigcfg  = eo_nv_rwmode_RW
-} eOprot_ep_mn_comm_rwmode_t; 
+    eoprot_ep_mn_rwmode_comm_wholeitem                                  = eo_nv_rwmode_RO,
+    eoprot_ep_mn_rwmode_comm_cmmnds_ropsigcfg                           = eo_nv_rwmode_RW
+} eOprot_ep_mn_rwmode_comm_t; 
 
-enum { eoprot_ep_mn_comm_rwmodes_numberof = 1 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_rwmodes_comm_numberof = 2 };  // it MUST be equal to the number of tags. 
 
 
 
 // - definition of the appl
   
 
-/** @typedef    typedef enum eOprot_ep_mn_appl_tag_t
+/** @typedef    typedef enum eOprot_ep_mn_tag_appl_t
     @brief      It contains the tags for all variables in the management of the application.
                 See definition of eOmn_appl_t (and its fields) in file EoManagement.h for explanation of the variables.
  **/
 typedef enum
 {
-     eoprot_ep_mn_appl_tag_config               = 0,
-     eoprot_ep_mn_appl_tag_status               = 1,
-     eoprot_ep_mn_appl_tag_cmmnds__go2state     = 2
-} eOprot_ep_mn_appl_tag_t;
+    eoprot_ep_mn_tag_appl_wholeitem                                     = 0,
+    eoprot_ep_mn_tag_appl_config                                        = 1,
+    eoprot_ep_mn_tag_appl_status                                        = 2,
+    eoprot_ep_mn_tag_appl_cmmnds_go2state                               = 3
+} eOprot_ep_mn_tag_appl_t;
 
-enum { eoprot_ep_mn_appl_tags_numberof = 3 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_tags_appl_numberof = 4 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_mn_appl_rwmode_t
+/** @typedef    typedef enum eOprot_ep_mn_rwmode_appl_t
     @brief      It contains the rw mode for all the network variables. There must be a one-to-one
-                correspondence to the values in eOprot_ep_mn_appl_tag_t.
+                correspondence to the values in eOprot_ep_mn_tag_appl_t.
  **/
 typedef enum
 {
-    eoprot_ep_mn_appl_rwmode_config             = eo_nv_rwmode_RW,
-    eoprot_ep_mn_appl_rwmode_status             = eo_nv_rwmode_RO,
-    eoprot_ep_mn_appl_rwmode_cmmnds__go2state   = eo_nv_rwmode_RW
-} eOprot_ep_mn_appl_rwmode_t; 
+    eoprot_ep_mn_rwmode_appl_wholeitem                                  = eo_nv_rwmode_RO,
+    eoprot_ep_mn_rwmode_appl_config                                     = eo_nv_rwmode_RW,
+    eoprot_ep_mn_rwmode_appl_status                                     = eo_nv_rwmode_RO,
+    eoprot_ep_mn_rwmode_appl_cmmnds_go2state                            = eo_nv_rwmode_RW
+} eOprot_ep_mn_rwmode_appl_t; 
 
-enum { eoprot_ep_mn_appl_rwmodes_numberof = 3 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_mn_rwmodes_appl_numberof = 4 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints

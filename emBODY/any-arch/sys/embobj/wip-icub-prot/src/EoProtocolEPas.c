@@ -63,11 +63,11 @@
 EO_VERIFYproposition(eoprot_ep_as_ded34, eoprot_ep_as_entities_numberof <= eoprot_entities_numberof);
 
 // - guard on tags ...
-EO_VERIFYproposition(eoprot_ep_as_tagsnum_st, eoprot_ep_as_strain_tags_numberof == eoprot_ep_as_strain_rwmodes_numberof);
-EO_VERIFYproposition(eoprot_ep_as_tagsmax_st, eoprot_ep_as_strain_tags_numberof <= eoprot_tags_numberof);
+EO_VERIFYproposition(eoprot_ep_as_tagsnum_st, eoprot_ep_as_tags_strain_numberof == eoprot_ep_as_rwmodes_strain_numberof);
+EO_VERIFYproposition(eoprot_ep_as_tagsmax_st, eoprot_ep_as_tags_strain_numberof <= eoprot_tags_numberof);
 
-EO_VERIFYproposition(eoprot_ep_as_tagsnum_ma, eoprot_ep_as_mais_tags_numberof == eoprot_ep_as_mais_rwmodes_numberof);
-EO_VERIFYproposition(eoprot_ep_as_tagsmax_ma, eoprot_ep_as_mais_tags_numberof <= eoprot_tags_numberof);
+EO_VERIFYproposition(eoprot_ep_as_tagsnum_ma, eoprot_ep_as_tags_mais_numberof == eoprot_ep_as_rwmodes_mais_numberof);
+EO_VERIFYproposition(eoprot_ep_as_tagsmax_ma, eoprot_ep_as_tags_mais_numberof <= eoprot_tags_numberof);
 
 
  
@@ -78,8 +78,8 @@ EO_VERIFYproposition(eoprot_ep_as_tagsmax_ma, eoprot_ep_as_mais_tags_numberof <=
 
 static uint16_t s_eoprot_ep_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id);
 
-static eObool_t s_eoprot_ep_as_strain_tag_is_valid(eOprotTag_t tag);
-static eObool_t s_eoprot_ep_as_mais_tag_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_as_tag_strain_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_ep_as_tag_mais_is_valid(eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ extern eObool_t eoprot_ep_as_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
         {   
             if(ind < s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain])
             {
-                ret = s_eoprot_ep_as_strain_tag_is_valid(tag);
+                ret = s_eoprot_ep_as_tag_strain_is_valid(tag);
             }            
         } break;
         
@@ -163,7 +163,7 @@ extern eObool_t eoprot_ep_as_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
         {
             if(ind < s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_mais]) 
             {
-                ret = s_eoprot_ep_as_mais_tag_is_valid(tag);
+                ret = s_eoprot_ep_as_tag_mais_is_valid(tag);
             }            
         } break;        
         
@@ -185,8 +185,8 @@ extern uint16_t eoprot_ep_as_variables_numberof_Get(eOprotBRD_t brd)
         return(0);
     }
     
-    num = eoprot_ep_as_strain_tags_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain] +
-          eoprot_ep_as_mais_tags_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_mais];
+    num = eoprot_ep_as_tags_strain_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain] +
+          eoprot_ep_as_tags_mais_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_mais];
           
     return(num);
 }
@@ -202,21 +202,21 @@ extern eOprotID_t eoprot_ep_as_variable_idfromprognumber_Get(eOprotBRD_t brd, ui
         return(0);
     }
     
-    uint16_t progsinstrains = eoprot_ep_as_strain_tags_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain];
-    uint16_t progsinmaises = eoprot_ep_as_mais_tags_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_mais];
+    uint16_t progsinstrains = eoprot_ep_as_tags_strain_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain];
+    uint16_t progsinmaises = eoprot_ep_as_tags_mais_numberof * s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_mais];
     
     if((0 != progsinstrains) && (prog < (progsinstrains)))
     {   // entity is eoas_entity_strain 
         entity  = eoas_entity_strain;
-        index   = prog / eoprot_ep_as_strain_tags_numberof;       // eoprot_ep_as_strain_tags_numberof cannot be zero if progsinstrains is non-zero
-        tag     = prog % eoprot_ep_as_strain_tags_numberof;        
+        index   = prog / eoprot_ep_as_tags_strain_numberof;       // eoprot_ep_as_tags_strain_numberof cannot be zero if progsinstrains is non-zero
+        tag     = prog % eoprot_ep_as_tags_strain_numberof;        
     }
     else if((0 != progsinmaises) && (prog < (progsinstrains + progsinmaises)))
     {   // entity is eoas_entity_mais 
         prog -= progsinstrains;
         entity  = eoas_entity_mais;
-        index   = prog / eoprot_ep_as_mais_tags_numberof;       // eoprot_ep_as_mais_tags_numberof cannot be zero if progsinmaises is non-zero
-        tag     = prog % eoprot_ep_as_mais_tags_numberof;                      
+        index   = prog / eoprot_ep_as_tags_mais_numberof;       // eoprot_ep_as_tags_mais_numberof cannot be zero if progsinmaises is non-zero
+        tag     = prog % eoprot_ep_as_tags_mais_numberof;                      
     }
     else
     {
@@ -242,13 +242,13 @@ extern uint16_t eoprot_ep_as_variable_progressivenumber_Get(eOprotBRD_t brd, eOp
     {
         case eoas_entity_strain: 
         {
-            prog = index*eoprot_ep_as_strain_tags_numberof + eoprot_ep_as_rom_get_prognum(id);
+            prog = index*eoprot_ep_as_tags_strain_numberof + eoprot_ep_as_rom_get_prognum(id);
         } break;
         
         case eoas_entity_mais: 
         {
-            prog = s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain]*eoprot_ep_as_strain_tags_numberof +
-                   index*eoprot_ep_as_mais_tags_numberof + eoprot_ep_as_rom_get_prognum(id);
+            prog = s_eoprot_ep_as_board_numberofeachentity[brd][eoas_entity_strain]*eoprot_ep_as_tags_strain_numberof +
+                   index*eoprot_ep_as_tags_mais_numberof + eoprot_ep_as_rom_get_prognum(id);
         } break; 
                 
         default:
@@ -378,14 +378,14 @@ static uint16_t s_eoprot_ep_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID_t id)
     return(offset);  
 }
 
-static eObool_t s_eoprot_ep_as_strain_tag_is_valid(eOprotTag_t tag)
+static eObool_t s_eoprot_ep_as_tag_strain_is_valid(eOprotTag_t tag)
 {   // in case of holes in tags ... change the code
-    return((tag < eoprot_ep_as_strain_tags_numberof)?(eobool_true):(eobool_false));
+    return((tag < eoprot_ep_as_tags_strain_numberof)?(eobool_true):(eobool_false));
 }
 
-static eObool_t s_eoprot_ep_as_mais_tag_is_valid(eOprotTag_t tag)
+static eObool_t s_eoprot_ep_as_tag_mais_is_valid(eOprotTag_t tag)
 {   // in case of holes in tags ... change the code  
-    return((tag < eoprot_ep_as_mais_tags_numberof)?(eobool_true):(eobool_false));
+    return((tag < eoprot_ep_as_tags_mais_numberof)?(eobool_true):(eobool_false));
 }
 
 

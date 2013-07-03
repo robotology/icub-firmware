@@ -63,12 +63,14 @@
 
 extern void eoprot_ep_sk_fun_INITIALISE(eOnvEP_t ep, void *ram);
 
+extern void eoprot_ep_sk_fun_INIT_skin_wholeitem(const EOnv* nv);
+extern void eoprot_ep_sk_fun_UPDT_skin_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_sk_fun_INIT_skin_config__sigmode(const EOnv* nv);
-extern void eoprot_ep_sk_fun_UPDT_skin_config__sigmode(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_sk_fun_INIT_skin_config_sigmode(const EOnv* nv);
+extern void eoprot_ep_sk_fun_UPDT_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes(const EOnv* nv);
-extern void eoprot_ep_sk_fun_UPDT_skin_status__arrayof10canframes(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_sk_fun_INIT_skin_status_arrayof10canframes(const EOnv* nv);
+extern void eoprot_ep_sk_fun_UPDT_skin_status_arrayof10canframes(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 

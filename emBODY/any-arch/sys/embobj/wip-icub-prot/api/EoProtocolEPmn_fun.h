@@ -64,17 +64,24 @@
 extern void eoprot_ep_mn_fun_INITIALISE(eOnvEP_t ep, void *ram);
 
 
-extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv);
-extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_mn_fun_INIT_comm_wholeitem(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_comm_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
+
+extern void eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds_ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd);
 
 extern void eoprot_ep_mn_fun_INIT_appl_config(const EOnv* nv);
 extern void eoprot_ep_mn_fun_UPDT_appl_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
+
+extern void eoprot_ep_mn_fun_INIT_appl_wholeitem(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_appl_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
+
 extern void eoprot_ep_mn_fun_INIT_appl_status(const EOnv* nv);
 extern void eoprot_ep_mn_fun_UPDT_appl_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state(const EOnv* nv);
-extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_mn_fun_INIT_appl_cmmnds_go2state(const EOnv* nv);
+extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 

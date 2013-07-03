@@ -64,48 +64,54 @@
 extern void eoprot_ep_as_fun_INITIALISE(eOnvEP_t ep, void *ram);
 
 
+extern void eoprot_ep_as_fun_INIT_strain_wholeitem(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
+
 extern void eoprot_ep_as_fun_INIT_strain_config(const EOnv* nv);
 extern void eoprot_ep_as_fun_UPDT_strain_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_config__mode(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_strain_config__mode(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_strain_config_mode(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_config__datarate(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_strain_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_strain_config_datarate(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_config__signaloncefullscale(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_strain_config__signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_strain_config_signaloncefullscale(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_config_signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd);
 
 extern void eoprot_ep_as_fun_INIT_strain_status(const EOnv* nv);
 extern void eoprot_ep_as_fun_UPDT_strain_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status__fullscale(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_strain_status__fullscale(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_strain_status_fullscale(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status_fullscale(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status__calibratedvalues(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_strain_status__calibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_strain_status_calibratedvalues(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status_calibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_strain_status__uncalibratedvalues(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_strain_status__uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_strain_status_uncalibratedvalues(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_strain_status_uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
 
+
+extern void eoprot_ep_as_fun_INIT_mais_wholeitem(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
 
 extern void eoprot_ep_as_fun_INIT_mais_config(const EOnv* nv);
 extern void eoprot_ep_as_fun_UPDT_mais_config(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_config__mode(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_mais_config__mode(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_mais_config_mode(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config_mode(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_config__datarate(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_mais_config__datarate(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_mais_config_datarate(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_config__resolution(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_mais_config__resolution(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_mais_config_resolution(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_config_resolution(const EOnv* nv, const eOropdescriptor_t* rd);
 
 extern void eoprot_ep_as_fun_INIT_mais_status(const EOnv* nv);
 extern void eoprot_ep_as_fun_UPDT_mais_status(const EOnv* nv, const eOropdescriptor_t* rd);
 
-extern void eoprot_ep_as_fun_INIT_mais_status__the15values(const EOnv* nv);
-extern void eoprot_ep_as_fun_UPDT_mais_status__the15values(const EOnv* nv, const eOropdescriptor_t* rd);
+extern void eoprot_ep_as_fun_INIT_mais_status_the15values(const EOnv* nv);
+extern void eoprot_ep_as_fun_UPDT_mais_status_the15values(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 

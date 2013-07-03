@@ -114,26 +114,36 @@ const eOsk_skin_t eoprot_ep_sk_rom_skin_defaultvalue =
 
 // - descriptors for the variables of a skin
 
-
-EOnv_rom_t eoprot_ep_sk_rom_skin_descriptor_config__sigmode =
+EOnv_rom_t eoprot_ep_sk_rom_descriptor_skin_wholeitem =
 {   
-    EO_INIT(.capacity)  sizeof(eoprot_ep_sk_rom_skin_defaultvalue.config.sigmode),
-    EO_INIT(.rwmode)    eoprot_ep_sk_skin_rwmode_config__sigmode,
+    EO_INIT(.capacity)  sizeof(eoprot_ep_sk_rom_skin_defaultvalue),
+    EO_INIT(.rwmode)    eoprot_ep_sk_rwmode_skin_wholeitem,
     EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_ep_sk_rom_skin_defaultvalue.config.sigmode,
-    EO_INIT(.init)      eoprot_ep_sk_fun_INIT_skin_config__sigmode,
-    EO_INIT(.update)    eoprot_ep_sk_fun_UPDT_skin_config__sigmode
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_sk_rom_skin_defaultvalue,
+    EO_INIT(.init)      eoprot_ep_sk_fun_INIT_skin_wholeitem,
+    EO_INIT(.update)    eoprot_ep_sk_fun_UPDT_skin_wholeitem
 };
 
 
-EOnv_rom_t eoprot_ep_sk_rom_skin_descriptor_status__arrayof10canframes =
+EOnv_rom_t eoprot_ep_sk_rom_descriptor_skin_config_sigmode =
+{   
+    EO_INIT(.capacity)  sizeof(eoprot_ep_sk_rom_skin_defaultvalue.config.sigmode),
+    EO_INIT(.rwmode)    eoprot_ep_sk_rwmode_skin_config_sigmode,
+    EO_INIT(.dummy)     0,    
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_sk_rom_skin_defaultvalue.config.sigmode,
+    EO_INIT(.init)      eoprot_ep_sk_fun_INIT_skin_config_sigmode,
+    EO_INIT(.update)    eoprot_ep_sk_fun_UPDT_skin_config_sigmode
+};
+
+
+EOnv_rom_t eoprot_ep_sk_rom_descriptor_skin_status_arrayof10canframes =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_sk_rom_skin_defaultvalue.status.arrayof10canframes),
-    EO_INIT(.rwmode)    eoprot_ep_sk_skin_rwmode_status__arrayof10canframes,
+    EO_INIT(.rwmode)    eoprot_ep_sk_rwmode_skin_status_arrayof10canframes,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_sk_rom_skin_defaultvalue.status.arrayof10canframes,
-    EO_INIT(.init)      eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes,
-    EO_INIT(.update)    eoprot_ep_sk_fun_UPDT_skin_status__arrayof10canframes
+    EO_INIT(.init)      eoprot_ep_sk_fun_INIT_skin_status_arrayof10canframes,
+    EO_INIT(.update)    eoprot_ep_sk_fun_UPDT_skin_status_arrayof10canframes
 };
 
 
@@ -145,11 +155,12 @@ EOnv_rom_t eoprot_ep_sk_rom_skin_descriptor_status__arrayof10canframes =
 
 const EOnv_rom_t * const eoprot_ep_sk_rom_folded_descriptors[] =
 {
-    // here are eoprot_ep_sk_skin_tags_numberof descriptors for the skins (equal for every skin)
-    &eoprot_ep_sk_rom_skin_descriptor_config__sigmode,
-    &eoprot_ep_sk_rom_skin_descriptor_status__arrayof10canframes
+    // here are eoprot_ep_sk_tags_skin_numberof descriptors for the skins (equal for every skin)
+    &eoprot_ep_sk_rom_descriptor_skin_wholeitem,
+    &eoprot_ep_sk_rom_descriptor_skin_config_sigmode,
+    &eoprot_ep_sk_rom_descriptor_skin_status_arrayof10canframes
          
-};  EO_VERIFYsizeof(eoprot_ep_sk_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_sk_skin_tags_numberof));
+};  EO_VERIFYsizeof(eoprot_ep_sk_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_sk_tags_skin_numberof));
 
 
 

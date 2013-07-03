@@ -68,30 +68,32 @@ enum { eoprot_ep_sk_entities_numberof = eosk_entities_numberof };
 // - definition of the skin
 
 
-/** @typedef    typedef enum eOprot_ep_sk_skin_tag_t
+/** @typedef    typedef enum eOprot_ep_sk_tag_skin_t
     @brief      It contains the tags for all variables in the skin endpoints.
                 See definition of eOsk_skin_t (and its fields) in file EoSkin.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_sk_skin_tag_config__sigmode                   = 0,
-    eoprot_ep_sk_skin_tag_status__arrayof10canframes        = 1
-} eOprot_ep_sk_skin_tag_t;
+    eoprot_ep_sk_tag_skin_wholeitem                                     = 0,
+    eoprot_ep_sk_tag_skin_config_sigmode                                = 1,
+    eoprot_ep_sk_tag_skin_status_arrayof10canframes                     = 2
+} eOprot_ep_sk_tag_skin_t;
 
-enum { eoprot_ep_sk_skin_tags_numberof = 2 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_sk_tags_skin_numberof = 3 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_sk_skin_rwmode_t
+/** @typedef    typedef enum eOprot_ep_sk_rwmode_skin_t
     @brief      It contains the function and type for all the network variables. There must be a one-to-one
-                correspondence to the values in eOprot_ep_sk_skin_tag_t.
+                correspondence to the values in eOprot_ep_sk_tag_skin_t.
  **/
 typedef enum
 {
-    eoprot_ep_sk_skin_rwmode_config__sigmode                = eo_nv_rwmode_RW,
-    eoprot_ep_sk_skin_rwmode_status__arrayof10canframes     = eo_nv_rwmode_RO
-} eOprot_ep_sk_skin_rwmode_t; 
+    eoprot_ep_sk_rwmode_skin_wholeitem                                  = eo_nv_rwmode_RO,
+    eoprot_ep_sk_rwmode_skin_config_sigmode                             = eo_nv_rwmode_RW,
+    eoprot_ep_sk_rwmode_skin_status_arrayof10canframes                  = eo_nv_rwmode_RO
+} eOprot_ep_sk_rwmode_skin_t; 
 
-enum { eoprot_ep_sk_skin_rwmodes_numberof = 2 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_sk_rwmodes_skin_numberof = 3 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints

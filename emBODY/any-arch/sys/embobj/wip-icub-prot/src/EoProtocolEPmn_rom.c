@@ -143,47 +143,68 @@ const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue =
 
 // - descriptors for the variables of a comm
 
-EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_cmmnds__ropsigcfg =
+EOnv_rom_t eoprot_ep_mn_rom_descriptor_comm_wholeitem =
+{   
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_comm_defaultvalue),
+    EO_INIT(.rwmode)    eoprot_ep_mn_rwmode_comm_wholeitem,
+    EO_INIT(.dummy)     0,    
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_comm_defaultvalue,
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_comm_wholeitem,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_comm_wholeitem
+};
+
+EOnv_rom_t eoprot_ep_mn_rom_descriptor_comm_cmmnds_ropsigcfg =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_comm_defaultvalue.cmmnds.ropsigcfg),
-    EO_INIT(.rwmode)    eoprot_ep_mn_comm_rwmode_cmmnds__ropsigcfg,
+    EO_INIT(.rwmode)    eoprot_ep_mn_rwmode_comm_cmmnds_ropsigcfg,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_comm_defaultvalue.cmmnds.ropsigcfg,
-    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg,
-    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_comm_cmmnds_ropsigcfg
 };
 
 
 // - descriptors for the variables of a appl
 
-EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_config =
+
+EOnv_rom_t eoprot_ep_mn_rom_descriptor_appl_wholeitem =
+{   
+    EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue),
+    EO_INIT(.rwmode)    eoprot_ep_mn_rwmode_appl_wholeitem,
+    EO_INIT(.dummy)     0,    
+    EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue,
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_wholeitem,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_wholeitem
+};
+
+EOnv_rom_t eoprot_ep_mn_rom_descriptor_appl_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue.config),
-    EO_INIT(.rwmode)    eoprot_ep_mn_appl_rwmode_config,
+    EO_INIT(.rwmode)    eoprot_ep_mn_rwmode_appl_config,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue.config,
     EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_config,
     EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_config
 };
 
-EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_status =
+EOnv_rom_t eoprot_ep_mn_rom_descriptor_appl_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue.status),
-    EO_INIT(.rwmode)    eoprot_ep_mn_appl_rwmode_status,
+    EO_INIT(.rwmode)    eoprot_ep_mn_rwmode_appl_status,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue.status,
     EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_status,
     EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_status
 };
 
-EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_cmmnds__go2state =
+EOnv_rom_t eoprot_ep_mn_rom_descriptor_appl_cmmnds_go2state =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_ep_mn_rom_appl_defaultvalue.cmmnds.go2state),
-    EO_INIT(.rwmode)    eoprot_ep_mn_appl_rwmode_cmmnds__go2state,
+    EO_INIT(.rwmode)    eoprot_ep_mn_rwmode_appl_cmmnds_go2state,
     EO_INIT(.dummy)     0,    
     EO_INIT(.resetval)  (const void*)&eoprot_ep_mn_rom_appl_defaultvalue.cmmnds.go2state,
-    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_cmmnds__go2state,
-    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state
+    EO_INIT(.init)      eoprot_ep_mn_fun_INIT_appl_cmmnds_go2state,
+    EO_INIT(.update)    eoprot_ep_mn_fun_UPDT_appl_cmmnds_go2state
 };
 
 
@@ -196,15 +217,17 @@ EOnv_rom_t eoprot_ep_mn_rom_comm_descriptor_cmmnds__go2state =
 
 const EOnv_rom_t * const eoprot_ep_mn_rom_folded_descriptors[] =
 {
-    // here are eoprot_ep_mn_comm_tags_numberof descriptors for the comms (equal for every comm)
-    &eoprot_ep_mn_rom_comm_descriptor_cmmnds__ropsigcfg,
+    // here are eoprot_ep_mn_tags_comm_numberof descriptors for the comms (equal for every comm)
+    &eoprot_ep_mn_rom_descriptor_comm_wholeitem,
+    &eoprot_ep_mn_rom_descriptor_comm_cmmnds_ropsigcfg,
 
-    // here are eoprot_ep_mn_appl_tags_numberof descriptors for the appls (equal for every appl)
-    &eoprot_ep_mn_rom_comm_descriptor_config,
-    &eoprot_ep_mn_rom_comm_descriptor_status,
-    &eoprot_ep_mn_rom_comm_descriptor_cmmnds__go2state
+    // here are eoprot_ep_mn_tags_appl_numberof descriptors for the appls (equal for every appl)
+    &eoprot_ep_mn_rom_descriptor_appl_wholeitem,
+    &eoprot_ep_mn_rom_descriptor_appl_config,
+    &eoprot_ep_mn_rom_descriptor_appl_status,
+    &eoprot_ep_mn_rom_descriptor_appl_cmmnds_go2state
          
-};  EO_VERIFYsizeof(eoprot_ep_mn_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_mn_comm_tags_numberof+eoprot_ep_mn_appl_tags_numberof));
+};  EO_VERIFYsizeof(eoprot_ep_mn_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_ep_mn_tags_comm_numberof+eoprot_ep_mn_tags_appl_numberof));
 
 
 
@@ -294,7 +317,7 @@ static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID_t i
         
         case eomn_entity_appl:
         {   // must add the number of vars in a comm
-            tag += eoprot_ep_mn_comm_tags_numberof; 
+            tag += eoprot_ep_mn_tags_comm_numberof; 
         } break;      
 
         default:

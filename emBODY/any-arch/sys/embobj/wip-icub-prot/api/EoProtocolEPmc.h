@@ -68,117 +68,113 @@ enum { eoprot_ep_mc_entities_numberof = eomc_entities_numberof };
 
 // - definition of the joint
 
-/** @typedef    typedef enum eOprot_ep_mc_joint_tag_t
+/** @typedef    typedef enum eOprot_ep_mc_tag_joint_t
     @brief      It contains the tags for all variables in a joint.
                 See definition of eOmc_joint_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_joint_tag_config                                      =  0,
-    eoprot_ep_mc_joint_tag_config__pidposition                         =  1,
-    eoprot_ep_mc_joint_tag_config__pidvelocity                         =  2,
-    eoprot_ep_mc_joint_tag_config__pidtorque                           =  3,
-    eoprot_ep_mc_joint_tag_config__impedance                           =  4,
-    eoprot_ep_mc_joint_tag_config__minpositionofjoint                  =  5,
-    eoprot_ep_mc_joint_tag_config__maxpositionofjoint                  =  6,
-    eoprot_ep_mc_joint_tag_config__velocitysetpointtimeout             =  7,
-    eoprot_ep_mc_joint_tag_config__motionmonitormode                   =  8,
-    eoprot_ep_mc_joint_tag_config__encoderconversionfactor             =  9,
-    eoprot_ep_mc_joint_tag_config__encoderconversionoffset             = 10,
-    
-    eoprot_ep_mc_joint_tag_status                                      = 11,
-    eoprot_ep_mc_joint_tag_status__basic                               = 12,
-    eoprot_ep_mc_joint_tag_status__ofpid                               = 13,
-    eoprot_ep_mc_joint_tag_status__chamaleon04                         = 14,
-    
-    eoprot_ep_mc_joint_tag_inputs                                      = 15,
-    eoprot_ep_mc_joint_tag_inputs__externallymeasuredtorque            = 16,    
-    
-    eoprot_ep_mc_joint_tag_cmmnds__calibration                         = 17,
-    eoprot_ep_mc_joint_tag_cmmnds__setpoint                            = 18,
-    eoprot_ep_mc_joint_tag_cmmnds__stoptrajectory                      = 19,
-    eoprot_ep_mc_joint_tag_cmmnds__controlmode                         = 20
-} eOprot_ep_mc_joint_tag_t;
+    eoprot_ep_mc_tag_joint_wholeitem                                    =  0,
+    eoprot_ep_mc_tag_joint_config                                       =  1,
+    eoprot_ep_mc_tag_joint_config_pidposition                           =  2,
+    eoprot_ep_mc_tag_joint_config_pidvelocity                           =  3,
+    eoprot_ep_mc_tag_joint_config_pidtorque                             =  4,
+    eoprot_ep_mc_tag_joint_config_impedance                             =  5,
+    eoprot_ep_mc_tag_joint_config_minpositionofjoint                    =  6,
+    eoprot_ep_mc_tag_joint_config_maxpositionofjoint                    =  7,
+    eoprot_ep_mc_tag_joint_config_velocitysetpointtimeout               =  8,
+    eoprot_ep_mc_tag_joint_config_motionmonitormode                     =  9,
+    eoprot_ep_mc_tag_joint_config_encoderconversionfactor               = 10,
+    eoprot_ep_mc_tag_joint_config_encoderconversionoffset               = 11,    
+    eoprot_ep_mc_tag_joint_status                                       = 12,
+    eoprot_ep_mc_tag_joint_status_basic                                 = 13,
+    eoprot_ep_mc_tag_joint_status_ofpid                                 = 14,
+    eoprot_ep_mc_tag_joint_status_chamaleon04                           = 15,    
+    eoprot_ep_mc_tag_joint_inputs                                       = 16,
+    eoprot_ep_mc_tag_joint_inputs_externallymeasuredtorque              = 17,       
+    eoprot_ep_mc_tag_joint_cmmnds_calibration                           = 18,
+    eoprot_ep_mc_tag_joint_cmmnds_setpoint                              = 19,
+    eoprot_ep_mc_tag_joint_cmmnds_stoptrajectory                        = 20,
+    eoprot_ep_mc_tag_joint_cmmnds_controlmode                           = 21
+} eOprot_ep_mc_tag_joint_t;
 
-enum { eoprot_ep_mc_joint_tags_numberof = 21 };  // it MUST be equal to the number of tags in a joint.      
+enum { eoprot_ep_mc_tags_joint_numberof = 22 };  // it MUST be equal to the number of tags in a joint.      
 
 
-/** @typedef    typedef enum eOprot_ep_mc_joint_rwmode_t
+/** @typedef    typedef enum eOprot_ep_mc_rwmode_joint_t
     @brief      It contains the rw mode for all the network variables in a joint. There must be a one-to-one
-                correspondence to the values in eOprot_ep_mc_joint_tag_t.
+                correspondence to the values in eOprot_ep_mc_tag_joint_t.
                 See definition of eOmc_joint_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_joint_rwmode_config                                   = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__pidposition                      = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__pidvelocity                      = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__pidtorque                        = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__impedance                        = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__minpositionofjoint               = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__maxpositionofjoint               = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__velocitysetpointtimeout          = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__motionmonitormode                = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__encoderconversionfactor          = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_config__encoderconversionoffset          = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_wholeitem                                 = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_joint_config                                    = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_pidposition                        = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_pidvelocity                        = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_pidtorque                          = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_impedance                          = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_minpositionofjoint                 = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_maxpositionofjoint                 = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_velocitysetpointtimeout            = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_motionmonitormode                  = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_encoderconversionfactor            = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_config_encoderconversionoffset            = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_status                                    = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_joint_status_basic                              = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_joint_status_ofpid                              = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_joint_status_chamaleon04                        = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_joint_inputs                                    = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_inputs_externallymeasuredtorque           = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_cmmnds_calibration                        = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_cmmnds_setpoint                           = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_cmmnds_stoptrajectory                     = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_joint_cmmnds_controlmode                        = eo_nv_rwmode_RW
+} eOprot_ep_mc_rwmode_joint_t;    
 
-    eoprot_ep_mc_joint_rwmode_status                                   = eo_nv_rwmode_RO,
-    eoprot_ep_mc_joint_rwmode_status__basic                            = eo_nv_rwmode_RO,
-    eoprot_ep_mc_joint_rwmode_status__ofpid                            = eo_nv_rwmode_RO,
-    eoprot_ep_mc_joint_rwmode_status__chamaleon04                      = eo_nv_rwmode_RO,
-
-    eoprot_ep_mc_joint_rwmode_inputs                                   = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_inputs__externallymeasuredtorque         = eo_nv_rwmode_RW,
-
-    eoprot_ep_mc_joint_rwmode_cmmnds__calibration                      = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_cmmnds__setpoint                         = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_cmmnds__stoptrajectory                   = eo_nv_rwmode_RW,
-    eoprot_ep_mc_joint_rwmode_cmmnds__controlmode                      = eo_nv_rwmode_RW
-} eOprot_ep_mc_joint_rwmode_t;    
-
-enum { eoprot_ep_mc_joint_rwmodes_numberof = 21 };  // it MUST be equal to the number of tags in a joint.  
+enum { eoprot_ep_mc_rwmodes_joint_numberof = 22 };  // it MUST be equal to the number of tags in a joint.  
 
 
 // - definition of the motor
 
 
-/** @typedef    typedef enum eOprot_ep_mc_motor_tag_t
+/** @typedef    typedef enum eOprot_ep_mc_tag_motor_t
     @brief      It contains the tags for all variables in a motor.
                 See definition of eOmc_joint_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_motor_tag_config                                    = 0,
-    eoprot_ep_mc_motor_tag_config__pidcurrent                        = 1,
-    eoprot_ep_mc_motor_tag_config__maxvelocityofmotor                = 2,
-    eoprot_ep_mc_motor_tag_config__maxcurrentofmotor                 = 3,
-    
-    eoprot_ep_mc_motor_tag_status                                    = 4,
-    eoprot_ep_mc_motor_tag_status__basic                             = 5,
-    eoprot_ep_mc_motor_tag_status__chamaleon04                       = 6
-} eOprot_ep_mc_motor_tag_t;
+    eoprot_ep_mc_tag_motor_wholeitem                                    = 0,
+    eoprot_ep_mc_tag_motor_config                                       = 1,
+    eoprot_ep_mc_tag_motor_config_pidcurrent                            = 2,
+    eoprot_ep_mc_tag_motor_config_maxvelocityofmotor                    = 3,
+    eoprot_ep_mc_tag_motor_config_maxcurrentofmotor                     = 4,    
+    eoprot_ep_mc_tag_motor_status                                       = 5,
+    eoprot_ep_mc_tag_motor_status_basic                                 = 6,
+    eoprot_ep_mc_tag_motor_status_chamaleon04                           = 7
+} eOprot_ep_mc_tag_motor_t;
 
-enum { eoprot_ep_mc_motor_tags_numberof = 7 };   // it MUST be equal to the number of tags in a motor.   
+enum { eoprot_ep_mc_tags_motor_numberof = 8 };   // it MUST be equal to the number of tags in a motor.   
 
 
-/** @typedef    typedef enum eOprot_ep_mc_motor_rwmode_t
+/** @typedef    typedef enum eOprot_ep_mc_rwmode_motor_t
     @brief      It contains the rw mode for all the network variables in a motor. There must be a one-to-one
-                correspondence to the values in eOprot_ep_mc_motor_tag_t.
+                correspondence to the values in eOprot_ep_mc_tag_motor_t.
                 See definition of eOmc_motor_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_motor_rwmode_config                                   = eo_nv_rwmode_RW,
-    eoprot_ep_mc_motor_rwmode_config__pidcurrent                       = eo_nv_rwmode_RW,
-    eoprot_ep_mc_motor_rwmode_config__maxvelocityofmotor               = eo_nv_rwmode_RW,
-    eoprot_ep_mc_motor_rwmode_config__maxcurrentofmotor                = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_motor_wholeitem                                 = eo_nv_rwmode_RO,    
+    eoprot_ep_mc_rwmode_motor_config                                    = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_motor_config_pidcurrent                         = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_motor_config_maxvelocityofmotor                 = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_motor_config_maxcurrentofmotor                  = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_motor_status                                    = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_motor_status_basic                              = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_motor_status_chamaleon04                        = eo_nv_rwmode_RO 
+} eOprot_ep_mc_rwmode_motor_t;  
 
-    eoprot_ep_mc_motor_rwmode_status                                   = eo_nv_rwmode_RO,
-    eoprot_ep_mc_motor_rwmode_status__basic                            = eo_nv_rwmode_RO,
-    eoprot_ep_mc_motor_rwmode_status__chamaleon04                      = eo_nv_rwmode_RO 
-} eOprot_ep_mc_motor_rwmode_t;  
-
-enum { eoprot_ep_mc_motor_rwmodes_numberof = 7 };   // it MUST be equal to the number of tags in a motor. 
+enum { eoprot_ep_mc_rwmodes_motor_numberof = 8 };   // it MUST be equal to the number of tags in a motor. 
 
 
 
@@ -186,38 +182,40 @@ enum { eoprot_ep_mc_motor_rwmodes_numberof = 7 };   // it MUST be equal to the n
 
 
 
-/** @typedef    typedef enum eOprot_ep_mc_controller_tag_t
+/** @typedef    typedef enum eOprot_ep_mc_tag_controller_t
     @brief      It contains the tags for all variables in a motor.
                 See definition of eOmc_controller_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-     eoprot_ep_mc_controller_tag_config                               = 0,
-     eoprot_ep_mc_controller_tag_config__durationofctrlloop           = 1,
-     eoprot_ep_mc_controller_tag_status                               = 2,
-     eoprot_ep_mc_controller_tag_status__alljomoinitted               = 3,
-     eoprot_ep_mc_controller_tag_cmmnds__go2stateofcontroller         = 4
-} eOprot_ep_mc_controller_tag_t;
+     eoprot_ep_mc_tag_controller_wholeitem                              = 0,
+     eoprot_ep_mc_tag_controller_config                                 = 1,
+     eoprot_ep_mc_tag_controller_config_durationofctrlloop              = 2,
+     eoprot_ep_mc_tag_controller_status                                 = 3,
+     eoprot_ep_mc_tag_controller_status_alljomoinitted                  = 4,
+     eoprot_ep_mc_tag_controller_cmmnds_go2stateofcontroller            = 5
+} eOprot_ep_mc_tag_controller_t;
 
-enum { eoprot_ep_mc_controller_tags_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
+enum { eoprot_ep_mc_tags_controller_numberof = 6 };  // it MUST be equal to the number of tags in a controller. 
 
 
-/** @typedef    typedef enum eOprot_ep_mc_controller_rwmode_t
+/** @typedef    typedef enum eOprot_ep_mc_rwmode_controller_t
     @brief      It contains the function and type for all the network variables in a controller. There must be a one-to-one
-                correspondence to the values in eOprot_ep_mc_controller_tag_t.
+                correspondence to the values in eOprot_ep_mc_tag_controller_t.
                 See definition of eOmc_controller_t (and its fields) in file EoMotionControl.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_mc_controller_rwmode_config                              = eo_nv_rwmode_RW,
-    eoprot_ep_mc_controller_rwmode_config__durationofctrlloop          = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_controller_wholeitem                            = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_controller_config                               = eo_nv_rwmode_RW,
+    eoprot_ep_mc_rwmode_controller_config_durationofctrlloop            = eo_nv_rwmode_RW,
 
-    eoprot_ep_mc_controller_rwmode_status                              = eo_nv_rwmode_RO,
-    eoprot_ep_mc_controller_rwmode_status__alljomoinitted              = eo_nv_rwmode_RO,
-    eoprot_ep_mc_controller_rwmode_cmmnds__go2stateofcontroller        = eo_nv_rwmode_RW
-} eOprot_ep_mc_controller_rwmode_t; 
+    eoprot_ep_mc_rwmode_controller_status                               = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_controller_status_alljomoinitted                = eo_nv_rwmode_RO,
+    eoprot_ep_mc_rwmode_controller_cmmnds_go2stateofcontroller          = eo_nv_rwmode_RW
+} eOprot_ep_mc_rwmode_controller_t; 
 
-enum { eoprot_ep_mc_controller_rwmodes_numberof = 5 };  // it MUST be equal to the number of tags in a controller. 
+enum { eoprot_ep_mc_rwmodes_controller_numberof = 6 };  // it MUST be equal to the number of tags in a controller. 
 
 
 // - structures implementing the endpoints

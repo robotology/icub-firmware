@@ -68,80 +68,84 @@ enum { eoprot_ep_as_entities_numberof = eoas_entities_numberof };
 // - definition of the strain
 
 
-/** @typedef    typedef enum eOprot_ep_as_strain_tag_t
-    @brief      It contains the tags for all variables in the analosensor endpoints.
+/** @typedef    typedef enum eOprot_ep_as_tag_strain_t
+    @brief      It contains the tags for all variables in the analog sensors endpoints.
                 See definition of eOas_strain_t (and its fields) in file EoAnalogSensors.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_as_strain_tag_config                            = 0,
-    eoprot_ep_as_strain_tag_config__mode                      = 1,
-    eoprot_ep_as_strain_tag_config__datarate                  = 2,
-    eoprot_ep_as_strain_tag_config__signaloncefullscale       = 3,
-    eoprot_ep_as_strain_tag_status                            = 4,
-    eoprot_ep_as_strain_tag_status__fullscale                 = 5,
-    eoprot_ep_as_strain_tag_status__calibratedvalues          = 6,
-    eoprot_ep_as_strain_tag_status__uncalibratedvalues        = 7
-} eOprot_ep_as_strain_tag_t;
+    eoprot_ep_as_tag_strain_wholeitem                                   = 0,
+    eoprot_ep_as_tag_strain_config                                      = 1,
+    eoprot_ep_as_tag_strain_config_mode                                 = 2,
+    eoprot_ep_as_tag_strain_config_datarate                             = 3,
+    eoprot_ep_as_tag_strain_config_signaloncefullscale                  = 4,
+    eoprot_ep_as_tag_strain_status                                      = 5,
+    eoprot_ep_as_tag_strain_status_fullscale                            = 6,
+    eoprot_ep_as_tag_strain_status_calibratedvalues                     = 7,
+    eoprot_ep_as_tag_strain_status_uncalibratedvalues                   = 8
+} eOprot_ep_as_tag_strain_t;
 
-enum { eoprot_ep_as_strain_tags_numberof = 8 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_as_tags_strain_numberof = 9 };  // it MUST be equal to the number of tags. 
 
 
 /** @typedef    typedef enum eOprot_ep_as_strain_rwmode_t
     @brief      It contains the function and type for all the network variables. There must be a one-to-one
-                correspondence to the values in eOprot_ep_as_strain_tag_t.
+                correspondence to the values in eOprot_ep_as_tag_strain_t.
  **/
 typedef enum
 {
-    eoprot_ep_as_strain_rwmode_config                         = eo_nv_rwmode_RW,
-    eoprot_ep_as_strain_rwmode_config__mode                   = eo_nv_rwmode_RW,
-    eoprot_ep_as_strain_rwmode_config__datarate               = eo_nv_rwmode_RW,
-    eoprot_ep_as_strain_rwmode_config__signaloncefullscale    = eo_nv_rwmode_RW,
-    eoprot_ep_as_strain_rwmode_status                         = eo_nv_rwmode_RO,
-    eoprot_ep_as_strain_rwmode_status__fullscale              = eo_nv_rwmode_RO,
-    eoprot_ep_as_strain_rwmode_status__calibratedvalues       = eo_nv_rwmode_RO,
-    eoprot_ep_as_strain_rwmode_status__uncalibratedvalues     = eo_nv_rwmode_RO    
+    eoprot_ep_as_strain_rwmode_wholeitem                                = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_config                                   = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_config_mode                              = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_config_datarate                          = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_config_signaloncefullscale               = eo_nv_rwmode_RW,
+    eoprot_ep_as_strain_rwmode_status                                   = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_status_fullscale                         = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_status_calibratedvalues                  = eo_nv_rwmode_RO,
+    eoprot_ep_as_strain_rwmode_status_uncalibratedvalues                = eo_nv_rwmode_RO    
 } eOprot_ep_as_strain_rwmode_t; 
 
-enum { eoprot_ep_as_strain_rwmodes_numberof = 8 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_as_rwmodes_strain_numberof = 9 };  // it MUST be equal to the number of tags. 
 
 
 
 // - definition of the mais
  
 
-/** @typedef    typedef enum eOprot_ep_as_mais_tag_t
+/** @typedef    typedef enum eOprot_ep_as_tag_mais_t
     @brief      It contains the tags for all variables in the analosensor .
                 See definition of eOas_mais_t (and its fields) in file EoAnalogSensors.h for explanation of the variables.
  **/
 typedef enum
 {
-    eoprot_ep_as_mais_tag_config                            = 0,
-    eoprot_ep_as_mais_tag_config__mode                      = 1,
-    eoprot_ep_as_mais_tag_config__datarate                  = 2,
-    eoprot_ep_as_mais_tag_config__resolution                = 3,
-    eoprot_ep_as_mais_tag_status                            = 4,
-    eoprot_ep_as_mais_tag_status__the15values               = 5
-} eOprot_ep_as_mais_tag_t;
+    eoprot_ep_as_tag_mais_wholeitem                                     = 0,
+    eoprot_ep_as_tag_mais_config                                        = 1,
+    eoprot_ep_as_tag_mais_config_mode                                   = 2,
+    eoprot_ep_as_tag_mais_config_datarate                               = 3,
+    eoprot_ep_as_tag_mais_config_resolution                             = 4,
+    eoprot_ep_as_tag_mais_status                                        = 5,
+    eoprot_ep_as_tag_mais_status_the15values                            = 6
+} eOprot_ep_as_tag_mais_t;
 
-enum { eoprot_ep_as_mais_tags_numberof = 6 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_as_tags_mais_numberof = 7 };  // it MUST be equal to the number of tags. 
 
 
-/** @typedef    typedef enum eOprot_ep_as_mais_rwmode_t
+/** @typedef    typedef enum eOprot_ep_as_rwmode_mais_t
     @brief      It contains the function and type for all the network variables. There must be a one-to-one
-                correspondence to the values in eOprot_ep_as_mais_tag_t.
+                correspondence to the values in eOprot_ep_as_tag_mais_t.
  **/
 typedef enum
 {
-    eoprot_ep_as_mais_rwmode_config                         = eo_nv_rwmode_RW,
-    eoprot_ep_as_mais_rwmode_config__mode                   = eo_nv_rwmode_RW,
-    eoprot_ep_as_mais_rwmode_config__datarate               = eo_nv_rwmode_RW,
-    eoprot_ep_as_mais_rwmode_config__resolution             = eo_nv_rwmode_RW,
-    eoprot_ep_as_mais_rwmode_status                         = eo_nv_rwmode_RO,
-    eoprot_ep_as_mais_rwmode_status__the15values            = eo_nv_rwmode_RO
-} eOprot_ep_as_mais_rwmode_t; 
+    eoprot_ep_as_rwmode_mais_wholeitem                                  = eo_nv_rwmode_RO,
+    eoprot_ep_as_rwmode_mais_config                                     = eo_nv_rwmode_RW,
+    eoprot_ep_as_rwmode_mais_config_mode                                = eo_nv_rwmode_RW,
+    eoprot_ep_as_rwmode_mais_config_datarate                            = eo_nv_rwmode_RW,
+    eoprot_ep_as_rwmode_mais_config_resolution                          = eo_nv_rwmode_RW,
+    eoprot_ep_as_rwmode_mais_status                                     = eo_nv_rwmode_RO,
+    eoprot_ep_as_rwmode_mais_status_the15values                         = eo_nv_rwmode_RO
+} eOprot_ep_as_rwmode_mais_t; 
 
-enum { eoprot_ep_as_mais_rwmodes_numberof = 6 };  // it MUST be equal to the number of tags. 
+enum { eoprot_ep_as_rwmodes_mais_numberof = 7 };  // it MUST be equal to the number of tags. 
 
 
 // - structures implementing the endpoints

@@ -46,7 +46,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-//#define OVERRIDE_eoprot_ep_sk_fun_INIT_skin_status__arrayof10canframes
+//#define OVERRIDE_eoprot_ep_sk_fun_INIT_skin_status_arrayof10canframes
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
