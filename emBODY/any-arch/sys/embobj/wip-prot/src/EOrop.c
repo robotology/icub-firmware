@@ -51,31 +51,24 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-#warning --> TODO in EOrop: (1) unifica eOropconfiguration_t, eOropconfig_t, e eOropctrl_t, (2) fare macro per uso esterno dei campi
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOropconfig_t eok_ropconfig_basic = 
-{
-    EO_INIT(.confrqst)      eobool_false,
-    EO_INIT(.timerqst)      eobool_false,
-    EO_INIT(.plussign)      eobool_false,
-    EO_INIT(.plustime)      eobool_false
-};
 
 
-const eOropconfiguration_t eok_ropconfiguration_basic =
+const eOropctrl_t eok_ropctrl_basic = 
 {
-    EO_INIT(.confrqst)      0,
-    EO_INIT(.timerqst)      0,
-    EO_INIT(.plussign)      0,
+    EO_INIT(.ffu)           0,
+    EO_INIT(.confinfo)      eo_ropconf_none,
     EO_INIT(.plustime)      0,
-    EO_INIT(.confirm)       eo_ropconf_none,
-    EO_INIT(.notused)       0
+    EO_INIT(.plussign)      0,
+    EO_INIT(.rqsttime)      0,
+    EO_INIT(.rqstconf)      0,
+    EO_INIT(.userdefn)      0
 };
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -218,7 +211,7 @@ extern uint8_t* eo_rop_GetROPdata(EOrop *p)
 }
 
 
-extern uint16_t eo_rop_ComputeSize(eOropconfig_t ropcfg, eOropcode_t ropc, uint16_t sizeofdata)
+extern uint16_t eo_rop_ComputeSize(eOropctrl_t ropctrl, eOropcode_t ropc, uint16_t sizeofdata)
 {
     uint16_t size = sizeof(eOrophead_t);
     eOrophead_t rophead = 
@@ -230,20 +223,20 @@ extern uint16_t eo_rop_ComputeSize(eOropconfig_t ropcfg, eOropcode_t ropc, uint1
         EO_INIT(.dsiz)  sizeofdata        
     };
 
-    if( (eo_ropcode_none == ropc) || (eo_ropcode_usr == ropc) )
+    if( (eo_ropcode_none == ropc) || (1 == ropctrl.userdefn) )
     {
         return(0);      
     }
     
 
-    
-    rophead.ctrl.ffu        = 0;
-    rophead.ctrl.confinfo   = eo_ropconf_none;
-    rophead.ctrl.plustime   = (eobool_true == ropcfg.plustime) ? (1) : (0);
-    rophead.ctrl.plussign   = (eobool_true == ropcfg.plussign) ? (1) : (0);
-    rophead.ctrl.rqsttime   = (eobool_true == ropcfg.timerqst) ? (1) : (0);
-    rophead.ctrl.rqstconf   = (eobool_true == ropcfg.confrqst) ? (1) : (0);
-    rophead.ctrl.userdefn   = 0;
+    memcpy(&rophead.ctrl, &ropctrl, sizeof(eOropctrl_t));
+//     rophead.ctrl.ffu        = 0;
+//     rophead.ctrl.confinfo   = eo_ropconf_none;
+//     rophead.ctrl.plustime   = (eobool_true == ropcfg.plustime) ? (1) : (0);
+//     rophead.ctrl.plussign   = (eobool_true == ropcfg.plussign) ? (1) : (0);
+//     rophead.ctrl.rqsttime   = (eobool_true == ropcfg.timerqst) ? (1) : (0);
+//     rophead.ctrl.rqstconf   = (eobool_true == ropcfg.confrqst) ? (1) : (0);
+//     rophead.ctrl.userdefn   = 0;
     
     
     if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
@@ -386,19 +379,20 @@ extern eOnvOwnership_t eo_rop_hid_GetOwnership(eOropcode_t ropc, eOropconfinfo_t
 
 extern void	eo_rop_hid_fill_ropdes(eOropdescriptor_t* ropdes, EOrop_stream_t* stream, uint16_t size, uint8_t* data)
 {
-		ropdes->configuration.confrqst 			= stream->head.ctrl.rqstconf;
-		ropdes->configuration.timerqst			= stream->head.ctrl.rqsttime;
-		ropdes->configuration.plussign			= stream->head.ctrl.plussign;
-		ropdes->configuration.plustime			= stream->head.ctrl.plustime;
-		ropdes->configuration.confirm     	    = stream->head.ctrl.confinfo;
-								
-		ropdes->ropcode			= stream->head.ropc; 
-		ropdes->ep			    = stream->head.endp;
-		ropdes->id			    = stream->head.nvid;
-		ropdes->size		    = size;
-		ropdes->data		    = data;
-		ropdes->signature		= stream->sign;
-		ropdes->time		    = stream->time;	
+//     ropdes->configuration.confrqst 			= stream->head.ctrl.rqstconf;
+//     ropdes->configuration.timerqst			= stream->head.ctrl.rqsttime;
+//     ropdes->configuration.plussign			= stream->head.ctrl.plussign;
+//     ropdes->configuration.plustime			= stream->head.ctrl.plustime;
+//     ropdes->configuration.confirm     	    = stream->head.ctrl.confinfo;
+    memcpy(&ropdes->control, &stream->head.ctrl, sizeof(eOropctrl_t)); 
+                            
+    ropdes->ropcode			= stream->head.ropc; 
+    ropdes->ep			    = stream->head.endp;
+    ropdes->id			    = stream->head.nvid;
+    ropdes->size		    = size;
+    ropdes->data		    = data;
+    ropdes->signature		= stream->sign;
+    ropdes->time		    = stream->time;	
 }
 
 

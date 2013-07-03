@@ -221,13 +221,20 @@ extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescripto
     eo_rop_Reset(rop);  
         
     // put in rophead all the options
-    rophead.ctrl.ffu        = 0;
-    rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
-    rophead.ctrl.plustime   = ropdescr->configuration.plustime;
-    rophead.ctrl.plussign   = ropdescr->configuration.plussign;
-    rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
-    rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
-    rophead.ctrl.userdefn   = 0;
+//     rophead.ctrl.ffu        = 0;
+//     rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
+//     rophead.ctrl.plustime   = ropdescr->configuration.plustime;
+//     rophead.ctrl.plussign   = ropdescr->configuration.plussign;
+//     rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
+//     rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
+//     rophead.ctrl.userdefn   = 0;
+    
+    memcpy(&rophead.ctrl, &ropdescr->control, sizeof(eOropctrl_t));
+    rophead.ctrl.confinfo   = eo_ropconf_none;  // cannot do a ack/ack
+    rophead.ctrl.ffu        = 0;                // it should be zero
+    rophead.ctrl.userdefn   = 0;                // it must be zero
+       
+    
     rophead.ropc            = ropdescr->ropcode;
     rophead.endp            = ropdescr->ep;
     rophead.nvid            = ropdescr->id;
@@ -273,10 +280,10 @@ extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescripto
     }
     
     // assign sign
-    rop->stream.sign = (1 == ropdescr->configuration.plussign) ? (ropdescr->signature) : (EOK_uint32dummy);
+    rop->stream.sign = (1 == ropdescr->control.plussign) ? (ropdescr->signature) : (EOK_uint32dummy);
 
     // assign time
-    rop->stream.time = (0 == ropdescr->configuration.plustime) ? (EOK_uint64dummy) : (eov_sys_LifeTimeGet(eov_sys_GetHandle()));
+    rop->stream.time = (0 == ropdescr->control.plustime) ? (EOK_uint64dummy) : (eov_sys_LifeTimeGet(eov_sys_GetHandle()));
 
     if(NULL != requiredbytes)
     {
@@ -354,13 +361,19 @@ extern eOresult_t eo_agent_OutROPinit(EOtheAgent *p, EOnvSet* nvset, eOipv4addr_
     eo_rop_Reset(rop);  
     
     // put in rophead all the options
-    rophead.ctrl.ffu        = 0;
-    rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
-    rophead.ctrl.plustime   = ropdescr->configuration.plustime;
-    rophead.ctrl.plussign   = ropdescr->configuration.plussign;
-    rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
-    rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
-    rophead.ctrl.userdefn   = 0;
+//     rophead.ctrl.ffu        = 0;
+//     rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
+//     rophead.ctrl.plustime   = ropdescr->configuration.plustime;
+//     rophead.ctrl.plussign   = ropdescr->configuration.plussign;
+//     rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
+//     rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
+//     rophead.ctrl.userdefn   = 0;
+    memcpy(&rophead.ctrl, &ropdescr->control, sizeof(eOropctrl_t)); 
+    rophead.ctrl.confinfo   = eo_ropconf_none;  // cannot do a ack/ack
+    rophead.ctrl.ffu        = 0;                // it should be 0
+    rophead.ctrl.userdefn   = 0;                // it must be 0
+    
+    
     rophead.ropc            = ropdescr->ropcode;
     rophead.endp            = ropdescr->ep;
     rophead.nvid            = ropdescr->id;
