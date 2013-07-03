@@ -196,15 +196,6 @@ __weak extern void eoprot_ep_mc_fun_INIT_joint_config__encoderconversionoffset(c
 __weak extern void eoprot_ep_mc_fun_UPDT_joint_config__encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config__des02FORstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_INIT_joint_config__des02FORstatuschamaleon04(const EOnv* nv) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd) {}
-#endif
-
   
 #warning --> when debug is over .... remove the initialisation of joint_status
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status)
@@ -334,13 +325,6 @@ __weak extern void eoprot_ep_mc_fun_INIT_motor_config__maxcurrentofmotor(const E
 __weak extern void eoprot_ep_mc_fun_UPDT_motor_config__maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_config__des02FORstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_INIT_motor_config__des02FORstatuschamaleon04(const EOnv* nv) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_ep_mc_fun_UPDT_motor_config__des02FORstatuschamaleon04)
-__weak extern void eoprot_ep_mc_fun_UPDT_motor_config__des02FORstatuschamaleon04(const EOnv* nv, const eOropdescriptor_t* rd) {}
-#endif
 
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_motor_status)
 __weak extern void eoprot_ep_mc_fun_INIT_motor_status(const EOnv* nv) {}
