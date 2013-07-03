@@ -94,7 +94,7 @@
 __weak extern void eoprot_ep_mc_fun_INITIALISE(eOnvEP_t ep, void *ram) {}
 #endif
 
-
+#warning --> when debug is over .... remove the initialisation of joint_config
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_config)
 __weak extern void eoprot_ep_mc_fun_INIT_joint_config(const EOnv* nv) // {}
     { memcpy(nv->ram, &eoprot_ep_mc_rom_joint_defaultvalue.config, sizeof(eoprot_ep_mc_rom_joint_defaultvalue.config)); }
@@ -206,7 +206,7 @@ __weak extern void eoprot_ep_mc_fun_UPDT_joint_config__des02FORstatuschamaleon04
 #endif
 
   
-
+#warning --> when debug is over .... remove the initialisation of joint_status
 #if !defined(OVERRIDE_eoprot_ep_mc_fun_INIT_joint_status)
 __weak extern void eoprot_ep_mc_fun_INIT_joint_status(const EOnv* nv) // {}
     { memcpy(nv->ram, &eoprot_ep_mc_rom_joint_defaultvalue.status, sizeof(eoprot_ep_mc_rom_joint_defaultvalue.status)); }
