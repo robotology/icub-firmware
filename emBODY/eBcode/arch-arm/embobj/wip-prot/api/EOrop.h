@@ -70,30 +70,31 @@ typedef uint8_t eOropcode_t;
 typedef enum
 {
     eo_ropcode_none         = 0,
-    eo_ropcode_usr          = 1,
-    eo_ropcode_ask          = 2,
-    eo_ropcode_say          = 3,
-    eo_ropcode_set          = 4,
-    eo_ropcode_sig          = 5,
-    eo_ropcode_rst          = 6
+    eo_ropcode_ask          = 1,
+    eo_ropcode_say          = 2,
+    eo_ropcode_set          = 3,
+    eo_ropcode_sig          = 4,
+    eo_ropcode_rst          = 5
 } eOropcodevalues_t;
 
-enum 
-{
-    eo_ropcodevalues_numberof = 7  
-};
+enum { eo_ropcodevalues_numberof = 6 };
 
 
-/** @typedef    typedef struct eOropconfig_t
-    @brief      eOropconfig_t contains the configuration for optional fields of a ROP.
+/** @typedef    typedef struct eOropctrl_t
+    @brief      eOropctrl_t contains the configuration for optional fields of a ROP. It is also used as first byte of a ROP.
  **/
 typedef struct
 {
-    eObool_t    confrqst;
-    eObool_t    timerqst;
-    eObool_t    plussign;
-    eObool_t    plustime;
-} eOropconfig_t;
+    uint8_t         ffu         : 1;        /**< it is the bit 0 of the first byte of the ROP and is not used so far */
+    uint8_t         confinfo    : 2;        /**< contains confirmation info. use eOropconfinfo_t */
+    uint8_t         plustime    : 1;        /**< if 1 the ROP has the time field of 8 bytes */
+    uint8_t         plussign    : 1;        /**< if 1 the ROP has the signature field of 4 bytes   */
+    uint8_t         rqsttime    : 1;        /**< if 1 the ROP requests that a reply shall have the time field */
+    uint8_t         rqstconf    : 1;        /**< if 1 the ROP requests that the received shall send confirmation */
+    uint8_t         userdefn    : 1;        /**< it is the bit 7 of the first byte of the ROP. It must be zero  */
+} eOropctrl_t;      EO_VERIFYsizeof(eOropctrl_t, 1);
+
+
 
 
 /** @typedef    typedef enum eOropconfinfo_t
@@ -117,20 +118,9 @@ typedef struct      // 06 bytes
 
 
 
-typedef struct
-{
-    uint8_t         confrqst    :1;
-    uint8_t         timerqst    :1;
-    uint8_t         plussign    :1;
-    uint8_t         plustime    :1;
-    uint8_t         confirm     :2;
-    uint8_t         notused     :2;
-} eOropconfiguration_t;
-
-
 typedef struct      // 24 bytes
 {
-    eOropconfiguration_t    configuration;      // 1B
+    eOropctrl_t             control;            // 1B
     eOropcode_t             ropcode;            // 1B
     eOnvEP_t                ep;                 // 2B
     eOnvID_t                id;                 // 2B
@@ -140,15 +130,15 @@ typedef struct      // 24 bytes
     uint64_t                time;               // 4B
 } eOropdescriptor_t;        //EO_VERIFYsizeof(eOropdescriptor_t, 24); 
 
+
 // the minimum size is just an header (e.g., the ask command)
 enum { eo_rop_minimumsize = 8 };
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOropconfig_t eok_ropconfig_basic; // = {.confrqst=eobool_false, .timerqst=eobool_false, .plussign= eobool_false, .plustime=eobool_false} 
 
-extern const eOropconfiguration_t eok_ropconfiguration_basic;
+extern const eOropctrl_t eok_ropctrl_basic; // no time, no sign, no conf request, no time request, ... nothing
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
@@ -188,7 +178,7 @@ extern eOropcode_t eo_rop_GetROPcode(EOrop *p);
 
 extern uint8_t* eo_rop_GetROPdata(EOrop *p);
 
-extern uint16_t eo_rop_ComputeSize(eOropconfig_t ropcfg, eOropcode_t ropc, uint16_t sizeofdata);
+extern uint16_t eo_rop_ComputeSize(eOropctrl_t ropctrl, eOropcode_t ropc, uint16_t sizeofdata);
 
 extern eOropcode_t eo_rop_ropcode_Get(EOrop *p);
 

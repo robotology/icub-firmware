@@ -50,16 +50,16 @@ extern "C" {
 
 
 
-typedef struct
-{
-    uint8_t         ffu         : 1;
-    uint8_t         confinfo    : 2;       
-    uint8_t         plustime    : 1;
-    uint8_t         plussign    : 1;
-    uint8_t         rqsttime    : 1;
-    uint8_t         rqstconf    : 1;
-    uint8_t         userdefn    : 1; 
-} eOropctrl_t;      EO_VERIFYsizeof(eOropctrl_t, 1);
+// typedef struct
+// {
+//     uint8_t         ffu         : 1;
+//     uint8_t         confinfo    : 2;       
+//     uint8_t         plustime    : 1;
+//     uint8_t         plussign    : 1;
+//     uint8_t         rqsttime    : 1;
+//     uint8_t         rqstconf    : 1;
+//     uint8_t         userdefn    : 1; 
+// } eOropctrl_t;      EO_VERIFYsizeof(eOropctrl_t, 1);
 
 
 typedef struct
@@ -144,7 +144,7 @@ EO_extern_inline uint16_t eo_rop_hid_DataField_EffectiveSize(uint16_t ropdatasiz
 
 EO_extern_inline eObool_t eo_rop_hid_ropcode_is_valid(uint8_t bytewithropcode)
 {
-    if((bytewithropcode >= (uint8_t)eo_ropcodevalues_numberof) || (bytewithropcode == (uint8_t)eo_ropcode_none) || ((bytewithropcode == (uint8_t)eo_ropcode_usr)))
+    if((bytewithropcode >= (uint8_t)eo_ropcodevalues_numberof) || (bytewithropcode == (uint8_t)eo_ropcode_none))
     {
         return(eobool_false);
     }

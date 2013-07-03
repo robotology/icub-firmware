@@ -72,7 +72,7 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOtheFormer";
+//static const char s_eobj_ownname[] = "EOtheFormer";
  
 static EOtheFormer eo_theformer = 
 {
@@ -153,10 +153,6 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
     // thus we dont check too much. we just dont process eo_ropcode_none and eo_ropcode_usr
     if(eobool_false == eo_rop_hid_ropcode_is_valid(rop->stream.head.ropc))
     {
-        if(eo_ropcode_usr == rop->stream.head.ropc)
-        {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "doesnt support user defined ropc");
-        }
         return(eores_NOK_generic); 
     }
 
