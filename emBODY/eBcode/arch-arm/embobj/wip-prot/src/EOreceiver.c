@@ -139,6 +139,7 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
     eOipv4addr_t remipv4addr;
     eOipv4port_t remipv4port;
     uint64_t rec_seqnum;
+    uint16_t numofprocessedrops = 0;
 
     
     if((NULL == p) || (NULL == packet)) 
@@ -146,15 +147,8 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
         return(eores_NOK_nullpointer);
     }
     
-    if(NULL != nvset)
-    {
-        nvset2use = nvset;
-    }
-    else
-    {
-        nvset2use = p->nvset;
-    }
-
+    nvset2use = (NULL != nvset) ? nvset : p->nvset;
+    
     if(NULL == nvset2use)
     {
         return(eores_NOK_nullpointer);
@@ -171,7 +165,6 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
     
    
     // then we assign them to the ones of the EOreceiver. by doing so we force the receive to accept packets from everyboby.
-
     //p->ipv4addr = remipv4addr;
     //p->ipv4port = remipv4port;
     
@@ -195,7 +188,9 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
         return(eores_NOK_generic);
     }
     
-    //check sequence number
+    
+    // check sequence number
+    
     rec_seqnum = eo_ropframe_seqnum_Get(p->ropframeinput);
     
     if(p->rx_seqnum == eok_uint64dummy)
@@ -216,55 +211,57 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
         }
         p->rx_seqnum = rec_seqnum;
     }
-    // for every rop inside with eo_ropframe_ROP_NumberOf() :
-    //nrops = eo_ropframe_ROP_NumberOf(p->ropframeinput);
-    // i have already verified validity of p->ropframeinput, thus i can use the quickversion
+    
+
     nrops = eo_ropframe_ROP_NumberOf_quickversion(p->ropframeinput);
     
     for(i=0; i<nrops; i++)
     {
         // - get the rop w/ eo_ropframe_ROP_Parse()
+              
+        // if we have a valid ropinput the following eo_ropframe_ROP_Parse() returns OK. 
+        // in all cases rxremainingbytes contains the number of bytes we still need to parse. in case of 
+        // unrecoverable error in the ropframe res is NOK and rxremainingbytes is 0.
         
         res = eo_ropframe_ROP_Parse(p->ropframeinput, p->ropinput, &rxremainingbytes);
+                
+        if(eores_OK == res)
+        {   // we have a valid ropinput
+            
+            numofprocessedrops++;
+             
+            // - use the agent w/ eo_agent_InpROPprocess() and retrieve the ropreply. 
+            //   we need to tell the agent what nvs database we are using and from where the rop is coming             
+            eo_agent_InpROPprocess(p->theagent, p->ropinput, nvset2use, remipv4addr, p->ropreply);
+            
+            // - if ropreply is ok w/ eo_rop_GetROPcode() then add it to ropframereply w/ eo_ropframe_ROP_Add()           
+            if(eo_ropcode_none != eo_rop_GetROPcode(p->ropreply))
+            {
+                res = eo_ropframe_ROP_Add(p->ropframereply, p->ropreply, NULL, NULL, &txremainingbytes);
+                
+                #if defined(USE_DEBUG_EORECEIVER)             
+                {   // DEBUG
+                    if(eores_OK != res)
+                    {
+                        p->DEBUG.lostreplies ++;
+                    }
+                }
+                #endif            
+            }
         
-        if(eores_OK != res)
+        }
+        
+        // we stop the decoding if rxremainingbytes has reached zero 
+        if(0 == rxremainingbytes)
         {
             break;
         }        
-        
-        // - use the agent w/ eo_agent_InpROPprocess() and retrieve the ropreply. 
-        //   we need to tell the agent what nvs database we are using and from where the rop is coming 
-        
-        eo_agent_InpROPprocess(p->theagent, p->ropinput, nvset2use, remipv4addr, p->ropreply);
-        
-        // - if ropreply is ok w/ eo_rop_GetROPcode() then add it to ropframereply w/ eo_ropframe_ROP_Add()
-        
-        if(eo_ropcode_none != eo_rop_GetROPcode(p->ropreply))
-        {
-            res = eo_ropframe_ROP_Add(p->ropframereply, p->ropreply, NULL, NULL, &txremainingbytes);
-            
-#if defined(USE_DEBUG_EORECEIVER)             
-            {   // DEBUG
-                if(eores_OK != res)
-                {
-                    p->DEBUG.lostreplies ++;
-                }
-            }
-#endif            
-        }
-        
-        // we keep on decoding eve if we cannot put a reply into the ropframe 
-        //if(0 == rxremainingbytes)
-        //{
-        //    break;
-        //}
-        
     }
 
     
     if(NULL != numberofrops)
     {
-        *numberofrops = nrops;
+        *numberofrops = numofprocessedrops;
     }
 
     // if any rop inside ropframereply w/ eo_ropframe_ROP_NumberOf() then sets thereisareply  

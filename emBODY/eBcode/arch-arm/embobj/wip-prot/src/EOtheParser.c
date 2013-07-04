@@ -107,7 +107,7 @@ extern EOtheParser * eo_parser_GetHandle(void)
 }
 
 
-extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, EOrop *rop, uint16_t *consumedbytes)
+extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, EOrop *rop, uint16_t *consumedbytes, eOparserResult_t *result)
 {   // this function requires the access to hidden types of EOrop
     eOrophead_t *rophead            = NULL;
     uint8_t     *ropdata            = NULL;
@@ -115,18 +115,26 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     uint16_t    dataeffectivesize   = 0; // multiple of four
     uint16_t    signeffectivesize   = 0;
     uint16_t    timeeffectivesize   = 0;
+    uint16_t    parsedropsize       = 0;
 
-    if((NULL == p) || (NULL == streamdata) || (NULL == rop) || (NULL == consumedbytes))
+    if((NULL == p) || (NULL == streamdata) || (NULL == rop) || (NULL == consumedbytes) || (NULL == result))
     {
+        if(NULL != result)
+        {
+            *result = eo_parser_res_nok_fatal;
+        }
         return(eores_NOK_nullpointer);
     }
 
     // reset return data: rop and consumed bytes
     eo_rop_Reset(rop);
     *consumedbytes = 0;
+    *result = eo_parser_res_ok;
 
     if(streamsize < eo_rop_minimumsize)
     {
+        *result = eo_parser_res_nok_nostreamdata;
+        *consumedbytes = streamsize;
         return(eores_NOK_generic);
     }
 
@@ -137,9 +145,11 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     roptail = roptail;  // there is this instruction to force roptail to have its correct value in debugger
 
     // check validity of ctrl
-    if(1 == rophead->ctrl.userdefn)
+    if(0 != rophead->ctrl.version)
     {
-       // not managed yet
+        // not managed yet
+        *result = eo_parser_res_nok_ropisillegal;    
+        *consumedbytes = streamsize;        
         return(eores_NOK_generic);
     }
 
@@ -147,36 +157,53 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     
     if(eobool_false == eo_rop_hid_ropcode_is_valid(rophead->ropc))
     {
+        *result = eo_parser_res_nok_ropisillegal;
+        *consumedbytes = streamsize;
         return(eores_NOK_generic);
     }
-
-
-
+    
+    // if the ropc requires data, the field datsize must be present
+    
     // some ropcodes also have a data field
-    if(eobool_true == eo_rop_hid_DataField_is_Present(rophead))
+    if(eobool_true == eo_rop_hid_DataField_is_Required(rophead))
     {
-        ropdata = (uint8_t*)(&streamdata[sizeof(eOrophead_t)]);
+        if(eobool_true == eo_rop_hid_DataField_is_Present(rophead))
+        {
+            ropdata = (uint8_t*)(&streamdata[sizeof(eOrophead_t)]);            
+        }
+        else
+        {   // the rop is not well formed
+            *result = eo_parser_res_nok_ropisillegal;
+            *consumedbytes = streamsize;
+            return(eores_NOK_generic);
+        }
     }
+    else
+    {
+        ropdata = NULL;
+    }
+
 
     // in case there is data field, verify it, and sets its effective length 
     // remember that size and info must occupy 4, 8, 12, etc bytes.
     if(NULL != ropdata)
-    {
-			
-        // at first we must be sure that the rop->stream can contain the data
-        if(rophead->dsiz > rop->stream.capacity)
-        {   // cannot handle the rop
-            return(eores_NOK_generic);
-        }			
-
-        // then we compute the effective size of data as the next multiple of four of dsiz
+    {        
+        // we compute the effective size of data as the next multiple of four of dsiz
         dataeffectivesize = eo_rop_hid_DataField_EffectiveSize(rophead->dsiz);
-
-        // the roptail is now after the bytes of the head and the bytes of the data
-        roptail = (uint8_t*)(&streamdata[sizeof(eOrophead_t) + dataeffectivesize]);
-   
+        
+        // we make a first verification of size whcih at least tell us if the roptail is inside the stream
+        if(streamsize < (sizeof(eOrophead_t) + dataeffectivesize))
+        {   // the rop is too big to be contained inside the stream
+            *result = eo_parser_res_nok_ropisillegal;
+            *consumedbytes = streamsize;
+            return(eores_NOK_generic);
+        }
+			
+        // the roptail is after the bytes of the head and the bytes of the data
+        roptail = (uint8_t*)(&streamdata[sizeof(eOrophead_t) + dataeffectivesize]);           
     }
 
+    
     // in case there is sign and/or time presence, then sets the correct sizes
 
     if(1 == rophead->ctrl.plussign)
@@ -188,18 +215,29 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     {
         timeeffectivesize = 8;
     }
+    
+    // the total size of the rop acording to info contained in the header is ...
+    parsedropsize = sizeof(eOrophead_t) + dataeffectivesize + signeffectivesize + timeeffectivesize;
 
-    // if we dont have enough bytes in the packet ... leave with an error
-    if(streamsize < (sizeof(eOrophead_t) + dataeffectivesize + signeffectivesize + timeeffectivesize))
-    {
-        // not enough bytes in the passed packet to keep the data sugegsted by the dsiz
+    // if we dont have enough bytes in the stream to accomodate  leave with an error
+    if(streamsize < parsedropsize)
+    {   // not enough bytes in the passed packet to keep the data suggested by the header
+        *result = eo_parser_res_nok_ropisillegal;
         *consumedbytes = streamsize;
         return(eores_NOK_generic);
     }
-
-    // else ... fill the rop w/ the acquired info
-
-    *consumedbytes = sizeof(eOrophead_t) + dataeffectivesize + signeffectivesize + timeeffectivesize;
+    
+    // verify if we can accomodate the parsed rop in our buffer
+    if(rop->stream.capacity < parsedropsize)
+    {   // cannot handle the parsed rop in the EOrop object
+        *result = eo_parser_res_nok_ropistoobig;
+        *consumedbytes = parsedropsize;       
+        return(eores_NOK_generic);
+    }			          
+    
+    // ok ... fill all info
+    *result = eo_parser_res_ok;
+    *consumedbytes = parsedropsize;
 
     // copy head
     memcpy(&rop->stream.head, rophead, sizeof(eOrophead_t));
@@ -208,7 +246,7 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     if(NULL != ropdata)
     {
         rop->stream.head.dsiz = rophead->dsiz;
-        memcpy(rop->stream.data, ropdata, rophead->dsiz);
+        memcpy(rop->stream.data, ropdata, dataeffectivesize);
     }
 		
     
@@ -225,14 +263,9 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     }  
     
 
-    // sets the ownership
-    // asfidanken
-    //rop->tmpdata.nvownership = eo_rop_hid_GetOwnership(rophead->ropc, (eOropconfinfo_t)rophead->ctrl.confinfo, eo_rop_dir_received);
-
     // prepare the ropdes
     eo_rop_hid_fill_ropdes(&rop->ropdes, &rop->stream, rop->stream.head.dsiz, rop->stream.data);
-				
-    
+				   
     return(eores_OK);
 }
 

@@ -60,13 +60,12 @@
 
 const eOropctrl_t eok_ropctrl_basic = 
 {
-    EO_INIT(.ffu)           0,
     EO_INIT(.confinfo)      eo_ropconf_none,
     EO_INIT(.plustime)      0,
     EO_INIT(.plussign)      0,
     EO_INIT(.rqsttime)      0,
     EO_INIT(.rqstconf)      0,
-    EO_INIT(.userdefn)      0
+    EO_INIT(.version)       0
 };
 
 
@@ -142,9 +141,6 @@ extern eOresult_t eo_rop_Reset(EOrop *p)
     
     memset(&p->ropdes, 0, sizeof(eOropdescriptor_t));
     
-    // - tmpdata --------------------------------------------------------------------
-// asfidanken    
-//    memset(&p->tmpdata, 0, sizeof(EOrop_tmpdata_t));
 			
 
     return(eores_OK);
@@ -169,11 +165,13 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
     rop_o = s_eo_rop_prepare_reply(p, replyrop);
 
     // also ... filter out the operations that we cannot surely perform, such any operation on a not-existing nv
-		// or as a write on a ro var etc
+    // or as a write on a ro var etc
     if(eobool_true == s_eo_rop_cannot_manage(p))
     {
         return(eores_OK);
     }
+    
+    // we are in here only if the var exists and the operation can be done
 
 // #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)    
 //     eo_nv_hid_OnBefore_ROP(&p->netvar, (eOropcode_t)p->stream.head.ropc, p->stream.time, p->sign);
@@ -218,25 +216,18 @@ extern uint16_t eo_rop_ComputeSize(eOropctrl_t ropctrl, eOropcode_t ropc, uint16
     {
         EO_INIT(.ctrl)  0,
         EO_INIT(.ropc)  ropc,
+        EO_INIT(.dsiz)  sizeofdata,           
         EO_INIT(.endp)  0,
-        EO_INIT(.nvid)  0,
-        EO_INIT(.dsiz)  sizeofdata        
+        EO_INIT(.nvid)  0,     
     };
 
-    if( (eo_ropcode_none == ropc) || (1 == ropctrl.userdefn) )
+    if( (eo_ropcode_none == ropc) || (0 != ropctrl.version) )
     {
         return(0);      
     }
     
 
     memcpy(&rophead.ctrl, &ropctrl, sizeof(eOropctrl_t));
-//     rophead.ctrl.ffu        = 0;
-//     rophead.ctrl.confinfo   = eo_ropconf_none;
-//     rophead.ctrl.plustime   = (eobool_true == ropcfg.plustime) ? (1) : (0);
-//     rophead.ctrl.plussign   = (eobool_true == ropcfg.plussign) ? (1) : (0);
-//     rophead.ctrl.rqsttime   = (eobool_true == ropcfg.timerqst) ? (1) : (0);
-//     rophead.ctrl.rqstconf   = (eobool_true == ropcfg.confrqst) ? (1) : (0);
-//     rophead.ctrl.userdefn   = 0;
     
     
     if(eobool_true == eo_rop_hid_DataField_is_Required(&rophead))
@@ -299,12 +290,11 @@ extern EOnv* eo_rop_hid_NV_Get(EOrop *p)
 // used when the rop is already built or when we already have a valid head from a stream
 extern eObool_t eo_rop_hid_DataField_is_Present(const eOrophead_t *head)
 {
-    //return( (0 != head->dsiz) ? (eobool_true) : (eobool_false));
-    return(eo_rop_hid_DataField_is_Required(head));
+    return( (0 != head->dsiz) ? (eobool_true) : (eobool_false));
 }
 
 
-// used when it is necessary to build a rop to transmit and teh dsiz field is not yet assigned
+// used when it is necessary to build a rop to transmit and the dsiz field is not yet assigned
 extern eObool_t eo_rop_hid_DataField_is_Required(const eOrophead_t *head)
 {
     eObool_t ret = eobool_false;
@@ -419,10 +409,10 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
         if(1 == ropin->stream.head.ctrl.rqstconf)
         {
             r = ropout;
-            r->stream.head.ctrl.confinfo 	        = eo_ropconf_nak;
+            r->stream.head.ctrl.confinfo 	        = eo_ropconf_nak;            
+            r->stream.head.dsiz 					= 0;
             r->stream.head.endp 					= ropin->stream.head.endp;
             r->stream.head.ropc 					= ropin->stream.head.ropc;
-            r->stream.head.dsiz 					= 0;
         }
         else
         {
@@ -453,21 +443,14 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
     // now we complete the reply
     if(NULL != r)
     {
-// asfidanken        
-//        #warning --> maybe we dont need to fill the tmpdata fields
-//        r->tmpdata.nvscfg              = ropin->tmpdata.nvscfg;
         // but we surely assign the same netvar, as the reply is about the very same netvar
         memcpy(&r->netvar, &ropin->netvar, sizeof(EOnv));
 
-
-        //r->head.ctrl.userdef = 0;
-        //r->head.ctrl.rqstconf = 0;
-        //r->head.ctrl.rqsttime= 0;
         r->stream.head.ctrl.plussign = ropin->stream.head.ctrl.plussign;
         r->stream.head.ctrl.plustime = ropin->stream.head.ctrl.rqsttime;
         
+        r->stream.head.dsiz = 0; // if it must be non-zero then some function shall fill it        
         r->stream.head.endp = ropin->stream.head.endp;
-        r->stream.head.dsiz = 0; // if it must be non-zero then some function shall fill it
         r->stream.head.nvid = ropin->stream.head.nvid;
 
         // nvid was filled earlier in this function
@@ -572,7 +555,14 @@ static void s_eo_rop_exec_on_it(EOrop *rop_in, EOrop *rop_o)
                 
                 // get the data to be set and its size.
                 source = rop_in->stream.data;
-                res = eo_nv_hid_SetROP(thenv, source, eo_nv_upd_ifneeded, theropdes);
+                if(rop_in->stream.head.dsiz == thenv->rom->capacity)
+                {
+                    res = eo_nv_hid_SetROP(thenv, source, eo_nv_upd_ifneeded, theropdes);
+                }
+                else
+                {   // if the rop is badly formed we dont write ...
+                    res = eores_NOK_generic;
+                }
             }
 
 
@@ -581,7 +571,6 @@ static void s_eo_rop_exec_on_it(EOrop *rop_in, EOrop *rop_o)
             if(eores_OK == res)  
             {                
                 // mark the ropcode of the reply (if any) to be ack
-                // for pkd data of type mix, we send an ack if at least one netvar is writeable.
                 if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
                 {
                     rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
@@ -647,166 +636,6 @@ static void s_eo_rop_exec_on_it(EOrop *rop_in, EOrop *rop_o)
 
 }
 
-// - oldies
-
-// static void s_eo_rop_received_leaf_exec_on_it(EOrop *rop_in, EOrop *rop_o)
-// {
-//     eOresult_t res = eores_NOK_generic;
-//     const uint8_t *source = NULL;
-//     uint8_t *destin = NULL;
-//     uint16_t size = 0;
-//     EOnv *thenv = NULL;
-
-//     thenv = &rop_in->netvar;
-
-
-//     switch(rop_in->stream.head.ropc)
-//     {
-//         case eo_ropcode_set:
-//         case eo_ropcode_rst:
-//         {   // the receiver owns the nv locally
-
-//             // in here we manage operations which ask to write a value into the netvar.
-//             // the value can be contained in the data field of the remote operation (set)
-//             // or can be taken from a constant local memory location (rst).
-//             // the destination is always a ram location and in addition can also be an eeprom location.
-//             // the writing operation is done only if the netvar has writeable properties.
-//             // we have a reply rop only if there is an explicit ack/nak request
-//             // also ... for updateable netvars (in our case vars out), we also call the update function to propagate
-//             // the value to the peripheral
-
-
-//             // get the source and increment its index. also get the size of the the source.
-//             // the size is always the capacity stored in the thenv except for set when typ is arr-m, where m is
-//             // stored in the first two bytes of payload and size is 2 + m.
-//             // dont use rop_in->datasize as it does not work for nested data
-
-//             if(eo_ropcode_rst == rop_in->stream.head.ropc)
-//             {   // rst
-
-//                 // just reset the thenv without forcing anything.
-//                 res = eo_nv_ResetTS(thenv, eobool_false, eo_nv_upd_ifneeded, rop_in->stream.time, rop_in->stream.sign); //eObool_t forcerst,           
-//             
-//                 // and dont increment the progressive index of rop_in because reset does not have any payload
-//             }
-//             else 
-//             {   // set
-//                 
-//                 // get the data to be set and its size.
-//                 source = rop_in->stream.data;
-
-//                 // set the thenv to the value without forcing anything
-//                 res = eo_nv_SetTS(thenv, source, eobool_false, eo_nv_upd_ifneeded, rop_in->stream.time, rop_in->stream.sign); //eObool_t forceset,
-
-//                 // and increment the progressive index even if the source was not written to destination
-//                 // (the reason is that the sender can fill the packet with data that can be read-only)
-// //                size = eo_nv_Size(thenv, source);
-// //                rop_in->aboutdata.index += size;
-//             }
-
-
-//             // if any set or rst was succesful, ... fill a possible reply 
-
-//             if(eores_OK == res)  
-//             {                
-//                 // mark the ropcode of the reply (if any) to be ack
-//                 // for pkd data of type mix, we send an ack if at least one netvar is writeable.
-//                 if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
-//                 {
-//                     rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
-//                 } 
-//             }
-
-//         } break;
-
-
-//         case eo_ropcode_upd:
-//         {   // the receiver owns the nv locally
-
-//             // in here we manage an operation which ask to refresh the ram value of the netvar (if input) or to
-//             // move its value to the peripheral (if ouput).
-//             // we can do that only if the netvar is updateable: input or output.
-//             // for an input variable this operation means to get the value of the peripheral and copy into ram value
-//             // for an output variable it is instead required to refresh the value of the peripheral using the ram value.
-//             // these operations are done using the update() function, to which we give every responsibility
-//             // we have a reply rop only if there is an explicit ack/nak request.
-
-//             res = eo_nv_Update(thenv);
-
-//             if(eores_OK == res)
-//             {
-//                 if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o))
-//                 {
-//                     rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
-//                 } 
-//             }
-
-//         } break; 
-//         
-//         
-//         case eo_ropcode_ask:
-//         {   // the receiver owns the nv locally
-//             
-//             // in here we manage operations which ask to retrieve the value of the netvar and to create a reply rop.
-//             // the value for reply rop is taken from ram
-
-
-
-//             // we use datasize and not the progressive index because by doing so we update the rop_o as soon as we write
-//             destin = rop_o->stream.data;
-
-//             eo_nv_Get(thenv, eo_nv_strg_volatile, destin, &size);
-
-//             // datasize is incremented by size. 
-//             // size is always equal to the capacity except for netvar of type arr-m,
-//             // for which m is contained in the first two bytes of the data and size is 2 + m. 
-//             rop_o->stream.head.dsiz += size;
-
-
-//             // never mark it as a nak or ack, even if we received the confirmation request.
-//             // the confirmation is the reply message itself 
-//             rop_o->stream.head.ctrl.confinfo = eo_ropconf_none;
-
-//         } break; 
-//                      
-
-//         case eo_ropcode_sig:
-//         case eo_ropcode_say:
-//         {   // the receiver owns the nv remotely.
-
-
-//             // in here we need to copy the received data into the volatile data of the netvar.
-//             // then, the processing of such data is done in the appropriate update(), fn_update() or fn_after_rop() function 
-//     
-
-
-//             // force write also if an input, force update. we never do storage on eeprom just because remote nvs shall not
-//             // have valid eeprom addresses
-//             source = rop_in->stream.data;
-//             eo_nv_remoteSetTS(thenv, source, eo_nv_upd_always, rop_in->stream.time, rop_in->stream.sign);
-
-//             // i increment the progressive index of the rop_in
-// //            size = eo_nv_Size(thenv, source);
-// //            rop_in->aboutdata.index += size;
-
-
-//             // in here we manage the case in which the sig message that we have received required an ack.
-//             if((1 == rop_in->stream.head.ctrl.rqstconf) && (NULL != rop_o) && (eo_ropcode_sig == rop_in->stream.head.ropc))
-//             {
-//                 rop_o->stream.head.ctrl.confinfo = eo_ropconf_ack;
-//             } 
-//           
-
-//         } break;
-
-//                   
-//         default:
-//         {
-//         } break;
-//     }
-
-
-// }
 
 
 // --------------------------------------------------------------------------------------------------------------------

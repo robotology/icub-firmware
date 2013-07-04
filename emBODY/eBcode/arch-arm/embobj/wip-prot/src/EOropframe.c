@@ -26,6 +26,9 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheParser.h"
 #include "EOtheFormer.h"
+#include "EOtheErrorManager.h"
+
+#include "EOrop_hid.h"
 
 
 
@@ -107,7 +110,7 @@ static void s_eo_ropframe_footer_adjust(EOropframe *p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOropframe";
+static const char s_eobj_ownname[] = "EOropframe";
 
 //static const uint16_t s_eo_ropframe_minimum_framesize = eo_ropframe_sizeforZEROrops;
 //(sizeof(EOropframeHeader_t)+sizeof(EOropframeFooter_t));
@@ -329,19 +332,24 @@ extern eOresult_t eo_ropframe_ROP_Parse(EOropframe *p, EOrop *rop, uint16_t *unp
     eOresult_t res = eores_NOK_generic;
     uint16_t unparsed = 0;
     uint8_t * ropstream = NULL;
+    eOparserResult_t parsres = eo_parser_res_ok;
     
     if((NULL == p) || (NULL == rop)) 
     {
         return(eores_NOK_nullpointer);
     }
-    
-    // dont go on if the rops are all retrieved.
+        
     unparsed = s_eo_ropframe_sizeofrops_get(p) - p->index2nextrop2beparsed;
     
     if(0 == unparsed)
     {
         // cannot parse anymore ...
         eo_rop_Reset(rop);
+
+        if(NULL != unparsedbytes)
+        {
+            *unparsedbytes = 0;
+        }        
         return(eores_NOK_generic);
     }
     
@@ -350,19 +358,24 @@ extern eOresult_t eo_ropframe_ROP_Parse(EOropframe *p, EOrop *rop, uint16_t *unp
     ropstream = s_eo_ropframe_rops_get(p);
     ropstream += p->index2nextrop2beparsed;
    
-    // this function fills the rop only if everything is ok. it returns error if the packet is not big enough or if it keeps non-valid data
-    res = eo_parser_GetROP(eo_parser_GetHandle(), ropstream, unparsed, rop, &consumedbytes);
+    // this function fills the rop only if everything is ok. it returns error if it cannot prepare a valid rop
+    // in consumedbytes it tells how many bytes it has used. in some case if the ropstream is strongly illegal
+    // an it cannot go to next rop, consumedbytes is equal to unparsed, so that we have to quit.
+    res = eo_parser_GetROP(eo_parser_GetHandle(), ropstream, unparsed, rop, &consumedbytes, &parsres);
     
     if(eores_OK != res)
     {
-        eo_rop_Reset(rop);
-        p->index2nextrop2beparsed = s_eo_ropframe_sizeofrops_get(p);
-        if(NULL != unparsedbytes)
+        if(eores_NOK_nullpointer == res)
         {
-            *unparsedbytes = 0;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "eo_ropframe_ROP_Parse() called w/ NULL params");          
         }
+       
+        eo_rop_Reset(rop);
         
-        return(eores_NOK_generic);
+        // for all errors the parser tells us how many bytes consume. 
+        // they may be those of the single rop or also those of the entire stream.  
+
+        // put in here diagnostics of parsing error ?
     }
     
     // advance the internal index2nextrop2beparsed
@@ -374,9 +387,9 @@ extern eOresult_t eo_ropframe_ROP_Parse(EOropframe *p, EOrop *rop, uint16_t *unp
         *unparsedbytes = s_eo_ropframe_sizeofrops_get(p) - p->index2nextrop2beparsed;
     }
 
-    // then ... returns ok.
+    // then ... returns the result: OK or NOK.
 
-    return(eores_OK);
+    return(res);
 }
 
 extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t* addedinpos, uint16_t* consumedbytes, uint16_t *remainingbytes)
@@ -392,8 +405,8 @@ extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t*
         return(eores_NOK_nullpointer);
     }
      
-    // verify that the rop has a valid ropcode ...
-    if(eo_ropcode_none == eo_rop_GetROPcode((EOrop*)rop))
+    // verify that the rop is valid
+    if(eobool_false == eo_rop_hid_is_valid((EOrop*)rop))
     {
         return(eores_NOK_generic);
     }

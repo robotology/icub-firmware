@@ -180,10 +180,7 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
     {   // we have a normal rop to be processed with eo_ropconf_none
         eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropc, eo_ropconf_none, eo_rop_dir_received); // local if we receive a set/get. remote if we receive a sig
         
-        // asfidanken
-        //ropin->tmpdata.nvset = nvset;
-        //ropin->tmpdata.nvownership = ownership;
-        
+
         res = eo_nvset_NVget(   nvset, /*ropin->tmpdata.nvset,*/ 
                                 (eo_nv_ownership_local == ownership) ? (eok_ipv4addr_localhost) : (fromipaddr),
                                 ropin->stream.head.endp, ropin->stream.head.nvid,  
@@ -195,7 +192,6 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
             eo_nv_Clear(&ropin->netvar);    
         }
         
-
         // process the rop even if the netvar is not found (res is not eores_OK)
         // because we may need to send back a nack. 
         eo_rop_Process(ropin, replyrop);
@@ -231,8 +227,7 @@ extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescripto
     
     memcpy(&rophead.ctrl, &ropdescr->control, sizeof(eOropctrl_t));
     rophead.ctrl.confinfo   = eo_ropconf_none;  // cannot do a ack/ack
-    rophead.ctrl.ffu        = 0;                // it should be zero
-    rophead.ctrl.userdefn   = 0;                // it must be zero
+    rophead.ctrl.version    = 0;                // it must be zero
        
     
     rophead.ropc            = ropdescr->ropcode;

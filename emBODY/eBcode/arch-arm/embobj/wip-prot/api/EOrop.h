@@ -85,13 +85,12 @@ enum { eo_ropcodevalues_numberof = 6 };
  **/
 typedef struct
 {
-    uint8_t         ffu         : 1;        /**< it is the bit 0 of the first byte of the ROP and is not used so far */
-    uint8_t         confinfo    : 2;        /**< contains confirmation info. use eOropconfinfo_t */
+    uint8_t         confinfo    : 2;        /**< it is formed by bits 0 and 1. it contains confirmation info as ine eOropconfinfo_t */
     uint8_t         plustime    : 1;        /**< if 1 the ROP has the time field of 8 bytes */
     uint8_t         plussign    : 1;        /**< if 1 the ROP has the signature field of 4 bytes   */
     uint8_t         rqsttime    : 1;        /**< if 1 the ROP requests that a reply shall have the time field */
     uint8_t         rqstconf    : 1;        /**< if 1 the ROP requests that the received shall send confirmation */
-    uint8_t         userdefn    : 1;        /**< it is the bit 7 of the first byte of the ROP. It must be zero  */
+    uint8_t         version     : 2;        /**< it is formed by bits 7 and 6 of the first byte of the ROP. It must be zero  */
 } eOropctrl_t;      EO_VERIFYsizeof(eOropctrl_t, 1);
 
 
@@ -103,8 +102,8 @@ typedef struct
 typedef enum
 {
     eo_ropconf_none = 0,
-    eo_ropconf_nak  = 2,
-    eo_ropconf_ack  = 3
+    eo_ropconf_nak  = 1,
+    eo_ropconf_ack  = 2
 } eOropconfinfo_t;
 
 
@@ -122,9 +121,9 @@ typedef struct      // 24 bytes
 {
     eOropctrl_t             control;            // 1B
     eOropcode_t             ropcode;            // 1B
+    uint16_t                size;               // 2B
     eOnvEP_t                ep;                 // 2B
     eOnvID_t                id;                 // 2B
-    uint16_t                size;               // 2B
     uint8_t*                data;               // 4B
     uint32_t                signature;          // 4B
     uint64_t                time;               // 4B
