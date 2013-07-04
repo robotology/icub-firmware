@@ -63,7 +63,7 @@
 #define ENCODER_NULL                        255
 #define INTPRIO_SPI_ENCODERS                hal_int_priority05
 #define DGN_COUNT_MAX                       10000 //1 sec
-#define DGN_THRESHOLD                       300
+#define DGN_THRESHOLD                       50
 
 
 
@@ -417,7 +417,7 @@ static void s_eo_appEncReader_check(EOappEncReader *p)
     
     if(1 == signal_error)
     {
-        res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p);
+        res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p, p->dgninfo.count);
         if(eores_OK == res)
         {
            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
