@@ -76,9 +76,9 @@ typedef struct
 {
     eOprot_ROP_ctrl_t   control;        /**< use eOprot_ROP_control_t values */
     eOprot_ROP_code_t   ropcode;        /**< use eOprot_ROP_code_value_t values */
+    uint16_t            datasize;       /**< the true size of the data field */
     eOprotEP_t          ep;             /**< the endpoint of the variable */
     eOprotID_t          id;             /**< the identifier of the variable */
-    uint16_t            datasize;       /**< the true size of the data field */
 } eOprot_ROP_head_t;    EO_VERIFYsizeof(eOprot_ROP_head_t, 8);
 
 
@@ -101,13 +101,12 @@ typedef struct
  **/
 typedef struct
 {
-    uint8_t             ffu         : 1;    /**< not used */ 
     uint8_t             confinfo    : 2;    /**< use eOprot_ROP_confinfo_t values */     
     uint8_t             plustime    : 1;    /**< the rop contains the time field */        
     uint8_t             plussign    : 1;    /**< the rop contains the signature field */ 
     uint8_t             rqsttime    : 1;    /**< the reply rop shall contains the time field */ 
     uint8_t             rqstconf    : 1;    /**< the receiver shall send a confirmation for this rop */ 
-    uint8_t             userdefn    : 1;    /**< not used */ 
+    uint8_t             version     : 2;    /**< always zero */ 
 } eOprot_ROP_control_t; EO_VERIFYsizeof(eOprot_ROP_control_t, 1);
 
 
@@ -117,8 +116,8 @@ typedef struct
 typedef enum
 {
     eo_ropconf_none     = 0,    /**< the ROP is not a confirmation ROP */ 
-    eo_ropconf_nak      = 2,    /**< the ROP is a NAK */ 
-    eo_ropconf_ack      = 3     /**< the ROP is a ACK */ 
+    eo_ropconf_nak      = 1,    /**< the ROP is a NAK */ 
+    eo_ropconf_ack      = 2     /**< the ROP is a ACK */ 
 } eOprot_ROP_confinfo_t;
 
 
@@ -128,11 +127,11 @@ typedef enum
 typedef enum
 {
     eoprot_ropcode_none = 0,    /**< not a ropcode */ 
-    eoprot_ropcode_ask  = 2,    /**< the sender ask the receiver the value of a variable. the receiver must reply with a eoprot_ropcode_say */ 
-    eoprot_ropcode_say  = 3,    /**< used to communicate the value of a variable in reply to a eoprot_ropcode_ask */     
-    eoprot_ropcode_set  = 4,    /**< the receiver shall modify the value of the variable with the data field of the rop */ 
-    eoprot_ropcode_sig  = 5,    /**< the sender spontaneously signal the value of a variable */
-    eoprot_ropcode_rst  = 6     /**< the receiver shall modify the value of the variable with its default value (not contained in the rop) */ 
+    eoprot_ropcode_ask  = 1,    /**< the sender ask the receiver the value of a variable. the receiver must reply with a eoprot_ropcode_say */ 
+    eoprot_ropcode_say  = 2,    /**< used to communicate the value of a variable in reply to a eoprot_ropcode_ask */     
+    eoprot_ropcode_set  = 3,    /**< the receiver shall modify the value of the variable with the data field of the rop */ 
+    eoprot_ropcode_sig  = 4,    /**< the sender spontaneously signal the value of a variable */
+    eoprot_ropcode_rst  = 5     /**< the receiver shall modify the value of the variable with its default value (not contained in the rop) */ 
 } eOprot_ROP_code_value_t;
 
    
