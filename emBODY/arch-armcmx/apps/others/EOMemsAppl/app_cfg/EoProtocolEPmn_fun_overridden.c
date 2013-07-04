@@ -89,7 +89,7 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv) 
+extern void eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg(const EOnv* nv) 
 {
     //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
 
@@ -108,7 +108,7 @@ extern void eoprot_ep_mn_fun_INIT_comm_cmmnds__ropsigcfg(const EOnv* nv)
 
 
 
-extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd) 
+extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds_ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
     
@@ -128,7 +128,7 @@ extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds__ropsigcfg(const EOnv* nv, const e
 }
 
 
-extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds__go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
+extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
 
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->ram;
@@ -206,8 +206,8 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
             for(i=0; i<size; i++)
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-                ropdesc.configuration           = eok_ropconfiguration_basic;
-                ropdesc.configuration.plustime  = sigcfg->plustime;
+                memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+                ropdesc.control.plustime        = (eobool_true == sigcfg->plustime) ? (1) : (0);
                 ropdesc.ropcode                 = eo_ropcode_sig;
                 ropdesc.ep                      = sigcfg->ep;    
                 ropdesc.id                      = sigcfg->id;
@@ -226,8 +226,8 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
             for(i=0; i<size; i++)
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-                ropdesc.configuration           = eok_ropconfiguration_basic;
-                ropdesc.configuration.plustime  = sigcfg->plustime;
+                memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+                ropdesc.control.plustime        = (eobool_true == sigcfg->plustime) ? (1) : (0);
                 ropdesc.ropcode                 = eo_ropcode_sig;
                 ropdesc.ep                      = sigcfg->ep;    
                 ropdesc.id                      = sigcfg->id;
@@ -241,8 +241,8 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
             for(i=0; i<size; i++)
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-                ropdesc.configuration           = eok_ropconfiguration_basic;
-                ropdesc.configuration.plustime  = sigcfg->plustime;
+                memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+                ropdesc.control.plustime        = (eobool_true == sigcfg->plustime) ? (1) : (0);
                 ropdesc.ropcode                 = eo_ropcode_sig;
                 ropdesc.ep                      = sigcfg->ep;    
                 ropdesc.id                      = sigcfg->id;
