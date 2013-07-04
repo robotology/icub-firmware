@@ -50,26 +50,16 @@ extern "C" {
 
 
 
-// typedef struct
-// {
-//     uint8_t         ffu         : 1;
-//     uint8_t         confinfo    : 2;       
-//     uint8_t         plustime    : 1;
-//     uint8_t         plussign    : 1;
-//     uint8_t         rqsttime    : 1;
-//     uint8_t         rqstconf    : 1;
-//     uint8_t         userdefn    : 1; 
-// } eOropctrl_t;      EO_VERIFYsizeof(eOropctrl_t, 1);
-
 
 typedef struct
 {
     eOropctrl_t     ctrl;
     eOropcode_t     ropc;
+    uint16_t        dsiz;
     eOnvEP_t        endp;
     eOnvID_t        nvid;
-    uint16_t        dsiz;
 } eOrophead_t;      EO_VERIFYsizeof(eOrophead_t, 8);
+
 
 EO_VERIFYproposition(eo_rop_minimumsize_verify, (eo_rop_minimumsize == sizeof(eOrophead_t)));
 
@@ -116,7 +106,6 @@ struct EOrop_hid
     EOrop_stream_t      stream;                     // contains the representation of the binary rop. it is created by parser or use by rop
     EOnv                netvar;                     // it is used by the agent in reception phase but also in transmission phase. it
     eOropdescriptor_t   ropdes;                     // contains a description of the rop used by the callback funtions of the netvar
-//    EOrop_tmpdata_t     tmpdata;                    // temporary data used for various purposes, mainly for computing the netvar    
 };    
 
 
@@ -151,6 +140,38 @@ EO_extern_inline eObool_t eo_rop_hid_ropcode_is_valid(uint8_t bytewithropcode)
     
     return(eobool_true);
 }
+
+
+EO_extern_inline eObool_t eo_rop_hid_is_valid(EOrop *p)
+{
+    // verify ropcode
+    if(eobool_false == eo_rop_hid_ropcode_is_valid(p->stream.head.ropc))
+    {
+        return(eobool_false);
+    }
+    
+    eObool_t datasizeispresent = eo_rop_hid_DataField_is_Present(&p->stream.head);
+    eObool_t datafieldisrequired = eo_rop_hid_DataField_is_Required(&p->stream.head);
+    
+    // verify datafield
+    if(eobool_true == datafieldisrequired)
+    {
+        if(eobool_false == datasizeispresent)
+        {
+            return(eobool_false);
+        }
+    }
+    else
+    {
+        if(eobool_true == datasizeispresent)
+        {
+            return(eobool_false);
+        }        
+    }
+    
+    return(eobool_true);
+}
+
 
 
 

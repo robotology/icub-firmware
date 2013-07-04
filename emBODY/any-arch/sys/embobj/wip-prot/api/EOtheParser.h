@@ -61,6 +61,16 @@ extern "C" {
 typedef struct EOtheParser_hid EOtheParser;
 
 
+typedef enum
+{
+    eo_parser_res_ok                    = 0,
+    eo_parser_res_nok_nostreamdata      = -1,
+    eo_parser_res_nok_ropistoobig       = -2,
+    eo_parser_res_nok_ropisillegal      = -3,
+    eo_parser_res_nok_fatal             = -4    
+} eOparserResult_t;
+
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -94,7 +104,7 @@ extern EOtheParser * eo_parser_GetHandle(void);
     @return     The value eores_NOK_nullpointer if any is a NULL pointer, eores_NOK_generic if pktdata does not have a valid rop, 
                 eores_OK if the function can fill @e rop with meaninful data.
  **/
-extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, EOrop *rop, uint16_t *consumedbytes);
+extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, const uint16_t streamsize, EOrop *rop, uint16_t *consumedbytes, eOparserResult_t *result);
 
 
 

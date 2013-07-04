@@ -97,6 +97,7 @@ extern uint16_t eo_ropframe_ROP_NumberOf(EOropframe *p);
 // does not check anything about p safety
 extern uint16_t eo_ropframe_ROP_NumberOf_quickversion(EOropframe *p);
 
+
 extern eOresult_t eo_ropframe_ROP_Parse(EOropframe *p, EOrop *rop, uint16_t *unparsedbytes);
 
 extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t* addedinpos, uint16_t* consumedbytes, uint16_t *remainingbytes);

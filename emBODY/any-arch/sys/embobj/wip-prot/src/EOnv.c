@@ -26,7 +26,7 @@
 #include "EOtheMemoryPool.h"
 
 #include "EOVmutex.h"
-//#include "EOVstorage.h"
+
 
 #include "EOrop.h" 
 #include "EOarray.h" 
@@ -82,28 +82,6 @@
 static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 static eOresult_t s_eo_nv_Set(const EOnv *nv, const void *dat, void *dst, eOnvUpdate_t upd);
 
-
-
-// EO_static_inline uint16_t s_eo_nv_get_size1(const EOnv *nv, const void* data)
-// {
-// #define USECAPACITYFORARRAY
-
-// #if     defined(USECAPACITYFORARRAY)
-//     return(nv->rom->capacity);
-// #else
-//     eObool_t typisarray = (eo_nv_TYP_arr == EO_nv_TYP(nv->rom->funtyp)) ? (eobool_true) : (eobool_false);
-//     void* dat = (NULL != data) ? ((void*)data) : (nv->ram);
-//     if(eobool_false == typisarray)
-//     {
-//         return(nv->rom->capacity);
-//     }
-//     else
-//     {
-//         // 4 bytes are for the capacity and the size fields, whcih are always present. head->size are the othres
-//         return(eo_array_UsedBytes((EOarray*)dat));
-//     }        
-// #endif       
-// }
 
 
 EO_static_inline uint16_t s_eo_nv_get_size2(const EOnv *nv)
@@ -165,7 +143,6 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
     nv->id          = eo_nv_IDdummy;
     nv->rom         = NULL;       
     nv->ram         = NULL;  
-//    nv->rem         = NULL; 
     nv->mtx         = NULL;
       
     return(eores_OK);
@@ -212,16 +189,6 @@ extern uint16_t eo_nv_Capacity(const EOnv *nv)
 }
 
 
-// extern uint16_t eo_nv_Size(const EOnv *nv, const void *data)
-// {
-//     if(NULL == nv)
-//     {
-//         return(0);
-//     }
-//     
-//     return(s_eo_nv_get_size1(nv, data));
-// }
-
 extern uint16_t eo_nv_Size(const EOnv *nv)
 {
     if(NULL == nv)
@@ -248,8 +215,7 @@ extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint
     {
         case eo_nv_strg_volatile:
         {   // better to protect so that the copy is atomic and not interrupted by other tasks which write 
-            source = nv->ram;
-            //*size = s_eo_nv_get_size1(nv, source);            
+            source = nv->ram;       
             *size = s_eo_nv_get_size2(nv);  
             eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
             memcpy(data, source, *size); 
@@ -300,11 +266,6 @@ extern eOresult_t eo_nv_Init(const EOnv *nv)
     return(res);
 }
 
-// extern eOresult_t eo_nv_Update(const EOnv *nv)
-// {
-//     return(eo_nv_hid_UpdateROP(nv, NULL));
-// }
-
 
 
 extern eOnvID_t eo_nv_GetID(const EOnv *nv)
@@ -335,47 +296,6 @@ extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv)
 }
 
 
-// extern eOresult_t eo_nv_remoteSet(const EOnv *nv, const void *dat, eOnvUpdate_t upd)
-// {
-//     if((NULL == nv) || (NULL == dat))
-//     {
-//         return(eores_NOK_nullpointer);
-//     }
-//     if(eobool_true == eo_nv_hid_isLocal(nv))
-//     {
-//         return(eores_NOK_generic);
-//     }
-//     return(s_eo_nv_Set(nv, dat, nv->rem, upd));
-// }
-
-
-
-// extern eOresult_t eo_nv_remoteGet(const EOnv *nv, void *data, uint16_t *size)
-// {
-//     void *source = NULL;
-
-//     
-//     if((NULL == data) || (NULL == size) || (NULL == nv))
-//     {
-//         return(eores_NOK_nullpointer);
-//     }
-
-//     if(eobool_true == eo_nv_hid_isLocal(nv))
-//     {
-//         return(eores_NOK_generic);
-//     }
-//   
-//     source = nv->rem;
-//     //*size = s_eo_nv_get_size1(nv, source);
-//     *size = s_eo_nv_get_size2(nv);
-//     
-//     eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
-//     memcpy(data, source, *size);
-//     eov_mutex_Release(nv->mtx);
-
-//     
-//     return(eores_OK);  
-// }
 
 extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv)
 {
@@ -391,27 +311,6 @@ extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv)
 {
     return((eobool_true == eo_nv_hid_isLocal(nv)) ? (eo_nv_ownership_local) : (eo_nv_ownership_remote));
 }
-
-// extern eOnvFunc_t eo_nv_GetFUN(const EOnv *nv)
-// {
-//     if((NULL == nv) || (NULL == nv->rom))
-//     {
-//         return(eo_nv_FUN_NO0);
-//     }
-
-//     return((eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp));
-// }
-
-
-// extern eOnvType_t eo_nv_GetTYP(const EOnv *nv)
-// {
-//     if((NULL == nv) || (NULL == nv->rom))
-//     {
-//         return(eo_nv_TYP_NO4);
-//     }
-
-//     return((eOnvType_t)EO_nv_TYP(nv->rom->funtyp));
-// }
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -440,18 +339,7 @@ extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest)
 
 
 extern eObool_t eo_nv_hid_isWritable(const EOnv *nv)
-{
-//     eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
-//
-//     if((fun == eo_nv_FUN_out) || (fun == eo_nv_FUN_cfg) || (fun == eo_nv_FUN_beh))
-//     {
-//         return(eobool_true);
-//     }
-//     else
-//     {
-//         return(eobool_false);
-//     }
-    
+{   
     if((eo_nv_rwmode_RW == nv->rom->rwmode) || (eo_nv_rwmode_WO == nv->rom->rwmode))
     {
         return(eobool_true);
@@ -469,23 +357,10 @@ extern eObool_t eo_nv_hid_isLocal(const EOnv *nv)
 } 
 
 
-// extern eObool_t eo_nv_hid_isPermanent(const EOnv *nv)
-// {
-//     eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
-//     return((fun == eo_nv_FUN_cfg) ? (eobool_true) : (eobool_false));
-// } 
 
 extern eObool_t eo_nv_hid_isUpdateable(const EOnv *nv)
 {
-//     eOnvFunc_t fun = (eOnvFunc_t)EO_nv_FUN(nv->rom->funtyp);
-//     if((fun == eo_nv_FUN_inp) || (fun == eo_nv_FUN_out) || (fun == eo_nv_FUN_cfg) || (fun == eo_nv_FUN_beh))
-//     {
-//         return(eobool_true);
-//     }
-//     else
-//     {
-//         return(eobool_false);
-//     }
+
     if(eobool_true == eo_nv_hid_isLocal(nv))
     {
         return(eo_nv_hid_isWritable(nv));
@@ -528,28 +403,6 @@ extern eOresult_t eo_nv_hid_SetROP(const EOnv *nv, const void *dat, eOnvUpdate_t
     return(s_eo_nv_SetROP(nv, dat, nv->ram, upd, ropdes));
 }
 
-// extern eOresult_t eo_nv_hid_UpdateROP(const EOnv *nv, const eOropdescriptor_t* ropdes)
-// {
-//     eOresult_t res = eores_NOK_generic;
-//     
-//     if(NULL == nv)
-//     {
-//         return(eores_NOK_nullpointer);
-//     }  	
-
-//     if(eobool_true == eo_nv_hid_isUpdateable(nv)) 
-//     {
-//         if(NULL != nv->rom->update)
-//         {   // protect
-//             eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
-//             nv->rom->update(nv, ropdes);
-//             eov_mutex_Release(nv->mtx);
-//             res = eores_OK;
-//         }
-//     }
-
-//     return(res);
-// }
 
 extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t* ropdes)
 {
@@ -557,11 +410,6 @@ extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUp
     {
         return(eores_NOK_nullpointer);
     }
-
-//     if(eobool_true == eo_nv_hid_isLocal(nv))
-//     {
-//         return(eores_NOK_generic);
-//     }
 
     return(s_eo_nv_SetROP(nv, dat, nv->ram, upd, ropdes));
 }
@@ -587,14 +435,6 @@ static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOn
     memcpy(dst, dat, size);
     eov_mutex_Release(nv->mtx);
 
-//     if(eobool_true == eo_nv_hid_isPermanent(nv)) 
-//     {
-//         if((EOK_uint32dummy != nv->usr->stg_address) && (NULL != nv->stg))
-//         {
-//             eov_strg_Set(nv->stg, nv->usr->stg_address, size, dat);
-//         }
-//     }
-
     // call the update function if necessary
     if(eo_nv_upd_dontdo != upd)
     {
@@ -611,37 +451,6 @@ static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOn
 
     return(eores_OK);
 }
-
-// - oldies
-
-// extern eOresult_t eo_nv_hid_GetPERMANENT(const EOnv *nv, void *dat, uint16_t *size)
-// {
-//     eOresult_t res = eores_NOK_generic;
-//     eObool_t typisarray = eobool_false;
-
-//     if((NULL == nv) || (NULL == dat))
-//     {
-//         return(eores_NOK_nullpointer);
-//     }
-
-//     typisarray = (eo_nv_TYP_arr == nv->rom->typ) ? eobool_true : eobool_false;
-
-//     *size = 0;
-
-// //     if(eobool_true == eo_nv_hid_isPermanent(nv))
-// //     {
-// //         if((EOK_uint32dummy != nv->usr->stg_address) && (NULL != nv->stg))
-// //         {   // protection is inside EOVstorage
-// //             uint16_t capacity = eo_nv_hid_GetCAPACITY(nv);
-// //             eov_strg_Get(nv->stg, nv->usr->stg_address, capacity, dat);
-// //             *size = (eobool_false == typisarray) ? (capacity) : (2 + *((uint16_t*)dat));
-// //             res = eores_OK;
-// //         }
-// //    }
-
-//     return(res);
-// }
-
 
 
 // --------------------------------------------------------------------------------------------------------------------

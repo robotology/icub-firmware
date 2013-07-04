@@ -105,17 +105,18 @@ extern EOtheFormer * eo_former_GetHandle(void)
     return( (1 == eo_theformer.initted) ? (&eo_theformer) : (eo_former_Initialise()) );
 }
 
+
 extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop)
 {   // this function requires the access to hidden types of EOrop
     uint16_t size = sizeof(eOrophead_t);
-    eOropcode_t ropcode = eo_rop_ropcode_Get((EOrop *)rop);
+//    eOropcode_t ropcode = eo_rop_ropcode_Get((EOrop *)rop);
 
     if((NULL == p) || (NULL == rop))
     {    
         return(0);
     }
 		
-    if(eobool_false == eo_rop_hid_ropcode_is_valid(ropcode))
+    if(eobool_false == eo_rop_hid_is_valid((EOrop *)rop))
     {
         return(0);      
     }
@@ -150,7 +151,7 @@ extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const ui
     }
 
     // we assume that the rop is legal as it was formed by the EOtheAgent or extracted from a stream by EOtheParser
-    // thus we dont check too much. we just dont process eo_ropcode_none and eo_ropcode_usr
+    // thus we dont check too much.
     if(eobool_false == eo_rop_hid_ropcode_is_valid(rop->stream.head.ropc))
     {
         return(eores_NOK_generic); 
