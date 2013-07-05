@@ -48,11 +48,7 @@ extern "C" {
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-
-#define EO_nv_FUNTYP(fun, typ) 	    ((uint8_t)(  (((fun)&0x07)<<5) | (((typ)&0x07)<<2) )  )
-#define EO_nv_FUN(funtyp)           ((uint8_t)(  (((uint8_t)(funtyp))>>5) & 0x07)         )
-#define EO_nv_TYP(funtyp)           ((uint8_t)(  (((uint8_t)(funtyp))>>2) & 0x07)         )
+// empty-section
 
 
 // - declaration of public user-defined types -------------------------------------------------------------------------    
