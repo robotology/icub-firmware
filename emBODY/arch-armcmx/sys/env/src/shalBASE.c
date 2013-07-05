@@ -619,8 +619,13 @@ static void s_shalbase_jump_to(uint32_t appaddr)
 static void s_shalbase_storage_init(const eEstorageType_t strgtype)
 {
     volatile hal_result_t res = hal_res_NOK_generic;
-
-    hal_sys_irq_disable();
+    
+    
+    
+//  acemor or 5 july 2013: removed the irq disable and enable between eeprom init because:
+//  1. it is not necessary 
+//  2. sometimes it makes the program hang when jtag is used. it may be due to the presence of rtos running    
+// removed:   hal_sys_irq_disable();
     
     if(ee_strg_eflash == strgtype)
     {
@@ -634,7 +639,7 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
         res =  res;
     }
     
-    hal_sys_irq_enable();
+// removed:   hal_sys_irq_enable();
 }
 
 
