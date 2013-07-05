@@ -116,7 +116,7 @@ extern eOresult_t eoprot_ep_sk_number_of_boards_Load(uint16_t numofboards)
 
 extern eOresult_t eoprot_ep_sk_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity)
 {
-    if(NULL != s_eoprot_ep_sk_board_numberofeachentity)
+    if(NULL == s_eoprot_ep_sk_board_numberofeachentity)
     {
         return(eores_NOK_generic);
     }
