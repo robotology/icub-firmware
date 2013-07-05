@@ -44,7 +44,7 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// emptty-section
+// empty-section
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
@@ -53,8 +53,6 @@ extern "C" {
 
 typedef     void        (*eOvoid_fp_cnvp_t)                             (const EOnv*);
 typedef     void        (*eOvoid_fp_cnvp_cropdesp_t)                    (const EOnv*, const eOropdescriptor_t*);
-
-
 
 
 typedef const struct                    // 16 bytes on arm 
@@ -76,7 +74,6 @@ struct EOnv_hid                    // 24 bytes
     eOnvID_t                        id;         // identifier of the nv
     EOnv_rom_t*                     rom;        // pointer to the constant part common to every device which uses this nv
     void*                           ram;        // the ram which keeps the LOCAL value of nv 
-//    void*                           rem;        // the ram which keeps REMOTE value of nv, when signalled or said
     EOVmutexDerived*                mtx;        // the mutex which protects concurrent access to the ram of this nv (or rem ...) 
 };   
 
@@ -98,37 +95,16 @@ extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest);
 
 extern eObool_t eo_nv_hid_isWritable(const EOnv *netvar);
 extern eObool_t eo_nv_hid_isLocal(const EOnv *netvar);
-//extern eObool_t eo_nv_hid_isPermanent(const EOnv *netvar);
 extern eObool_t eo_nv_hid_isUpdateable(const EOnv *netvar);
 
 
 extern eOresult_t eo_nv_hid_ResetROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 extern eOresult_t eo_nv_hid_SetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
-//extern eOresult_t eo_nv_hid_UpdateROP(const EOnv *nv, const eOropdescriptor_t* ropdes);
 extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t* ropdes);
 
 
 // - declaration of extern hidden online functions -------------------------------------------------------------------
-
-
-// EO_extern_inline const void* eo_nv_hid_GetDEFAULT(const EOnv *nv)
-// {
-//     if(NULL == nv)
-//     {
-//         return(NULL);
-//     }
-//     return(nv->rom->resetval);
-// }
-
-// EO_extern_inline void* eo_nv_hid_GetVOLATILE(const EOnv *nv)
-// {
-//     if(NULL == nv)
-//     {
-//         return(NULL);
-//     }
-//     return(nv->ram);
-// }
- 
+// empty-section
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

@@ -45,8 +45,6 @@ extern "C" {
 #include "EoCommon.h"
 
 
-
-
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
 
@@ -93,36 +91,6 @@ typedef enum
 } eOnvStorage_t;
 
 
-// typedef enum
-// {
-//     eo_nv_FUN_NO0               = 0,
-//     eo_nv_FUN_NO1               = 1,
-//     eo_nv_FUN_mix               = 2,
-//     eo_nv_FUN_con               = 3,
-//     eo_nv_FUN_cfg               = 4,
-//     eo_nv_FUN_beh               = 5,
-//     eo_nv_FUN_inp               = 6,
-//     eo_nv_FUN_out               = 7
-// } eOnvFunc_t; 
-
-// enum {eonv_fun_bits_numberof = 3 };
-
-
-// typedef enum
-// {
-//     eo_nv_TYP_b08                = 0,
-//     eo_nv_TYP_b16                = 1,
-//     eo_nv_TYP_b32                = 2,
-//     eo_nv_TYP_b64                = 3,
-//     eo_nv_TYP_NO4                = 4,
-//     eo_nv_TYP_NO5                = 5,
-//     eo_nv_TYP_arr                = 6,   // packed as a EOarray object: 2B+1B+1B+[data]
-//     eo_nv_TYP_pkd                = 7
-// } eOnvType_t; 
-
-// enum {eonv_typ_bits_numberof = 3 };
-
-
 typedef enum
 {
     eo_nv_rwmode_RO         = 1,
@@ -157,8 +125,6 @@ extern eOresult_t eo_nv_Clear(EOnv *nv);
 
 extern eOresult_t eo_nv_Init(const EOnv *nv);
 
-//extern eOresult_t eo_nv_Update(const EOnv *nv);
-
 extern uint16_t eo_nv_Size(const EOnv *nv);
 
 extern uint16_t eo_nv_Capacity(const EOnv *nv);
@@ -169,10 +135,6 @@ extern eOresult_t eo_nv_Reset(const EOnv *nv, eObool_t forcerst, eOnvUpdate_t up
 
 extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint16_t *size);
 
-//extern eOresult_t eo_nv_remoteSet(const EOnv *nv, const void *dat, eOnvUpdate_t upd);
-//extern eOresult_t eo_nv_remoteGet(const EOnv *nv, void *data, uint16_t *size);
-
-
 extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv);
 extern eOnvEP_t eo_nv_GetEP(const EOnv *nv);
 extern eOnvID_t eo_nv_GetID(const EOnv *nv);
@@ -180,9 +142,6 @@ extern eOnvID_t eo_nv_GetID(const EOnv *nv);
 extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv);
 
 extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv);
-
-//extern eOnvFunc_t eo_nv_GetFUN(const EOnv *nv);
-//extern eOnvType_t eo_nv_GetTYP(const EOnv *nv);
 
 
 

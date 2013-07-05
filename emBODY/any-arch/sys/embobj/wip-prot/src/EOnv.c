@@ -86,24 +86,7 @@ static eOresult_t s_eo_nv_Set(const EOnv *nv, const void *dat, void *dst, eOnvUp
 
 EO_static_inline uint16_t s_eo_nv_get_size2(const EOnv *nv)
 {
-#define USECAPACITYFORARRAY
-
-#if     defined(USECAPACITYFORARRAY)
-    return(nv->rom->capacity);
-#else
-    eObool_t typisarray = (eo_nv_TYP_arr == EO_nv_TYP(nv->rom->funtyp)) ? (eobool_true) : (eobool_false);
-    void* dat = nv->ram;
-    if(eobool_false == typisarray)
-    {
-        return(nv->rom->capacity);
-    }
-    else
-    {
-        // 4 bytes are for the capacity and the size fields, whcih are always present. head->size are the othres
-        return(eo_array_UsedBytes((EOarray*)dat));
-    }        
-#endif      
-    
+    return(nv->rom->capacity);   
 }
 
 
@@ -232,10 +215,6 @@ extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint
             res = eores_OK;
         } break;
 
-//         case eo_nv_strg_permanent:
-//         {   // protection is done inside eo_nv_hid_GetPERMANENT()
-//             //res = eo_nv_hid_GetPERMANENT(nv, data, size);
-//         } break;
         default:
         {
             res = eores_NOK_generic;
@@ -277,6 +256,7 @@ extern eOnvID_t eo_nv_GetID(const EOnv *nv)
     return(nv->id);
 }
 
+
 extern eOnvEP_t eo_nv_GetEP(const EOnv *nv)
 {
     if(NULL == nv)
@@ -294,7 +274,6 @@ extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv)
     }
     return(nv->ip);
 }
-
 
 
 extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv)
@@ -429,7 +408,7 @@ static eOresult_t s_eo_nv_Set(const EOnv *nv, const void *dat, void *dst, eOnvUp
 
 static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes)
 {
-    uint16_t size = s_eo_nv_get_size2(nv);// s_eo_nv_get_size1(nv, dat);
+    uint16_t size = s_eo_nv_get_size2(nv);
 
     eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
     memcpy(dst, dat, size);
