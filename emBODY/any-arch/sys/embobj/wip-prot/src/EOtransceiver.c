@@ -87,7 +87,7 @@ const eo_transceiver_cfg_t eo_transceiver_cfg_default =
     EO_INIT(.maxnumberofregularrops)        16,
     EO_INIT(.remipv4addr)                   EO_COMMON_IPV4ADDR_LOCALHOST,
     EO_INIT(.remipv4port)                   10001,
-    EO_INIT(.nvset)                        NULL,
+    EO_INIT(.nvset)                         NULL,
     EO_INIT(.mutex_fn_new)                  NULL,
     EO_INIT(.protection)                    eo_trans_protection_none
 };
@@ -117,7 +117,7 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
     rec_cfg.capacityofropframereply         = cfg->capacityofropframereplies;
     rec_cfg.capacityofropinput              = cfg->capacityofrop;
     rec_cfg.capacityofropreply              = cfg->capacityofrop;
-    rec_cfg.nvset                          = cfg->nvset;
+    rec_cfg.nvset                           = cfg->nvset;
 
     
     memcpy(&tra_cfg, &eo_transmitter_cfg_default, sizeof(eo_transmitter_cfg_t));

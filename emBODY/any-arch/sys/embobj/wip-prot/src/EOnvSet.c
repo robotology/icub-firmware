@@ -142,6 +142,7 @@ static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ow
 	}
     
     eo_errman_Assert(eo_errman_GetHandle(), (0 != nendpoints), s_eobj_ownname, "nendpoints is zero");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != fptr_ep2index), s_eobj_ownname, "fptr_ep2index() is NULL");
     
     eo_errman_Assert(eo_errman_GetHandle(), (eobool_false == eo_vector_Full(p->thedevices)), s_eobj_ownname, "->thedevices is full");
 
