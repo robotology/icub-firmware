@@ -49,12 +49,10 @@ extern "C" {
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
-#define EOMANAGEMENT_USE20ROPSIGCFG
+#define EOMANAGEMENT_USE21ROPSIGCFG
 
-#if     defined(EOMANAGEMENT_USE18ROPSIGCFG)
-#define NUMOFROPSIGCFG 18
-#elif   defined(EOMANAGEMENT_USE20ROPSIGCFG) 
-#define NUMOFROPSIGCFG 20
+#if     defined(EOMANAGEMENT_USE21ROPSIGCFG) 
+#define NUMOFROPSIGCFG 21
 #else
 #error --> define a size for NUMOFROPSIGCFG
 #endif
@@ -107,22 +105,25 @@ typedef enum
 /** @typedef    typedef struct eOmn_ropsigcfg_array_t;
     @brief      is an array of eOropSIGcfg_t structs used to configure the communication
  **/
-typedef struct              // size is 4+20*6=124 bytes
+typedef struct              // size is 4+21*4=88 bytes
 {
     eOarray_head_t          head;
     uint8_t                 data[NUMOFROPSIGCFG*sizeof(eOropSIGcfg_t)];
-} eOmn_ropsigcfg_array_t;   EO_VERIFYsizeof(eOmn_ropsigcfg_array_t, 124);
+} eOmn_ropsigcfg_array_t;   EO_VERIFYsizeof(eOmn_ropsigcfg_array_t, 88);
 
 
 /** @typedef    typedef struct eOmn_ropsigcfg_command_t;
     @brief      is the command used to configure the communication
  **/
-typedef struct              // size is 124+1+3 = 128 bytes
+typedef struct              // size is 88+ 1+1+1+1+4 = 96 bytes
 {
     eOmn_ropsigcfg_array_t          array;
     eOenum08_t                      cmmnd;              /**< but use eOmn_ropsigcfg_commandtype_t */
-    uint8_t                         filler03[3];
-} eOmn_ropsigcfg_command_t;         EO_VERIFYsizeof(eOmn_ropsigcfg_command_t, 128);
+    uint8_t                         plustime;
+    uint8_t                         plussign;
+    uint8_t                         filler01;
+    uint32_t                        signature;
+} eOmn_ropsigcfg_command_t;         EO_VERIFYsizeof(eOmn_ropsigcfg_command_t, 96);
 
 
 /** @typedef    typedef enum eOmn_appl_runMode_t;
@@ -155,18 +156,18 @@ typedef struct
 typedef struct
 {
     eOmn_ropsigcfg_command_t        ropsigcfg;
-} eOmn_comm_cmmnds_t;               EO_VERIFYsizeof(eOmn_comm_cmmnds_t, 128);
+} eOmn_comm_cmmnds_t;               EO_VERIFYsizeof(eOmn_comm_cmmnds_t, 96);
 
 
 /** @typedef    typedef struct eOmn_comm_t;
     @brief      used to represent the communication with config, status, commands. so far config and status are not used
  **/
-typedef struct                      // size is 4+4+128+0 = 136 bytes
+typedef struct                      // size is 4+4+96+0 = 104 bytes
 {
     eOmn_comm_config_t              config;
     eOmn_comm_status_t              status;
     eOmn_comm_cmmnds_t              cmmnds;
-} eOmn_comm_t;                      EO_VERIFYsizeof(eOmn_comm_t, 136);
+} eOmn_comm_t;                      EO_VERIFYsizeof(eOmn_comm_t, 104);
 
 
 
