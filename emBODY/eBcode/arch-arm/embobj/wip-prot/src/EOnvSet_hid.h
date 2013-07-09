@@ -51,17 +51,11 @@ extern "C" {
 
 typedef struct
 {
+    eOnvset_EPcfg_t                     epcfg;
+    uint16_t                            epnvsnumberof;
     eObool_t                            initted;
-    eOnvEP_t                            endpoint;
-    uint16_t                            epnvs_numberof; 
-    uint16_t                            epram_sizeof;
-    void*                               epram_ram;
-    eOvoid_fp_uint16_voidp_t            fptr_epram_initialise;  // ep, vol
-    eObool_fp_uint16_uint16_t           fptr_isepidsupported;
-    eOuint16_fp_uint16_uint16_t         fptr_epnvprogressivenumber2id;
-    eOuint16_fp_uint16_uint16_t         fptr_epid2nvprogressivenumber;
-    eOvoidp_fp_voidp_uint16_uint16_t    fptr_dataepid2nvram;    
-    eOvoidp_fp_uint16_uint16_t          fptr_epid2nvrom; 
+    uint8_t                             dummy; 
+    void*                               epram;    
     EOVmutexDerived*                    mtx_endpoint;    
     EOvector*                           themtxofthenvs;    
 } eOnvset_ep_t;
@@ -70,10 +64,11 @@ typedef struct
 typedef struct
 {
     eOipv4addr_t                    ipaddress;
-    EOvector*                       theendpoints;
+    eOnvBRD_t                       boardnum;
     eOnvsetOwnership_t              ownership;
-    uint16_t                        theendpoints_numberof; 
-    eOuint16_fp_uint16_t            fptr_ep2index;   
+    uint16_t                        theendpoints_numberof;     
+    EOvector*                       theendpoints;
+    eOuint16_fp_uint8_t             fptr_ep2index;   
     EOVmutexDerived*                mtx_device;      
 } eOnvset_dev_t;
 
@@ -110,7 +105,8 @@ struct EOnvSet_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern uint16_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id);
+
+extern eOnvPROGnum_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32);
 
 
 

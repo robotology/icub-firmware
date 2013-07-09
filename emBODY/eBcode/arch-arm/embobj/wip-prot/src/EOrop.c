@@ -51,6 +51,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#warning ID32--> cambiato dimensione di eOropSIGcfg_t da 6 a 8: 1. verifica
+#warning %%--> valuta di mettere un campo ipv4 in eOropdescriptor_t che indichi da chi arriva il rop oppure a chi deve andare.
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -217,8 +220,7 @@ extern uint16_t eo_rop_ComputeSize(eOropctrl_t ropctrl, eOropcode_t ropc, uint16
         EO_INIT(.ctrl)  0,
         EO_INIT(.ropc)  ropc,
         EO_INIT(.dsiz)  sizeofdata,           
-        EO_INIT(.endp)  0,
-        EO_INIT(.nvid)  0,     
+        EO_INIT(.id32)  0     
     };
 
     if( (eo_ropcode_none == ropc) || (0 != ropctrl.version) )
@@ -369,16 +371,10 @@ extern eOnvOwnership_t eo_rop_hid_GetOwnership(eOropcode_t ropc, eOropconfinfo_t
 
 extern void	eo_rop_hid_fill_ropdes(eOropdescriptor_t* ropdes, EOrop_stream_t* stream, uint16_t size, uint8_t* data)
 {
-//     ropdes->configuration.confrqst 			= stream->head.ctrl.rqstconf;
-//     ropdes->configuration.timerqst			= stream->head.ctrl.rqsttime;
-//     ropdes->configuration.plussign			= stream->head.ctrl.plussign;
-//     ropdes->configuration.plustime			= stream->head.ctrl.plustime;
-//     ropdes->configuration.confirm     	    = stream->head.ctrl.confinfo;
     memcpy(&ropdes->control, &stream->head.ctrl, sizeof(eOropctrl_t)); 
                             
     ropdes->ropcode			= stream->head.ropc; 
-    ropdes->ep			    = stream->head.endp;
-    ropdes->id			    = stream->head.nvid;
+    ropdes->id32		    = stream->head.id32;
     ropdes->size		    = size;
     ropdes->data		    = data;
     ropdes->signature		= stream->sign;
@@ -405,13 +401,13 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
     eObool_t nvisnotexisting = (NULL == ropin->netvar.rom) ? eobool_true : eobool_false;
 
     if(eobool_true == nvisnotexisting)
-    {   // we did not find a netvar w/ that (ip,ep,id) but if we have been asked for a confirmation then we must send a nak
+    {   // we did not find a netvar w/ that (ip,id32) but if we have been asked for a confirmation then we must send a nak
         if(1 == ropin->stream.head.ctrl.rqstconf)
         {
             r = ropout;
             r->stream.head.ctrl.confinfo 	        = eo_ropconf_nak;            
             r->stream.head.dsiz 					= 0;
-            r->stream.head.endp 					= ropin->stream.head.endp;
+            r->stream.head.id32 					= ropin->stream.head.id32;
             r->stream.head.ropc 					= ropin->stream.head.ropc;
         }
         else
@@ -450,10 +446,8 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
         r->stream.head.ctrl.plustime = ropin->stream.head.ctrl.rqsttime;
         
         r->stream.head.dsiz = 0; // if it must be non-zero then some function shall fill it        
-        r->stream.head.endp = ropin->stream.head.endp;
-        r->stream.head.nvid = ropin->stream.head.nvid;
+        r->stream.head.id32 = ropin->stream.head.id32;
 
-        // nvid was filled earlier in this function
         // data will be filled by some other function
         r->stream.sign = (1 == r->stream.head.ctrl.plussign) ? (ropin->stream.sign) : (EOK_uint32dummy);
 #ifndef EODEF_DONT_USE_THE_VSYSTEM
@@ -461,7 +455,6 @@ static EOrop * s_eo_rop_prepare_reply(EOrop *ropin, EOrop *ropout)
 #else
         r->stream.time = (1 == r->stream.head.ctrl.plustime) ? (0xf1f2f3f4f5f6f7f8) : (EOK_uint64dummy);
 #endif
-
 
         eo_rop_hid_fill_ropdes(&r->ropdes, &r->stream, 0, NULL);
 			

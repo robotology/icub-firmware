@@ -28,6 +28,8 @@
 
 #include "EOnv_hid.h" 
 
+#include "EoProtocolEP.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -66,12 +68,12 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ownership, eOipv4addr_t ipaddress, eOuint16_fp_uint16_t fptr_ep2index, uint16_t nendpoints);
-static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, eOnvset_EPcfg_t *cfgofep);
+static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ownership, eOipv4addr_t ipaddress, eOnvBRD_t boardnum, eOuint16_fp_uint8_t fptr_ep2index, uint16_t nendpoints);
+static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, eOnvset_EPcfg_t *cfgofep, eOnvBRD_t boardnum);
 
 
-static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedevice, eOnvset_ep_t* theendpoint, eOnvID_t id);
-static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvset_dev_t** thedevice, eOnvset_ep_t** theendpoint);
+static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedevice, eOnvset_ep_t* theendpoint, eOnvID32_t id32);
+static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvset_dev_t** thedevice, eOnvset_ep_t** theendpoint);
 
 static void s_eo_nvset_devicesowneship_change(EOnvSet *p, eOnvsetOwnership_t ownership);
 
@@ -117,7 +119,7 @@ extern eOresult_t eo_nvset_DEVpushback(EOnvSet* p, uint16_t ondevindex, eOnvset_
 {
     uint16_t i = 0;
     uint16_t nendpoints = eo_constvector_Size(cfgofdev->vectorof_epcfg);
-    s_eo_nvset_PushBackDEVholder(p, ownership, ipaddress, cfgofdev->fptr_ep2indexofepcfg, nendpoints);
+    s_eo_nvset_PushBackDEVholder(p, ownership, ipaddress, cfgofdev->boardnum, cfgofdev->fptr_ep2indexofepcfg, nendpoints);
     
     if(NULL != cfgofdev->fptr_device_initialise)
     {
@@ -127,13 +129,13 @@ extern eOresult_t eo_nvset_DEVpushback(EOnvSet* p, uint16_t ondevindex, eOnvset_
     for(i=0; i<nendpoints; i++)
     {
         eOnvset_EPcfg_t* pepcfg = (eOnvset_EPcfg_t*) eo_constvector_At(cfgofdev->vectorof_epcfg, i);
-        s_eo_nvset_onDEV_PushBackEP(p, ondevindex, pepcfg);        
+        s_eo_nvset_onDEV_PushBackEP(p, ondevindex, pepcfg, cfgofdev->boardnum);        
     }
     
     return(eores_OK); 
 }
 
-static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ownership, eOipv4addr_t ipaddress, eOuint16_fp_uint16_t fptr_ep2index, uint16_t nendpoints)
+static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ownership, eOipv4addr_t ipaddress, eOnvBRD_t boardnum, eOuint16_fp_uint8_t fptr_ep2index, uint16_t nendpoints)
 {
     eOnvset_dev_t *dev = NULL;
  	if(NULL == p) 
@@ -158,9 +160,10 @@ static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ow
     dev = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eOnvset_dev_t), 1);
     
     dev->ipaddress              = ipaddress;
-    dev->theendpoints           = eo_vector_New(sizeof(eOnvset_ep_t*), nendpoints, NULL, 0, NULL, NULL);
+    dev->boardnum               = boardnum;
     dev->ownership              = ownership;
     dev->theendpoints_numberof  = nendpoints;
+    dev->theendpoints           = eo_vector_New(sizeof(eOnvset_ep_t*), nendpoints, NULL, 0, NULL, NULL);    
     dev->fptr_ep2index          = fptr_ep2index;
     dev->mtx_device             = (eo_nvset_protection_one_per_device == p->protection) ? p->mtxderived_new() : NULL;
 
@@ -171,39 +174,24 @@ static eOresult_t s_eo_nvset_PushBackDEVholder(EOnvSet* p, eOnvsetOwnership_t ow
 }
 
 
-static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, eOnvset_EPcfg_t *cfgofep)
+static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, eOnvset_EPcfg_t *cfgofep, eOnvBRD_t boardnum)
 {
     eOnvset_dev_t** thedev = NULL;
     eOnvset_ep_t *theendpoint = NULL;
     uint16_t epnvsnumberof = 0;
-    
-    eOnvEP_t endpoint;
-    eOuint16_fp_uint16_uint16_t fptr_epid2nvprogressivenumber = NULL;
-    eOuint16_fp_uint16_uint16_t fptr_epnvprogressivenumber2id = NULL;
-    eObool_fp_uint16_uint16_t fptr_isepidsupported = NULL;
-    eOvoidp_fp_voidp_uint16_uint16_t fptr_dataepid2nvram =  NULL;
-    eOvoidp_fp_uint16_uint16_t fptr_epid2nvrom = NULL;
-    uint32_t epram_sizeof;
-    eOvoid_fp_uint16_voidp_t fptr_epram_initialise;
+   
  
     if((NULL == p) || (NULL == cfgofep)) 
     {
         return(eores_NOK_nullpointer); 
     }
-        
-    endpoint                        = cfgofep->endpoint;
-    epram_sizeof                    = cfgofep->epram_sizeof;
-    fptr_dataepid2nvram  	        = cfgofep->fptr_epramepid2nvram;
-    fptr_epid2nvrom                 = cfgofep->fptr_epid2nvrom;
-    fptr_epid2nvprogressivenumber   = cfgofep->fptr_epid2nvprogressivenumber;
-    fptr_epnvprogressivenumber2id   = cfgofep->fptr_epnvprogressivenumber2id;
-    fptr_isepidsupported            = cfgofep->fptr_isepidsupported;
-    fptr_epram_initialise           = cfgofep->fptr_epram_initialise;
-    epnvsnumberof                   = cfgofep->fptr_ep2nvsnumberof(cfgofep->endpoint);
-
     
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != epnvsnumberof), s_eobj_ownname, "epnvsnumberof is zero");
-   
+    epnvsnumberof = cfgofep->fptr_getnvsnumberof(boardnum);
+    
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != epnvsnumberof), s_eobj_ownname, "epnvsnumberof is zero"); 
+    
+    // ok: i go on
+        
     thedev = (eOnvset_dev_t**) eo_vector_At(p->thedevices, ondevindex);
     
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != thedev), s_eobj_ownname, "->thedevices is indexed in wrong pos");    
@@ -211,18 +199,11 @@ static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, e
      
     theendpoint = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eOnvset_ep_t), 1);
     
-    theendpoint->endpoint                       = endpoint;
-    theendpoint->initted                        = eobool_false;
-    theendpoint->epnvs_numberof                 = epnvsnumberof;
-    theendpoint->epram_ram                      = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, epram_sizeof, 1);
-    theendpoint->fptr_epram_initialise          = fptr_epram_initialise;
-    theendpoint->epram_sizeof      		        = epram_sizeof;
-    theendpoint->fptr_epid2nvprogressivenumber  = fptr_epid2nvprogressivenumber;
-    theendpoint->fptr_epnvprogressivenumber2id  = fptr_epnvprogressivenumber2id;
-    theendpoint->fptr_isepidsupported           = fptr_isepidsupported;
-    theendpoint->fptr_epid2nvrom                = fptr_epid2nvrom;
-    theendpoint->fptr_dataepid2nvram			= fptr_dataepid2nvram;
-    theendpoint->mtx_endpoint       		    = (eo_nvset_protection_one_per_endpoint == p->protection) ? p->mtxderived_new() : NULL;
+    memcpy(&theendpoint->epcfg, cfgofep, sizeof(eOnvset_EPcfg_t));   
+    theendpoint->epnvsnumberof      = epnvsnumberof;
+    theendpoint->initted            = eobool_false;    
+    theendpoint->epram              = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, theendpoint->epcfg.epram_sizeof, 1);
+    theendpoint->mtx_endpoint       = (eo_nvset_protection_one_per_endpoint == p->protection) ? p->mtxderived_new() : NULL;
     
     // now add the vector of mtx if needed.
     if(eo_nvset_protection_one_per_netvar == p->protection)
@@ -252,7 +233,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
     uint16_t i, j;
     uint16_t ndev;
     uint16_t nendpoints;
-    eOvoid_fp_uint16_voidp_t initialise = NULL;
+    eOvoid_fp_voidp_t initialise = NULL;
 
 
  	if(NULL == p) 
@@ -280,25 +261,25 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
 
             if(eobool_false == ((*theEndpoint)->initted))
             {
-                initialise  = (*theEndpoint)->fptr_epram_initialise;
+                initialise  = (*theEndpoint)->epcfg.fptr_initialise;
                 (*theEndpoint)->initted = eobool_true;
                 
                 if(NULL != initialise)
                 {
-                    initialise((*theEndpoint)->endpoint, (*theEndpoint)->epram_ram);
+                    initialise((*theEndpoint)->epram);
                 }
             }
-#undef EO_NVSET_INIT_EVERY_NV
+#define EO_NVSET_INIT_EVERY_NV
 #if defined(EO_NVSET_INIT_EVERY_NV)
             
             EOnv thenv;
             uint16_t k = 0;
             EOnv_rom_t* rom = NULL;
-            uint16_t nvars = (*theEndpoint)->epnvs_numberof;
+            uint16_t nvars = (*theEndpoint)->epnvsnumberof;
             eOipv4addr_t ip = (*theDevice)->ipaddress;
-            eOnvEP_t ep = (*theEndpoint)->endpoint;
-            eOnvID_t id = EOK_uint16dummy;
-            uint16_t prog = 0;
+            uint8_t brd =  (*theDevice)->boardnum;
+            eOnvID32_t id32 = EOK_uint32dummy;
+            uint32_t prog = 0;
 
             for(k=0; k<nvars; k++)
             {
@@ -310,24 +291,23 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                 }
                 
                 prog = k;
-                // - 0. the id 
-                id = (*theEndpoint)->fptr_epnvprogressivenumber2id(ep, prog);    
-                if(EOK_uint16dummy == id)
+                // - 0. the id32 
+                id32 = (*theEndpoint)->epcfg.fptr_getid(brd, prog);    
+                if(EOK_uint32dummy == id32)
                 {
                     continue;
                 }                    
                 // - 1. the rom
-                rom = (EOnv_rom_t*) (*theEndpoint)->fptr_epid2nvrom(ep, id);
+                rom = (EOnv_rom_t*) (*theEndpoint)->epcfg.fptr_getnvrom(id32);
                 // - 2. the ram
-                uint8_t* ram = (*theEndpoint)->fptr_dataepid2nvram((*theEndpoint)->epram_ram, ep, id);
+                uint8_t* ram = (*theEndpoint)->epcfg.fptr_getnvram(brd, id32, (*theEndpoint)->epram);
                 // - 3. the mtx
-                mtx2use = s_eo_nvset_get_nvmutex(p, (*theDevice), (*theEndpoint), id);
+                mtx2use = s_eo_nvset_get_nvmutex(p, (*theDevice), (*theEndpoint), id32);
 
                 // - load everything into the nv
                 eo_nv_hid_Load(     &thenv,
                                     ip, //(*theDevice)->ipaddress,
-                                    ep, //(*theEndpoint)->endpoint,
-                                    id,
+                                    id32,
                                     rom,
                                     ram,
                                     mtx2use
@@ -345,7 +325,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
 }
 
 
-extern void* eo_nvset_EPRAMget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep)
+extern void* eo_nvset_RAMofEndpoint_Get(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8)
 {
     eOnvset_dev_t* theDevice = NULL;
     eOnvset_ep_t* theEndpoint = NULL;
@@ -356,19 +336,41 @@ extern void* eo_nvset_EPRAMget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep)
     }
 
     // - retrieve the device and the endpoint
-    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep, &theDevice, &theEndpoint))   
+    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep8, &theDevice, &theEndpoint))   
     {
         return(NULL);
     }
     
-    return(theEndpoint->epram_ram); 
+    return(theEndpoint->epram); 
 }
 
-
-extern eOresult_t eo_nvset_NVget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, EOnv* thenv)
+extern void* eo_nvset_RAMofEntity_Get(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvENT_t ent)
 {
     eOnvset_dev_t* theDevice = NULL;
     eOnvset_ep_t* theEndpoint = NULL;
+ 
+    if((NULL == p)) 
+    {
+        return(NULL); 
+    }
+
+    // - retrieve the device and the endpoint
+    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep8, &theDevice, &theEndpoint))   
+    {
+        return(NULL);
+    }
+    
+
+    return(eoprot_ep_entity_ram_extract(theDevice->boardnum, ep8, ent, theEndpoint->epram));
+
+}
+
+
+extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, EOnv* thenv)
+{
+    eOnvset_dev_t* theDevice = NULL;
+    eOnvset_ep_t* theEndpoint = NULL;
+    eOnvEP8_t ep8 = eo_nv_hid_id32_extract_ep8(id32); 
 
  
     if((NULL == p) || (NULL == thenv)) 
@@ -376,40 +378,42 @@ extern eOresult_t eo_nvset_NVget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvI
         return(eores_NOK_nullpointer); 
     }
 
-    // - retrieve the device and the endpoint. if the ep is not recognised, then ... eores_NOK_generic
-    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep, &theDevice, &theEndpoint))   
+    // - retrieve the device and the endpoint. if the ep8 is not recognised, then ... eores_NOK_generic
+    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep8, &theDevice, &theEndpoint))   
     {
         return(eores_NOK_generic);
     }
+
+    uint8_t brd = theDevice->boardnum;
     
-    // - verify that on the given ep there is a valid id. if the id is not recognised, then ... eores_NOK_generic
-    if(eobool_false ==  theEndpoint->fptr_isepidsupported(ep, id))
+    // - verify that on the given endpoint there is a valid id32. if the id32 is not recognised, then ... eores_NOK_generic
+    if(eobool_false ==  theEndpoint->epcfg.fptr_isidsupported(brd, id32))
     {
         return(eores_NOK_generic);       
     }
-
+    
     // - retrieve from the device and endpoint what is required to form the netvar: con, ram, mtx, etc.    
     // - 1. the rom
-    EOnv_rom_t* rom = (EOnv_rom_t*) theEndpoint->fptr_epid2nvrom(ep, id);
+    EOnv_rom_t* rom = (EOnv_rom_t*) theEndpoint->epcfg.fptr_getnvrom(id32);
     // - 2. the ram
-    uint8_t* ram = theEndpoint->fptr_dataepid2nvram(theEndpoint->epram_ram, ep, id);
+    uint8_t* ram = theEndpoint->epcfg.fptr_getnvram(brd, id32, theEndpoint->epram);
     // - 3. the mtx
-    EOVmutexDerived* mtx2use = s_eo_nvset_get_nvmutex(p, theDevice, theEndpoint, id);
+    EOVmutexDerived* mtx2use = s_eo_nvset_get_nvmutex(p, theDevice, theEndpoint, id32);
     
     
-    // - final control about the validity of ep-id. it may be redundant but it is safer. for instance if the fptr_isepidsupported()
+    // - final control about the validity of id32. it may be redundant but it is safer. for instance if the fptr_isepidsupported()
     //   does not take into account a removed tag and just checks that the tag-number is lower than the max allowed.
     
     if((NULL == rom) || (NULL == ram))  // mtx2use can be NULL
     {
         return(eores_NOK_generic); 
     }
+    
 
     // - load everything into the nv
     eo_nv_hid_Load(     thenv,
                         ip, //(*theDevice)->ipaddress,
-                        ep, //(*theEndpoint)->endpoint,
-                        id,
+                        id32, 
                         rom,
                         ram,
                         mtx2use
@@ -425,28 +429,30 @@ extern eOresult_t eo_nvset_NVget(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvI
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern uint16_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id)
+extern eOnvPROGnum_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32)
 {
     eOnvset_dev_t* theDevice = NULL;
     eOnvset_ep_t* theEndpoint = NULL;
+    
+    eOnvEP8_t ep8 = eo_nv_hid_id32_extract_ep8(id32);
  
     if(NULL == p) 
     {
-        return(EOK_uint16dummy); 
+        return(EOK_uint32dummy); 
     }
 
     // - retrieve the device and the endpoint
-    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep, &theDevice, &theEndpoint))   
+    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, ep8, &theDevice, &theEndpoint))   
     {
-        return(EOK_uint16dummy);
+        return(EOK_uint32dummy);
     }
     
-    if(NULL == theEndpoint->fptr_epid2nvprogressivenumber)
+    if(NULL == theEndpoint->epcfg.fptr_getnvprognumber)
     {
-        return(EOK_uint16dummy);
+        return(EOK_uint32dummy);
     }
     
-    return(theEndpoint->fptr_epid2nvprogressivenumber(ep, id));
+    return(theEndpoint->epcfg.fptr_getnvprognumber(theDevice->boardnum, id32));
 }
 
 extern uint16_t eo_nvset_hid_ip2index(EOnvSet* p, eOipv4addr_t ip)
@@ -470,7 +476,7 @@ extern uint16_t eo_nvset_hid_ip2index(EOnvSet* p, eOipv4addr_t ip)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedevice, eOnvset_ep_t* theendpoint, eOnvID_t id)
+static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedevice, eOnvset_ep_t* theendpoint, eOnvID32_t id32)
 {
     EOVmutexDerived* mtx2use = NULL;
     
@@ -500,7 +506,7 @@ static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedev
             case eo_nvset_protection_one_per_netvar:
             {
                 //#warning .... i think of void* as a uint32_t*
-                uint16_t nvprognumber = theendpoint->fptr_epid2nvprogressivenumber(theendpoint->endpoint, id);
+                uint32_t nvprognumber = theendpoint->epcfg.fptr_getnvprognumber(thedevice->boardnum, id32);
                 uint32_t** addr = eo_vector_At(theendpoint->themtxofthenvs, nvprognumber);
                 mtx2use = (EOVmutexDerived*) (*addr);
             } break;  
@@ -517,7 +523,7 @@ static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedev
 }
 
 
-static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4addr_t ip, eOnvEP_t ep, eOnvset_dev_t** thedevice, eOnvset_ep_t** theendpoint)
+static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvset_dev_t** thedevice, eOnvset_ep_t** theendpoint)
 {
     // get the device   
     uint16_t ondevindex = (eok_ipv4addr_localhost == ip) ? (p->devindexoflocaldevice) : (eo_nvset_hid_ip2index(p, ip));   
@@ -535,24 +541,25 @@ static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4ad
     uint16_t onendpointindex = EOK_uint16dummy;
     if((NULL != (*thedev)->fptr_ep2index))
     {
-        onendpointindex = (*thedev)->fptr_ep2index(ep);
+        onendpointindex = (*thedev)->fptr_ep2index(ep8);
     }
-    // if the fptr_ep2index is not present or if it fails ... we must do a full search
-    if(EOK_uint16dummy == onendpointindex)
-    {   // cannot fill w/ hash --> need to do an exhaustive search.
-        uint16_t j = 0;
-        uint16_t nendpoints = eo_vector_Size((*thedev)->theendpoints);
-        for(j=0; j<nendpoints; j++)
-        {
-            eOnvset_ep_t **tmpendpoint = (eOnvset_ep_t**) eo_vector_At((*thedev)->theendpoints, j);
-    
-            if(ep == (*tmpendpoint)->endpoint)
-            {
-                onendpointindex = j;
-                break;
-            }
-        }
-    }    
+    // we dont do a full search because we must rely on the given function !!!
+//     // if the fptr_ep2index is not present or if it fails ... we must do a full search
+//     if(EOK_uint16dummy == onendpointindex)
+//     {   // cannot fill w/ hash --> need to do an exhaustive search.
+//         uint16_t j = 0;
+//         uint16_t nendpoints = eo_vector_Size((*thedev)->theendpoints);
+//         for(j=0; j<nendpoints; j++)
+//         {
+//             eOnvset_ep_t **tmpendpoint = (eOnvset_ep_t**) eo_vector_At((*thedev)->theendpoints, j);
+//     
+//             if(ep8 == (*tmpendpoint)->epcfg.endpoint)
+//             {
+//                 onendpointindex = j;
+//                 break;
+//             }
+//         }
+//     }    
     if(EOK_uint16dummy == onendpointindex)
     {
         return(eores_NOK_generic);

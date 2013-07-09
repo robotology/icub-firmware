@@ -107,14 +107,13 @@ typedef enum
 } eOropconfinfo_t;
 
 
-typedef struct      // 06 bytes
-{
-    eOnvEP_t        ep;
-    eOnvID_t        id;
-    eObool_t        plustime;
-    uint8_t         filler;
-} eOropSIGcfg_t;    EO_VERIFYsizeof(eOropSIGcfg_t, 6);
 
+typedef struct      // 04 bytes
+{
+    eOnvID32_t      id32;
+//     eObool_t        plustime;
+//     uint8_t         filler[3];
+} eOropSIGcfg_t;    EO_VERIFYsizeof(eOropSIGcfg_t, 4);
 
 
 typedef struct      // 24 bytes
@@ -122,8 +121,7 @@ typedef struct      // 24 bytes
     eOropctrl_t             control;            // 1B
     eOropcode_t             ropcode;            // 1B
     uint16_t                size;               // 2B
-    eOnvEP_t                ep;                 // 2B
-    eOnvID_t                id;                 // 2B
+    eOnvID32_t              id32;               // 4B
     uint8_t*                data;               // 4B
     uint32_t                signature;          // 4B
     uint64_t                time;               // 4B

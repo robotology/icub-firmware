@@ -56,8 +56,7 @@ typedef struct
     eOropctrl_t     ctrl;
     eOropcode_t     ropc;
     uint16_t        dsiz;
-    eOnvEP_t        endp;
-    eOnvID_t        nvid;
+    eOnvID32_t      id32;
 } eOrophead_t;      EO_VERIFYsizeof(eOrophead_t, 8);
 
 

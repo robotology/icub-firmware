@@ -238,8 +238,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
 
     // for searching inside listofregropinfo we need only those three fields: ropcode, id, ep
     ropdescriptor.ropcode   = ropdesc->ropcode;
-    ropdescriptor.ep        = ropdesc->ep;
-    ropdescriptor.id        = ropdesc->id;
+    ropdescriptor.id32      = ropdesc->id32;
 
     
     // search for ropcode+ep+id. if found, then ... return OK and dont do anything because it means that the rop is already inside
@@ -254,9 +253,9 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     
     nvownership = eo_rop_hid_GetOwnership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
       
-    res = eo_nvset_NVget(   (p->nvset),  
+    res = eo_nvset_NV_Get(  (p->nvset),  
                             (eo_nv_ownership_local == nvownership) ? (eok_ipv4addr_localhost) : (p->ipv4addr), 
-                            ropdesc->ep, ropdesc->id,
+                            ropdesc->id32,
                             &nv
                             );   
 
@@ -363,8 +362,7 @@ extern eOresult_t eo_transmitter_regular_rops_Unload(EOtransmitter *p, eOropdesc
     
     // need only ropcode, ep and id to search for inside the list listofregropinfo
     ropdescriptor.ropcode       = ropdesc->ropcode;
-    ropdescriptor.ep            = ropdesc->ep;
-    ropdescriptor.id            = ropdesc->id;
+    ropdescriptor.id32          = ropdesc->id32;
 
       
     // search for ropcode+nvep+nvid. if not found, then ... return OK and dont do anything.
@@ -545,9 +543,9 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     
     nvownership = eo_rop_hid_GetOwnership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
       
-    res = eo_nvset_NVget(   (p->nvset),  
+    res = eo_nvset_NV_Get(  (p->nvset),  
                             (eo_nv_ownership_local == nvownership) ? (eok_ipv4addr_localhost) : (p->ipv4addr), 
-                            ropdesc->ep, ropdesc->id,
+                            ropdesc->id32,
                             &nv
                             );   
 
@@ -653,8 +651,8 @@ static eOresult_t s_eo_transmitter_ropmatchingrule_rule(void *item, void *param)
 {
     eo_transm_regrop_info_t *inside = (eo_transm_regrop_info_t*)item;
     eOropdescriptor_t *targetrop = (eOropdescriptor_t*)param;
-    
-    if((inside->thenv.id == targetrop->id) && (inside->thenv.ep == targetrop->ep) && (inside->ropcode == targetrop->ropcode))
+
+    if((inside->thenv.id32 == targetrop->id32) && (inside->ropcode == targetrop->ropcode))
     {
         return(eores_OK);
     }
