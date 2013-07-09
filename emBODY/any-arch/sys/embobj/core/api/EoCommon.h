@@ -418,6 +418,7 @@ typedef enum
 #define eOpurevirtual  
 
 
+typedef     uint16_t    (*eOuint16_fp_uint8_uint8_t)                (uint8_t, uint8_t);
 typedef     uint16_t    (*eOuint16_fp_uint16_t)                     (uint16_t);
 typedef     uint16_t    (*eOuint16_fp_uint32_t)                     (uint32_t);
 typedef     uint8_t     (*eOuint8_fp_voidp_t)                       (void *);
@@ -461,9 +462,22 @@ typedef     eOresult_t  (*eOres_fp_voidp_uint32_uint32_voidp_t)     (void *, uin
 typedef     void        (*eOvoid_fp_voidfpvoiduint32_t)             (void (*)(void), uint32_t);
 typedef     void        (*eOvoid_fp_voidfpvoiduint32uint8_t)       	(void (*)(void), uint32_t, uint8_t);
 typedef     uint16_t    (*eOuint16_fp_uint16_uint16_t)              (uint16_t, uint16_t);
+typedef     uint32_t    (*eOuint32_fp_uint8_uint16_t)               (uint8_t, uint16_t);
+typedef     uint32_t    (*eOuint32_fp_uint8_uint8_uint16_t)         (uint8_t, uint8_t, uint16_t);
+typedef     uint16_t    (*eOuint16_fp_uint8_uint32_t)               (uint8_t, uint32_t);
+typedef     uint16_t    (*eOuint16_fp_uint8_t)                      (uint8_t);
+typedef     uint32_t    (*eOuint32_fp_uint8_uint32_t)               (uint8_t, uint32_t);
 typedef     void*       (*eOvoidp_fp_uint16_uint16_t)               (uint16_t, uint16_t);
+typedef     void*       (*eOvoidp_fp_uint8_uint32_t)                (uint8_t, uint32_t);
 typedef     eObool_t    (*eObool_fp_uint16_uint16_t)                (uint16_t, uint16_t);
 typedef     void*       (*eOvoidp_fp_voidp_uint16_uint16_t)         (void*, uint16_t, uint16_t);
+typedef     eObool_t    (*eObool_fp_uint8_uint32_t)                 (uint8_t, uint32_t);
+typedef     void*       (*eOvoidp_fp_voidp_uint8_uint32_t)          (void*, uint8_t, uint32_t);
+typedef     void*       (*eOvoidp_fp_uint32_t)                      (uint32_t);
+typedef     void        (*eOvoid_fp_uint8_uint8_voidp_t)            (uint8_t, uint8_t, void*);
+typedef     void*       (*eOvoidp_fp_uint8_uint32_voidp_t)          (uint8_t, uint32_t, void*);
+
+
 
 
 /** @typedef    typedef struct eOcallbackData_t
