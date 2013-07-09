@@ -119,7 +119,7 @@ typedef const struct
     eObool_t                        errmng_haltrace_enabled;  /**< if true enable hal trace in error manager to write to debug window */
     eom_emsapplcfg_boardid_t        boardid;
     eObool_t                        hasdevice[eom_emsappl_deviceid_numberof];
-    eOnvEP_t                        eps[eom_emsappl_eptype_numberof];
+    eOnvEP8_t                       eps[eom_emsappl_eptype_numberof];
     eOemsdiscoverylistener_cfg_t    disclistcfg;
     eOemsbackdoor_cfg_t             backdoorcfg;
     eOemssocket_cfg_t               socketcfg;      /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
@@ -169,11 +169,11 @@ extern EOMtheEMSapplCfg * eom_emsapplcfg_GetHandle(void);
 extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev); 
 
 
-/** @fn         extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
+/** @fn         extern eOnvEP8_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
     @brief      tells the ep for a given category of endpoint.
-    @return     teh ep value or 0xffff if the ep type is not present
+    @return     teh ep value or 0xff if the ep type is not present
  **/
-extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype); 
+extern eOnvEP8_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype); 
 
 
 /** @}            

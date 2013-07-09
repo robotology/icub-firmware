@@ -413,7 +413,7 @@ extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_dev
     return(s_emsapplcfg_singleton.hasdevice[dev]);
 }
 
-extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
+extern eOnvEP8_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
 {
     return(s_emsapplcfg_singleton.eps[eptype]);
 }
