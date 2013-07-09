@@ -1026,7 +1026,7 @@ static hal_result_t s_hal_can_tx_highprio(hal_can_port_t port, hal_can_frame_t *
 {
     hal_can_portdatastructure_t *cport = s_hal_can_portdatastruct_ptr[HAL_can_port2index(port)];
     uint8_t buff_num;
-    hal_result_t res;
+    hal_result_t res=hal_res_OK;
 
     // disable scheduling
     hal_base_hid_osal_scheduling_suspend();
