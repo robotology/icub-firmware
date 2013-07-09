@@ -69,11 +69,11 @@ enum {  eocfg_EPs_eb2_mn_numberof_comms = 1, eocfg_EPs_eb2_mn_numberof_appls = 1
 /** @typedef    typedef struct eocfg_EPs_eb2_mn_t;
     @brief      It is the container of comms, apps in the management endpoint of board eb2.
  **/
-typedef struct                  // 136+24+0 = 160              
+typedef struct                  // 124+24+0 = 128              
 {
     eOmn_comm_t                 communication; 
     eOmn_appl_t                 application;
-} eocfg_EPs_eb2_mn_t;           EO_VERIFYsizeof(eocfg_EPs_eb2_mn_t, 160); 
+} eocfg_EPs_eb2_mn_t;           EO_VERIFYsizeof(eocfg_EPs_eb2_mn_t, 128); 
 
 
 // - motion control
@@ -136,14 +136,14 @@ extern const eOnvset_DEVcfg_t eocfg_EPs_eb2_object;
 extern eOresult_t eocfg_EPs_eb2_Initialise(void);
 
 
-/** @fn         extern void* eocfg_EPs_eb2_Get_RAM(eOnvEP_t ep)
+/** @fn         extern void* eocfg_EPs_eb2_Get_RAM(eOnvEP8_t ep)
     @brief      Retrieves all the RAM of the endpoint specified by @e ep.
                 This ram can be used with a proper cast to the struct representing the endpoint on the board (e.g., for 
                 the endpoint eoprot_endpoint_motioncontrol in this board, the cast is to be done with eOprot_ep_mc_eb2_t).
     @param      ep              The endpoint.
     @return     The pointer to the memory or NULL if the memory is not initialised yet or if the @e ep is not recognised
  **/
-extern void* eocfg_EPs_eb2_Get_RAM(eOnvEP_t ep);
+extern void* eocfg_EPs_eb2_Get_RAM(eOnvEP8_t ep);
 
 
 
