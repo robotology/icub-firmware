@@ -122,8 +122,7 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
     }
     
     nv->ip          = eo_nv_IPdummy;
-    nv->ep          = eo_nv_EPdummy;
-    nv->id          = eo_nv_IDdummy;
+    nv->id32        = eo_nv_ID32dummy;
     nv->rom         = NULL;       
     nv->ram         = NULL;  
     nv->mtx         = NULL;
@@ -246,25 +245,24 @@ extern eOresult_t eo_nv_Init(const EOnv *nv)
 }
 
 
-
-extern eOnvID_t eo_nv_GetID(const EOnv *nv)
+extern eOnvID32_t eo_nv_GetID32(const EOnv *nv)
 {
     if(NULL == nv)
     {
-        return(eo_nv_IDdummy);
+        return(eo_nv_ID32dummy);
     }
-    return(nv->id);
+    return(nv->id32);
 }
 
-
-extern eOnvEP_t eo_nv_GetEP(const EOnv *nv)
+extern eOnvEP8_t eo_nv_GetEP8(const EOnv *nv)
 {
     if(NULL == nv)
     {
-        return(eo_nv_EPdummy);
+        return(eo_nv_EP8dummy);
     }
-    return(nv->ep);
+    return(eo_nv_hid_id32_extract_ep8(nv->id32));
 }
+
 
 extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv)
 {
@@ -297,11 +295,10 @@ extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx/*, EOVstorageDerived* stg*/)
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
 {
     nv->ip          = ip;
-    nv->ep          = ep;
-    nv->id          = id;
+    nv->id32        = id32;
     nv->rom         = rom;
     nv->ram         = ram; 
     nv->mtx         = mtx;

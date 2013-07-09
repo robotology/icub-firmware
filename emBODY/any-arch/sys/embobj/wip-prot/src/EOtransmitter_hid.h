@@ -55,15 +55,15 @@ extern "C" {
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-typedef struct      // 40 bytes on arm .... 
+typedef struct      // 28 bytes on arm .... 
 {
     eOropcode_t     ropcode;
     eObool_t        hasdata2update;       
-    uint16_t        ropstarthere;   // the index where the rop starts inside teh ropframe. if data is available, then it is placed at ropstarthere+8
+    uint16_t        ropstarthere;           // the index where the rop starts inside teh ropframe. if data is available, then it is placed at ropstarthere+8
     uint16_t        ropsize;
-    uint16_t        timeoffsetinsiderop;     // if time is not present its value is 0xffff 
+    uint16_t        timeoffsetinsiderop;    // if time is not present its value is 0xffff 
     EOnv            thenv;
-} eo_transm_regrop_info_t; //EO_VERIFYsizeof(eo_transm_regrop_info_t, (10*4));
+} eo_transm_regrop_info_t;  EO_VERIFYsizeof(eo_transm_regrop_info_t, (8+20));
 
 
 typedef struct

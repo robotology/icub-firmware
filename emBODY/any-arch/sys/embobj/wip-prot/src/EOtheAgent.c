@@ -171,7 +171,7 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
 			
         if(NULL != eo_theagent.cfg->on_rop_conf_received)
         {
-            eo_theagent.cfg->on_rop_conf_received(/*ropin->aboutip.ipaddr*/ fromipaddr, ropc, ropin->stream.head.endp, ropin->stream.head.nvid, ropin->stream.sign, ropin->stream.time, (eOropconfinfo_t)ropin->stream.head.ctrl.confinfo);
+            eo_theagent.cfg->on_rop_conf_received(fromipaddr, &ropin->ropdes);
         }
 
         return(eores_OK); 
@@ -181,9 +181,9 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
         eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropc, eo_ropconf_none, eo_rop_dir_received); // local if we receive a set/get. remote if we receive a sig
         
 
-        res = eo_nvset_NVget(   nvset, /*ropin->tmpdata.nvset,*/ 
+        res = eo_nvset_NV_Get(  nvset, /*ropin->tmpdata.nvset,*/ 
                                 (eo_nv_ownership_local == ownership) ? (eok_ipv4addr_localhost) : (fromipaddr),
-                                ropin->stream.head.endp, ropin->stream.head.nvid,  
+                                ropin->stream.head.id32,  
                                 &ropin->netvar
                                 );
         
@@ -217,23 +217,14 @@ extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescripto
     eo_rop_Reset(rop);  
         
     // put in rophead all the options
-//     rophead.ctrl.ffu        = 0;
-//     rophead.ctrl.confinfo   = eo_ropconf_none; // cannot do a ack/ack
-//     rophead.ctrl.plustime   = ropdescr->configuration.plustime;
-//     rophead.ctrl.plussign   = ropdescr->configuration.plussign;
-//     rophead.ctrl.rqsttime   = ropdescr->configuration.timerqst;
-//     rophead.ctrl.rqstconf   = ropdescr->configuration.confrqst;
-//     rophead.ctrl.userdefn   = 0;
-    
     memcpy(&rophead.ctrl, &ropdescr->control, sizeof(eOropctrl_t));
     rophead.ctrl.confinfo   = eo_ropconf_none;  // cannot do a ack/ack
     rophead.ctrl.version    = 0;                // it must be zero
        
     
     rophead.ropc            = ropdescr->ropcode;
-    rophead.endp            = ropdescr->ep;
-    rophead.nvid            = ropdescr->id;
     rophead.dsiz            = ropdescr->size;
+    rophead.id32            = ropdescr->id32;
 
 
     // check validity of ropc 
@@ -303,7 +294,7 @@ extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
         if(NULL !=  eo_theagent.cfg->on_rop_conf_requested)
         {
 //            #warning --> in eo_agent_hid_OutROPonTransmission() ho rimosso il ip di destinazione
-            eo_theagent.cfg->on_rop_conf_requested(/*rop->aboutip.ipaddr*/0, rop->stream.head.ropc, rop->stream.head.endp, rop->stream.head.nvid, rop->stream.sign, rop->stream.time);
+            eo_theagent.cfg->on_rop_conf_requested(0, &rop->ropdes);
         }
         return(eores_OK);
     }

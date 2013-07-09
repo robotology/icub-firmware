@@ -60,20 +60,23 @@ extern "C" {
 typedef struct EOnv_hid EOnv;
 
 
-typedef uint16_t eOnvEP_t;
+typedef uint8_t eOnvBRD_t;
+typedef uint32_t eOnvID32_t;
+typedef uint32_t eOnvPROGnum_t;
+typedef uint8_t eOnvEP8_t;
+typedef uint8_t eOnvENT_t;
 
-typedef uint16_t eOnvID_t;
-
-enum { eo_nv_IPdummy = 0, eo_nv_EPdummy = EOK_uint16dummy, eo_nv_IDdummy = EOK_uint16dummy }; 
-
-//typedef uint8_t eOnvIDfuntyp_t;
+// typedef uint8_t eOnvENT_t;
+// typedef uint8_t eOnvIND_t;
+// typedef uint8_t eOnvTAG_t;
 
 
-typedef struct      // 04 bytes
-{
-    eOnvEP_t        ep;
-    eOnvID_t        id;
-} eOnvEPID_t;       EO_VERIFYsizeof(eOnvEPID_t, 4);
+
+
+enum { eo_nv_IPdummy = 0, eo_nv_EP8dummy = EOK_uint08dummy }; 
+
+#define eo_nv_ID32dummy     EOK_uint32dummy
+#define eo_nv_PROGnumdummy  EOK_uint32dummy
 
 
 typedef enum
@@ -136,13 +139,15 @@ extern eOresult_t eo_nv_Reset(const EOnv *nv, eObool_t forcerst, eOnvUpdate_t up
 extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint16_t *size);
 
 extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv);
-extern eOnvEP_t eo_nv_GetEP(const EOnv *nv);
-extern eOnvID_t eo_nv_GetID(const EOnv *nv);
+
+extern eOnvID32_t eo_nv_GetID32(const EOnv *nv);
+
+extern eOnvEP8_t eo_nv_GetEP8(const EOnv *nv);
+
 
 extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv);
 
 extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv);
-
 
 
 

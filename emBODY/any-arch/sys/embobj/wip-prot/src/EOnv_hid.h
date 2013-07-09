@@ -67,15 +67,14 @@ typedef const struct                    // 16 bytes on arm
 
 
 
-struct EOnv_hid                    // 24 bytes 
+struct EOnv_hid                    // 20 bytes 
 {
     eOipv4addr_t                    ip;         // ip address of the device owning the nv. if equal to eok_ipv4addr_localhost, then the nv is owned by the device.
-    eOnvEP_t                        ep;         // endpoint (aka logical classification of data) of the nv           
-    eOnvID_t                        id;         // identifier of the nv
+    eOnvID32_t                      id32;
     EOnv_rom_t*                     rom;        // pointer to the constant part common to every device which uses this nv
     void*                           ram;        // the ram which keeps the LOCAL value of nv 
     EOVmutexDerived*                mtx;        // the mutex which protects concurrent access to the ram of this nv (or rem ...) 
-};   
+};  EO_VERIFYsizeof(EOnv, 20);   
 
 
 
@@ -89,7 +88,7 @@ struct EOnv_hid                    // 24 bytes
 //extern EOnv * eo_nv_hid_New(uint8_t fun, uint8_t typ, uint32_t otherthingsmaybe);
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvEP_t ep, eOnvID_t id, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx/*, EOVstorageDerived* stg*/);
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx);
 
 extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest);
 
@@ -102,6 +101,11 @@ extern eOresult_t eo_nv_hid_ResetROP(const EOnv *nv, eOnvUpdate_t upd, const eOr
 extern eOresult_t eo_nv_hid_SetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t* ropdes);
 
+
+EO_extern_inline eOnvEP8_t eo_nv_hid_id32_extract_ep8(eOnvID32_t id32)
+{
+    return((id32>>24)&0xff);
+}
 
 // - declaration of extern hidden online functions -------------------------------------------------------------------
 // empty-section
