@@ -183,7 +183,7 @@ extern "C" {
 #if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_motioncontrol       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_analogsensors
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB2)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_motioncontrol       
@@ -193,7 +193,7 @@ extern "C" {
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB3)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightupperarm       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_rightupperarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB4)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightlowerarm       
@@ -202,28 +202,28 @@ extern "C" {
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB5)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_torso       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_none 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB6)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_leftupperleg       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_leftupperleg 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB7)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_leftlowerleg       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_none 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB8)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightupperleg       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_as_rightupperleg 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB9)
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    eoprot_endpoint_mc_rightlowerleg       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    eoprot_endpoint_none 
+        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    eoprot_endpoint_none 
 #else
     #error --> you must define an EBx
     //unless you have already added function to get mc, as and sk endpoint number and use them to initialise appTheNVmapRef obj!!!
