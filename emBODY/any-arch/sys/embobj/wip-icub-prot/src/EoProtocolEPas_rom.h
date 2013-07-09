@@ -66,9 +66,9 @@ extern const eOas_mais_t eoprot_ep_as_rom_mais_defaultvalue;
 extern uint16_t eoprot_ep_as_rom_strain_get_offset(eOprotTag_t tag);
 extern uint16_t eoprot_ep_as_rom_mais_get_offset(eOprotTag_t tag);
 
-extern void* eoprot_ep_as_rom_get_nvrom(eOprotID_t id);
-extern uint16_t eoprot_ep_as_rom_get_sizeofvar(eOprotID_t id);
-extern uint16_t eoprot_ep_as_rom_get_prognum(eOprotID_t id);
+extern void* eoprot_ep_as_rom_get_nvrom(eOprotID32_t id);
+extern uint16_t eoprot_ep_as_rom_get_sizeofvar(eOprotID32_t id);
+extern uint16_t eoprot_ep_as_rom_get_prognum(eOprotID32_t id);
 
 
 

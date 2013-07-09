@@ -77,8 +77,7 @@ typedef struct
     eOprot_ROP_ctrl_t   control;        /**< use eOprot_ROP_control_t values */
     eOprot_ROP_code_t   ropcode;        /**< use eOprot_ROP_code_value_t values */
     uint16_t            datasize;       /**< the true size of the data field */
-    eOprotEP_t          ep;             /**< the endpoint of the variable */
-    eOprotID_t          id;             /**< the identifier of the variable */
+    eOprotID32_t        id;             /**< the identifier of the variable */
 } eOprot_ROP_head_t;    EO_VERIFYsizeof(eOprot_ROP_head_t, 8);
 
 

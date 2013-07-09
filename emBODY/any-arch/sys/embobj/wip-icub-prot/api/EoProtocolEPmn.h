@@ -134,11 +134,11 @@ enum { eoprot_ep_mn_rwmodes_appl_numberof = 4 };  // it MUST be equal to the num
 /** @typedef    typedef struct eOprot_ep_mn_template_t;
     @brief      it is a template for the organisation of the entities in the endpoint management.
  **/
-typedef struct                  // 136+24+0 = 160              
+typedef struct                  // 104+24+0 = 128              
 {
     eOmn_comm_t                 communication; 
     eOmn_appl_t                 application;
-} eOprot_ep_mn_template_t;      EO_VERIFYsizeof(eOprot_ep_mn_template_t, 160);  
+} eOprot_ep_mn_template_t;      EO_VERIFYsizeof(eOprot_ep_mn_template_t, 128);  
 
   
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -164,13 +164,13 @@ extern eOresult_t eoprot_ep_mn_number_of_boards_Load(uint16_t numofboards);
 extern eOresult_t eoprot_ep_mn_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
-/** @fn         extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+/** @fn         extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
     @brief      This function tells if an id belongs to the board
     @param      brd                     the board
     @param      id                      the id
     @return     eobool_true if the ID belongs to the board, eobool_false if not.
   */
-extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id);
+extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
 
 
 /** @fn         extern uint16_t eoprot_ep_mn_variable_numberof_Get(eOprotBRD_t brd)
@@ -180,21 +180,21 @@ extern eObool_t eoprot_ep_mn_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id);
   */
 extern uint16_t eoprot_ep_mn_variables_numberof_Get(eOprotBRD_t brd);
 
-/** @fn         extern eOprotID_t eoprot_ep_mn_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+/** @fn         extern eOprotID32_t eoprot_ep_mn_variable_idfromprognumber_Get(eOprotBRD_t brd, eOprotPROGnum_t prog)
     @brief      This function retrieves the id of a variable from the progressive number given the board
     @param      brd                     the board
     @param      prog                    the progressive number
-    @return     the ID or EOK_uint16dummy if invalid .
+    @return     the ID or EOK_uint32dummy if invalid .
   */
-extern eOprotID_t eoprot_ep_mn_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog);
+extern eOprotID32_t eoprot_ep_mn_variable_idfromprognumber_Get(eOprotBRD_t brd, eOprotPROGnum_t prog);
 
-/** @fn         extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id)
+/** @fn         extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID32_t id)
     @brief      This function retrieves the progressive number of a variable given the board and the @e id
     @param      brd                     the board
     @param      id                      the ID
-    @return     the progressive number or EOK_uint16dummy if invalid .
+    @return     the progressive number or EOK_uint32dummy if invalid .
   */
-extern uint16_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id);
+extern eOprotPROGnum_t eoprot_ep_mn_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID32_t id);
 
 
 /** @fn         extern uint16_t eoprot_ep_mn_comms_numberof_Get(eOprotBRD_t brd)
@@ -215,11 +215,13 @@ extern uint16_t eoprot_ep_mn_appls_numberof_Get(eOprotBRD_t brd);
 
 extern uint16_t eoprot_ep_mn_ram_sizeof_Get(eOprotBRD_t brd);
 
-extern uint16_t eoprot_ep_mn_variable_ram_sizeof_Get(eOprotID_t id);
+extern void* eoprot_ep_mn_entity_ram_Extract(eOprotBRD_t brd, eOprotEntity_t ent, void* epram);
 
-extern void* eoprot_ep_mn_variable_ram_Extract(void* epram, eOprotBRD_t brd, eOprotID_t id);
+extern uint16_t eoprot_ep_mn_variable_ram_sizeof_Get(eOprotID32_t id);
 
-extern void* eoprot_ep_mn_variable_rom_Get(eOprotID_t id);
+extern void* eoprot_ep_mn_variable_ram_Extract(eOprotBRD_t brd, eOprotID32_t id, void* epram);
+
+extern void* eoprot_ep_mn_variable_rom_Get(eOprotID32_t id);
 
 extern const eOmn_comm_t* eoprot_ep_mn_comm_default_Get(void);
 

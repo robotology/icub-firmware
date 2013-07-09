@@ -61,7 +61,7 @@
 
 // all of them are weakly-defined or/and overridable by means of a specific include file
 
-extern void eoprot_ep_sk_fun_INITIALISE(eOnvEP_t ep, void *ram);
+extern void eoprot_ep_sk_fun_INITIALISE(void *ram);
 
 extern void eoprot_ep_sk_fun_INIT_skin_wholeitem(const EOnv* nv);
 extern void eoprot_ep_sk_fun_UPDT_skin_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);

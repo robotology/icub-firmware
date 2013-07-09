@@ -88,7 +88,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #if !defined(OVERRIDE_eoprot_ep_mn_fun_INITIALISE)
-__weak extern void eoprot_ep_mn_fun_INITIALISE(eOnvEP_t ep, void *ram) {}
+__weak extern void eoprot_ep_mn_fun_INITIALISE(void *ram) {}
 #endif
 
 

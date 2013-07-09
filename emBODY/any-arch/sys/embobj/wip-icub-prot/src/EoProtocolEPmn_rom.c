@@ -68,7 +68,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID_t id);
+static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
 
 static uint16_t s_eoprot_ep_mn_rom_comm_ramoffset(uint16_t tag);
 static uint16_t s_eoprot_ep_mn_rom_appl_ramoffset(uint16_t tag);
@@ -81,65 +81,12 @@ static uint16_t s_eoprot_ep_mn_rom_appl_ramoffset(uint16_t tag);
 
 // - default value of a comm
 
-#if 1
 const eOmn_comm_t eoprot_ep_mn_rom_comm_defaultvalue = { 0 };
-#else
-const eOmn_comm_t eoprot_ep_mn_rom_comm_defaultvalue =
-{
-    EO_INIT(.config)             
-    {
-        EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4} 
-    },
-    EO_INIT(.status)             
-    {
-        EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4} 
-    },
-    EO_INIT(.cmmnds)                       
-    {
-        EO_INIT(.ropsigcfg)                 
-        {
-            EO_INIT(.array)
-            {
-                EO_INIT(.head)
-                {
-                    EO_INIT(.capacity)      NUMOFROPSIGCFG,
-                    EO_INIT(.itemsize)      sizeof(eOropSIGcfg_t),
-                    EO_INIT(.size)          0
-                },
-                EO_INIT(.data)              {0}    
-            },
-            EO_INIT(.cmmnd)                 ropsigcfg_cmd_none,
-            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
-        }
-    }
-}; 
-#endif
 
 // - default value of a appl
 
-#if 1
 const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue = { 0 };
-#else
-const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue =
-{
-    EO_INIT(.config)
-    {
-        EO_INIT(.cycletime)         1000,
-        EO_INIT(.filler04)          {0xf1, 0xf2, 0xf3, 0xf4}    
-    },
-    EO_INIT(.status)
-    {
-        EO_INIT(.currstate)         applstate_config,  
-        EO_INIT(.runmode)           applrunMode__default,
-        EO_INIT(.filler06)          {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6}    
-    },
-    EO_INIT(.cmmnds)
-    {
-        EO_INIT(.go2state)          applstate_config,        
-        EO_INIT(.filler07)          {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}    
-    }       
-};  
-#endif
+
 
 // - descriptors for the variables of a comm
 
@@ -258,7 +205,7 @@ extern uint16_t eoprot_ep_mn_rom_appl_get_offset(eOprotTag_t tag)
     return(s_eoprot_ep_mn_rom_appl_ramoffset(tag));
 }
 
-extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID_t id)
+extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID32_t id)
 {
     uint16_t indexoffoldeddescriptors = s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(id);
     
@@ -270,7 +217,7 @@ extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID_t id)
     return((void*)eoprot_ep_mn_rom_folded_descriptors[indexoffoldeddescriptors]);   
 }
 
-extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID_t id)
+extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID32_t id)
 {     
     EOnv_rom_t* rom = eoprot_ep_mn_rom_get_nvrom(id);  
     if(NULL == rom)
@@ -280,9 +227,9 @@ extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID_t id)
     return(rom->capacity); 
 }
 
-extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID_t id)
+extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID32_t id)
 {   // we assume that the variables are inserted in a progressive way without holes. and even if there are a few holes never mind.
-    return(eoprot_ep_variable_ID2tag(eoprot_endpoint_management, id));
+    return(eoprot_ep_variable_ID2tag(id));
 }
 
 
@@ -297,16 +244,16 @@ extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID_t id)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID_t id)
+static uint16_t s_eoprot_ep_mn_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
 {      
-    uint16_t tag = eoprot_ep_variable_ID2tag(eoprot_endpoint_management, id);
+    uint16_t tag = eoprot_ep_variable_ID2tag(id);
     
     if(EOK_uint16dummy == tag)
     {
         return(EOK_uint16dummy);
     }
     
-    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(eoprot_endpoint_management, id);
+    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(id);
     
     switch(entity)
     {

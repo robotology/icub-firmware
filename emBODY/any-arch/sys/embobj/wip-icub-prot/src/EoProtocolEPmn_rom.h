@@ -65,9 +65,9 @@ extern const eOmn_appl_t eoprot_ep_mn_rom_appl_defaultvalue;
 extern uint16_t eoprot_ep_mn_rom_comm_get_offset(eOprotTag_t tag);
 extern uint16_t eoprot_ep_mn_rom_appl_get_offset(eOprotTag_t tag);
 
-extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID_t id);
-extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID_t id);
-extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID_t id);
+extern void* eoprot_ep_mn_rom_get_nvrom(eOprotID32_t id);
+extern uint16_t eoprot_ep_mn_rom_get_sizeofvar(eOprotID32_t id);
+extern uint16_t eoprot_ep_mn_rom_get_prognum(eOprotID32_t id);
 
 
 /** @}            

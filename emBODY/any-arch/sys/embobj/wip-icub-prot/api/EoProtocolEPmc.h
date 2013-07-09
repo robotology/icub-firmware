@@ -279,13 +279,13 @@ extern eOresult_t eoprot_ep_mc_number_of_boards_Load(uint16_t numofboards);
 extern eOresult_t eoprot_ep_mc_number_of_entities_Load(eOprotBRD_t brd, const uint8_t* numberofeachentity);
 
 
-/** @fn         extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id)
+/** @fn         extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
     @brief      This function tells if an id belongs to the board
     @param      brd                     the board
     @param      id                      the id
     @return     eobool_true if the ID belongs to the board, eobool_false if not.
   */
-extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id);
+extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
 
 
 /** @fn         extern uint16_t eoprot_ep_mc_variable_numberof_Get(eOprotBRD_t brd)
@@ -296,21 +296,22 @@ extern eObool_t eoprot_ep_mc_variables_id_isvalid(eOprotBRD_t brd, eOnvID_t id);
 extern uint16_t eoprot_ep_mc_variables_numberof_Get(eOprotBRD_t brd);
 
 
-/** @fn         extern eOprotID_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog)
+/** @fn         extern eOprotID32_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, eOprotPROGnum_t prog)
     @brief      This function retrieves the id of a variable from the progressive number given the board
     @param      brd                     the board
     @param      prog                    the progressive number
-    @return     the ID or EOK_uint16dummy if invalid .
+    @return     the ID or EOK_uint32dummy if invalid .
   */
-extern eOprotID_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, uint16_t prog);
+extern eOprotID32_t eoprot_ep_mc_variable_idfromprognumber_Get(eOprotBRD_t brd, eOprotPROGnum_t prog);
 
 
-/** @fn         extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd)
+/** @fn         extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID32_t id )
     @brief      This function retrieves the progressive number of a variable given the board and the @e id
-    @param      ep              the endpoint
-    @return     the progressive number or EOK_uint16dummy if invalid .
+    @param      brd                     the board
+    @param      id                      the id
+    @return     the progressive number or EOK_uint32dummy if invalid .
   */
-extern uint16_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID_t id);
+extern eOprotPROGnum_t eoprot_ep_mc_variable_progressivenumber_Get(eOprotBRD_t brd, eOprotID32_t id);
 
 
 /** @fn         extern uint16_t eoprot_ep_mc_joints_numberof_Get(eOprotBRD_t brd)
@@ -339,11 +340,13 @@ extern uint16_t eoprot_ep_mc_controllers_numberof_Get(eOprotBRD_t brd);
 
 extern uint16_t eoprot_ep_mc_ram_sizeof_Get(eOprotBRD_t brd);
 
-extern uint16_t eoprot_ep_mc_variable_ram_sizeof_Get(eOprotID_t id);
+extern void* eoprot_ep_mc_entity_ram_Extract(eOprotBRD_t brd, eOprotEntity_t ent, void* epram);
 
-extern void* eoprot_ep_mc_variable_ram_Extract(void* epram, eOprotBRD_t brd, eOprotID_t id);
+extern uint16_t eoprot_ep_mc_variable_ram_sizeof_Get(eOprotID32_t id);
 
-extern void* eoprot_ep_mc_variable_rom_Get(eOprotID_t id);
+extern void* eoprot_ep_mc_variable_ram_Extract(eOprotBRD_t brd, eOprotID32_t id, void* epram);
+
+extern void* eoprot_ep_mc_variable_rom_Get(eOprotID32_t id);
 
 extern const eOmc_joint_t* eoprot_ep_mc_joint_default_Get(void);
 

@@ -72,58 +72,64 @@ typedef struct
  **/
 typedef uint32_t eOprotIP_t;
 
+
 /** @typedef    typedef uint8_t eOprotBRD_t
     @brief      used as a short identifier of an IP address with values starting from 0 upto the max number of boards in the network
  **/
 typedef uint8_t eOprotBRD_t;
 
 
-/** @typedef    typedef uint16_t eOprotEP_t
-    @brief      the endopint is used to group some variables of homogeneous type inside a given device. for example
-                it can be motion control in left lower arm. 
+/** @typedef    typedef uint32_t eOprotID32_t
+    @brief      used to identify a variable inside a device. It can have holes in its representation
  **/
-typedef uint16_t eOprotEP_t;
+typedef uint32_t eOprotID32_t;
+
+/** @typedef    typedef uint32_t eOprotPROGnum_t
+    @brief      used to identify a variable inside a device. It does not have holes in its representation
+ **/
+typedef uint32_t eOprotPROGnum_t;
 
 
-/** @typedef    typedef uint16_t eOprotID_t
-    @brief      used to identify a variable inside an endpoint on a device. It can have holes in its representation
+/** @typedef    typedef uint8_t eOprotEP_t
+    @brief      It is part of eOprotID32_t. The endopint is used to group some variables of homogeneous type inside a given device. 
+                for example it can be motion control in left lower arm. 
  **/
-typedef uint16_t eOprotID_t;
+typedef uint8_t eOprotEP_t;
+
+enum { eoprot_endpoints_maxnumberof = 256 };  
+
 
 
 /** @typedef    uint8_t eOprotEntity_t
-    @brief      used to chose the value of the eOprotID_t. it can be a joint or a motor in a motion control endpoint.
+    @brief      It is part of eOprotID32_t. it can be a joint or a motor in a motion control endpoint.
                 It is used as a generic type for function arguments. You should use the relevant type of the endpoint
                 in use: eOprotEntityEPas_t, eOprotEntityEPmc_t, eOprotEntityEPmn_t, or eOprotEntityEPsk_t
  **/
 typedef uint8_t eOprotEntity_t;
 
-enum { eoprot_entities_numberof = 16 };  // the current implementation uses at most 16 possible types of entities per endpoint.
+enum { eoprot_entities_maxnumberof = 256 };  
 
 
 /** @typedef    uint8_t eOprotIndex_t
-    @brief      used to chose the value of the eOprotID_t. it can be the index of a joint or a motor in a motion control 
-                endpoint.
+    @brief      It is part of eOprotID32_t. It can be the index of a joint or a motor in a motion control endpoint.
  **/
 typedef uint8_t eOprotIndex_t;
 
-enum { eoprot_indices_numberof = 16 };  // the current implementation uses at most 16 possible entities of a given type per endpoint.
+enum { eoprot_indices_maxnumberof = 256 }; 
 
 
-/** @typedef    uint16_t eOprotTag_t
-    @brief      used to chose the value of the eOprotID_t. it can be associated to the PID of a joint, or to its measured 
-                position.
+/** @typedef    uint8_t eOprotTag_t
+    @brief      It is part of eOprotID32_t. it can be associated to the PID of a joint, or to its measured position.
  **/
-typedef uint16_t eOprotTag_t;
+typedef uint8_t eOprotTag_t;
 
-enum { eoprot_tags_numberof = 256 };    // the current implementation uses at most 256 possible tags per entity of a given type per endpoint.
+enum { eoprot_tags_maxnumberof = 256 };    // the current implementation uses at most 256 possible tags per entity of a given type per endpoint.
 
 
-/** @typedef    uint16_t eOprotProgNumber_t
-    @brief      it identifies a variable inside an endpoint on a device but it does not have holes in its representation.
+/** @typedef    uint32_t eOprotProgNumber_t
+    @brief      it identifies a variable inside a device but it does not have holes in its representation.
  **/
-typedef uint16_t eOprotProgNumber_t;
-
+typedef uint32_t eOprotProgNumber_t;
 
 
     
