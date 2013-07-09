@@ -89,21 +89,21 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg(const EOnv* nv) 
-{
-    //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+// extern void eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg(const EOnv* nv) 
+// {
+//     //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
 
-    eOmn_ropsigcfg_command_t* cmd = (eOmn_ropsigcfg_command_t*)nv->ram;
-        
-    if(eobool_true == eo_nv_hid_isLocal(nv))
-    {   // function is called from within the local board
-        s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(cmd);  
-    }
-    else
-    {   // function is called from within the remote host 
-    }    
+//     eOmn_ropsigcfg_command_t* cmd = (eOmn_ropsigcfg_command_t*)nv->ram;
+//         
+//     if(eobool_true == eo_nv_hid_isLocal(nv))
+//     {   // function is called from within the local board
+//         s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(cmd);  
+//     }
+//     else
+//     {   // function is called from within the remote host 
+//     }    
 
-}
+// }
 
 
 
@@ -207,10 +207,11 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
                 memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-                ropdesc.control.plustime        = (eobool_true == sigcfg->plustime) ? (1) : (0);
+                ropdesc.control.plustime        = (eobool_true == ropsigcfgcmd->plustime) ? (1) : (0);
+                ropdesc.control.plussign        = (eobool_true == ropsigcfgcmd->plussign) ? (1) : (0);
                 ropdesc.ropcode                 = eo_ropcode_sig;
-                ropdesc.ep                      = sigcfg->ep;    
-                ropdesc.id                      = sigcfg->id;
+                ropdesc.id32                    = sigcfg->id32;    
+                ropdesc.signature               = ropsigcfgcmd->signature;   
                 res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
                 res = res;
                 if(eores_OK != res)
@@ -227,10 +228,11 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
                 memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-                ropdesc.control.plustime        = (eobool_true == sigcfg->plustime) ? (1) : (0);
+                ropdesc.control.plustime        = (eobool_true == ropsigcfgcmd->plustime) ? (1) : (0);
+                ropdesc.control.plussign        = (eobool_true == ropsigcfgcmd->plussign) ? (1) : (0);
                 ropdesc.ropcode                 = eo_ropcode_sig;
-                ropdesc.ep                      = sigcfg->ep;    
-                ropdesc.id                      = sigcfg->id;
+                ropdesc.id32                    = sigcfg->id32;
+                ropdesc.signature               = ropsigcfgcmd->signature;
                 res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
                 res = res;
             }         
@@ -242,10 +244,11 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
             {
                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
                 memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-                ropdesc.control.plustime        = (eobool_true == sigcfg->plustime) ? (1) : (0);
+                ropdesc.control.plustime        = (eobool_true == ropsigcfgcmd->plustime) ? (1) : (0);
+                ropdesc.control.plussign        = (eobool_true == ropsigcfgcmd->plussign) ? (1) : (0);
                 ropdesc.ropcode                 = eo_ropcode_sig;
-                ropdesc.ep                      = sigcfg->ep;    
-                ropdesc.id                      = sigcfg->id;
+                ropdesc.id32                    = sigcfg->id32;
+                ropdesc.signature               = ropsigcfgcmd->signature;
                 res = eo_transceiver_rop_regular_Unload(theems00transceiver, &ropdesc);
                 res = res;
             }         
