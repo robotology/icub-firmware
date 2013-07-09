@@ -34,7 +34,7 @@
 #include "EoProtocolEPmc.h"
 #include "EoProtocolEPmn.h"
 #include "EoProtocolEPas.h"
-//#include "EoProtocolEPsk.h"
+#include "EoProtocolEPsk.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -107,12 +107,12 @@ extern uint16_t eoprot_ep_variables_numberof_get(eOprotBRD_t brd, eOprotEP_t ep)
         {
             total = eoprot_ep_as_variables_numberof_Get(brd);
         } break;     
-#if 0        
+       
         case eoprot_endpoint_skin:
         {
             total = eoprot_ep_sk_variables_numberof_Get(brd);
         } break;  
-#endif
+
         default:
         {
             total = 0;
@@ -123,43 +123,53 @@ extern uint16_t eoprot_ep_variables_numberof_get(eOprotBRD_t brd, eOprotEP_t ep)
 }
 
 
-// current implementation depends on the fatct taht we have the 16 bits of the id assigned to entity-index-tag
-// with 4-4-8 bits. thus we put a guard which fails compilation in case those values change.
-EO_VERIFYproposition(eoprot_ep_1234, 16 == eoprot_entities_numberof);
-EO_VERIFYproposition(eoprot_ep_1234, 16 == eoprot_indices_numberof);
-EO_VERIFYproposition(eoprot_ep_1234, 256 == eoprot_tags_numberof);
+// current implementation depends on the fact taht we have the 32 bits of the id assigned to ep-entity-index-tag
+// with 8-8-8-8 bits. thus we put a guard which fails compilation in case those values change.
+EO_VERIFYproposition(eoprot_ep_1233, 256 == eoprot_endpoints_maxnumberof);
+EO_VERIFYproposition(eoprot_ep_1234, 256 == eoprot_entities_maxnumberof);
+EO_VERIFYproposition(eoprot_ep_1235, 256 == eoprot_indices_maxnumberof);
+EO_VERIFYproposition(eoprot_ep_1236, 256 == eoprot_tags_maxnumberof);
 
-extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag)
+extern eOprotID32_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag)
 {
     uint32_t id = (uint32_t)tag & 0xff;
-    id |= (((uint32_t)index & 0x0f)<<8);
-    id |= (((uint32_t)entity & 0x0f)<<12);
-    return((eOprotID_t)id);    
+    id |= (((uint32_t)index & 0xff)<<8);
+    id |= (((uint32_t)entity & 0xff)<<16);
+    id |= (((uint32_t)ep & 0xff)<<24);
+    return((eOprotID32_t)id);    
 }
 
-extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotEP_t ep, eOprotID_t id)
+extern eOprotEP_t eoprot_ep_variable_ID2endpoint(eOprotID32_t id)
 {
-    uint32_t ent = (((uint32_t)id>>12) & 0x0f);
+    uint32_t end = (((uint32_t)id>>24) & 0xff);
+    return((eOprotEP_t)end);    
+}
+
+extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotID32_t id)
+{
+    uint32_t ent = (((uint32_t)id>>16) & 0xff);
     return((eOprotEntity_t)ent);    
 }
 
-extern eOprotIndex_t eoprot_ep_variable_ID2index(eOprotEP_t ep, eOprotID_t id)
+extern eOprotIndex_t eoprot_ep_variable_ID2index(eOprotID32_t id)
 {
-    uint32_t index = (((uint32_t)id>>8) & 0x0f);
+    uint32_t index = (((uint32_t)id>>8) & 0xff);
     return((eOprotIndex_t)index);    
 }
 
 
-extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID_t id)
+extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotID32_t id)
 {
     uint32_t tag = ((uint32_t)id & 0xff);
     return((eOprotTag_t)tag);  
 }
 
 
-extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
+extern eOprotProgNumber_t eoprot_ep_variable_prognumber_get(eOprotBRD_t brd, eOprotID32_t id)
 {
-    uint16_t prognum = EOK_uint16dummy;
+    eOprotProgNumber_t prognum = EOK_uint32dummy;
+    
+    eOprotEP_t ep = eoprot_ep_variable_ID2endpoint(id);
     
     switch(ep)
     {
@@ -180,12 +190,12 @@ extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotBRD_t brd, eOpr
         
         case eoprot_endpoint_skin:
         {
- //           prognum = eoprot_ep_sk_variable_progressivenumber_Get(brd, id);
+            prognum = eoprot_ep_sk_variable_progressivenumber_Get(brd, id);
         } break;  
 
         default:
         {
-            prognum = EOK_uint16dummy;
+            prognum = EOK_uint32dummy;
         } break;    
     }
 
@@ -217,7 +227,7 @@ extern uint16_t eoprot_ep_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep)
         
         case eoprot_endpoint_skin:
         {
-//            size = eoprot_ep_sk_ram_sizeof_Get(brd);
+            size = eoprot_ep_sk_ram_sizeof_Get(brd);
         } break;  
 
         default:
@@ -230,9 +240,47 @@ extern uint16_t eoprot_ep_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep)
 }
 
 
-extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
+extern void* eoprot_ep_entity_ram_extract(eOprotBRD_t brd, eOprotEP_t ep, eOprotEntity_t ent, void* epram)
+{
+    void* ram = NULL;
+         
+    switch(ep)
+    {
+        case eoprot_endpoint_management:
+        {
+            ram = eoprot_ep_mn_entity_ram_Extract(brd, ent, epram);
+        } break;
+        
+        case eoprot_endpoint_motioncontrol:
+        {
+            ram = eoprot_ep_mc_entity_ram_Extract(brd, ent, epram);
+        } break;  
+        
+        case eoprot_endpoint_analogsensors:
+        {
+            ram = eoprot_ep_as_entity_ram_Extract(brd, ent, epram);
+        } break;     
+        
+        case eoprot_endpoint_skin:
+        {
+            ram = eoprot_ep_sk_entity_ram_Extract(brd, ent, epram);
+        } break;  
+
+        default:
+        {
+            ram = NULL;
+        } break;    
+    }
+
+    return(ram);      
+}
+
+
+extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotID32_t id)
 {
     uint16_t size = 0;
+    
+    eOprotEP_t ep = eoprot_ep_variable_ID2endpoint(id);
 
     switch(ep)
     {
@@ -253,7 +301,7 @@ extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep
         
         case eoprot_endpoint_skin:
         {
-//            size = eoprot_ep_sk_variable_ram_sizeof_Get(id);
+            size = eoprot_ep_sk_variable_ram_sizeof_Get(id);
         } break;  
 
         default:
@@ -266,30 +314,33 @@ extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep
 }
 
 
-extern void* eoprot_ep_variable_ram_extract(void* epram, eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
+
+extern void* eoprot_ep_variable_ram_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram)
 {
     void* ram = NULL;
+    
+    eOprotEP_t ep = eoprot_ep_variable_ID2endpoint(id);
      
     switch(ep)
     {
         case eoprot_endpoint_management:
         {
-            ram = eoprot_ep_mn_variable_ram_Extract(epram, brd, id);
+            ram = eoprot_ep_mn_variable_ram_Extract(brd, id, epram);
         } break;
         
         case eoprot_endpoint_motioncontrol:
         {
-            ram = eoprot_ep_mc_variable_ram_Extract(epram, brd, id);
+            ram = eoprot_ep_mc_variable_ram_Extract(brd, id, epram);
         } break;  
         
         case eoprot_endpoint_analogsensors:
         {
-            ram = eoprot_ep_as_variable_ram_Extract(epram, brd, id);
+            ram = eoprot_ep_as_variable_ram_Extract(brd, id, epram);
         } break;     
         
         case eoprot_endpoint_skin:
         {
-//            ram = eoprot_ep_sk_variable_ram_Extract(epram, brd, id);
+            ram = eoprot_ep_sk_variable_ram_Extract(brd, id, epram);
         } break;  
 
         default:
@@ -302,9 +353,11 @@ extern void* eoprot_ep_variable_ram_extract(void* epram, eOprotBRD_t brd, eOprot
 }
 
 
-extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id)
+extern const void* eoprot_ep_variable_rom_get(eOprotID32_t id)
 {
     void* rom = NULL;
+    
+    eOprotEP_t ep = eoprot_ep_variable_ID2endpoint(id);
         
     switch(ep)
     {
@@ -325,7 +378,7 @@ extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id)
         
         case eoprot_endpoint_skin:
         {
-  //          rom = eoprot_ep_sk_variable_rom_Get(id);
+            rom = eoprot_ep_sk_variable_rom_Get(id);
         } break;  
 
         default:

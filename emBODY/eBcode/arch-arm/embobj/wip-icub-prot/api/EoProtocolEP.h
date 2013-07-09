@@ -62,11 +62,11 @@ extern "C" {
  **/
 typedef enum
 {
-    eoprot_endpoint_management          = 0x0001,   /**< management of the ems board: comm+appl */   
-    eoprot_endpoint_motioncontrol       = 0x0011,   /**< management of motion control  */        
-    eoprot_endpoint_analogsensors       = 0x0021,   /**< management of analog sensors  */ 
-    eoprot_endpoint_skin                = 0x0031,   /**< management of skin  */     
-    eoprot_endpoint_none                = EOK_uint16dummy
+    eoprot_endpoint_management          = 0x01,     /**< management of the ems board: comm+appl */   
+    eoprot_endpoint_motioncontrol       = 0x11,     /**< management of motion control  */        
+    eoprot_endpoint_analogsensors       = 0x21,     /**< management of analog sensors  */ 
+    eoprot_endpoint_skin                = 0x31,     /**< management of skin  */     
+    eoprot_endpoint_none                = EOK_uint08dummy
 } eOprot_endpoint_t;
 
 enum { eoprot_endpoints_numberof = 4 }; // it does not count the eoprot_endpoint_none.
@@ -116,8 +116,8 @@ typedef struct                  // 4+4 = 8
 extern uint16_t eoprot_ep_variables_numberof_get(eOprotBRD_t brd, eOprotEP_t ep); 
 
 
-/** @fn         extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag)
-    @brief      it retrieves the endpoint of a variable in the endpoint given a triple (entity, index, tag).
+/** @fn         extern eOprotID32_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag)
+    @brief      it retrieves the endpoint of a variable in the endpoint given (entity, index, tag).
     @param      ep              the endpoint.
     @param      entity          the entity. Use relevant values for the enum of the specific endpoint: eOprotEntityEPas_t, 
                                 eOprotEntityEPmc_t, eOprotEntityEPmn_t, or eOprotEntityEPsk_t
@@ -125,48 +125,53 @@ extern uint16_t eoprot_ep_variables_numberof_get(eOprotBRD_t brd, eOprotEP_t ep)
     @param      tag             the tag of the variable of the index-th entity (from 0 to eoprot_tags_numberof-1).
     @return     the variable ID or EOK_uint16dummy if there is no variable defined by the triple (entity, index, tag) in that endpoint.
  **/
-extern eOprotID_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag); 
+extern eOprotID32_t eoprot_ep_variable_ID_get(eOprotEP_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOprotTag_t tag); 
 
 
-/** @fn         extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
+/** @fn         extern eOprotEP_t eoprot_ep_variable_ID2endpoint(eOprotID32_t id)
+    @brief      it extracts the endpoint of the ID.
+    @param      id              the identifier of the variable.
+    @return     the entity or EOK_uint8dummy in case of invalid parameters.
+ **/
+extern eOprotEP_t eoprot_ep_variable_ID2endpoint(eOprotID32_t id); 
+
+
+/** @fn         extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotID32_t id)
+    @brief      it extracts the entity of the ID.
+    @param      id              the identifier of the variable.
+    @return     the entity or EOK_uint8dummy in case of invalid parameters.
+ **/
+extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotID32_t id); 
+
+
+/** @fn         extern eOprotIndex_t eoprot_ep_variable_ID2number(eOprotEP_t ep, eOprotID32_t id)
+    @brief      it extract the ordinal number of entity of the ID.
+    @param      id              the identifier of the variable.
+    @return     the index of the entity or EOK_uint8dummy in case of invalid parameters.
+ **/
+extern eOprotIndex_t eoprot_ep_variable_ID2index(eOprotID32_t id); 
+
+
+/** @fn         extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID32_t id)
+    @brief      it extract the tag of the variable defined by the ID of a given endpoint.
+    @param      id              the identifier of the variable.
+    @return     the tag of the entity or EOK_uint8dummy in case of invalid parameters.
+ **/
+extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotID32_t id); 
+
+
+/** @fn         extern eOprotProgNumber_t eoprot_ep_variable_prognumber_get(eOprotBRD_t brd, eOprotID32_t id)
     @brief      it extract the progressive number of the variable of a given ID inside the endpoint.
     @param      brd             The board
-    @param      ep              the endpoint.
     @param      id              the identifier of the variable.
-    @return     the progressive number of the variable or EOK_uint16dummy in case of invalid parameters.
+    @return     the progressive number of the variable or EOK_uint32dummy in case of invalid parameters.
  **/
-extern eOprotProgNumber_t eoprot_ep_variable_ID2prognumber(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id); 
+extern eOprotProgNumber_t eoprot_ep_variable_prognumber_get(eOprotBRD_t brd, eOprotID32_t id); 
 
 
-/** @fn         extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotEP_t ep, eOprotID_t id)
-    @brief      it extract the entity of the ID of a given endpoint.
-    @param      ep              the endpoint.
-    @param      id              the identified of the variable.
-    @return     the entity or EOK_uint16dummy in case of invalid parameters.
- **/
-extern eOprotEntity_t eoprot_ep_variable_ID2entity(eOprotEP_t ep, eOprotID_t id); 
 
-
-/** @fn         extern eOprotIndex_t eoprot_ep_variable_ID2number(eOprotEP_t ep, eOprotID_t id)
-    @brief      it extract the ordinal number of entity of the ID of a given endpoint.
-    @param      ep              the endpoint.
-    @param      id              the identified of the variable.
-    @return     the index of the entity or EOK_uint16dummy in case of invalid parameters.
- **/
-extern eOprotIndex_t eoprot_ep_variable_ID2index(eOprotEP_t ep, eOprotID_t id); 
-
-
-/** @fn         extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID_t id)
-    @brief      it extract the tag of the variable defined by the ID of a given endpoint.
-    @param      ep              the endpoint.
-    @param      id              the identified of the variable.
-    @return     the tag of the entity or EOK_uint16dummy in case of invalid parameters.
- **/
-extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID_t id); 
-
-
-/** @fn         extern uint16_t eoprot_ep_ram_sizeof_get(eOprotEP_t ep)
-    @brief      it tells the number of bytes required to contain all the variables of a given endpoint.
+/** @fn         extern uint16_t eoprot_ep_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep)
+    @brief      it tells the number of bytes required to contain all the variables of a given endpoint of a board
     @param      brd             The board
     @param      ep              the endpoint.
     @return     the size of the ram or EOK_uint16dummy in case of invalid parameters.
@@ -174,34 +179,42 @@ extern eOprotTag_t eoprot_ep_variable_ID2tag(eOprotEP_t ep, eOprotID_t id);
 extern uint16_t eoprot_ep_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep); 
 
 
-/** @fn         extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
-    @brief      it tells the number of bytes required by a given variable of a given endpoint.
+/** @fn         extern void* eoprot_ep_entity_ram_extract(eOprotBRD_t brd, eOprotEP_t ep, eOprotEntity_t en, void* epram)
+    @brief      it returns the ram used by a given variables of a given endpoint staring from the total ram of the endpoint.
     @param      brd             The board
     @param      ep              the endpoint.
+    @param      ent             the entity.
+    @param      epram           The ram of the complete endpoint
+    @return     pointer to the ram of the first entity or NULL upon failure.
+ **/
+extern void* eoprot_ep_entity_ram_extract(eOprotBRD_t brd, eOprotEP_t ep, eOprotEntity_t ent, void* epram); 
+
+
+/** @fn         extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotID32_t id)
+    @brief      it tells the number of bytes required by a given variable
+    @param      brd             The board
     @param      id              the identifier of the variable.
     @return     the size of the ram or EOK_uint16dummy in case of invalid parameters.
  **/
-extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id); 
+extern uint16_t eoprot_ep_variable_ram_sizeof_get(eOprotID32_t id); 
 
 
-/** @fn         extern void* eoprot_ep_variable_ram_extract(void* epram, eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id)
+/** @fn         extern void* eoprot_ep_variable_ram_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram)
     @brief      it returns the ram used by a given variables of a given endpoint staring from the total ram of the endpoint.
-    @param      epram           The ram of the complete endpoint
     @param      brd             The board
-    @param      ep              the endpoint.
     @param      id              the identifier of the variable.
+    @param      epram           The ram of the complete endpoint
     @return     pointer to the ram of the variable or NULL upon failure.
  **/
-extern void* eoprot_ep_variable_ram_extract(void* epram, eOprotBRD_t brd, eOprotEP_t ep, eOprotID_t id); 
+extern void* eoprot_ep_variable_ram_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram); 
 
 
-/** @fn         extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id)
+/** @fn         extern const void* eoprot_ep_variable_rom_get(eOprotID32_t id)
     @brief      it returns the rom pointer used as descriptor by a given variables of a given endpoint 
-    @param      ep              the endpoint.
     @param      id              the identifier of the variable.
     @return     pointer to the rom descriptor (EOnv_rom_t*) of the variable or NULL upon failure.
  **/
-extern const void* eoprot_ep_variable_rom_get(eOprotEP_t ep, eOprotID_t id);
+extern const void* eoprot_ep_variable_rom_get(eOprotID32_t id);
 
 
 /** @}            

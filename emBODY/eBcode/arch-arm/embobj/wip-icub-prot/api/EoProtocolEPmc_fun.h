@@ -61,7 +61,7 @@
 
 // all of them are weakly-defined or/and overridable by means of a specific include file
 
-extern void eoprot_ep_mc_fun_INITIALISE(eOnvEP_t ep, void *ram);
+extern void eoprot_ep_mc_fun_INITIALISE(void *ram);
 
 
 extern void eoprot_ep_mc_fun_INIT_joint_wholeitem(const EOnv* nv);

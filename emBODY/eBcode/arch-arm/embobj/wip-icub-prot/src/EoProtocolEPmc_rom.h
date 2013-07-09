@@ -64,14 +64,14 @@ extern const eOmc_controller_t eoprot_ep_mc_rom_controller_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-//extern void* eoprot_ep_mc_rom_get_nvram(void* data, eOprotBRD_t brd, eOprotID_t id);
+//extern void* eoprot_ep_mc_rom_get_nvram(void* data, eOprotBRD_t brd, eOprotID32_t id);
 extern uint16_t eoprot_ep_mc_rom_joint_get_offset(eOprotTag_t tag);
 extern uint16_t eoprot_ep_mc_rom_motor_get_offset(eOprotTag_t tag);
 extern uint16_t eoprot_ep_mc_rom_controller_get_offset(eOprotTag_t tag);
 
-extern void* eoprot_ep_mc_rom_get_nvrom(eOprotID_t id);
-extern uint16_t eoprot_ep_mc_rom_get_sizeofvar(eOprotID_t id);
-extern uint16_t eoprot_ep_mc_rom_get_prognum(eOprotID_t id);
+extern void* eoprot_ep_mc_rom_get_nvrom(eOprotID32_t id);
+extern uint16_t eoprot_ep_mc_rom_get_sizeofvar(eOprotID32_t id);
+extern uint16_t eoprot_ep_mc_rom_get_prognum(eOprotID32_t id);
 
 
 

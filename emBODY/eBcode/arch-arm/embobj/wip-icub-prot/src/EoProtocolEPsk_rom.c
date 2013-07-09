@@ -68,7 +68,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_eoprot_ep_sk_rom_epid2index_of_folded_descriptors(eOprotID_t id);
+static uint16_t s_eoprot_ep_sk_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
 
 static uint16_t s_eoprot_ep_sk_rom_skin_ramoffset(uint16_t tag);
 
@@ -184,7 +184,7 @@ extern uint16_t eoprot_ep_sk_rom_skin_get_offset(eOprotTag_t tag)
 }
 
     
-extern void* eoprot_ep_sk_rom_get_nvrom(eOprotID_t id)
+extern void* eoprot_ep_sk_rom_get_nvrom(eOprotID32_t id)
 {
     uint16_t indexoffoldeddescriptors = s_eoprot_ep_sk_rom_epid2index_of_folded_descriptors(id);
     
@@ -196,7 +196,7 @@ extern void* eoprot_ep_sk_rom_get_nvrom(eOprotID_t id)
     return((void*)eoprot_ep_sk_rom_folded_descriptors[indexoffoldeddescriptors]);   
 }
 
-extern uint16_t eoprot_ep_sk_rom_get_sizeofvar(eOprotID_t id)
+extern uint16_t eoprot_ep_sk_rom_get_sizeofvar(eOprotID32_t id)
 {     
     EOnv_rom_t* rom = eoprot_ep_sk_rom_get_nvrom(id);  
     if(NULL == rom)
@@ -206,9 +206,9 @@ extern uint16_t eoprot_ep_sk_rom_get_sizeofvar(eOprotID_t id)
     return(rom->capacity); 
 }
 
-extern uint16_t eoprot_ep_sk_rom_get_prognum(eOprotID_t id)
+extern uint16_t eoprot_ep_sk_rom_get_prognum(eOprotID32_t id)
 {   // we assume that the variables are inserted in a progressive way without holes. and even if there are a few holes never mind.
-    return(eoprot_ep_variable_ID2tag(eoprot_endpoint_skin, id));
+    return(eoprot_ep_variable_ID2tag(id));
 }
 
 
@@ -224,16 +224,16 @@ extern uint16_t eoprot_ep_sk_rom_get_prognum(eOprotID_t id)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_eoprot_ep_sk_rom_epid2index_of_folded_descriptors(eOprotID_t id)
+static uint16_t s_eoprot_ep_sk_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
 {      
-    uint16_t tag = eoprot_ep_variable_ID2tag(eoprot_endpoint_skin, id);
+    uint16_t tag = eoprot_ep_variable_ID2tag(id);
     
     if(EOK_uint16dummy == tag)
     {
         return(EOK_uint16dummy);
     }
     
-    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(eoprot_endpoint_skin, id);
+    eOprotEntity_t entity = eoprot_ep_variable_ID2entity(id);
     
     switch(entity)
     {

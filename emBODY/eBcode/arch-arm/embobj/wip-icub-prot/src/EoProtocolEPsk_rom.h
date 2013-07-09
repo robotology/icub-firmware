@@ -64,9 +64,9 @@ extern const eOsk_skin_t eoprot_ep_sk_rom_skin_defaultvalue;
 
 extern uint16_t eoprot_ep_sk_rom_skin_get_offset(eOprotTag_t tag);
 
-extern void* eoprot_ep_sk_rom_get_nvrom(eOprotID_t id);
-extern uint16_t eoprot_ep_sk_rom_get_sizeofvar(eOprotID_t id);
-extern uint16_t eoprot_ep_sk_rom_get_prognum(eOprotID_t id);
+extern void* eoprot_ep_sk_rom_get_nvrom(eOprotID32_t id);
+extern uint16_t eoprot_ep_sk_rom_get_sizeofvar(eOprotID32_t id);
+extern uint16_t eoprot_ep_sk_rom_get_prognum(eOprotID32_t id);
 
 
 
