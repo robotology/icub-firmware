@@ -364,18 +364,18 @@ extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp);
 // time functions
 
 
-/** @fn         extern uint64_t oosiit_time_get(void)
-    @brief      Returns the time since last bootstrap in system ticks.
-    @return     System ticks since bootstrap.
- **/
-extern uint64_t oosiit_time_get(void);
-
-
 /** @fn         extern oosiit_result_t oosiit_time_set(uint64_t target)
     @brief      Changes by brute-force the time since last bootstrap in system ticks.
     @param      target          The target time in sys ticks.
  **/
 extern oosiit_result_t oosiit_time_set(uint64_t target);
+
+
+/** @fn         extern uint64_t oosiit_time_get(void)
+    @brief      Returns the time since last bootstrap in system ticks.
+    @return     System ticks since bootstrap.
+ **/
+extern uint64_t oosiit_time_get(void);
 
 
 /** @fn         extern uint64_t oosiit_microtime_get(void)
