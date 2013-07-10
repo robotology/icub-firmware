@@ -457,7 +457,7 @@ extern void osal_system_ticks_abstime_set(osal_abstime_t tot)
 }
 
 
-extern osal_abstime_t osal_ticks_system_abstime_get(void)
+extern osal_abstime_t osal_system_ticks_abstime_get(void)
 {
     return((uint64_t)s_osal_usec_in_tick * osiit_time_get());
 }
