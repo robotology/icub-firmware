@@ -158,8 +158,11 @@ static __INLINE oosiit_result_t s_oosiit_mut_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_sem_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_mbx_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op);
+
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high);
 static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* high);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of svc functions
@@ -199,10 +202,11 @@ SVC_1_1(svc_oosiit_tsk_get_extdata,     void*,              oosiit_tskptr_t,    
 
 // - time
 SVC_2_1(svc_oosiit_time_set,            oosiit_result_t,    uint32_t,           uint32_t,                                               RET_int32_t);
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 SVC_2_1(svc_oosiit_time_get,            oosiit_result_t,    uint32_t*,          uint32_t*,                                              RET_int32_t);
 SVC_2_1(svc_oosiit_microtime_get,       oosiit_result_t,    uint32_t*,          uint32_t*,                                              RET_int32_t);
 SVC_2_1(svc_oosiit_nanotime_get,        oosiit_result_t,    uint32_t*,          uint32_t*,                                              RET_int32_t);
-
+#endif
 
 
 // delay
@@ -1634,6 +1638,8 @@ extern oosiit_result_t svc_oosiit_time_set(uint32_t low, uint32_t high)
     return(oosiit_res_OK);
 }
 
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+
 extern oosiit_result_t svc_oosiit_time_get(uint32_t* low, uint32_t* high)
 {
     rt_iit_dbg_svc_enter();
@@ -1662,6 +1668,7 @@ extern oosiit_result_t svc_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
     return(oosiit_res_OK);    
 }
 
+#endif
 
 // delay
 
@@ -2136,6 +2143,7 @@ static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op)
     return(oosiit_res_OK);    
 }
 
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high)
 {
@@ -2175,6 +2183,7 @@ static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* h
     return(oosiit_res_OK);    
 }
 
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
