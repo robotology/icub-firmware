@@ -65,6 +65,8 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+//#define OOSIIT_USE_TIMEGET_UNDER_SVC
+
 // used to avoid problems with the SVC declarations
 #define FAKE_VOID_FP_VOIDP  void*
 #define FAKE_VOID_FP_VOID   void*
@@ -156,6 +158,8 @@ static __INLINE oosiit_result_t s_oosiit_mut_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_sem_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_mbx_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op);
+static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high);
+static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* high);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of svc functions
@@ -195,6 +199,11 @@ SVC_1_1(svc_oosiit_tsk_get_extdata,     void*,              oosiit_tskptr_t,    
 
 // - time
 SVC_2_1(svc_oosiit_time_set,            oosiit_result_t,    uint32_t,           uint32_t,                                               RET_int32_t);
+SVC_2_1(svc_oosiit_time_get,            oosiit_result_t,    uint32_t*,          uint32_t*,                                              RET_int32_t);
+SVC_2_1(svc_oosiit_microtime_get,       oosiit_result_t,    uint32_t*,          uint32_t*,                                              RET_int32_t);
+SVC_2_1(svc_oosiit_nanotime_get,        oosiit_result_t,    uint32_t*,          uint32_t*,                                              RET_int32_t);
+
+
 
 // delay
 SVC_1_1(svc_oosiit_dly_wait,            oosiit_result_t,    uint32_t,                                                                   RET_int32_t);
@@ -676,12 +685,6 @@ extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
 
 // - time management functions ----------------------------------------------------------------------------------------
 
-extern uint64_t oosiit_time_get(void)
-{
-    return(oosiit_time);
-}
-
-
 extern oosiit_result_t oosiit_time_set(uint64_t target)
 {
     if(0 != __get_IPSR()) 
@@ -693,6 +696,78 @@ extern oosiit_result_t oosiit_time_set(uint64_t target)
     {   // call svc
         return(__svc_oosiit_time_set(target&0xffffffff, (target>>32)&0xffffffff));
     }   
+}
+
+
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+
+extern uint64_t oosiit_time_get(void)
+{
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(oosiit_time);
+    } 
+    else
+    {   // call svc
+        uint32_t low = 0;
+        uint32_t high = 0;
+        uint64_t res = 0;
+        __svc_oosiit_time_get(&low, &high);
+        res = high;
+        res <<= 32;
+        res += low;
+        return(res);
+    }   
+}
+
+
+extern uint64_t oosiit_microtime_get(void)
+{       
+    uint32_t low = 0;
+    uint32_t high = 0;
+    uint64_t res = 0;
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        s_oosiit_microtime_get(&low, &high);
+    } 
+    else
+    {   // call svc
+        __svc_oosiit_microtime_get(&low, &high);
+    }  
+    
+    res = high;
+    res <<= 32;
+    res += low;
+    return(res);    
+}
+
+extern uint64_t oosiit_nanotime_get(void)
+{
+    uint32_t low = 0;
+    uint32_t high = 0;
+    uint64_t res = 0;
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        s_oosiit_nanotime_get(&low, &high);
+    } 
+    else
+    {   // call svc
+        __svc_oosiit_nanotime_get(&low, &high);
+    }  
+    
+    res = high;
+    res <<= 32;
+    res += low;
+    return(res); 
+}
+
+#else
+
+extern uint64_t oosiit_time_get(void)
+{
+    return(oosiit_time);
 }
 
 
@@ -726,6 +801,10 @@ extern uint64_t oosiit_nanotime_get(void)
 
     return(nanosecs);
 }
+
+
+
+#endif
 
 #if 0
 extern oosiit_result_t oosiit_secsnano_get(uint32_t *secs, uint32_t *nano)
@@ -1555,6 +1634,34 @@ extern oosiit_result_t svc_oosiit_time_set(uint32_t low, uint32_t high)
     return(oosiit_res_OK);
 }
 
+extern oosiit_result_t svc_oosiit_time_get(uint32_t* low, uint32_t* high)
+{
+    rt_iit_dbg_svc_enter();
+    
+    *low = oosiit_time & 0xffffffff;
+    *high = (oosiit_time >> 32) & 0xffffffff;
+    
+    rt_iit_dbg_svc_exit();
+    return(oosiit_res_OK);
+}
+
+extern oosiit_result_t svc_oosiit_microtime_get(uint32_t* low, uint32_t* high)
+{
+    rt_iit_dbg_svc_enter();
+    s_oosiit_microtime_get(low, high);
+    rt_iit_dbg_svc_exit();
+    return(oosiit_res_OK);    
+}
+
+
+extern oosiit_result_t svc_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
+{
+    rt_iit_dbg_svc_enter();
+    s_oosiit_nanotime_get(low, high);
+    rt_iit_dbg_svc_exit();
+    return(oosiit_res_OK);    
+}
+
 
 // delay
 
@@ -2028,6 +2135,46 @@ static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op)
     }
     return(oosiit_res_OK);    
 }
+
+
+static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high)
+{
+    uint64_t microsecs;
+    uint64_t nanosecs;
+    volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
+    
+    // add to microsecs the content of register systick_current_value_reg properly scaled.
+    // if it is equal to systick_reload_value_reg, then extranano = 0;
+    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
+
+    nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + nanosecs/1000LL;
+    
+    *low = microsecs & 0xffffffff;
+    *high = (microsecs >> 32) & 0xffffffff;
+
+    return(oosiit_res_OK);    
+}
+
+
+static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
+{
+    uint64_t nanosecs;// = osiit_time * osiit_params_cfg->ticktime * 1000;
+    volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
+
+    // add to nanosecs the content of register systick_current_value_reg properly scaled.
+    // if it is equal to systick_reload_value_reg, then extranano = 0;
+    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
+
+    nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    nanosecs += (oosiit_time * oosiit_cfg_in_use->ticktime * 1000LL);
+
+    *low = nanosecs & 0xffffffff;
+    *high = (nanosecs >> 32) & 0xffffffff;
+    
+    return(oosiit_res_OK);    
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
