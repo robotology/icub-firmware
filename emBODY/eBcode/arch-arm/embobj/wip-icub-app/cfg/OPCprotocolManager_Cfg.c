@@ -89,7 +89,7 @@ static opcprotman_var_map_t s_myarray[] =
 
 opcprotman_cfg_t opcprotmanCFGv0x1234 =
 {
-    .databaseversion        = 0x1234,
+    .databaseversion        = 0x1235,
     .numberofvariables      = opcCfg_nvid_bdoor_user_num + eodgn_nvidbdoor_max,
     .arrayofvariablemap     = s_myarray
 };
