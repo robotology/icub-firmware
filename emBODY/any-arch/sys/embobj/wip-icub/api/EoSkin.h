@@ -98,11 +98,11 @@ typedef struct                  // size is: 164+4+0 = 168
 
 // -- the definition of a skin entity 
 
-/** @typedef    uint16_t  eOsk_skinId_t
+/** @typedef    uint8_t  eOsk_skinId_t
     @brief      eOsk_skinId_t contains the values required to identify a skin;
-		currently a skin id identifies a set of 7 skin board attached on a single body part.
+		        currently a skin id identifies a set of 7 skin board attached on a single body part.
  **/
-typedef uint16_t  eOsk_skinId_t;
+typedef uint8_t  eOsk_skinId_t;
 
 typedef struct                      
 {
