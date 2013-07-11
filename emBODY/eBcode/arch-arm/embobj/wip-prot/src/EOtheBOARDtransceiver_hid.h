@@ -60,11 +60,15 @@ struct EOtheBOARDtransceiver_hid
 {
     EOtransceiver*          transceiver;
     EOnvSet*                nvset;
+    eOnvBRD_t               boardnumber;
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-extern EOnvSet * eo_boardtransceiver_hid_GetNVset(void);
+
+// extern EOnvSet * eo_boardtransceiver_hid_GetNVset(void);
+
+// extern eOnvBRD_t eo_boardtransceiver_hid_GetBoardNumber(void);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

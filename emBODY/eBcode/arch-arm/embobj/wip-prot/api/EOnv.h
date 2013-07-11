@@ -77,7 +77,7 @@ enum { eo_nv_IPdummy = 0, eo_nv_EP8dummy = EOK_uint08dummy };
 
 #define eo_nv_ID32dummy     EOK_uint32dummy
 #define eo_nv_PROGnumdummy  EOK_uint32dummy
-
+#define eo_nv_BRDdummy      EOK_uint08dummy
 
 typedef enum
 {

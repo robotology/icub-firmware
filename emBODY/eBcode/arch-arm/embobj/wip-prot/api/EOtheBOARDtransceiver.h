@@ -91,14 +91,20 @@ extern const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default;
                             If NULL, then  is is issued a info by the EOtheErrorManager.
     @return     A valid and not-NULL pointer to the EOtheBOARDtransceiver singleton.
  **/
-extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg);
+extern EOtheBOARDtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg);
 
 
 /** @fn         extern EOtheBOARDtransceiver * eo_boardtransceiver_GetHandle(void)
     @brief      Gets the handle of the EOtheBOARDtransceiver singleton 
     @return     Constant pointer to the singleton.
  **/
-extern EOtransceiver * eo_boardtransceiver_GetHandle(void);
+extern EOtheBOARDtransceiver * eo_boardtransceiver_GetHandle(void);
+
+extern EOtransceiver * eo_boardtransceiver_GetTransceiver(EOtheBOARDtransceiver* p);
+
+extern EOnvSet * eo_boardtransceiver_GetNVset(EOtheBOARDtransceiver* p);
+
+extern eOnvBRD_t eo_boardtransceiver_GetBoardNumber(EOtheBOARDtransceiver* p);
 
 
 
