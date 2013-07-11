@@ -81,7 +81,8 @@ static const char s_eobj_ownname[] = "EOtheBOARDtransceiver";
 static EOtheBOARDtransceiver s_eo_theboardtrans = 
 {
     EO_INIT(.transceiver)               NULL,
-    EO_INIT(.nvset)                    NULL
+    EO_INIT(.nvset)                     NULL,
+    EO_INIT(.boardnumber)               0xff
 };
 
 
@@ -104,13 +105,13 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
 
 
  
-extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg) 
+extern EOtheBOARDtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg) 
 {
     eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
     
     if(NULL != s_eo_theboardtrans.transceiver)
     {
-        return(s_eo_theboardtrans.transceiver);
+        return(&s_eo_theboardtrans);
     }
 
 
@@ -134,6 +135,8 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
 
     s_eo_theboardtrans.nvset = s_eo_boardtransceiver_nvset_get(cfg);
     
+    s_eo_theboardtrans.boardnumber = cfg->nvsetdevcfg->boardnum;
+    
 
     txrxcfg.capacityoftxpacket              = cfg->sizes.capacityoftxpacket;
     txrxcfg.capacityofrop                   = cfg->sizes.capacityofrop;
@@ -150,26 +153,72 @@ extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_c
     s_eo_theboardtrans.transceiver = eo_transceiver_New(&txrxcfg);
     
     
-    return(s_eo_theboardtrans.transceiver);        
+    return(&s_eo_theboardtrans);        
 }    
 
 
-extern EOtransceiver * eo_boardtransceiver_GetHandle(void) 
+extern EOtheBOARDtransceiver * eo_boardtransceiver_GetHandle(void) 
 {
-    return(s_eo_theboardtrans.transceiver);
+    if(NULL != s_eo_theboardtrans.transceiver)
+    {
+        return(&s_eo_theboardtrans);
+    }
+    else
+    {    
+        return(NULL);
+    }
 }
 
+extern EOtransceiver * eo_boardtransceiver_GetTransceiver(EOtheBOARDtransceiver* p)
+{
+    if(NULL != p)
+    {
+        return(s_eo_theboardtrans.transceiver);
+    }
+    else
+    {    
+        return(NULL);
+    }     
+}
 
+extern EOnvSet * eo_boardtransceiver_GetNVset(EOtheBOARDtransceiver* p)
+{
+    if(NULL != p)
+    {
+        return(s_eo_theboardtrans.nvset);
+    }
+    else
+    {    
+        return(NULL);
+    }        
+}
+
+extern eOnvBRD_t eo_boardtransceiver_GetBoardNumber(EOtheBOARDtransceiver* p)
+{
+    if(NULL != p)
+    {
+        return(s_eo_theboardtrans.boardnumber);
+    }
+    else
+    {    
+        return(eo_nv_BRDdummy);
+    }          
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-extern EOnvSet * eo_boardtransceiver_hid_GetNVset(void)
-{
-    return(s_eo_theboardtrans.nvset);
-}
 
+// extern EOnvSet * eo_boardtransceiver_hid_GetNVset(void)
+// {
+//     return(s_eo_theboardtrans.nvset);
+// }
+
+// extern eOnvBRD_t eo_boardtransceiver_hid_GetBoardNumber(void)
+// {
+//     return(s_eo_theboardtrans.boardnumber);
+// }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
