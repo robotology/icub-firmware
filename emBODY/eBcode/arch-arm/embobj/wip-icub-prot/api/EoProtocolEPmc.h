@@ -85,17 +85,17 @@ typedef enum
     eoprot_ep_mc_tag_joint_config_velocitysetpointtimeout               =  8,
     eoprot_ep_mc_tag_joint_config_motionmonitormode                     =  9,
     eoprot_ep_mc_tag_joint_config_encoderconversionfactor               = 10,
-    eoprot_ep_mc_tag_joint_config_encoderconversionoffset               = 11,    
+    eoprot_ep_mc_tag_joint_config_encoderconversionoffset               = 11,
     eoprot_ep_mc_tag_joint_status                                       = 12,
     eoprot_ep_mc_tag_joint_status_basic                                 = 13,
     eoprot_ep_mc_tag_joint_status_ofpid                                 = 14,
-    eoprot_ep_mc_tag_joint_status_chamaleon04                           = 15,    
+    eoprot_ep_mc_tag_joint_status_chamaleon04                           = 15,
     eoprot_ep_mc_tag_joint_inputs                                       = 16,
-    eoprot_ep_mc_tag_joint_inputs_externallymeasuredtorque              = 17,       
+    eoprot_ep_mc_tag_joint_inputs_externallymeasuredtorque              = 17,
     eoprot_ep_mc_tag_joint_cmmnds_calibration                           = 18,
     eoprot_ep_mc_tag_joint_cmmnds_setpoint                              = 19,
     eoprot_ep_mc_tag_joint_cmmnds_stoptrajectory                        = 20,
-    eoprot_ep_mc_tag_joint_cmmnds_controlmode                           = 21
+    eoprot_ep_mc_tag_joint_cmmnds_controlmode                           = 21 
 } eOprot_ep_mc_tag_joint_t;
 
 enum { eoprot_ep_mc_tags_joint_numberof = 22 };  // it MUST be equal to the number of tags in a joint.      
