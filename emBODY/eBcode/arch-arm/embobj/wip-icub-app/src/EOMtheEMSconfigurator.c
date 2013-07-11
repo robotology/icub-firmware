@@ -34,6 +34,7 @@
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
 
+#include "eventviewer.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -52,7 +53,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#if defined(EVIEWER_ENABLED)
+#define EVIEWER_userDef_IDbase             (ev_ID_first_usrdef+1)
+//#define EVIEWER_userDef_RUNRecRopframe     (EVIEWER_userDef_IDbase +1) see definition in EOMtheEMSrunner.c
+#define EVIEWER_userDef_CFGRecRopframe     (EVIEWER_userDef_IDbase +2)
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,7 +126,10 @@ extern EOMtheEMSconfigurator * eom_emsconfigurator_Initialise(const eOemsconfigu
                                                     tskEMScfg, "tskEMScfg");
  
                                                    
-    
+    #if defined(EVIEWER_ENABLED)    
+    eventviewer_load(EVIEWER_userDef_CFGRecRopframe, usrDef_CFGRecRopframe);
+    #endif    
+
     return(&s_emsconfigurator_singleton);
 }
 
@@ -235,7 +244,15 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         // 2. process the packet with the transceiver
         if(eores_OK == res)
         {
+
+            #if defined(EVIEWER_ENABLED)    
+            evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_CFGRecRopframe);
+            #endif
             res = eom_emstransceiver_Parse(eom_emstransceiver_GetHandle(), rxpkt, &numberofrxrops, &txtimeofrxropframe);
+            #if defined(EVIEWER_ENABLED)    
+            eventviewer_switch_to(prev);
+            #endif  
+            
             if(eores_OK == res)
             {
                 s_emsconfigurator_singleton.numofrxrops = numberofrxrops;
@@ -282,7 +299,9 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 
 }
 
-
+#if defined(EVIEWER_ENABLED)
+void usrDef_CFGRecRopframe(void){}
+#endif
 
 
 

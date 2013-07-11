@@ -202,16 +202,18 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     s_eom_emsappl_environment_init();
     s_eom_emsappl_ipnetwork_init();
 
+    // 3b. initialise the backdoor
+    s_eom_emsappl_backdoor_init();  
     
-    // 5. initialise the EOMtheEMSsocket and the EOMtheEMStransceiver   
+    // 4. initialise the EOMtheEMSsocket and the EOMtheEMStransceiver   
     s_eom_emsappl_theemssocket_init();    
     s_eom_emsappl_theemstransceiver_init();
     
-    // 4. initialise the listener
+    // 5. initialise the listener
     s_eom_emsappl_thelistener_init();
     
-    // 4b. initialise the backdoor
-    s_eom_emsappl_backdoor_init();    
+//     // 4b. initialise the backdoor
+//     s_eom_emsappl_backdoor_init();    
     
     // 6. initialise the EOMtheEMSerror
     s_eom_emsappl_theemserror_init();    
