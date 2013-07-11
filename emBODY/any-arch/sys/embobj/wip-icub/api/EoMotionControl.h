@@ -452,9 +452,8 @@ typedef struct
 /** @typedef    typedef uint8_t  eOmc_jointId_t
     @brief      eOmc_jointId_t contains the values required to identify a joint
  **/
-typedef uint16_t  eOmc_jointId_t;
+typedef uint8_t  eOmc_jointId_t;
 
-//#warning --> eval using uint8_t ...
 
 
 
@@ -555,9 +554,8 @@ typedef struct                  // size is 80+32+8+32+0 = 152
 /** @typedef    typedef uint8_t  eOmc_motorId_t
     @brief      eOmc_motorId_t contains the values required to identify a motor
  **/
-typedef uint16_t  eOmc_motorId_t;
+typedef uint8_t  eOmc_motorId_t;
 
-//#warning --> eval using uint8_t ...
 
 
 /** @typedef    typedef struct eOmc_motor_config_t
