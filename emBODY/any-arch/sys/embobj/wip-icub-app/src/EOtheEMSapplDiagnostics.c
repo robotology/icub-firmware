@@ -34,7 +34,7 @@
 #include "EOMtheEMSrunner.h"
 #include "EOMtheIPnet.h"
 
-
+#include "hal.h"
 
 
 
@@ -166,7 +166,7 @@ extern eOresult_t eo_theEMSdgn_UpdateApplCore(EOTheEMSdiagnostics_t* p)
     return(eores_OK);
 }
 
-extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappEncReader* encreader_ptr)
+extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappEncReader* encreader_ptr, uint16_t count)
 {
     uint8_t i;
     eOappEncReader_diagnosticsinfo_t* dgn_ptr = eo_appEncReader_GetDiagnosticsHandle(encreader_ptr);
@@ -181,6 +181,7 @@ extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappE
         eo_dgn_emsappmc.encreads.encList[i].err_onInvalidValue = dgn_ptr->enclist[i][err_onInvalidValue];
         eo_dgn_emsappmc.encreads.encList[i].err_onParityError = dgn_ptr->enclist[i][err_onParityError];
     }
+    eo_dgn_emsappmc.encreads.count = count;
     return(eores_OK);
 }
 
@@ -210,6 +211,96 @@ extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *st
     return(eores_OK);
 }
 
+
+extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup)
+{
+
+//     uint8_t PHYaddr = 0x1;
+//     uint8_t REGaddr = 0x1;
+//     uint16_t status_link;
+     char str[50];
+//     #define LINK_IS_UP 0x00000004
+    uint8_t linkst_mask, links_num;
+    static uint8_t link_st[2] = {0};
+    uint8_t state2notify = 0;
+    
+    
+    if((NULL == p) || (NULL == link1_isup) || (NULL == link2_isup))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    hal_eth_check_links(&linkst_mask, &links_num);
+    
+    if((linkst_mask & 0x01) == 0x01)
+    {
+        *link1_isup = 1;
+        if(link_st[0] == 0)
+        {
+            sprintf(str, "Link 0 down --> up (mask=%d)", linkst_mask);
+            hal_trace_puts(str);
+            link_st[0] = 1;
+            state2notify = 1;
+        }
+    }
+    else
+    {
+         hal_led_on(hal_led1);
+        if(link_st[0] == 1)
+        {
+            sprintf(str, "Link 0 up --> down (mask=%d)", linkst_mask);
+            hal_trace_puts(str);
+            link_st[0] = 0;
+            state2notify = 1;
+        }
+ 
+        
+    }
+
+     if((linkst_mask & 0x02) == 0x02)
+    {
+        *link2_isup = 1;
+    }
+    else
+    {
+        hal_led_on(hal_led2);
+    }
+    
+    if(state2notify)
+    {
+         eo_dgn_emsperiph.eth_dev.linksmask = linkst_mask;
+        eo_theEMSdgn_Signalerror(&s_thedgn, eodgn_nvidbdoor_emsperiph , 0);
+        sprintf(str, "Signal error %d ", linkst_mask);
+        hal_trace_puts(str);
+    }
+    sprintf(str, "LINKs mask %d ", linkst_mask);
+    hal_trace_puts(str);
+ 
+    
+    
+//     *link1_isup = 0;
+//     *link2_isup = 0;
+//     
+//     status_link = hal_eth_smi_read(PHYaddr, REGaddr);
+//     if(EO_COMMON_CHECK_FLAG(status_link, LINK_IS_UP))
+//     {
+//         *link1_isup = 1;
+//         sprintf(str, "LINK 1 is up!! %d", status_link);
+//         hal_trace_puts(str);
+//     }
+//     
+//     PHYaddr = 0x2;
+//     status_link = hal_eth_smi_read(PHYaddr, REGaddr);
+//     if(EO_COMMON_CHECK_FLAG(status_link, LINK_IS_UP))
+//     {
+//         *link2_isup = 1;
+//         sprintf(str, "LINK 2 is up!! %d", status_link);
+//         hal_trace_puts(str);
+//     }
+    
+    return(eores_OK);
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

@@ -149,8 +149,8 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     brdtransceiver_cfg.nvsetprotection          = cfg->nvsetprotection;
    
  
-    //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
-    s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
+    eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
+    s_emstransceiver_singleton.transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
 
     
     s_eom_emstransceiver_update_diagnosticsinfo();
@@ -193,7 +193,7 @@ extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p)
         return(NULL);
     }
     
-    return(eo_boardtransceiver_hid_GetNVset());
+    return(eo_boardtransceiver_GetNVset(eo_boardtransceiver_GetHandle()));
 }
 
 
