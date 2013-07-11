@@ -106,6 +106,8 @@ typedef struct
     uint8_t                 sgn;    /**< contains a signature for the opc. it is teh first byte of the packet and must be opcprotman_signature  */
     uint8_t                 opc;    /**< use opcprotman_opc_t values */
     uint16_t                dbv;    /**< version of the used database */
+    uint32_t                seqnum;
+    uint32_t                dummy;
     uint16_t                var;    /**< identifier of the variable to be manipulated */
     uint16_t                len;    /**< length of the data field */
 } opcprotman_header_t; 
@@ -186,6 +188,7 @@ extern opcprotman_var_map_t* opcprotman_find(OPCprotocolManager* p, uint16_t var
 
 extern opcprotman_res_t opcprotman_personalize_var(OPCprotocolManager* p, uint16_t var, uint8_t* var_ram, opcprotman_fp_onrec_t fn);
 
+extern uint32_t opcprotman_getSeqNum(OPCprotocolManager* p, opcprotman_message_t* msg);
 /** @}            
     end of group doxy_opcprotman  
  **/
