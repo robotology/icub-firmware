@@ -54,9 +54,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef uint16_t eObrd_boardId_t;
-
-#warning --> eval to use uint8_t for eObrd_boardId_t ...
+typedef uint8_t eObrd_boardId_t;
 
 
 typedef enum
