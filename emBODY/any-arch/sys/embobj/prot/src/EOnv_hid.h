@@ -113,7 +113,7 @@ typedef struct
 } eOnv_fn_peripheral_t;
 
 
-typedef const struct                // 12 bytes on arm ... 24 on 64 bit arch
+typedef const struct EOnv_con_T     // 12 bytes on arm ... 24 on 64 bit arch
 {
     eOnvID_t                        id;
     uint16_t                        capacity;
@@ -123,7 +123,7 @@ typedef const struct                // 12 bytes on arm ... 24 on 64 bit arch
     uint8_t                         fun;
 } EOnv_con_t;                       //EO_VERIFYsizeof(EOnv_con_t, 12); 
 
-typedef const struct
+typedef const struct EOnv_usr_T
 {
     const eOnv_fn_peripheral_t*     peripheralinterface;
 #if !defined(EO_NV_DONT_USE_ONROPRECEPTION)
