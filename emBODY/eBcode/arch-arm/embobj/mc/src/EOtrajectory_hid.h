@@ -59,7 +59,7 @@ struct EOtrajectory_hid
     //////////////////
     // velocity
     eObool_t bVelocityMove;
-    eObool_t bIsBraking;
+    //eObool_t bIsBraking;
     
     float vX;
     float vV;
