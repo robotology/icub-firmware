@@ -732,7 +732,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     //if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
     {
         controlmode_2foc = eomc_controlmode_cmd_openloop;
-        
+       
         pid.kp = 0x0A00;
         pid.kd = 0x0000;
         pid.ki = 0x0000;

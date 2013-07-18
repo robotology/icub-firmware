@@ -70,7 +70,7 @@ extern void eo_trajectory_SetVelMax(EOtrajectory *o, int32_t vel_max);
 extern void eo_trajectory_GetPosReference(EOtrajectory *o, int32_t *xStar, int32_t *velAvg);
 extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t p1, int32_t avg_vel);
 extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t v1, int32_t avg_acc);
-extern void eo_trajectory_VelocityTimeout(EOtrajectory *o);
+//extern void eo_trajectory_VelocityTimeout(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_Step(EOtrajectory *o)
     @brief      Executes a trajectory step.

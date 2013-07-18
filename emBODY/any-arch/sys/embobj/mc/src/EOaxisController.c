@@ -336,6 +336,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
         eo_trajectory_SetPosReference(o->trajectory, pos, avg_vel);
         break;
         
+    case eomc_controlmode_torque:
     case eomc_controlmode_impedance_vel:
         o->control_mode = eomc_controlmode_impedance_pos;
     case eomc_controlmode_impedance_pos:
@@ -343,8 +344,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
         break;
 
     case eomc_controlmode_idle: 
-    case eomc_controlmode_calib:
-    case eomc_controlmode_torque: 
+    case eomc_controlmode_calib: 
     case eomc_controlmode_openloop: 
         // command ignored
         return;    
@@ -366,6 +366,7 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         eo_trajectory_SetVelReference(o->trajectory, vel, avg_acc);
         break;
         
+    case eomc_controlmode_torque:
     case eomc_controlmode_impedance_pos:
         o->control_mode = eomc_controlmode_impedance_vel;
     case eomc_controlmode_impedance_vel:
@@ -374,8 +375,7 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
         break;  
 
     case eomc_controlmode_idle: 
-    case eomc_controlmode_calib:
-    case eomc_controlmode_torque: 
+    case eomc_controlmode_calib: 
     case eomc_controlmode_openloop: 
         // command ignored
         return;    
@@ -535,17 +535,21 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             {
                 if (!--o->velocity_timer)
                 {
-                    eo_trajectory_VelocityTimeout(o->trajectory);
-
+                    //eo_trajectory_VelocityTimeout(o->trajectory);
+                    eo_trajectory_VelocityStop(o->trajectory);
                     o->control_mode = eomc_controlmode_position;    
                 }
             }
         case eomc_controlmode_position:
-        {            
+        {
+            /*
             if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref))
             {
                 eo_pid_Reset(o->pidP); // position limit reached 
             }
+            */
+            
+            eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
             
             #ifdef MC_CAN_DEBUG
             if (o->axisID == 0)
@@ -583,18 +587,24 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             {
                 if (!--o->velocity_timer)
                 {
-                    eo_trajectory_VelocityTimeout(o->trajectory);
+                    //eo_trajectory_VelocityTimeout(o->trajectory);
+                    eo_trajectory_VelocityStop(o->trajectory);
+                    o->control_mode = eomc_controlmode_impedance_pos;
 
-                    o->control_mode = eomc_controlmode_impedance_pos;    
+                    o->err = 0;
                 }
             }
         case eomc_controlmode_impedance_pos:
         {
+            /*
             if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref))
             {
                 eo_pid_Reset(o->pidT); // position limit reached
             }
+            */
        
+            eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
+            
             int32_t err = pos_ref - pos;
             
             o->torque_ref = o->torque_off + (o->stiffness*err)/1000 + o->damping*(err - o->err);
@@ -631,9 +641,10 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 break;
             }
             
-            if (pos <= o->pos_min || o->pos_max <= pos)
+            if ((pos <= o->pos_min && o->torque_ref < 0) || (pos >= o->pos_max && o->torque_ref > 0))
             {
-                if (pwm < -2000) pwm = -2000; else if (pwm > 2000) pwm = 2000;
+                if (pwm >  2500) pwm =  2500;
+                if (pwm < -2500) pwm = -2500;
             }
             
             return pwm;
@@ -672,9 +683,7 @@ extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, 
     
     SET_BIT(MASK_TRQ_PID);
 
-    eo_pid_SetPid(o->pidT, K, Kd, Ki, Imax, Ymax, 0);
-    
-    o->torque_ref = Yoff;
+    eo_pid_SetPid(o->pidT, K, Kd, Ki, Imax, Ymax, Yoff);
 }
 
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus)

@@ -118,7 +118,8 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
     o->Xdebug = 0;
     o->Vdebug = 0;
     
-    o->bVelocityMove = o->bIsBraking = eobool_false;
+    //o->bVelocityMove = o->bIsBraking = eobool_false;
+    o->bVelocityMove = eobool_false;
 }
 
 extern void eo_trajectory_GetPosReference(EOtrajectory *o, int32_t *xStar, int32_t *velAvg)
@@ -179,7 +180,7 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t vStar, int32_
     if (!o) return;
     
     o->bVelocityMove = eobool_true;
-    o->bIsBraking = eobool_false;
+    //o->bIsBraking = eobool_false;
 
     LIMIT(-o->vel_max, vStar, o->vel_max)
     
@@ -254,18 +255,19 @@ extern void eo_trajectory_VelocityStop(EOtrajectory *o)
 {
     if (!o) return;
     
-    o->bIsBraking    = eobool_false;
+    //o->bIsBraking  = eobool_false;
     o->bVelocityMove = eobool_false;
     
     o->vTimer = o->vT = 0.0f;
 
     o->xX += o->vX;
-    o->xV += o->vV;
-    o->xA += o->vA;
+    //o->xV += o->vV;
+    //o->xA += o->vA;
 
     o->vX = o->vV = o->vA = 0.0f;    
 }
 
+/*
 extern void eo_trajectory_VelocityTimeout(EOtrajectory *o)
 {
     if (!o) return;
@@ -273,11 +275,12 @@ extern void eo_trajectory_VelocityTimeout(EOtrajectory *o)
     if (o->bVelocityMove)
     {
         o->bVelocityMove = eobool_false;
-        o->bIsBraking    = eobool_true;
+        //o->bIsBraking  = eobool_true;
 
         eo_trajectory_SetVelReference(o, 0, o->acc_max);
     }
 }
+*/
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -325,7 +328,7 @@ extern int8_t eo_trajectory_Step(EOtrajectory* o, float *p, float *v, float *a)
     }
     else
     {
-        if (o->bIsBraking) eo_trajectory_VelocityStop(o);
+        //if (o->bIsBraking) eo_trajectory_VelocityStop(o);
 
         *p = o->xX;
         *v = o->xV;
