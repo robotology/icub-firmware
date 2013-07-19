@@ -32,7 +32,6 @@
 #include "stdio.h"
 
 #include "EoProtocol.h"
-
 #include "EoProtocolAS_rom.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,7 +67,8 @@ EO_VERIFYproposition(eoprot_as_tagsmax_st, eoprot_tags_as_strain_numberof <= eop
 EO_VERIFYproposition(eoprot_as_tagsnum_ma, eoprot_tags_as_mais_numberof == eoprot_rwms_as_mais_numberof);
 EO_VERIFYproposition(eoprot_as_tagsmax_ma, eoprot_tags_as_mais_numberof <= eoprot_tags_maxnumberof);
 
-
+EO_VERIFYproposition(eoprot_as_tagsnum_et, eoprot_tags_as_extorque_numberof == eoprot_rwms_as_extorque_numberof);
+EO_VERIFYproposition(eoprot_as_tagsmax_et, eoprot_tags_as_extorque_numberof <= eoprot_tags_maxnumberof);
  
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,29 +77,40 @@ EO_VERIFYproposition(eoprot_as_tagsmax_ma, eoprot_tags_as_mais_numberof <= eopro
 
 
 // functions used to configure the eOnvset_EPcfg_t
+
 static uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd);
 static eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
 static eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog);
 static eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id);
 static void* eoprot_as_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id);
-//static void* eoprot_as_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram);
-
 
 
 static uint16_t s_eoprot_as_brdentityindex2ramoffset(eOprotBRD_t brd, eOprotEntity_t entity, eOprotIndex_t index);
 static uint16_t s_eoprot_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID32_t id);
 
-static eObool_t s_eoprot_as_tag_strain_is_valid(eOprotTag_t tag);
-static eObool_t s_eoprot_as_tag_mais_is_valid(eOprotTag_t tag);
 
-static uint16_t s_eoprot_as_strains_numberof_Get(eOprotBRD_t brd);
-
-//static uint16_t s_eoprot_as_maises_numberof_Get(eOprotBRD_t brd);
+static eObool_t s_eoprot_as_entity_tag_is_valid(eOprotEntity_t entity, eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
+static const uint8_t s_eoprot_as_tags_numberof[] = 
+{
+    eoprot_tags_as_strain_numberof, 
+    eoprot_tags_as_mais_numberof, 
+    eoprot_tags_as_extorque_numberof
+};  EO_VERIFYsizeof(s_eoprot_as_tags_numberof, eoprot_entities_as_numberof*sizeof(uint8_t)); 
+
+
+static const uint16_t s_eoprot_as_entities_sizeof[] = 
+{
+    sizeof(eOas_strain_t), 
+    sizeof(eOas_mais_t), 
+    sizeof(eOas_extorque_t)
+};  EO_VERIFYsizeof(s_eoprot_as_entities_sizeof, eoprot_entities_as_numberof*sizeof(uint16_t)); 
+
 
 #if 0   // dynamic mode
 static const uint8_t** s_eoprot_as_board_numberofeachentity = NULL; // s_eoprot_as_board_numberofeachentity[brd][entype] tells how many entities of kind entype are in brd
@@ -177,9 +188,11 @@ extern uint16_t eoprot_as_endpoint_sizeof_get(eOprotBRD_t brd)
         return(0);
     }
     
-    //#warning --> it is valid only if organisation of memory is st[n], ma[m]
-    size = sizeof(eOas_strain_t) *      s_eoprot_as_board_numberofeachentity[brd][eoas_entity_strain] +
-           sizeof(eOas_mais_t) *      s_eoprot_as_board_numberofeachentity[brd][eoas_entity_mais];
+    uint8_t i;
+    for(i=0; i<eoprot_entities_as_numberof; i++)
+    {
+        size += s_eoprot_as_entities_sizeof[i] * s_eoprot_as_board_numberofeachentity[brd][i];
+    }
     
     return(size);
 }
@@ -231,7 +244,7 @@ extern void* eoprot_as_entity_ramof_get(eOprotBRD_t brd, eOprotEntity_t ent, eOp
         return(NULL);
     }
     
-    uint8_t* startofdata = (void*)s_eoprot_as_board_ramofeachendpoint[brd];
+    uint8_t* startofdata = (uint8_t*)s_eoprot_as_board_ramofeachendpoint[brd];
     uint16_t offset = s_eoprot_as_brdentityindex2ramoffset(brd, ent, index);
     
     if(EOK_uint16dummy == offset)
@@ -246,22 +259,10 @@ extern void* eoprot_as_entity_ramof_get(eOprotBRD_t brd, eOprotEntity_t ent, eOp
 extern uint16_t eoprot_as_entity_sizeof_get(eOprotBRD_t brd, eOprotEntity_t ent)
 {
     uint16_t sizeofentity = EOK_uint16dummy;
-    switch(ent)
+    
+    if(ent < eoprot_entities_as_numberof)
     {
-        case eoas_entity_strain:
-        {  
-            sizeofentity = sizeof(eOas_strain_t); 
-        } break;
-        
-        case eoas_entity_mais:
-        {  
-            sizeofentity = sizeof(eOas_mais_t);  
-        } break;      
-        
-        default:
-        {   // error
-            sizeofentity = EOK_uint16dummy;
-        } break;    
+        sizeofentity = s_eoprot_as_entities_sizeof[ent];
     }
     
     return(sizeofentity);    
@@ -276,21 +277,12 @@ extern uint8_t eoprot_as_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent
     {
         return(0);
     }
- 
-    switch(ent)
-    {    
-        case eoas_entity_strain: 
-        case eoas_entity_mais:
-        {
-            numberof = s_eoprot_as_board_numberofeachentity[brd][ent];
-        } break;
-                     
-        default:
-        {   
-            numberof = 0;
-        } break; 
-    }        
     
+    if(ent < eoprot_entities_as_numberof)
+    {
+        numberof = s_eoprot_as_board_numberofeachentity[brd][ent];
+    }
+     
     return(numberof);
 }
 
@@ -306,8 +298,6 @@ extern uint8_t eoprot_as_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// ---
-
 
 static uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd)
 {
@@ -318,52 +308,44 @@ static uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd)
         return(0);
     }
     
-    num = eoprot_tags_as_strain_numberof * s_eoprot_as_board_numberofeachentity[brd][eoas_entity_strain] +
-          eoprot_tags_as_mais_numberof * s_eoprot_as_board_numberofeachentity[brd][eoas_entity_mais];
-          
+    uint8_t i;
+    for(i=0; i<eoprot_entities_as_numberof; i++)
+    {   
+        // simply the sum for each entity of the number of tags multiplied the number of each entity. 
+        // it also works if an entity is not present in the board
+        num += (s_eoprot_as_tags_numberof[i] * s_eoprot_as_board_numberofeachentity[brd][i]);
+    }
+
     return(num);
 }
 
 
 static eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
 {
-    eObool_t ret = eobool_false;    
-    
     if((NULL == s_eoprot_as_board_numberofeachentity) || (NULL == s_eoprot_as_board_numberofeachentity[brd]))
     {
         return(eobool_false);
     }    
     
+    // just verifies that the entity, index, and tag have numbers which are consistent with their maximum number
+    
     eOprotEntity_t ent = eoprot_ID2entity(id);
     eOprotIndex_t  ind = eoprot_ID2index(id);
     eOprotTag_t    tag = eoprot_ID2tag(id);
     
-    switch(ent)
+    if(ent >= eoprot_entities_as_numberof)
     {
-        case eoas_entity_strain:
-        {   
-            if(ind < s_eoprot_as_board_numberofeachentity[brd][eoas_entity_strain])
-            {
-                ret = s_eoprot_as_tag_strain_is_valid(tag);
-            }            
-        } break;
-        
-        case eoas_entity_mais:
-        {
-            if(ind < s_eoprot_as_board_numberofeachentity[brd][eoas_entity_mais]) 
-            {
-                ret = s_eoprot_as_tag_mais_is_valid(tag);
-            }            
-        } break;        
-        
-        default:
-        {           
-        } break;        
+        return(eobool_false);
     }
     
-    return(ret);     
-}
+    if(ind >= s_eoprot_as_board_numberofeachentity[brd][ent])
+    {
+        return(eobool_false);
+    }   
+    
+    return(s_eoprot_as_entity_tag_is_valid(ent, tag));
 
+}
 
 static eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog)
 {
@@ -374,35 +356,32 @@ static eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t pro
     if((NULL == s_eoprot_as_board_numberofeachentity) || (NULL == s_eoprot_as_board_numberofeachentity[brd]))
     {
         return(EOK_uint32dummy);
-    }
+    }   
     
-    eOprotProgNumber_t progsinstrains = eoprot_tags_as_strain_numberof * s_eoprot_as_board_numberofeachentity[brd][eoas_entity_strain];
-    eOprotProgNumber_t progsinmaises = eoprot_tags_as_mais_numberof * s_eoprot_as_board_numberofeachentity[brd][eoas_entity_mais];
-    
-    if((0 != progsinstrains) && (prog < (progsinstrains)))
-    {   // entity is eoas_entity_strain 
-        entity  = eoas_entity_strain;
-        index   = prog / eoprot_tags_as_strain_numberof;       // eoprot_tags_as_strain_numberof cannot be zero if progsinstrains is non-zero
-        tag     = prog % eoprot_tags_as_strain_numberof;        
-    }
-    else if((0 != progsinmaises) && (prog < (progsinstrains + progsinmaises)))
-    {   // entity is eoas_entity_mais 
-        prog -= progsinstrains;
-        entity  = eoas_entity_mais;
-        index   = prog / eoprot_tags_as_mais_numberof;       // eoprot_tags_as_mais_numberof cannot be zero if progsinmaises is non-zero
-        tag     = prog % eoprot_tags_as_mais_numberof;                      
-    }
-    else
+    uint8_t i;
+    for(i=0; i<eoprot_entities_as_numberof; i++)
     {
-        return(EOK_uint32dummy);
+        // starting from the first entity (if it present in the board) we progressively check if the signedprog is in its relevant range.
+        uint8_t tags_number_ith = s_eoprot_as_tags_numberof[i];
+        eOprotProgNumber_t progs_ith = tags_number_ith * s_eoprot_as_board_numberofeachentity[brd][i]; // num of progs in all the entities i-th
+        if((0 != progs_ith) && (prog < (progs_ith)))
+        {   // entity is the i-th 
+            entity  = i;
+            index   = prog / tags_number_ith;       // tags_number_ith cannot be zero if progs_ith is non-zero
+            tag     = prog % tags_number_ith;  
+
+            return(eoprot_ID_get(eoprot_endpoint_analogsensors, entity, index, tag));
+        }
+        prog -= progs_ith; // entity may be the next one. 
     }
-    
-    return(eoprot_ID_get(eoprot_endpoint_analogsensors, entity, index, tag));
+
+    return(EOK_uint32dummy);   
 }
+
 
 static eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
 {
-    eOprotProgNumber_t prog = EOK_uint32dummy;
+    eOprotProgNumber_t prog = 0;
     
     if((NULL == s_eoprot_as_board_numberofeachentity) || (NULL == s_eoprot_as_board_numberofeachentity[brd]))
     {
@@ -410,28 +389,24 @@ static eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
     }
     
     eOprotEntity_t entity = eoprot_ID2entity(id);
-    eOprotIndex_t index = eoprot_ID2index(id);
-    switch(entity)
+    eOprotIndex_t  index  = eoprot_ID2index(id);
+    
+    if(entity >= eoprot_entities_as_numberof)
     {
-        case eoas_entity_strain: 
-        {
-            prog = index*eoprot_tags_as_strain_numberof + eoprot_as_rom_get_prognum(id);
-        } break;
-        
-        case eoas_entity_mais: 
-        {
-            prog = s_eoprot_as_board_numberofeachentity[brd][eoas_entity_strain]*eoprot_tags_as_strain_numberof +
-                   index*eoprot_tags_as_mais_numberof + eoprot_as_rom_get_prognum(id);
-        } break; 
-                
-        default:
-        {   
-            prog = EOK_uint32dummy;
-        } break;    
+        return(EOK_uint32dummy);
     }
     
+    uint8_t i;
+    for(i=0; i<=entity; i++)
+    {   // we add all the tags in the entities below
+        prog += (s_eoprot_as_tags_numberof[i] * s_eoprot_as_board_numberofeachentity[brd][i]);
+    }
+    // then we add only the tags of the entities equal to the current one + the progessive number of the tag
+    prog += (index*s_eoprot_as_tags_numberof[entity] + eoprot_as_rom_get_prognum(id));
+
     return(prog);
-}
+}    
+    
 
 
 static void* eoprot_as_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id)
@@ -440,118 +415,56 @@ static void* eoprot_as_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id)
     return(eoprot_as_rom_get_nvrom(id));
 }
 
-
-// static void* eoprot_as_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram)
-// {
-//     uint8_t* startofdata = epram;
-//     uint16_t offset = s_eoprot_as_brdid2ramoffset(brd, id);
-//     
-//     if(EOK_uint16dummy == offset)
-//     {
-//         return(NULL);
-//     }   
-
-//     return(&startofdata[offset]);
-// }
-
-
-
 static uint16_t s_eoprot_as_brdentityindex2ramoffset(eOprotBRD_t brd, eOprotEntity_t entity, eOprotIndex_t index)
 {
     uint16_t offset = 0;
-    
-    switch(entity)
+        
+    if(entity >= eoprot_entities_as_numberof)
     {
-        case eoas_entity_strain:
-        {   // the strains, if present, are all displaced at the beginning of the data in every as endpoint
-            offset = 0;
-            offset += sizeof(eOas_strain_t)*index; 
-        } break;
-        
-        case eoas_entity_mais:
-        {   // the maises, if present, are placed after all the strains (if present). 
-            uint16_t numberofstrains = s_eoprot_as_strains_numberof_Get(brd);
-            offset = numberofstrains*sizeof(eOas_strain_t);  
-            offset += sizeof(eOas_mais_t)*index;
-        } break;      
-        
-        default:
-        {   // error
-            offset = EOK_uint16dummy;
-        } break;    
+        return(EOK_uint16dummy);
     }
     
-    return(offset);  
-}
+    uint8_t i;
+    for(i=0; i<=entity; i++)
+    {   // we sum the size of all the entities before the current one
+        offset += (s_eoprot_as_board_numberofeachentity[brd][i] * s_eoprot_as_entities_sizeof[i]);
+    }
+    // then we add the offset of the current entity
+    offset += (index*s_eoprot_as_entities_sizeof[entity]);
+
+    return(offset);
+}    
 
 
 
 static uint16_t s_eoprot_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID32_t id)
 {
-    uint16_t offset = 0;
+    eOprotEntity_t entity = eoprot_ID2entity(id);
+    eOprotIndex_t index = eoprot_ID2index(id);
     eOprotTag_t tag = eoprot_ID2tag(id);
     
-    if(EOK_uint08dummy == tag)
+    // we compute the offset of the entity
+    uint16_t offset = s_eoprot_as_brdentityindex2ramoffset(brd, entity, index);
+       
+    if(EOK_uint16dummy == offset)
     {
         return(EOK_uint16dummy);
     }
     
-    //#warning --> it is valid only if organisation of memory is jo[n], mo[m], c[l]
-    
-    eOprotEntity_t entity = eoprot_ID2entity(id);
-    uint16_t index = eoprot_ID2index(id);
-    
-    switch(entity)
-    {
-        case eoas_entity_strain:
-        {   // the strain are all displaced at the beginning of the data in every mc endpoint
-            offset = index*sizeof(eOas_strain_t) + eoprot_as_rom_strain_get_offset(tag); 
-        } break;
-        
-        case eoas_entity_mais:
-        {   // the maises are placed after all the strains (if any strains ...). 
-            uint16_t numberofstrains = s_eoprot_as_strains_numberof_Get(brd);
-            offset = numberofstrains*sizeof(eOas_strain_t) + index*sizeof(eOas_mais_t) + eoprot_as_rom_mais_get_offset(tag);  
-        } break;      
-        
-        default:
-        {   // error
-            offset = EOK_uint16dummy;
-        } break;    
-    }
-    
-    return(offset);  
-}
+    // then we add the offset of the tag
+    offset += (eoprot_as_rom_get_offset(entity, tag)); 
 
-static eObool_t s_eoprot_as_tag_strain_is_valid(eOprotTag_t tag)
-{   // in case of holes in tags ... change the code
-    return((tag < eoprot_tags_as_strain_numberof)?(eobool_true):(eobool_false));
-}
+    return(offset);
+} 
 
-static eObool_t s_eoprot_as_tag_mais_is_valid(eOprotTag_t tag)
-{   // in case of holes in tags ... change the code  
-    return((tag < eoprot_tags_as_mais_numberof)?(eobool_true):(eobool_false));
-}
 
-static uint16_t s_eoprot_as_strains_numberof_Get(eOprotBRD_t brd)
+
+static eObool_t s_eoprot_as_entity_tag_is_valid(eOprotEntity_t entity, eOprotTag_t tag)
 {
-//     if((NULL == s_eoprot_as_board_numberofeachentity) || (NULL == s_eoprot_as_board_numberofeachentity[brd]))
-//     {
-//         return(0);
-//     }
-    
-    return(s_eoprot_as_board_numberofeachentity[brd][eoas_entity_strain]);
+    return((tag < s_eoprot_as_tags_numberof[entity])?(eobool_true):(eobool_false));
 }
 
-// static uint16_t s_eoprot_as_maises_numberof_Get(eOprotBRD_t brd)
-// {
-// //     if((NULL == s_eoprot_as_board_numberofeachentity) || (NULL == s_eoprot_as_board_numberofeachentity[brd]))
-// //     {
-// //         return(0);
-// //     }
-//     
-//     return(s_eoprot_as_board_numberofeachentity[brd][eoas_entity_mais]);
-// }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
