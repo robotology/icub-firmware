@@ -142,17 +142,52 @@ typedef enum
 enum { eoprot_rwms_as_mais_numberof = 7 };  // it MUST be equal to the number of rw modes. 
 
 
+
+// - entity extorque
+
+
+/** @typedef    typedef enum eOprot_tag_as_extorque_t
+    @brief      It contains the tags for all variables of the extorque entity.
+                See definition of eOas_extorque_t (and its fields) in file EoAnalogSensors.h for explanation of the variables.
+ **/
+typedef enum
+{
+    eoprot_tag_as_extorque_wholeitem                                = 0,
+    eoprot_tag_as_extorque_config                                   = 1,
+    eoprot_tag_as_extorque_inputs                                   = 2
+} eOprot_tag_as_extorque_t;
+
+enum { eoprot_tags_as_extorque_numberof = 3 };  // it MUST be equal to the number of tags. 
+
+
+/** @typedef    typedef enum eOprot_rwm_as_extorque_t
+    @brief      It contains the rw modes for all variables of the extorque entity. There must be a one-to-one
+                correspondence to the values in eOprot_tag_as_extorque_t.
+ **/
+typedef enum
+{
+    eoprot_rwm_as_extorque_wholeitem                                = eo_nv_rwmode_RO,
+    eoprot_rwm_as_extorque_config                                   = eo_nv_rwmode_RW,
+    eoprot_rwm_as_extorque_inputs                                   = eo_nv_rwmode_RW   
+} eOprot_rwm_as_extorque_t; 
+
+enum { eoprot_rwms_as_extorque_numberof = 3 };  // it MUST be equal to the number of rw modes. 
+
+
+
+
 // - structures implementing the endpoints
 
 /** @typedef    typedef struct eOprot_template_as_t;
     @brief      It is a template for the organisation of strain and mais entities in the analog sensors endpoint.
                 The effective number depends on the board.
  **/
-typedef struct                  // 56*1+48*1 = 104              
+typedef struct                  // 56*1+48*1+8*1 = 112              
 {
-    eOas_strain_t               strains[1]; 
-    eOas_mais_t                 maises[1];
-} eOprot_template_as_t;      //EO_VERIFYsizeof(eOprot_template_as_t, 104);
+    eOas_strain_t               strain[1]; 
+    eOas_mais_t                 maise[1];
+    eOas_extorque_t             extorque[1];
+} eOprot_template_as_t;         //EO_VERIFYsizeof(eOprot_template_as_t, 112);
   
   
 
@@ -247,6 +282,7 @@ extern uint8_t eoprot_as_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent
 
 extern void eoprot_fun_INITIALISE_as(eOprotIP_t ip, void *ram);
 
+// -- strain 
 
 extern void eoprot_fun_INIT_as_strain_wholeitem(const EOnv* nv);
 extern void eoprot_fun_UPDT_as_strain_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
@@ -275,6 +311,7 @@ extern void eoprot_fun_UPDT_as_strain_status_calibratedvalues(const EOnv* nv, co
 extern void eoprot_fun_INIT_as_strain_status_uncalibratedvalues(const EOnv* nv);
 extern void eoprot_fun_UPDT_as_strain_status_uncalibratedvalues(const EOnv* nv, const eOropdescriptor_t* rd);
 
+// -- mais
 
 extern void eoprot_fun_INIT_as_mais_wholeitem(const EOnv* nv);
 extern void eoprot_fun_UPDT_as_mais_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
@@ -297,6 +334,16 @@ extern void eoprot_fun_UPDT_as_mais_status(const EOnv* nv, const eOropdescriptor
 extern void eoprot_fun_INIT_as_mais_status_the15values(const EOnv* nv);
 extern void eoprot_fun_UPDT_as_mais_status_the15values(const EOnv* nv, const eOropdescriptor_t* rd);
 
+// -- extorque
+
+extern void eoprot_fun_INIT_as_extorque_wholeitem(const EOnv* nv);
+extern void eoprot_fun_UPDT_as_extorque_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd);
+
+extern void eoprot_fun_INIT_as_extorque_config(const EOnv* nv);
+extern void eoprot_fun_UPDT_as_extorque_config(const EOnv* nv, const eOropdescriptor_t* rd);
+
+extern void eoprot_fun_INIT_as_extorque_inputs(const EOnv* nv);
+extern void eoprot_fun_UPDT_as_extorque_inputs(const EOnv* nv, const eOropdescriptor_t* rd);
 
 
 /** @}            

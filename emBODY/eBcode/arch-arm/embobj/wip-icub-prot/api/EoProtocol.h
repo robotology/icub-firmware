@@ -158,11 +158,12 @@ typedef enum
     eoprot_entity_mc_controller             = eomc_entity_controller,   /**<  */    
     eoprot_entity_as_strain                 = eoas_entity_strain,       /**<  */   
     eoprot_entity_as_mais                   = eoas_entity_mais,         /**<  */            
+    eoprot_entity_as_extorque               = eoas_entity_extorque,     /**<  */  
     eoprot_entity_sk_skin                   = eosk_entity_skin,         /**<  */
     eoprot_entity_none                      = EOK_uint08dummy
 } eOprot_entity_t;
 
-enum { eoprot_entities_numberof = 8 }; // it does not count the eoprot_entity_none.
+enum { eoprot_entities_numberof = 9 }; // it does not count the eoprot_entity_none.
 
 
 /** @typedef    typedef enum eOprot_index_t
