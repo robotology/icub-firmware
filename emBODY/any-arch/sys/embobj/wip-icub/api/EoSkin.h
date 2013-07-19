@@ -82,7 +82,7 @@ typedef struct              // size is 4+10*16+0 = 164
 {
     eOarray_head_t          head;
     uint8_t                 data[10*sizeof(eOutil_canframe_t)];
-} EOarray_of_10canframes;   EO_VERIFYsizeof(EOarray_of_10canframes, 164);
+} EOarray_of_10canframes;   //EO_VERIFYsizeof(EOarray_of_10canframes, 164);
 
 
 /** @typedef    typedef struct eOsk_array_data_t
@@ -93,7 +93,7 @@ typedef struct                  // size is: 164+4+0 = 168
 {
     EOarray_of_10canframes  array;
     uint8_t                 filler04[4];
-} eOsk_array_data_t;        EO_VERIFYsizeof(eOsk_array_data_t, 168);
+} eOsk_array_data_t;        //EO_VERIFYsizeof(eOsk_array_data_t, 168);
 
 
 // -- the definition of a skin entity 
@@ -108,20 +108,20 @@ typedef struct
 {
     eOenum08_t                  sigmode;                                   /**< use values from eOsk_sigmode_t */
     uint8_t                     filler03[3];                           
-} eOsk_config_t;                EO_VERIFYsizeof(eOsk_config_t, 4);
+} eOsk_config_t;                //EO_VERIFYsizeof(eOsk_config_t, 4);
 
 
 typedef struct                      
 {
     uint8_t                     filler04[4];                           
-} eOsk_inputs_t;                EO_VERIFYsizeof(eOsk_inputs_t, 4);
+} eOsk_inputs_t;                //EO_VERIFYsizeof(eOsk_inputs_t, 4);
 
 
 typedef struct                  // size is: 164+4+0 = 168                     
 {
     EOarray_of_10canframes      arrayof10canframes;
     uint8_t                     filler04[4];                           
-} eOsk_status_t;                EO_VERIFYsizeof(eOsk_status_t, 168);
+} eOsk_status_t;                //EO_VERIFYsizeof(eOsk_status_t, 168);
 
 
 typedef struct                  // size is: 4+4+168+0 = 176
@@ -129,7 +129,7 @@ typedef struct                  // size is: 4+4+168+0 = 176
     eOsk_config_t               config;
     eOsk_inputs_t               inputs;    
     eOsk_status_t               status;
-} eOsk_skin_t;                  EO_VERIFYsizeof(eOsk_skin_t, 176);
+} eOsk_skin_t;                  //EO_VERIFYsizeof(eOsk_skin_t, 176);
 
 
 

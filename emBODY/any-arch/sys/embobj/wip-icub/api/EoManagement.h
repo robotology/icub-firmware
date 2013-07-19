@@ -109,7 +109,7 @@ typedef struct              // size is 4+21*4=88 bytes
 {
     eOarray_head_t          head;
     uint8_t                 data[NUMOFROPSIGCFG*sizeof(eOropSIGcfg_t)];
-} eOmn_ropsigcfg_array_t;   EO_VERIFYsizeof(eOmn_ropsigcfg_array_t, 88);
+} eOmn_ropsigcfg_array_t;   //EO_VERIFYsizeof(eOmn_ropsigcfg_array_t, 88);
 
 
 /** @typedef    typedef struct eOmn_ropsigcfg_command_t;
@@ -123,7 +123,7 @@ typedef struct              // size is 88+ 1+1+1+1+4 = 96 bytes
     uint8_t                         plussign;
     uint8_t                         filler01;
     uint32_t                        signature;
-} eOmn_ropsigcfg_command_t;         EO_VERIFYsizeof(eOmn_ropsigcfg_command_t, 96);
+} eOmn_ropsigcfg_command_t;         //EO_VERIFYsizeof(eOmn_ropsigcfg_command_t, 96);
 
 
 /** @typedef    typedef enum eOmn_appl_runMode_t;
@@ -146,17 +146,17 @@ typedef enum
 typedef struct
 {
     uint8_t                         filler04[4];
-} eOmn_comm_config_t;               EO_VERIFYsizeof(eOmn_comm_config_t, 4);
+} eOmn_comm_config_t;               //EO_VERIFYsizeof(eOmn_comm_config_t, 4);
 
 typedef struct
 {
     uint8_t                         filler04[4];
-} eOmn_comm_status_t;               EO_VERIFYsizeof(eOmn_comm_status_t, 4);
+} eOmn_comm_status_t;               //EO_VERIFYsizeof(eOmn_comm_status_t, 4);
 
 typedef struct
 {
     eOmn_ropsigcfg_command_t        ropsigcfg;
-} eOmn_comm_cmmnds_t;               EO_VERIFYsizeof(eOmn_comm_cmmnds_t, 96);
+} eOmn_comm_cmmnds_t;               //EO_VERIFYsizeof(eOmn_comm_cmmnds_t, 96);
 
 
 /** @typedef    typedef struct eOmn_comm_t;
@@ -167,7 +167,7 @@ typedef struct                      // size is 4+4+96+0 = 104 bytes
     eOmn_comm_config_t              config;
     eOmn_comm_status_t              status;
     eOmn_comm_cmmnds_t              cmmnds;
-} eOmn_comm_t;                      EO_VERIFYsizeof(eOmn_comm_t, 104);
+} eOmn_comm_t;                      //EO_VERIFYsizeof(eOmn_comm_t, 104);
 
 
 
@@ -180,7 +180,7 @@ typedef struct                      // size is 4+4 = 8 bytes
 {
     eOreltime_t                     cycletime;
     uint8_t                         filler04[4];
-} eOmn_appl_config_t;               EO_VERIFYsizeof(eOmn_appl_config_t, 8);
+} eOmn_appl_config_t;               //EO_VERIFYsizeof(eOmn_appl_config_t, 8);
 
 
 /** @typedef    typedef struct eOmn_appl_status_t;
@@ -191,7 +191,7 @@ typedef struct                      // size is 1+7 = 8 bytes
     eOenum08_t                      currstate;          /**< use eOmn_appl_state_t  */
     eOenum08_t                      runmode;            /**< use eOmn_appl_runMode_t */
     uint8_t                         filler06[6];
-} eOmn_appl_status_t;               EO_VERIFYsizeof(eOmn_appl_status_t, 8);
+} eOmn_appl_status_t;               //EO_VERIFYsizeof(eOmn_appl_status_t, 8);
 
                                          
 /** @typedef    typedef struct eOmn_appl_cmmnds_t;
@@ -201,7 +201,7 @@ typedef struct                      // size is 1+7 = 8 bytes
 {
     eOenum08_t                      go2state;       /**< use eOmn_appl_state_t */
     uint8_t                         filler07[7];
-} eOmn_appl_cmmnds_t;               EO_VERIFYsizeof(eOmn_appl_cmmnds_t, 8);
+} eOmn_appl_cmmnds_t;               //EO_VERIFYsizeof(eOmn_appl_cmmnds_t, 8);
 
 
 /** @typedef    typedef struct eOmn_appl_t;
@@ -212,7 +212,7 @@ typedef struct                      // size is 8+8+8 = 24 bytes
     eOmn_appl_config_t              config;
     eOmn_appl_status_t              status;
     eOmn_appl_cmmnds_t              cmmnds;
-} eOmn_appl_t;                      EO_VERIFYsizeof(eOmn_appl_t, 24);
+} eOmn_appl_t;                      //EO_VERIFYsizeof(eOmn_appl_t, 24);
 
 
 

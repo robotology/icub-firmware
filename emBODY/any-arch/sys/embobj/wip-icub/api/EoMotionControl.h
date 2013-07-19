@@ -322,7 +322,7 @@ typedef struct              // size is 2+2+2+2+2+2+1+3+0 bytes
     int16_t                 offset;             /**< the k0 in the pid formula */
     int8_t                  scale;              /**< scale factor for the gains (used for a rigth shift */
     uint8_t                 filler03[3];        /**< filler to make struct a multiple of 4 */
-} eOmc_PID16_t;             EO_VERIFYsizeof(eOmc_PID16_t, 16);
+} eOmc_PID16_t;             //EO_VERIFYsizeof(eOmc_PID16_t, 16);
 
 
 typedef struct              // size is 4+4+4+4+4+4+0 bytes
@@ -333,7 +333,7 @@ typedef struct              // size is 4+4+4+4+4+4+0 bytes
     float32_t               limitonintegral;    /**< limit of integral term */ 
     float32_t               limitonoutput;      /**< limit of the output of the pid */
     float32_t               offset;             /**< the k0 in the pid formula */
-} eOmc_PIDfl_t;             EO_VERIFYsizeof(eOmc_PIDfl_t, 24);
+} eOmc_PIDfl_t;             //EO_VERIFYsizeof(eOmc_PIDfl_t, 24);
 
 // the PID to be used is a PID16
 typedef eOmc_PID16_t eOmc_PID_t;
@@ -350,7 +350,7 @@ typedef struct                  // size is 4+4+2+2+0 = 12
     eOmeas_damping_t            damping;                            /**< the Kd parameter */
     eOmeas_torque_t             offset;                             /**< the Ko parameter */
     uint8_t                     filler02[2];                        
-} eOmc_impedance_t;             EO_VERIFYsizeof(eOmc_impedance_t, 12);
+} eOmc_impedance_t;             //EO_VERIFYsizeof(eOmc_impedance_t, 12);
 
 
 
@@ -370,7 +370,7 @@ typedef struct                  // size is 1+1+2+2+2+0 = 8
         eOmc_calibrator16_params_type3_abs_sens_digital_t       type3;
         eOmc_calibrator16_params_type4_abs_and_incremental_t    type4;
     } params;                                                       /**< the params of the calibrator */   
-} eOmc_calibrator16_t;           EO_VERIFYsizeof(eOmc_calibrator16_t, 8);
+} eOmc_calibrator16_t;           //EO_VERIFYsizeof(eOmc_calibrator16_t, 8);
 
 
 
@@ -390,7 +390,7 @@ typedef struct                  // size is 1+3+4*3 = 16
         eOmc_calibrator_params_type3_abs_sens_digital_t         type3;
         eOmc_calibrator_params_type4_abs_and_incremental_t      type4;
     } params;                                                       /**< the params of the calibrator */   
-} eOmc_calibrator32_t;           EO_VERIFYsizeof(eOmc_calibrator32_t, 16);
+} eOmc_calibrator32_t;           //EO_VERIFYsizeof(eOmc_calibrator32_t, 16);
 
 typedef eOmc_calibrator32_t eOmc_calibrator_t;
 
@@ -430,7 +430,7 @@ typedef struct              // size is 1+3+8+0 = 12
             eOmeas_current_t       value; 
         } current;
     }to;                                        /**< the uinion containing the value field and optional param */
-} eOmc_setpoint_t;              EO_VERIFYsizeof(eOmc_setpoint_t, 12);
+} eOmc_setpoint_t;              //EO_VERIFYsizeof(eOmc_setpoint_t, 12);
 
 
 
@@ -473,7 +473,7 @@ typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+4+4+0 = 80
     uint8_t                     filler01[1];                             
     eOutil_emulfloat32_t        encoderconversionfactor;
     eOutil_emulfloat32_t        encoderconversionoffset;
-} eOmc_joint_config_t;          EO_VERIFYsizeof(eOmc_joint_config_t, 80);
+} eOmc_joint_config_t;          //EO_VERIFYsizeof(eOmc_joint_config_t, 80);
 
 
 
@@ -489,7 +489,7 @@ typedef struct                  // size is: 4+4+4+2+1+1+0 = 16
     eOmeas_torque_t             torque;                     /**< the torque of the joint when locally measured */
     eOenum08_t                  motionmonitorstatus;        /**< use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode */  
     eOenum08_t                  controlmodestatus;          /**< use eOmc_controlmode_t. */
-} eOmc_joint_status_basic_t;    EO_VERIFYsizeof(eOmc_joint_status_basic_t, 16);
+} eOmc_joint_status_basic_t;    //EO_VERIFYsizeof(eOmc_joint_status_basic_t, 16);
 
 
 
@@ -503,7 +503,7 @@ typedef struct                  // size is: 4+4+4+0 = 12
     int32_t                     reference;              /**< the reference of the pid. it can be position, velocity, torque, current  */
     int32_t                     error;                  /**< the error of the pid */ 
     int32_t                     output;                 /**< the output of the pid */ 
-} eOmc_joint_status_ofpid_t;    EO_VERIFYsizeof(eOmc_joint_status_ofpid_t, 12);
+} eOmc_joint_status_ofpid_t;    //EO_VERIFYsizeof(eOmc_joint_status_ofpid_t, 12);
 
 
 
@@ -515,7 +515,7 @@ typedef struct                  // size is:  16+12+4 = 32
     eOmc_joint_status_basic_t   basic;              /**< the basic status */
     eOmc_joint_status_ofpid_t   ofpid;              /**< the pid status   */ 
     uint8_t                     chamaleon04[4];     /**< these bytes are available for the application for debug purposes */
-} eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 32);
+} eOmc_joint_status_t;          //EO_VERIFYsizeof(eOmc_joint_status_t, 32);
 
 
 
@@ -523,7 +523,7 @@ typedef struct                  // size is 2+6 = 8
 {
     eOmeas_torque_t             externallymeasuredtorque;   /**< the torque at the joint when externally measured or estimated */
     uint8_t                     filler06[6];
-} eOmc_joint_inputs_t;          EO_VERIFYsizeof(eOmc_joint_inputs_t, 8);
+} eOmc_joint_inputs_t;          //EO_VERIFYsizeof(eOmc_joint_inputs_t, 8);
 
 
 
@@ -534,7 +534,7 @@ typedef struct                  // size is 16+12+1+1+2+0 = 32
     eObool_t                    stoptrajectory;             /**< it is an order to stop the current trajectory on the joint */
     eOenum08_t                  controlmode;                /**< use values from eOmc_controlmode_command_t */
     uint8_t                     filler02[2];     
-} eOmc_joint_commands_t;        EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
+} eOmc_joint_commands_t;        //EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
 
 
 
@@ -544,7 +544,7 @@ typedef struct                  // size is 80+32+8+32+0 = 152
     eOmc_joint_status_t         status;                     /**< the status of the joint */
     eOmc_joint_inputs_t         inputs;                     /**< it contains all the values that a host can send to a joint as inputs */
     eOmc_joint_commands_t       cmmnds;                     /**< it contains all the commands that a host can send to a joint */
-} eOmc_joint_t;                 EO_VERIFYsizeof(eOmc_joint_t, 152);
+} eOmc_joint_t;                 //EO_VERIFYsizeof(eOmc_joint_t, 152);
 
 
 // -- the definition of a motor
@@ -568,7 +568,7 @@ typedef struct                  // size is: 16+4+2+2+0 = 24
     eOmeas_velocity_t           maxvelocityofmotor;         /**< the maximum velocity in the motor */
     eOmeas_current_t            maxcurrentofmotor;          /**< the maximum current in the motor */
     uint8_t                     filler02[2];                
-} eOmc_motor_config_t;          EO_VERIFYsizeof(eOmc_motor_config_t, 24);
+} eOmc_motor_config_t;          //EO_VERIFYsizeof(eOmc_motor_config_t, 24);
 
 
 /** @typedef    typedef struct eOmc_motor_status_t
@@ -581,7 +581,7 @@ typedef struct                  // size is: 4+4+2+2+0 = 12
     eOmeas_velocity_t           velocity;                   /**< the velocity of the motor */ 
     eOmeas_current_t            current;                    /**< the current of the motor */  
     uint8_t                     filler02[2];
-} eOmc_motor_status_basic_t;    EO_VERIFYsizeof(eOmc_motor_status_basic_t, 12);
+} eOmc_motor_status_basic_t;    //EO_VERIFYsizeof(eOmc_motor_status_basic_t, 12);
 
 
 /** @typedef    typedef struct eOmc_motor_status_t
@@ -592,7 +592,7 @@ typedef struct                  // size is: 12+4+0 = 16
 {
     eOmc_motor_status_basic_t   basic;                  /**< the basic status of a motor */
     uint8_t                     chamaleon04[4];         /**< these bytes are available for the application for debug purposes */
-} eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 16);
+} eOmc_motor_status_t;          //EO_VERIFYsizeof(eOmc_motor_status_t, 16);
 
 
 
@@ -600,7 +600,7 @@ typedef struct                  // size is 24+16+0 = 40
 {
     eOmc_motor_config_t         config;                     /**< the configuration of the motor */
     eOmc_motor_status_t         status;                     /**< the status of the motor */   
-} eOmc_motor_t;                 EO_VERIFYsizeof(eOmc_motor_t, 40); 
+} eOmc_motor_t;                 //EO_VERIFYsizeof(eOmc_motor_t, 40); 
  
 
 // -- the definition of a controller containing a given number of joints and motors  
@@ -620,7 +620,7 @@ typedef struct                  // size is 4+4+0 = 8
 {
     eOreltime_t                 durationofctrlloop;         /**< the duration of the control-loop in micro-sec. its default is 1000. so far it cannot be changed. */
     uint8_t                     filler04[4];                
-} eOmc_controller_config_t;     EO_VERIFYsizeof(eOmc_controller_config_t, 8); 
+} eOmc_controller_config_t;     //EO_VERIFYsizeof(eOmc_controller_config_t, 8); 
 
 
 typedef struct                  // size is 1+1+1+1+2+2+0 = 8
@@ -631,14 +631,14 @@ typedef struct                  // size is 1+1+1+1+2+2+0 = 8
     eOenum08_t                  stateofcontroller;          /**< it holds a value from enum eOmc_stateofcontroller_t */               
     eO16flags_t                 flagsinittedjoints;         /**< bit position 0 (1, 2, ..) keeps 1 if the joint 0 (1, 2, ..) is fully initted. */
     eO16flags_t                 flagsinittedmotors;         /**< bit position 0 (1, 2, ..) keeps 1 if the motor 0 (1, 2, ..) is fully initted. */ 
-} eOmc_controller_status_t;     EO_VERIFYsizeof(eOmc_controller_status_t, 8); 
+} eOmc_controller_status_t;     //EO_VERIFYsizeof(eOmc_controller_status_t, 8); 
 
 
 typedef struct                  // size is 1+7+0 = 8
 {
     eOenum08_t                  go2stateofcontroller;       /**< it forces a transition towards the specified state. use a value from enum eOmc_stateofcontroller_t */
     uint8_t                     filler07[7];                
-} eOmc_controller_commands_t;   EO_VERIFYsizeof(eOmc_controller_commands_t, 8); 
+} eOmc_controller_commands_t;   //EO_VERIFYsizeof(eOmc_controller_commands_t, 8); 
 
 
 typedef struct                  // size is 8+8+8+0 = 24
@@ -646,7 +646,7 @@ typedef struct                  // size is 8+8+8+0 = 24
     eOmc_controller_config_t    config;                     /**< controller configuration */
     eOmc_controller_status_t    status;                     /**< controller status  */
     eOmc_controller_commands_t  cmmnds;                     /**< controller commands  */
-} eOmc_controller_t;            EO_VERIFYsizeof(eOmc_controller_t, 24); 
+} eOmc_controller_t;            //EO_VERIFYsizeof(eOmc_controller_t, 24); 
 
 
 
