@@ -35,10 +35,8 @@
 #include "EOnv_hid.h"
 #include "EOconstvector_hid.h"
 
-
-#include "EoMotionControl.h"
 #include "EoProtocolMC.h"
-//#include "EoProtocolMC.h"
+#include "EoMotionControl.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -69,12 +67,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
 static uint16_t s_eoprot_mc_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
-
-static uint16_t s_eoprot_mc_rom_joint_ramoffset(uint16_t tag);
-static uint16_t s_eoprot_mc_rom_motor_ramoffset(uint16_t tag);
-static uint16_t s_eoprot_mc_rom_controller_ramoffset(uint16_t tag);
+static uint16_t s_eoprot_mc_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -82,21 +76,18 @@ static uint16_t s_eoprot_mc_rom_controller_ramoffset(uint16_t tag);
 // --------------------------------------------------------------------------------------------------------------------
 
 // - default value of a joint
-
-const eOmc_joint_t eoprot_mc_rom_joint_defaultvalue = { 0 };
+static const eOmc_joint_t eoprot_mc_rom_joint_defaultvalue = { 0 };
 
 // - default value of a motor
-
-const eOmc_motor_t eoprot_mc_rom_motor_defaultvalue = { 0 };
+static const eOmc_motor_t eoprot_mc_rom_motor_defaultvalue = { 0 };
 
 // - default value of a controller
-
-const eOmc_controller_t eoprot_mc_rom_controller_defaultvalue = { 0 };
+static const eOmc_controller_t eoprot_mc_rom_controller_defaultvalue = { 0 };
 
 
 // - descriptors for the variables of a joint
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_wholeitem =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_wholeitem =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_wholeitem,
@@ -107,7 +98,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_wholeitem =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config,
@@ -118,7 +109,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidposition =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidposition =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.pidposition),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_pidposition,
@@ -129,7 +120,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidposition =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidvelocity =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidvelocity =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.pidvelocity),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_pidvelocity,
@@ -140,7 +131,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidvelocity =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidtorque =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidtorque =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.pidtorque),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_pidtorque,
@@ -151,7 +142,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidtorque =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_impedance =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_impedance =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.impedance),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_impedance,
@@ -162,7 +153,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_impedance =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_minpositionofjoint =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_minpositionofjoint =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.minpositionofjoint),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_minpositionofjoint,
@@ -173,7 +164,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_minpositionofjoint =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_maxpositionofjoint =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_maxpositionofjoint =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.maxpositionofjoint),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_maxpositionofjoint,
@@ -184,7 +175,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_maxpositionofjoint =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_velocitysetpointtimeout =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_velocitysetpointtimeout =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.velocitysetpointtimeout),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_velocitysetpointtimeout,
@@ -195,7 +186,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_velocitysetpointtimeout =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_motionmonitormode =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_motionmonitormode =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.motionmonitormode),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_motionmonitormode,
@@ -206,7 +197,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_motionmonitormode =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionfactor =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionfactor =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.encoderconversionfactor),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_encoderconversionfactor,
@@ -217,7 +208,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionfactor =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionoffset =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionoffset =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.encoderconversionoffset),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_encoderconversionoffset,
@@ -228,7 +219,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionoffset =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_status =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.status),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_status,
@@ -239,7 +230,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_status =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_basic =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_basic =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.status.basic),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_status_basic,
@@ -250,7 +241,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_basic =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_ofpid =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_ofpid =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.status.ofpid),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_status_ofpid,
@@ -261,7 +252,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_ofpid =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_chamaleon04 =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_chamaleon04 =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.status.chamaleon04),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_status_chamaleon04,
@@ -272,7 +263,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_chamaleon04 =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_inputs =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_inputs =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.inputs),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_inputs,
@@ -283,7 +274,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_inputs =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_inputs_externallymeasuredtorque =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_inputs_externallymeasuredtorque =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.inputs.externallymeasuredtorque),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_inputs_externallymeasuredtorque,
@@ -294,7 +285,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_inputs_externallymeasuredtorque =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_calibration =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_calibration =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.cmmnds.calibration),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_cmmnds_calibration,
@@ -305,7 +296,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_calibration =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_setpoint =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_setpoint =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.cmmnds.setpoint),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_cmmnds_setpoint,
@@ -316,7 +307,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_setpoint =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_stoptrajectory =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_stoptrajectory =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.cmmnds.stoptrajectory),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_cmmnds_stoptrajectory,
@@ -327,7 +318,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_stoptrajectory =
 }; 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_controlmode =
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_controlmode =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.cmmnds.controlmode),
     EO_INIT(.rwmode)    eoprot_rwm_mc_joint_cmmnds_controlmode,
@@ -343,7 +334,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_joint_cmmnds_controlmode =
 // - descriptors for the variables of a motor 
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_wholeitem =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_wholeitem =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_wholeitem,
@@ -354,7 +345,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_wholeitem =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_config =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_config,
@@ -365,7 +356,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_config =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_pidcurrent =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_pidcurrent =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config.pidcurrent),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_config_pidcurrent,
@@ -376,7 +367,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_pidcurrent =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxvelocityofmotor =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxvelocityofmotor =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config.maxvelocityofmotor),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_config_maxvelocityofmotor,
@@ -387,7 +378,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxvelocityofmotor =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxcurrentofmotor =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxcurrentofmotor =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config.maxcurrentofmotor),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_config_maxcurrentofmotor,
@@ -398,7 +389,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxcurrentofmotor =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_status =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.status),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_status,
@@ -409,7 +400,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_status =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_basic =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_basic =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.status.basic),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_status_basic,
@@ -420,7 +411,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_basic =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_chamaleon04 =
+static EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_chamaleon04 =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.status.chamaleon04),
     EO_INIT(.rwmode)    eoprot_rwm_mc_motor_status_chamaleon04,
@@ -433,8 +424,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_chamaleon04 =
 
 // - descriptors for the variables of a controller
 
-
-EOnv_rom_t eoprot_mc_rom_descriptor_controller_wholeitem =
+static EOnv_rom_t eoprot_mc_rom_descriptor_controller_wholeitem =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue),
     EO_INIT(.rwmode)    eoprot_rwm_mc_controller_wholeitem,
@@ -445,7 +435,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_controller_wholeitem =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_controller_config =
+static EOnv_rom_t eoprot_mc_rom_descriptor_controller_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.config),
     EO_INIT(.rwmode)    eoprot_rwm_mc_controller_config,
@@ -456,7 +446,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_controller_config =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_controller_config_durationofctrlloop =
+static EOnv_rom_t eoprot_mc_rom_descriptor_controller_config_durationofctrlloop =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.config.durationofctrlloop),
     EO_INIT(.rwmode)    eoprot_rwm_mc_controller_config_durationofctrlloop,
@@ -467,7 +457,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_controller_config_durationofctrlloop =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_controller_status =
+static EOnv_rom_t eoprot_mc_rom_descriptor_controller_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.status),
     EO_INIT(.rwmode)    eoprot_rwm_mc_controller_status,
@@ -478,7 +468,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_controller_status =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_controller_status_alljomoinitted =
+static EOnv_rom_t eoprot_mc_rom_descriptor_controller_status_alljomoinitted =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.status.alljomoinitted),
     EO_INIT(.rwmode)    eoprot_rwm_mc_controller_status_alljomoinitted,
@@ -489,7 +479,7 @@ EOnv_rom_t eoprot_mc_rom_descriptor_controller_status_alljomoinitted =
 };
 
 
-EOnv_rom_t eoprot_mc_rom_descriptor_controller_cmmnds_go2stateofcontroller =
+static EOnv_rom_t eoprot_mc_rom_descriptor_controller_cmmnds_go2stateofcontroller =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.cmmnds.go2stateofcontroller),
     EO_INIT(.rwmode)    eoprot_rwm_mc_controller_cmmnds_go2stateofcontroller,
@@ -500,14 +490,9 @@ EOnv_rom_t eoprot_mc_rom_descriptor_controller_cmmnds_go2stateofcontroller =
 };
 
 
+// -- the folded array of descriptors
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of extern variables
-// --------------------------------------------------------------------------------------------------------------------
-
-
-const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
+static const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
 {
     // here are eoprot_mc_tag_joints_numberof descriptors for the joints (equal for every joint)
     &eoprot_mc_rom_descriptor_joint_wholeitem,
@@ -555,8 +540,12 @@ const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
 
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of extern variables
+// --------------------------------------------------------------------------------------------------------------------
 
-const EOconstvector  eoprot_mc_rom_constvector_of_folded_descriptors_dat = 
+
+const EOconstvector eoprot_mc_rom_constvector_of_folded_descriptors_dat = 
 {
     EO_INIT(.size)              sizeof(eoprot_mc_rom_folded_descriptors)/sizeof(EOnv_rom_t*), 
     EO_INIT(.item_size)         sizeof(EOnv_rom_t*),
@@ -570,21 +559,36 @@ const EOconstvector  eoprot_mc_rom_constvector_of_folded_descriptors_dat =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-extern uint16_t eoprot_mc_rom_joint_get_offset(eOprotTag_t tag)
+extern uint16_t eoprot_mc_rom_get_offset(eOprotEntity_t entity, eOprotTag_t tag)
 {
-    return(s_eoprot_mc_rom_joint_ramoffset(tag));
+    const void* startofrom = NULL;
+    
+    switch(entity)
+    {
+        case eomc_entity_joint:
+        {   
+            startofrom = &eoprot_mc_rom_joint_defaultvalue; 
+        } break;
+        
+        case eomc_entity_motor:
+        {   
+            startofrom = &eoprot_mc_rom_motor_defaultvalue;
+        } break;  
+
+        case eomc_entity_controller:
+        {   
+            startofrom = &eoprot_mc_rom_controller_defaultvalue; 
+        } break;          
+
+        default:
+        {   
+            return(EOK_uint16dummy);
+        } //break; // commented the break just to remove a warning  
+    }    
+    
+    return(s_eoprot_mc_rom_entity_offset_of_tag(startofrom, tag));
 }
 
-extern uint16_t eoprot_mc_rom_motor_get_offset(eOprotTag_t tag)
-{
-    return(s_eoprot_mc_rom_motor_ramoffset(tag));
-}
-
-extern uint16_t eoprot_mc_rom_controller_get_offset(eOprotTag_t tag)
-{
-    return(s_eoprot_mc_rom_controller_ramoffset(tag));
-}
 
 extern void* eoprot_mc_rom_get_nvrom(eOprotID32_t id)
 {
@@ -630,16 +634,12 @@ extern uint16_t eoprot_mc_rom_get_prognum(eOprotID32_t id)
 
 static uint16_t s_eoprot_mc_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
 {      
-    uint16_t tag = eoprot_ID2tag(id);
+    uint16_t ret = eoprot_ID2tag(id);
     
-    if(EOK_uint16dummy == tag)
-    {
-        return(EOK_uint16dummy);
-    }
-    
+    // dont check validity of the tag. we could check inside the case xxxx: by verifying if ret is higher than 
+    // the max number of tags for that entity.
+       
     eOprotEntity_t entity = eoprot_ID2entity(id);
-    
-    //#warning -> function s_eoprot_mc_rom_epid2index_of_folded_descriptors() uses tha fact that we dont have holes and that eoprot_mc_tag_joints_numberof is equal to eoprot_mc_tag_joint_nextone
     
     switch(entity)
     {
@@ -650,48 +650,32 @@ static uint16_t s_eoprot_mc_rom_epid2index_of_folded_descriptors(eOprotID32_t id
         
         case eomc_entity_motor:
         {   // must add the number of vars in a joint
-            tag += eoprot_tags_mc_joint_numberof; 
+            ret += eoprot_tags_mc_joint_numberof; 
         } break;      
 
         case eomc_entity_controller:
         {   // must add the number of vars in a joint and in a motor
-            tag += eoprot_tags_mc_joint_numberof; 
-            tag += eoprot_tags_mc_motor_numberof;
+            ret += eoprot_tags_mc_joint_numberof; 
+            ret += eoprot_tags_mc_motor_numberof;
         } break; 
         
         default:
         {   // error
-            tag = EOK_uint16dummy;
+            ret = EOK_uint16dummy;
         } break;
     
     }
     
-    return(tag);   
+    return(ret);   
 }
 
-// returns the offset form the start of the struct eOmc_joint_t of the variable with a given tag 
-static uint16_t s_eoprot_mc_rom_joint_ramoffset(uint16_t tag)
-{   
-    //return(eoprot_mc_rom_joint_offsets[tag]);
-    uint32_t tmp = ((uint32_t) eoprot_mc_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_mc_rom_joint_defaultvalue);
-    return((uint16_t)tmp); 
-}
-
-// returns the offset form the start of the struct eOmc_motor_t of the variable with a given tag 
-static uint16_t s_eoprot_mc_rom_motor_ramoffset(uint16_t tag)
+// returns the offset of the variable with a given tag from the start of the entity
+static uint16_t s_eoprot_mc_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag)
 {
-    //return(eoprot_mc_rom_motor_offsets[tag]);
-    uint32_t tmp = ((uint32_t) eoprot_mc_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_mc_rom_motor_defaultvalue);
+    uint32_t tmp = ((uint32_t) eoprot_mc_rom_folded_descriptors[tag]->resetval) - ((uint32_t) entityrom);
     return((uint16_t)tmp); 
 }
 
-// returns the offset form the start of the struct eOmc_controller_t of the variable with a given tag 
-static uint16_t s_eoprot_mc_rom_controller_ramoffset(uint16_t tag)
-{
-    //return(eoprot_mc_rom_controller_offsets[tag]);
-    uint32_t tmp = ((uint32_t) eoprot_mc_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_mc_rom_controller_defaultvalue);
-    return((uint16_t)tmp); 
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------

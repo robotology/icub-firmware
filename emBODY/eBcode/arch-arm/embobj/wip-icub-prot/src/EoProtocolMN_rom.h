@@ -40,30 +40,26 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoManagement.h"
 #include "EoProtocol.h"
-
+#include "EoManagement.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
 
 
-
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
+// empty-section
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOmn_comm_t eoprot_mn_rom_comm_defaultvalue;
-extern const eOmn_appl_t eoprot_mn_rom_appl_defaultvalue;
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint16_t eoprot_mn_rom_comm_get_offset(eOprotTag_t tag);
-extern uint16_t eoprot_mn_rom_appl_get_offset(eOprotTag_t tag);
+extern uint16_t eoprot_mn_rom_get_offset(eOprotEntity_t ent, eOprotTag_t tag);
+
 
 extern void* eoprot_mn_rom_get_nvrom(eOprotID32_t id);
 extern uint16_t eoprot_mn_rom_get_sizeofvar(eOprotID32_t id);
