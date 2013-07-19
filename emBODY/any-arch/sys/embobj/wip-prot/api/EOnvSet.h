@@ -74,28 +74,32 @@ typedef struct
 {
     eOnvBRD_t               boardnum;
     uint8_t                 dummy[3];
-    eOres_fp_void_t         fptr_device_initialise; /*< used to initialise whatever is needed before using the eOnvset_EPcfg_t. for instance the number of entities in the board */
+    eOres_fp_uint8_t        fptr_device_initialise; /*< used to initialise whatever is needed before using the eOnvset_EPcfg_t. for instance the number of entities in the board */
     const EOconstvector*    vectorof_epcfg;         /*< a const vector of eOnvset_EPcfg_t items, of size equal to the number of managed endpoints */
     eOuint16_fp_uint8_t     fptr_ep2indexofepcfg;   /*< a function which maps a given ep to and index inside @e vectorof_epcfg. It returns EOK_uint16dummy if the ep is not managed */
 } eOnvset_DEVcfg_t;
 
-
+typedef struct
+{
+    eOres_fp_uint8_voidp_uint16_t       fptr_loadram;           /*< a function which loads the ram of the endpoint given: (brd, ram, sizeof) */
+    eOuint16_fp_uint8_t                 fptr_getnvsnumberof;    /*< a function which returns the total number of the NVS in (brd) */
+    eObool_fp_uint8_uint32_t            fptr_isidsupported;     /*< a function which tells if the id is supported given (brd, id). */
+    eOuint32_fp_uint8_uint32_t          fptr_getid;             /*< a function which returns the full ID given (brd, prognumber)  */
+    eOuint32_fp_uint8_uint32_t          fptr_getnvprognumber;   /*< a function which returns a progressive number from (brd, id) */
+    eOvoidp_fp_uint8_uint32_t           fptr_getnvrom;          /*< a function which returns the .rom part of the NV from (brd, id)  */
+    eOvoidp_fp_uint8_uint32_t           fptr_getnvram;          /*< a function which returns the .ram part of the NV with (brd, id) */
+} eOnvset_protocol_interface_t;
 
 /** @typedef    typedef struct eOnvset_EPcfg_t
     @brief      It contains the configuration of the managed NVs inside an endpoint. 
  **/ 
 typedef struct                     
 {
-    eOnvEP8_t                           endpoint;                       /*< the endpoint value */
+    eOnvEP8_t                           endpoint;                   /*< the endpoint value */
     uint8_t                             dummy;
-    uint16_t                            epram_sizeof;                   /*< the size of the ram used for the NVs in the endpoint */
-    eOuint16_fp_uint8_t                 fptr_getnvsnumberof;            /*< a function which returns the total number of the NVS in (brd) */
-    eObool_fp_uint8_uint32_t            fptr_isidsupported;             /*< a function which tells if the id is supported given (brd, id). */
-    eOuint32_fp_uint8_uint32_t          fptr_getid;                     /*< a function which returns the full ID given (brd, prognumber)  */
-    eOuint32_fp_uint8_uint32_t          fptr_getnvprognumber;           /*< a function which returns a progressive number from (board, id) */
-    eOvoidp_fp_uint32_t	                fptr_getnvrom;                  /*< a function which returns the .rom part of the NV from (id)  */
-    eOvoidp_fp_uint8_uint32_voidp_t     fptr_getnvram;                  /*< a function which returns the .ram part of the NV with (epram, brd, id) */
-    eOvoid_fp_voidp_t                   fptr_initialise;                /*< a function which initialises the ram (ram) */
+    uint16_t                            epram_sizeof;               /*< the size of the ram used for the NVs in the endpoint */
+    eOvoid_fp_uint32_voidp_t            fptr_ram_initialise;        /*< a function which initialises the ram (ram) */
+    eOnvset_protocol_interface_t*       protif;                     /* functions used to interface with the protocol library */
 } eOnvset_EPcfg_t;
 
 
@@ -129,7 +133,7 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
 
 extern void* eo_nvset_RAMofEndpoint_Get(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8);
 
-extern void* eo_nvset_RAMofEntity_Get(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvENT_t ent);
+extern void* eo_nvset_RAMofEntity_Get(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvENT_t ent, uint8_t index);
 
 
 /** @}            
