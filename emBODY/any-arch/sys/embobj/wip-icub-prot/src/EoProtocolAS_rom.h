@@ -43,11 +43,9 @@
 #include "EoProtocol.h"
 #include "EoAnalogSensors.h"
 
- 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
-
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -55,20 +53,16 @@
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOas_strain_t eoprot_as_rom_strain_defaultvalue;
-extern const eOas_mais_t eoprot_as_rom_mais_defaultvalue;
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint16_t eoprot_as_rom_strain_get_offset(eOprotTag_t tag);
-extern uint16_t eoprot_as_rom_mais_get_offset(eOprotTag_t tag);
+extern uint16_t eoprot_as_rom_get_offset(eOprotEntity_t ent, eOprotTag_t tag);
 
 extern void* eoprot_as_rom_get_nvrom(eOprotID32_t id);
 extern uint16_t eoprot_as_rom_get_sizeofvar(eOprotID32_t id);
 extern uint16_t eoprot_as_rom_get_prognum(eOprotID32_t id);
-
 
 
 /** @}            

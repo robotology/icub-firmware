@@ -92,6 +92,8 @@ __weak extern void eoprot_fun_INITIALISE_as(eOprotIP_t ip, void *ram) {}
 #endif
 
 
+// -- strain functions 
+
 #if !defined(OVERRIDE_eoprot_fun_INIT_as_strain_wholeitem)
 __weak extern void eoprot_fun_INIT_as_strain_wholeitem(const EOnv* nv) {}
 #endif
@@ -158,6 +160,8 @@ __weak extern void eoprot_fun_UPDT_as_strain_status_uncalibratedvalues(const EOn
 #endif
 
 
+// -- mais functions
+
 #if !defined(OVERRIDE_eoprot_fun_INIT_as_mais_wholeitem)
 __weak extern void eoprot_fun_INIT_as_mais_wholeitem(const EOnv* nv) {}
 #endif
@@ -205,6 +209,30 @@ __weak extern void eoprot_fun_INIT_as_mais_status_the15values(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_fun_UPDT_as_mais_status_the15values)
 __weak extern void eoprot_fun_UPDT_as_mais_status_the15values(const EOnv* nv, const eOropdescriptor_t* rd) {}
+#endif
+
+
+// -- extorque functions
+
+#if !defined(OVERRIDE_eoprot_fun_INIT_as_extorque_wholeitem)
+__weak extern void eoprot_fun_INIT_as_extorque_wholeitem(const EOnv* nv) {}
+#endif
+#if !defined(OVERRIDE_eoprot_fun_UPDT_as_extorque_wholeitem)
+__weak extern void eoprot_fun_UPDT_as_extorque_wholeitem(const EOnv* nv, const eOropdescriptor_t* rd) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_fun_INIT_as_extorque_config)
+__weak extern void eoprot_fun_INIT_as_extorque_config(const EOnv* nv) {}
+#endif
+#if !defined(OVERRIDE_eoprot_fun_UPDT_as_extorque_config)
+__weak extern void eoprot_fun_UPDT_as_extorque_config(const EOnv* nv, const eOropdescriptor_t* rd) {}
+#endif
+
+#if !defined(OVERRIDE_eoprot_fun_INIT_as_extorque_inputs)
+__weak extern void eoprot_fun_INIT_as_extorque_inputs(const EOnv* nv) {}
+#endif
+#if !defined(OVERRIDE_eoprot_fun_UPDT_as_extorque_inputs)
+__weak extern void eoprot_fun_UPDT_as_extorque_inputs(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 
