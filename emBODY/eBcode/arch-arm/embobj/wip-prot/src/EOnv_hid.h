@@ -55,7 +55,7 @@ typedef     void        (*eOvoid_fp_cnvp_t)                             (const E
 typedef     void        (*eOvoid_fp_cnvp_cropdesp_t)                    (const EOnv*, const eOropdescriptor_t*);
 
 
-typedef const struct                    // 16 bytes on arm 
+typedef const struct EOnv_rom_T         // 16 bytes on arm 
 {
     uint16_t                            capacity;   // the capacity of the nv
     eOenum08_t                          rwmode;     
