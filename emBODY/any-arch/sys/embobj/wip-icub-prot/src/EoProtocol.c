@@ -247,7 +247,7 @@ extern uint16_t eoprot_endpoint_sizeof_get(eOprotBRD_t brd, eOprotEndpoint_t ep)
 }
 
 
-extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t ep, uint16_t sizeofram, void* ram)
+extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t ep, void* ram, uint16_t sizeofram)
 {
     eOresult_t res = eores_OK;
     
@@ -265,22 +265,22 @@ extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t e
     {
         case eoprot_endpoint_management:
         {
-            eoprot_mn_config_endpoint_ram(brd, ram);
+            eoprot_mn_config_endpoint_ram(brd, ram, sizeofram);
         } break;
         
         case eoprot_endpoint_motioncontrol:
         {
-            eoprot_mc_config_endpoint_ram(brd, ram);
+            eoprot_mc_config_endpoint_ram(brd, ram, sizeofram);
         } break;  
          
         case eoprot_endpoint_analogsensors:
         {
-            eoprot_as_config_endpoint_ram(brd, ram);
+            eoprot_as_config_endpoint_ram(brd, ram, sizeofram);
         } break;     
          
         case eoprot_endpoint_skin:
         {
-            eoprot_sk_config_endpoint_ram(brd, ram);
+            eoprot_sk_config_endpoint_ram(brd, ram, sizeofram);
         } break;  
 
         default:
@@ -309,22 +309,22 @@ extern void* eoprot_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id)
     {
         case eoprot_endpoint_management:
         {
-            ram = eoprot_mn_ramofvariable_get(brd, id);
+            ram = eoprot_mn_variable_ramof_get(brd, id);
         } break;
         
         case eoprot_endpoint_motioncontrol:
         {
-            ram = eoprot_mc_ramofvariable_get(brd, id);
+            ram = eoprot_mc_variable_ramof_get(brd, id);
         } break;  
          
         case eoprot_endpoint_analogsensors:
         {
-            ram = eoprot_as_ramofvariable_get(brd, id);
+            ram = eoprot_as_variable_ramof_get(brd, id);
         } break;     
          
         case eoprot_endpoint_skin:
         {
-            ram = eoprot_sk_ramofvariable_get(brd, id);
+            ram = eoprot_sk_variable_ramof_get(brd, id);
         } break;  
 
         default:

@@ -75,6 +75,17 @@ EO_VERIFYproposition(eoprot_as_tagsmax_ma, eoprot_tags_as_mais_numberof <= eopro
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
+// functions used to configure the eOnvset_EPcfg_t
+static uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd);
+static eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
+static eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog);
+static eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id);
+static void* eoprot_as_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id);
+//static void* eoprot_as_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram);
+
+
+
 static uint16_t s_eoprot_as_brdentityindex2ramoffset(eOprotBRD_t brd, eOprotEntity_t entity, eOprotIndex_t index);
 static uint16_t s_eoprot_as_brdid2ramoffset(eOprotBRD_t brd, eOprotID32_t id);
 
@@ -104,6 +115,17 @@ static void* s_eoprot_as_board_ramofeachendpoint[eoprot_boards_maxnumberof] = { 
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+
+const eOprot_nvset_interface_t eoprot_eonvset_interface_as =
+{
+    EO_INIT(.loadram)               eoprot_as_config_endpoint_ram,
+    EO_INIT(.getvarsnumberof)       eoprot_as_numberofvariables_get,       
+    EO_INIT(.isidsupported)         eoprot_as_id_isvalid,     
+    EO_INIT(.getid)                 eoprot_as_prognum2id,            
+    EO_INIT(.getprognumber)         eoprot_as_id2prognum,     
+    EO_INIT(.getrom)                eoprot_as_eonvrom_get,             
+    EO_INIT(.getram)                eoprot_as_variable_ramof_get                      
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,7 +184,7 @@ extern uint16_t eoprot_as_endpoint_sizeof_get(eOprotBRD_t brd)
     return(size);
 }
 
-extern eOresult_t eoprot_as_config_endpoint_ram(eOprotBRD_t brd, void *ram)
+extern eOresult_t eoprot_as_config_endpoint_ram(eOprotBRD_t brd, void *ram, uint16_t sizeofram)
 {
     if(NULL == s_eoprot_as_board_ramofeachendpoint)
     {
@@ -179,7 +201,23 @@ extern eOresult_t eoprot_as_config_endpoint_ram(eOprotBRD_t brd, void *ram)
     return(eores_OK);       
 }
 
+extern void* eoprot_as_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id)
+{
+    if((NULL == s_eoprot_as_board_ramofeachendpoint) || (NULL == s_eoprot_as_board_ramofeachendpoint[brd]))
+    {
+        return(NULL);
+    }
+    
+    uint8_t* startofdata = (void*)s_eoprot_as_board_ramofeachendpoint[brd];
+    uint16_t offset = s_eoprot_as_brdid2ramoffset(brd, id);
+    
+    if(EOK_uint16dummy == offset)
+    {
+        return(NULL);
+    }   
 
+    return(&startofdata[offset]);
+}
 
 extern uint16_t eoprot_as_variable_sizeof_get(eOprotID32_t id)
 {
@@ -258,10 +296,20 @@ extern uint8_t eoprot_as_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent
 
 
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
 // ---
 
 
-extern uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd)
+static uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd)
 {
     uint16_t num = 0;
     
@@ -277,7 +325,7 @@ extern uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd)
 }
 
 
-extern eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
+static eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
 {
     eObool_t ret = eobool_false;    
     
@@ -317,7 +365,7 @@ extern eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
 }
 
 
-extern eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog)
+static eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog)
 {
     eOprotTag_t tag = 0xff;
     eOprotIndex_t index = 0xff;
@@ -352,7 +400,7 @@ extern eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t pro
     return(eoprot_ID_get(eoprot_endpoint_analogsensors, entity, index, tag));
 }
 
-extern eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
+static eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
 {
     eOprotProgNumber_t prog = EOK_uint32dummy;
     
@@ -386,56 +434,27 @@ extern eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
 }
 
 
-extern void* eoprot_as_eonvrom_get(/*eOprotBRD_t brd,*/ eOprotID32_t id)
+static void* eoprot_as_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id)
 {
-    //brd =  brd;
+    brd =  brd;
     return(eoprot_as_rom_get_nvrom(id));
 }
 
 
-extern void* eoprot_as_ramofvariable_get(eOprotBRD_t brd, eOprotID32_t id)
-{
-    if((NULL == s_eoprot_as_board_ramofeachendpoint) || (NULL == s_eoprot_as_board_ramofeachendpoint[brd]))
-    {
-        return(NULL);
-    }
-    
-    uint8_t* startofdata = (void*)s_eoprot_as_board_ramofeachendpoint[brd];
-    uint16_t offset = s_eoprot_as_brdid2ramoffset(brd, id);
-    
-    if(EOK_uint16dummy == offset)
-    {
-        return(NULL);
-    }   
+// static void* eoprot_as_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram)
+// {
+//     uint8_t* startofdata = epram;
+//     uint16_t offset = s_eoprot_as_brdid2ramoffset(brd, id);
+//     
+//     if(EOK_uint16dummy == offset)
+//     {
+//         return(NULL);
+//     }   
 
-    return(&startofdata[offset]);
-}
-
-extern void* eoprot_as_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram)
-{
-    uint8_t* startofdata = epram;
-    uint16_t offset = s_eoprot_as_brdid2ramoffset(brd, id);
-    
-    if(EOK_uint16dummy == offset)
-    {
-        return(NULL);
-    }   
-
-    return(&startofdata[offset]);
-}
+//     return(&startofdata[offset]);
+// }
 
 
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
 
 static uint16_t s_eoprot_as_brdentityindex2ramoffset(eOprotBRD_t brd, eOprotEntity_t entity, eOprotIndex_t index)
 {
