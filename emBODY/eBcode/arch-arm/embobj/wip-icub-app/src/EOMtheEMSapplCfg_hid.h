@@ -38,7 +38,7 @@ extern "C" {
 #include "EOtheBOARDtransceiver.h"
 	
 	
-#include "EoProtocolEP.h"
+#include "EoProtocol.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -57,48 +57,48 @@ extern "C" {
 #if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB1
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB1"
-        #include    "eOcfg_EPs_eb1.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eocfg_EPs_eb1_object
+        #include    "eOprot_b01.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg
 #elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB2
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB2"
-        #include    "eOcfg_EPs_eb2.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eocfg_EPs_eb2_object        
+        #include    "eOprot_b02.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg        
 #elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB3
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB3"
-        #include    "eOcfg_EPs_eb3.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb3_object         
+        #include    "eOprot_b03.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg         
 #elif   (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB4
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB4"
-        #include    "eOcfg_EPs_eb4.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb4_object  
+        #include    "eOprot_b04.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b04_nvsetDEVcfg  
 #elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB5
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB5"
-        #include    "eOcfg_EPs_eb5.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb5_object   
+        #include    "eOprot_b05.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b05_nvsetDEVcfg   
 #elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB6
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB6"
-        #include    "eOcfg_EPs_eb6.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb6_object   
+        #include    "eOprot_b06.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b06_nvsetDEVcfg   
 #elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB7
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB7"
-        #include    "eOcfg_EPs_eb7.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb7_object   
+        #include    "eOprot_b07.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b07_nvsetDEVcfg   
 #elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB8
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB8"
-        #include    "eOcfg_EPs_eb8.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb8_object   
+        #include    "eOprot_b08.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b08_nvsetDEVcfg   
 #elif   (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB9
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB9"
-        #include    "eOcfg_EPs_eb9.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eo_cfg_EPs_eb9_object   
+        #include    "eOprot_b09.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b09_nvsetDEVcfg   
 #endif
 
 
