@@ -188,7 +188,22 @@ typedef enum
     eoprot_tag_xx_nameofentity_nameoftag    = 0     /**< xx is the two-letter short for the entity: as, mn, mc, sk, etc. */
 } eOprot_tag_t;
 
- 
+
+
+/** @typedef    typedef struct eOprot_nvset_interface_t;
+    @brief      It contains those functions which are required to offer services to the EOnvset object. The functions in here must
+                match those defined inside eOnvset_protocol_interface_t. Every endpoint must export a variables of this type.    
+ **/ 
+typedef struct
+{
+    eOres_fp_uint8_voidp_uint16_t       loadram;            /*< a function which loads the ram of the endpoint given: (brd, ram, sizeof) */
+    eOuint16_fp_uint8_t                 getvarsnumberof;    /*< a function which returns the total number of variables given: (brd) */
+    eObool_fp_uint8_uint32_t            isidsupported;      /*< a function which tells if the id is supported given: (brd, id) */
+    eOuint32_fp_uint8_uint32_t          getid;              /*< a function which returns the full ID given: (brd, prognumber)  */
+    eOuint32_fp_uint8_uint32_t          getprognumber;      /*< a function which returns a progressive number given: (brd, id) */
+    eOvoidp_fp_uint8_uint32_t           getrom;             /*< a function which returns the .rom part of the NV given: (brd, id) */
+    eOvoidp_fp_uint8_uint32_t           getram;             /*< a function which returns the .ram part of the NV given: (brd, id) */  
+} eOprot_nvset_interface_t;
 
  
  
@@ -283,17 +298,17 @@ extern eOresult_t eoprot_config_endpoint_entities(eOprotBRD_t brd, eOprotEndpoin
 extern uint16_t eoprot_endpoint_sizeof_get(eOprotBRD_t brd, eOprotEndpoint_t ep);
 
 
-/** @fn         extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t ep, uint16_t sizeofram, void* ram)
+/** @fn         extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t ep, void* ram, uint16_t sizeofram)
     @brief      it configures the library to use some ram for that board and endpoint. The ram must be externally allocated and be
                 of the correct dimension. One can use a sizeof(eOprot_bxx_endpointname_t) or use the function 
                 eoprot_endpoint_sizeof_get().
     @param      brd                 the number of board 
     @param      ep                  the endpoint
-    @param      sizeofram           the size of the ram.
     @param      ram                 the ram
+    @param      sizeofram           the size of the ram.    
     @return     eores_OK or eores_NOK_generic upon failure (also if sizeofram is not coherent with brd and ep).
  **/
-extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t ep, uint16_t sizeofram, void* ram);
+extern eOresult_t eoprot_config_endpoint_ram(eOprotBRD_t brd, eOprotEndpoint_t ep, void* ram, uint16_t sizeofram);
 
 
 /** @fn         extern void* eoprot_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id)

@@ -157,10 +157,9 @@ typedef struct                  // 56*1+48*1 = 104
   
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
 
-// - these three are used to configure the endpoint into a EOnvsCfg object
-// empty-section
+
+extern const eOprot_nvset_interface_t eoprot_eonvset_interface_as;  // used by EOnvset to access the endpoint
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -191,9 +190,19 @@ extern uint16_t eoprot_as_endpoint_sizeof_get(eOprotBRD_t brd);
     @brief      This function loads the ram used by the endpoint
     @param      brd                     the board
     @param      ram                     the externally allocated ram.
+    @param      sizeofram               its size
     @return     eores_OK if successful or eores_NOK_generic upon failure.
   */
-extern eOresult_t eoprot_as_config_endpoint_ram(eOprotBRD_t brd, void *ram);
+extern eOresult_t eoprot_as_config_endpoint_ram(eOprotBRD_t brd, void *ram, uint16_t sizeofram);
+
+
+/** @fn         extern void* eoprot_as_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id)
+    @brief      This function gets the ram used by the specified variable
+    @param      brd                     the board number
+    @param      id                      the id
+    @return     the ram or NULL upon failure.
+  */
+extern void* eoprot_as_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id);
 
 
 /** @fn         extern uint16_t eoprot_as_variable_sizeof_get(eOprotID32_t id)
@@ -230,23 +239,6 @@ extern uint16_t eoprot_as_entity_sizeof_get(eOprotBRD_t brd, eOprotEntity_t ent)
     @return     the number or 0 upon failure or if no entities of that kind.
   */
 extern uint8_t eoprot_as_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent);
-
-
-// functions used to configure the eOnvset_EPcfg_t
-
-extern uint16_t eoprot_as_numberofvariables_get(eOprotBRD_t brd);
-
-extern eObool_t eoprot_as_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
-
-extern eOprotID32_t eoprot_as_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog);
-
-extern eOprotProgNumber_t eoprot_as_id2prognum(eOprotBRD_t brd, eOprotID32_t id);
-
-extern void* eoprot_as_eonvrom_get(/*eOprotBRD_t brd,*/ eOprotID32_t id);
-
-extern void* eoprot_as_ramofvariable_get(eOprotBRD_t brd, eOprotID32_t id);
-
-extern void* eoprot_as_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram);
 
 
 
