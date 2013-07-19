@@ -35,9 +35,9 @@
 #include "EOnv_hid.h"
 #include "EOconstvector_hid.h"
 
-
-#include "EoSkin.h"
 #include "EoProtocolSK.h"
+#include "EoMotionControl.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -68,10 +68,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static uint16_t s_eoprot_sk_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
-
-static uint16_t s_eoprot_sk_rom_skin_ramoffset(uint16_t tag);
-
-
+static uint16_t s_eoprot_sk_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -79,14 +76,13 @@ static uint16_t s_eoprot_sk_rom_skin_ramoffset(uint16_t tag);
 // --------------------------------------------------------------------------------------------------------------------
 
 // - default value of a skin
-
-const eOsk_skin_t eoprot_sk_rom_skin_defaultvalue = { 0 };
+static const eOsk_skin_t eoprot_sk_rom_skin_defaultvalue = { 0 };
 
 
 
 // - descriptors for the variables of a skin
 
-EOnv_rom_t eoprot_sk_rom_descriptor_skin_wholeitem =
+static EOnv_rom_t eoprot_sk_rom_descriptor_skin_wholeitem =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_sk_rom_skin_defaultvalue),
     EO_INIT(.rwmode)    eoprot_rwm_sk_skin_wholeitem,
@@ -97,7 +93,7 @@ EOnv_rom_t eoprot_sk_rom_descriptor_skin_wholeitem =
 };
 
 
-EOnv_rom_t eoprot_sk_rom_descriptor_skin_config_sigmode =
+static EOnv_rom_t eoprot_sk_rom_descriptor_skin_config_sigmode =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_sk_rom_skin_defaultvalue.config.sigmode),
     EO_INIT(.rwmode)    eoprot_rwm_sk_skin_config_sigmode,
@@ -108,7 +104,7 @@ EOnv_rom_t eoprot_sk_rom_descriptor_skin_config_sigmode =
 };
 
 
-EOnv_rom_t eoprot_sk_rom_descriptor_skin_status_arrayof10canframes =
+static EOnv_rom_t eoprot_sk_rom_descriptor_skin_status_arrayof10canframes =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_sk_rom_skin_defaultvalue.status.arrayof10canframes),
     EO_INIT(.rwmode)    eoprot_rwm_sk_skin_status_arrayof10canframes,
@@ -119,13 +115,9 @@ EOnv_rom_t eoprot_sk_rom_descriptor_skin_status_arrayof10canframes =
 };
 
 
+// -- the folded array of descriptors
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of extern variables
-// --------------------------------------------------------------------------------------------------------------------
-
-
-const EOnv_rom_t * const eoprot_sk_rom_folded_descriptors[] =
+const static EOnv_rom_t * const eoprot_sk_rom_folded_descriptors[] =
 {
     // here are eoprot_tags_sk_skin_numberof descriptors for the skins (equal for every skin)
     &eoprot_sk_rom_descriptor_skin_wholeitem,
@@ -135,6 +127,11 @@ const EOnv_rom_t * const eoprot_sk_rom_folded_descriptors[] =
 };  EO_VERIFYsizeof(eoprot_sk_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_tags_sk_skin_numberof));
 
 
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of extern variables
+// --------------------------------------------------------------------------------------------------------------------
 
 
 const EOconstvector  eoprot_sk_rom_constvector_of_folded_descriptors_dat = 
@@ -150,9 +147,24 @@ const EOconstvector  eoprot_sk_rom_constvector_of_folded_descriptors_dat =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern uint16_t eoprot_sk_rom_skin_get_offset(eOprotTag_t tag)
+extern uint16_t eoprot_sk_rom_get_offset(eOprotEntity_t entity, eOprotTag_t tag)
 {
-    return(s_eoprot_sk_rom_skin_ramoffset(tag));
+    const void* startofrom = NULL;
+    
+    switch(entity)
+    {
+        case eosk_entity_skin:
+        {   
+            startofrom = &eoprot_sk_rom_skin_defaultvalue; 
+        } break;
+
+        default:
+        {   
+            return(EOK_uint16dummy);
+        } //break; // commented the break just to remove a warning  
+    }    
+    
+    return(s_eoprot_sk_rom_entity_offset_of_tag(startofrom, tag));
 }
 
     
@@ -198,13 +210,11 @@ extern uint16_t eoprot_sk_rom_get_prognum(eOprotID32_t id)
 
 static uint16_t s_eoprot_sk_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
 {      
-    uint16_t tag = eoprot_ID2tag(id);
+    uint16_t ret = eoprot_ID2tag(id);
     
-    if(EOK_uint16dummy == tag)
-    {
-        return(EOK_uint16dummy);
-    }
-    
+    // dont check validity of the tag. we could check inside the case xxxx: by verifying if ret is higher than 
+    // the max number of tags for that entity.
+       
     eOprotEntity_t entity = eoprot_ID2entity(id);
     
     switch(entity)
@@ -216,24 +226,20 @@ static uint16_t s_eoprot_sk_rom_epid2index_of_folded_descriptors(eOprotID32_t id
         
         default:
         {   // error
-            tag = EOK_uint16dummy;
+            ret = EOK_uint16dummy;
         } break;
     
     }
     
-    return(tag);   
+    return(ret);   
 }
 
-
-// returns the offset form the start of the struct eOsk_comm_t of the variable with a given tag 
-static uint16_t s_eoprot_sk_rom_skin_ramoffset(uint16_t tag)
-{   
-    //return(eoprot_sk_rom_comm_offsets[tag]);
-    uint32_t tmp = ((uint32_t) eoprot_sk_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_sk_rom_skin_defaultvalue);
+// returns the offset of the variable with a given tag from the start of the entity
+static uint16_t s_eoprot_sk_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag)
+{
+    uint32_t tmp = ((uint32_t) eoprot_sk_rom_folded_descriptors[tag]->resetval) - ((uint32_t) entityrom);
     return((uint16_t)tmp); 
 }
-
-
 
 
 

@@ -40,39 +40,29 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoMotionControl.h"
 #include "EoProtocol.h"
-//#include "EoProtocolMC.h"
-
+#include "EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
 
 
-
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
+// empty-section
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOmc_joint_t eoprot_mc_rom_joint_defaultvalue;
-extern const eOmc_motor_t eoprot_mc_rom_motor_defaultvalue;
-extern const eOmc_controller_t eoprot_mc_rom_controller_defaultvalue;
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-//extern void* eoprot_mc_rom_get_nvram(void* data, eOprotBRD_t brd, eOprotID32_t id);
-extern uint16_t eoprot_mc_rom_joint_get_offset(eOprotTag_t tag);
-extern uint16_t eoprot_mc_rom_motor_get_offset(eOprotTag_t tag);
-extern uint16_t eoprot_mc_rom_controller_get_offset(eOprotTag_t tag);
+extern uint16_t eoprot_mc_rom_get_offset(eOprotEntity_t ent, eOprotTag_t tag);
 
 extern void* eoprot_mc_rom_get_nvrom(eOprotID32_t id);
 extern uint16_t eoprot_mc_rom_get_sizeofvar(eOprotID32_t id);
 extern uint16_t eoprot_mc_rom_get_prognum(eOprotID32_t id);
-
 
 
 /** @}            

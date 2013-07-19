@@ -43,7 +43,6 @@
 #include "EoProtocol.h"
 #include "EoSkin.h"
 
- 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -51,22 +50,20 @@
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
+// empty-section
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOsk_skin_t eoprot_sk_rom_skin_defaultvalue;
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern uint16_t eoprot_sk_rom_skin_get_offset(eOprotTag_t tag);
+extern uint16_t eoprot_sk_rom_get_offset(eOprotEntity_t ent, eOprotTag_t tag);
 
 extern void* eoprot_sk_rom_get_nvrom(eOprotID32_t id);
 extern uint16_t eoprot_sk_rom_get_sizeofvar(eOprotID32_t id);
 extern uint16_t eoprot_sk_rom_get_prognum(eOprotID32_t id);
-
 
 
 /** @}            

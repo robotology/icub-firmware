@@ -35,9 +35,8 @@
 #include "EOnv_hid.h"
 #include "EOconstvector_hid.h"
 
-
-#include "EoManagement.h"
 #include "EoProtocolMN.h"
+#include "EoMotionControl.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -69,10 +68,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static uint16_t s_eoprot_mn_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
-
-static uint16_t s_eoprot_mn_rom_comm_ramoffset(uint16_t tag);
-static uint16_t s_eoprot_mn_rom_appl_ramoffset(uint16_t tag);
-
+static uint16_t s_eoprot_mn_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,17 +76,15 @@ static uint16_t s_eoprot_mn_rom_appl_ramoffset(uint16_t tag);
 // --------------------------------------------------------------------------------------------------------------------
 
 // - default value of a comm
-
-const eOmn_comm_t eoprot_mn_rom_comm_defaultvalue = { 0 };
+static const eOmn_comm_t eoprot_mn_rom_comm_defaultvalue = { 0 };
 
 // - default value of a appl
-
-const eOmn_appl_t eoprot_mn_rom_appl_defaultvalue = { 0 };
+static const eOmn_appl_t eoprot_mn_rom_appl_defaultvalue = { 0 };
 
 
 // - descriptors for the variables of a comm
 
-EOnv_rom_t eoprot_mn_rom_descriptor_comm_wholeitem =
+static EOnv_rom_t eoprot_mn_rom_descriptor_comm_wholeitem =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mn_rom_comm_defaultvalue),
     EO_INIT(.rwmode)    eoprot_rwm_mn_comm_wholeitem,
@@ -100,7 +94,7 @@ EOnv_rom_t eoprot_mn_rom_descriptor_comm_wholeitem =
     EO_INIT(.update)    eoprot_fun_UPDT_mn_comm_wholeitem
 };
 
-EOnv_rom_t eoprot_mn_rom_descriptor_comm_cmmnds_ropsigcfg =
+static EOnv_rom_t eoprot_mn_rom_descriptor_comm_cmmnds_ropsigcfg =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mn_rom_comm_defaultvalue.cmmnds.ropsigcfg),
     EO_INIT(.rwmode)    eoprot_rwm_mn_comm_cmmnds_ropsigcfg,
@@ -114,7 +108,7 @@ EOnv_rom_t eoprot_mn_rom_descriptor_comm_cmmnds_ropsigcfg =
 // - descriptors for the variables of a appl
 
 
-EOnv_rom_t eoprot_mn_rom_descriptor_appl_wholeitem =
+static EOnv_rom_t eoprot_mn_rom_descriptor_appl_wholeitem =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mn_rom_appl_defaultvalue),
     EO_INIT(.rwmode)    eoprot_rwm_mn_appl_wholeitem,
@@ -124,7 +118,7 @@ EOnv_rom_t eoprot_mn_rom_descriptor_appl_wholeitem =
     EO_INIT(.update)    eoprot_fun_UPDT_mn_appl_wholeitem
 };
 
-EOnv_rom_t eoprot_mn_rom_descriptor_appl_config =
+static EOnv_rom_t eoprot_mn_rom_descriptor_appl_config =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mn_rom_appl_defaultvalue.config),
     EO_INIT(.rwmode)    eoprot_rwm_mn_appl_config,
@@ -134,7 +128,7 @@ EOnv_rom_t eoprot_mn_rom_descriptor_appl_config =
     EO_INIT(.update)    eoprot_fun_UPDT_mn_appl_config
 };
 
-EOnv_rom_t eoprot_mn_rom_descriptor_appl_status =
+static EOnv_rom_t eoprot_mn_rom_descriptor_appl_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mn_rom_appl_defaultvalue.status),
     EO_INIT(.rwmode)    eoprot_rwm_mn_appl_status,
@@ -144,7 +138,7 @@ EOnv_rom_t eoprot_mn_rom_descriptor_appl_status =
     EO_INIT(.update)    eoprot_fun_UPDT_mn_appl_status
 };
 
-EOnv_rom_t eoprot_mn_rom_descriptor_appl_cmmnds_go2state =
+static EOnv_rom_t eoprot_mn_rom_descriptor_appl_cmmnds_go2state =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mn_rom_appl_defaultvalue.cmmnds.go2state),
     EO_INIT(.rwmode)    eoprot_rwm_mn_appl_cmmnds_go2state,
@@ -155,14 +149,9 @@ EOnv_rom_t eoprot_mn_rom_descriptor_appl_cmmnds_go2state =
 };
 
 
+// -- the folded array of descriptors
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of extern variables
-// --------------------------------------------------------------------------------------------------------------------
-
-
-const EOnv_rom_t * const eoprot_mn_rom_folded_descriptors[] =
+const static EOnv_rom_t * const eoprot_mn_rom_folded_descriptors[] =
 {
     // here are eoprot_mn_tags_comm_numberof descriptors for the comms (equal for every comm)
     &eoprot_mn_rom_descriptor_comm_wholeitem,
@@ -177,6 +166,10 @@ const EOnv_rom_t * const eoprot_mn_rom_folded_descriptors[] =
 };  EO_VERIFYsizeof(eoprot_mn_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_tags_mn_comm_numberof+eoprot_tags_mn_appl_numberof));
 
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of extern variables
+// --------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -195,15 +188,31 @@ const EOconstvector  eoprot_mn_rom_constvector_of_folded_descriptors_dat =
 
 
 
-extern uint16_t eoprot_mn_rom_comm_get_offset(eOprotTag_t tag)
+extern uint16_t eoprot_mn_rom_get_offset(eOprotEntity_t entity, eOprotTag_t tag)
 {
-    return(s_eoprot_mn_rom_comm_ramoffset(tag));
+    const void* startofrom = NULL;
+    
+    switch(entity)
+    {
+        case eomn_entity_comm:
+        {   
+            startofrom = &eoprot_mn_rom_comm_defaultvalue; 
+        } break;
+        
+        case eomn_entity_appl:
+        {   
+            startofrom = &eoprot_mn_rom_appl_defaultvalue;
+        } break;  
+       
+        default:
+        {   
+            return(EOK_uint16dummy);
+        } //break; // commented the break just to remove a warning  
+    }    
+    
+    return(s_eoprot_mn_rom_entity_offset_of_tag(startofrom, tag));
 }
 
-extern uint16_t eoprot_mn_rom_appl_get_offset(eOprotTag_t tag)
-{
-    return(s_eoprot_mn_rom_appl_ramoffset(tag));
-}
 
 extern void* eoprot_mn_rom_get_nvrom(eOprotID32_t id)
 {
@@ -246,13 +255,11 @@ extern uint16_t eoprot_mn_rom_get_prognum(eOprotID32_t id)
 
 static uint16_t s_eoprot_mn_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
 {      
-    uint16_t tag = eoprot_ID2tag(id);
+    uint16_t ret = eoprot_ID2tag(id);
     
-    if(EOK_uint16dummy == tag)
-    {
-        return(EOK_uint16dummy);
-    }
-    
+    // dont check validity of the tag. we could check inside the case xxxx: by verifying if ret is higher than 
+    // the max number of tags for that entity.
+       
     eOprotEntity_t entity = eoprot_ID2entity(id);
     
     switch(entity)
@@ -264,35 +271,26 @@ static uint16_t s_eoprot_mn_rom_epid2index_of_folded_descriptors(eOprotID32_t id
         
         case eomn_entity_appl:
         {   // must add the number of vars in a comm
-            tag += eoprot_tags_mn_comm_numberof; 
+            ret += eoprot_tags_mn_comm_numberof; 
         } break;      
 
         default:
         {   // error
-            tag = EOK_uint16dummy;
+            ret = EOK_uint16dummy;
         } break;
     
     }
     
-    return(tag);   
+    return(ret);   
 }
 
-
-// returns the offset form the start of the struct eOmn_comm_t of the variable with a given tag 
-static uint16_t s_eoprot_mn_rom_comm_ramoffset(uint16_t tag)
-{   
-    //return(eoprot_mn_rom_comm_offsets[tag]);
-    uint32_t tmp = ((uint32_t) eoprot_mn_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_mn_rom_comm_defaultvalue);
-    return((uint16_t)tmp); 
-}
-
-// returns the offset form the start of the struct eOmn_appl_t of the variable with a given tag 
-static uint16_t s_eoprot_mn_rom_appl_ramoffset(uint16_t tag)
+// returns the offset of the variable with a given tag from the start of the entity
+static uint16_t s_eoprot_mn_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag)
 {
-    //return(eoprot_mn_rom_appl_offsets[tag]);
-    uint32_t tmp = ((uint32_t) eoprot_mn_rom_folded_descriptors[tag]->resetval) - ((uint32_t) &eoprot_mn_rom_appl_defaultvalue);
+    uint32_t tmp = ((uint32_t) eoprot_mn_rom_folded_descriptors[tag]->resetval) - ((uint32_t) entityrom);
     return((uint16_t)tmp); 
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

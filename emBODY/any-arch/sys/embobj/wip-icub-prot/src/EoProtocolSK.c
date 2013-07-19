@@ -32,7 +32,6 @@
 #include "stdio.h"
 
 #include "EoProtocol.h"
-
 #include "EoProtocolSK_rom.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,6 +70,7 @@ EO_VERIFYproposition(eoprot_sk_tagsmax_sk, eoprot_tags_sk_skin_numberof <= eopro
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
 // functions used to configure the eOnvset_EPcfg_t
 
 static uint16_t eoprot_sk_numberofvariables_get(eOprotBRD_t brd);
@@ -78,18 +78,32 @@ static eObool_t eoprot_sk_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
 static eOprotID32_t eoprot_sk_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog);
 static eOprotProgNumber_t eoprot_sk_id2prognum(eOprotBRD_t brd, eOprotID32_t id);
 static void* eoprot_sk_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id);
-//static void* eoprot_sk_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram);
+
+//static uint16_t s_eoprot_sk_entities_numberof_Get(eOprotBRD_t brd, eOprotEntity_t ent);
 
 static uint16_t s_eoprot_sk_brdentityindex2ramoffset(eOprotBRD_t brd, eOprotEntity_t entity, eOprotIndex_t index);
+static uint16_t s_eoprot_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID32_t id);
 
 static uint16_t s_eoprot_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID32_t id);
 
-static eObool_t s_eoprot_sk_tag_skin_is_valid(eOprotTag_t tag);
+static eObool_t s_eoprot_sk_entity_tag_is_valid(eOprotEntity_t entity, eOprotTag_t tag);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
+static const uint8_t s_eoprot_sk_tags_numberof[] = 
+{
+    eoprot_tags_sk_skin_numberof
+};  EO_VERIFYsizeof(s_eoprot_sk_tags_numberof, eoprot_entities_sk_numberof*sizeof(uint8_t)); 
+
+
+static const uint16_t s_eoprot_sk_entities_sizeof[] = 
+{
+    sizeof(eOsk_skin_t)
+};  EO_VERIFYsizeof(s_eoprot_sk_entities_sizeof, eoprot_entities_sk_numberof*sizeof(uint16_t)); 
+
 
 #if 0   // dynamic mode
 static const uint8_t** s_eoprot_sk_board_numberofeachentity = NULL; // s_eoprot_sk_board_numberofeachentity[brd][entype] tells how many entities of kind entype are in brd
@@ -104,6 +118,7 @@ static void* s_eoprot_sk_board_ramofeachendpoint[eoprot_boards_maxnumberof] = { 
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+
 const eOprot_nvset_interface_t eoprot_eonvset_interface_sk =
 {
     EO_INIT(.loadram)               eoprot_sk_config_endpoint_ram,
@@ -115,9 +130,11 @@ const eOprot_nvset_interface_t eoprot_eonvset_interface_sk =
     EO_INIT(.getram)                eoprot_sk_variable_ramof_get                      
 };
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 
 #if 0   // dynamic mode
 extern eOresult_t eoprot_sk_number_of_boards_Load(uint16_t numofboards)
@@ -133,6 +150,8 @@ extern eOresult_t eoprot_sk_number_of_boards_Load(uint16_t numofboards)
     return(eores_OK);   
 }
 #endif
+
+
 
 extern eOresult_t eoprot_sk_config_endpoint_entities(eOprotBRD_t brd, const uint8_t* numberofeachentity)
 {
@@ -151,6 +170,7 @@ extern eOresult_t eoprot_sk_config_endpoint_entities(eOprotBRD_t brd, const uint
     return(eores_OK);       
 }
 
+
 extern uint16_t eoprot_sk_endpoint_sizeof_get(eOprotBRD_t brd)
 {
     uint16_t size = 0;
@@ -160,11 +180,14 @@ extern uint16_t eoprot_sk_endpoint_sizeof_get(eOprotBRD_t brd)
         return(0);
     }
     
-    size = sizeof(eOsk_skin_t) * s_eoprot_sk_board_numberofeachentity[brd][eosk_entity_skin];
+    uint8_t i;
+    for(i=0; i<eoprot_entities_sk_numberof; i++)
+    {
+        size += s_eoprot_sk_entities_sizeof[i] * s_eoprot_sk_board_numberofeachentity[brd][i];
+    }
     
     return(size);
 }
-
 
 extern eOresult_t eoprot_sk_config_endpoint_ram(eOprotBRD_t brd, void *ram, uint16_t sizeofram)
 {
@@ -198,9 +221,8 @@ extern void* eoprot_sk_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id)
         return(NULL);
     }   
 
-
     return(&startofdata[offset]);
-} 
+}
 
 extern uint16_t eoprot_sk_variable_sizeof_get(eOprotID32_t id)
 {
@@ -225,24 +247,19 @@ extern void* eoprot_sk_entity_ramof_get(eOprotBRD_t brd, eOprotEntity_t ent, eOp
     return(&startofdata[offset]);
 } 
 
+
 extern uint16_t eoprot_sk_entity_sizeof_get(eOprotBRD_t brd, eOprotEntity_t ent)
 {
-    uint16_t sizeofentity = 0;
-    switch(ent)
+    uint16_t sizeofentity = EOK_uint16dummy;
+    
+    if(ent < eoprot_entities_sk_numberof)
     {
-        case eosk_entity_skin:
-        {  
-            sizeofentity = sizeof(eOsk_skin_t); 
-        } break;
-         
-        default:
-        {   // error
-            sizeofentity = 0;
-        } break;    
+        sizeofentity = s_eoprot_sk_entities_sizeof[ent];
     }
     
     return(sizeofentity);    
 }
+
 
 extern uint8_t eoprot_sk_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent)
 {
@@ -252,20 +269,12 @@ extern uint8_t eoprot_sk_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent
     {
         return(0);
     }
- 
-    switch(ent)
-    {    
-        case eosk_entity_skin: 
-        {
-            numberof = s_eoprot_sk_board_numberofeachentity[brd][ent];
-        } break;
-                     
-        default:
-        {   
-            numberof = 0;
-        } break; 
-    }        
     
+    if(ent < eoprot_entities_sk_numberof)
+    {
+        numberof = s_eoprot_sk_board_numberofeachentity[brd][ent];
+    }
+     
     return(numberof);
 }
 
@@ -281,7 +290,6 @@ extern uint8_t eoprot_sk_entity_numberof_get(eOprotBRD_t brd, eOprotEntity_t ent
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// ---
 
 static uint16_t eoprot_sk_numberofvariables_get(eOprotBRD_t brd)
 {
@@ -292,42 +300,44 @@ static uint16_t eoprot_sk_numberofvariables_get(eOprotBRD_t brd)
         return(0);
     }
     
-    num = eoprot_tags_sk_skin_numberof * s_eoprot_sk_board_numberofeachentity[brd][eosk_entity_skin];
-          
+    uint8_t i;
+    for(i=0; i<eoprot_entities_sk_numberof; i++)
+    {   
+        // simply the sum for each entity of the number of tags multiplied the number of each entity. 
+        // it also works if an entity is not present in the board
+        num += (s_eoprot_sk_tags_numberof[i] * s_eoprot_sk_board_numberofeachentity[brd][i]);
+    }
+
     return(num);
 }
 
+
 static eObool_t eoprot_sk_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
 {
-    eObool_t ret = eobool_false;    
-    
     if((NULL == s_eoprot_sk_board_numberofeachentity) || (NULL == s_eoprot_sk_board_numberofeachentity[brd]))
     {
         return(eobool_false);
     }    
     
+    // just verifies that the entity, index, and tag have numbers which are consistent with their maximum number
+    
     eOprotEntity_t ent = eoprot_ID2entity(id);
     eOprotIndex_t  ind = eoprot_ID2index(id);
     eOprotTag_t    tag = eoprot_ID2tag(id);
     
-    switch(ent)
+    if(ent >= eoprot_entities_sk_numberof)
     {
-        case eosk_entity_skin:
-        {   
-            if(ind < s_eoprot_sk_board_numberofeachentity[brd][eosk_entity_skin])
-            {
-                ret = s_eoprot_sk_tag_skin_is_valid(tag);
-            }            
-        } break;
-        
-        default:
-        {           
-        } break;        
+        return(eobool_false);
     }
     
-    return(ret);     
-}
+    if(ind >= s_eoprot_sk_board_numberofeachentity[brd][ent])
+    {
+        return(eobool_false);
+    }   
+    
+    return(s_eoprot_sk_entity_tag_is_valid(ent, tag));
 
+}
 
 static eOprotID32_t eoprot_sk_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog)
 {
@@ -338,27 +348,32 @@ static eOprotID32_t eoprot_sk_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t pro
     if((NULL == s_eoprot_sk_board_numberofeachentity) || (NULL == s_eoprot_sk_board_numberofeachentity[brd]))
     {
         return(EOK_uint32dummy);
-    }
+    }   
     
-    eOprotProgNumber_t progsinskins = eoprot_tags_sk_skin_numberof * s_eoprot_sk_board_numberofeachentity[brd][eosk_entity_skin];
-    
-    if((0 != progsinskins) && (prog < (progsinskins)))
-    {   // entity is eosk_entity_skin 
-        entity  = eosk_entity_skin;
-        index   = prog / eoprot_tags_sk_skin_numberof;       // eoprot_tags_sk_skin_numberof cannot be zero if progsinskins is non-zero
-        tag     = prog % eoprot_tags_sk_skin_numberof;        
-    }
-    else
+    uint8_t i;
+    for(i=0; i<eoprot_entities_sk_numberof; i++)
     {
-        return(EOK_uint32dummy);
+        // starting from the first entity (if it present in the board) we progressively check if the signedprog is in its relevant range.
+        uint8_t tags_number_ith = s_eoprot_sk_tags_numberof[i];
+        eOprotProgNumber_t progs_ith = tags_number_ith * s_eoprot_sk_board_numberofeachentity[brd][i]; // num of progs in all the entities i-th
+        if((0 != progs_ith) && (prog < (progs_ith)))
+        {   // entity is the i-th 
+            entity  = i;
+            index   = prog / tags_number_ith;       // tags_number_ith cannot be zero if progs_ith is non-zero
+            tag     = prog % tags_number_ith;  
+
+            return(eoprot_ID_get(eoprot_endpoint_analogsensors, entity, index, tag));
+        }
+        prog -= progs_ith; // entity may be the next one. 
     }
-    
-    return(eoprot_ID_get(eoprot_endpoint_skin, entity, index, tag));   
+
+    return(EOK_uint32dummy);   
 }
+
 
 static eOprotProgNumber_t eoprot_sk_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
 {
-    eOprotProgNumber_t prog = EOK_uint32dummy;
+    eOprotProgNumber_t prog = 0;
     
     if((NULL == s_eoprot_sk_board_numberofeachentity) || (NULL == s_eoprot_sk_board_numberofeachentity[brd]))
     {
@@ -366,116 +381,82 @@ static eOprotProgNumber_t eoprot_sk_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
     }
     
     eOprotEntity_t entity = eoprot_ID2entity(id);
-    eOprotIndex_t index = eoprot_ID2index(id);
-    switch(entity)
+    eOprotIndex_t  index  = eoprot_ID2index(id);
+    
+    if(entity >= eoprot_entities_sk_numberof)
     {
-        case eosk_entity_skin: 
-        {
-            prog = index*eoprot_tags_sk_skin_numberof + eoprot_sk_rom_get_prognum(id);
-        } break;
-        
-                
-        default:
-        {   
-            prog = EOK_uint32dummy;
-        } break;    
+        return(EOK_uint32dummy);
     }
     
+    uint8_t i;
+    for(i=0; i<=entity; i++)
+    {   // we add all the tags in the entities below
+        prog += (s_eoprot_sk_tags_numberof[i] * s_eoprot_sk_board_numberofeachentity[brd][i]);
+    }
+    // then we add only the tags of the entities equal to the current one + the progessive number of the tag
+    prog += (index*s_eoprot_sk_tags_numberof[entity] + eoprot_sk_rom_get_prognum(id));
+
     return(prog);
-}
+}    
+    
+
 
 static void* eoprot_sk_eonvrom_get(eOprotBRD_t brd, eOprotID32_t id)
 {
+    brd =  brd;
     return(eoprot_sk_rom_get_nvrom(id));
 }
-
-
-
-// static void* eoprot_sk_ramofvariable_extract(eOprotBRD_t brd, eOprotID32_t id, void* epram)
-// {
-//     uint8_t* startofdata = epram;
-//     uint16_t offset = s_eoprot_sk_brdid2ramoffset(brd, id);
-//     
-//     if(EOK_uint16dummy == offset)
-//     {
-//         return(NULL);
-//     }   
-
-//     return(&startofdata[offset]);
-// } 
-
-// ---
 
 static uint16_t s_eoprot_sk_brdentityindex2ramoffset(eOprotBRD_t brd, eOprotEntity_t entity, eOprotIndex_t index)
 {
     uint16_t offset = 0;
-    
-    switch(entity)
+        
+    if(entity >= eoprot_entities_sk_numberof)
     {
-        case eosk_entity_skin:
-        {   // the skin, if present, are all displaced at the beginning of the data in every as endpoint
-            offset = 0;
-            offset += sizeof(eOsk_skin_t)*index; 
-        } break;
-        
-        
-        default:
-        {   // error
-            offset = EOK_uint16dummy;
-        } break;    
+        return(EOK_uint16dummy);
     }
     
-    return(offset);  
-}
+    uint8_t i;
+    for(i=0; i<=entity; i++)
+    {   // we sum the size of all the entities before the current one
+        offset += (s_eoprot_sk_board_numberofeachentity[brd][i] * s_eoprot_sk_entities_sizeof[i]);
+    }
+    // then we add the offset of the current entity
+    offset += (index*s_eoprot_sk_entities_sizeof[entity]);
 
+    return(offset);
+}    
 
 
 
 static uint16_t s_eoprot_sk_brdid2ramoffset(eOprotBRD_t brd, eOprotID32_t id)
 {
-    uint16_t offset = 0;
+    eOprotEntity_t entity = eoprot_ID2entity(id);
+    eOprotIndex_t index = eoprot_ID2index(id);
     eOprotTag_t tag = eoprot_ID2tag(id);
     
-    if(EOK_uint08dummy == tag)
+    // we compute the offset of the entity
+    uint16_t offset = s_eoprot_sk_brdentityindex2ramoffset(brd, entity, index);
+       
+    if(EOK_uint16dummy == offset)
     {
         return(EOK_uint16dummy);
     }
     
-    
-    eOprotEntity_t entity = eoprot_ID2entity(id);
-    uint16_t index = eoprot_ID2index(id);
-    
-    switch(entity)
-    {
-        case eosk_entity_skin:
-        {   // the skin are all displaced at the beginning of the data in every sk endpoint
-            offset = index*sizeof(eOsk_skin_t) + eoprot_sk_rom_skin_get_offset(tag); 
-        } break;   
-        
-        default:
-        {   // error
-            offset = EOK_uint16dummy;
-        } break;    
-    }
-    
-    return(offset);  
-}
+    // then we add the offset of the tag
+    offset += (eoprot_sk_rom_get_offset(entity, tag)); 
 
-static eObool_t s_eoprot_sk_tag_skin_is_valid(eOprotTag_t tag)
-{   // in case of holes in tags ... change the code
-    return((tag < eoprot_tags_sk_skin_numberof)?(eobool_true):(eobool_false));
+    return(offset);
+} 
+
+
+
+static eObool_t s_eoprot_sk_entity_tag_is_valid(eOprotEntity_t entity, eOprotTag_t tag)
+{
+    return((tag < s_eoprot_sk_tags_numberof[entity])?(eobool_true):(eobool_false));
 }
 
 
-//static uint16_t s_eoprot_sk_skins_numberof_Get(eOprotBRD_t brd)
-//{
-////    if((NULL == s_eoprot_sk_board_numberofeachentity) || (NULL == s_eoprot_sk_board_numberofeachentity[brd]))
-////    {
-////        return(0);
-////    }
-//    
-//    return(s_eoprot_sk_board_numberofeachentity[brd][eosk_entity_skin]);
-//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
