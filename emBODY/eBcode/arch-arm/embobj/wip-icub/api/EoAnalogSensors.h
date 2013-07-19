@@ -121,7 +121,7 @@ typedef struct                  // size is: 1+1*15+0 = 16
 {
     uint8_t                     number;             /**< the number of values */ 
     uint8_t                     value[15];          /**< the values */
-} eOas_upto15analog08vals_t;    EO_VERIFYsizeof(eOas_upto15analog08vals_t, 16);
+} eOas_upto15analog08vals_t;    //EO_VERIFYsizeof(eOas_upto15analog08vals_t, 16);
 
 
 /** @typedef    typedef struct eOas_arrayofupto12bytes_t
@@ -131,7 +131,7 @@ typedef struct                  // size is: 4+12 = 16
 {
     eOarray_head_t              head;               /**< the head */ 
     uint8_t                     data[12];           /**< the data: upto 12 U8, or 6 U16, or 3 U32 */
-} eOas_arrayofupto12bytes_t;    EO_VERIFYsizeof(eOas_arrayofupto12bytes_t, 16);
+} eOas_arrayofupto12bytes_t;    //EO_VERIFYsizeof(eOas_arrayofupto12bytes_t, 16);
 
 
 /** @typedef    typedef struct eOas_arrayofupto20bytes_t
@@ -141,7 +141,7 @@ typedef struct                  // size is: 4+20 = 24
 {
     eOarray_head_t              head;               /**< the head */ 
     uint8_t                     data[20];           /**< the data: upto 20 U8, or 10 U16, or 5 U32 */
-} eOas_arrayofupto20bytes_t;    EO_VERIFYsizeof(eOas_arrayofupto20bytes_t, 24);
+} eOas_arrayofupto20bytes_t;    //EO_VERIFYsizeof(eOas_arrayofupto20bytes_t, 24);
 
 
 /** @typedef    typedef struct eOas_arrayofupto36bytes_t
@@ -151,7 +151,7 @@ typedef struct                  // size is: 4+36+0 = 40
 {
     eOarray_head_t              head;               /**< the head */ 
     uint8_t                     data[36];           /**< the data: upto 36 U8, or 18 U16, or 9 U32 */
-} eOas_arrayofupto36bytes_t;    EO_VERIFYsizeof(eOas_arrayofupto36bytes_t, 40);
+} eOas_arrayofupto36bytes_t;    //EO_VERIFYsizeof(eOas_arrayofupto36bytes_t, 40);
 
 
 // -- the definition of a strain entity
@@ -169,13 +169,13 @@ typedef struct
     uint8_t                         datarate;                               /**< in ms from 1 up to 210 */
     eObool_t                        signaloncefullscale;                    /**< if eobool_true, then the strains signals its full scale*/
     uint8_t                         filler01[1];                           
-} eOas_strain_config_t;             EO_VERIFYsizeof(eOas_strain_config_t, 4);
+} eOas_strain_config_t;             //EO_VERIFYsizeof(eOas_strain_config_t, 4);
 
 
 typedef struct                      
 {
     uint8_t                         filler04[4];                               
-} eOas_strain_inputs_t;             EO_VERIFYsizeof(eOas_strain_inputs_t, 4);
+} eOas_strain_inputs_t;             //EO_VERIFYsizeof(eOas_strain_inputs_t, 4);
 
 
 typedef struct                      // size is: 16+16+16+0 = 48                     
@@ -183,7 +183,7 @@ typedef struct                      // size is: 16+16+16+0 = 48
     eOas_arrayofupto12bytes_t       fullscale;                              /**< the full scale as an array of three forces and three torques each of 2 bytes */
     eOas_arrayofupto12bytes_t       calibratedvalues;                       /**< the calibrated values as an array of three forces and three torques each of 2 bytes */
     eOas_arrayofupto12bytes_t       uncalibratedvalues;                     /**< the uncalibrated values as an array of three forces and three torques each of 2 bytes */                  
-} eOas_strain_status_t;             EO_VERIFYsizeof(eOas_strain_status_t, 48);
+} eOas_strain_status_t;             //EO_VERIFYsizeof(eOas_strain_status_t, 48);
 
 
 typedef struct                      // size is: 4+4+48+0 = 56
@@ -191,7 +191,7 @@ typedef struct                      // size is: 4+4+48+0 = 56
     eOas_strain_config_t            config;
     eOas_strain_inputs_t            inputs;    
     eOas_strain_status_t            status;
-} eOas_strain_t;                    EO_VERIFYsizeof(eOas_strain_t, 56);
+} eOas_strain_t;                    //EO_VERIFYsizeof(eOas_strain_t, 56);
 
 
 
@@ -209,13 +209,13 @@ typedef struct
     uint8_t                         datarate;                           /**< in ms from 1 upto 210 */
     eOenum08_t                      resolution;                         /**< use values from eOas_maisresolution_t */               
     uint8_t                         filler01[1];                           
-} eOas_mais_config_t;               EO_VERIFYsizeof(eOas_mais_config_t, 4);
+} eOas_mais_config_t;               //EO_VERIFYsizeof(eOas_mais_config_t, 4);
 
 
 typedef struct                      
 {
     uint8_t                         filler04[4];                               
-} eOas_mais_inputs_t;               EO_VERIFYsizeof(eOas_mais_inputs_t, 4);
+} eOas_mais_inputs_t;               //EO_VERIFYsizeof(eOas_mais_inputs_t, 4);
 
 
 /* 
@@ -226,14 +226,14 @@ typedef struct
 typedef struct                      // size is: 40+0 = 40                     
 {
     eOas_arrayofupto36bytes_t       the15values;                        /**< the 15 values of the mais, either at 1 byte or 2 bytes resolution. */                  
-} eOas_mais_status_t;               EO_VERIFYsizeof(eOas_mais_status_t, 40);
+} eOas_mais_status_t;               //EO_VERIFYsizeof(eOas_mais_status_t, 40);
 
 typedef struct                      // size is: 4+4+40+0 = 48
 {
     eOas_mais_config_t              config;
     eOas_mais_inputs_t              inputs;    
     eOas_mais_status_t              status;
-} eOas_mais_t;                      EO_VERIFYsizeof(eOas_mais_t, 48);
+} eOas_mais_t;                      //EO_VERIFYsizeof(eOas_mais_t, 48);
 
 
 
@@ -248,7 +248,7 @@ typedef struct                      // size is: 4+4+40+0 = 48
 typedef struct                  // size is: 4+0 = 4
 {
     uint32_t                    value;            // used with ... see hal_encoder.h for bitfield formatting  
-} eOas_aea_t;                   EO_VERIFYsizeof(eOas_aea_t, 4);
+} eOas_aea_t;                   //EO_VERIFYsizeof(eOas_aea_t, 4);
 
 
 /** @typedef    typedef struct eOas_forcetorque_t
@@ -259,7 +259,7 @@ typedef struct                  // size is: 4+2*3+2*3+0 = 16
     uint32_t                    identifier;         /**< the identifier of the origin of measure: so far only strain */ 
     eOmeas_force_t              force[3];           /**< the force split in x, y, and z components */
     eOmeas_torque_t             torque[3];          /**< the torque split in three components*/
-} eOas_forcetorque_t;           EO_VERIFYsizeof(eOas_forcetorque_t, 16);
+} eOas_forcetorque_t;           //EO_VERIFYsizeof(eOas_forcetorque_t, 16);
 
 
 
