@@ -64,9 +64,10 @@ typedef enum
 {
     eoas_entity_strain                      = 0,
     eoas_entity_mais                        = 1,
+    eoas_entity_extorque                    = 2
 } eOas_entity_t; 
 
-enum { eoas_entities_numberof = 2 };
+enum { eoas_entities_numberof = 3 };
 
 // -- all the possible enum
 
@@ -236,6 +237,35 @@ typedef struct                      // size is: 4+4+40+0 = 48
 } eOas_mais_t;                      //EO_VERIFYsizeof(eOas_mais_t, 48);
 
 
+
+
+// -- the definition of a extorque entity
+
+
+/** @typedef    typedef uint8_t  eOas_extorqueId_t
+    @brief      eOas_extorqueId_t contains the values required to identify a extorque sensor board in robot.
+ **/
+typedef uint8_t  eOas_extorqueId_t;
+
+typedef struct                      
+{
+    uint8_t                         jointindex;
+    uint8_t                         filler03[3];                          
+} eOas_extorque_config_t;           //EO_VERIFYsizeof(eOas_extorque_config_t, 4);
+
+
+typedef struct                      
+{
+    eOmeas_torque_t                 torquevalue;
+    uint8_t                         filler02[2];
+} eOas_extorque_inputs_t;           //EO_VERIFYsizeof(eOas_extorque_inputs_t, 4);
+
+
+typedef struct                      // size is: 4+4+0 = 8
+{
+    eOas_extorque_config_t          config;
+    eOas_extorque_inputs_t          inputs;    
+} eOas_extorque_t;                  //EO_VERIFYsizeof(eOas_extorque_t, 8);
 
 
 
