@@ -104,8 +104,7 @@ typedef struct                  // 176+0 = 176
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOprot_nvset_interface_t eoprot_eonvset_interface_sk;  // used by EOnvset to access the endpoint
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

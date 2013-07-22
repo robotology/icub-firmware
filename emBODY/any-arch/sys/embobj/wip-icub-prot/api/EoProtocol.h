@@ -193,23 +193,22 @@ typedef enum
 
 /** @typedef    typedef struct eOprot_nvset_interface_t;
     @brief      It contains those functions which are required to offer services to the EOnvset object. The functions in here must
-                match those defined inside eOnvset_protocol_interface_t. Every endpoint must export a variables of this type.    
+                match those defined inside eOnvset_protocol_Interface_t. Every endpoint must export a variables of this type.    
  **/ 
 typedef struct
 {
-    eOres_fp_uint8_voidp_uint16_t       loadram;            /*< a function which loads the ram of the endpoint given: (brd, ram, sizeof) */
-    eOuint16_fp_uint8_t                 getvarsnumberof;    /*< a function which returns the total number of variables given: (brd) */
+    eOres_fp_uint8_uint8_voidp_uint16_t loadram;            /*< a function which loads the ram of the endpoint given: (brd, ep, ram, sizeof) */
+    eOuint16_fp_uint8_uint8_t           getvarsnumberof;    /*< a function which returns the total number of variables given: (brd, ep) */
     eObool_fp_uint8_uint32_t            isidsupported;      /*< a function which tells if the id is supported given: (brd, id) */
-    eOuint32_fp_uint8_uint32_t          getid;              /*< a function which returns the full ID given: (brd, prognumber)  */
+    eOuint32_fp_uint8_uint8_uint32_t    getid;              /*< a function which returns the full ID given: (brd, ep, prognumber)  */
     eOuint32_fp_uint8_uint32_t          getprognumber;      /*< a function which returns a progressive number given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getrom;             /*< a function which returns the .rom part of the NV given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getram;             /*< a function which returns the .ram part of the NV given: (brd, id) */  
-} eOprot_nvset_interface_t;
+} eOprot_nvset_Interface_t;
 
- 
- 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const eOprot_nvset_Interface_t eoprot_eonvset_Interface;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -364,6 +363,33 @@ extern uint16_t eoprot_entity_sizeof_get(eOprotBRD_t brd, eOprotEndpoint_t ep, e
     @return     the number of the entities or 0 in case of invalid parameters.
  **/
 extern uint8_t eoprot_entity_numberof_get(eOprotBRD_t brd, eOprotEndpoint_t ep, eOprotEntity_t entity);
+
+
+/** @fn         extern eObool_t eoprot_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
+    @brief      it tells if a given ID is valid on that board.
+    @param      brd             the number of the board.
+    @param      id              the ID.
+    @return     eobool_true or eobool_false.
+ **/
+extern eObool_t eoprot_id_isvalid(eOprotBRD_t brd, eOnvID32_t id);
+
+
+/** @fn         extern eOprotID32_t eoprot_prognum2id(eOprotBRD_t brd, eOprotEndpoint_t ep, eOprotProgNumber_t prog)
+    @brief      it converts the progressive number into the ID for a given endpoint on a given board 
+    @param      brd             the number of the board.
+    @param      ep              the endpoint.
+    @param      prog            the progressive number.
+    @return     the ID or EOK_uint32dummy in case of invalid parameters.
+ **/
+extern eOprotID32_t eoprot_prognum2id(eOprotBRD_t brd, eOprotEndpoint_t ep, eOprotProgNumber_t prog);
+
+/** @fn         extern eOprotProgNumber_t eoprot_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
+    @brief      it converts the ID into the progressive number for a given board 
+    @param      brd             the number of the board.
+    @param      id              the ID.
+    @return     the progressive number or EOK_uint32dummy in case of invalid parameters.
+ **/
+extern eOprotProgNumber_t eoprot_id2prognum(eOprotBRD_t brd, eOprotID32_t id);
 
 
 
