@@ -134,10 +134,10 @@ enum { eoprot_tags_maxnumberof = 256 };    // the current implementation uses at
  **/
 typedef enum
 {
-    eoprot_endpoint_management              = 0x01,     /**< management of the ems board: comm+appl */   
-    eoprot_endpoint_motioncontrol           = 0x11,     /**< management of motion control  */        
-    eoprot_endpoint_analogsensors           = 0x21,     /**< management of analog sensors  */ 
-    eoprot_endpoint_skin                    = 0x31,     /**< management of skin  */     
+    eoprot_endpoint_management              = 0,        /**< management of the ems board: comm+appl */   
+    eoprot_endpoint_motioncontrol           = 1,        /**< management of motion control  */        
+    eoprot_endpoint_analogsensors           = 2,        /**< management of analog sensors  */ 
+    eoprot_endpoint_skin                    = 3,        /**< management of skin  */     
     eoprot_endpoint_none                    = EOK_uint08dummy
 } eOprot_endpoint_t;
 
