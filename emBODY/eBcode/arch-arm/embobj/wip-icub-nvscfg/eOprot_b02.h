@@ -97,16 +97,17 @@ typedef struct                  // 152*12+40*12+24 = 2328
 
 // - analog sensors
 
-enum { eoprot_b02_as_strains_numberof = 0, eoprot_b02_as_maises_numberof = 1 };
+enum { eoprot_b02_as_strains_numberof = 0, eoprot_b02_as_maises_numberof = 1, eoprot_b02_as_extorque_numberof = 12 };
          
 
 /** @typedef    typedef struct eOprot_b02_analogsensors_t;
     @brief      It is the container of strain, mais in the analog sensors endpoint of board eb1.
  **/
-typedef struct                  // 48+0 = 48             
+typedef struct                  // 48+12*8+0 = 144             
 {
     eOas_mais_t                 mais; 
-} eOprot_b02_analogsensors_t;           //EO_VERIFYsizeof(eOprot_b02_analogsensors_t, 48); 
+    eOas_extorque_t             extorque[eoprot_b02_as_extorque_numberof];
+} eOprot_b02_analogsensors_t;   //EO_VERIFYsizeof(eOprot_b02_analogsensors_t, 144); 
 
 
 // - skin
@@ -130,7 +131,7 @@ extern const eOnvset_DEVcfg_t eoprot_b02_nvsetDEVcfg;
 
 extern const uint8_t eoprot_b02_mn_entities_numberofeach[]; // = { eoprot_b02_mn_comms_numberof, eoprot_b02_mn_appls_numberof };
 extern const uint8_t eoprot_b02_mc_entities_numberofeach[]; // = { eoprot_b02_mc_joints_numberof, eoprot_b02_mc_motors_numberof, eoprot_b02_mc_controllers_numberof };
-extern const uint8_t eoprot_b02_as_entities_numberofeach[]; // = { eoprot_b02_as_strains_numberof, eoprot_b02_as_maises_numberof };
+extern const uint8_t eoprot_b02_as_entities_numberofeach[]; // = { eoprot_b02_as_strains_numberof, eoprot_b02_as_maises_numberof, eoprot_b02_as_extorque_numberof };
 extern const uint8_t eoprot_b02_sk_entities_numberofeach[]; // = { eoprot_b02_sk_skins_numberof };
 
 
