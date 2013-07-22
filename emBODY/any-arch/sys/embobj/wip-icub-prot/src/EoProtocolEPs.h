@@ -18,19 +18,19 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOPROTOCOLMN_ROM_H_
-#define _EOPROTOCOLMN_ROM_H_
+#ifndef _EOPROTOCOLEPS_H_
+#define _EOPROTOCOLEPS_H_
 
 
 
 
-/** @file       EoProtocolMN_rom.h
-	@brief      This header file gives the constant configuration for the NVs in mc endpoints
+/** @file       EoProtocolEPs.h
+	@brief      This header file gives ...
 	@author     marco.accame@iit.it
 	@date       05/29/2013
 **/
 
-/** @defgroup eo_EoProtocolMN_rom Configuration of the NVs ..
+/** @defgroup eo_EoProtocolEPs Ccewcwe
     Tcecece 
     
     @{		
@@ -41,10 +41,8 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoProtocol.h"
-#include "EoProtocolEPs.h"
-#include "EoProtocolMN.h"
-#include "EoManagement.h"
 #include "EOnv_hid.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -56,18 +54,23 @@
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const EOnv_rom_t * const eoprot_mn_rom_folded_descriptors[];
-extern const uint8_t eoprot_mn_rom_tags_numberof[eoprot_entities_mn_numberof];
-extern const uint16_t eoprot_mn_rom_entities_sizeof[eoprot_entities_mn_numberof];
-extern const uint32_t* eoprot_mn_rom_entities_defval[eoprot_entities_mn_numberof];
+extern const uint16_t eoprot_ep_board_numberofthem;
+extern const uint8_t eoprot_ep_entities_numberof[eoprot_endpoints_numberof];
+extern const EOnv_rom_t * const * eoprot_ep_folded_descriptors[eoprot_endpoints_numberof];
+extern const uint16_t* eoprot_ep_entities_sizeof[eoprot_endpoints_numberof]; 
+extern const uint32_t** eoprot_ep_entities_defval[eoprot_endpoints_numberof]; 
+extern const uint8_t* eoprot_ep_tags_numberof[eoprot_endpoints_numberof];
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
 
+EO_extern_inline uint8_t eoprot_ep_ep2index(eOprotEndpoint_t ep)
+{   // dont use control that ep is lower than eoprot_endpoints_numberof ... use sensibly !
+    return(ep);
+}
 
 /** @}            
-    end of group eo_EoProtocolMN_rom  
+    end of group eo_EoProtocolEPs  
  **/
 
 #endif  // include-guard

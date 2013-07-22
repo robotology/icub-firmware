@@ -36,7 +36,6 @@
 #include "EOconstvector_hid.h"
 
 #include "EoProtocolAS.h"
-
 #include "EoAnalogSensors.h"
 
 
@@ -67,10 +66,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-static uint16_t s_eoprot_as_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
-static uint16_t s_eoprot_as_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag);
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -284,9 +280,13 @@ static EOnv_rom_t eoprot_as_rom_descriptor_extorque_inputs =
 };
 
 
-// -- the folded array of descriptors
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of extern variables
+// --------------------------------------------------------------------------------------------------------------------
 
-static const EOnv_rom_t * const eoprot_as_rom_folded_descriptors[] =
+// -- the folded array of descriptors: to be changed if any new tag is added
+
+const EOnv_rom_t * const eoprot_as_rom_folded_descriptors[] =
 {
     // here are eoprot_tags_as_strain_numberof descriptors for the strains (equal for every strain)
     &eoprot_as_rom_descriptor_strain_wholeitem,
@@ -316,85 +316,34 @@ static const EOnv_rom_t * const eoprot_as_rom_folded_descriptors[] =
 };  EO_VERIFYsizeof(eoprot_as_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_tags_as_strain_numberof+eoprot_tags_as_mais_numberof+eoprot_tags_as_extorque_numberof));
 
 
+// the other constants: to be changed when a new entity is added
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of extern variables
-// --------------------------------------------------------------------------------------------------------------------
-
-
-const EOconstvector  eoprot_as_rom_constvector_of_folded_descriptors_dat = 
+const uint8_t eoprot_as_rom_tags_numberof[] = 
 {
-    EO_INIT(.size)              sizeof(eoprot_as_rom_folded_descriptors)/sizeof(EOnv_rom_t*), 
-    EO_INIT(.item_size)         sizeof(EOnv_rom_t*),
-    EO_INIT(.item_array_data)   eoprot_as_rom_folded_descriptors
-};
+    eoprot_tags_as_strain_numberof, 
+    eoprot_tags_as_mais_numberof, 
+    eoprot_tags_as_extorque_numberof
+};  EO_VERIFYsizeof(eoprot_as_rom_tags_numberof, eoprot_entities_as_numberof*sizeof(uint8_t)); 
 
+const uint16_t eoprot_as_rom_entities_sizeof[] = 
+{
+    sizeof(eOas_strain_t), 
+    sizeof(eOas_mais_t), 
+    sizeof(eOas_extorque_t)
+};  EO_VERIFYsizeof(eoprot_as_rom_entities_sizeof, eoprot_entities_as_numberof*sizeof(uint16_t)); 
+
+const uint32_t* eoprot_as_rom_entities_defval[] = 
+{
+    (const uint32_t*)&eoprot_as_rom_strain_defaultvalue, 
+    (const uint32_t*)&eoprot_as_rom_mais_defaultvalue,
+	(const uint32_t*)&eoprot_as_rom_extorque_defaultvalue
+};  EO_VERIFYsizeof(eoprot_as_rom_entities_defval, eoprot_entities_as_numberof*sizeof(uint32_t*)); 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
-extern uint16_t eoprot_as_rom_get_offset(eOprotEntity_t entity, eOprotTag_t tag)
-{
-    const void* startofrom = NULL;
-    
-    switch(entity)
-    {
-        case eoas_entity_strain:
-        {   
-            startofrom = &eoprot_as_rom_strain_defaultvalue; 
-        } break;
-        
-        case eoas_entity_mais:
-        {   
-            startofrom = &eoprot_as_rom_mais_defaultvalue;
-        } break;  
-
-        case eoas_entity_extorque:
-        {   
-            startofrom = &eoprot_as_rom_extorque_defaultvalue; 
-        } break;          
-
-        default:
-        {   
-            return(EOK_uint16dummy);
-        } //break;   
-    }    
-    
-    return(s_eoprot_as_rom_entity_offset_of_tag(startofrom, tag));
-
-}
-
-
-extern void* eoprot_as_rom_get_nvrom(eOprotID32_t id)
-{
-    uint16_t indexoffoldeddescriptors = s_eoprot_as_rom_epid2index_of_folded_descriptors(id);
-    
-    if(EOK_uint16dummy == indexoffoldeddescriptors)
-    {
-        return(NULL);
-    }
-    
-    return((void*)eoprot_as_rom_folded_descriptors[indexoffoldeddescriptors]);   
-}
-
-extern uint16_t eoprot_as_rom_get_sizeofvar(eOprotID32_t id)
-{     
-    EOnv_rom_t* rom = eoprot_as_rom_get_nvrom(id);  
-    if(NULL == rom)
-    {
-        return(0);
-    }    
-    return(rom->capacity); 
-}
-
-extern uint16_t eoprot_as_rom_get_prognum(eOprotID32_t id)
-{   // we assume that the variables are inserted in a progressive way without holes. and even if there are a few holes never mind.
-    return(eoprot_ID2tag(id));
-}
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -405,52 +354,7 @@ extern uint16_t eoprot_as_rom_get_prognum(eOprotID32_t id)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-static uint16_t s_eoprot_as_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
-{      
-    uint16_t ret = eoprot_ID2tag(id);
-    
-    // dont check validity of the tag. we could check inside the case xxxx: by verifying if ret is higher than 
-    // the max number of tags for that entity.
-       
-    eOprotEntity_t entity = eoprot_ID2entity(id);
-    
-    switch(entity)
-    {
-        case eoas_entity_strain:
-        {   // nothing to add as the strain vars are in first position
-            ; 
-        } break;
-        
-        case eoas_entity_mais:
-        {   // must add the number of vars in a strain
-            ret += eoprot_tags_as_strain_numberof; 
-        } break;  
-
-        case eoas_entity_extorque:
-        {   // must add the number of vars in a strain + the number of vars in a mais
-            ret += eoprot_tags_as_strain_numberof; 
-            ret += eoprot_tags_as_mais_numberof; 
-        } break;          
-
-        default:
-        {   // error
-            ret = EOK_uint16dummy;
-        } break;
-    
-    }
-    
-    return(ret);   
-}
-
-// returns the offset of the variable with a given tag from the start of the entity
-static uint16_t s_eoprot_as_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag)
-{
-    uint32_t tmp = ((uint32_t) eoprot_as_rom_folded_descriptors[tag]->resetval) - ((uint32_t) entityrom);
-    return((uint16_t)tmp); 
-}
-
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------

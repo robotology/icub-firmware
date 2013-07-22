@@ -41,8 +41,10 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoProtocol.h"
+#include "EoProtocolEPs.h"
+#include "EoProtocolMC.h"
 #include "EoMotionControl.h"
-
+#include "EOnv_hid.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -53,16 +55,15 @@
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[];
+extern const uint8_t eoprot_mc_rom_tags_numberof[eoprot_entities_mc_numberof];
+extern const uint16_t eoprot_mc_rom_entities_sizeof[eoprot_entities_mc_numberof];
+extern const uint32_t* eoprot_mc_rom_entities_defval[eoprot_entities_mc_numberof];
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-
-extern uint16_t eoprot_mc_rom_get_offset(eOprotEntity_t ent, eOprotTag_t tag);
-
-extern void* eoprot_mc_rom_get_nvrom(eOprotID32_t id);
-extern uint16_t eoprot_mc_rom_get_sizeofvar(eOprotID32_t id);
-extern uint16_t eoprot_mc_rom_get_prognum(eOprotID32_t id);
+// empty-section
 
 
 /** @}            

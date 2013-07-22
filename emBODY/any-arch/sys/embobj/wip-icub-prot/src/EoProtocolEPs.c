@@ -16,10 +16,10 @@
  * Public License for more details
 */
 
-/* @file       EoProtocolSK_rom.c
-    @brief      This file keeps ....
+/* @file       EoProtocolEPs.c
+    @brief      This file keeps ...
     @author     marco.accame@iit.it
-    @date       06/06/2013
+    @date       06/05/2013
 **/
 
 
@@ -31,19 +31,21 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoCommon.h"
-#include "EOnv_hid.h"
-#include "EOconstvector_hid.h"
-
+#include "EoProtocolAS.h"
+#include "EoProtocolMC.h"
+#include "EoProtocolMN.h"
 #include "EoProtocolSK.h"
-#include "EoMotionControl.h"
 
+#include "EoProtocolAS_rom.h"
+#include "EoProtocolMC_rom.h"
+#include "EoProtocolMN_rom.h"
+#include "EoProtocolSK_rom.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EoProtocolSK_rom.h"
+#include "EoProtocolEPs.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -55,6 +57,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -72,79 +75,56 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-// - default value of a skin
-static const eOsk_skin_t eoprot_sk_rom_skin_defaultvalue = { 0 };
-
-
-
-// - descriptors for the variables of a skin
-
-static EOnv_rom_t eoprot_sk_rom_descriptor_skin_wholeitem =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_sk_rom_skin_defaultvalue),
-    EO_INIT(.rwmode)    eoprot_rwm_sk_skin_wholeitem,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_sk_rom_skin_defaultvalue,
-    EO_INIT(.init)      eoprot_fun_INIT_sk_skin_wholeitem,
-    EO_INIT(.update)    eoprot_fun_UPDT_sk_skin_wholeitem
-};
-
-
-static EOnv_rom_t eoprot_sk_rom_descriptor_skin_config_sigmode =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_sk_rom_skin_defaultvalue.config.sigmode),
-    EO_INIT(.rwmode)    eoprot_rwm_sk_skin_config_sigmode,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_sk_rom_skin_defaultvalue.config.sigmode,
-    EO_INIT(.init)      eoprot_fun_INIT_sk_skin_config_sigmode,
-    EO_INIT(.update)    eoprot_fun_UPDT_sk_skin_config_sigmode
-};
-
-
-static EOnv_rom_t eoprot_sk_rom_descriptor_skin_status_arrayof10canframes =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_sk_rom_skin_defaultvalue.status.arrayof10canframes),
-    EO_INIT(.rwmode)    eoprot_rwm_sk_skin_status_arrayof10canframes,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_sk_rom_skin_defaultvalue.status.arrayof10canframes,
-    EO_INIT(.init)      eoprot_fun_INIT_sk_skin_status_arrayof10canframes,
-    EO_INIT(.update)    eoprot_fun_UPDT_sk_skin_status_arrayof10canframes
-};
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// -- the folded array of descriptors: to be changed if any new tag is added
 
-const EOnv_rom_t * const eoprot_sk_rom_folded_descriptors[] =
-{
-    // here are eoprot_tags_sk_skin_numberof descriptors for the skins (equal for every skin)
-    &eoprot_sk_rom_descriptor_skin_wholeitem,
-    &eoprot_sk_rom_descriptor_skin_config_sigmode,
-    &eoprot_sk_rom_descriptor_skin_status_arrayof10canframes
-         
-};  EO_VERIFYsizeof(eoprot_sk_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_tags_sk_skin_numberof));
+extern const uint16_t eoprot_ep_board_numberofthem = eoprot_boards_maxnumberof;
 
+extern const uint8_t eoprot_ep_entities_numberof[] =
+{   // very important: use order of eOprot_endpoint_t: pos 0 is eoprot_endpoint_management etc.
+    eoprot_entities_mn_numberof,
+    eoprot_entities_mc_numberof,
+    eoprot_entities_as_numberof,
+    eoprot_entities_sk_numberof
+};  EO_VERIFYsizeof(eoprot_ep_entities_numberof, eoprot_endpoints_numberof*sizeof(uint8_t)); 
 
-// the other constants: to be changed when a new entity is added
+extern const EOnv_rom_t * const * eoprot_ep_folded_descriptors[] = 
+{   // very important: use order of eOprot_endpoint_t: pos 0 is eoprot_endpoint_management etc.
+    eoprot_mn_rom_folded_descriptors,
+    eoprot_mc_rom_folded_descriptors,
+    eoprot_as_rom_folded_descriptors,
+    eoprot_sk_rom_folded_descriptors
+};  EO_VERIFYsizeof(eoprot_ep_folded_descriptors, eoprot_endpoints_numberof*sizeof(const EOnv_rom_t * const *)); 
 
-const uint8_t eoprot_sk_rom_tags_numberof[] = 
-{
-    eoprot_tags_sk_skin_numberof
-};  EO_VERIFYsizeof(eoprot_sk_rom_tags_numberof, eoprot_entities_sk_numberof*sizeof(uint8_t)); 
+extern const uint16_t* eoprot_ep_entities_sizeof[] =
+{   // very important: use order of eOprot_endpoint_t: pos 0 is eoprot_endpoint_management etc.
+    eoprot_mn_rom_entities_sizeof,
+    eoprot_mc_rom_entities_sizeof,
+    eoprot_as_rom_entities_sizeof,
+    eoprot_sk_rom_entities_sizeof
+};  EO_VERIFYsizeof(eoprot_ep_entities_sizeof, eoprot_endpoints_numberof*sizeof(uint16_t*)); 
 
-extern const uint16_t eoprot_sk_rom_entities_sizeof[] = 
-{
-    sizeof(eOsk_skin_t)
-};  EO_VERIFYsizeof(eoprot_sk_rom_entities_sizeof, eoprot_entities_sk_numberof*sizeof(uint16_t));
+extern const uint32_t** eoprot_ep_entities_defval[] =
+{   // very important: use order of eOprot_endpoint_t: pos 0 is eoprot_endpoint_management etc.
+    (const uint32_t**)&eoprot_mn_rom_entities_defval,
+    (const uint32_t**)&eoprot_mc_rom_entities_defval,
+    (const uint32_t**)&eoprot_as_rom_entities_defval,
+    (const uint32_t**)&eoprot_sk_rom_entities_defval   
+};
 
-const uint32_t* eoprot_sk_rom_entities_defval[] = 
-{
-    (const uint32_t*)&eoprot_sk_rom_skin_defaultvalue
-};  EO_VERIFYsizeof(eoprot_sk_rom_entities_defval, eoprot_entities_sk_numberof*sizeof(uint32_t*)); 
+extern const uint8_t* eoprot_ep_tags_numberof[] =
+{   // very important: use order of eOprot_endpoint_t: pos 0 is eoprot_endpoint_management etc.
+    eoprot_mn_rom_tags_numberof,
+    eoprot_mc_rom_tags_numberof,
+    eoprot_as_rom_tags_numberof,
+    eoprot_sk_rom_tags_numberof
+};  EO_VERIFYsizeof(eoprot_ep_tags_numberof, eoprot_endpoints_numberof*sizeof(uint8_t*)); 
 
 
 
@@ -153,16 +133,18 @@ const uint32_t* eoprot_sk_rom_entities_defval[] =
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
