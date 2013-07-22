@@ -163,7 +163,8 @@ const uint8_t eoprot_b02_mc_entities_numberofeach[eomc_entities_numberof] =
 const uint8_t eoprot_b02_as_entities_numberofeach[eoas_entities_numberof] = 
 { 
     eoprot_b02_as_strains_numberof, 
-    eoprot_b02_as_maises_numberof
+    eoprot_b02_as_maises_numberof,
+    eoprot_b02_as_extorque_numberof
 };
 
 
@@ -206,6 +207,8 @@ extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if 0
+
 EO_VERIFYproposition(s_eoprot_b02_mn_val, 0x01 == eoprot_endpoint_management);
 EO_VERIFYproposition(s_eoprot_b02_mc_val, 0x11 == eoprot_endpoint_motioncontrol);
 EO_VERIFYproposition(s_eoprot_b02_as_val, 0x21 == eoprot_endpoint_analogsensors);
@@ -242,6 +245,24 @@ static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep)
     }
     return(EOK_uint16dummy);
 }
+
+#else
+
+EO_VERIFYproposition(s_eoprot_b02_mn_val, 0 == eoprot_endpoint_management);
+EO_VERIFYproposition(s_eoprot_b02_mc_val, 1 == eoprot_endpoint_motioncontrol);
+EO_VERIFYproposition(s_eoprot_b02_as_val, 2 == eoprot_endpoint_analogsensors);
+EO_VERIFYproposition(s_eoprot_b02_sk_val, 3 == eoprot_endpoint_skin);
+
+static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep)
+{    
+    if(ep < eoprot_b02_endpoints_numberof)
+    {
+        return(ep);
+    }
+    return(EOK_uint16dummy);
+}
+
+#endif
 
 
 

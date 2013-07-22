@@ -96,16 +96,17 @@ typedef struct                  // 152*4+40*4+24 = 792
 
 // - analog sensors
 
-enum { eoprot_b01_as_strains_numberof = 1, eoprot_b01_as_maises_numberof = 0 };
+enum { eoprot_b01_as_strains_numberof = 1, eoprot_b01_as_maises_numberof = 0, eoprot_b01_as_extorque_numberof = 4 };
          
 
 /** @typedef    typedef struct eOprot_b01_analogsensors_t;
     @brief      It is the container of strain, mais in the analog sensors endpoint of board eb1.
  **/
-typedef struct                  // 56+0 = 56              
+typedef struct                  // 56+4*8+0 = 88              
 {
     eOas_strain_t               strain; 
-} eOprot_b01_analogsensors_t;   //EO_VERIFYsizeof(eOprot_b01_analogsensors_t, 56); 
+    eOas_extorque_t             extorque[eoprot_b01_as_extorque_numberof];
+} eOprot_b01_analogsensors_t;   //EO_VERIFYsizeof(eOprot_b01_analogsensors_t, 88); 
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -115,7 +116,7 @@ extern const eOnvset_DEVcfg_t eoprot_b01_nvsetDEVcfg;
 
 extern const uint8_t eoprot_b01_mn_entities_numberofeach[]; // = { eoprot_b01_mn_comms_numberof, eoprot_b01_mn_appls_numberof };
 extern const uint8_t eoprot_b01_mc_entities_numberofeach[]; // = { eoprot_b01_mc_joints_numberof, eoprot_b01_mc_motors_numberof, eoprot_b01_mc_controllers_numberof };
-extern const uint8_t eoprot_b01_as_entities_numberofeach[]; // = { eoprot_b01_as_strains_numberof, eoprot_b01_as_maises_numberof };
+extern const uint8_t eoprot_b01_as_entities_numberofeach[]; // = { eoprot_b01_as_strains_numberof, eoprot_b01_as_maises_numberof, eoprot_b01_as_extorque_numberof };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
