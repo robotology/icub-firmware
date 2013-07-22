@@ -66,9 +66,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-static uint16_t s_eoprot_mc_rom_epid2index_of_folded_descriptors(eOprotID32_t id);
-static uint16_t s_eoprot_mc_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag);
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -490,9 +488,14 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_controller_cmmnds_go2stateofcontrolle
 };
 
 
-// -- the folded array of descriptors
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of extern variables
+// --------------------------------------------------------------------------------------------------------------------
 
-static const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
+// -- the folded array of descriptors: to be changed if any new tag is added
+
+
+const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
 {
     // here are eoprot_mc_tag_joints_numberof descriptors for the joints (equal for every joint)
     &eoprot_mc_rom_descriptor_joint_wholeitem,
@@ -539,87 +542,38 @@ static const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
 };  EO_VERIFYsizeof(eoprot_mc_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_tags_mc_joint_numberof+eoprot_tags_mc_motor_numberof+eoprot_tags_mc_controller_numberof));
 
 
+// the other constants: to be changed when a new entity is added
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of extern variables
-// --------------------------------------------------------------------------------------------------------------------
-
-
-const EOconstvector eoprot_mc_rom_constvector_of_folded_descriptors_dat = 
+const uint8_t eoprot_mc_rom_tags_numberof[] = 
 {
-    EO_INIT(.size)              sizeof(eoprot_mc_rom_folded_descriptors)/sizeof(EOnv_rom_t*), 
-    EO_INIT(.item_size)         sizeof(EOnv_rom_t*),
-    EO_INIT(.item_array_data)   eoprot_mc_rom_folded_descriptors
-};
+    eoprot_tags_mc_joint_numberof, 
+    eoprot_tags_mc_motor_numberof, 
+    eoprot_tags_mc_controller_numberof
+};  EO_VERIFYsizeof(eoprot_mc_rom_tags_numberof, eoprot_entities_mc_numberof*sizeof(uint8_t)); 
+
+
+const uint16_t eoprot_mc_rom_entities_sizeof[] = 
+{
+    sizeof(eOmc_joint_t), 
+    sizeof(eOmc_motor_t), 
+    sizeof(eOmc_controller_t)
+};  EO_VERIFYsizeof(eoprot_mc_rom_entities_sizeof, eoprot_entities_mc_numberof*sizeof(uint16_t)); 
+
+
+const uint32_t* eoprot_mc_rom_entities_defval[] = 
+{
+    (const uint32_t*)&eoprot_mc_rom_joint_defaultvalue, 
+    (const uint32_t*)&eoprot_mc_rom_motor_defaultvalue,
+	(const uint32_t*)&eoprot_mc_rom_controller_defaultvalue
+};  EO_VERIFYsizeof(eoprot_mc_rom_entities_defval, eoprot_entities_mc_numberof*sizeof(uint32_t*)); 
+
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
-
-extern uint16_t eoprot_mc_rom_get_offset(eOprotEntity_t entity, eOprotTag_t tag)
-{
-    const void* startofrom = NULL;
-    
-    switch(entity)
-    {
-        case eomc_entity_joint:
-        {   
-            startofrom = &eoprot_mc_rom_joint_defaultvalue; 
-        } break;
-        
-        case eomc_entity_motor:
-        {   
-            startofrom = &eoprot_mc_rom_motor_defaultvalue;
-        } break;  
-
-        case eomc_entity_controller:
-        {   
-            startofrom = &eoprot_mc_rom_controller_defaultvalue; 
-        } break;          
-
-        default:
-        {   
-            return(EOK_uint16dummy);
-        } //break; // commented the break just to remove a warning  
-    }    
-    
-    return(s_eoprot_mc_rom_entity_offset_of_tag(startofrom, tag));
-}
-
-
-extern void* eoprot_mc_rom_get_nvrom(eOprotID32_t id)
-{
-    uint16_t indexoffoldeddescriptors = s_eoprot_mc_rom_epid2index_of_folded_descriptors(id);
-    
-    if(EOK_uint16dummy == indexoffoldeddescriptors)
-    {
-        return(NULL);
-    }
-    
-    return((void*)eoprot_mc_rom_folded_descriptors[indexoffoldeddescriptors]);   
-}
-
-
-extern uint16_t eoprot_mc_rom_get_sizeofvar(eOprotID32_t id)
-{     
-    EOnv_rom_t* rom = eoprot_mc_rom_get_nvrom(id);  
-    if(NULL == rom)
-    {
-        return(0);
-    }    
-    return(rom->capacity); 
-}
-
-
-extern uint16_t eoprot_mc_rom_get_prognum(eOprotID32_t id)
-{   // we assume that the variables are inserted in a progressive way without holes. and even if there are a few holes never mind.
-    return(eoprot_ID2tag(id));
-}
-
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -630,52 +584,7 @@ extern uint16_t eoprot_mc_rom_get_prognum(eOprotID32_t id)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-
-static uint16_t s_eoprot_mc_rom_epid2index_of_folded_descriptors(eOprotID32_t id)
-{      
-    uint16_t ret = eoprot_ID2tag(id);
-    
-    // dont check validity of the tag. we could check inside the case xxxx: by verifying if ret is higher than 
-    // the max number of tags for that entity.
-       
-    eOprotEntity_t entity = eoprot_ID2entity(id);
-    
-    switch(entity)
-    {
-        case eomc_entity_joint:
-        {   // nothing to add as the joint vars are in first position
-            ; 
-        } break;
-        
-        case eomc_entity_motor:
-        {   // must add the number of vars in a joint
-            ret += eoprot_tags_mc_joint_numberof; 
-        } break;      
-
-        case eomc_entity_controller:
-        {   // must add the number of vars in a joint and in a motor
-            ret += eoprot_tags_mc_joint_numberof; 
-            ret += eoprot_tags_mc_motor_numberof;
-        } break; 
-        
-        default:
-        {   // error
-            ret = EOK_uint16dummy;
-        } break;
-    
-    }
-    
-    return(ret);   
-}
-
-// returns the offset of the variable with a given tag from the start of the entity
-static uint16_t s_eoprot_mc_rom_entity_offset_of_tag(const void* entityrom, eOprotTag_t tag)
-{
-    uint32_t tmp = ((uint32_t) eoprot_mc_rom_folded_descriptors[tag]->resetval) - ((uint32_t) entityrom);
-    return((uint16_t)tmp); 
-}
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------

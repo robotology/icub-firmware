@@ -41,12 +41,13 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoProtocol.h"
+#include "EoProtocolEPs.h"
+#include "EoProtocolSK.h"
 #include "EoSkin.h"
-
+#include "EOnv_hid.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
-
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -54,16 +55,15 @@
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const EOnv_rom_t * const eoprot_sk_rom_folded_descriptors[];
+extern const uint8_t eoprot_sk_rom_tags_numberof[eoprot_entities_sk_numberof];
+extern const uint16_t eoprot_sk_rom_entities_sizeof[eoprot_entities_sk_numberof];
+extern const uint32_t* eoprot_sk_rom_entities_defval[eoprot_entities_sk_numberof];
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-
-extern uint16_t eoprot_sk_rom_get_offset(eOprotEntity_t ent, eOprotTag_t tag);
-
-extern void* eoprot_sk_rom_get_nvrom(eOprotID32_t id);
-extern uint16_t eoprot_sk_rom_get_sizeofvar(eOprotID32_t id);
-extern uint16_t eoprot_sk_rom_get_prognum(eOprotID32_t id);
+// empty-section
 
 
 /** @}            
