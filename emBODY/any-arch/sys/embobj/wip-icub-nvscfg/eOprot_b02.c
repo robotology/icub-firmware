@@ -92,7 +92,7 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
         EO_INIT(.dummy)                             0,
         EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_management_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_mn,
-        EO_INIT(.protif)                            (eOnvset_protocol_interface_t*)&eoprot_eonvset_interface_mn        
+        EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface        
     },        
 
     {   // motion-control         
@@ -100,7 +100,7 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
         EO_INIT(.dummy)                             0,
         EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_motioncontrol_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_mc,
-        EO_INIT(.protif)                            (eOnvset_protocol_interface_t*)&eoprot_eonvset_interface_mc        
+        EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface        
     },
  
     {   // analog-sensors         
@@ -108,7 +108,7 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
         EO_INIT(.dummy)                             0,
         EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_analogsensors_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_as,
-        EO_INIT(.protif)                            (eOnvset_protocol_interface_t*)&eoprot_eonvset_interface_as        
+        EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface        
     },
 
     {   // skin         
@@ -116,7 +116,7 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
         EO_INIT(.dummy)                             0,
         EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_skin_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_sk,
-        EO_INIT(.protif)                            (eOnvset_protocol_interface_t*)&eoprot_eonvset_interface_sk             
+        EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface             
     }     
     
 };  EO_VERIFYsizeof(s_eoprot_b02_theEPcfgs, sizeof(eOnvset_EPcfg_t)*(eoprot_b02_endpoints_numberof));
