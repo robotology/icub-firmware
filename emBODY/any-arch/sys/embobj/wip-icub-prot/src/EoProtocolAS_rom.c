@@ -55,12 +55,24 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+// - guard on max number of entities
+EO_VERIFYproposition(eoprot_as_ded34, eoprot_entities_as_numberof <= eoprot_entities_maxnumberof);
+
+// - guard on tags ...
+EO_VERIFYproposition(eoprot_as_tagsnum_st, eoprot_tags_as_strain_numberof == eoprot_rwms_as_strain_numberof);
+EO_VERIFYproposition(eoprot_as_tagsmax_st, eoprot_tags_as_strain_numberof <= eoprot_tags_maxnumberof);
+
+EO_VERIFYproposition(eoprot_as_tagsnum_ma, eoprot_tags_as_mais_numberof == eoprot_rwms_as_mais_numberof);
+EO_VERIFYproposition(eoprot_as_tagsmax_ma, eoprot_tags_as_mais_numberof <= eoprot_tags_maxnumberof);
+
+EO_VERIFYproposition(eoprot_as_tagsnum_et, eoprot_tags_as_extorque_numberof == eoprot_rwms_as_extorque_numberof);
+EO_VERIFYproposition(eoprot_as_tagsmax_et, eoprot_tags_as_extorque_numberof <= eoprot_tags_maxnumberof);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,36 +115,6 @@ static EOnv_rom_t eoprot_as_rom_descriptor_strain_config =
     EO_INIT(.resetval)  (const void*)&eoprot_as_rom_strain_defaultvalue.config,
     EO_INIT(.init)      eoprot_fun_INIT_as_strain_config,
     EO_INIT(.update)    eoprot_fun_UPDT_as_strain_config
-};
-
-static EOnv_rom_t eoprot_as_rom_descriptor_strain_config_mode =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_as_rom_strain_defaultvalue.config.mode),
-    EO_INIT(.rwmode)    eoprot_rwm_as_strain_config_mode,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_as_rom_strain_defaultvalue.config.mode,
-    EO_INIT(.init)      eoprot_fun_INIT_as_strain_config_mode,
-    EO_INIT(.update)    eoprot_fun_UPDT_as_strain_config_mode
-};
-
-static EOnv_rom_t eoprot_as_rom_descriptor_strain_config_datarate =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_as_rom_strain_defaultvalue.config.datarate),
-    EO_INIT(.rwmode)    eoprot_rwm_as_strain_config_datarate,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_as_rom_strain_defaultvalue.config.datarate,
-    EO_INIT(.init)      eoprot_fun_INIT_as_strain_config_datarate,
-    EO_INIT(.update)    eoprot_fun_UPDT_as_strain_config_datarate
-};
-
-static EOnv_rom_t eoprot_as_rom_descriptor_strain_config_signaloncefullscale =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_as_rom_strain_defaultvalue.config.signaloncefullscale),
-    EO_INIT(.rwmode)    eoprot_rwm_as_strain_config_signaloncefullscale,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_as_rom_strain_defaultvalue.config.signaloncefullscale,
-    EO_INIT(.init)      eoprot_fun_INIT_as_strain_config_signaloncefullscale,
-    EO_INIT(.update)    eoprot_fun_UPDT_as_strain_config_signaloncefullscale
 };
 
 static EOnv_rom_t eoprot_as_rom_descriptor_strain_status =
@@ -291,9 +273,6 @@ const EOnv_rom_t * const eoprot_as_rom_folded_descriptors[] =
     // here are eoprot_tags_as_strain_numberof descriptors for the strains (equal for every strain)
     &eoprot_as_rom_descriptor_strain_wholeitem,
     &eoprot_as_rom_descriptor_strain_config,
-    &eoprot_as_rom_descriptor_strain_config_mode,
-    &eoprot_as_rom_descriptor_strain_config_datarate,
-    &eoprot_as_rom_descriptor_strain_config_signaloncefullscale,
     &eoprot_as_rom_descriptor_strain_status,
     &eoprot_as_rom_descriptor_strain_status_fullscale,
     &eoprot_as_rom_descriptor_strain_status_calibratedvalues,

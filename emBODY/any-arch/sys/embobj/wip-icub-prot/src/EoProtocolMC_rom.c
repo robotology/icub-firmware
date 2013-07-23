@@ -55,13 +55,24 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+// - guard on max number of entities
+EO_VERIFYproposition(eoprot_mc_dew4, eoprot_entities_mc_numberof <= eoprot_entities_maxnumberof);
+
+// - guard on tags ...
+EO_VERIFYproposition(eoprot_mc_tagsnum_jo, eoprot_tags_mc_joint_numberof == eoprot_rwms_mc_joint_numberof);
+EO_VERIFYproposition(eoprot_mc_tagsmax_jo, eoprot_tags_mc_joint_numberof <= eoprot_tags_maxnumberof);
+
+EO_VERIFYproposition(eoprot_mc_tagsnum_mo, eoprot_tags_mc_motor_numberof == eoprot_rwms_mc_motor_numberof);
+EO_VERIFYproposition(eoprot_mc_tagsmax_mo, eoprot_tags_mc_motor_numberof <= eoprot_tags_maxnumberof);
+
+EO_VERIFYproposition(eoprot_mc_tagsnum_co, eoprot_tags_mc_controller_numberof == eoprot_rwms_mc_controller_numberof);
+EO_VERIFYproposition(eoprot_mc_tagsmax_co, eoprot_tags_mc_controller_numberof <= eoprot_tags_maxnumberof);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -140,6 +151,17 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_pidtorque =
 };
 
 
+static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_limitsofjoint =
+{   
+    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.limitsofjoint),
+    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_limitsofjoint,
+    EO_INIT(.dummy)     0,    
+    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.limitsofjoint,
+    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_limitsofjoint,
+    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_limitsofjoint
+}; 
+
+
 static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_impedance =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.impedance),
@@ -151,39 +173,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_impedance =
 }; 
 
 
-static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_minpositionofjoint =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.minpositionofjoint),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_minpositionofjoint,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.minpositionofjoint,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_minpositionofjoint,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_minpositionofjoint
-}; 
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_maxpositionofjoint =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.maxpositionofjoint),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_maxpositionofjoint,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.maxpositionofjoint,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_maxpositionofjoint,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_maxpositionofjoint
-}; 
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_velocitysetpointtimeout =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.velocitysetpointtimeout),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_velocitysetpointtimeout,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.velocitysetpointtimeout,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_velocitysetpointtimeout,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout
-}; 
-
-
 static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_motionmonitormode =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.motionmonitormode),
@@ -192,28 +181,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_motionmonitormode =
     EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.motionmonitormode,
     EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_motionmonitormode,
     EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_motionmonitormode
-}; 
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionfactor =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.encoderconversionfactor),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_encoderconversionfactor,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.encoderconversionfactor,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_encoderconversionfactor,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor
-}; 
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_joint_config_encoderconversionoffset =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.config.encoderconversionoffset),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_config_encoderconversionoffset,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.config.encoderconversionoffset,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_config_encoderconversionoffset,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset
 }; 
 
 
@@ -247,17 +214,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_ofpid =
     EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.status.ofpid,
     EO_INIT(.init)      eoprot_fun_INIT_mc_joint_status_ofpid,
     EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_status_ofpid
-};
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_joint_status_chamaleon04 =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_joint_defaultvalue.status.chamaleon04),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_joint_status_chamaleon04,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_joint_defaultvalue.status.chamaleon04,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_joint_status_chamaleon04,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_joint_status_chamaleon04
 };
 
 
@@ -354,28 +310,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config =
 };
 
 
-static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_pidcurrent =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config.pidcurrent),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_motor_config_pidcurrent,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_motor_defaultvalue.config.pidcurrent,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_motor_config_pidcurrent,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_motor_config_pidcurrent
-};
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxvelocityofmotor =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config.maxvelocityofmotor),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_motor_config_maxvelocityofmotor,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_motor_defaultvalue.config.maxvelocityofmotor,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_motor_config_maxvelocityofmotor,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor
-};
-
-
 static EOnv_rom_t eoprot_mc_rom_descriptor_motor_config_maxcurrentofmotor =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.config.maxcurrentofmotor),
@@ -409,16 +343,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_basic =
 };
 
 
-static EOnv_rom_t eoprot_mc_rom_descriptor_motor_status_chamaleon04 =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_motor_defaultvalue.status.chamaleon04),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_motor_status_chamaleon04,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_motor_defaultvalue.status.chamaleon04,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_motor_status_chamaleon04,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_motor_status_chamaleon04
-};
-
 
 // - descriptors for the variables of a controller
 
@@ -444,17 +368,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_controller_config =
 };
 
 
-static EOnv_rom_t eoprot_mc_rom_descriptor_controller_config_durationofctrlloop =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.config.durationofctrlloop),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_controller_config_durationofctrlloop,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_controller_defaultvalue.config.durationofctrlloop,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_controller_config_durationofctrlloop,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_controller_config_durationofctrlloop
-};
-
-
 static EOnv_rom_t eoprot_mc_rom_descriptor_controller_status =
 {   
     EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.status),
@@ -465,27 +378,6 @@ static EOnv_rom_t eoprot_mc_rom_descriptor_controller_status =
     EO_INIT(.update)    eoprot_fun_UPDT_mc_controller_status
 };
 
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_controller_status_alljomoinitted =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.status.alljomoinitted),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_controller_status_alljomoinitted,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_controller_defaultvalue.status.alljomoinitted,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_controller_status_alljomoinitted,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_controller_status_alljomoinitted
-};
-
-
-static EOnv_rom_t eoprot_mc_rom_descriptor_controller_cmmnds_go2stateofcontroller =
-{   
-    EO_INIT(.capacity)  sizeof(eoprot_mc_rom_controller_defaultvalue.cmmnds.go2stateofcontroller),
-    EO_INIT(.rwmode)    eoprot_rwm_mc_controller_cmmnds_go2stateofcontroller,
-    EO_INIT(.dummy)     0,    
-    EO_INIT(.resetval)  (const void*)&eoprot_mc_rom_controller_defaultvalue.cmmnds.go2stateofcontroller,
-    EO_INIT(.init)      eoprot_fun_INIT_mc_controller_cmmnds_go2stateofcontroller,
-    EO_INIT(.update)    eoprot_fun_UPDT_mc_controller_cmmnds_go2stateofcontroller
-};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -503,17 +395,12 @@ const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
     &eoprot_mc_rom_descriptor_joint_config_pidposition,
     &eoprot_mc_rom_descriptor_joint_config_pidvelocity,
     &eoprot_mc_rom_descriptor_joint_config_pidtorque,
+    &eoprot_mc_rom_descriptor_joint_config_limitsofjoint,
     &eoprot_mc_rom_descriptor_joint_config_impedance,
-    &eoprot_mc_rom_descriptor_joint_config_minpositionofjoint,
-    &eoprot_mc_rom_descriptor_joint_config_maxpositionofjoint,
-    &eoprot_mc_rom_descriptor_joint_config_velocitysetpointtimeout,
     &eoprot_mc_rom_descriptor_joint_config_motionmonitormode,
-    &eoprot_mc_rom_descriptor_joint_config_encoderconversionfactor,
-    &eoprot_mc_rom_descriptor_joint_config_encoderconversionoffset,
     &eoprot_mc_rom_descriptor_joint_status,
     &eoprot_mc_rom_descriptor_joint_status_basic,
     &eoprot_mc_rom_descriptor_joint_status_ofpid,
-    &eoprot_mc_rom_descriptor_joint_status_chamaleon04,
     &eoprot_mc_rom_descriptor_joint_inputs,
     &eoprot_mc_rom_descriptor_joint_inputs_externallymeasuredtorque,
     &eoprot_mc_rom_descriptor_joint_cmmnds_calibration,
@@ -524,20 +411,14 @@ const EOnv_rom_t * const eoprot_mc_rom_folded_descriptors[] =
     // here are eoprot_tags_mc_motor_numberof descriptors for the motors (equal for every motor)
     &eoprot_mc_rom_descriptor_motor_wholeitem,
     &eoprot_mc_rom_descriptor_motor_config,
-    &eoprot_mc_rom_descriptor_motor_config_pidcurrent,
-    &eoprot_mc_rom_descriptor_motor_config_maxvelocityofmotor,
     &eoprot_mc_rom_descriptor_motor_config_maxcurrentofmotor,
     &eoprot_mc_rom_descriptor_motor_status,
     &eoprot_mc_rom_descriptor_motor_status_basic,
-    &eoprot_mc_rom_descriptor_motor_status_chamaleon04,
 
     // here are eoprot_tags_mc_controller_numberof descriptors for the single controller
     &eoprot_mc_rom_descriptor_controller_wholeitem,
     &eoprot_mc_rom_descriptor_controller_config,
-    &eoprot_mc_rom_descriptor_controller_config_durationofctrlloop,
-    &eoprot_mc_rom_descriptor_controller_status,
-    &eoprot_mc_rom_descriptor_controller_status_alljomoinitted,
-    &eoprot_mc_rom_descriptor_controller_cmmnds_go2stateofcontroller
+    &eoprot_mc_rom_descriptor_controller_status
          
 };  EO_VERIFYsizeof(eoprot_mc_rom_folded_descriptors, sizeof(EOnv_rom_t*)*(eoprot_tags_mc_joint_numberof+eoprot_tags_mc_motor_numberof+eoprot_tags_mc_controller_numberof));
 

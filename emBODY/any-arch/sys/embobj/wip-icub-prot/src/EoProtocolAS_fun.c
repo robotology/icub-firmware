@@ -92,7 +92,7 @@ __weak extern void eoprot_fun_INITIALISE_as(eOprotIP_t ip, void *ram) {}
 #endif
 
 
-// -- strain functions 
+// -- strain 
 
 #if !defined(OVERRIDE_eoprot_fun_INIT_as_strain_wholeitem)
 __weak extern void eoprot_fun_INIT_as_strain_wholeitem(const EOnv* nv) {}
@@ -106,29 +106,6 @@ __weak extern void eoprot_fun_INIT_as_strain_config(const EOnv* nv) {}
 #endif
 #if !defined(OVERRIDE_eoprot_fun_UPDT_as_strain_config)
 __weak extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_fun_INIT_as_strain_config_mode)
-__weak extern void eoprot_fun_INIT_as_strain_config_mode(const EOnv* nv) {}
-#endif
-#if !defined(OVERRIDE_eoprot_fun_UPDT_as_strain_config_mode)
-__weak extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd) {}
-#endif
-
-
-#if !defined(OVERRIDE_eoprot_fun_INIT_as_strain_config_datarate)
-__weak extern void eoprot_fun_INIT_as_strain_config_datarate(const EOnv* nv) {}
-#endif
-#if !defined(OVERRIDE_eoprot_fun_UPDT_as_strain_config_datarate)
-__weak extern void eoprot_fun_UPDT_as_strain_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd) {}
-#endif
-
-#if !defined(OVERRIDE_eoprot_fun_INIT_as_strain_config_signaloncefullscale)
-__weak extern void eoprot_fun_INIT_as_strain_config_signaloncefullscale(const EOnv* nv) {}
-#endif
-#if !defined(OVERRIDE_eoprot_fun_UPDT_as_strain_config_signaloncefullscale)
-__weak extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
 #if !defined(OVERRIDE_eoprot_fun_INIT_as_strain_status)
@@ -160,7 +137,7 @@ __weak extern void eoprot_fun_UPDT_as_strain_status_uncalibratedvalues(const EOn
 #endif
 
 
-// -- mais functions
+// -- mais
 
 #if !defined(OVERRIDE_eoprot_fun_INIT_as_mais_wholeitem)
 __weak extern void eoprot_fun_INIT_as_mais_wholeitem(const EOnv* nv) {}
@@ -212,7 +189,7 @@ __weak extern void eoprot_fun_UPDT_as_mais_status_the15values(const EOnv* nv, co
 #endif
 
 
-// -- extorque functions
+// -- extorque
 
 #if !defined(OVERRIDE_eoprot_fun_INIT_as_extorque_wholeitem)
 __weak extern void eoprot_fun_INIT_as_extorque_wholeitem(const EOnv* nv) {}
