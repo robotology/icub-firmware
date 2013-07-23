@@ -63,6 +63,15 @@ extern "C" {
  **/
 typedef int32_t             eOmeas_position_t;
 
+/** @typedef    typedef struct             eOmeas_position_limits_t
+    @brief      eOmeas_position_limits_t contains a pair of values which express a limit.                                
+ **/
+typedef struct
+{
+    eOmeas_position_t           min;        /**< the minimum position  */
+    eOmeas_position_t           max;        /**< the maximum position  */    
+} eOmeas_position_limits_t;
+
 
 /** @typedef    typedef uint16_t            eOmeas_time_t
     @brief      eOmeas_time_t contains the time values.
