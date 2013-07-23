@@ -520,7 +520,7 @@ extern eOprotProgNumber_t eoprot_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
     }
     
     uint8_t i;
-    for(i=0; i<=entity; i++)
+    for(i=0; i<entity; i++)
     {   // we add all the tags in the entities below
         prog += (eoprot_ep_tags_numberof[epi][i] * eoprot_board_numberofeachentity[brd][epi][i]);
     }
@@ -598,7 +598,7 @@ static uint16_t s_eoprot_brdentityindex2ramoffset(eOprotBRD_t brd, uint8_t epi, 
     }
     
     uint8_t i;
-    for(i=0; i<=entity; i++)
+    for(i=0; i<entity; i++)
     {   // we sum the size of all the entities before the current one
         offset += (eoprot_board_numberofeachentity[brd][epi][i] * eoprot_ep_entities_sizeof[epi][i]);
     }
@@ -705,7 +705,7 @@ static uint16_t s_eoprot_rom_epid2index_of_folded_descriptors(uint8_t epi, eOpro
     }
     
     uint8_t i;
-    for(i=0; i<=entity; i++)
+    for(i=0; i<entity; i++)
     {   // we add all the tags in the entities below
         ret += eoprot_ep_tags_numberof[epi][i];
     }
