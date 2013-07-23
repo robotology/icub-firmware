@@ -55,12 +55,22 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+// - guard on max number of entities
+EO_VERIFYproposition(eoprot_mn_ded34, eoprot_entities_mn_numberof <= eoprot_entities_maxnumberof);
+
+// - guard on tags ...
+EO_VERIFYproposition(eoprot_mn_tagsnum_co, eoprot_tags_mn_comm_numberof == eoprot_rwms_mn_comm_numberof);
+EO_VERIFYproposition(eoprot_mn_tagsmax_co, eoprot_tags_mn_comm_numberof <= eoprot_tags_maxnumberof);
+
+EO_VERIFYproposition(eoprot_mn_tagsnum_ap, eoprot_tags_mn_appl_numberof == eoprot_rwms_mn_appl_numberof);
+EO_VERIFYproposition(eoprot_mn_tagsmax_ap, eoprot_tags_mn_appl_numberof <= eoprot_tags_maxnumberof);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,9 +112,7 @@ static EOnv_rom_t eoprot_mn_rom_descriptor_comm_cmmnds_ropsigcfg =
     EO_INIT(.update)    eoprot_fun_UPDT_mn_comm_cmmnds_ropsigcfg
 };
 
-
 // - descriptors for the variables of a appl
-
 
 static EOnv_rom_t eoprot_mn_rom_descriptor_appl_wholeitem =
 {   
@@ -145,10 +153,6 @@ static EOnv_rom_t eoprot_mn_rom_descriptor_appl_cmmnds_go2state =
     EO_INIT(.init)      eoprot_fun_INIT_mn_appl_cmmnds_go2state,
     EO_INIT(.update)    eoprot_fun_UPDT_mn_appl_cmmnds_go2state
 };
-
-
-
-
 
 
 

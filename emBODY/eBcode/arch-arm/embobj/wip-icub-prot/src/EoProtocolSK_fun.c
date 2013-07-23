@@ -91,6 +91,7 @@
 __weak extern void eoprot_fun_INITIALISE_sk(eOprotIP_t ip, void *ram) {}
 #endif
 
+// -- skin
 
 #if !defined(OVERRIDE_eoprot_fun_INIT_sk_skin_wholeitem)
 __weak extern void eoprot_fun_INIT_sk_skin_wholeitem(const EOnv* nv) {}
@@ -105,7 +106,6 @@ __weak extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv) {}
 #if !defined(OVERRIDE_eoprot_fun_UPDT_sk_skin_config_sigmode)
 __weak extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
-
 
 #if !defined(OVERRIDE_eoprot_fun_INIT_sk_skin_status_arrayof10canframes)
 __weak extern void eoprot_fun_INIT_sk_skin_status_arrayof10canframes(const EOnv* nv) {}
