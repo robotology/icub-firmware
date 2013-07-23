@@ -178,7 +178,7 @@ typedef struct                      // size is 4+4+96+0 = 104 bytes
  **/
 typedef struct                      // size is 4+4 = 8 bytes
 {
-    eOreltime_t                     cycletime;
+    eOreltime_t                     cycletime;      /**< the time to be used for the control loop expressed in microseconds */
     uint8_t                         filler04[4];
 } eOmn_appl_config_t;               //EO_VERIFYsizeof(eOmn_appl_config_t, 8);
 

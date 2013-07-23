@@ -429,9 +429,8 @@ typedef struct              // size is 1+3+8+0 = 12
         { 
             eOmeas_current_t       value; 
         } current;
-    }to;                                        /**< the uinion containing the value field and optional param */
+    } to;                               /**< the uinion containing the value field and optional param */
 } eOmc_setpoint_t;              //EO_VERIFYsizeof(eOmc_setpoint_t, 12);
-
 
 
 // -- all the possible data holding structures used in a motor
@@ -456,21 +455,19 @@ typedef uint8_t  eOmc_jointId_t;
 
 
 
-
 /** @typedef    typedef struct eOmc_joint_config_t
     @brief      eOmc_joint_config_t contains the values required to configure a joint
  **/
-typedef struct                  // size is: 16+16+16+12+4+4+2+1+1+4+4+0 = 80
+typedef struct                  // size is: 16+16+16+8++12+2+1+1+4+4+0 = 80
 {
     eOmc_PID_t                  pidposition;                /**< the pid for position control */
     eOmc_PID_t                  pidvelocity;                /**< the pid for velocity control */
     eOmc_PID_t                  pidtorque;                  /**< the pid for torque control */
+    eOmeas_position_limits_t    limitsofjoint;              /**< the minimum and maximum position of the joint */
     eOmc_impedance_t            impedance;                  /**< the impedance to use in control of the relevant kind */                 
-    eOmeas_position_t           minpositionofjoint;         /**< the minimum position of the joint */
-    eOmeas_position_t           maxpositionofjoint;         /**< the maximum position of the joint */
     eOmeas_time_t               velocitysetpointtimeout;    /**< max time between two setpoints in eomc_controlmode_velocity before going back to eomc_controlmode_position */              
     eOenum08_t                  motionmonitormode;          /**< use values from eOmc_motionmonitormode_t. it tells if and how to monitor the motion. the result is placed inside jstatus.jstatusbasic.motionmonitorstatus */
-    uint8_t                     filler01[1];                             
+    uint8_t                     filler01[1];      
     eOutil_emulfloat32_t        encoderconversionfactor;
     eOutil_emulfloat32_t        encoderconversionoffset;
 } eOmc_joint_config_t;          //EO_VERIFYsizeof(eOmc_joint_config_t, 80);
@@ -591,7 +588,7 @@ typedef struct                  // size is: 4+4+2+2+0 = 12
 typedef struct                  // size is: 12+4+0 = 16
 {
     eOmc_motor_status_basic_t   basic;                  /**< the basic status of a motor */
-    uint8_t                     chamaleon04[4];         /**< these bytes are available for the application for debug purposes */
+    uint8_t                     filler04[4];            
 } eOmc_motor_status_t;          //EO_VERIFYsizeof(eOmc_motor_status_t, 16);
 
 
@@ -625,28 +622,27 @@ typedef struct                  // size is 4+4+0 = 8
 
 typedef struct                  // size is 1+1+1+1+2+2+0 = 8
 {
-    eObool_t                    alljomoinitted;             /**< it is eobool_true only when every joint and motor is initted */
+    eOenum08_t                  stateofcontroller;          /**< it holds a value from enum eOmc_stateofcontroller_t */               
     uint8_t                     numofjoints;                /**< the number of joints */   
     uint8_t                     numofmotors;                /**< the number of motors */ 
-    eOenum08_t                  stateofcontroller;          /**< it holds a value from enum eOmc_stateofcontroller_t */               
+    eObool_t                    alljomoinitted;             /**< it is eobool_true only when every joint and motor is initted */    
     eO16flags_t                 flagsinittedjoints;         /**< bit position 0 (1, 2, ..) keeps 1 if the joint 0 (1, 2, ..) is fully initted. */
     eO16flags_t                 flagsinittedmotors;         /**< bit position 0 (1, 2, ..) keeps 1 if the motor 0 (1, 2, ..) is fully initted. */ 
 } eOmc_controller_status_t;     //EO_VERIFYsizeof(eOmc_controller_status_t, 8); 
 
 
-typedef struct                  // size is 1+7+0 = 8
-{
-    eOenum08_t                  go2stateofcontroller;       /**< it forces a transition towards the specified state. use a value from enum eOmc_stateofcontroller_t */
-    uint8_t                     filler07[7];                
-} eOmc_controller_commands_t;   //EO_VERIFYsizeof(eOmc_controller_commands_t, 8); 
+// typedef struct                  // size is 1+7+0 = 8
+// {
+//     eOenum08_t                  go2stateofcontroller;       /**< it forces a transition towards the specified state. use a value from enum eOmc_stateofcontroller_t */
+//     uint8_t                     filler07[7];                
+// } eOmc_controller_commands_t;   //EO_VERIFYsizeof(eOmc_controller_commands_t, 8); 
 
 
-typedef struct                  // size is 8+8+8+0 = 24
+typedef struct                  // size is 8+8+0 = 16
 {
     eOmc_controller_config_t    config;                     /**< controller configuration */
     eOmc_controller_status_t    status;                     /**< controller status  */
-    eOmc_controller_commands_t  cmmnds;                     /**< controller commands  */
-} eOmc_controller_t;            //EO_VERIFYsizeof(eOmc_controller_t, 24); 
+} eOmc_controller_t;            //EO_VERIFYsizeof(eOmc_controller_t, 16); 
 
 
 
