@@ -126,14 +126,14 @@ __weak extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdes
 #if !defined(OVERRIDE_eoprot_fun_INIT_mn_appl_status)
 __weak extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv) {}
 #endif
-#if !defined(OVERRIDE_eoprot_fun_UPDT_mn_appl_mstatus)
+#if !defined(OVERRIDE_eoprot_fun_UPDT_mn_appl_status)
 __weak extern void eoprot_fun_UPDT_mn_appl_status(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
-#if !defined(OVERRIDE_eoprot_fun_INIT_mn_appl_ccmmnds__go2state)
+#if !defined(OVERRIDE_eoprot_fun_INIT_mn_appl_cmmnds_go2state)
 __weak extern void eoprot_fun_INIT_mn_appl_cmmnds_go2state(const EOnv* nv) {}
 #endif
-#if !defined(OVERRIDE_eoprot_fun_UPDT_mn_appl_ccmmnds__go2state)
+#if !defined(OVERRIDE_eoprot_fun_UPDT_mn_appl_cmmnds_go2state)
 __weak extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 
