@@ -1230,7 +1230,7 @@ static void s_eo_appCanSP_callbackOnErr_portx(void *arg, eOcanport_t port)
 {
     EOappCanSP *p = (EOappCanSP *)arg;
     
-    hal_can_getstatus((hal_can_port_t)port, &p->periphstatus[port].st);
+    hal_can_getstatus((hal_can_port_t)port, &(p->periphstatus[port].st));
     p->periphstatus[port].isnewvalue = 1;
 }
 
