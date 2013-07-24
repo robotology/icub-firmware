@@ -226,7 +226,6 @@ extern eOnvBRD_t eo_boardtransceiver_GetBoardNumber(EOtheBOARDtransceiver* p)
 
 static EOnvSet* s_eo_boardtransceiver_nvset_get(const eOboardtransceiver_cfg_t *cfg)
 {
-#if 1
     const uint16_t numofdevices     = 1;    // one device only
     const uint16_t ondevindexzero   = 0;    // one device only
 
@@ -243,50 +242,6 @@ static EOnvSet* s_eo_boardtransceiver_nvset_get(const eOboardtransceiver_cfg_t *
 
     return(nvset);
 
-#else    
-    EOnvSet* nvset = s_eo_theboardtrans.nvset;
-    eOnvset_EPcfg_t *epcfg;
-    const EOconstvector* theepcfgs = NULL;
-    uint16_t nendpoints = 0;
-    uint16_t i;
-    
-    const uint16_t numofdevices = 1;    // one device only
-    const uint16_t ondevindex = 0;      // hence only index 0
-    
-    if(NULL != nvset)
-    {
-        // if i call it more than once ... then i return the configuration but allocate and init only once 
-        return(nvset);
-    }
-
- 
-    theepcfgs = cfg->vectorof_endpoint_cfg;
-    
-
-//    #warning --> so far the BOARDtransceiver does not use any storage. if needed ... change the NULL into a ...
-    nvset = eo_nvset_New(numofdevices, cfg->nvsetprotection, cfg->mutex_fn_new);
-    
-    
-    //foreach<device>
-    // begin
-
-    nendpoints = eo_constvector_Size(theepcfgs);
-    
-    // use local-host address as we dont need to put the actual address of board in nvset.
-    eo_nvset_PushBackDEV(nvset, eo_nvset_ownership_local, EO_COMMON_IPV4ADDR_LOCALHOST, cfg->hashfunction_ep2index, nendpoints);
-    
-    for(i=0; i<nendpoints; i++)
-    {
-        epcfg = (eOnvset_EPcfg_t*) eo_constvector_At(theepcfgs, i);
-        eo_nvset_onDEV_PushBackEP(nvset, ondevindex, epcfg);         
-    }
-    
-    //end
-    
-    eo_nvset_InitialiseNVs(nvset);
-
-    return(nvset);
-#endif    
 }
 
 
