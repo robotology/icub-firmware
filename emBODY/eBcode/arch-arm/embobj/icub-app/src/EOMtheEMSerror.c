@@ -235,6 +235,10 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
   
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
     char str[192];
+#if	!defined(EMSAPPL_USE_CORE)  
+    char str_err[250];
+#endif
+
     EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
 
     if(emsapplcfg->errmng_haltrace_enabled)
@@ -250,8 +254,9 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
     
     //eov_sys_Stop(eov_sys_GetHandle());
 
-#if	!defined(EMSAPPL_USE_CORE)    
-    eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+#if	!defined(EMSAPPL_USE_CORE)  
+    snprintf(str_err, sizeof(str_err)-1, "%s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
+    eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str_err[0], sizeof(str_err));
     eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
 #endif
      
