@@ -35,7 +35,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
-#include "EOnvsCfg.h"
+#include "EOnvSet.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -59,7 +59,8 @@ extern "C" {
 struct EOhostTransceiver_hid 
 {
     EOtransceiver*          transceiver;
-    EOnvsCfg*               nvscfg;
+    EOnvSet*                nvset;
+    eOnvBRD_t               boardnumber;
 }; 
 
 

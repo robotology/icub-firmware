@@ -69,7 +69,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *cfg);
+static EOnvSet* s_eo_hosttransceiver_nvset_get(const eOhosttransceiver_cfg_t *cfg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -81,8 +81,7 @@ static const char s_eobj_ownname[] = "EOhostTransceiver";
 
 const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default = 
 {
-    EO_INIT(.vectorof_endpoint_cfg)     NULL,
-    EO_INIT(.hashfunction_ep2index)     NULL,
+    EO_INIT(.nvsetdevcfg)               NULL,
     EO_INIT(.remoteboardipv4addr)       EO_COMMON_IPV4ADDR(10, 0, 1, 1), 
     EO_INIT(.remoteboardipv4port)       12345,
     EO_INIT(.sizes)
@@ -96,8 +95,7 @@ const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default =
     },    
     EO_INIT(.mutex_fn_new)              NULL,
     EO_INIT(.transprotection)           eo_trans_protection_none,
-    EO_INIT(.nvscfgprotection)          eo_nvscfg_protection_none
-
+    EO_INIT(.nvsetprotection)           eo_nvset_protection_none
 };
 
 
@@ -112,22 +110,21 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
     EOhostTransceiver* retptr = NULL;
     eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
 
-
     if(NULL == cfg)
     {
         cfg = &eo_hosttransceiver_cfg_default;
     }
-
-    if(NULL == cfg->vectorof_endpoint_cfg)
+    
+    if(NULL == cfg->nvsetdevcfg)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "need a vector of endpoints");
-    }
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "need a nv set cfg");
+    }  
     
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOhostTransceiver), 1);
 
     // 1. init the proper transceiver cfg
 
-    retptr->nvscfg = s_eo_hosttransceiver_nvscfg_get(cfg);
+    retptr->nvset = s_eo_hosttransceiver_nvset_get(cfg);
     
 
     txrxcfg.capacityoftxpacket              = cfg->sizes.capacityoftxpacket;
@@ -138,7 +135,7 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
     txrxcfg.maxnumberofregularrops          = cfg->sizes.maxnumberofregularrops;
     txrxcfg.remipv4addr                     = cfg->remoteboardipv4addr;
     txrxcfg.remipv4port                     = cfg->remoteboardipv4port;
-    txrxcfg.nvscfg                          = retptr->nvscfg;
+    txrxcfg.nvset                           = retptr->nvset;
     txrxcfg.mutex_fn_new                    = cfg->mutex_fn_new;
     txrxcfg.protection                      = cfg->transprotection;
     
@@ -150,7 +147,7 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
 }    
 
 
-extern EOtransceiver* eo_hosttransceiver_Transceiver(EOhostTransceiver *p)
+extern EOtransceiver* eo_hosttransceiver_GetTransceiver(EOhostTransceiver *p)
 {
     if(NULL == p)
     {
@@ -160,18 +157,27 @@ extern EOtransceiver* eo_hosttransceiver_Transceiver(EOhostTransceiver *p)
     return(p->transceiver);
 }
 
-extern EOnvsCfg* eo_hosttransceiver_NVsCfg(EOhostTransceiver *p)
+
+extern EOnvSet * eo_hosttransceiver_GetNVset(EOhostTransceiver *p)
 {
     if(NULL == p)
     {
         return(NULL);
     }
     
-    return(p->nvscfg);
+    return(p->nvset);
 }
 
 
-
+extern eOnvBRD_t eo_hosttransceiver_GetBoardNumber(EOhostTransceiver* p)
+{
+    if(NULL == p)
+    {
+        return(eo_nv_BRDdummy);
+    }
+    
+    return(p->boardnumber);    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -184,41 +190,20 @@ extern EOnvsCfg* eo_hosttransceiver_NVsCfg(EOhostTransceiver *p)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOnvsCfg* s_eo_hosttransceiver_nvscfg_get(const eOhosttransceiver_cfg_t *cfg)
+static EOnvSet* s_eo_hosttransceiver_nvset_get(const eOhosttransceiver_cfg_t *cfg)
 {
-    const uint16_t ndevices         = 1;
-    EOVstorageDerived * const stg   = NULL;
-    const uint16_t ondevindex = 0;      // one device only, hence the index is 0
+    const uint16_t numofdevices     = 1;    // one device only
+    const uint16_t ondevindexzero   = 0;    // one device only
 
-    EOnvsCfg* nvscfg;
-    eOnvscfg_EP_t *epcfg;
-    const EOconstvector* theepcfgs = NULL;
-    uint16_t nendpoints = 0;
-    uint16_t i;
 
-    theepcfgs = cfg->vectorof_endpoint_cfg;
-
-    // the HOSTtransceiver manages one device only, thus the first argument is 1
-    // the HOSTtransceiver does not use any storage, thus the second argument is NULL.
-
-    nvscfg = eo_nvscfg_New(ndevices, stg, cfg->nvscfgprotection, cfg->mutex_fn_new);
-
-    nendpoints = eo_constvector_Size(theepcfgs);
+    EOnvSet* nvset = eo_nvset_New(numofdevices, cfg->nvsetprotection, cfg->mutex_fn_new);
     
+    //i add the first and only device. it has remote ownership and ipaddress cfg->remoteboardipv4addr.
+    eo_nvset_DEVpushback(nvset, ondevindexzero, (eOnvset_DEVcfg_t*)cfg->nvsetdevcfg, eo_nvset_ownership_remote, cfg->remoteboardipv4addr);
     
-    // i add the first and only device. it has remote ownership and ipaddress cfg->remoteboardipv4addr.
-    eo_nvscfg_PushBackDevice(nvscfg, eo_nvscfg_ownership_remote, cfg->remoteboardipv4addr, cfg->hashfunction_ep2index, nendpoints);
-    
-    // add all the endpoints for the device
-    for(i=0; i<nendpoints; i++)
-    {
-        epcfg = (eOnvscfg_EP_t*) eo_constvector_At(theepcfgs, i);        
-        eo_nvscfg_ondevice_PushBackEP(nvscfg, ondevindex, epcfg);
-    }
-    
-    eo_nvscfg_data_Initialise(nvscfg);
+    eo_nvset_NVSinitialise(nvset);
 
-    return(nvscfg);
+    return(nvset);
 }
 
 
