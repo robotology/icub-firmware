@@ -88,7 +88,7 @@ struct EOreceiver_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum);
+extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum);
 
 
 #ifdef __cplusplus
