@@ -79,16 +79,18 @@ typedef struct
     eOuint16_fp_uint8_t     fptr_ep2indexofepcfg;   /*< a function which maps a given ep to and index inside @e vectorof_epcfg. It returns EOK_uint16dummy if the ep is not managed */
 } eOnvset_DEVcfg_t;
 
+
 typedef struct
 {
-    eOres_fp_uint8_voidp_uint16_t       fptr_loadram;           /*< a function which loads the ram of the endpoint given: (brd, ram, sizeof) */
-    eOuint16_fp_uint8_t                 fptr_getnvsnumberof;    /*< a function which returns the total number of the NVS in (brd) */
-    eObool_fp_uint8_uint32_t            fptr_isidsupported;     /*< a function which tells if the id is supported given (brd, id). */
-    eOuint32_fp_uint8_uint32_t          fptr_getid;             /*< a function which returns the full ID given (brd, prognumber)  */
-    eOuint32_fp_uint8_uint32_t          fptr_getnvprognumber;   /*< a function which returns a progressive number from (brd, id) */
-    eOvoidp_fp_uint8_uint32_t           fptr_getnvrom;          /*< a function which returns the .rom part of the NV from (brd, id)  */
-    eOvoidp_fp_uint8_uint32_t           fptr_getnvram;          /*< a function which returns the .ram part of the NV with (brd, id) */
-} eOnvset_protocol_interface_t;
+    eOres_fp_uint8_uint8_voidp_uint16_t loadram;            /*< a function which loads the ram of the endpoint given: (brd, ep, ram, sizeof) */
+    eOuint16_fp_uint8_uint8_t           getvarsnumberof;    /*< a function which returns the total number of variables given: (brd, ep) */
+    eObool_fp_uint8_uint32_t            isidsupported;      /*< a function which tells if the id is supported given: (brd, id) */
+    eOuint32_fp_uint8_uint8_uint32_t    getid;              /*< a function which returns the full ID given: (brd, ep, prognumber)  */
+    eOuint32_fp_uint8_uint32_t          getprognumber;      /*< a function which returns a progressive number given: (brd, id) */
+    eOvoidp_fp_uint8_uint32_t           getrom;             /*< a function which returns the .rom part of the NV given: (brd, id) */
+    eOvoidp_fp_uint8_uint32_t           getram;    
+} eOnvset_protocol_Interface_t;
+
 
 /** @typedef    typedef struct eOnvset_EPcfg_t
     @brief      It contains the configuration of the managed NVs inside an endpoint. 
@@ -99,7 +101,7 @@ typedef struct
     uint8_t                             dummy;
     uint16_t                            epram_sizeof;               /*< the size of the ram used for the NVs in the endpoint */
     eOvoid_fp_uint32_voidp_t            fptr_ram_initialise;        /*< a function which initialises the ram (ram) */
-    eOnvset_protocol_interface_t*       protif;                     /* functions used to interface with the protocol library */
+    eOnvset_protocol_Interface_t*       protif;                     /* functions used to interface with the protocol library */
 } eOnvset_EPcfg_t;
 
 
