@@ -237,7 +237,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
         *link1_isup = 1;
         if(link_st[0] == 0)
         {
-            sprintf(str, "Link 0 down --> up (mask=%d)", linkst_mask);
+            snprintf(str, sizeof(str)-1, "Link 0 down --> up (mask=%d)", linkst_mask);
             hal_trace_puts(str);
             link_st[0] = 1;
             state2notify = 1;
@@ -248,7 +248,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
          hal_led_on(hal_led1);
         if(link_st[0] == 1)
         {
-            sprintf(str, "Link 0 up --> down (mask=%d)", linkst_mask);
+            snprintf(str, sizeof(str)-1, "Link 0 up --> down (mask=%d)", linkst_mask);
             hal_trace_puts(str);
             link_st[0] = 0;
             state2notify = 1;
@@ -270,11 +270,11 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
     {
          eo_dgn_emsperiph.eth_dev.linksmask = linkst_mask;
         eo_theEMSdgn_Signalerror(&s_thedgn, eodgn_nvidbdoor_emsperiph , 0);
-        sprintf(str, "Signal error %d ", linkst_mask);
+        snprintf(str, sizeof(str)-1, "Signal error %d ", linkst_mask);
         hal_trace_puts(str);
     }
-    sprintf(str, "LINKs mask %d ", linkst_mask);
-    hal_trace_puts(str);
+//     snprintf(str, sizeof(str)-1, "LINKs mask %d ", linkst_mask);
+//     hal_trace_puts(str);
  
     
     
@@ -285,7 +285,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
 //     if(EO_COMMON_CHECK_FLAG(status_link, LINK_IS_UP))
 //     {
 //         *link1_isup = 1;
-//         sprintf(str, "LINK 1 is up!! %d", status_link);
+//         snprintf(str, sizeof(str)-1, "LINK 1 is up!! %d", status_link);
 //         hal_trace_puts(str);
 //     }
 //     
@@ -294,7 +294,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
 //     if(EO_COMMON_CHECK_FLAG(status_link, LINK_IS_UP))
 //     {
 //         *link2_isup = 1;
-//         sprintf(str, "LINK 2 is up!! %d", status_link);
+//         snprintf(str, sizeof(str)-1, "LINK 2 is up!! %d", status_link);
 //         hal_trace_puts(str);
 //     }
     
