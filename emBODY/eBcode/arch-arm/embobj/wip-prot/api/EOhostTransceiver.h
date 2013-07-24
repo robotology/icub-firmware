@@ -45,6 +45,7 @@ extern "C" {
 #include "EOropframe.h"
 
 
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
 //#warning --> instead of 20 ... can i put 0? answer: seems yes  .. but be carefule w/ eo_ropframe_ROP_NumberOf_quickversion()
@@ -65,15 +66,15 @@ extern "C" {
 
 typedef struct
 {
-    const EOconstvector*            vectorof_endpoint_cfg;
-    eOuint16_fp_uint16_t            hashfunction_ep2index;
+    const eOnvset_DEVcfg_t*         nvsetdevcfg;
     eOipv4addr_t                    remoteboardipv4addr;
     eOipv4port_t                    remoteboardipv4port;
     eo_transceiver_sizes_t          sizes;       
     eov_mutex_fn_mutexderived_new   mutex_fn_new;    
     eOtransceiver_protection_t      transprotection;
-    eOnvscfg_protection_t           nvscfgprotection; 
+    eOnvset_protection_t            nvsetprotection; 
 } eOhosttransceiver_cfg_t;
+
 
 
 /** @typedef    typedef struct EOhostTransceiver_hid EOhostTransceiver
@@ -102,11 +103,11 @@ extern const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default; // = { ... 
  **/
 extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t *cfg);
 
+extern EOtransceiver * eo_hosttransceiver_GetTransceiver(EOhostTransceiver *p);
 
-extern EOtransceiver* eo_hosttransceiver_Transceiver(EOhostTransceiver *p);
+extern EOnvSet * eo_hosttransceiver_GetNVset(EOhostTransceiver *p);
 
-extern EOnvsCfg* eo_hosttransceiver_NVsCfg(EOhostTransceiver *p);
-
+extern eOnvBRD_t eo_hosttransceiver_GetBoardNumber(EOhostTransceiver *p);
 
 
 
