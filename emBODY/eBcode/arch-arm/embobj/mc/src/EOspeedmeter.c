@@ -226,7 +226,6 @@ static int32_t normalize_angle(int32_t a)
     return a;
 }
 
-//#define NO_ENC_FILTER
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 {
     if (!o) return;
@@ -234,7 +233,8 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     if (!o->enc_sign) return;
     
     ////////////////////////////////
-    #ifdef NO_ENC_FILTER
+    //ENC_FILTER
+    /*
     position -= o->offset;
         
     if (position < 0)
@@ -253,7 +253,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
     o->is_started = eobool_true;
     
     return;
-    #endif
+    */
     ////////////////////////////////
     
     //if (o->hard_fault) return;
