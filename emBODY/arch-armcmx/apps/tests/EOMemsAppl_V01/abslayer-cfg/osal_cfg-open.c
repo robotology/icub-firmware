@@ -116,7 +116,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 //    tt = (EOMtask*) x->ext;
     
     
-    sprintf(str, "OSAL fatal error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
+    snprintf(str, sizeof(str)-1, "OSAL fatal error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
     hal_trace_puts(str);
     for(;;);
 }

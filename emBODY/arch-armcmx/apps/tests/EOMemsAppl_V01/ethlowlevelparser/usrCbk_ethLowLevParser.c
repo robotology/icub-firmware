@@ -99,7 +99,7 @@ extern void EthLowLevParser_callbackInHAL(uint8_t *packet)
 extern void my_cbk_onErrorSeqNum(eOethLowLevParser_packetInfo_t *pktInfo_ptr, uint32_t rec_seqNum, uint32_t expected_seqNum)
 {
     char str[80];
-    sprintf(str, "ETHPARSER: SEQ_NUM: rec=%d expeted=%d", rec_seqNum, expected_seqNum);
+    snprintf(str, sizeof(str)-1,  "ETHPARSER: SEQ_NUM: rec=%d expeted=%d", rec_seqNum, expected_seqNum);
     hal_trace_puts(str);
 
     hal_led_on(hal_led1); //led verde
@@ -108,7 +108,7 @@ extern void my_cbk_onErrorSeqNum(eOethLowLevParser_packetInfo_t *pktInfo_ptr, ui
 extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_eoProtoParser_ropAdditionalInfo_t *ropAddInfo_ptr)
 {
     char str[80];
-    sprintf(str, "eoDeb_protoParser:NVfound: ep=%d, id=%d", ropAddInfo_ptr->desc.ep, ropAddInfo_ptr->desc.id);
+    sprintf(str, 80, "eoDeb_protoParser:NVfound: ep=%d, id=%d", ropAddInfo_ptr->desc.ep, ropAddInfo_ptr->desc.id);
     hal_trace_puts(str);
 }
 
@@ -117,7 +117,7 @@ extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_
 // extern void EthLowLevParser_callbackInHAL(uint8_t *packet, uint32_t size)
 // {
 //     char str[80];
-//     sprintf(str, "HO RICEVUTO UN PKT");
+//     snprintf(str, sizeof(str)-1, "HO RICEVUTO UN PKT");
 //     hal_trace_puts(str);
 //     pippo = 5;
 // }

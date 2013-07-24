@@ -984,6 +984,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     eOresult_t                              res;
     eOappTheDB_canBoardCanLocation_t        canLoc;
     eObrd_boardId_t                         bid;
+    char                                    str[120];
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id); 
@@ -994,9 +995,12 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
         return(res);
     }
     
+      
     if(1 != frame->data[7])
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "parse can cmd", "getFirmwareVersion: proto ver mismatch");    
+        uint16_t buildNum = *((uint16_t*)&frame->data[2]);
+        snprintf(str, sizeof(str), "getfwVer bId%d: bType=%d fw_ver=0x%x build=%d proto=%d.%d check=%d", bid, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6],frame->data[7]);   
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "parse can cmd", str);
     }
     return(eores_OK);
 }

@@ -117,7 +117,7 @@ int main(void)
 extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum)
 {
     char str[80];
-    sprintf(str, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
+    snprintf(str, sizeof(str)-1, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
     hal_trace_puts(str);
   
 }

@@ -85,7 +85,7 @@ static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, voi
         default:
         {   
             char str[50];
-            sprintf(str, "diagnostics cmd=%d", cmd_ptr->enable);
+            snprintf(str, sizeof(str)-1, "diagnostics cmd=%d", cmd_ptr->enable);
             hal_trace_puts(str);
             memcpy(&eo_dgn_cmds, (eOdgn_commands_t*)recdata, sizeof(eOdgn_commands_t));
         } break;

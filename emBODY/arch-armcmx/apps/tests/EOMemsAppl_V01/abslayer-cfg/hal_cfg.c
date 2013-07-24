@@ -91,7 +91,7 @@ static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * err
     errorcode = errorcode;
     if(NULL != errormsg)
     {
-        sprintf(str, "fatal error #%d: %s\n", errorcode, errormsg);
+        snprintf(str, sizeof(str)-1, "fatal error #%d: %s\n", errorcode, errormsg);
         hal_trace_puts(str);
     }
     
