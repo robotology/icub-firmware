@@ -33,6 +33,7 @@
 
 #include "hal.h"
 #include "osal.h"
+#include "userdef_onerror.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -42,10 +43,6 @@
 #include "ipal_cfg.h"
 
 static void onethframerx(void);
-
-
-static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);;
-
 
 
 extern uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);  
@@ -118,7 +115,7 @@ extern const ipal_cfg_t ipal_cfg =
 
     .extfn                  = 
     { 
-        .usr_on_fatal_error         = s_ipal_cfg_on_fatal_error,
+        .usr_on_fatal_error         =  ipal_cfg_on_fatal_error,
 
         .osal_mutex_new             = NULL, 
         .osal_mutex_take            = NULL, 
@@ -161,21 +158,7 @@ extern const ipal_cfg_t ipal_cfg =
 extern const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
-static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
-{
-    static volatile uint8_t a = 0;
-    char str[80];
-//    static ipal_fatalerror_t er = ipal_error_generic;
-   
-    snprintf(str, sizeof(str)-1, "fatal error #%d: %s\n", errorcode, errormsg);
-    hal_trace_puts(str);
-    for(;;)
-    {
-//        er = er;
-        a++;
-        a = a;
-    }
-}
+
 // #ifdef _SETPOINT_TEST_
 // extern volatile uint8_t rec_pkts_isr;
 // #endif

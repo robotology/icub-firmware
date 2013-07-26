@@ -1420,6 +1420,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
+            <File>
+              <FileName>userdef_onerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\userdef_onerror.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2819,6 +2824,11 @@
               <FileName>EOtheEMSapplDiagnostics.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
+            </File>
+            <File>
+              <FileName>userdef_onerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\userdef_onerror.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4492,6 +4502,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
+            <File>
+              <FileName>userdef_onerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\userdef_onerror.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -6124,6 +6139,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
+            <File>
+              <FileName>userdef_onerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\userdef_onerror.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -7755,6 +7775,11 @@
               <FileName>EOtheEMSapplDiagnostics.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
+            </File>
+            <File>
+              <FileName>userdef_onerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\userdef_onerror.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -9427,6 +9452,11 @@
               <FileName>EOtheEMSapplDiagnostics.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</FilePath>
+            </File>
+            <File>
+              <FileName>userdef_onerror.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\userdef_onerror.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -32,6 +32,7 @@
 #include "osal.h"
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
+#include "userdef_onerror.h"
 
 
 
@@ -41,7 +42,6 @@
 
 #include "osal_cfg.h"
 
-static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg);
 static void s_osal_cfg_on_idle(void);
 
 
@@ -71,7 +71,7 @@ extern const osal_cfg_t osal_cfg =
     .extfn                  = 
     {
         .hal_sys_irqn_priority_set      = NULL,
-        .usr_on_fatal_error             = s_osal_cfg_on_fatal_error, 
+        .usr_on_fatal_error             = osal_cfg_on_fatal_error, 
         .usr_on_idle                    = s_osal_cfg_on_idle
     }
 };
@@ -80,16 +80,7 @@ extern const osal_cfg_t osal_cfg =
 extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
 
 
-static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
-{
-    uint8_t tskid = 0;
-    char str[128];
-    
-    osal_task_id_get(task, &tskid);
-    snprintf(str, sizeof(str)-1, "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
-    hal_trace_puts(str);
-    for(;;);
-}
+
 
 static void s_osal_cfg_on_idle(void)
 {

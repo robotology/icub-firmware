@@ -32,6 +32,7 @@
 #include "osal.h"
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
+#include "userdef_onerror.h"
 
 
 
@@ -48,7 +49,6 @@
 //     #error --> you must define a board
 // #endif
 
-static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg);
 static void s_osal_cfg_on_idle(void);
 
 
@@ -79,7 +79,7 @@ extern const osal_cfg_t osal_cfg =
     .extfn                  = 
     {
         .hal_sys_irqn_priority_set      = NULL,
-        .usr_on_fatal_error             = s_osal_cfg_on_fatal_error, 
+        .usr_on_fatal_error             = osal_cfg_on_fatal_error, 
         .usr_on_idle                    = s_osal_cfg_on_idle
     }
 };
@@ -97,29 +97,6 @@ typedef struct
     void            *ext;
 } x_t;
 
-static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
-{
-    uint8_t tskid = 0;
-    char str[128];
-    
-    static volatile osal_task_t* t = NULL;
-    
-    static volatile x_t* x = NULL;
-    
-    t = osal_task_get(osal_callerAUTOdetect);
-    t = t;
-    
-    x = (x_t*)t;
-    x = x;
-//    static volatile EOMtask* tt = NULL;
-    
-//    tt = (EOMtask*) x->ext;
-    
-    
-    snprintf(str, sizeof(str)-1, "OSAL fatal error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
-    hal_trace_puts(str);
-    for(;;);
-}
 
 static void s_osal_cfg_on_idle(void)
 {
