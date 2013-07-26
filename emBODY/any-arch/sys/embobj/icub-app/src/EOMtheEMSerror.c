@@ -255,7 +255,7 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
     //eov_sys_Stop(eov_sys_GetHandle());
 
 #if	!defined(EMSAPPL_USE_CORE)  
-    snprintf(str_err, sizeof(str_err)-1, "%s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
+    snprintf(str_err, sizeof(str_err)-1, "EOMtheEMSerror %s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
     eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str_err[0], sizeof(str_err));
     eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
 #endif
