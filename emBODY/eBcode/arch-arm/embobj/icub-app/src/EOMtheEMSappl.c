@@ -150,7 +150,8 @@ static EOMtheEMSappl s_emsappl_singleton =
         EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
 //        EO_INIT(.hostipv4port)      12345
     },
-    EO_INIT(.timer4led)      NULL
+    EO_INIT(.timer4led)      NULL,
+    EO_INIT(.initted)        0
 };
 
 
@@ -233,8 +234,12 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     snprintf(str, sizeof(str)-1, "used %d bytes of HEAP out of %d so far", eo_mempool_SizeOfAllocated(eo_mempool_GetHandle()), eom_sys_GetHeapSize(eom_sys_GetHandle()));  
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);    
  
+    s_emsappl_singleton.initted = 1;
+    
     // finally ... start the state machine which enters in cfg mode    
     eo_sm_Start(s_emsappl_singleton.sm);
+    
+    
         
     return(&s_emsappl_singleton);
 }
@@ -242,7 +247,8 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 
 extern EOMtheEMSappl* eom_emsappl_GetHandle(void) 
 {
-    if(NULL != s_emsappl_singleton.sm)
+    //if(NULL != s_emsappl_singleton.sm)
+    if(s_emsappl_singleton.initted)
     {
         return(&s_emsappl_singleton);
     }

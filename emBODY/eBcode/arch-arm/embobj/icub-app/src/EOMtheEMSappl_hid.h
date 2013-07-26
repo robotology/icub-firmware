@@ -57,6 +57,7 @@ struct EOMtheEMSappl_hid
     EOsm*               sm;
 	eOemsappl_cfg_t     cfg;
     osal_timer_t        *timer4led;     //this timer is used to blink led (orange) when application is in configuration state.
+    uint8_t             initted;
 };
 
 
