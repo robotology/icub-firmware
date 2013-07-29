@@ -30,7 +30,7 @@ char LISRegRead(char reg, unsigned char *rbuf)
 
 void LISRegBurst(char reg,char naxis, unsigned int *data )
 {
-	LISI2COps.i2c_burst(0, LIS_I2C_ADDR,reg|0x80, naxis, data);
+	LISI2COps.i2c_burst(2, LIS_I2C_ADDR,reg|0x80, naxis, data);
 }
 
 unsigned int LISInit(tLISI2COps ops)

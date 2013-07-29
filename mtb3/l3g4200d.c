@@ -32,7 +32,7 @@ char L3GRegRead(char reg)
 
 void L3GRegBurst(char reg,char naxis, unsigned int *data )
 {
-	L3GI2COps.i2c_burst(0, L3G_I2C_ADDR,reg|0x80, naxis, data);
+	L3GI2COps.i2c_burst(2, L3G_I2C_ADDR,reg|0x80, naxis, data);
 }
 
 

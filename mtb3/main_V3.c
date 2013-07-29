@@ -117,7 +117,8 @@ _FOSC(CSW_FSCM_OFF & EC_PLL8);
   // External clock with PLL x8 (10MHz*8->Fcycle=80/4=20MIPS)
 _FWDT(WDT_OFF);      // WD disabled
 //
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
+ 
+ _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
 
 

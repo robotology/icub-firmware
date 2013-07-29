@@ -27,8 +27,8 @@
 #define TIMER_ALL      0x1A00    
 
 
-#define _version  0x0201
-#define _build_number  4     //changed the I2C speed
+#define _version  0x0210
+#define _build_number  5     //changed the I2C speed
 
 
 #endif

@@ -1,4 +1,4 @@
-Microchip Technology Inc, vv1_10 (A) S
+Microchip Technology Inc, vv1_10 (A) 9
 
 Tool Name:
   c:\program files (x86)\microchip\xc16\v1.10\bin\bin\..\bin/elf-ld.exe
@@ -127,8 +127,8 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x340           0x4e0  (1248)
 .const                       0x440                0x9c            0xea  (234)
-.text                        0x4dc              0x3100          0x4980  (18816)
-.text                       0x35dc                0x22            0x33  (51)
+.text                        0x4dc              0x3102          0x4983  (18819)
+.text                       0x35de                0x22            0x33  (51)
 .prog                       0x3600               0x200           0x300  (768)
 .text                       0x3800               0x1e6           0x2d9  (729)
 .dinit                      0x39e6                0x7a            0xb7  (183)
@@ -136,14 +136,14 @@ section                    address   length (PC units)   length (bytes) (dec)
 .isr.text                   0x3b38                0x20            0x30  (48)
 .isr                        0x3b58                 0x4             0x6  (6)
 
-                     Total program memory used (bytes):         0x5787  (22407) 56%
+                     Total program memory used (bytes):         0x578a  (22410) 56%
 
 
 Data EEPROM Memory  [Origin = 0x7ffc00, Length = 0x400]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-_02FBDAE05113d9c1         0x7ffc00                0x26            0x26  (38)
+_02BEDAE051f62f72         0x7ffc00                0x26            0x26  (38)
 
                         Total data EEPROM used (bytes):           0x26  (38) 3%
 
@@ -339,14 +339,14 @@ External Symbols in Program Memory (by address):
                   0x002a8c                  _CAN1_RxbufferIndex_dec
                   0x002a9c                  _can_send_additional_info
                   0x002baa                  _CAN1_handleRx
-                  0x002f8e                  _can_receive_additional_info
-                  0x002f9e                  _ConfigAD7147_T
-                  0x0031cc                  _ConfigAD7147
-                  0x0033e2                  _ConfigAD7147_ALL
-                  0x00345a                  _ConfigAD7147_THREE
-                  0x00352e                  _ConfigAD7147_FINGERTIP
-                  0x0035dc                  _LED_Init
-                  0x0035f0                  _LED_test
+                  0x002f90                  _can_receive_additional_info
+                  0x002fa0                  _ConfigAD7147_T
+                  0x0031ce                  _ConfigAD7147
+                  0x0033e4                  _ConfigAD7147_ALL
+                  0x00345c                  _ConfigAD7147_THREE
+                  0x003530                  _ConfigAD7147_FINGERTIP
+                  0x0035de                  _LED_Init
+                  0x0035f2                  _LED_test
                   0x003600                  _CapOffset
                   0x003780                  _CapOffset_all
                   0x003800                  _L3GRegWrite
@@ -400,11 +400,11 @@ External Symbols in Program Memory (by name):
                   0x0027d4                  _CAN_Init
                   0x003600                  _CapOffset
                   0x003780                  _CapOffset_all
-                  0x0031cc                  _ConfigAD7147
-                  0x0033e2                  _ConfigAD7147_ALL
-                  0x00352e                  _ConfigAD7147_FINGERTIP
-                  0x002f9e                  _ConfigAD7147_T
-                  0x00345a                  _ConfigAD7147_THREE
+                  0x0031ce                  _ConfigAD7147
+                  0x0033e4                  _ConfigAD7147_ALL
+                  0x003530                  _ConfigAD7147_FINGERTIP
+                  0x002fa0                  _ConfigAD7147_T
+                  0x00345c                  _ConfigAD7147_THREE
                   0x0002e2                  _ConfigIntCAN1
                   0x000308                  _ConfigIntTimer1
                   0x000324                  _ConfigIntTimer2
@@ -421,8 +421,8 @@ External Symbols in Program Memory (by name):
                   0x00381e                  _L3GRegBurst
                   0x00380c                  _L3GRegRead
                   0x003800                  _L3GRegWrite
-                  0x0035dc                  _LED_Init
-                  0x0035f0                  _LED_test
+                  0x0035de                  _LED_Init
+                  0x0035f2                  _LED_test
                   0x0039be                  _LISAxisBurst
                   0x003968                  _LISAxisRead
                   0x003922                  _LISInit
@@ -483,7 +483,7 @@ External Symbols in Program Memory (by name):
                   0x000484                  __pCapOffset_all
                   0x000122                  __psv_init
                   0x000100                  __resetPRI
-                  0x002f8e                  _can_receive_additional_info
+                  0x002f90                  _can_receive_additional_info
                   0x002a9c                  _can_send_additional_info
                   0x00129c                  _main
 
@@ -1961,7 +1961,7 @@ __c30_signature
                     0x8444                  __pCapOffset
                     0x8484                  __pCapOffset_all
 
-.text             0x0004dc       0x3100
+.text             0x0004dc       0x3102
  .text            0x0004dc       0x1756 build/default/production/_ext/1472/main_V3.o
                   0x0005bc                  __T1Interrupt
                   0x0005c8                  __T2Interrupt
@@ -1989,7 +1989,7 @@ __c30_signature
                   0x00247a                  _ReadBurstViaI2C
                   0x002554                  _ReadViaI2C
                   0x00270c                  _ReadByteViaI2C
- .text            0x00276a        0x834 build/default/production/_ext/1472/can_interface.o
+ .text            0x00276a        0x836 build/default/production/_ext/1472/can_interface.o
                   0x00276a                  _SetBoardCanFilter
                   0x0027d4                  _CAN_Init
                   0x002866                  _CAN1_send
@@ -1999,13 +1999,13 @@ __c30_signature
                   0x002a8c                  _CAN1_RxbufferIndex_dec
                   0x002a9c                  _can_send_additional_info
                   0x002baa                  _CAN1_handleRx
-                  0x002f8e                  _can_receive_additional_info
- .text            0x002f9e        0x63e build/default/production/_ext/1472/AD7147 - Configuration.o
-                  0x002f9e                  _ConfigAD7147_T
-                  0x0031cc                  _ConfigAD7147
-                  0x0033e2                  _ConfigAD7147_ALL
-                  0x00345a                  _ConfigAD7147_THREE
-                  0x00352e                  _ConfigAD7147_FINGERTIP
+                  0x002f90                  _can_receive_additional_info
+ .text            0x002fa0        0x63e build/default/production/_ext/1472/AD7147 - Configuration.o
+                  0x002fa0                  _ConfigAD7147_T
+                  0x0031ce                  _ConfigAD7147
+                  0x0033e4                  _ConfigAD7147_ALL
+                  0x00345c                  _ConfigAD7147_THREE
+                  0x003530                  _ConfigAD7147_FINGERTIP
 
 .prog             0x003600        0x200
  .prog            0x003600        0x200 build/default/production/_ext/1472/main_V3.o
@@ -2042,10 +2042,10 @@ __c30_signature
                   0x003b0c                  _T1_Init
                   0x003b22                  _T2_Init
 
-.text             0x0035dc         0x22
- .text            0x0035dc         0x22 build/default/production/_ext/1472/LED.o
-                  0x0035dc                  _LED_Init
-                  0x0035f0                  _LED_test
+.text             0x0035de         0x22
+ .text            0x0035de         0x22 build/default/production/_ext/1472/LED.o
+                  0x0035de                  _LED_Init
+                  0x0035f2                  _LED_test
 
 .isr.text         0x003b38         0x20
  .isr.text        0x003b38         0x20 build/default/production/_ext/1472/traps.o
@@ -2062,8 +2062,8 @@ __c30_signature
  .isr             0x003b58          0x4 default_isr
                   0x003b58                  __DefaultInterrupt
 
-_02FBDAE05113d9c1
+_02BEDAE051f62f72
                     0xfc00         0x26 load address 0x7ffc00  
- _02FBDAE05113d9c1
+ _02BEDAE051f62f72
                     0xfc00         0x26 build/default/production/_ext/1472/main_V3.o
                     0xfc00                  _ee_data
