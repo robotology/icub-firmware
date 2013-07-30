@@ -44,6 +44,7 @@ extern "C" {
 #include "EOropframe.h"
 #include "EOpacket.h"
 #include "EOnvSet.h"
+#include "EOconfirmationManager.h"
 
 
 
@@ -66,17 +67,18 @@ typedef struct EOreceiver_hid EOreceiver;
 
 typedef struct
 {
-    uint16_t        capacityofropframereply; // or of packetreply in case we want to use a apcket whcih also has ipaddr and port  
-    uint16_t        capacityofropinput;
-    uint16_t        capacityofropreply;
-    EOnvSet*       nvset;
+    uint16_t                capacityofropframereply; // or of packetreply in case we want to use a apcket whcih also has ipaddr and port  
+    uint16_t                capacityofropinput;
+    uint16_t                capacityofropreply;
+    EOnvSet*                nvset;
+    EOconfirmationManager*  confmanager;
 } eo_receiver_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_receiver_cfg_t eo_receiver_cfg_default; //= {256, 128, 128, NULL};
+extern const eo_receiver_cfg_t eo_receiver_cfg_default; //= {256, 128, 128, NULL, NULL};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

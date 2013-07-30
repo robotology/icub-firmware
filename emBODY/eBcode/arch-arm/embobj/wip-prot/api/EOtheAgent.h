@@ -42,6 +42,8 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOrop.h"
+#include "EOnvSet.h"
+#include "EOconfirmationManager.h"
 
 
 
@@ -60,18 +62,9 @@ extern "C" {
 typedef struct EOtheAgent_hid EOtheAgent;
 
 
-
-typedef struct
-{
-    void (*on_rop_conf_received)(eOipv4addr_t ipaddr, eOropdescriptor_t* ropdes);
-    void (*on_rop_conf_requested)(eOipv4addr_t ipaddr, eOropdescriptor_t* ropdes);
-} eOagent_cfg_t;
- 
-
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOagent_cfg_t eo_agent_cfg_default; // = {NULL, NULL};
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -84,7 +77,7 @@ extern const eOagent_cfg_t eo_agent_cfg_default; // = {NULL, NULL};
                             If NULL, then  is is issued a info by the EOtheErrorManager.
     @return     A valid and not-NULL pointer to the EOtheAgent singleton.
  **/
-extern EOtheAgent* eo_agent_Initialise(const eOagent_cfg_t *cfg);
+extern EOtheAgent* eo_agent_Initialise(void);
 
 
 
@@ -97,7 +90,7 @@ extern EOtheAgent* eo_agent_GetHandle(void);
 
 // processes a received rop, it may call on_rop_confirmation_received(), it may execute some actions related to the rop,
 // it may produce a rop in output. the rop in output must not be fed to eo_agent_OutROPinit() or eo_agent_OutROPfill()
-extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* nvset, eOipv4addr_t fromipaddr, EOrop *replyrop);
+extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* nvset, EOconfirmationManager* confman, eOipv4addr_t fromipaddr, EOrop *replyrop);
 
 // OK: called by eo_transmitter_occasional_rops_Load() and eo_transmitter_regular_rops_Load(). 
 // if data is required this function uses ropdescr->data/size if not NULL/0, otherwise if NULL it used data from EOnv.

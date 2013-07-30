@@ -91,11 +91,13 @@ const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default =
         EO_INIT(.capacityofropframeregulars)        EOK_HOSTTRANSCEIVER_capacityofropframeregulars,
         EO_INIT(.capacityofropframeoccasionals)     EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals,
         EO_INIT(.capacityofropframereplies)         EOK_HOSTTRANSCEIVER_capacityofropframereplies,
-        EO_INIT(.maxnumberofregularrops)            EOK_HOSTTRANSCEIVER_maxnumberofregularrops        
+        EO_INIT(.maxnumberofregularrops)            EOK_HOSTTRANSCEIVER_maxnumberofregularrops,
+        EO_INIT(.maxnumberofconfreqrops)            EOK_HOSTTRANSCEIVER_maxnumberofconfreqrops        
     },    
     EO_INIT(.mutex_fn_new)              NULL,
     EO_INIT(.transprotection)           eo_trans_protection_none,
-    EO_INIT(.nvsetprotection)           eo_nvset_protection_none
+    EO_INIT(.nvsetprotection)           eo_nvset_protection_none,
+    EO_INIT(.confmancfg)                NULL
 };
 
 
@@ -133,15 +135,20 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
     txrxcfg.capacityofropframeoccasionals   = cfg->sizes.capacityofropframeoccasionals;
     txrxcfg.capacityofropframereplies       = cfg->sizes.capacityofropframereplies;
     txrxcfg.maxnumberofregularrops          = cfg->sizes.maxnumberofregularrops;
+    txrxcfg.maxnumberofconfreqrops          = cfg->sizes.maxnumberofconfreqrops;
     txrxcfg.remipv4addr                     = cfg->remoteboardipv4addr;
     txrxcfg.remipv4port                     = cfg->remoteboardipv4port;
     txrxcfg.nvset                           = retptr->nvset;
     txrxcfg.mutex_fn_new                    = cfg->mutex_fn_new;
     txrxcfg.protection                      = cfg->transprotection;
+    txrxcfg.confmancfg                      = cfg->confmancfg;
     
     
     retptr->transceiver = eo_transceiver_New(&txrxcfg);
     
+    retptr->ipaddressofboard = cfg->remoteboardipv4addr;
+    
+    eo_nvset_BRD_Get(retptr->nvset, cfg->remoteboardipv4addr, &retptr->boardnumber);
     
     return(retptr);        
 }    
@@ -177,6 +184,16 @@ extern eOnvBRD_t eo_hosttransceiver_GetBoardNumber(EOhostTransceiver* p)
     }
     
     return(p->boardnumber);    
+}
+
+extern eOipv4addr_t eo_hosttransceiver_GetRemoteIP(EOhostTransceiver* p)
+{
+    if(NULL == p)
+    {
+        return(eo_nv_IPdummy);
+    }
+    
+    return(p->ipaddressofboard);    
 }
 
 

@@ -68,7 +68,27 @@ const eOropctrl_t eok_ropctrl_basic =
     EO_INIT(.plussign)      0,
     EO_INIT(.rqsttime)      0,
     EO_INIT(.rqstconf)      0,
-    EO_INIT(.version)       0
+    EO_INIT(.version)       EOK_ROP_VERSION_0
+};
+
+
+const eOropdescriptor_t eok_ropdesc_basic = 
+{
+    EO_INIT(.control)
+    {
+        EO_INIT(.confinfo)      eo_ropconf_none,
+        EO_INIT(.plustime)      0,
+        EO_INIT(.plussign)      0,
+        EO_INIT(.rqsttime)      0,
+        EO_INIT(.rqstconf)      0,
+        EO_INIT(.version)       EOK_ROP_VERSION_0        
+    },
+    EO_INIT(.ropcode)           eo_ropcode_none,
+    EO_INIT(.size)              0,
+    EO_INIT(.id32)              eo_nv_ID32dummy,
+    EO_INIT(.data)              NULL,
+    EO_INIT(.signature)         0,
+    EO_INIT(.time)              0   
 };
 
 

@@ -45,6 +45,7 @@ extern "C" {
 #include "EOpacket.h"
 #include "EOnvSet.h"
 #include "EOVmutex.h"
+#include "EOconfirmationManager.h"
 
 
 
@@ -78,11 +79,13 @@ typedef struct
     uint16_t                        capacityofropframereplies;
     uint16_t                        capacityofrop;
     uint16_t                        maxnumberofregularrops;
+    uint16_t                        maxnumberofconfreqrops;
     EOnvSet*                        nvset;
+    EOconfirmationManager*          confmanager;
     eOipv4addr_t                    ipv4addr;
-    eOipv4port_t                    ipv4port;
-    eov_mutex_fn_mutexderived_new   mutex_fn_new;
-    eOtransmitter_protection_t      protection;    
+    eOipv4port_t                    ipv4port;    
+    eOtransmitter_protection_t      protection;  
+    eov_mutex_fn_mutexderived_new   mutex_fn_new;        
 } eo_transmitter_cfg_t;
 
 

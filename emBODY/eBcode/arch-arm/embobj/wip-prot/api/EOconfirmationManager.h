@@ -62,8 +62,8 @@ typedef struct EOconfirmationManager_hid EOconfirmationManager;
 
 typedef struct
 {
-    void (*on_rop_conf_requested)(EOrop *rop, eOipv4addr_t toipaddr);
-    void (*on_rop_conf_received)(EOrop *rop, eOipv4addr_t fromipaddr);
+    void (*on_rop_conf_requested)(eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes);
+    void (*on_rop_conf_received)(eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes);
 } eOconfman_cfg_t;
  
 
@@ -76,22 +76,19 @@ extern const eOconfman_cfg_t eOconfman_cfg_default;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOconfirmationManager* eo_transmitter_New(uint16_t capacity)
-    @brief      Creates a new frame object and allocates memory able to store @e capacity bytes. If @e capacity is
-                zero, then the object shall have external storage mode.
-    @param      capacity   The max size of the packet.
+/** @fn         extern EOconfirmationManager* eo_confman_New(const eOconfman_cfg_t *cfg)
+    @brief      Creates a new EOconfirmationManager object
+    @param      cfg     The cfg.
     @return     The pointer to the required object.
  **/
- 
- 
 
 extern EOconfirmationManager* eo_confman_New(const eOconfman_cfg_t *cfg);
 
 
-extern eOresult_t eo_confman_Confirmation_Requested(EOconfirmationManager *p, EOrop *rop, eOipv4addr_t toipaddr);
+extern eOresult_t eo_confman_Confirmation_Requested(EOconfirmationManager *p, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes);
                                                    
                                                    
-extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, EOrop *rop, eOipv4addr_t fromipaddr);
+extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes);
 
                                                    
 

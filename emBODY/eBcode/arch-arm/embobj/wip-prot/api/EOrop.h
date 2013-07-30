@@ -46,7 +46,8 @@ extern "C" {
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+
+#define EOK_ROP_VERSION_0   0
 
 
   
@@ -134,8 +135,9 @@ enum { eo_rop_minimumsize = 8 };
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-
 extern const eOropctrl_t eok_ropctrl_basic; // no time, no sign, no conf request, no time request, ... nothing
+
+extern const eOropdescriptor_t eok_ropdesc_basic; // no time, no sign, no conf request, no time request, ... nothing
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  

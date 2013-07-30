@@ -73,6 +73,7 @@ static eOresult_t s_eo_nvset_onDEV_PushBackEP(EOnvSet* p, uint16_t ondevindex, e
 
 
 static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedevice, eOnvset_ep_t* theendpoint, eOnvID32_t id32);
+static eOresult_t s_eo_nvset_hid_get_device(EOnvSet* p, eOipv4addr_t ip, eOnvset_dev_t** thedevice);
 static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvset_dev_t** thedevice, eOnvset_ep_t** theendpoint);
 
 static void s_eo_nvset_devicesowneship_change(EOnvSet *p, eOnvsetOwnership_t ownership);
@@ -377,6 +378,46 @@ extern void* eo_nvset_RAMofEntity_Get(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8
 }
 
 
+extern void* eo_nvset_RAMofVariable_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32)
+{
+    eOnvset_dev_t* theDevice = NULL;
+    eOnvset_ep_t* theEndpoint = NULL;
+ 
+    if((NULL == p)) 
+    {
+        return(NULL); 
+    }
+
+    // - retrieve the device and the endpoint
+    if(eores_OK != s_eo_nvset_hid_get_device_endpoint_faster(p, ip, eoprot_ID2endpoint(id32), &theDevice, &theEndpoint))   
+    {
+        return(NULL);
+    }
+      
+    return(eoprot_variable_ramof_get(theDevice->boardnum, id32));
+}
+
+extern eOresult_t eo_nvset_BRD_Get(EOnvSet* p, eOipv4addr_t ip, eOnvBRD_t* brd)
+{
+    eOnvset_dev_t* theDevice = NULL;
+ 
+    if((NULL == p) || (NULL == brd)) 
+    {
+        return(eores_NOK_nullpointer); 
+    }
+
+    // - retrieve the device. if the ip is not recognised, then ... eores_NOK_generic
+    if(eores_OK != s_eo_nvset_hid_get_device(p, ip, &theDevice))   
+    {
+        return(eores_NOK_generic);
+    }
+
+    *brd = theDevice->boardnum;    
+
+    return(eores_OK);    
+}
+
+
 extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, EOnv* thenv)
 {
     eOnvset_dev_t* theDevice = NULL;
@@ -533,6 +574,25 @@ static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedev
     return(mtx2use);  
 }
 
+static eOresult_t s_eo_nvset_hid_get_device(EOnvSet* p, eOipv4addr_t ip, eOnvset_dev_t** thedevice)
+{
+    // get the device   
+    uint16_t ondevindex = (eok_ipv4addr_localhost == ip) ? (p->devindexoflocaldevice) : (eo_nvset_hid_ip2index(p, ip));   
+    if(EOK_uint16dummy == ondevindex)
+    {
+        return(eores_NOK_generic);
+    }    
+    eOnvset_dev_t** thedev = (eOnvset_dev_t**) eo_vector_At(p->thedevices, ondevindex);
+    if(NULL == thedev)
+    {
+        return(eores_NOK_nullpointer);
+    }
+ 
+   
+    *thedevice      = *thedev;  
+
+    return(eores_OK);
+}
 
 static eOresult_t s_eo_nvset_hid_get_device_endpoint_faster(EOnvSet* p, eOipv4addr_t ip, eOnvEP8_t ep8, eOnvset_dev_t** thedevice, eOnvset_ep_t** theendpoint)
 {

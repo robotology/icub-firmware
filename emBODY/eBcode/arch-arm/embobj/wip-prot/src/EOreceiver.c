@@ -80,8 +80,10 @@ const eo_receiver_cfg_t eo_receiver_cfg_default =
     EO_INIT(.capacityofropframereply)   256, 
     EO_INIT(.capacityofropinput)        128, 
     EO_INIT(.capacityofropreply)        128, 
-    EO_INIT(.nvset)                     NULL
+    EO_INIT(.nvset)                     NULL,
+    EO_INIT(.confmanager)               NULL
 };
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -106,8 +108,9 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     retptr->ropframereply       = eo_ropframe_New();
     retptr->ropinput            = eo_rop_New(cfg->capacityofropinput);
     retptr->ropreply            = eo_rop_New(cfg->capacityofropreply);
-    retptr->nvset              = cfg->nvset;
-    retptr->theagent            = eo_agent_Initialise(NULL);
+    retptr->nvset               = cfg->nvset;
+    retptr->theagent            = eo_agent_Initialise();
+    retptr->confmanager         = cfg->confmanager;
     retptr->ipv4addr            = 0;
     retptr->ipv4port            = 0;
     retptr->bufferropframereply = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereply, 1);
@@ -229,10 +232,11 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
         {   // we have a valid ropinput
             
             numofprocessedrops++;
+            #warning ---->>>>>> add the EOconfirmationManager
              
             // - use the agent w/ eo_agent_InpROPprocess() and retrieve the ropreply. 
             //   we need to tell the agent what nvs database we are using and from where the rop is coming             
-            eo_agent_InpROPprocess(p->theagent, p->ropinput, nvset2use, remipv4addr, p->ropreply);
+            eo_agent_InpROPprocess(p->theagent, p->ropinput, nvset2use, p->confmanager, remipv4addr, p->ropreply);
             
             // - if ropreply is ok w/ eo_rop_GetROPcode() then add it to ropframereply w/ eo_ropframe_ROP_Add()           
             if(eo_ropcode_none != eo_rop_GetROPcode(p->ropreply))

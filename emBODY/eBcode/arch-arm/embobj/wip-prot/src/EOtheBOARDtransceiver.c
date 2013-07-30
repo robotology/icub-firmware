@@ -94,7 +94,8 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
     EO_INIT(.sizes)                     {0},
     EO_INIT(.mutex_fn_new)              NULL,
     EO_INIT(.transprotection)           eo_trans_protection_none,
-    EO_INIT(.nvsetprotection)           eo_nvset_protection_none
+    EO_INIT(.nvsetprotection)           eo_nvset_protection_none,
+    EO_INIT(.confmancfg)                NULL
 };
 
 
@@ -147,6 +148,7 @@ extern EOtheBOARDtransceiver * eo_boardtransceiver_Initialise(const eOboardtrans
     txrxcfg.remipv4addr                     = cfg->remotehostipv4addr;
     txrxcfg.remipv4port                     = cfg->remotehostipv4port;
     txrxcfg.nvset                           = s_eo_theboardtrans.nvset;
+    txrxcfg.confmancfg                      = cfg->confmancfg;
     txrxcfg.mutex_fn_new                    = cfg->mutex_fn_new;
     txrxcfg.protection                      = cfg->transprotection;
     

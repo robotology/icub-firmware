@@ -85,16 +85,10 @@
  
 static EOtheAgent eo_theagent = 
 {
-    EO_INIT(.initted)                   0,
-    EO_INIT(.cfg)                       NULL
+    EO_INIT(.initted)                   0
 };
 
 
-const eOagent_cfg_t eo_agent_cfg_default =
-{
-    EO_INIT(.on_rop_conf_received)      NULL, 
-    EO_INIT(.on_rop_conf_requested)     NULL
-};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,19 +97,13 @@ const eOagent_cfg_t eo_agent_cfg_default =
 
 
  
-extern EOtheAgent* eo_agent_Initialise(const eOagent_cfg_t *cfg) 
+extern EOtheAgent* eo_agent_Initialise(void) 
 {    
     if(1 == eo_theagent.initted)
     {
         return(&eo_theagent);
     }
 
-    if(NULL == cfg)
-    {
-        cfg = &eo_agent_cfg_default;
-    }
-
-    eo_theagent.cfg     = cfg;
     eo_theagent.initted = 1;
     
     return(&eo_theagent);        
@@ -124,11 +112,11 @@ extern EOtheAgent* eo_agent_Initialise(const eOagent_cfg_t *cfg)
 
 extern EOtheAgent * eo_agent_GetHandle(void) 
 {
-    return( (1 == eo_theagent.initted) ? (&eo_theagent) : (eo_agent_Initialise(NULL)) );
+    return( (1 == eo_theagent.initted) ? (&eo_theagent) : (eo_agent_Initialise()) );
 }
 
 
-extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* nvset, eOipv4addr_t fromipaddr, EOrop *replyrop)
+extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* nvset, EOconfirmationManager* confman, eOipv4addr_t fromipaddr, EOrop *replyrop)
 {
     uint8_t ropc = eo_ropcode_none;
     eOropconfinfo_t confinfo = eo_ropconf_none;
@@ -169,9 +157,9 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
     if(eo_ropconf_none != confinfo)
     {   // received a confirmation ack/nak: execute the callback
 			
-        if(NULL != eo_theagent.cfg->on_rop_conf_received)
+        if(NULL != confman)
         {
-            eo_theagent.cfg->on_rop_conf_received(fromipaddr, &ropin->ropdes);
+            eo_confman_Confirmation_Received(confman, fromipaddr, &ropin->ropdes);
         }
 
         return(eores_OK); 
@@ -287,20 +275,20 @@ extern eOresult_t eo_agent_OutROPprepare(EOtheAgent* p, EOnv* nv, eOropdescripto
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
-{
-    if(1 == rop->stream.head.ctrl.rqstconf)
-    {
-        if(NULL !=  eo_theagent.cfg->on_rop_conf_requested)
-        {
-//            #warning --> in eo_agent_hid_OutROPonTransmission() ho rimosso il ip di destinazione
-            eo_theagent.cfg->on_rop_conf_requested(0, &rop->ropdes);
-        }
-        return(eores_OK);
-    }
+// extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop)
+// {
+//     if(1 == rop->stream.head.ctrl.rqstconf)
+//     {
+//         if(NULL !=  eo_theagent.cfg->on_rop_conf_requested)
+//         {
+// //            #warning --> in eo_agent_hid_OutROPonTransmission() ho rimosso il ip di destinazione
+//             eo_theagent.cfg->on_rop_conf_requested(0, &rop->ropdes);
+//         }
+//         return(eores_OK);
+//     }
 
-    return(eores_NOK_generic);   
-}
+//     return(eores_NOK_generic);   
+// }
 
 
 

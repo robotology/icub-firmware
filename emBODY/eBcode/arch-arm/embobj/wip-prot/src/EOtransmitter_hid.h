@@ -42,6 +42,8 @@ extern "C" {
 #include "EOlist.h"
 #include "EOVmutex.h"
 #include "EOnv_hid.h"
+#include "EOconfirmationManager.h"
+#include "EOvector.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -88,6 +90,7 @@ struct EOtransmitter_hid
     EOrop*                      roptmp;
     EOnvSet*                    nvset;
     EOtheAgent*                 theagent;
+    EOconfirmationManager*      confmanager;
     eOipv4addr_t                ipv4addr;
     eOipv4port_t                ipv4port;
     uint8_t*                    bufferropframeregulars;
@@ -99,6 +102,7 @@ struct EOtransmitter_hid
     EOVmutexDerived*            mtx_regulars;
     EOVmutexDerived*            mtx_occasionals;
     uint64_t                    tx_seqnum;
+    EOvector*                   confrequests;
 #if defined(USE_DEBUG_EOTRANSMITTER)    
     EOtransmitterDEBUG_t        DEBUG;
 #endif    
