@@ -66,6 +66,7 @@ typedef struct
 struct EOtransceiver_hid 
 {
     eo_transceiver_cfg_t        cfg;
+    EOconfirmationManager*      confmanager;
     EOreceiver*                 receiver;
     EOtransmitter*              transmitter;   
 #if defined(USE_DEBUG_EOTRANSCEIVER)    

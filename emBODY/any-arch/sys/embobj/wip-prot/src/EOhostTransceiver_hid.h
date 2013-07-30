@@ -61,6 +61,7 @@ struct EOhostTransceiver_hid
     EOtransceiver*          transceiver;
     EOnvSet*                nvset;
     eOnvBRD_t               boardnumber;
+    eOipv4addr_t            ipaddressofboard;
 }; 
 
 

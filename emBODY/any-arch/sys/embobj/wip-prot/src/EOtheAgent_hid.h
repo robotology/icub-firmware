@@ -57,14 +57,13 @@ extern "C" {
 struct EOtheAgent_hid 
 {
     uint8_t                 initted;
-    const eOagent_cfg_t*    cfg;
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 // to be called only once just before transmission
-extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop);
+//extern eOresult_t eo_agent_hid_OutROPonTransmission(EOtheAgent *p, EOrop *rop);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

@@ -64,6 +64,7 @@ typedef struct
     eov_mutex_fn_mutexderived_new   mutex_fn_new;    
     eOtransceiver_protection_t      transprotection;
     eOnvset_protection_t            nvsetprotection;
+    eOconfman_cfg_t*                confmancfg;
 } eOboardtransceiver_cfg_t;
 
 
@@ -105,7 +106,6 @@ extern EOtransceiver * eo_boardtransceiver_GetTransceiver(EOtheBOARDtransceiver*
 extern EOnvSet * eo_boardtransceiver_GetNVset(EOtheBOARDtransceiver* p);
 
 extern eOnvBRD_t eo_boardtransceiver_GetBoardNumber(EOtheBOARDtransceiver* p);
-
 
 
 /** @}            

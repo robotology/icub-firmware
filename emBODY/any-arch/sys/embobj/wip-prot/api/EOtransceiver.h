@@ -43,6 +43,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOpacket.h"
 #include "EOnvSet.h"
+#include "EOconfirmationManager.h"
 #include "EOrop.h"
 #include "EOVmutex.h"
 
@@ -79,6 +80,7 @@ typedef struct
     uint16_t        capacityofropframeoccasionals;
     uint16_t        capacityofropframereplies;
     uint16_t        maxnumberofregularrops;
+    uint16_t        maxnumberofconfreqrops;
 } eo_transceiver_sizes_t; 
 
 
@@ -90,9 +92,11 @@ typedef struct
     uint16_t                        capacityofropframeoccasionals;
     uint16_t                        capacityofropframereplies;
     uint16_t                        maxnumberofregularrops;
+    uint16_t                        maxnumberofconfreqrops;
     eOipv4addr_t                    remipv4addr;           
     eOipv4port_t                    remipv4port;    
-    EOnvSet*                        nvset;         // later on we could split it into a locnvscfg and a remnvscfg
+    EOnvSet*                        nvset; 
+    eOconfman_cfg_t*                confmancfg;
     eov_mutex_fn_mutexderived_new   mutex_fn_new;
     eOtransceiver_protection_t      protection;
 } eo_transceiver_cfg_t;

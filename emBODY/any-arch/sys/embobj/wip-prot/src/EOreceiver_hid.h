@@ -39,6 +39,7 @@ extern "C" {
 #include "EOrop.h"
 #include "EOnvSet.h"
 #include "EOtheAgent.h"
+#include "EOconfirmationManager.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -74,6 +75,7 @@ struct EOreceiver_hid
     EOrop*                      ropreply;
     EOnvSet*                    nvset;
     EOtheAgent*                 theagent;
+    EOconfirmationManager*      confmanager;
     eOipv4addr_t                ipv4addr;
     eOipv4port_t                ipv4port;
     uint8_t*                    bufferropframereply;

@@ -24,14 +24,6 @@
 #include "EoCommon.h"
 #include "string.h"
 #include "EOtheMemoryPool.h"
-#include "EOtheParser.h"
-#include "EOtheFormer.h"
-#include "EOropframe_hid.h"
-#include "EOnv_hid.h"
-#include "EOrop_hid.h"
-#include "EOVtheSystem.h"
-
-#include "EOtheAgent_hid.h"
 
 
 
@@ -73,8 +65,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eo_confman_default_rop_conf_requested(EOrop *rop, eOipv4addr_t toipaddr);
-static void s_eo_confman_default_rop_conf_received(EOrop *rop, eOipv4addr_t fromipaddr);
+static void s_eo_confman_default_rop_conf_requested(eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes);
+static void s_eo_confman_default_rop_conf_received(eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,50 +107,48 @@ extern EOconfirmationManager* eo_confman_New(const eOconfman_cfg_t *cfg)
 }
 
 
-extern eOresult_t eo_confman_Confirmation_Requested(EOconfirmationManager *p, EOrop *rop, eOipv4addr_t toipaddr)
+extern eOresult_t eo_confman_Confirmation_Requested(EOconfirmationManager *p, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes)
 {
-    if((NULL == p) || (NULL == rop))
+    if((NULL == p) || (NULL == ropdes))
     {
         return(eores_NOK_generic);  
     }
 
-    if(1 == rop->stream.head.ctrl.rqstconf)
+    if(1 == ropdes->control.rqstconf)
     {
         if(NULL !=  p->config.on_rop_conf_requested)
         {
-            p->config.on_rop_conf_requested(rop, toipaddr);
+            p->config.on_rop_conf_requested(toipaddr, ropdes);
         }
         return(eores_OK);
     }
 
     return(eores_NOK_generic);   
-
 }
 
 
 
-extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, EOrop *rop, eOipv4addr_t fromipaddr)
+extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes)
 {
-    if((NULL == p) || (NULL == rop))
+    if((NULL == p) || (NULL == ropdes))
     {
         return(eores_NOK_generic);  
     }
     
-    eOropconfinfo_t confinfo = (eOropconfinfo_t)rop->stream.head.ctrl.confinfo;
+    eOropconfinfo_t confinfo = (eOropconfinfo_t)ropdes->control.confinfo;
 
     if(eo_ropconf_none != confinfo)
     {
         // received a confirmation ack/nak: execute the callback
         if(NULL != p->config.on_rop_conf_received)
         {
-            p->config.on_rop_conf_received(rop, fromipaddr);
+            p->config.on_rop_conf_received(fromipaddr, ropdes);
         }
 
         return(eores_OK); 
     } 
 
     return(eores_NOK_generic);      
-
 }
 
 
@@ -166,8 +156,7 @@ extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, EOr
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-
+// empty-section
 
 
 
@@ -176,39 +165,15 @@ extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, EOr
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_eo_confman_default_rop_conf_requested(EOrop *rop, eOipv4addr_t toipaddr)
+static void s_eo_confman_default_rop_conf_requested(eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes)
 {
-
-   // of the rop it is useful to examinate the following which can be used to store info about the rop:
-    
-    // rop->stream.head.ropc 
-    // rop->stream.head.endp 
-    // rop->stream.head.nvid 
-    // rop->stream.sign             (if any)
-    // rop->stream.time             (if any)
-    
+    // do nothing
 }
 
-static void s_eo_confman_default_rop_conf_received(EOrop *rop, eOipv4addr_t fromipaddr)
+static void s_eo_confman_default_rop_conf_received(eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes)
 {
-
-    // of the confirmation rop it is useful to examinate the following which can be used to mark the original rop delivered (if confinfo is eo_ropconf_ack)
-    
-    // rop->stream.head.ropc 
-    // rop->stream.head.endp 
-    // rop->stream.head.nvid 
-    // rop->stream.sign             (if any) 
-    // rop->stream.time             (if any)
-    
-    // and obviuosly ... the confirmation info:
-    
-    // (eOropconfinfo_t)rop->stream.head.ctrl.confinfo
-
+    // do nothing
 }
-
-
-
-
 
 
 

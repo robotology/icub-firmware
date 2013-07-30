@@ -61,6 +61,7 @@ extern "C" {
 #define EOK_HOSTTRANSCEIVER_TMP                                ( EOK_HOSTTRANSCEIVER_capacityofropframeregulars + EOK_HOSTTRANSCEIVER_capacityofropframereplies + EOK_HOSTTRANSCEIVER_emptyropframe_dimension)
 #define EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals      (EOK_HOSTTRANSCEIVER_capacityoftxpacket - EOK_HOSTTRANSCEIVER_TMP)
 #define EOK_HOSTTRANSCEIVER_maxnumberofregularrops             0
+#define EOK_HOSTTRANSCEIVER_maxnumberofconfreqrops             16
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -73,6 +74,7 @@ typedef struct
     eov_mutex_fn_mutexderived_new   mutex_fn_new;    
     eOtransceiver_protection_t      transprotection;
     eOnvset_protection_t            nvsetprotection; 
+    eOconfman_cfg_t*                confmancfg;
 } eOhosttransceiver_cfg_t;
 
 
@@ -108,6 +110,8 @@ extern EOtransceiver * eo_hosttransceiver_GetTransceiver(EOhostTransceiver *p);
 extern EOnvSet * eo_hosttransceiver_GetNVset(EOhostTransceiver *p);
 
 extern eOnvBRD_t eo_hosttransceiver_GetBoardNumber(EOhostTransceiver *p);
+
+extern eOipv4addr_t eo_hosttransceiver_GetRemoteIP(EOhostTransceiver* p);
 
 
 

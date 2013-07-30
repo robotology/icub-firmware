@@ -34,13 +34,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOpacket.h"
-#include "EOropframe.h"
-#include "EOrop.h"
-#include "EOnvSet.h"
-#include "EOtheAgent.h"
-#include "EOlist.h"
-#include "EOVmutex.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
