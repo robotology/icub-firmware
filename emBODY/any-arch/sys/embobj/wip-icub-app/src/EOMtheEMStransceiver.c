@@ -147,6 +147,7 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     brdtransceiver_cfg.mutex_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New;
     brdtransceiver_cfg.transprotection          = cfg->transprotection;
     brdtransceiver_cfg.nvsetprotection          = cfg->nvsetprotection;
+    brdtransceiver_cfg.confmancfg               = NULL;
    
  
     eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
