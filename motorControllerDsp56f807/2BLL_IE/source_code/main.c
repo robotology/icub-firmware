@@ -5,6 +5,7 @@
 
 #include "dsp56f807.h"
 #include "options.h"
+#include "versions.h"
 #include "asc.h"
 #include "ti1.h"
 #include "pid.h"
@@ -34,7 +35,7 @@
 byte	_board_ID = 16;	
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
-word    _build_number = 70;
+word    _build_number = BUILD_2BLL_IE;
 int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;

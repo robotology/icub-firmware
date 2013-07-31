@@ -309,6 +309,13 @@ byte can_interface (void)
 									_pad_enabled[i] = false; 
 									_general_board_error = ERROR_NONE; 								
 								}
+								
+								//disable broadcast
+								for (i=0; i<JN; i++)
+								{
+									broadcast_mask[JN]=0;	
+								}
+								
 #ifdef DEBUG_CAN_MSG							
 								can_printf("CANLOADER DIS");
 #endif	

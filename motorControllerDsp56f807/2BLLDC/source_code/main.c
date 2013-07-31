@@ -5,6 +5,7 @@
 
 #include "dsp56f807.h"
 #include "options.h"
+#include "versions.h"
 #include "asc.h"
 #include "ti1.h"
 #include "pid.h"
@@ -31,7 +32,7 @@
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
-byte    _build_number = 70;
+byte    _build_number = BUILD_4DC;
 byte    _my_can_protocol_major = 1;
 byte    _my_can_protocol_minor = 1;
 bool    _can_protocol_ack = false;
