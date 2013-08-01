@@ -313,7 +313,7 @@ byte can_interface (void)
 								//disable broadcast
 								for (i=0; i<JN; i++)
 								{
-									broadcast_mask[JN]=0;	
+									broadcast_mask[i]=0;	
 								}
 								
 #ifdef DEBUG_CAN_MSG							
