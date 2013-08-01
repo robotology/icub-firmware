@@ -154,7 +154,7 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
 
 static void s_error_manage(hal_result_t error);
 
-static void s_frame_fill(hal_can_frame_t *msg_out, uint8_t src, uint8_t dest, uint8_t *data, uint8_t len);
+static void s_frame_fill(hal_can_frame_t *msg_out, uint32_t receivedId, uint8_t *data, uint8_t len);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -298,7 +298,9 @@ extern hal_result_t parse_message(void)
     */
     if( ((len_data_out > 0) && (len_data_out <=  hal_can_frame_payload_maxlen)) || ( (CFG_6SG_BEHAV.send_ack_each_cmd) && (len_data_out == 0)) )
     {
-        s_frame_fill(&msg_out,  /*src*/CFG_GEN_EEDATA.board_address, /*dest*/(GET_CMD_SRC(msg_in.id)), data_out, len_data_out);
+        //s_frame_fill(&msg_out,  /*src*/CFG_GEN_EEDATA.board_address, /*dest*/(GET_CMD_SRC(msg_in.id)), data_out, len_data_out);msg_in.id
+        s_frame_fill(&msg_out, msg_in.id, data_out, len_data_out);
+        
         res = hal_can_put(hal_can_port1, &msg_out, hal_can_send_normprio_now);
         while(hal_res_NOK_busy == res)
         {
@@ -1078,11 +1080,11 @@ static void s_error_manage(hal_result_t error)
     return;
 }
 
-static void s_frame_fill(hal_can_frame_t *msg_out, uint8_t src, uint8_t dest, uint8_t *data, uint8_t len)
+static void s_frame_fill(hal_can_frame_t *msg_out, uint32_t receivedId, uint8_t *data, uint8_t len)
 {
     msg_out->id_type    = hal_can_frameID_std;
     msg_out->frame_type = hal_can_frame_data;
-    msg_out->id         = (CAN_MSG_CLASS_POLLING | (src << 4) | dest);
+    msg_out->id         = (GET_CMD_CLASS(receivedId) | (CFG_GEN_EEDATA.board_address << 4) | (GET_CMD_SRC(receivedId)));
     msg_out->size       = len;
     memcpy (msg_out->data, data, len);    
 }

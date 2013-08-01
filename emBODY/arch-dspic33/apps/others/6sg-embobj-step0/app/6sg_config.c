@@ -130,7 +130,7 @@ hal_arch_dspic_eeprom_emfl_DECLARE_VAR_IN_EE(ee_6sg_cfg, SIXsg_ee_config_data_t,
 
 static const SIXsg_ee_config_data_t ee_cfg_data_default =
 {
-    .additional_info = {'C', 'i', 'a', 'o'},
+    .additional_info = {'6', 's', 'g'},
     .serial_number = {1,2,3,4,5,6,7},  
     .an_channel_offset = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }, //{0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5 },  //ofset to apply to each channel.
     .tr_matrix =
@@ -259,7 +259,7 @@ static const eEmoduleInfo_t s_ap_moduleinfo_application =
             .version    = 
             { 
                 .major = 1, 
-                .minor = 0
+                .minor = 1
             },  
             .builddate  = 
             {
