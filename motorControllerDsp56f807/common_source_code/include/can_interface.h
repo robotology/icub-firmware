@@ -152,8 +152,9 @@ void can_receive_additional_info();
 #define CAN_BCAST_DEBUG				9
 #define CAN_BCAST_MOTOR_POSITION   10
 #define CAN_BCAST_MOTOR_SPEED      11
+#define ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT   15 //embobj reserved 
 
-#define CAN_BCAST_MAX_MSGS		   12
+#define CAN_BCAST_MAX_MSGS		   12  //in embobj 16
 
 #define MAIS_CAN_ID                 0xE 
 #define MAIS_8bit_D_MSG             0x3ED //8 bits value
