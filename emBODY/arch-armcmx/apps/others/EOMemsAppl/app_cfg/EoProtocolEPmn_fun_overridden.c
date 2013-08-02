@@ -43,7 +43,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EoProtocolEPmn_fun.h"
+#include "EoProtocolMN.h"
 
 
 
@@ -91,7 +91,7 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
 
 // extern void eoprot_ep_mn_fun_INIT_comm_cmmnds_ropsigcfg(const EOnv* nv) 
 // {
-//     //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+//     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
 
 //     eOmn_ropsigcfg_command_t* cmd = (eOmn_ropsigcfg_command_t*)nv->ram;
 //         
@@ -108,9 +108,9 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
 
 
 
-extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds_ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd) 
+extern void eoprot_fun_UPDT_mn_comm_cmmnds_ropsigcfg(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    //eOprotIndex_t index = eoprot_ep_variable_ID2index(nv->ep, nv->id);
+    //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
     eOmn_ropsigcfg_command_t* cmd = (eOmn_ropsigcfg_command_t*)nv->ram;
     
@@ -128,7 +128,7 @@ extern void eoprot_ep_mn_fun_UPDT_comm_cmmnds_ropsigcfg(const EOnv* nv, const eO
 }
 
 
-extern void eoprot_ep_mn_fun_UPDT_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
+extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
 
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->ram;
@@ -178,7 +178,7 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
 
     eOresult_t res;
     
-    if(NULL == (theems00transceiver = eo_boardtransceiver_GetHandle()))
+    if(NULL == (theems00transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle())))
     {
         return;
     }
@@ -196,12 +196,12 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
     
         case ropsigcfg_cmd_clear:
         {   // just clear
-            eo_transceiver_rop_regular_Clear(theems00transceiver);
+            eo_transceiver_RegularROPs_Clear(theems00transceiver);
         } break;
         
         case ropsigcfg_cmd_assign:
         {   // clear and load all the sigcfg in the array
-            eo_transceiver_rop_regular_Clear(theems00transceiver);
+            eo_transceiver_RegularROPs_Clear(theems00transceiver);
 
             for(i=0; i<size; i++)
             {
@@ -212,7 +212,7 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
                 ropdesc.ropcode                 = eo_ropcode_sig;
                 ropdesc.id32                    = sigcfg->id32;    
                 ropdesc.signature               = ropsigcfgcmd->signature;   
-                res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
+                res = eo_transceiver_RegularROP_Load(theems00transceiver, &ropdesc);
                 res = res;
                 if(eores_OK != res)
                 {
@@ -233,7 +233,7 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
                 ropdesc.ropcode                 = eo_ropcode_sig;
                 ropdesc.id32                    = sigcfg->id32;
                 ropdesc.signature               = ropsigcfgcmd->signature;
-                res = eo_transceiver_rop_regular_Load(theems00transceiver, &ropdesc);
+                res = eo_transceiver_RegularROP_Load(theems00transceiver, &ropdesc);
                 res = res;
             }         
         } break;        
@@ -249,7 +249,7 @@ static void s_eoprot_ep_mn_fun_generic_ropsigcfgcommand(eOmn_ropsigcfg_command_t
                 ropdesc.ropcode                 = eo_ropcode_sig;
                 ropdesc.id32                    = sigcfg->id32;
                 ropdesc.signature               = ropsigcfgcmd->signature;
-                res = eo_transceiver_rop_regular_Unload(theems00transceiver, &ropdesc);
+                res = eo_transceiver_RegularROP_Unload(theems00transceiver, &ropdesc);
                 res = res;
             }         
         } break;                
