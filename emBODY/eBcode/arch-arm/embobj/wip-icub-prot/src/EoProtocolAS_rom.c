@@ -92,7 +92,7 @@ static const eOas_strain_t eoprot_as_rom_strain_defaultvalue = { 0 };
 static const eOas_mais_t eoprot_as_rom_mais_defaultvalue = { 0 };
 
 // - default value of a extorque
-static const eOas_mais_t eoprot_as_rom_extorque_defaultvalue = { 0 };
+static const eOas_extorque_t eoprot_as_rom_extorque_defaultvalue = { 0 };
 
 
 // - descriptors for the variables of a strain
