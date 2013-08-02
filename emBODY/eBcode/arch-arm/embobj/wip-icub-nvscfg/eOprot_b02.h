@@ -138,11 +138,13 @@ extern const uint8_t eoprot_b02_sk_entities_numberofeach[]; // = { eoprot_b02_sk
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 /** @fn         extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
-    @brief      Initialises the endpoints of this board by loading the number of entities for each of them in the
-                related endpoint file. As a result of that, the functions which require a brd argument
-                will return the correct value if called with brd = eoprot_b02_boardnumber.
-                This function is called by the EOnvset because the eOnvset_DEVcfg_t contains a pointer to it.
-                However, it can be called independently from the use of EOnvset.
+    @brief      Initialises the endpoints of this board by loading the number of 
+                entities for each of them in the related endpoint file. As a result of that, 
+                the functions which require a brd argument will return the correct value if called 
+                with brd = eoprot_b01_boardnumber.
+                This function is called by the EOnvset because the eOnvset_DEVcfg_t contains a 
+                pointer to it.  However, it is made public so that it can be called independently 
+                from the use of EOnvset.
     @return     eores_OK if successful or eores_NOK_generic upon failure.
  **/
 extern eOresult_t eoprot_b02_Initialise(eObool_t islocal);
