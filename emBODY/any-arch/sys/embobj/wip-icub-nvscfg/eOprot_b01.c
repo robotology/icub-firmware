@@ -82,9 +82,6 @@ static uint16_t s_eoprot_b01_ep2index(eOnvEP8_t ep);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// if an endpoint XX is present in this array, then the relevant epXXpos must be defined equal to its position, else 0xff 
-enum { epMNpos = 0, epMCpos = 1, epASpos = 2, epSKpos = 0xff };
-
 static const eOnvset_EPcfg_t s_eoprot_b01_theEPcfgs[] =
 {  
     {   // management
@@ -193,45 +190,6 @@ extern eOresult_t eoprot_b01_Initialise(eObool_t islocal)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if 0
-
-EO_VERIFYproposition(s_eoprot_b01_mn_val, 0x01 == eoprot_endpoint_management);
-EO_VERIFYproposition(s_eoprot_b01_mc_val, 0x11 == eoprot_endpoint_motioncontrol);
-EO_VERIFYproposition(s_eoprot_b01_as_val, 0x21 == eoprot_endpoint_analogsensors);
-EO_VERIFYproposition(s_eoprot_b01_sk_val, 0x31 == eoprot_endpoint_skin);
-
-// VERY IMPORTANT INFO about how to fill the hashtable:
-// the table has all entries equal to 0xff except for the entries in positions p = ep&0x3f (the 6 less significant 
-// bits of the endpoint) which shall contain the index be applied to s_eoprot_b01_theEPcfgs[] which
-// allows to retrieve the eOnvset_EPcfg_t of the endpoint ep.
-static const uint8_t s_eoprot_b01_hashtable[64] = 
-{   
-    // 00-15: eoprot_endpoint_management has p=0x01=1 and its EPcfg is in epcfgindex = 0 -> hashtable[1] = 0
-    0xff, epMNpos, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-    // 16-31: eoprot_endpoint_motioncontrol has p=0x11=17 and its EPcfg is in epcfgindex = 1 -> hashtable[17] = 1
-    0xff, epMCpos, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-    // 32-47: eoprot_endpoint_analogsensors has p=0x21=33 and its EPcfg is in epcfgindex = 2 -> hashtable[33] = 2
-    0xff, epASpos, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    // 48-63: SK not present -> all row is 0xff.
-    0xff, epSKpos, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff     
-};  
-
-static uint16_t s_eoprot_b01_ep2index(eOnvEP8_t ep)
-{    
-    if(ep > sizeof(s_eoprot_b01_hashtable))
-    {
-        return(EOK_uint16dummy);
-    }
-    
-    uint8_t r = s_eoprot_b01_hashtable[ep];
-    
-    if(r < eoprot_b01_endpoints_numberof)
-    {
-        return(r);
-    }
-    return(EOK_uint16dummy);
-}
-#else
 
 EO_VERIFYproposition(s_eoprot_b01_mn_val, 0 == eoprot_endpoint_management);
 EO_VERIFYproposition(s_eoprot_b01_mc_val, 1 == eoprot_endpoint_motioncontrol);
@@ -246,8 +204,6 @@ static uint16_t s_eoprot_b01_ep2index(eOnvEP8_t ep)
     }
     return(EOK_uint16dummy);
 }
-
-#endif
 
 
 
