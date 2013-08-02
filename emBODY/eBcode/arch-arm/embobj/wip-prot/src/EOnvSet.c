@@ -317,6 +317,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                 // - load everything into the nv
                 eo_nv_hid_Load(     &thenv,
                                     ip, //(*theDevice)->ipaddress,
+                                    brd,
                                     id32,
                                     rom,
                                     ram,
@@ -465,6 +466,7 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
     // - load everything into the nv
     eo_nv_hid_Load(     thenv,
                         ip, //(*theDevice)->ipaddress,
+                        brd,
                         id32, 
                         rom,
                         ram,

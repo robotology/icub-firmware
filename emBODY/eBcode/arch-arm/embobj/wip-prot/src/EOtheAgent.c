@@ -169,7 +169,7 @@ extern eOresult_t eo_agent_InpROPprocess(EOtheAgent *p, EOrop *ropin, EOnvSet* n
         eOnvOwnership_t ownership = eo_rop_hid_GetOwnership(ropc, eo_ropconf_none, eo_rop_dir_received); // local if we receive a set/get. remote if we receive a sig
         
 
-        res = eo_nvset_NV_Get(  nvset, /*ropin->tmpdata.nvset,*/ 
+        res = eo_nvset_NV_Get(  nvset, 
                                 (eo_nv_ownership_local == ownership) ? (eok_ipv4addr_localhost) : (fromipaddr),
                                 ropin->stream.head.id32,  
                                 &ropin->netvar
