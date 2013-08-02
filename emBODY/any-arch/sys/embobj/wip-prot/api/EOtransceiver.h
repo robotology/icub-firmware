@@ -102,25 +102,6 @@ typedef struct
 } eo_transceiver_cfg_t;
 
 
-// typedef struct      // 12 bytes           
-// {
-//     eOropconfig_t   ropcfg;     // 4B
-//     eOropcode_t     ropcode;    // 1B
-//     eOnvEP_t        nvep;       // 2B
-//     eOnvID_t        nvid;       // 2B
-//     uint32_t        signature;
-// } eo_transceiver_ropinfo_t;
-
-
-// typedef struct      // 16 bytes
-// {
-//     eOropconfig_t   ropconfig;      // 4B
-//     eOropconfinfo_t ropconfinfo;    // 1B
-//     eOropcode_t     ropcode;        // 1B
-//     eOnvEP_t        ep;             // 2B
-//     eOnvID_t        id;             // 2B
-//     uint32_t        signature;      // 4B
-// } eOropdescriptor_t;   
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -136,23 +117,19 @@ extern const eo_transceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256
     @param      capacity   The max size of the packet.
     @return     The pointer to the required object.
  **/
- 
- 
- // gestisce 1 solo indirizzo ip di destinazione in modo da avere 1 solo EOpacket in uscita.
- // 
 extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg);
 
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime); 
 
 extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint16_t *numberofrops);
 
-extern eOresult_t eo_transceiver_rop_regular_Clear(EOtransceiver *p);
-extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescriptor_t *ropdes); 
-extern eOresult_t eo_transceiver_rop_regular_Unload(EOtransceiver *p, eOropdescriptor_t *ropdes); 
+// if the variable is local then it is used the ram of the netvar. if it is remote, the ropdescr must contain data and size
+extern eOresult_t eo_transceiver_OccasionalROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdes);
 
-// if the rop requires data ... if the variable is local then it is used the ram of teh netvar. if remote the ropdescr must contain data and size
-extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdescriptor_t *ropdes);
 
+extern eOresult_t eo_transceiver_RegularROPs_Clear(EOtransceiver *p);
+extern eOresult_t eo_transceiver_RegularROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdes); 
+extern eOresult_t eo_transceiver_RegularROP_Unload(EOtransceiver *p, eOropdescriptor_t *ropdes); 
 
 
 

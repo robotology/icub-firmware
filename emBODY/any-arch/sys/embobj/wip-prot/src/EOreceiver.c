@@ -232,8 +232,7 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
         {   // we have a valid ropinput
             
             numofprocessedrops++;
-            #warning ---->>>>>> add the EOconfirmationManager
-             
+
             // - use the agent w/ eo_agent_InpROPprocess() and retrieve the ropreply. 
             //   we need to tell the agent what nvs database we are using and from where the rop is coming             
             eo_agent_InpROPprocess(p->theagent, p->ropinput, nvset2use, p->confmanager, remipv4addr, p->ropreply);

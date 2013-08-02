@@ -207,8 +207,6 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
     {
         // must put the reply inside the transmitter
         EOropframe* ropframereply = NULL;
-//        eOipv4addr_t toipv4addr;
-//        eOipv4port_t toipv4port;
         
         // if in here, i am sure that there is a reply and that return value will be eores_OK
         res = eo_receiver_GetReply(p->receiver, &ropframereply);
@@ -216,9 +214,7 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
         // i will transmit back a reply to the remote host at address p->cfg.remipv4addr and port p->cfg.remipv4port  ...
         // which are the ones also assigned to the p->transmitter at its creation.
         
-        //eov_mutex_Take(p->mtx_tx_replies, eok_reltimeINFINITE);
         res = eo_transmitter_reply_ropframe_Load(p->transmitter, ropframereply);      
-        //eov_mutex_Release(p->mtx_tx_replies);  
         
 #if defined(USE_DEBUG_EOTRANSCEIVER) 
         {   // DEBUG
@@ -246,26 +242,17 @@ extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint
     }
     
     // refresh regulars ...    
-    //eov_mutex_Take(p->mtx_tx_regulars, eok_reltimeINFINITE); 
     eo_transmitter_regular_rops_Refresh(p->transmitter);
-    //eov_mutex_Release(p->mtx_tx_regulars); 
     
     
     // finally retrieve the packet from the transmitter. it will be formed by replies, regulars, occasionals.
-    //eov_mutex_Take(p->mtx_tx_replies, eok_reltimeINFINITE);
-    //eov_mutex_Take(p->mtx_tx_regulars, eok_reltimeINFINITE);
-    //eov_mutex_Take(p->mtx_tx_occasionals, eok_reltimeINFINITE);
     res = eo_transmitter_outpacket_Get(p->transmitter, pkt, numberofrops);
-    //eov_mutex_Release(p->mtx_tx_occasionals);
-    //eov_mutex_Release(p->mtx_tx_regulars);
-    //eov_mutex_Release(p->mtx_tx_replies);
-    
     
     return(res);    
 }
 
 
-extern eOresult_t eo_transceiver_rop_regular_Clear(EOtransceiver *p)
+extern eOresult_t eo_transceiver_RegularROPs_Clear(EOtransceiver *p)
 {
     eOresult_t res;
     
@@ -274,14 +261,12 @@ extern eOresult_t eo_transceiver_rop_regular_Clear(EOtransceiver *p)
         return(eores_NOK_nullpointer);
     }
     
-    //eov_mutex_Take(p->mtx_tx_regulars, eok_reltimeINFINITE); 
     res = eo_transmitter_regular_rops_Clear(p->transmitter);
-    //eov_mutex_Release(p->mtx_tx_regulars); 
     
     return(res);
 }
 
-extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
+extern eOresult_t eo_transceiver_RegularROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
 {
     eOresult_t res;
     
@@ -290,9 +275,8 @@ extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescrip
         return(eores_NOK_nullpointer);
     }
     
-    //eov_mutex_Take(p->mtx_tx_regulars, eok_reltimeINFINITE); 
     res = eo_transmitter_regular_rops_Load(p->transmitter, ropdesc);
-    //eov_mutex_Release(p->mtx_tx_regulars); 
+
 
 #if defined(USE_DEBUG_EOTRANSCEIVER)     
     {   // DEBUG    
@@ -306,7 +290,7 @@ extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescrip
     return(res);
 }
 
-extern eOresult_t eo_transceiver_rop_regular_Unload(EOtransceiver *p, eOropdescriptor_t *ropdesc)
+extern eOresult_t eo_transceiver_RegularROP_Unload(EOtransceiver *p, eOropdescriptor_t *ropdesc)
 {
     eOresult_t res;
     
@@ -315,41 +299,13 @@ extern eOresult_t eo_transceiver_rop_regular_Unload(EOtransceiver *p, eOropdescr
         return(eores_NOK_nullpointer);
     }
     
-    //eov_mutex_Take(p->mtx_tx_regulars, eok_reltimeINFINITE); 
     res = eo_transmitter_regular_rops_Unload(p->transmitter, ropdesc);
-    //eov_mutex_Release(p->mtx_tx_regulars); 
     
     return(res);
 }
 
-#if 0
-extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver *p, eOropdescriptor_t *ropdesc, uint8_t itisobsolete)
-{
-    eOresult_t res;
-    
-    if((NULL == p) || (NULL == ropdesc))
-    {
-        return(eores_NOK_nullpointer);
-    }
 
-    //eov_mutex_Take(p->mtx_tx_occasionals, eok_reltimeINFINITE);
-    res = eo_transmitter_occasional_rops_Load_without_data(p->transmitter, ropdesc, itisobsolete);
-    //eov_mutex_Release(p->mtx_tx_occasionals);
-
-#if defined(USE_DEBUG_EOTRANSCEIVER) 
-    {   // DEBUG    
-        if(eores_OK != res)
-        {
-            p->DEBUG.cannotloadropinoccasionals ++;
-        }
-    }     
-#endif
-    
-    return(res);
-}  
-#endif
-
-extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
+extern eOresult_t eo_transceiver_OccasionalROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
 {
     eOresult_t res;
     
@@ -378,7 +334,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 
@@ -386,7 +342,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 

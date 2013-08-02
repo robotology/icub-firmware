@@ -66,11 +66,6 @@ typedef uint32_t eOnvPROGnum_t;
 typedef uint8_t eOnvEP8_t;
 typedef uint8_t eOnvENT_t;
 
-// typedef uint8_t eOnvENT_t;
-// typedef uint8_t eOnvIND_t;
-// typedef uint8_t eOnvTAG_t;
-
-
 
 
 enum { eo_nv_IPdummy = 0, eo_nv_EP8dummy = EOK_uint08dummy }; 
@@ -139,6 +134,8 @@ extern eOresult_t eo_nv_Reset(const EOnv *nv, eObool_t forcerst, eOnvUpdate_t up
 extern eOresult_t eo_nv_Get(const EOnv *nv, eOnvStorage_t strg, void *data, uint16_t *size);
 
 extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv);
+
+extern eOnvBRD_t eo_nv_GetBRD(const EOnv *nv);
 
 extern eOnvID32_t eo_nv_GetID32(const EOnv *nv);
 

@@ -57,7 +57,7 @@ extern "C" {
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-typedef struct      // 28 bytes on arm .... 
+typedef struct      // 32 bytes on arm .... 
 {
     eOropcode_t     ropcode;
     eObool_t        hasdata2update;       
@@ -65,7 +65,7 @@ typedef struct      // 28 bytes on arm ....
     uint16_t        ropsize;
     uint16_t        timeoffsetinsiderop;    // if time is not present its value is 0xffff 
     EOnv            thenv;
-} eo_transm_regrop_info_t;  EO_VERIFYsizeof(eo_transm_regrop_info_t, (8+20));
+} eo_transm_regrop_info_t;  EO_VERIFYsizeof(eo_transm_regrop_info_t, (8+24));
 
 
 typedef struct

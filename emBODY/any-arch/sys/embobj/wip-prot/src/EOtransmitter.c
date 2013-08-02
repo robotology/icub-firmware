@@ -502,8 +502,7 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     // now add the age of the frame
     eo_ropframe_age_Set(p->ropframereadytotx, eov_sys_LifeTimeGet(eov_sys_GetHandle()));
     
-    // and get teh number of rops to tx
-    
+    // and get the number of rops to tx    
     rops2tx = eo_ropframe_ROP_NumberOf(p->ropframereadytotx);
     
     // add sequence number
@@ -578,13 +577,13 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
                             &nv
                             );   
 
-    // if the nvset does not have the triple (ip, ep, id) then we return an error because we cannot form the rop
+    // if the nvset does not have the pair (ip, id) then we return an error because we cannot form the rop
     if(eores_OK != res)
     {
         return(eores_NOK_generic);
     } 
 
-    // force size to be coherent with the nv. the size is always used, even if there is no dat to transmit
+    // force size to be coherent with the nv. the size is always used, even if there is no data to transmit
     ropdesc->size = eo_nv_Size(&nv);    
     
     // now we have the nv. we set its value in local ram

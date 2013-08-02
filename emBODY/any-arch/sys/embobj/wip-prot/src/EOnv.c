@@ -122,6 +122,7 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
     }
     
     nv->ip          = eo_nv_IPdummy;
+    nv->brd         = eo_nv_BRDdummy;
     nv->id32        = eo_nv_ID32dummy;
     nv->rom         = NULL;       
     nv->ram         = NULL;  
@@ -273,6 +274,15 @@ extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv)
     return(nv->ip);
 }
 
+extern eOnvBRD_t eo_nv_GetBRD(const EOnv *nv)
+{
+    if(NULL == nv)
+    {
+        return(eo_nv_BRDdummy);
+    }
+    return(nv->brd);    
+}
+
 
 extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv)
 {
@@ -295,9 +305,10 @@ extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
 {
     nv->ip          = ip;
+    nv->brd         = brd;
     nv->id32        = id32;
     nv->rom         = rom;
     nv->ram         = ram; 
