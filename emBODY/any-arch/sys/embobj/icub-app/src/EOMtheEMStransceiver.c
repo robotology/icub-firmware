@@ -220,13 +220,27 @@ extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rx
 extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops)
 {
     eOresult_t res;
+    uint16_t numofrops = 0;
     
     if((NULL == p) || (NULL == txpkt))
     {
         return(eores_NOK_nullpointer);
     }
     
-    res = eo_transceiver_Transmit(s_emstransceiver_singleton.transceiver, txpkt, numberofrops);
+    
+    
+    res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    if(NULL != numberofrops)
+    {
+        *numberofrops = numofrops;
+    }
+    //even if numofrops is equal to zero, i send a rop becaouse it used by pc104 like keep alive.
+    res = eo_transceiver_outpacket_Get(s_emstransceiver_singleton.transceiver, txpkt);
     
     s_eom_emstransceiver_update_diagnosticsinfo();
     

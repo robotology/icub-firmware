@@ -416,12 +416,15 @@ extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p)
     return(eores_OK);   
 }
 
-extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt, uint16_t *numberofrops)
+
+
+
+extern eOresult_t eo_transmitter_outpacket_Prepare(EOtransmitter *p, uint16_t *numberofrops)
 {
     uint16_t remainingbytes;
-    uint16_t size;
 
-    if((NULL == p) || (NULL == outpkt)) 
+
+    if((NULL == p) || (NULL == numberofrops)) 
     {
         return(eores_NOK_nullpointer);
     }
@@ -447,16 +450,30 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     eo_ropframe_Clear(p->ropframereplies);
     eov_mutex_Release(p->mtx_replies);
 
+    *numberofrops = eo_ropframe_ROP_NumberOf(p->ropframereadytotx);
+    
+    return(eores_OK);   
+}
+
+
+
+extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt)
+{
+    uint16_t size;
+
+    if((NULL == p) || (NULL == outpkt)) 
+    {
+        return(eores_NOK_nullpointer);
+    }
+
     // now add the age of the frame
     eo_ropframe_age_Set(p->ropframereadytotx, eov_sys_LifeTimeGet(eov_sys_GetHandle()));
     
     // add sequence number
-    //#warning --> the sequence number in tx ropframe is incremneted only if the number of rops is non-zero ... (?)
-    if( eo_ropframe_ROP_NumberOf(p->ropframereadytotx) != 0)
-    {
-    	p->tx_seqnum++;
-    	eo_ropframe_seqnum_Set(p->ropframereadytotx, p->tx_seqnum);
-    }
+
+    p->tx_seqnum++;
+    eo_ropframe_seqnum_Set(p->ropframereadytotx, p->tx_seqnum);
+
     // now set the size of the packet according to what is inside the ropframe.
     eo_ropframe_Size_Get(p->ropframereadytotx, &size);
     eo_packet_Size_Set(p->txpacket, size);
@@ -474,15 +491,29 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     
     // finally gives back the packet
     *outpkt = p->txpacket;
-
-    // and the number of contained rops
-    if(NULL != numberofrops)
-    {
-       *numberofrops = eo_ropframe_ROP_NumberOf(p->ropframereadytotx);
-    }
     
     return(eores_OK);   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //#warning --> make eo_transmitter_occasional_rops_Load obsolete ............. DO IT
 extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter *p, eOropdescriptor_t* ropdesc, uint8_t itisobsolete)//eOropcode_t ropcode, eOnvEP_t nvep, eOnvID_t nvid, eOropconfig_t ropcfg)

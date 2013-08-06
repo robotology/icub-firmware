@@ -140,7 +140,25 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg);
 
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime); 
 
-extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint16_t *numberofrops);
+
+
+/** @fn         extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops)
+    @brief      prepares outpacket to send. It contains all rops to send.   
+    @param      p               poiter to transceiver        
+    @param      numberofrops    in outpunt will contain number of rops cointained in outpacket
+    @return     eores_OK or eores_NOK_nullpointer
+ **/
+extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops);
+
+
+/** @fn         extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt)
+    @brief      returns a pointer to outpacket. the aoutpacket is well formed only if eo_transceiver_outpacket_Prepare 
+                function is called before eo_transceiver_outpacket_Get.  
+    @param      p         poiter to transceiver        
+    @param      pkt       in outpunt will contain poiter to aiutpacket
+    @return     eores_OK or eores_NOK_nullpointer
+ **/
+extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt);
 
 extern eOresult_t eo_transceiver_rop_regular_Clear(EOtransceiver *p);
 extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescriptor_t *ropdes); 
