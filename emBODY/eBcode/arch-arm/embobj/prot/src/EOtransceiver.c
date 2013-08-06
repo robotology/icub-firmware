@@ -217,11 +217,12 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
 
 
 
-extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint16_t *numberofrops)
+
+extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops)
 {
-    eOresult_t res;
+
     
-    if((NULL == p) || (NULL == pkt))
+    if((NULL == p) || (NULL == numberofrops))
     {
         return(eores_NOK_nullpointer);
     }
@@ -232,17 +233,23 @@ extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint
     //eov_mutex_Release(p->mtx_tx_regulars); 
     
     
-    // finally retrieve the packet from the transmitter. it will be formed by replies, regulars, occasionals.
-    //eov_mutex_Take(p->mtx_tx_replies, eok_reltimeINFINITE);
-    //eov_mutex_Take(p->mtx_tx_regulars, eok_reltimeINFINITE);
-    //eov_mutex_Take(p->mtx_tx_occasionals, eok_reltimeINFINITE);
-    res = eo_transmitter_outpacket_Get(p->transmitter, pkt, numberofrops);
-    //eov_mutex_Release(p->mtx_tx_occasionals);
-    //eov_mutex_Release(p->mtx_tx_regulars);
-    //eov_mutex_Release(p->mtx_tx_replies);
+    return(eo_transmitter_outpacket_Prepare(p->transmitter, numberofrops));
+ 
+}
+
+
+
+
+extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt)
+{
     
+    if(NULL == p) 
+    {
+        return(eores_NOK_nullpointer);
+    }
     
-    return(res);    
+    return(eo_transmitter_outpacket_Get(p->transmitter, pkt));
+ 
 }
 
 
