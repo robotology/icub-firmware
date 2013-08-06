@@ -69,7 +69,7 @@
 #define ICUBCANPROTO_POL_SB_ID_DEFAULT                          ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (0x0<<4))
 #define ICUBCANPROTO_POL_SB_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
 #define ICUBCANPROTO_POL_SK_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8)|  (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
-
+#define ICUBCANPROTO_PER_SB_CREATE_ID(cmdId, addr)              ((ICUBCANPROTO_CLASS_PERIODIC_SENSORBOARD << 8) | (addr<<4) | (cmdId&0xF))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -531,7 +531,30 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
 
 
 
+//********************** F O R M E R       PERIODIC     F U N C T I O N S  ******************************************************
+extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
 
+    uint8_t *data_ptr = (uint8_t*)val_ptr;
+    canFrame->id = ICUBCANPROTO_PER_SB_CREATE_ID(ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR, dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 6;
+    memcpy(&canFrame->data[0], data_ptr, 6);
+    return(eores_OK);
+
+}
+extern eOresult_t eo_icubCanProto_former_per_sb_cmd__torqueVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    uint8_t *data_ptr = (uint8_t*)val_ptr;
+    canFrame->id = ICUBCANPROTO_PER_SB_CREATE_ID(ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR, dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 6;
+    memcpy(&canFrame->data[0], data_ptr, 6);
+    return(eores_OK);
+
+}
 
 
 /***********************************************************************************************************************************/

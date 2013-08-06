@@ -268,6 +268,12 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOsnsr_strain
 extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOskin_sigmode_t **sigmode_ptr);
 extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_skinId_t skId,  EOarray_of_10canframes **arrayof10canframes_ptr);
 
+
+
+extern eOresult_t eo_appTheDB_GetVirtualStrainDataPtr(EOappTheDB *p, uint16_t **virtStrain_ptr);
+extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p);
+extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue);
+
 /** @}            
     end of group eo_app_encodersReader
  **/

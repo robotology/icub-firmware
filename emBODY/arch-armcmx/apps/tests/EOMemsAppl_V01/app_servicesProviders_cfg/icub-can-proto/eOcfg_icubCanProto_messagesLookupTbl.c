@@ -105,7 +105,7 @@ static const eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t s_msgClasses_
 
     {   // 3
         EO_INIT(.parserTbl)                           &icubCanProto_periodicSensorBoardMsg_parser_LUTbl,
-        EO_INIT(.formerTbl)                           NULL,
+        EO_INIT(.formerTbl)                           &icubCanProto_periodicSensorBoardMsg_former_LUTbl,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass 
     },
     //in order to use the same mecchanism of other messages i used class message id = 4,

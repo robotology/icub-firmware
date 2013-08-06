@@ -932,7 +932,9 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams(EOicubCa
     canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
-    canFrame->size = 5;
+    canFrame->size = 8;
+    
+    memset(&canFrame->data[0], 0, 8);
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS;
 
     //stiffnes and damping are uint16_t
@@ -1828,10 +1830,10 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
     }
     
-    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
-    {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
-    }
+//     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
+//     {
+//         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
+//     }
  
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT)) //over current
     {

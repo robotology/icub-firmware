@@ -101,6 +101,16 @@ typedef struct
 //     eOicubCanProto_canBoardAddress_t    maxusedcanaddr4motorboard;
 // } eOappTheDB_hid_generaldata_t;
 
+
+
+
+typedef struct
+{
+    uint16_t values[6];
+    uint8_t  isupdated;
+}eOappTheDB_hid_virtualStrainData_t;
+
+
 typedef struct
 {
     eOmc_joint_t            *jointsList_ptr;    
@@ -129,7 +139,7 @@ struct EOappTheDB_hid
 	}canaddressLookuptbl;
 
     eOappTheDB_hid_nvsRamRef_t nvsram;
-
+    eOappTheDB_hid_virtualStrainData_t virtualStrainData;
 };
 
 

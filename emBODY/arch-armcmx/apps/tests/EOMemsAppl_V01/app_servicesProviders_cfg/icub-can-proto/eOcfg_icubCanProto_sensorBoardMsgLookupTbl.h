@@ -64,6 +64,8 @@ extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_L
 extern const EOconstLookupTbl        icubCanProto_periodicSensorBoardMsg_parser_LUTbl;
 extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_parser_LUTbl__ptr;
 
+extern const EOconstLookupTbl        icubCanProto_periodicSensorBoardMsg_former_LUTbl;
+extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_former_LUTbl__ptr;
 
 extern const EOconstLookupTbl        icubCanProto_pollingSkinMsg_former_LUTbl;
 extern const EOconstLookupTbl* const icubCanProto_pollingSkinMsg_former_LUTbl__ptr;

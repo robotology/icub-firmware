@@ -93,6 +93,8 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p);
 
 static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p);
 
+static eOresult_t s_appTheDB_virtualStrainData_init(EOappTheDB *p);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -175,6 +177,8 @@ extern EOappTheDB* eo_appTheDB_Initialise(eOappTheDB_cfg_t *cfg)
     {
         return(NULL);
     }
+    
+    s_appTheDB_virtualStrainData_init(retptr);
 
     retptr->isinitted = eobool_true;
     
@@ -806,6 +810,64 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
 
 
 
+
+extern eOresult_t eo_appTheDB_GetVirtualStrainDataPtr(EOappTheDB *p, uint16_t **virtStrain_ptr)
+{
+	if((NULL == p) || (NULL == virtStrain_ptr))
+	{
+        return(eores_NOK_nullpointer);
+	}
+    
+    *virtStrain_ptr = &p->virtualStrainData.values[0];
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue)
+{
+	if(NULL == p)
+	{
+        return(eores_NOK_nullpointer);
+	}
+    
+    switch(jId)
+    {
+        case 0:
+        {
+            p->virtualStrainData.values[4] = torquevalue; //wrist pronosupination
+            p->virtualStrainData.isupdated = 1;
+        }break;
+
+        case 1:
+        {
+            p->virtualStrainData.values[0] = torquevalue; //wrist yaw
+            p->virtualStrainData.isupdated = 1;
+        }break;
+        
+        case 2:
+        {
+            p->virtualStrainData.values[1] = torquevalue; //wrist pitch
+            p->virtualStrainData.isupdated = 1;
+        }break;
+        default:
+        {
+            ;//nothing to do!!!
+        }
+
+    };
+
+    return(eores_OK);
+}
+
+extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p)
+{
+ 	if(NULL == p)
+	{
+        return(0);
+	}   
+    return(p->virtualStrainData.isupdated);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1252,7 +1314,11 @@ static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
 }
 
 
-
+static eOresult_t s_appTheDB_virtualStrainData_init(EOappTheDB *p)
+{
+    memset(&p->virtualStrainData, 0, sizeof(eOappTheDB_hid_virtualStrainData_t));
+    return(eores_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

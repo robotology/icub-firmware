@@ -81,6 +81,11 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
 
 
 //*********************************** S K I N *************************************************************
+extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+extern eOresult_t eo_icubCanProto_former_per_sb_cmd__torqueVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+
+
+//*********************************** S K I N *************************************************************
 extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);
 

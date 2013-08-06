@@ -70,6 +70,8 @@
 #define runner_timeout_send_diagnostics         1000
 #define runner_countmax_check_ethlink_status    1000 //every one second
 
+#define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        50
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -126,6 +128,7 @@ EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSappl
 
 static uint16_t motionDoneJoin2Use = 0;
 static uint16_t count_ethlink_status = 0;
+static uint8_t count_watchdog_virtaulStrain = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -637,10 +640,15 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 {
-    eOresult_t                      res;
-    uint16_t                        numofjoint;
-    eOmc_joint_status_t             *jstatus_ptr;
-    eOicubCanProto_msgCommand_t    msgCmd = 
+    eOresult_t                              res;
+    uint8_t                                 send_virtualStrainData;
+    uint16_t                                numofjoint;
+    eOmc_joint_status_t                     *jstatus_ptr;
+    uint16_t                                *virtStrain_ptr;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db_ptr; 
+    eOicubCanProto_msgDestination_t         msgdest;
+    eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__MOTION_DONE
@@ -648,9 +656,11 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    db_ptr = eo_appTheDB_GetHandle();
+    
+    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(db_ptr);
 
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), motionDoneJoin2Use, &jstatus_ptr);
+    res = eo_appTheDB_GetJointStatusPtr(db_ptr, motionDoneJoin2Use, &jstatus_ptr);
     if(eores_OK != res)
     {
         return; //error
@@ -674,7 +684,53 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     {
         motionDoneJoin2Use = 0;
     }
+    
+ 
 
+    //prepare virtual strain data
+    if(eo_appTheDB_IsVirtualStrainDataUpdated(db_ptr))
+    {
+        send_virtualStrainData = 1;
+        count_watchdog_virtaulStrain = 0;
+    }
+    else
+    {
+        count_watchdog_virtaulStrain++;
+        if(count_watchdog_virtaulStrain <= COUNT_WATCHDOG_VIRTUALSTRAIN_MAX)
+        {
+            send_virtualStrainData = 1;
+        }
+        else
+        {
+            send_virtualStrainData = 0;
+        }
+
+    }
+    
+    
+    
+    if(send_virtualStrainData)
+    {
+        eo_appTheDB_GetVirtualStrainDataPtr(db_ptr, &virtStrain_ptr);
+        
+        res = eo_appTheDB_GetJointCanLocation(db_ptr, 0,  &canLoc, NULL);
+        if(eores_OK != res)
+        {
+            return;
+        }
+
+        //set destination of all messages 
+        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); //virtual ft sensor has address 12
+        
+        //set command (calss + id) and send it
+        msgCmd.class = eo_icubCanProto_msgCmdClass_periodicSensorBoard;
+        msgCmd.cmdId = ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
+        
+        msgCmd.cmdId = ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
+    }
+    
     
 //     for(jId = 0; jId<numofjoint; jId++)
 //     {

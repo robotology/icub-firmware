@@ -771,9 +771,6 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
             return;
         }
         
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
-        
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
         
@@ -781,7 +778,23 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+        
+        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
+        
     }
+}
+
+extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+{
+    eOmeas_torque_t *torquevalue_ptr = (eOmeas_torque_t*)nv->loc;
+    eOicubCanProto_torque_t icub_torque;
+    
+//     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+//     eOicubCanProto_torque_t icub_torque =  eo_appMeasConv_torque_I2S(appMeasConv_ptr, jxx, *torquevalue_ptr);
+
+    icub_torque = *torquevalue_ptr +0x8000;
+    eo_appTheDB_SetVirtualStrainValue(eo_appTheDB_GetHandle(), jxx, icub_torque);
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

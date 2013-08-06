@@ -60,7 +60,8 @@ and with id not continuos. */
 #define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1   //ICUBCANPROTO_POL_SB_CMD_MAXNUM
 #define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_SB_CMD__CMD_MAXNUM
 
-#define eo_icubCanProto_periodicSensorBoardMsg_inTbl_max       ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM 
+#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM
+#define eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max 2 
 #define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
@@ -149,7 +150,7 @@ extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_L
 /**************************************************************************************************************/
 
 /* DECLARATION OF PERIODIC SENSOR BOARD PARSER BODY TBL */
-static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensorBoardMsg_parserFn_list[eo_icubCanProto_periodicSensorBoardMsg_inTbl_max] = 
+static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensorBoardMsg_parserFn_list[eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max] = 
 {
     {   // 8 ICUBCANPROTO_PER_SB_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
@@ -174,13 +175,42 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensor
 extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_parser_LUTbl = 
 {                                        
 
-    EO_INIT(.capacity)          eo_icubCanProto_periodicSensorBoardMsg_inTbl_max,
+    EO_INIT(.capacity)          eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max,
     EO_INIT(.offset)            8,
     EO_INIT(.exceptionMngFn)    s_eo_icubCanProto_periodicSensorBoardMsg_parser_excFn,
     EO_INIT(.itemsList)         &s_periodicSensorBoardMsg_parserFn_list[0]                          
 };
 
 extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_parser_LUTbl__ptr = &icubCanProto_periodicSensorBoardMsg_parser_LUTbl;
+
+
+
+
+
+/* DECLARATION OF PERIODIC SENSOR BOARD FORMER BODY TBL */
+static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_periodicSensorBoardMsg_formerFn_list[eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max] = 
+{   
+    {   // 10 ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR 			
+        EO_INIT(.former)    eo_icubCanProto_former_per_sb_cmd__forceVector
+    },
+    {   // 11 ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR 			
+        EO_INIT(.former)    eo_icubCanProto_former_per_sb_cmd__torqueVector
+    }
+};        
+
+extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_former_LUTbl = 
+{                                        
+
+    EO_INIT(.capacity)          eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max,
+    EO_INIT(.offset)            10,
+    EO_INIT(.exceptionMngFn)    NULL,
+    EO_INIT(.itemsList)         &s_periodicSensorBoardMsg_formerFn_list[0]                          
+};
+
+extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_former_LUTbl__ptr = &icubCanProto_periodicSensorBoardMsg_former_LUTbl;
+
+
+
 
 
 
