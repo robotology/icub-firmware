@@ -8,8 +8,7 @@
 #define EIGHT_BITS      1
 #define TEN_BITS        2
 #define CALIB           3
-#define SKIN_2          0
-#define SKIN_PALM       1
+
 #define CONFIG_SINGLE 0
 #define CONFIG_THREE 1
 #define CONFIG_FINGERTIP 4
@@ -29,6 +28,14 @@
 
 #define _version  0x0210
 #define _build_number  5     //changed the I2C speed
+
+enum skin_type
+{
+	new_skin = 0,
+        palm_fingertips=1,
+        old_skin=2
+};
+
 
 
 #endif

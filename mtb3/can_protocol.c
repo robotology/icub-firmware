@@ -75,7 +75,24 @@ Note: if Bit 7 of B[0] is 1 then the second message has a payload of 6 byte inst
 // |class	| Source | Dest  |   type |    Payload     |
 //  -------  -------  -------  -------  -------  ------- 
 
+#define CAN_MSG_CLASS_ACC_GYRO 0x500
+// For messages of class 0x5 the meaning of data/ID is defined as follows:
+//  -------------------------- ------------------------
+// |           11b            |           8B            |
+//  -------  -------  -------   -------  -------  -------
+// | 3b     | 4b     |   4b  |          B[1-7]          |
+// |class   | Source | Type  |       Payload            |
+//  -------  -------  -------  -------  -------  -------
 
+//Type= 0 digital gyro
+//Type= 1 digital accelerometer
+//Type= 2 analog  accelerometer
+
+//Payload
+//
+// 3 axis 16 bits measurements (X,Y,Z). B[7] not used
+//
+      
 
 #define CAN_TX_SOFTWARE_BUFFER_SIZE 64
 

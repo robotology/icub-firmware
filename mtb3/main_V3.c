@@ -104,10 +104,13 @@
 #include "lis331dlh.h"
 
 
+#define CAN_MSG_CLASS_ACC_GYRO 0x500
+#define MSG_TYPE_GYRO 0x000
+#define MSG_TYPE_ACC 0x001
+#define MSG_TYPE_ANALOG_ACC 0x002
 
 //#define DEBUG
 //#define DEBUG_EMS //send a message in the triangle 0 pad 0 that goes from 0 to 255
-
 
 
 
@@ -120,6 +123,7 @@ _FWDT(WDT_OFF);      // WD disabled
  
  _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
+
 
 
 
@@ -225,7 +229,7 @@ unsigned char SHIFT_THREE=3;// shift of the CDC value for removing the noise
 unsigned char SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned char NOLOAD=245;
 unsigned char ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
-unsigned int ANALOG_ID=0x550; // default value
+unsigned int ANALOG_ID=0x552; // default value
 unsigned char DIG_GYRO=0; //gyro of the MMSP 
 unsigned char DIG_ACC=0; //accelerometer of the MMSP 
 unsigned char TEMP_COMPENSATION=1; //if 1 means internal temperature drift compensation 
@@ -235,7 +239,7 @@ int Tpad_palm_base; //initial value of the Tpad in the palm
 int Tpad_palm;      //current value of the Tpad in the palm
 int drift;      //current drift
 
-unsigned char SKIN_TYPE=0; //SKIN_2; //if =0 means new skin with drift compensation and 10 pads
+enum skin_type TYPE=new_skin; //SKIN_2; //if =0 means new skin with drift compensation and 10 pads
 unsigned int TRIANGLE_MASK=0xFFFF; //all the triangles are enabled for default
 unsigned char CONFIG_TYPE=CONFIG_SINGLE;
 unsigned char ERROR_COUNTER=0; //it counts the errors in reading the triangles.
@@ -274,7 +278,7 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt(void)
 	flag2=1;
 	if (ANALOG_ACC)
 {
-	    acc[0]=((AN2 &0xFF00) >>0x8); // axis X
+	acc[0]=((AN2 &0xFF00) >>0x8); // axis X
         acc[1]=(AN2 & 0xFF);
         acc[2]=((AN3 &0xFF00) >>0x8); // axis Y
         acc[3]=(AN3 & 0xFF);
@@ -481,21 +485,21 @@ if (DIG_GYRO || DIG_ACC)
         	gyro[4]=((gz &0xFF00) >>0x8); // axis Z
         	gyro[5]=(gz & 0xFF);
         	while (!CAN1IsTXReady(2));   
-        	PMsgID=0x600;   
-		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4; 
+        	PMsgID=CAN_MSG_CLASS_ACC_GYRO | MSG_TYPE_GYRO;
+		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4 ;
         	CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, gyro, 6,2);
   		}
   		if (DIG_ACC)
 		{    	
       		LISAxisBurst(&ax, &ay, &az);  
-		    acc[0]=((ax &0xFF00) >>0x8); // axis X
+		acc[0]=((ax &0xFF00) >>0x8); // axis X
 	        acc[1]=(ax & 0xFF);
 	        acc[2]=((ay &0xFF00) >>0x8); // axis Y
 	        acc[3]=(ay & 0xFF);
 	        acc[4]=((az &0xFF00) >>0x8); // axis Z
 	        acc[5]=(az & 0xFF);
-	       	PMsgID=0x500;   
+	       	PMsgID=CAN_MSG_CLASS_ACC_GYRO | MSG_TYPE_ACC;
 		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4; 
 	        while (!CAN1IsTXReady(1));    
         	CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
@@ -529,7 +533,7 @@ if (DIG_GYRO || DIG_ACC)
 				 	{
 					 	switch(CONFIG_TYPE)
 					 	{
-						 	case CONFIG_SINGLE :
+						case CONFIG_SINGLE :
 						 	{
 							 	// Service routine for the triangles 
 	            				 ServiceAD7147Isr(CH0);
@@ -543,7 +547,7 @@ if (DIG_GYRO || DIG_ACC)
 		      		
 		      				}
 		      				break;
-		      			    case CONFIG_THREE:
+		      			        case CONFIG_THREE:
 		      				{
 			      				ServiceAD7147Isr_three(CH0);
 			      				for (i=0;i<16;i++)					
@@ -561,7 +565,7 @@ if (DIG_GYRO || DIG_ACC)
 			      				}
 		      				}
 		      				break;
-		      			    case CONFIG_ALL:
+		      			        case CONFIG_ALL:
 		      				{
 						     	ServiceAD7147Isr_all(CH0);
 		      					for (i=0;i<16;i++)					
@@ -886,9 +890,9 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 			}
 			if (TEMP_COMPENSATION==1)
 			{
-				switch (SKIN_TYPE)
+				switch (TYPE)
 				{
-				case SKIN_2:
+				case new_skin:
 				{
 					if (Tpad>Tpad_base)
 					{
@@ -902,7 +906,7 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 				}
 				break;
 				
-				case SKIN_PALM:
+				case palm_fingertips:
 				{
 					if (Tpad_palm>Tpad_palm_base)
 					{

@@ -37,7 +37,7 @@ extern unsigned char DIG_ACC;
 extern 	tL3GI2COps l3g;
 extern 	tLISI2COps l3a;
 extern unsigned char TEMP_COMPENSATION;
-extern unsigned char SKIN_TYPE;
+extern enum skin_type TYPE;
 extern unsigned int TRIANGLE_MASK;
 extern char _additional_info[32];
 extern unsigned int ConValue[2];
@@ -505,27 +505,20 @@ int CAN1_handleRx (unsigned int board_id)
 					//data[2](first 4bit 0xF)  right SHIFT_THREE  factor for the sensor readings (3 macro areas)     
 				    //data[2](last 4 bit 0xF0) right SHIFT_ALL  factor for the sensor readings (1 macro area) 
 				    
-				    SHIFT_THREE =	 CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;             
+				        SHIFT_THREE =	 CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF;
 					SHIFT_ALL   =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[2]&0xF0)>>4;    
 					
 					//data[3] NO_LOAD value (it is set to 235 for default, it is the initial value of the sensor output) 
 					
 				    NOLOAD		=	CANRxBuffer[canRxBufferIndex-1].CAN_data[3]&0xFF;  
 					//data[4] 
-					//			bit 0: ANALOG ACCELEROMETER ON/OFF (0,1)
-					//          bit 1: DIGITAL ACCELEROMETER ON/OFF (0,1)
-					//          bit 2: DIGITAL GYROSCOPE ON/OFF (0,1)
-					//          bit 3: INTERNAL TEMPERATURE COMPENSATION ON/OFF (0,1)
-					//          bit 4: SKIN_TYPE   
-					//          bit 5: SKIN_TYPE          0,1,2  
-					//          bit 6:
-					//          bit 7: 
+					//          bit 0: NOT USED
+					//          bit 1: SKIN_TYPE
+					//          bit 2: SKIN_TYPE          0,1,2
+                                        //          bit 3: TEMPERATURE COMPENSATION
 					
-					ANALOG_ACC   = 	 CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x01;
-					DIG_ACC      =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x02)>>1;    
-					DIG_GYRO     =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x04)>>2;   
 					TEMP_COMPENSATION =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x08)>>3;
-					SKIN_TYPE =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x30)>>4;
+					TYPE =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[4]&0x03);
 					
 					//data[5] each bit represents the enable/disable of the triangle (each board has 16 triangles
 					//        but not all of them are always connected to the board. In this way you can EN/DIS each triangle
@@ -536,35 +529,46 @@ int CAN1_handleRx (unsigned int board_id)
 					
 					TRIANGLE_MASK= ((CANRxBuffer[canRxBufferIndex-1].CAN_data[6])<<8) | CANRxBuffer[canRxBufferIndex-1].CAN_data[5];
 
-					//data[7] time in ms of the accelerometers and gyroscope. From 1 to 255
-					
-					if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[7]) != 0)
+				
+					board_MODE=CALIB;
+					EnableIntT1;
+                                        
+				}
+				break;
+
+                                case CAN_ACC_GYRO_SETUP:
+                                {
+                                        ANALOG_ACC   = 	 CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x01;
+					DIG_ACC      =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x02)>>1;
+					DIG_GYRO     =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x04)>>2;
+                                        //data[7] time in ms of the accelerometers and gyroscope. From 1 to 255
+
+					if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]) != 0)
 					{
-						TIMER_VALUE2=0x132*CANRxBuffer[canRxBufferIndex-1].CAN_data[7]; 
+						TIMER_VALUE2=0x132*CANRxBuffer[canRxBufferIndex-1].CAN_data[2];
 					}
 					if (ANALOG_ACC)
 					{
-						 EnableIntT2;
-						 T2_Init(TIMER_VALUE2);
-						 ANALOG_ID=0x500;   
-    					 ANALOG_ID |= (BoardConfig.EE_CAN_BoardAddress<<4); 
-    				     ADC_Init();             //Initialize the A/D converter
+                                             EnableIntT2;
+                                             T2_Init(TIMER_VALUE2);
+				         ANALOG_ID=0x502;
+    					 ANALOG_ID |= (BoardConfig.EE_CAN_BoardAddress<<4);
+    				         ADC_Init();             //Initialize the A/D converter
 					}
 					if (DIG_GYRO || DIG_ACC)
 					{
 						 EnableIntT2;
 						 T2_Init(TIMER_VALUE2);
 						 L3GInit(l3g);
-				        
+
 				   	LISInit(l3a);
 					}
-					
+
 
 					board_MODE=CALIB;
 					EnableIntT1;
-                                        
-				}
-				break;
+                                }
+                                break;
 
 				case CAN_TACT_CALIB:
 				{	

@@ -1,4 +1,4 @@
-Microchip Technology Inc, vv1_10 (A) 9
+Microchip Technology Inc, vv1_10 (A) ?
 
 Tool Name:
   c:\program files (x86)\microchip\xc16\v1.10\bin\bin\..\bin/elf-ld.exe
@@ -127,23 +127,22 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x340           0x4e0  (1248)
 .const                       0x440                0x9c            0xea  (234)
-.text                        0x4dc              0x3102          0x4983  (18819)
-.text                       0x35de                0x22            0x33  (51)
+.text                        0x4dc              0x310e          0x4995  (18837)
+.isr                        0x35ea                 0x4             0x6  (6)
 .prog                       0x3600               0x200           0x300  (768)
 .text                       0x3800               0x1e6           0x2d9  (729)
-.dinit                      0x39e6                0x7a            0xb7  (183)
-.text                       0x3a60                0xd8           0x144  (324)
-.isr.text                   0x3b38                0x20            0x30  (48)
-.isr                        0x3b58                 0x4             0x6  (6)
+.dinit                      0x39e6                0x7c            0xba  (186)
+.text                       0x3a62                0xfa           0x177  (375)
+.isr.text                   0x3b5c                0x20            0x30  (48)
 
-                     Total program memory used (bytes):         0x578a  (22410) 56%
+                     Total program memory used (bytes):         0x579f  (22431) 56%
 
 
 Data EEPROM Memory  [Origin = 0x7ffc00, Length = 0x400]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-_02BEDAE051f62f72         0x7ffc00                0x26            0x26  (38)
+_02FADAE052020a2c         0x7ffc00                0x26            0x26  (38)
 
                         Total data EEPROM used (bytes):           0x26  (38) 3%
 
@@ -153,10 +152,10 @@ Data Memory  [Origin = 0x800, Length = 0x800]
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
 .nbss                        0x800                   0           0x302  (770)
-.ndata                       0xb02                   0            0x7e  (126)
-.nbss                        0xb80                   0            0x10  (16)
+.ndata                       0xb02                   0            0x80  (128)
+.nbss                        0xb82                   0            0x10  (16)
 
-                        Total data memory used (bytes):          0x390  (912) 44%
+                        Total data memory used (bytes):          0x392  (914) 44%
 
 
 Dynamic Memory Usage
@@ -164,9 +163,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                        0xb90                               0x470  (1136)
+stack                        0xb92                               0x46e  (1134)
 
-                        Maximum dynamic memory (bytes):          0x470  (1136)
+                        Maximum dynamic memory (bytes):          0x46e  (1134)
 
 
 External Symbols in Data Memory (by address):
@@ -201,61 +200,61 @@ External Symbols in Data Memory (by address):
                     0x0b5c                  _DIG_GYRO
                     0x0b5d                  _DIG_ACC
                     0x0b5e                  _TEMP_COMPENSATION
-                    0x0b5f                  _SKIN_TYPE
-                    0x0b60                  _TRIANGLE_MASK
-                    0x0b62                  _CONFIG_TYPE
-                    0x0b63                  _ERROR_COUNTER
-                    0x0b64                  _counter
-                    0x0b66                  _ConValue
-                    0x0b6a                  _acc
-                    0x0b72                  _gyro
-                    0x0b7a                  _AN2
-                    0x0b7c                  _AN3
-                    0x0b7e                  _AN4
-                    0x0b80                  _LISI2COps
-                    0x0b86                  _L3GI2COps
+                    0x0b60                  _TYPE
+                    0x0b62                  _TRIANGLE_MASK
+                    0x0b64                  _CONFIG_TYPE
+                    0x0b65                  _ERROR_COUNTER
+                    0x0b66                  _counter
+                    0x0b68                  _ConValue
+                    0x0b6c                  _acc
+                    0x0b74                  _gyro
+                    0x0b7c                  _AN2
+                    0x0b7e                  _AN3
+                    0x0b80                  _AN4
+                    0x0b82                  _LISI2COps
+                    0x0b88                  _L3GI2COps
 
 External Symbols in Data Memory (by name):
 
                     0x0802                  _AD7147Registers
-                    0x0b7a                  _AN2
-                    0x0b7c                  _AN3
-                    0x0b7e                  _AN4
+                    0x0b7c                  _AN2
+                    0x0b7e                  _AN3
+                    0x0b80                  _AN4
                     0x0b58                  _ANALOG_ACC
                     0x0b5a                  _ANALOG_ID
                     0x0982                  _BitToSend
                     0x0b02                  _BoardConfig
-                    0x0b62                  _CONFIG_TYPE
-                    0x0b66                  _ConValue
+                    0x0b64                  _CONFIG_TYPE
+                    0x0b68                  _ConValue
                     0x0b5d                  _DIG_ACC
                     0x0b5c                  _DIG_GYRO
-                    0x0b63                  _ERROR_COUNTER
-                    0x0b86                  _L3GI2COps
-                    0x0b80                  _LISI2COps
+                    0x0b65                  _ERROR_COUNTER
+                    0x0b88                  _L3GI2COps
+                    0x0b82                  _LISI2COps
                     0x0b57                  _NOLOAD
                     0x098e                  _PMsgID
                     0x0b4e                  _PW_CONTROL
                     0x0b54                  _SHIFT
                     0x0b56                  _SHIFT_ALL
                     0x0b55                  _SHIFT_THREE
-                    0x0b5f                  _SKIN_TYPE
                     0x0b5e                  _TEMP_COMPENSATION
                     0x0b50                  _TIMER_VALUE
                     0x0b52                  _TIMER_VALUE2
-                    0x0b60                  _TRIANGLE_MASK
+                    0x0b62                  _TRIANGLE_MASK
+                    0x0b60                  _TYPE
                     0x0986                  _Tpad
                     0x0984                  _Tpad_base
                     0x098a                  _Tpad_palm
                     0x0988                  _Tpad_palm_base
                     0x0b2e                  __additional_info
                     0x0b2a                  __board_ID
-                    0x0b6a                  _acc
+                    0x0b6c                  _acc
                     0x0b2c                  _board_MODE
-                    0x0b64                  _counter
+                    0x0b66                  _counter
                     0x098c                  _drift
                     0x0800                  _flag
                     0x0801                  _flag2
-                    0x0b72                  _gyro
+                    0x0b74                  _gyro
                     0x0996                  _l3a
                     0x0990                  _l3g
                     0x0b2d                  _new_board_MODE
@@ -339,14 +338,13 @@ External Symbols in Program Memory (by address):
                   0x002a8c                  _CAN1_RxbufferIndex_dec
                   0x002a9c                  _can_send_additional_info
                   0x002baa                  _CAN1_handleRx
-                  0x002f90                  _can_receive_additional_info
-                  0x002fa0                  _ConfigAD7147_T
-                  0x0031ce                  _ConfigAD7147
-                  0x0033e4                  _ConfigAD7147_ALL
-                  0x00345c                  _ConfigAD7147_THREE
-                  0x003530                  _ConfigAD7147_FINGERTIP
-                  0x0035de                  _LED_Init
-                  0x0035f2                  _LED_test
+                  0x002f9c                  _can_receive_additional_info
+                  0x002fac                  _ConfigAD7147_T
+                  0x0031da                  _ConfigAD7147
+                  0x0033f0                  _ConfigAD7147_ALL
+                  0x003468                  _ConfigAD7147_THREE
+                  0x00353c                  _ConfigAD7147_FINGERTIP
+                  0x0035ea                  __DefaultInterrupt
                   0x003600                  _CapOffset
                   0x003780                  _CapOffset_all
                   0x003800                  _L3GRegWrite
@@ -361,27 +359,28 @@ External Symbols in Program Memory (by address):
                   0x003922                  _LISInit
                   0x003968                  _LISAxisRead
                   0x0039be                  _LISAxisBurst
-                  0x003a60                  _SaveEepromBoardConfig
-                  0x003ab0                  _RecoverConfigurationFromEEprom
-                  0x003abe                  _ADC_Init
-                  0x003afc                  __ADCInterrupt
-                  0x003b0c                  _T1_Init
-                  0x003b22                  _T2_Init
-                  0x003b38                  __OscillatorFail
-                  0x003b3c                  __AddressError
-                  0x003b40                  __StackError
-                  0x003b44                  __MathError
-                  0x003b48                  __AltOscillatorFail
-                  0x003b4c                  __AltAddressError
-                  0x003b50                  __AltStackError
-                  0x003b54                  __AltMathError
-                  0x003b58                  __DefaultInterrupt
+                  0x003a62                  _SaveEepromBoardConfig
+                  0x003ab2                  _RecoverConfigurationFromEEprom
+                  0x003ac0                  _ADC_Init
+                  0x003afe                  __ADCInterrupt
+                  0x003b0e                  _T1_Init
+                  0x003b24                  _T2_Init
+                  0x003b3a                  _LED_Init
+                  0x003b4e                  _LED_test
+                  0x003b5c                  __OscillatorFail
+                  0x003b60                  __AddressError
+                  0x003b64                  __StackError
+                  0x003b68                  __MathError
+                  0x003b6c                  __AltOscillatorFail
+                  0x003b70                  __AltAddressError
+                  0x003b74                  __AltStackError
+                  0x003b78                  __AltMathError
                   0xf8000a                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
                   0x000440                  _AD7147_ADD
-                  0x003abe                  _ADC_Init
+                  0x003ac0                  _ADC_Init
                   0x00019c                  _CAN1AbortAll
                   0x0001a0                  _CAN1Initialize
                   0x0001a6                  _CAN1IsTXReady
@@ -400,11 +399,11 @@ External Symbols in Program Memory (by name):
                   0x0027d4                  _CAN_Init
                   0x003600                  _CapOffset
                   0x003780                  _CapOffset_all
-                  0x0031ce                  _ConfigAD7147
-                  0x0033e4                  _ConfigAD7147_ALL
-                  0x003530                  _ConfigAD7147_FINGERTIP
-                  0x002fa0                  _ConfigAD7147_T
-                  0x00345c                  _ConfigAD7147_THREE
+                  0x0031da                  _ConfigAD7147
+                  0x0033f0                  _ConfigAD7147_ALL
+                  0x00353c                  _ConfigAD7147_FINGERTIP
+                  0x002fac                  _ConfigAD7147_T
+                  0x003468                  _ConfigAD7147_THREE
                   0x0002e2                  _ConfigIntCAN1
                   0x000308                  _ConfigIntTimer1
                   0x000324                  _ConfigIntTimer2
@@ -421,8 +420,8 @@ External Symbols in Program Memory (by name):
                   0x00381e                  _L3GRegBurst
                   0x00380c                  _L3GRegRead
                   0x003800                  _L3GRegWrite
-                  0x0035de                  _LED_Init
-                  0x0035f2                  _LED_test
+                  0x003b3a                  _LED_Init
+                  0x003b4e                  _LED_test
                   0x0039be                  _LISAxisBurst
                   0x003968                  _LISAxisRead
                   0x003922                  _LISInit
@@ -435,16 +434,16 @@ External Symbols in Program Memory (by name):
                   0x00270c                  _ReadByteViaI2C
                   0x002554                  _ReadViaI2C
                   0x001f7c                  _ReceiveByteI2CMaster
-                  0x003ab0                  _RecoverConfigurationFromEEprom
-                  0x003a60                  _SaveEepromBoardConfig
+                  0x003ab2                  _RecoverConfigurationFromEEprom
+                  0x003a62                  _SaveEepromBoardConfig
                   0x001d76                  _SendByteI2CMaster
                   0x000660                  _ServiceAD7147Isr_all
                   0x0006d0                  _ServiceAD7147Isr_three
                   0x00276a                  _SetBoardCanFilter
                   0x001cd4                  _StartI2CMaster
                   0x001d2e                  _StopI2CMaster
-                  0x003b0c                  _T1_Init
-                  0x003b22                  _T2_Init
+                  0x003b0e                  _T1_Init
+                  0x003b24                  _T2_Init
                   0x000742                  _TrianglesInit
                   0x000978                  _TrianglesInit_all
                   0x000740                  _Wait
@@ -452,18 +451,18 @@ External Symbols in Program Memory (by name):
                   0x000358                  _WriteTimer1
                   0x00035c                  _WriteTimer2
                   0x001eac                  _WriteViaI2C
-                  0x003afc                  __ADCInterrupt
-                  0x003b3c                  __AddressError
-                  0x003b4c                  __AltAddressError
-                  0x003b54                  __AltMathError
-                  0x003b48                  __AltOscillatorFail
-                  0x003b50                  __AltStackError
+                  0x003afe                  __ADCInterrupt
+                  0x003b60                  __AddressError
+                  0x003b70                  __AltAddressError
+                  0x003b78                  __AltMathError
+                  0x003b6c                  __AltOscillatorFail
+                  0x003b74                  __AltStackError
                   0x000630                  __C1Interrupt
-                  0x003b58                  __DefaultInterrupt
+                  0x0035ea                  __DefaultInterrupt
                   0xf8000a                  __FGS.sec
-                  0x003b44                  __MathError
-                  0x003b38                  __OscillatorFail
-                  0x003b40                  __StackError
+                  0x003b68                  __MathError
+                  0x003b5c                  __OscillatorFail
+                  0x003b64                  __StackError
                   0x0005bc                  __T1Interrupt
                   0x0005c8                  __T2Interrupt
                   0x000132                  __data_init
@@ -483,7 +482,7 @@ External Symbols in Program Memory (by name):
                   0x000484                  __pCapOffset_all
                   0x000122                  __psv_init
                   0x000100                  __resetPRI
-                  0x002f90                  _can_receive_additional_info
+                  0x002f9c                  _can_receive_additional_info
                   0x002a9c                  _can_send_additional_info
                   0x00129c                  _main
 
@@ -666,51 +665,51 @@ userdata
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x6312
+.debug_info       0x000000       0x638e
  *(.debug_info)
- .debug_info      0x000000       0x19ba build/default/production/_ext/1472/can_interface.o
- .debug_info      0x0019ba         0xaa build/default/production/_ext/1472/can_protocol.o
- .debug_info      0x001a64        0xbed build/default/production/_ext/1472/I2C.o
- .debug_info      0x002651        0x384 build/default/production/_ext/1472/LED.o
- .debug_info      0x0029d5       0x1bbb build/default/production/_ext/1472/main_V3.o
- .debug_info      0x004590        0x27b build/default/production/_ext/1472/traps.o
- .debug_info      0x00480b        0x30e build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_info      0x004b19        0x454 build/default/production/_ext/1472/eeprom.o
- .debug_info      0x004f6d         0xf2 build/default/production/_ext/1472/timers.o
- .debug_info      0x00505f        0xb53 build/default/production/_ext/1472/ADC.o
- .debug_info      0x005bb2        0x3b6 build/default/production/_ext/1472/lis331dlh.o
- .debug_info      0x005f68        0x3aa build/default/production/_ext/1472/l3g4200d.o
+ .debug_info      0x000000       0x19f7 build/default/production/_ext/1472/can_interface.o
+ .debug_info      0x0019f7         0xaa build/default/production/_ext/1472/can_protocol.o
+ .debug_info      0x001aa1        0xbed build/default/production/_ext/1472/I2C.o
+ .debug_info      0x00268e        0x384 build/default/production/_ext/1472/LED.o
+ .debug_info      0x002a12       0x1bfa build/default/production/_ext/1472/main_V3.o
+ .debug_info      0x00460c        0x27b build/default/production/_ext/1472/traps.o
+ .debug_info      0x004887        0x30e build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_info      0x004b95        0x454 build/default/production/_ext/1472/eeprom.o
+ .debug_info      0x004fe9         0xf2 build/default/production/_ext/1472/timers.o
+ .debug_info      0x0050db        0xb53 build/default/production/_ext/1472/ADC.o
+ .debug_info      0x005c2e        0x3b6 build/default/production/_ext/1472/lis331dlh.o
+ .debug_info      0x005fe4        0x3aa build/default/production/_ext/1472/l3g4200d.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0xd33
+.debug_abbrev     0x000000        0xd74
  *(.debug_abbrev)
- .debug_abbrev    0x000000        0x271 build/default/production/_ext/1472/can_interface.o
- .debug_abbrev    0x000271         0x1f build/default/production/_ext/1472/can_protocol.o
- .debug_abbrev    0x000290        0x19a build/default/production/_ext/1472/I2C.o
- .debug_abbrev    0x00042a         0x8c build/default/production/_ext/1472/LED.o
- .debug_abbrev    0x0004b6        0x28f build/default/production/_ext/1472/main_V3.o
- .debug_abbrev    0x000745         0x7d build/default/production/_ext/1472/traps.o
- .debug_abbrev    0x0007c2         0xda build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_abbrev    0x00089c        0x140 build/default/production/_ext/1472/eeprom.o
- .debug_abbrev    0x0009dc         0x5a build/default/production/_ext/1472/timers.o
- .debug_abbrev    0x000a36        0x10b build/default/production/_ext/1472/ADC.o
- .debug_abbrev    0x000b41         0xf9 build/default/production/_ext/1472/lis331dlh.o
- .debug_abbrev    0x000c3a         0xf9 build/default/production/_ext/1472/l3g4200d.o
+ .debug_abbrev    0x000000        0x289 build/default/production/_ext/1472/can_interface.o
+ .debug_abbrev    0x000289         0x1f build/default/production/_ext/1472/can_protocol.o
+ .debug_abbrev    0x0002a8        0x19a build/default/production/_ext/1472/I2C.o
+ .debug_abbrev    0x000442         0x8c build/default/production/_ext/1472/LED.o
+ .debug_abbrev    0x0004ce        0x2b8 build/default/production/_ext/1472/main_V3.o
+ .debug_abbrev    0x000786         0x7d build/default/production/_ext/1472/traps.o
+ .debug_abbrev    0x000803         0xda build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_abbrev    0x0008dd        0x140 build/default/production/_ext/1472/eeprom.o
+ .debug_abbrev    0x000a1d         0x5a build/default/production/_ext/1472/timers.o
+ .debug_abbrev    0x000a77        0x10b build/default/production/_ext/1472/ADC.o
+ .debug_abbrev    0x000b82         0xf9 build/default/production/_ext/1472/lis331dlh.o
+ .debug_abbrev    0x000c7b         0xf9 build/default/production/_ext/1472/l3g4200d.o
 
-.debug_line       0x000000       0x4c4f
+.debug_line       0x000000       0x4c81
  *(.debug_line)
- .debug_line      0x000000        0xa99 build/default/production/_ext/1472/can_interface.o
- .debug_line      0x000a99         0x24 build/default/production/_ext/1472/can_protocol.o
- .debug_line      0x000abd       0x12a5 build/default/production/_ext/1472/I2C.o
- .debug_line      0x001d62        0x127 build/default/production/_ext/1472/LED.o
- .debug_line      0x001e89       0x1a69 build/default/production/_ext/1472/main_V3.o
- .debug_line      0x0038f2        0x15d build/default/production/_ext/1472/traps.o
- .debug_line      0x003a4f        0xb16 build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_line      0x004565        0x194 build/default/production/_ext/1472/eeprom.o
- .debug_line      0x0046f9         0x97 build/default/production/_ext/1472/timers.o
- .debug_line      0x004790        0x15f build/default/production/_ext/1472/ADC.o
- .debug_line      0x0048ef        0x1a9 build/default/production/_ext/1472/lis331dlh.o
- .debug_line      0x004a98        0x1b7 build/default/production/_ext/1472/l3g4200d.o
+ .debug_line      0x000000        0xabe build/default/production/_ext/1472/can_interface.o
+ .debug_line      0x000abe         0x24 build/default/production/_ext/1472/can_protocol.o
+ .debug_line      0x000ae2       0x12a5 build/default/production/_ext/1472/I2C.o
+ .debug_line      0x001d87        0x127 build/default/production/_ext/1472/LED.o
+ .debug_line      0x001eae       0x1a76 build/default/production/_ext/1472/main_V3.o
+ .debug_line      0x003924        0x15d build/default/production/_ext/1472/traps.o
+ .debug_line      0x003a81        0xb16 build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_line      0x004597        0x194 build/default/production/_ext/1472/eeprom.o
+ .debug_line      0x00472b         0x97 build/default/production/_ext/1472/timers.o
+ .debug_line      0x0047c2        0x15f build/default/production/_ext/1472/ADC.o
+ .debug_line      0x004921        0x1a9 build/default/production/_ext/1472/lis331dlh.o
+ .debug_line      0x004aca        0x1b7 build/default/production/_ext/1472/l3g4200d.o
 
 .debug_frame      0x000000        0x658
  *(.debug_frame)
@@ -726,19 +725,19 @@ userdata
  .debug_frame     0x000570         0x74 build/default/production/_ext/1472/lis331dlh.o
  .debug_frame     0x0005e4         0x74 build/default/production/_ext/1472/l3g4200d.o
 
-.debug_str        0x000000        0x540
+.debug_str        0x000000        0x52c
  *(.debug_str)
- .debug_str       0x000000        0x174 build/default/production/_ext/1472/can_interface.o
- .debug_str       0x000174        0x106 build/default/production/_ext/1472/I2C.o
- .debug_str       0x00027a         0x1d build/default/production/_ext/1472/LED.o
- .debug_str       0x000297        0x1f0 build/default/production/_ext/1472/main_V3.o
- .debug_str       0x000487          0xc build/default/production/_ext/1472/traps.o
- .debug_str       0x000493         0x38 build/default/production/_ext/1472/AD7147 - Configuration.o
- .debug_str       0x0004cb         0x17 build/default/production/_ext/1472/eeprom.o
- .debug_str       0x0004e2          0xc build/default/production/_ext/1472/timers.o
- .debug_str       0x0004ee         0x3e build/default/production/_ext/1472/ADC.o
- .debug_str       0x00052c          0xa build/default/production/_ext/1472/lis331dlh.o
- .debug_str       0x000536          0xa build/default/production/_ext/1472/l3g4200d.o
+ .debug_str       0x000000        0x16a build/default/production/_ext/1472/can_interface.o
+ .debug_str       0x00016a        0x106 build/default/production/_ext/1472/I2C.o
+ .debug_str       0x000270         0x1d build/default/production/_ext/1472/LED.o
+ .debug_str       0x00028d        0x1e6 build/default/production/_ext/1472/main_V3.o
+ .debug_str       0x000473          0xc build/default/production/_ext/1472/traps.o
+ .debug_str       0x00047f         0x38 build/default/production/_ext/1472/AD7147 - Configuration.o
+ .debug_str       0x0004b7         0x17 build/default/production/_ext/1472/eeprom.o
+ .debug_str       0x0004ce          0xc build/default/production/_ext/1472/timers.o
+ .debug_str       0x0004da         0x3e build/default/production/_ext/1472/ADC.o
+ .debug_str       0x000518          0xa build/default/production/_ext/1472/lis331dlh.o
+ .debug_str       0x000522          0xa build/default/production/_ext/1472/l3g4200d.o
 
 .debug_loc
  *(.debug_loc)
@@ -747,7 +746,7 @@ userdata
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0x8a5
+                  0x000000        0x8a0
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0xf1 build/default/production/_ext/1472/can_interface.o
@@ -756,21 +755,21 @@ userdata
  .debug_pubnames
                   0x0001e3         0x2c build/default/production/_ext/1472/LED.o
  .debug_pubnames
-                  0x00020f        0x3cf build/default/production/_ext/1472/main_V3.o
+                  0x00020f        0x3ca build/default/production/_ext/1472/main_V3.o
  .debug_pubnames
-                  0x0005de         0xa8 build/default/production/_ext/1472/traps.o
+                  0x0005d9         0xa8 build/default/production/_ext/1472/traps.o
  .debug_pubnames
-                  0x000686         0x7d build/default/production/_ext/1472/AD7147 - Configuration.o
+                  0x000681         0x7d build/default/production/_ext/1472/AD7147 - Configuration.o
  .debug_pubnames
-                  0x000703         0x4f build/default/production/_ext/1472/eeprom.o
+                  0x0006fe         0x4f build/default/production/_ext/1472/eeprom.o
  .debug_pubnames
-                  0x000752         0x2a build/default/production/_ext/1472/timers.o
+                  0x00074d         0x2a build/default/production/_ext/1472/timers.o
  .debug_pubnames
-                  0x00077c         0x31 build/default/production/_ext/1472/ADC.o
+                  0x000777         0x31 build/default/production/_ext/1472/ADC.o
  .debug_pubnames
-                  0x0007ad         0x7c build/default/production/_ext/1472/lis331dlh.o
+                  0x0007a8         0x7c build/default/production/_ext/1472/lis331dlh.o
  .debug_pubnames
-                  0x000829         0x7c build/default/production/_ext/1472/l3g4200d.o
+                  0x000824         0x7c build/default/production/_ext/1472/l3g4200d.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -801,132 +800,132 @@ userdata
                   0x0000f0         0x18 build/default/production/_ext/1472/l3g4200d.o
 
 .ivt              0x000004         0x7c
-                  0x000004          0x4 LONG 0x3b58 DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
-                  0x000006          0x4 LONG 0x3b38 DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
-                  0x000008          0x4 LONG 0x3b3c DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000a          0x4 LONG 0x3b40 DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000c          0x4 LONG 0x3b44 DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
-                  0x00000e          0x4 LONG 0x3b58 DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
-                  0x000010          0x4 LONG 0x3b58 DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
-                  0x000012          0x4 LONG 0x3b58 DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
-                  0x000014          0x4 LONG 0x3b58 DEFINED (__INT0Interrupt)?ABSOLUTE (__INT0Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000016          0x4 LONG 0x3b58 DEFINED (__IC1Interrupt)?ABSOLUTE (__IC1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000018          0x4 LONG 0x3b58 DEFINED (__OC1Interrupt)?ABSOLUTE (__OC1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000004          0x4 LONG 0x35ea DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
+                  0x000006          0x4 LONG 0x3b5c DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
+                  0x000008          0x4 LONG 0x3b60 DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000a          0x4 LONG 0x3b64 DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000c          0x4 LONG 0x3b68 DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
+                  0x00000e          0x4 LONG 0x35ea DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
+                  0x000010          0x4 LONG 0x35ea DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
+                  0x000012          0x4 LONG 0x35ea DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
+                  0x000014          0x4 LONG 0x35ea DEFINED (__INT0Interrupt)?ABSOLUTE (__INT0Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000016          0x4 LONG 0x35ea DEFINED (__IC1Interrupt)?ABSOLUTE (__IC1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000018          0x4 LONG 0x35ea DEFINED (__OC1Interrupt)?ABSOLUTE (__OC1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00001a          0x4 LONG 0x5bc DEFINED (__T1Interrupt)?ABSOLUTE (__T1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00001c          0x4 LONG 0x3b58 DEFINED (__IC2Interrupt)?ABSOLUTE (__IC2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00001e          0x4 LONG 0x3b58 DEFINED (__OC2Interrupt)?ABSOLUTE (__OC2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00001c          0x4 LONG 0x35ea DEFINED (__IC2Interrupt)?ABSOLUTE (__IC2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00001e          0x4 LONG 0x35ea DEFINED (__OC2Interrupt)?ABSOLUTE (__OC2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x000020          0x4 LONG 0x5c8 DEFINED (__T2Interrupt)?ABSOLUTE (__T2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000022          0x4 LONG 0x3b58 DEFINED (__T3Interrupt)?ABSOLUTE (__T3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000024          0x4 LONG 0x3b58 DEFINED (__SPI1Interrupt)?ABSOLUTE (__SPI1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000026          0x4 LONG 0x3b58 DEFINED (__U1RXInterrupt)?ABSOLUTE (__U1RXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000028          0x4 LONG 0x3b58 DEFINED (__U1TXInterrupt)?ABSOLUTE (__U1TXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00002a          0x4 LONG 0x3afc DEFINED (__ADCInterrupt)?ABSOLUTE (__ADCInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00002c          0x4 LONG 0x3b58 DEFINED (__NVMInterrupt)?ABSOLUTE (__NVMInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00002e          0x4 LONG 0x3b58 DEFINED (__SI2CInterrupt)?ABSOLUTE (__SI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000030          0x4 LONG 0x3b58 DEFINED (__MI2CInterrupt)?ABSOLUTE (__MI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000032          0x4 LONG 0x3b58 DEFINED (__CNInterrupt)?ABSOLUTE (__CNInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000034          0x4 LONG 0x3b58 DEFINED (__INT1Interrupt)?ABSOLUTE (__INT1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000036          0x4 LONG 0x3b58 DEFINED (__IC7Interrupt)?ABSOLUTE (__IC7Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000038          0x4 LONG 0x3b58 DEFINED (__IC8Interrupt)?ABSOLUTE (__IC8Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00003a          0x4 LONG 0x3b58 DEFINED (__OC3Interrupt)?ABSOLUTE (__OC3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00003c          0x4 LONG 0x3b58 DEFINED (__OC4Interrupt)?ABSOLUTE (__OC4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00003e          0x4 LONG 0x3b58 DEFINED (__T4Interrupt)?ABSOLUTE (__T4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000040          0x4 LONG 0x3b58 DEFINED (__T5Interrupt)?ABSOLUTE (__T5Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000042          0x4 LONG 0x3b58 DEFINED (__INT2Interrupt)?ABSOLUTE (__INT2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000044          0x4 LONG 0x3b58 DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000046          0x4 LONG 0x3b58 DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000048          0x4 LONG 0x3b58 DEFINED (__SPI2Interrupt)?ABSOLUTE (__SPI2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000022          0x4 LONG 0x35ea DEFINED (__T3Interrupt)?ABSOLUTE (__T3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000024          0x4 LONG 0x35ea DEFINED (__SPI1Interrupt)?ABSOLUTE (__SPI1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000026          0x4 LONG 0x35ea DEFINED (__U1RXInterrupt)?ABSOLUTE (__U1RXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000028          0x4 LONG 0x35ea DEFINED (__U1TXInterrupt)?ABSOLUTE (__U1TXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00002a          0x4 LONG 0x3afe DEFINED (__ADCInterrupt)?ABSOLUTE (__ADCInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00002c          0x4 LONG 0x35ea DEFINED (__NVMInterrupt)?ABSOLUTE (__NVMInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00002e          0x4 LONG 0x35ea DEFINED (__SI2CInterrupt)?ABSOLUTE (__SI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000030          0x4 LONG 0x35ea DEFINED (__MI2CInterrupt)?ABSOLUTE (__MI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000032          0x4 LONG 0x35ea DEFINED (__CNInterrupt)?ABSOLUTE (__CNInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000034          0x4 LONG 0x35ea DEFINED (__INT1Interrupt)?ABSOLUTE (__INT1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000036          0x4 LONG 0x35ea DEFINED (__IC7Interrupt)?ABSOLUTE (__IC7Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000038          0x4 LONG 0x35ea DEFINED (__IC8Interrupt)?ABSOLUTE (__IC8Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00003a          0x4 LONG 0x35ea DEFINED (__OC3Interrupt)?ABSOLUTE (__OC3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00003c          0x4 LONG 0x35ea DEFINED (__OC4Interrupt)?ABSOLUTE (__OC4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00003e          0x4 LONG 0x35ea DEFINED (__T4Interrupt)?ABSOLUTE (__T4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000040          0x4 LONG 0x35ea DEFINED (__T5Interrupt)?ABSOLUTE (__T5Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000042          0x4 LONG 0x35ea DEFINED (__INT2Interrupt)?ABSOLUTE (__INT2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000044          0x4 LONG 0x35ea DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000046          0x4 LONG 0x35ea DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000048          0x4 LONG 0x35ea DEFINED (__SPI2Interrupt)?ABSOLUTE (__SPI2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00004a          0x4 LONG 0x630 DEFINED (__C1Interrupt)?ABSOLUTE (__C1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00004c          0x4 LONG 0x3b58 DEFINED (__IC3Interrupt)?ABSOLUTE (__IC3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00004e          0x4 LONG 0x3b58 DEFINED (__IC4Interrupt)?ABSOLUTE (__IC4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000050          0x4 LONG 0x3b58 DEFINED (__IC5Interrupt)?ABSOLUTE (__IC5Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000052          0x4 LONG 0x3b58 DEFINED (__IC6Interrupt)?ABSOLUTE (__IC6Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000054          0x4 LONG 0x3b58 DEFINED (__OC5Interrupt)?ABSOLUTE (__OC5Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000056          0x4 LONG 0x3b58 DEFINED (__OC6Interrupt)?ABSOLUTE (__OC6Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000058          0x4 LONG 0x3b58 DEFINED (__OC7Interrupt)?ABSOLUTE (__OC7Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00005a          0x4 LONG 0x3b58 DEFINED (__OC8Interrupt)?ABSOLUTE (__OC8Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00005c          0x4 LONG 0x3b58 DEFINED (__INT3Interrupt)?ABSOLUTE (__INT3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00005e          0x4 LONG 0x3b58 DEFINED (__INT4Interrupt)?ABSOLUTE (__INT4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000060          0x4 LONG 0x3b58 DEFINED (__C2Interrupt)?ABSOLUTE (__C2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000062          0x4 LONG 0x3b58 DEFINED (__PWMInterrupt)?ABSOLUTE (__PWMInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000064          0x4 LONG 0x3b58 DEFINED (__QEIInterrupt)?ABSOLUTE (__QEIInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000066          0x4 LONG 0x3b58 DEFINED (__DCIInterrupt)?ABSOLUTE (__DCIInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000068          0x4 LONG 0x3b58 DEFINED (__LVDInterrupt)?ABSOLUTE (__LVDInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00006a          0x4 LONG 0x3b58 DEFINED (__FLTAInterrupt)?ABSOLUTE (__FLTAInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00006c          0x4 LONG 0x3b58 DEFINED (__FLTBInterrupt)?ABSOLUTE (__FLTBInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00006e          0x4 LONG 0x3b58 DEFINED (__Interrupt45)?ABSOLUTE (__Interrupt45):ABSOLUTE (__DefaultInterrupt)
-                  0x000070          0x4 LONG 0x3b58 DEFINED (__Interrupt46)?ABSOLUTE (__Interrupt46):ABSOLUTE (__DefaultInterrupt)
-                  0x000072          0x4 LONG 0x3b58 DEFINED (__Interrupt47)?ABSOLUTE (__Interrupt47):ABSOLUTE (__DefaultInterrupt)
-                  0x000074          0x4 LONG 0x3b58 DEFINED (__Interrupt48)?ABSOLUTE (__Interrupt48):ABSOLUTE (__DefaultInterrupt)
-                  0x000076          0x4 LONG 0x3b58 DEFINED (__Interrupt49)?ABSOLUTE (__Interrupt49):ABSOLUTE (__DefaultInterrupt)
-                  0x000078          0x4 LONG 0x3b58 DEFINED (__Interrupt50)?ABSOLUTE (__Interrupt50):ABSOLUTE (__DefaultInterrupt)
-                  0x00007a          0x4 LONG 0x3b58 DEFINED (__Interrupt51)?ABSOLUTE (__Interrupt51):ABSOLUTE (__DefaultInterrupt)
-                  0x00007c          0x4 LONG 0x3b58 DEFINED (__Interrupt52)?ABSOLUTE (__Interrupt52):ABSOLUTE (__DefaultInterrupt)
-                  0x00007e          0x4 LONG 0x3b58 DEFINED (__Interrupt53)?ABSOLUTE (__Interrupt53):ABSOLUTE (__DefaultInterrupt)
+                  0x00004c          0x4 LONG 0x35ea DEFINED (__IC3Interrupt)?ABSOLUTE (__IC3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00004e          0x4 LONG 0x35ea DEFINED (__IC4Interrupt)?ABSOLUTE (__IC4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000050          0x4 LONG 0x35ea DEFINED (__IC5Interrupt)?ABSOLUTE (__IC5Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000052          0x4 LONG 0x35ea DEFINED (__IC6Interrupt)?ABSOLUTE (__IC6Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000054          0x4 LONG 0x35ea DEFINED (__OC5Interrupt)?ABSOLUTE (__OC5Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000056          0x4 LONG 0x35ea DEFINED (__OC6Interrupt)?ABSOLUTE (__OC6Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000058          0x4 LONG 0x35ea DEFINED (__OC7Interrupt)?ABSOLUTE (__OC7Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00005a          0x4 LONG 0x35ea DEFINED (__OC8Interrupt)?ABSOLUTE (__OC8Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00005c          0x4 LONG 0x35ea DEFINED (__INT3Interrupt)?ABSOLUTE (__INT3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00005e          0x4 LONG 0x35ea DEFINED (__INT4Interrupt)?ABSOLUTE (__INT4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000060          0x4 LONG 0x35ea DEFINED (__C2Interrupt)?ABSOLUTE (__C2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000062          0x4 LONG 0x35ea DEFINED (__PWMInterrupt)?ABSOLUTE (__PWMInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000064          0x4 LONG 0x35ea DEFINED (__QEIInterrupt)?ABSOLUTE (__QEIInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000066          0x4 LONG 0x35ea DEFINED (__DCIInterrupt)?ABSOLUTE (__DCIInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000068          0x4 LONG 0x35ea DEFINED (__LVDInterrupt)?ABSOLUTE (__LVDInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00006a          0x4 LONG 0x35ea DEFINED (__FLTAInterrupt)?ABSOLUTE (__FLTAInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00006c          0x4 LONG 0x35ea DEFINED (__FLTBInterrupt)?ABSOLUTE (__FLTBInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00006e          0x4 LONG 0x35ea DEFINED (__Interrupt45)?ABSOLUTE (__Interrupt45):ABSOLUTE (__DefaultInterrupt)
+                  0x000070          0x4 LONG 0x35ea DEFINED (__Interrupt46)?ABSOLUTE (__Interrupt46):ABSOLUTE (__DefaultInterrupt)
+                  0x000072          0x4 LONG 0x35ea DEFINED (__Interrupt47)?ABSOLUTE (__Interrupt47):ABSOLUTE (__DefaultInterrupt)
+                  0x000074          0x4 LONG 0x35ea DEFINED (__Interrupt48)?ABSOLUTE (__Interrupt48):ABSOLUTE (__DefaultInterrupt)
+                  0x000076          0x4 LONG 0x35ea DEFINED (__Interrupt49)?ABSOLUTE (__Interrupt49):ABSOLUTE (__DefaultInterrupt)
+                  0x000078          0x4 LONG 0x35ea DEFINED (__Interrupt50)?ABSOLUTE (__Interrupt50):ABSOLUTE (__DefaultInterrupt)
+                  0x00007a          0x4 LONG 0x35ea DEFINED (__Interrupt51)?ABSOLUTE (__Interrupt51):ABSOLUTE (__DefaultInterrupt)
+                  0x00007c          0x4 LONG 0x35ea DEFINED (__Interrupt52)?ABSOLUTE (__Interrupt52):ABSOLUTE (__DefaultInterrupt)
+                  0x00007e          0x4 LONG 0x35ea DEFINED (__Interrupt53)?ABSOLUTE (__Interrupt53):ABSOLUTE (__DefaultInterrupt)
 
 .aivt             0x000084         0x7c
-                  0x000084          0x4 LONG 0x3b58 DEFINED (__AltReservedTrap0)?ABSOLUTE (__AltReservedTrap0):DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
-                  0x000086          0x4 LONG 0x3b48 DEFINED (__AltOscillatorFail)?ABSOLUTE (__AltOscillatorFail):DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
-                  0x000088          0x4 LONG 0x3b4c DEFINED (__AltAddressError)?ABSOLUTE (__AltAddressError):DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008a          0x4 LONG 0x3b50 DEFINED (__AltStackError)?ABSOLUTE (__AltStackError):DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008c          0x4 LONG 0x3b54 DEFINED (__AltMathError)?ABSOLUTE (__AltMathError):DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
-                  0x00008e          0x4 LONG 0x3b58 DEFINED (__AltReservedTrap5)?ABSOLUTE (__AltReservedTrap5):DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
-                  0x000090          0x4 LONG 0x3b58 DEFINED (__AltReservedTrap6)?ABSOLUTE (__AltReservedTrap6):DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
-                  0x000092          0x4 LONG 0x3b58 DEFINED (__AltReservedTrap7)?ABSOLUTE (__AltReservedTrap7):DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
-                  0x000094          0x4 LONG 0x3b58 DEFINED (__AltINT0Interrupt)?ABSOLUTE (__AltINT0Interrupt):DEFINED (__INT0Interrupt)?ABSOLUTE (__INT0Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000096          0x4 LONG 0x3b58 DEFINED (__AltIC1Interrupt)?ABSOLUTE (__AltIC1Interrupt):DEFINED (__IC1Interrupt)?ABSOLUTE (__IC1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x000098          0x4 LONG 0x3b58 DEFINED (__AltOC1Interrupt)?ABSOLUTE (__AltOC1Interrupt):DEFINED (__OC1Interrupt)?ABSOLUTE (__OC1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000084          0x4 LONG 0x35ea DEFINED (__AltReservedTrap0)?ABSOLUTE (__AltReservedTrap0):DEFINED (__ReservedTrap0)?ABSOLUTE (__ReservedTrap0):ABSOLUTE (__DefaultInterrupt)
+                  0x000086          0x4 LONG 0x3b6c DEFINED (__AltOscillatorFail)?ABSOLUTE (__AltOscillatorFail):DEFINED (__OscillatorFail)?ABSOLUTE (__OscillatorFail):ABSOLUTE (__DefaultInterrupt)
+                  0x000088          0x4 LONG 0x3b70 DEFINED (__AltAddressError)?ABSOLUTE (__AltAddressError):DEFINED (__AddressError)?ABSOLUTE (__AddressError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008a          0x4 LONG 0x3b74 DEFINED (__AltStackError)?ABSOLUTE (__AltStackError):DEFINED (__StackError)?ABSOLUTE (__StackError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008c          0x4 LONG 0x3b78 DEFINED (__AltMathError)?ABSOLUTE (__AltMathError):DEFINED (__MathError)?ABSOLUTE (__MathError):ABSOLUTE (__DefaultInterrupt)
+                  0x00008e          0x4 LONG 0x35ea DEFINED (__AltReservedTrap5)?ABSOLUTE (__AltReservedTrap5):DEFINED (__ReservedTrap5)?ABSOLUTE (__ReservedTrap5):ABSOLUTE (__DefaultInterrupt)
+                  0x000090          0x4 LONG 0x35ea DEFINED (__AltReservedTrap6)?ABSOLUTE (__AltReservedTrap6):DEFINED (__ReservedTrap6)?ABSOLUTE (__ReservedTrap6):ABSOLUTE (__DefaultInterrupt)
+                  0x000092          0x4 LONG 0x35ea DEFINED (__AltReservedTrap7)?ABSOLUTE (__AltReservedTrap7):DEFINED (__ReservedTrap7)?ABSOLUTE (__ReservedTrap7):ABSOLUTE (__DefaultInterrupt)
+                  0x000094          0x4 LONG 0x35ea DEFINED (__AltINT0Interrupt)?ABSOLUTE (__AltINT0Interrupt):DEFINED (__INT0Interrupt)?ABSOLUTE (__INT0Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000096          0x4 LONG 0x35ea DEFINED (__AltIC1Interrupt)?ABSOLUTE (__AltIC1Interrupt):DEFINED (__IC1Interrupt)?ABSOLUTE (__IC1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x000098          0x4 LONG 0x35ea DEFINED (__AltOC1Interrupt)?ABSOLUTE (__AltOC1Interrupt):DEFINED (__OC1Interrupt)?ABSOLUTE (__OC1Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x00009a          0x4 LONG 0x5bc DEFINED (__AltT1Interrupt)?ABSOLUTE (__AltT1Interrupt):DEFINED (__T1Interrupt)?ABSOLUTE (__T1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00009c          0x4 LONG 0x3b58 DEFINED (__AltIC2Interrupt)?ABSOLUTE (__AltIC2Interrupt):DEFINED (__IC2Interrupt)?ABSOLUTE (__IC2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x00009e          0x4 LONG 0x3b58 DEFINED (__AltOC2Interrupt)?ABSOLUTE (__AltOC2Interrupt):DEFINED (__OC2Interrupt)?ABSOLUTE (__OC2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00009c          0x4 LONG 0x35ea DEFINED (__AltIC2Interrupt)?ABSOLUTE (__AltIC2Interrupt):DEFINED (__IC2Interrupt)?ABSOLUTE (__IC2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x00009e          0x4 LONG 0x35ea DEFINED (__AltOC2Interrupt)?ABSOLUTE (__AltOC2Interrupt):DEFINED (__OC2Interrupt)?ABSOLUTE (__OC2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000a0          0x4 LONG 0x5c8 DEFINED (__AltT2Interrupt)?ABSOLUTE (__AltT2Interrupt):DEFINED (__T2Interrupt)?ABSOLUTE (__T2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000a2          0x4 LONG 0x3b58 DEFINED (__AltT3Interrupt)?ABSOLUTE (__AltT3Interrupt):DEFINED (__T3Interrupt)?ABSOLUTE (__T3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000a4          0x4 LONG 0x3b58 DEFINED (__AltSPI1Interrupt)?ABSOLUTE (__AltSPI1Interrupt):DEFINED (__SPI1Interrupt)?ABSOLUTE (__SPI1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000a6          0x4 LONG 0x3b58 DEFINED (__AltU1RXInterrupt)?ABSOLUTE (__AltU1RXInterrupt):DEFINED (__U1RXInterrupt)?ABSOLUTE (__U1RXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000a8          0x4 LONG 0x3b58 DEFINED (__AltU1TXInterrupt)?ABSOLUTE (__AltU1TXInterrupt):DEFINED (__U1TXInterrupt)?ABSOLUTE (__U1TXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000aa          0x4 LONG 0x3afc DEFINED (__AltADCInterrupt)?ABSOLUTE (__AltADCInterrupt):DEFINED (__ADCInterrupt)?ABSOLUTE (__ADCInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ac          0x4 LONG 0x3b58 DEFINED (__AltNVMInterrupt)?ABSOLUTE (__AltNVMInterrupt):DEFINED (__NVMInterrupt)?ABSOLUTE (__NVMInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ae          0x4 LONG 0x3b58 DEFINED (__AltSI2CInterrupt)?ABSOLUTE (__AltSI2CInterrupt):DEFINED (__SI2CInterrupt)?ABSOLUTE (__SI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000b0          0x4 LONG 0x3b58 DEFINED (__AltMI2CInterrupt)?ABSOLUTE (__AltMI2CInterrupt):DEFINED (__MI2CInterrupt)?ABSOLUTE (__MI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000b2          0x4 LONG 0x3b58 DEFINED (__AltCNInterrupt)?ABSOLUTE (__AltCNInterrupt):DEFINED (__CNInterrupt)?ABSOLUTE (__CNInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000b4          0x4 LONG 0x3b58 DEFINED (__AltINT1Interrupt)?ABSOLUTE (__AltINT1Interrupt):DEFINED (__INT1Interrupt)?ABSOLUTE (__INT1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000b6          0x4 LONG 0x3b58 DEFINED (__AltIC7Interrupt)?ABSOLUTE (__AltIC7Interrupt):DEFINED (__IC7Interrupt)?ABSOLUTE (__IC7Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000b8          0x4 LONG 0x3b58 DEFINED (__AltIC8Interrupt)?ABSOLUTE (__AltIC8Interrupt):DEFINED (__IC8Interrupt)?ABSOLUTE (__IC8Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ba          0x4 LONG 0x3b58 DEFINED (__AltOC3Interrupt)?ABSOLUTE (__AltOC3Interrupt):DEFINED (__OC3Interrupt)?ABSOLUTE (__OC3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000bc          0x4 LONG 0x3b58 DEFINED (__AltOC4Interrupt)?ABSOLUTE (__AltOC4Interrupt):DEFINED (__OC4Interrupt)?ABSOLUTE (__OC4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000be          0x4 LONG 0x3b58 DEFINED (__AltT4Interrupt)?ABSOLUTE (__AltT4Interrupt):DEFINED (__T4Interrupt)?ABSOLUTE (__T4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c0          0x4 LONG 0x3b58 DEFINED (__AltT5Interrupt)?ABSOLUTE (__AltT5Interrupt):DEFINED (__T5Interrupt)?ABSOLUTE (__T5Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c2          0x4 LONG 0x3b58 DEFINED (__AltINT2Interrupt)?ABSOLUTE (__AltINT2Interrupt):DEFINED (__INT2Interrupt)?ABSOLUTE (__INT2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c4          0x4 LONG 0x3b58 DEFINED (__AltU2RXInterrupt)?ABSOLUTE (__AltU2RXInterrupt):DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c6          0x4 LONG 0x3b58 DEFINED (__AltU2TXInterrupt)?ABSOLUTE (__AltU2TXInterrupt):DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000c8          0x4 LONG 0x3b58 DEFINED (__AltSPI2Interrupt)?ABSOLUTE (__AltSPI2Interrupt):DEFINED (__SPI2Interrupt)?ABSOLUTE (__SPI2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000a2          0x4 LONG 0x35ea DEFINED (__AltT3Interrupt)?ABSOLUTE (__AltT3Interrupt):DEFINED (__T3Interrupt)?ABSOLUTE (__T3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000a4          0x4 LONG 0x35ea DEFINED (__AltSPI1Interrupt)?ABSOLUTE (__AltSPI1Interrupt):DEFINED (__SPI1Interrupt)?ABSOLUTE (__SPI1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000a6          0x4 LONG 0x35ea DEFINED (__AltU1RXInterrupt)?ABSOLUTE (__AltU1RXInterrupt):DEFINED (__U1RXInterrupt)?ABSOLUTE (__U1RXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000a8          0x4 LONG 0x35ea DEFINED (__AltU1TXInterrupt)?ABSOLUTE (__AltU1TXInterrupt):DEFINED (__U1TXInterrupt)?ABSOLUTE (__U1TXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000aa          0x4 LONG 0x3afe DEFINED (__AltADCInterrupt)?ABSOLUTE (__AltADCInterrupt):DEFINED (__ADCInterrupt)?ABSOLUTE (__ADCInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ac          0x4 LONG 0x35ea DEFINED (__AltNVMInterrupt)?ABSOLUTE (__AltNVMInterrupt):DEFINED (__NVMInterrupt)?ABSOLUTE (__NVMInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ae          0x4 LONG 0x35ea DEFINED (__AltSI2CInterrupt)?ABSOLUTE (__AltSI2CInterrupt):DEFINED (__SI2CInterrupt)?ABSOLUTE (__SI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000b0          0x4 LONG 0x35ea DEFINED (__AltMI2CInterrupt)?ABSOLUTE (__AltMI2CInterrupt):DEFINED (__MI2CInterrupt)?ABSOLUTE (__MI2CInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000b2          0x4 LONG 0x35ea DEFINED (__AltCNInterrupt)?ABSOLUTE (__AltCNInterrupt):DEFINED (__CNInterrupt)?ABSOLUTE (__CNInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000b4          0x4 LONG 0x35ea DEFINED (__AltINT1Interrupt)?ABSOLUTE (__AltINT1Interrupt):DEFINED (__INT1Interrupt)?ABSOLUTE (__INT1Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000b6          0x4 LONG 0x35ea DEFINED (__AltIC7Interrupt)?ABSOLUTE (__AltIC7Interrupt):DEFINED (__IC7Interrupt)?ABSOLUTE (__IC7Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000b8          0x4 LONG 0x35ea DEFINED (__AltIC8Interrupt)?ABSOLUTE (__AltIC8Interrupt):DEFINED (__IC8Interrupt)?ABSOLUTE (__IC8Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ba          0x4 LONG 0x35ea DEFINED (__AltOC3Interrupt)?ABSOLUTE (__AltOC3Interrupt):DEFINED (__OC3Interrupt)?ABSOLUTE (__OC3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000bc          0x4 LONG 0x35ea DEFINED (__AltOC4Interrupt)?ABSOLUTE (__AltOC4Interrupt):DEFINED (__OC4Interrupt)?ABSOLUTE (__OC4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000be          0x4 LONG 0x35ea DEFINED (__AltT4Interrupt)?ABSOLUTE (__AltT4Interrupt):DEFINED (__T4Interrupt)?ABSOLUTE (__T4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c0          0x4 LONG 0x35ea DEFINED (__AltT5Interrupt)?ABSOLUTE (__AltT5Interrupt):DEFINED (__T5Interrupt)?ABSOLUTE (__T5Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c2          0x4 LONG 0x35ea DEFINED (__AltINT2Interrupt)?ABSOLUTE (__AltINT2Interrupt):DEFINED (__INT2Interrupt)?ABSOLUTE (__INT2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c4          0x4 LONG 0x35ea DEFINED (__AltU2RXInterrupt)?ABSOLUTE (__AltU2RXInterrupt):DEFINED (__U2RXInterrupt)?ABSOLUTE (__U2RXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c6          0x4 LONG 0x35ea DEFINED (__AltU2TXInterrupt)?ABSOLUTE (__AltU2TXInterrupt):DEFINED (__U2TXInterrupt)?ABSOLUTE (__U2TXInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000c8          0x4 LONG 0x35ea DEFINED (__AltSPI2Interrupt)?ABSOLUTE (__AltSPI2Interrupt):DEFINED (__SPI2Interrupt)?ABSOLUTE (__SPI2Interrupt):ABSOLUTE (__DefaultInterrupt)
                   0x0000ca          0x4 LONG 0x630 DEFINED (__AltC1Interrupt)?ABSOLUTE (__AltC1Interrupt):DEFINED (__C1Interrupt)?ABSOLUTE (__C1Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000cc          0x4 LONG 0x3b58 DEFINED (__AltIC3Interrupt)?ABSOLUTE (__AltIC3Interrupt):DEFINED (__IC3Interrupt)?ABSOLUTE (__IC3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ce          0x4 LONG 0x3b58 DEFINED (__AltIC4Interrupt)?ABSOLUTE (__AltIC4Interrupt):DEFINED (__IC4Interrupt)?ABSOLUTE (__IC4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000d0          0x4 LONG 0x3b58 DEFINED (__AltIC5Interrupt)?ABSOLUTE (__AltIC5Interrupt):DEFINED (__IC5Interrupt)?ABSOLUTE (__IC5Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000d2          0x4 LONG 0x3b58 DEFINED (__AltIC6Interrupt)?ABSOLUTE (__AltIC6Interrupt):DEFINED (__IC6Interrupt)?ABSOLUTE (__IC6Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000d4          0x4 LONG 0x3b58 DEFINED (__AltOC5Interrupt)?ABSOLUTE (__AltOC5Interrupt):DEFINED (__OC5Interrupt)?ABSOLUTE (__OC5Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000d6          0x4 LONG 0x3b58 DEFINED (__AltOC6Interrupt)?ABSOLUTE (__AltOC6Interrupt):DEFINED (__OC6Interrupt)?ABSOLUTE (__OC6Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000d8          0x4 LONG 0x3b58 DEFINED (__AltOC7Interrupt)?ABSOLUTE (__AltOC7Interrupt):DEFINED (__OC7Interrupt)?ABSOLUTE (__OC7Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000da          0x4 LONG 0x3b58 DEFINED (__AltOC8Interrupt)?ABSOLUTE (__AltOC8Interrupt):DEFINED (__OC8Interrupt)?ABSOLUTE (__OC8Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000dc          0x4 LONG 0x3b58 DEFINED (__AltINT3Interrupt)?ABSOLUTE (__AltINT3Interrupt):DEFINED (__INT3Interrupt)?ABSOLUTE (__INT3Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000de          0x4 LONG 0x3b58 DEFINED (__AltINT4Interrupt)?ABSOLUTE (__AltINT4Interrupt):DEFINED (__INT4Interrupt)?ABSOLUTE (__INT4Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000e0          0x4 LONG 0x3b58 DEFINED (__AltC2Interrupt)?ABSOLUTE (__AltC2Interrupt):DEFINED (__C2Interrupt)?ABSOLUTE (__C2Interrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000e2          0x4 LONG 0x3b58 DEFINED (__AltPWMInterrupt)?ABSOLUTE (__AltPWMInterrupt):DEFINED (__PWMInterrupt)?ABSOLUTE (__PWMInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000e4          0x4 LONG 0x3b58 DEFINED (__AltQEIInterrupt)?ABSOLUTE (__AltQEIInterrupt):DEFINED (__QEIInterrupt)?ABSOLUTE (__QEIInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000e6          0x4 LONG 0x3b58 DEFINED (__AltDCIInterrupt)?ABSOLUTE (__AltDCIInterrupt):DEFINED (__DCIInterrupt)?ABSOLUTE (__DCIInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000e8          0x4 LONG 0x3b58 DEFINED (__AltLVDInterrupt)?ABSOLUTE (__AltLVDInterrupt):DEFINED (__LVDInterrupt)?ABSOLUTE (__LVDInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ea          0x4 LONG 0x3b58 DEFINED (__AltFLTAInterrupt)?ABSOLUTE (__AltFLTAInterrupt):DEFINED (__FLTAInterrupt)?ABSOLUTE (__FLTAInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ec          0x4 LONG 0x3b58 DEFINED (__AltFLTBInterrupt)?ABSOLUTE (__AltFLTBInterrupt):DEFINED (__FLTBInterrupt)?ABSOLUTE (__FLTBInterrupt):ABSOLUTE (__DefaultInterrupt)
-                  0x0000ee          0x4 LONG 0x3b58 DEFINED (__AltInterrupt45)?ABSOLUTE (__AltInterrupt45):DEFINED (__Interrupt45)?ABSOLUTE (__Interrupt45):ABSOLUTE (__DefaultInterrupt)
-                  0x0000f0          0x4 LONG 0x3b58 DEFINED (__AltInterrupt46)?ABSOLUTE (__AltInterrupt46):DEFINED (__Interrupt46)?ABSOLUTE (__Interrupt46):ABSOLUTE (__DefaultInterrupt)
-                  0x0000f2          0x4 LONG 0x3b58 DEFINED (__AltInterrupt47)?ABSOLUTE (__AltInterrupt47):DEFINED (__Interrupt47)?ABSOLUTE (__Interrupt47):ABSOLUTE (__DefaultInterrupt)
-                  0x0000f4          0x4 LONG 0x3b58 DEFINED (__AltInterrupt48)?ABSOLUTE (__AltInterrupt48):DEFINED (__Interrupt48)?ABSOLUTE (__Interrupt48):ABSOLUTE (__DefaultInterrupt)
-                  0x0000f6          0x4 LONG 0x3b58 DEFINED (__AltInterrupt49)?ABSOLUTE (__AltInterrupt49):DEFINED (__Interrupt49)?ABSOLUTE (__Interrupt49):ABSOLUTE (__DefaultInterrupt)
-                  0x0000f8          0x4 LONG 0x3b58 DEFINED (__AltInterrupt50)?ABSOLUTE (__AltInterrupt50):DEFINED (__Interrupt50)?ABSOLUTE (__Interrupt50):ABSOLUTE (__DefaultInterrupt)
-                  0x0000fa          0x4 LONG 0x3b58 DEFINED (__AltInterrupt51)?ABSOLUTE (__AltInterrupt51):DEFINED (__Interrupt51)?ABSOLUTE (__Interrupt51):ABSOLUTE (__DefaultInterrupt)
-                  0x0000fc          0x4 LONG 0x3b58 DEFINED (__AltInterrupt52)?ABSOLUTE (__AltInterrupt52):DEFINED (__Interrupt52)?ABSOLUTE (__Interrupt52):ABSOLUTE (__DefaultInterrupt)
-                  0x0000fe          0x4 LONG 0x3b58 DEFINED (__AltInterrupt53)?ABSOLUTE (__AltInterrupt53):DEFINED (__Interrupt53)?ABSOLUTE (__Interrupt53):ABSOLUTE (__DefaultInterrupt)
+                  0x0000cc          0x4 LONG 0x35ea DEFINED (__AltIC3Interrupt)?ABSOLUTE (__AltIC3Interrupt):DEFINED (__IC3Interrupt)?ABSOLUTE (__IC3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ce          0x4 LONG 0x35ea DEFINED (__AltIC4Interrupt)?ABSOLUTE (__AltIC4Interrupt):DEFINED (__IC4Interrupt)?ABSOLUTE (__IC4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000d0          0x4 LONG 0x35ea DEFINED (__AltIC5Interrupt)?ABSOLUTE (__AltIC5Interrupt):DEFINED (__IC5Interrupt)?ABSOLUTE (__IC5Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000d2          0x4 LONG 0x35ea DEFINED (__AltIC6Interrupt)?ABSOLUTE (__AltIC6Interrupt):DEFINED (__IC6Interrupt)?ABSOLUTE (__IC6Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000d4          0x4 LONG 0x35ea DEFINED (__AltOC5Interrupt)?ABSOLUTE (__AltOC5Interrupt):DEFINED (__OC5Interrupt)?ABSOLUTE (__OC5Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000d6          0x4 LONG 0x35ea DEFINED (__AltOC6Interrupt)?ABSOLUTE (__AltOC6Interrupt):DEFINED (__OC6Interrupt)?ABSOLUTE (__OC6Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000d8          0x4 LONG 0x35ea DEFINED (__AltOC7Interrupt)?ABSOLUTE (__AltOC7Interrupt):DEFINED (__OC7Interrupt)?ABSOLUTE (__OC7Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000da          0x4 LONG 0x35ea DEFINED (__AltOC8Interrupt)?ABSOLUTE (__AltOC8Interrupt):DEFINED (__OC8Interrupt)?ABSOLUTE (__OC8Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000dc          0x4 LONG 0x35ea DEFINED (__AltINT3Interrupt)?ABSOLUTE (__AltINT3Interrupt):DEFINED (__INT3Interrupt)?ABSOLUTE (__INT3Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000de          0x4 LONG 0x35ea DEFINED (__AltINT4Interrupt)?ABSOLUTE (__AltINT4Interrupt):DEFINED (__INT4Interrupt)?ABSOLUTE (__INT4Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000e0          0x4 LONG 0x35ea DEFINED (__AltC2Interrupt)?ABSOLUTE (__AltC2Interrupt):DEFINED (__C2Interrupt)?ABSOLUTE (__C2Interrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000e2          0x4 LONG 0x35ea DEFINED (__AltPWMInterrupt)?ABSOLUTE (__AltPWMInterrupt):DEFINED (__PWMInterrupt)?ABSOLUTE (__PWMInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000e4          0x4 LONG 0x35ea DEFINED (__AltQEIInterrupt)?ABSOLUTE (__AltQEIInterrupt):DEFINED (__QEIInterrupt)?ABSOLUTE (__QEIInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000e6          0x4 LONG 0x35ea DEFINED (__AltDCIInterrupt)?ABSOLUTE (__AltDCIInterrupt):DEFINED (__DCIInterrupt)?ABSOLUTE (__DCIInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000e8          0x4 LONG 0x35ea DEFINED (__AltLVDInterrupt)?ABSOLUTE (__AltLVDInterrupt):DEFINED (__LVDInterrupt)?ABSOLUTE (__LVDInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ea          0x4 LONG 0x35ea DEFINED (__AltFLTAInterrupt)?ABSOLUTE (__AltFLTAInterrupt):DEFINED (__FLTAInterrupt)?ABSOLUTE (__FLTAInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ec          0x4 LONG 0x35ea DEFINED (__AltFLTBInterrupt)?ABSOLUTE (__AltFLTBInterrupt):DEFINED (__FLTBInterrupt)?ABSOLUTE (__FLTBInterrupt):ABSOLUTE (__DefaultInterrupt)
+                  0x0000ee          0x4 LONG 0x35ea DEFINED (__AltInterrupt45)?ABSOLUTE (__AltInterrupt45):DEFINED (__Interrupt45)?ABSOLUTE (__Interrupt45):ABSOLUTE (__DefaultInterrupt)
+                  0x0000f0          0x4 LONG 0x35ea DEFINED (__AltInterrupt46)?ABSOLUTE (__AltInterrupt46):DEFINED (__Interrupt46)?ABSOLUTE (__Interrupt46):ABSOLUTE (__DefaultInterrupt)
+                  0x0000f2          0x4 LONG 0x35ea DEFINED (__AltInterrupt47)?ABSOLUTE (__AltInterrupt47):DEFINED (__Interrupt47)?ABSOLUTE (__Interrupt47):ABSOLUTE (__DefaultInterrupt)
+                  0x0000f4          0x4 LONG 0x35ea DEFINED (__AltInterrupt48)?ABSOLUTE (__AltInterrupt48):DEFINED (__Interrupt48)?ABSOLUTE (__Interrupt48):ABSOLUTE (__DefaultInterrupt)
+                  0x0000f6          0x4 LONG 0x35ea DEFINED (__AltInterrupt49)?ABSOLUTE (__AltInterrupt49):DEFINED (__Interrupt49)?ABSOLUTE (__Interrupt49):ABSOLUTE (__DefaultInterrupt)
+                  0x0000f8          0x4 LONG 0x35ea DEFINED (__AltInterrupt50)?ABSOLUTE (__AltInterrupt50):DEFINED (__Interrupt50)?ABSOLUTE (__Interrupt50):ABSOLUTE (__DefaultInterrupt)
+                  0x0000fa          0x4 LONG 0x35ea DEFINED (__AltInterrupt51)?ABSOLUTE (__AltInterrupt51):DEFINED (__Interrupt51)?ABSOLUTE (__Interrupt51):ABSOLUTE (__DefaultInterrupt)
+                  0x0000fc          0x4 LONG 0x35ea DEFINED (__AltInterrupt52)?ABSOLUTE (__AltInterrupt52):DEFINED (__Interrupt52)?ABSOLUTE (__Interrupt52):ABSOLUTE (__DefaultInterrupt)
+                  0x0000fe          0x4 LONG 0x35ea DEFINED (__AltInterrupt53)?ABSOLUTE (__AltInterrupt53):DEFINED (__Interrupt53)?ABSOLUTE (__Interrupt53):ABSOLUTE (__DefaultInterrupt)
                     0x0000                  WREG0 = 0x0
                     0x0000                  _WREG0 = 0x0
                     0x0002                  WREG1 = 0x2
@@ -1807,98 +1806,98 @@ LOAD default_isr
 LOAD data_init
 
 .debug_pubtypes
-                  0x000108        0x5de
+                  0x000108        0x5fa
  .debug_pubtypes
-                  0x000108        0x1b3 build/default/production/_ext/1472/can_interface.o
+                  0x000108        0x1c1 build/default/production/_ext/1472/can_interface.o
  .debug_pubtypes
-                  0x0002bb         0x12 build/default/production/_ext/1472/can_protocol.o
+                  0x0002c9         0x12 build/default/production/_ext/1472/can_protocol.o
  .debug_pubtypes
-                  0x0002cd         0xcc build/default/production/_ext/1472/I2C.o
+                  0x0002db         0xcc build/default/production/_ext/1472/I2C.o
  .debug_pubtypes
-                  0x000399         0x6d build/default/production/_ext/1472/LED.o
+                  0x0003a7         0x6d build/default/production/_ext/1472/LED.o
  .debug_pubtypes
-                  0x000406        0x134 build/default/production/_ext/1472/main_V3.o
+                  0x000414        0x142 build/default/production/_ext/1472/main_V3.o
  .debug_pubtypes
-                  0x00053a         0x35 build/default/production/_ext/1472/traps.o
+                  0x000556         0x35 build/default/production/_ext/1472/traps.o
  .debug_pubtypes
-                  0x00056f         0x53 build/default/production/_ext/1472/eeprom.o
+                  0x00058b         0x53 build/default/production/_ext/1472/eeprom.o
  .debug_pubtypes
-                  0x0005c2         0x12 build/default/production/_ext/1472/timers.o
+                  0x0005de         0x12 build/default/production/_ext/1472/timers.o
  .debug_pubtypes
-                  0x0005d4         0xd0 build/default/production/_ext/1472/ADC.o
+                  0x0005f0         0xd0 build/default/production/_ext/1472/ADC.o
  .debug_pubtypes
-                  0x0006a4         0x21 build/default/production/_ext/1472/lis331dlh.o
+                  0x0006c0         0x21 build/default/production/_ext/1472/lis331dlh.o
  .debug_pubtypes
-                  0x0006c5         0x21 build/default/production/_ext/1472/l3g4200d.o
+                  0x0006e1         0x21 build/default/production/_ext/1472/l3g4200d.o
 
 __c30_signature
-                  0x0006e6         0xc6
+                  0x000702         0xc6
  __c30_signature
-                  0x0006e6          0x6 build/default/production/_ext/1472/can_interface.o
+                  0x000702          0x6 build/default/production/_ext/1472/can_interface.o
  __c30_signature
-                  0x0006ec          0x6 build/default/production/_ext/1472/can_protocol.o
+                  0x000708          0x6 build/default/production/_ext/1472/can_protocol.o
  __c30_signature
-                  0x0006f2          0x6 build/default/production/_ext/1472/I2C.o
+                  0x00070e          0x6 build/default/production/_ext/1472/I2C.o
  __c30_signature
-                  0x0006f8          0x6 build/default/production/_ext/1472/LED.o
+                  0x000714          0x6 build/default/production/_ext/1472/LED.o
  __c30_signature
-                  0x0006fe          0x6 build/default/production/_ext/1472/main_V3.o
+                  0x00071a          0x6 build/default/production/_ext/1472/main_V3.o
  __c30_signature
-                  0x000704          0x6 build/default/production/_ext/1472/traps.o
+                  0x000720          0x6 build/default/production/_ext/1472/traps.o
  __c30_signature
-                  0x00070a          0x6 build/default/production/_ext/1472/AD7147 - Configuration.o
+                  0x000726          0x6 build/default/production/_ext/1472/AD7147 - Configuration.o
  __c30_signature
-                  0x000710          0x6 build/default/production/_ext/1472/eeprom.o
+                  0x00072c          0x6 build/default/production/_ext/1472/eeprom.o
  __c30_signature
-                  0x000716          0x6 build/default/production/_ext/1472/timers.o
+                  0x000732          0x6 build/default/production/_ext/1472/timers.o
  __c30_signature
-                  0x00071c          0x6 build/default/production/_ext/1472/ADC.o
+                  0x000738          0x6 build/default/production/_ext/1472/ADC.o
  __c30_signature
-                  0x000722          0x6 build/default/production/_ext/1472/lis331dlh.o
+                  0x00073e          0x6 build/default/production/_ext/1472/lis331dlh.o
  __c30_signature
-                  0x000728          0x6 build/default/production/_ext/1472/l3g4200d.o
+                  0x000744          0x6 build/default/production/_ext/1472/l3g4200d.o
  __c30_signature
-                  0x00072e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1AbortAll.o)
+                  0x00074a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1AbortAll.o)
  __c30_signature
-                  0x000734          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1Initialize.o)
+                  0x000750          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1Initialize.o)
  __c30_signature
-                  0x00073a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1IsTXReady.o)
+                  0x000756          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1IsTXReady.o)
  __c30_signature
-                  0x000740          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SendMessage.o)
+                  0x00075c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SendMessage.o)
  __c30_signature
-                  0x000746          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetFilter.o)
+                  0x000762          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetFilter.o)
  __c30_signature
-                  0x00074c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetMask.o)
+                  0x000768          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetMask.o)
  __c30_signature
-                  0x000752          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetOperationMode.o)
+                  0x00076e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetOperationMode.o)
  __c30_signature
-                  0x000758          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetRXMode.o)
+                  0x000774          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetRXMode.o)
  __c30_signature
-                  0x00075e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetTXMode.o)
+                  0x00077a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(CAN1SetTXMode.o)
  __c30_signature
-                  0x000764          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntCAN1.o)
+                  0x000780          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntCAN1.o)
  __c30_signature
-                  0x00076a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer1.o)
+                  0x000786          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer1.o)
  __c30_signature
-                  0x000770          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer2.o)
+                  0x00078c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(ConfigIntTimer2.o)
  __c30_signature
-                  0x000776          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer1.o)
+                  0x000792          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer1.o)
  __c30_signature
-                  0x00077c          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer2.o)
+                  0x000798          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(OpenTimer2.o)
  __c30_signature
-                  0x000782          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer1.o)
+                  0x00079e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer1.o)
  __c30_signature
-                  0x000788          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer2.o)
+                  0x0007a4          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib/dsPIC30F\libp30F4011-elf.a(WriteTimer2.o)
  __c30_signature
-                  0x00078e          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
+                  0x0007aa          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(crt0_standard.o)
  __c30_signature
-                  0x000794          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
+                  0x0007b0          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(data_init_standard.o)
  __c30_signature
-                  0x00079a          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(eedata_helper.eo)
+                  0x0007b6          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(eedata_helper.eo)
  __c30_signature
-                  0x0007a0          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(flash_helper.eo)
+                  0x0007bc          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(flash_helper.eo)
  __c30_signature
-                  0x0007a6          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(memcpy_helper.eo)
+                  0x0007c2          0x6 c:/program files (x86)/microchip/xc16/v1.10/bin/bin/../../lib\libpic30-elf.a(memcpy_helper.eo)
 
 .nbss               0x0800        0x302
  .nbss              0x0800        0x19c build/default/production/_ext/1472/main_V3.o
@@ -1916,8 +1915,8 @@ __c30_signature
                     0x0996                  _l3a
  .nbss              0x099c        0x166 build/default/production/_ext/1472/can_interface.o
 
-.ndata              0x0b02         0x7e
- .ndata             0x0b02         0x7e build/default/production/_ext/1472/main_V3.o
+.ndata              0x0b02         0x80
+ .ndata             0x0b02         0x80 build/default/production/_ext/1472/main_V3.o
                     0x0b02                  _BoardConfig
                     0x0b28                  _test
                     0x0b2a                  __board_ID
@@ -1936,24 +1935,24 @@ __c30_signature
                     0x0b5c                  _DIG_GYRO
                     0x0b5d                  _DIG_ACC
                     0x0b5e                  _TEMP_COMPENSATION
-                    0x0b5f                  _SKIN_TYPE
-                    0x0b60                  _TRIANGLE_MASK
-                    0x0b62                  _CONFIG_TYPE
-                    0x0b63                  _ERROR_COUNTER
-                    0x0b64                  _counter
-                    0x0b66                  _ConValue
-                    0x0b6a                  _acc
-                    0x0b72                  _gyro
-                    0x0b7a                  _AN2
-                    0x0b7c                  _AN3
-                    0x0b7e                  _AN4
+                    0x0b60                  _TYPE
+                    0x0b62                  _TRIANGLE_MASK
+                    0x0b64                  _CONFIG_TYPE
+                    0x0b65                  _ERROR_COUNTER
+                    0x0b66                  _counter
+                    0x0b68                  _ConValue
+                    0x0b6c                  _acc
+                    0x0b74                  _gyro
+                    0x0b7c                  _AN2
+                    0x0b7e                  _AN3
+                    0x0b80                  _AN4
 
-.nbss               0x0b80         0x10
- .nbss              0x0b80          0x6 build/default/production/_ext/1472/lis331dlh.o
-                    0x0b80                  _LISI2COps
- .nbss              0x0b86          0x6 build/default/production/_ext/1472/l3g4200d.o
-                    0x0b86                  _L3GI2COps
- .nbss              0x0b8c          0x4 build/default/production/_ext/1472/I2C.o
+.nbss               0x0b82         0x10
+ .nbss              0x0b82          0x6 build/default/production/_ext/1472/lis331dlh.o
+                    0x0b82                  _LISI2COps
+ .nbss              0x0b88          0x6 build/default/production/_ext/1472/l3g4200d.o
+                    0x0b88                  _L3GI2COps
+ .nbss              0x0b8e          0x4 build/default/production/_ext/1472/I2C.o
 
 .const              0x8440         0x9c load address 0x000440  
  .const             0x8440         0x9c build/default/production/_ext/1472/main_V3.o
@@ -1961,7 +1960,7 @@ __c30_signature
                     0x8444                  __pCapOffset
                     0x8484                  __pCapOffset_all
 
-.text             0x0004dc       0x3102
+.text             0x0004dc       0x310e
  .text            0x0004dc       0x1756 build/default/production/_ext/1472/main_V3.o
                   0x0005bc                  __T1Interrupt
                   0x0005c8                  __T2Interrupt
@@ -1989,7 +1988,7 @@ __c30_signature
                   0x00247a                  _ReadBurstViaI2C
                   0x002554                  _ReadViaI2C
                   0x00270c                  _ReadByteViaI2C
- .text            0x00276a        0x836 build/default/production/_ext/1472/can_interface.o
+ .text            0x00276a        0x842 build/default/production/_ext/1472/can_interface.o
                   0x00276a                  _SetBoardCanFilter
                   0x0027d4                  _CAN_Init
                   0x002866                  _CAN1_send
@@ -1999,13 +1998,13 @@ __c30_signature
                   0x002a8c                  _CAN1_RxbufferIndex_dec
                   0x002a9c                  _can_send_additional_info
                   0x002baa                  _CAN1_handleRx
-                  0x002f90                  _can_receive_additional_info
- .text            0x002fa0        0x63e build/default/production/_ext/1472/AD7147 - Configuration.o
-                  0x002fa0                  _ConfigAD7147_T
-                  0x0031ce                  _ConfigAD7147
-                  0x0033e4                  _ConfigAD7147_ALL
-                  0x00345c                  _ConfigAD7147_THREE
-                  0x003530                  _ConfigAD7147_FINGERTIP
+                  0x002f9c                  _can_receive_additional_info
+ .text            0x002fac        0x63e build/default/production/_ext/1472/AD7147 - Configuration.o
+                  0x002fac                  _ConfigAD7147_T
+                  0x0031da                  _ConfigAD7147
+                  0x0033f0                  _ConfigAD7147_ALL
+                  0x003468                  _ConfigAD7147_THREE
+                  0x00353c                  _ConfigAD7147_FINGERTIP
 
 .prog             0x003600        0x200
  .prog            0x003600        0x200 build/default/production/_ext/1472/main_V3.o
@@ -2028,42 +2027,40 @@ __c30_signature
                   0x003968                  _LISAxisRead
                   0x0039be                  _LISAxisBurst
 
-.dinit            0x0039e6         0x7a
- .dinit           0x0039e6         0x7a data_init
+.dinit            0x0039e6         0x7c
+ .dinit           0x0039e6         0x7c data_init
 
-.text             0x003a60         0xd8
- .text            0x003a60         0x5e build/default/production/_ext/1472/eeprom.o
-                  0x003a60                  _SaveEepromBoardConfig
-                  0x003ab0                  _RecoverConfigurationFromEEprom
- .text            0x003abe         0x4e build/default/production/_ext/1472/ADC.o
-                  0x003abe                  _ADC_Init
-                  0x003afc                  __ADCInterrupt
- .text            0x003b0c         0x2c build/default/production/_ext/1472/timers.o
-                  0x003b0c                  _T1_Init
-                  0x003b22                  _T2_Init
+.text             0x003a62         0xfa
+ .text            0x003a62         0x5e build/default/production/_ext/1472/eeprom.o
+                  0x003a62                  _SaveEepromBoardConfig
+                  0x003ab2                  _RecoverConfigurationFromEEprom
+ .text            0x003ac0         0x4e build/default/production/_ext/1472/ADC.o
+                  0x003ac0                  _ADC_Init
+                  0x003afe                  __ADCInterrupt
+ .text            0x003b0e         0x2c build/default/production/_ext/1472/timers.o
+                  0x003b0e                  _T1_Init
+                  0x003b24                  _T2_Init
+ .text            0x003b3a         0x22 build/default/production/_ext/1472/LED.o
+                  0x003b3a                  _LED_Init
+                  0x003b4e                  _LED_test
 
-.text             0x0035de         0x22
- .text            0x0035de         0x22 build/default/production/_ext/1472/LED.o
-                  0x0035de                  _LED_Init
-                  0x0035f2                  _LED_test
+.isr.text         0x003b5c         0x20
+ .isr.text        0x003b5c         0x20 build/default/production/_ext/1472/traps.o
+                  0x003b5c                  __OscillatorFail
+                  0x003b60                  __AddressError
+                  0x003b64                  __StackError
+                  0x003b68                  __MathError
+                  0x003b6c                  __AltOscillatorFail
+                  0x003b70                  __AltAddressError
+                  0x003b74                  __AltStackError
+                  0x003b78                  __AltMathError
 
-.isr.text         0x003b38         0x20
- .isr.text        0x003b38         0x20 build/default/production/_ext/1472/traps.o
-                  0x003b38                  __OscillatorFail
-                  0x003b3c                  __AddressError
-                  0x003b40                  __StackError
-                  0x003b44                  __MathError
-                  0x003b48                  __AltOscillatorFail
-                  0x003b4c                  __AltAddressError
-                  0x003b50                  __AltStackError
-                  0x003b54                  __AltMathError
+.isr              0x0035ea          0x4
+ .isr             0x0035ea          0x4 default_isr
+                  0x0035ea                  __DefaultInterrupt
 
-.isr              0x003b58          0x4
- .isr             0x003b58          0x4 default_isr
-                  0x003b58                  __DefaultInterrupt
-
-_02BEDAE051f62f72
+_02FADAE052020a2c
                     0xfc00         0x26 load address 0x7ffc00  
- _02BEDAE051f62f72
+ _02FADAE052020a2c
                     0xfc00         0x26 build/default/production/_ext/1472/main_V3.o
                     0xfc00                  _ee_data
