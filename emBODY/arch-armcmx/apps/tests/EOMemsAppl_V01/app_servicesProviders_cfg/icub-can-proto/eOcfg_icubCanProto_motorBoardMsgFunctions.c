@@ -1830,10 +1830,10 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
     }
     
-//     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
-//     {
-//         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
-//     }
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
+    }
  
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT)) //over current
     {
