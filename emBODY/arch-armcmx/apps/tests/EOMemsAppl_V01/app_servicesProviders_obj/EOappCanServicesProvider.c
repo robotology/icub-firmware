@@ -459,10 +459,11 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         }
 
        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canport);
-        if(eores_OK != res) 
-        {
-            return(res);                    
-        }
+        #warning remove comment and insert in diagnostics
+//         if(eores_OK != res) 
+//         {
+//             return(res);                    
+//         }
     }
     
     if(NULL != numofREADcanframe)
