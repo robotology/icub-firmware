@@ -239,7 +239,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t enable; //if true than all errrors are signaled else none!
+    uint8_t enable; //if true then all errrors are signaled else none!
+    uint8_t signalExtFault; //if true external fault is signaled
 }eOdgn_commands_t;
 
 typedef struct
