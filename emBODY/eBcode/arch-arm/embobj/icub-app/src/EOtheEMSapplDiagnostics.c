@@ -122,6 +122,20 @@ extern eOresult_t eo_theEMSdgn_Signalerror(EOTheEMSdiagnostics_t* p, uint16_t va
     }
 }
 
+
+
+extern eObool_t eo_theEMSdgn_IsExtFault2Signal(EOTheEMSdiagnostics_t* p)
+{
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
+    return(eo_dgn_cmds.signalExtFault);
+}
+
+
+
 extern eOresult_t eo_theEMSdgn_UpdateApplCore(EOTheEMSdiagnostics_t* p)
 {
 
