@@ -1810,7 +1810,7 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     eOresult_t              res;
     uint8_t                 flag0 = frame->data[0];
     uint8_t                 flag5 = frame->data[5];
-    
+    EOTheEMSdiagnostics_t*  dgn_ptr = NULL;
     
     res = eo_appTheDB_GetMotorStatusPtr(eo_appTheDB_GetHandle(), mId,  &mstatus_ptr);
     if(eores_OK != res)
@@ -1819,6 +1819,7 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     }
     
     mstatus_ptr->chamaleon04[0] = 0;
+    dgn_ptr = eo_theEMSdgn_GetHandle();
     
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_UNDERVOLTAGE)) //undervoltage
     {
@@ -1830,11 +1831,15 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
     }
     
-    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
+    
+    if(eo_theEMSdgn_IsExtFault2Signal(dgn_ptr))
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
+        if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
+        {
+            mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
+        }
     }
- 
+    
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT)) //over current
     {
         if((applrunMode__2foc == runmode) && (EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MB_STATUS_FLAG_I2TFAILURE)))
@@ -1849,9 +1854,9 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
 
     if(0 != mstatus_ptr->chamaleon04[0])
     {
-        eo_theEMSdgn_UpdateMotorStFlags(eo_theEMSdgn_GetHandle(), mId, mstatus_ptr->chamaleon04[0]);
-        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_motorstatus , 0);
-        eo_theEMSdgn_ClearMotorStFlags(eo_theEMSdgn_GetHandle());
+        eo_theEMSdgn_UpdateMotorStFlags(dgn_ptr, mId, mstatus_ptr->chamaleon04[0]);
+        eo_theEMSdgn_Signalerror(dgn_ptr, eodgn_nvidbdoor_motorstatus , 0);
+        eo_theEMSdgn_ClearMotorStFlags(dgn_ptr);
     }
     return(eores_OK);
     
