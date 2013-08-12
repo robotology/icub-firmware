@@ -83,6 +83,8 @@ extern EOTheEMSdiagnostics_t* eo_theEMSdgn_GetHandle(void);
 
 extern eOresult_t eo_theEMSdgn_Signalerror(EOTheEMSdiagnostics_t* p, uint16_t var , eOreltime_t timeout);
 
+extern eObool_t eo_theEMSdgn_IsExtFault2Signal(EOTheEMSdiagnostics_t* p);
+
 extern eOresult_t eo_theEMSdgn_UpdateApplCore(EOTheEMSdiagnostics_t* p);
 
 extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappEncReader* encreader_ptr, uint16_t count);
