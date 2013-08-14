@@ -419,13 +419,13 @@ typedef int16_t             eOicubCanProto_torque_t;
 /** @typedef    typedef uint32_t             eOicubCanProto_stiffness_t
     @brief      eOicubCanProto_stiffness_t contains the stiffness values.
  **/
-typedef uint16_t            eOicubCanProto_stiffness_t;
+typedef int16_t            eOicubCanProto_stiffness_t;
 
 
 /** @typedef    typedef uint32_t             eOicubCanProto_damping_t
     @brief      eOicubCanProto_damping_t contains the damping values.
  **/
-typedef uint16_t            eOicubCanProto_damping_t;
+typedef int16_t            eOicubCanProto_damping_t;
 
 
 /** @typedef    typedef int16_t             eOicubCanProto_current_t
