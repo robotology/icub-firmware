@@ -284,35 +284,27 @@ extern eOicubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMea
 //     char *str_err;
  //   char str_err[200];
     float factor = eo_appMeasConv_hid_GetEncConv_factor(p, jId);
+    int32_t stiff;
  //   eOmeas_stiffness_t prova = 18000;
     
-    if(factor<0)
+//     if(factor<0)
+//     {
+//         factor = -factor;
+//     }
+    
+    if(i_stiff > INT32_MAX)
     {
-        factor = -factor;
+        stiff = INT32_MAX;
     }
-//     float r1 = prova / factor;
-//     float r2 = r1/1000.0;
-//     eOicubCanProto_stiffness_t r3 = (eOicubCanProto_stiffness_t)r2;
-//     snprintf(str_err, sizeof(str_err)-1, "impedence rec=%d confact=%f div_res = %f res=%f (int%d)", i_stiff, eo_appMeasConv_hid_GetEncConv_factor(p, jId),
-//                                                                                                     (i_stiff / eo_appMeasConv_hid_GetEncConv_factor(p, jId)),
-//                                                                                                     (((i_stiff / eo_appMeasConv_hid_GetEncConv_factor(p, jId))) /1000.0),
-//                                                                                                     (eOicubCanProto_stiffness_t)(((i_stiff / eo_appMeasConv_hid_GetEncConv_factor(p, jId))) /1000.0)
-//                                                                                                      );
-    
-    
-//     snprintf(str_err, sizeof(str_err)-1, "impedence rec=%d confact=%f div_res = %f res=%f (int%d)", i_stiff, factor, r1, r2, r3 );
-//     hal_trace_puts(str_err);
-    //snprintf(str_err, sizeof(str_err)-1, "impedence confact=%6.3f", factor );
-    
-//     eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str_err[0], sizeof(str_err));
-//     eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_errorlog , 5000);
-    
+    else
+    {
+        stiff = (int32_t)i_stiff;
+    }
     //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
     //inoltre lo divido per mille perche' su robot interface e' moltiplicato per 1000 per avere piu' precisione possibile
-   return((eOicubCanProto_stiffness_t)(((i_stiff / factor)) /1000.0) );
-    //return(r3);
+    //return((eOicubCanProto_stiffness_t)(((i_stiff / factor)) /1000.0) );
     
-    
+    return((eOicubCanProto_stiffness_t)(((stiff / factor)) /1000.0) );
 }
 
 extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_stiffness_t s_stiff)
@@ -326,9 +318,19 @@ extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p
 
 extern eOicubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
 {
+    int32_t damping;
+    if(i_damping > INT32_MAX)
+    {
+        damping = INT32_MAX;
+    }
+    else
+    {
+        damping = (int32_t)i_damping;
+    }
+    
     //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
     //qui non divido per 1000 perche' devo estrimerlo al millisec.
-    return((eOicubCanProto_stiffness_t)((i_damping / eo_appMeasConv_hid_GetEncConv_factor(p, jId))) );
+    return((eOicubCanProto_stiffness_t)((damping / eo_appMeasConv_hid_GetEncConv_factor(p, jId))) );
 }
 
 
