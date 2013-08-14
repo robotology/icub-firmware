@@ -63,7 +63,7 @@
 #define ENCODER_NULL                        255
 #define INTPRIO_SPI_ENCODERS                hal_int_priority05
 #define DGN_COUNT_MAX                       10000 //1 sec
-#define DGN_THRESHOLD                       100
+#define DGN_THRESHOLD                       0
 
 
 
