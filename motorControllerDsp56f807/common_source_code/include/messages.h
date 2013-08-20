@@ -36,7 +36,8 @@
 }
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
+#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252
+//this is for waist coupling
 #define CAN_CONTROLLER_RUN_HANDLER(x) \
 	{ \
 		if ((_pad_enabled[0]==false) || (_pad_enabled[1]==false))\
@@ -66,6 +67,66 @@
 		} \
 		else \
 			_general_board_error = ERROR_MODE; \
+	}
+#elif VERSION == 0x0215
+//this is for eyes coupling
+#define CAN_CONTROLLER_RUN_HANDLER(x) \
+	{ \
+		if ((axis==2) || (axis==3))\
+		{\
+			if ((_pad_enabled[2]==false) || (_pad_enabled[3]==false))\
+				can_printf("WARNING: RUN called before AMP");\
+			if (((_control_mode[2] == MODE_IDLE) || (_control_mode[3] == MODE_IDLE)))  \
+			{ \
+			 	if ((_received_pid[2].rec_pid==0x7F) || (_received_pid[3].rec_pid==0x7F))   \
+				{ \
+					_control_mode[2] = MODE_POSITION; \
+					_control_mode[3] = MODE_POSITION; \
+					_desired[2] = _position[2]; \
+					_desired[3] = _position[3]; \
+					_integral[2] = 0; \
+					_integral[3] = 0; \
+					_ko_imp[2] = 0; \
+					_ko_imp[3] = 0; \
+					_set_point[2] = _position[2]; \
+					_set_point[3] = _position[3]; \
+					init_trajectory (2, _position[2], _position[2], 1); \
+					init_trajectory (3, _position[3], _position[3], 1); \
+					_general_board_error = ERROR_NONE; \
+				} \
+				else \
+				{ \
+				  can_printf("WARNING:PID IS NOT SET");\
+				} \
+			} \
+			else \
+				_general_board_error = ERROR_MODE; \
+		}\
+		else\
+		{\
+			if (_pad_enabled[axis]==false)\
+			can_printf("WARNING: RUN called before AMP");\
+			if (_control_mode[axis] == MODE_IDLE) \
+			{ \
+				if (_received_pid[axis].rec_pid==0x7F)\
+				{\
+				_control_mode[axis] = MODE_POSITION; \
+				_desired[axis] = _position[axis]; \
+				_desired_vel[axis] = 0; \
+				_integral[axis] = 0; \
+				_ko_imp[axis] = 0; \
+				_set_point[axis] = _position[axis]; \
+				init_trajectory (axis, _position[axis], _position[axis], 1); \
+				_general_board_error = ERROR_NONE; \
+				}\
+				else\
+				{ \
+					can_printf("WARNING:PID IS NOT SET"); \
+				} \
+			} \
+			else \
+				_general_board_error = ERROR_MODE; \
+		}\
 	}
 #elif VERSION == 0x0351
 #define CAN_CONTROLLER_RUN_HANDLER(x) \
@@ -248,6 +309,32 @@
 			can_printf("calib failed 0&1"); \
 		} \
 	}
+#elif VERSION == 0x0215
+	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
+	{ \
+		if (_can_protocol_ack == false) \
+		{ \
+			can_printf("can protocol NOT ack"); \
+			break; \
+		} \
+		if ((axis==2) || (axis==3))\
+		{\
+			if (_pad_enabled[2] == false &&	_pad_enabled[3] == false) \
+			{ \
+				PWM_outputPadEnable(2); \
+				PWM_outputPadEnable(3); \
+				_general_board_error = ERROR_NONE; \
+				can_printf("PWM ENA COUPLED:2 & 3");\
+			} \
+		}\
+		else\
+		{\
+			PWM_outputPadEnable(axis);\
+			_control_mode[axis] = MODE_IDLE; \
+			_general_board_error = ERROR_NONE; \
+			can_printf("PWM ENA:%d",axis);\
+		}\
+	} 
 #elif VERSION == 0x0219 
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
@@ -363,6 +450,26 @@
 		_general_board_error = ERROR_NONE; \
 		can_printf("PWM DIS COUPLED:0 & 1");\
 	}
+#elif VERSION == 0x0215
+ 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
+	{ \
+		if ((axis==2) || (axis==3))\
+		{\
+			PWM_outputPadDisable(2); \
+			PWM_outputPadDisable(3); \
+			_pad_enabled[2] = false; \
+			_pad_enabled[3] = false; \
+			_general_board_error = (unsigned char) ERROR_NONE; \
+			can_printf("PWM DIS COUPLED:2 & 3");\
+		}\
+		else\
+		{\
+			PWM_outputPadDisable(axis); \
+			_pad_enabled[axis] = false; \
+			_general_board_error = ERROR_NONE; \
+			can_printf("PWM DIS:%d",axis);\
+		}\
+    }
 #elif VERSION == 0x0219
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
