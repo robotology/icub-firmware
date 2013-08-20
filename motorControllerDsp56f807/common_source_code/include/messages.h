@@ -68,7 +68,7 @@
 		else \
 			_general_board_error = ERROR_MODE; \
 	}
-#elif VERSION == 0x0215
+#elif VERSION == 0x0215 || VERSION == 0x0115
 //this is for eyes coupling
 #define CAN_CONTROLLER_RUN_HANDLER(x) \
 	{ \
@@ -173,7 +173,8 @@
 			} \
 		} \
 	}
-#elif (VERSION == 0x0219) 
+#elif VERSION == 0x0219 || VERSION == 0x0119 
+//this is for wrist coupling
 #define CAN_CONTROLLER_RUN_HANDLER(x) \
 	{ \
 		if ((axis>0) && (axis<3))\
@@ -288,6 +289,7 @@
 }
 //-------------------------------------------------------------------
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
+//this is for waist coupling
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if (_can_protocol_ack == false) \
@@ -309,7 +311,8 @@
 			can_printf("calib failed 0&1"); \
 		} \
 	}
-#elif VERSION == 0x0215
+#elif VERSION == 0x0215 || VERSION == 0x0115
+//this is for eyes coupling
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if (_can_protocol_ack == false) \
@@ -335,7 +338,8 @@
 			can_printf("PWM ENA:%d",axis);\
 		}\
 	} 
-#elif VERSION == 0x0219 
+#elif VERSION == 0x0219 || VERSION == 0x0119
+//this is for wrist coupling
 	#define CAN_ENABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if (_can_protocol_ack == false) \
@@ -441,6 +445,7 @@
 
 //-------------------------------------------------------------------
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
+//this is for waist coupling
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		PWM_outputPadDisable(0); \
@@ -450,7 +455,8 @@
 		_general_board_error = ERROR_NONE; \
 		can_printf("PWM DIS COUPLED:0 & 1");\
 	}
-#elif VERSION == 0x0215
+#elif VERSION == 0x0215 || VERSION == 0x0115
+//this is for eyes coupling
  	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if ((axis==2) || (axis==3))\
@@ -470,7 +476,8 @@
 			can_printf("PWM DIS:%d",axis);\
 		}\
     }
-#elif VERSION == 0x0219
+#elif VERSION == 0x0219  || VERSION == 0x0119
+//this is for wrist coupling
 	#define CAN_DISABLE_PWM_PAD_HANDLER(x) \
 	{ \
 		if ((axis>0) && (axis<3))\
