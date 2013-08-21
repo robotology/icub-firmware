@@ -55,7 +55,7 @@
 
 #include "EOMtheIPnet_hid.h" 
 #include "EOMmutex_hid.h" 
-#include "OPCprotocolManager_Cfg.h"
+//#include "OPCprotocolManager_Cfg.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
