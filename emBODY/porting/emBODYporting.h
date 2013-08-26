@@ -107,6 +107,14 @@ extern "C" {
     //#define stdint    dspic_stdint
     #define EO_TAILOR_CODE_FOR_DSPIC
     #define __weak      __attribute__((__weak__))
+#elif defined(APPLE)
+    #define EO_extern_inline       static inline
+    #define EO_static_inline       static inline
+    #define EO_INIT(f)
+    #pragma pack(8)
+    #define snprintf        snprintf
+    #define float32_t       float
+    #define __weak __attribute__((weak))
 #else
     #error architecture not defined 
 #endif
