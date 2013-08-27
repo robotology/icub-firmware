@@ -72,6 +72,9 @@ typedef enum
 typedef struct EOaction_hid EOaction;
 
 
+enum { EOaction_sizeof = 16 };
+typedef uint8_t EOaction_strg[EOaction_sizeof];
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
