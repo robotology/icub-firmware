@@ -77,7 +77,7 @@ struct EOaction_hid
         } cbk;
 
     } data;
-};   
+};  EO_VERIFYsizeof(EOaction, EOaction_sizeof);   
  
 #define EOACTION_DUMMY      { eo_actypeNONE, {0} }
 
