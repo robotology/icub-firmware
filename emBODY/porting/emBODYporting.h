@@ -107,7 +107,7 @@ extern "C" {
     //#define stdint    dspic_stdint
     #define EO_TAILOR_CODE_FOR_DSPIC
     #define __weak      __attribute__((__weak__))
-#elif defined(APPLE)
+#elif defined(__APPLE__)
     #define EO_extern_inline       static inline
     #define EO_static_inline       static inline
     #define EO_INIT(f)
