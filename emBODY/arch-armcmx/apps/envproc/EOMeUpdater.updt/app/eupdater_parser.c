@@ -34,6 +34,8 @@
 
 #include "updater-core.h"
 
+#include "eupdater_cangtw.h"
+
 #include "osal_system.h"
 #include "EOtimer.h"
 #include "EOaction.h"
@@ -91,8 +93,8 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//static eObool_t s_eupdater_parser_process_rop_dummy(EOpacket *rxpkt, EOpacket *txpkt);
-static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpacket *txpkt);
+//static eObool_t s_eupdater_parser_process_ethcmd_dummy(EOpacket *rxpkt, EOpacket *txpkt);
+static eObool_t s_eupdater_parser_process_ethcmd_alessandro(EOpacket *rxpkt, EOpacket *txpkt);
 
 static void s_eupdater_jump2app(void *par);
 static void s_toggle_led(void *p);
@@ -105,11 +107,14 @@ static void s_jump2app_countdown_stop(void);
 static void s_led_countdown_start(void);
 static void s_led_countdown_stop(void);
 
+static void s_stayforever(eOipv4addr_t remaddress);
 
 static void s_led_stayforever_start(void);
 
 
+static void s_toggle_led_cangtw(void *p);
 
+static void s_led_cangtw_start(void);
 
 
 
@@ -124,15 +129,31 @@ static eObool_t s_isrunning_jump2app = eobool_false;
 static EOtimer* s_timer_led = NULL;
 static EOaction *s_action_led = NULL;
 
+
+static eObool_t s_stay_in_here_forever = eobool_false;
+
+#if defined(_DEBUG_MODE_)
+    #warning --> we are in _DEBUG_MODE_ and use: mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR(10, 255, 72, 114)
+    static eOipv4addr_t mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR(10, 255, 72, 114);
+#else
+    static eOipv4addr_t mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR_LOCALHOST;
+#endif
+
+
+
+static uint8_t s_cangtw_is_active = 0;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
-extern void eupdater_parser_init(void)
+// evaluates if to stay in updated or to jump to application now or after a timeout
+extern void eupdater_parser_evalwhenjumping(void)
 {
     eOreltime_t time2stay = 0;
     eEprocess_t pr = ee_procNone;
+    
+    s_stay_in_here_forever = eobool_false;
     
 #if !defined(_MAINTAINER_APPL_ )    
 
@@ -145,8 +166,8 @@ extern void eupdater_parser_init(void)
         shalbase_ipc_gotoproc_clr();
         
         if(ee_procUpdater == pr)
-        {   // stay in here forever
-            s_led_stayforever_start();
+        {   // stay in this process forever
+            s_stayforever(mostrecent_host_ipaddress);
             return;
         }
     }    
@@ -165,7 +186,7 @@ extern void eupdater_parser_init(void)
     }
     else if(EOK_reltimeINFINITE == time2stay)
     {
-        s_led_stayforever_start();
+        s_stayforever(mostrecent_host_ipaddress);
         return;
     }
     else
@@ -179,8 +200,8 @@ extern void eupdater_parser_init(void)
 
 #elif defined(_MAINTAINER_APPL_)
  
-    // the maintainer just stays in here forever. thus init the stayforver leds    
-    s_led_stayforever_start();
+    // the maintainer just stays in here forever. thus init the stayforever leds    
+    s_stayforever(mostrecent_host_ipaddress);
     
 #endif    
 }
@@ -188,18 +209,14 @@ extern void eupdater_parser_init(void)
 
 
 // return true if there is a pkt to transmit back
-extern eObool_t eupdater_parser_process_rop(EOpacket *rxpkt, EOpacket *txpkt)
+extern eObool_t eupdater_parser_process_ethcmd(EOpacket *rxpkt, EOpacket *txpkt)
 {
-    //return(s_eupdater_parser_process_rop_dummy(rxpkt, txpkt));
-    return(s_eupdater_parser_process_rop_alessandro(rxpkt, txpkt));
+    //return(s_eupdater_parser_process_ethcmd_dummy(rxpkt, txpkt));
+    return(s_eupdater_parser_process_ethcmd_alessandro(rxpkt, txpkt));
 }
 
 
-extern eObool_t eupdater_parser_process_data(EOpacket *rxpkt, EOpacket *txpkt)
-{
 
-    return(eobool_false);
-}
 
 
 extern void eupdater_parser_download_blinkled_start(void)
@@ -233,7 +250,18 @@ extern void eupdater_parser_download_toggleled(void)
     s_toggle_led(NULL);
 }
 
+extern eObool_t eupdater_parser_stay_forever(void)
+{
+    return(s_stay_in_here_forever);
+}
 
+extern void eupdater_parser_cangtw_activated(void)
+{
+    s_cangtw_is_active = 1;
+    s_cangtw_is_active = s_cangtw_is_active;
+    
+    s_led_cangtw_start();
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -246,7 +274,7 @@ extern void eupdater_parser_download_toggleled(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpacket *txpkt)
+static eObool_t s_eupdater_parser_process_ethcmd_alessandro(EOpacket *rxpkt, EOpacket *txpkt)
 {
     uint8_t *datarx;
     uint8_t *datatx;
@@ -256,6 +284,10 @@ static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpack
     eOipv4addr_t remaddr = 0;
     eOipv4port_t remport = 0;
     
+     eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
+    
+    mostrecent_host_ipaddress = remaddr;
+    
     // if we receive any packet from the correct socket, then we stop the countdown
     if(eobool_true == s_jump2app_countdown_isrunning())
     {
@@ -263,16 +295,14 @@ static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpack
         
         // and also we change the led frequency
         s_led_countdown_stop();
-        s_led_stayforever_start();
+        s_stayforever(mostrecent_host_ipaddress);
     }
 
     eo_packet_Payload_Get(rxpkt, &datarx, &sizerx);
     eo_packet_Payload_Get(txpkt, &datatx, &sizetx);
 
-    if(1 == upd_core_manage_cmd(datarx, datatx, &sizetx))
+    if(1 == upd_core_manage_cmd(datarx, remaddr, datatx, &sizetx))
     {
-        eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
-
         eo_packet_Payload_Set(txpkt, (uint8_t*)datatx, sizetx);
         //eo_packet_Destination_Set(txpkt, remaddr, remport);
         eo_packet_Destination_Set(txpkt, remaddr, 3333);
@@ -284,7 +314,7 @@ static eObool_t s_eupdater_parser_process_rop_alessandro(EOpacket *rxpkt, EOpack
 
 }
 
-// static eObool_t s_eupdater_parser_process_rop_dummy(EOpacket *rxpkt, EOpacket *txpkt)
+// static eObool_t s_eupdater_parser_process_ethcmd_dummy(EOpacket *rxpkt, EOpacket *txpkt)
 // {
 //     pkt_payload_t *pktdata = NULL;
 //     uint8_t *data;
@@ -353,7 +383,7 @@ static void s_eupdater_jump2app(void *par)
     
     // if in here ... we stay in eupdater forever
 
-    s_led_stayforever_start();      
+    s_stayforever(mostrecent_host_ipaddress);      
 }
 
 static void s_jump2app_countdown_start(eOreltime_t countdown)
@@ -413,6 +443,18 @@ static void s_led_countdown_stop(void)
     eo_timer_Stop(s_timer_led);
 }
 
+static void s_stayforever(eOipv4addr_t remaddress)
+{
+    s_led_stayforever_start();    
+    s_stay_in_here_forever = eobool_true;       
+#if !defined(_MAINTAINER_APPL_)
+#ifdef _START_CANGTW_WHEN_STAY_FOREVER_    
+    // if updater we also start the can gateway
+    eupdater_cangtw_start(remaddress);
+#endif    
+#endif       
+}
+
 static void s_led_stayforever_start(void)
 {
     if(NULL == s_timer_led)
@@ -457,7 +499,39 @@ static void s_toggle_led(void *p)
 #endif    
 }
 
+static void s_toggle_led_cangtw(void *p)
+{  
+    hal_led_toggle(hal_led0);
+    hal_led_toggle(hal_led1);
+    hal_led_toggle(hal_led2);
+    hal_led_toggle(hal_led3);
+}
 
+
+static void s_led_cangtw_start(void)
+{
+    if(NULL == s_timer_led)
+    {
+        s_timer_led = eo_timer_New();
+    }
+    
+    if(NULL == s_action_led)
+    {
+        s_action_led = eo_action_New();
+    }
+    
+    eo_timer_Stop(s_timer_led);
+    
+    hal_led_off(hal_led0);
+    hal_led_off(hal_led1);
+    hal_led_off(hal_led2);
+    hal_led_off(hal_led3);    
+    hal_led_off(hal_led4);
+    hal_led_off(hal_led5);
+    
+    eo_action_SetCallback(s_action_led, s_toggle_led_cangtw, NULL, eom_callbackman_GetTask(eom_callbackman_GetHandle()));
+    eo_timer_Start(s_timer_led, eok_abstimeNOW, 2000*1000, eo_tmrmode_FOREVER, s_action_led);
+}
 
 
 

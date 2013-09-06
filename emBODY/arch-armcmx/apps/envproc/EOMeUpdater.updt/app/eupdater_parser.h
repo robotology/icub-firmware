@@ -22,7 +22,7 @@
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       eupdater-parser.h
+/** @file       eupdater_parser.h
     @brief      This header file implements ....
     @author     marco.accame@iit.it
     @date       01/11/2012
@@ -58,11 +58,13 @@
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-extern void eupdater_parser_init(void);
+extern void eupdater_parser_evalwhenjumping(void);
 
-extern eObool_t eupdater_parser_process_rop(EOpacket *rxpkt, EOpacket *txpkt);
+extern eObool_t eupdater_parser_process_ethcmd(EOpacket *rxpkt, EOpacket *txpkt);
 
-extern eObool_t eupdater_parser_process_data(EOpacket *rxpkt, EOpacket *txpkt);
+extern eObool_t eupdater_parser_stay_forever(void);
+
+extern void eupdater_parser_cangtw_activated(void);
 
 
 extern void eupdater_parser_download_blinkled_start(void);
