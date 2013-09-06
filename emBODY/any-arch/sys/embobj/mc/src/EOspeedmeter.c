@@ -248,7 +248,12 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         
     position *= o->enc_sign;
     
-    o->distance_pred = position;
+    int32_t delta = normalize_angle(position - o->position_last);
+    o->position_last = position;
+
+    o->distance += delta;
+
+    o->distance_pred = o->distance;
     
     o->is_started = eobool_true;
     
