@@ -81,14 +81,14 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
             .signature  = ee_procUpdater,
             .version    = 
             { 
-                .major = 1, 
+                .major = 2, 
                 .minor = 0
             },  
             .builddate  = 
             {
-                .year  = 2012,
-                .month = 1,
-                .day   = 11,
+                .year  = 2013,
+                .month = 8,
+                .day   = 26,
                 .hour  = 18,
                 .min   = 0
             }
@@ -114,10 +114,10 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
     },
     .protocols  =
     {
-        .udpprotversion  = { .major = 0, .minor = 1},
+        .udpprotversion  = { .major = 1, .minor = 1},
         .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
+        .can2protversion = { .major = 0, .minor = 1},
+        .gtwprotversion  = { .major = 1, .minor = 0}
     },
     .extra      = {0}
 };
