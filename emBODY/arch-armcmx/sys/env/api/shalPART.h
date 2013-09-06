@@ -45,15 +45,19 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#if	defined(SHARSERV_MODE_SHALIB) || defined(SHALS_MODE_STATIC)
+    #define SHALPART_MODE_STATICLIBRARY
+#endif
+
       
 #define SHALPART_NAME                   "shalPART"          // name ... 
 
 #define SHALPART_VER_MAJOR              0x01                // change of APIs
-#define SHALPART_VER_MINOR              0x01                // change of internals
+#define SHALPART_VER_MINOR              0x02                // change of internals
 
-#define SHALPART_BUILDDATE_YEAR         2012
-#define SHALPART_BUILDDATE_MONTH        4
-#define SHALPART_BUILDDATE_DAY          2
+#define SHALPART_BUILDDATE_YEAR         2013
+#define SHALPART_BUILDDATE_MONTH        9
+#define SHALPART_BUILDDATE_DAY          4
 #define SHALPART_BUILDDATE_HOUR         12
 #define SHALPART_BUILDDATE_MIN          0
 
@@ -72,7 +76,7 @@ typedef enum
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-#if defined(SHALPART_MODE_STATICLIBRARY)  || defined(SHALS_MODE_STATIC)
+#if	defined(SHALPART_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalpart_moduleinfo_get(void);
 extern const eEentity_t * shalpart_moduleinfo_entity_get(void);
