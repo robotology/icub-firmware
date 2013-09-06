@@ -74,7 +74,11 @@
 #define LOADER_LED                 0x100
 
 
+//#define FORCE_EEPROM_ERASE // it must be undefined unless you wanto to erase the eeprom
 
+#if defined(FORCE_EEPROM_ERASE)
+	#warning -> ATTENTION: FORCE_EEPROM_ERASE is set ... undef it after you have erased the eeprom
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -100,15 +104,20 @@ static void s_loader_HW_LED_On(uint32_t led);
 static void s_loader_HW_LED_Off(uint32_t led);
 
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-static void s_loader_eval_user_request(void);
+//static void s_loader_eval_user_request(void);
 static void s_loader_HW_INP_Config(void);
 static uint32_t s_loader_HW_INP_IsPushed(void);
 #endif
+
+
 
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
 static void s_eval_eeprom_erase(void);
 #endif
 
+#if defined(FORCE_EEPROM_ERASE) || defined(ENABLE_ERASE_EEPROM)
+static void s_eeprom_erase(void);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -126,14 +135,14 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
             .version    = 
             { 
                 .major = 1, 
-                .minor = 0
+                .minor = 1
             },  
             .builddate  = 
             {
-                .year  = 2012,
-                .month = 3,
-                .day   = 30,
-                .hour  = 12,
+                .year  = 2013,
+                .month = 9,
+                .day   = 6,
+                .hour  = 14,
                 .min   = 0
             }
         },
@@ -293,7 +302,6 @@ int main(void)
 
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
     // if any user request, it either jumps or manage error. else, it returns.
-    //#warning --> pensa a mettere qualcosa ???
     //s_loader_eval_user_request();
 #endif
 
@@ -390,7 +398,7 @@ static void s_loader_shalibs_init(void)
     
     if(ee_res_OK != shalpart_proc_def2run_get(&defproc))
     {
-        // we impose that the default process is teh application
+        // we impose that the default process is the application
         shalpart_proc_def2run_set(ee_procApplication);
     }    
 
@@ -546,20 +554,20 @@ static void s_loader_attempt_jump(eEprocess_t proc, uint32_t adr_in_case_proc_fa
     return;
 }
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-static void s_loader_eval_user_request(void)
-{
-    // we see if the user wants to go to the updater by pushing the button
-    if(1 == s_loader_HW_INP_IsPushed())
-    {
-        s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_DEF_UPD);
-        // if in here ... the jump failed, thus i go to error.
-        s_loader_manage_error(200, 800); 
-    }
+// #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
+// static void s_loader_eval_user_request(void)
+// {
+//     // we see if the user wants to go to the updater by pushing the button
+//     if(1 == s_loader_HW_INP_IsPushed())
+//     {
+//         s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_DEF_UPD);
+//         // if in here ... the jump failed, thus i go to error.
+//         s_loader_manage_error(200, 800); 
+//     }
 
-    // if hw can tell none, updater, one, another etc. put a switch-case and if the chosen fails ... manage error.
-}
-#endif//BOARD_MVBSTM32C
+//     // if hw can tell none, updater, one, another etc. put a switch-case and if the chosen fails ... manage error.
+// }
+// #endif//BOARD_MVBSTM32C
 
 
 // static void s_loader_eval_def_from_partition_table(void)
@@ -622,6 +630,10 @@ static void s_loader_HW_init(void)
     
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
     s_eval_eeprom_erase();
+#endif   
+
+#if defined(FORCE_EEPROM_ERASE)
+    s_eeprom_erase();
 #endif    
     
 
@@ -640,6 +652,27 @@ static void s_loader_HW_SYSTICK_Config(void)
     hal_sys_systick_sethandler(systickhandler, 1000, hal_int_priority15); // 1 milli
 }
 
+#if defined(FORCE_EEPROM_ERASE) || defined(ENABLE_ERASE_EEPROM)
+static void s_eeprom_erase(void)
+{
+    uint32_t i=0;
+    static uint8_t data[EENV_STGSIZE-EENV_STGSTART] = {0};
+    
+    // erase-eeprom
+    hal_eeprom_erase(hal_eeprom_i2c_01, EENV_STGSTART, EENV_STGSIZE);  
+    
+    hal_eeprom_read(hal_eeprom_i2c_01, EENV_STGSTART, EENV_STGSIZE, data);
+
+    for(i=0; i<EENV_STGSIZE-EENV_STGSTART; i++)
+    {
+        if(0xff != data[i])
+        {
+            s_loader_manage_error(100, 100);
+        }
+    }              
+}
+#endif
+
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
 static void s_loader_HW_INP_Config(void)
 {
@@ -655,23 +688,10 @@ static uint32_t s_loader_HW_INP_IsPushed(void)
 #if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
 static void s_eval_eeprom_erase(void)
 {
-    uint32_t i=0;
-    static uint8_t data[EENV_STGSIZE-EENV_STGSTART] = {0};
-    
+  
     if(1 == s_loader_HW_INP_IsPushed())
-    {
-        // erase-eeprom
-        hal_eeprom_erase(hal_eeprom_i2c_01, EENV_STGSTART, EENV_STGSIZE);  
-        
-        hal_eeprom_read(hal_eeprom_i2c_01, EENV_STGSTART, EENV_STGSIZE, data);
-
-        for(i=0; i<EENV_STGSIZE-EENV_STGSTART; i++)
-        {
-            if(0xff != data[i])
-            {
-                s_loader_manage_error(100, 100);
-            }
-        }        
+    {    
+        s_eeprom_erase();
     }
 }
 #endif   
