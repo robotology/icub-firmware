@@ -133,17 +133,17 @@
 // <i> sssssssss
 
 #ifndef HAL_CAN1_ENABLE
- #define HAL_CAN1_ENABLE  0     
+ #define HAL_CAN1_ENABLE  1     
 #endif
 
 
-//   <o> Max can frames in input buffer <1-16>
+//   <o> Max can frames in input buffer <1-128>
 //   <i> Default: 4
-#define HAL_CAN1_INPBUFFCAPACITY     0
+#define HAL_CAN1_INPBUFFCAPACITY     64
 
-//   <o> Max can frames in output buffer <1-16>
+//   <o> Max can frames in output buffer <1-128>
 //   <i> Default: 4
-#define HAL_CAN1_OUTBUFFCAPACITY     0
+#define HAL_CAN1_OUTBUFFCAPACITY     16
 
 
 // </e> CAN 0  
@@ -154,17 +154,17 @@
 // <i> sssssssss
 
 #ifndef HAL_CAN2_ENABLE
- #define HAL_CAN2_ENABLE  0     
+ #define HAL_CAN2_ENABLE  1     
 #endif
 
 
-//   <o> Max can frames in input buffer <1-16>
+//   <o> Max can frames in input buffer <1-128>
 //   <i> Default: 4
-#define HAL_CAN2_INPBUFFCAPACITY     0
+#define HAL_CAN2_INPBUFFCAPACITY     64
 
-//   <o> Max can frames in output buffer <1-16>
+//   <o> Max can frames in output buffer <1-128>
 //   <i> Default: 4
-#define HAL_CAN2_OUTBUFFCAPACITY     0
+#define HAL_CAN2_OUTBUFFCAPACITY     16
 
 
 // </e> CAN 2  
