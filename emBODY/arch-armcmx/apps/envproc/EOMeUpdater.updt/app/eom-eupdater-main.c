@@ -51,6 +51,7 @@
 
 #if !defined(_MAINTAINER_APPL_)
 #include "eupdater-info.h"
+#include "eupdater_cangtw.h"
 #else
 #include "emaintainer-info.h"
 #endif
@@ -77,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void task_udpserver(void *p);
+extern void task_ethcommand(void *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
@@ -90,6 +91,10 @@ extern void task_udpserver(void *p);
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(_DEBUG_MODE_)
+    #warning --> we are in _DEBUG_MODE_ and use macro _FORCE_NETWORK_FROM_IPAL_CFG 
+    #define _FORCE_NETWORK_FROM_IPAL_CFG
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,8 +117,8 @@ static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taski
 
 static void s_eom_eupdater_main_init(void);
 
-static void s_udpserver_startup(EOMtask *p, uint32_t t);
-static void s_udpserver_run(EOMtask *p, uint32_t t);
+static void s_ethcommand_startup(EOMtask *p, uint32_t t);
+static void s_ethcommand_run(EOMtask *p, uint32_t t);
 
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt);
@@ -125,19 +130,18 @@ static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketData
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOsocketDatagram*        s_skt_rops          = NULL;
-static EOsocketDatagram*        s_skt_data          = NULL;
-static EOpacket*                s_rxpkt             = NULL;
-static EOpacket*                s_txpkt             = NULL;
-static EOMtask*                 s_task_udpserver    = NULL;
-static EOaction*                s_action            = NULL;
+// task eth command
+
+static EOsocketDatagram*        s_skt_ethcmd                = NULL;
+static EOpacket*                s_rxpkt_ethcmd              = NULL;
+static EOpacket*                s_txpkt_ethcmd              = NULL;
+static EOMtask*                 s_task_ethcommand           = NULL;
+static EOaction*                s_action_ethcmd             = NULL;
+
+static const eOipv4port_t       s_ethcmd_port               = 3333; 
+static const eOmessage_t        s_message_from_skt_ethcmd   = 0x00000001;
 
 
-
-static const eOmessage_t s_message_from_skt_rops        = 0x00000001;
-static const eOmessage_t s_message_from_skt_data        = 0x00000002;
-
-static const eOipv4port_t s_server_port = 3333; 
 
 
 static const eOerrman_cfg_t  errmancfg = 
@@ -188,7 +192,7 @@ void osal_on_idle(void)
 
 
 
-extern void task_udpserver(void *p)
+extern void task_ethcommand(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start(p);
@@ -205,7 +209,7 @@ static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taski
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
     char str[128];
 
-    sprintf(str, "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
     hal_trace_puts(str);
 
     if(errtype <= eo_errortype_warning)
@@ -222,13 +226,20 @@ static void s_eom_eupdater_main_init(void)
     const ipal_cfg_t* ipalcfg = NULL;
     uint8_t *ipaddr = NULL;
     eOmipnet_cfg_addr_t* eomipnet_addr;
+#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
     const eEipnetwork_t *ipnet = NULL;
+#endif    
     char str[96];
 
     const eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_MyCfg = 
-    {   
-        .numberofsockets            = 3, 
+    { 
+#if !defined(_MAINTAINER_APPL_)    
+        .numberofsockets            = 2,    // one for eth command and one for can gateway
+        .maxdatagramenqueuedintx    = 32    // can gatweay needs to be able to manage many small packets
+#else
+        .numberofsockets            = 2, 
         .maxdatagramenqueuedintx    = 2
+#endif
     };
 
 #if !defined(_MAINTAINER_APPL_)
@@ -242,9 +253,9 @@ static void s_eom_eupdater_main_init(void)
     
     
 #if !defined(_MAINTAINER_APPL_)     
-    sprintf(str, "starting EOMeUpdater:: \n\r");
+    snprintf(str, sizeof(str), "starting EOMeUpdater:: \n\r");
 #else
-    sprintf(str, "starting EOMeMaintainer:: \n\r");
+    snprintf(str, sizeof(str), "starting EOMeMaintainer:: \n\r");
 #endif  
     hal_trace_puts(str);
 
@@ -273,76 +284,77 @@ static void s_eom_eupdater_main_init(void)
     }
 
 
-    sprintf(str, "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+    // start the ipnet
+    snprintf(str, sizeof(str), "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
     hal_trace_puts(str);    
 
-    // start the ipnet
     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
                          ipalcfg, 
                          eomipnet_addr,
                          &eom_ipnet_dtgskt_MyCfg
                          );
-                         
-
-    sprintf(str, "starting ::taskudpserver");
-    hal_trace_puts(str);                         
-
-    s_task_udpserver = eom_task_New(eom_mtask_MessageDriven, 100, 2*1024, s_udpserver_startup, s_udpserver_run,  6, 
-                                    eok_reltimeINFINITE, NULL, 
-                                    task_udpserver, "udpserver");
-
-    s_task_udpserver = s_task_udpserver;
-
-
+    
+    // init the leds   
     hal_led_init(hal_led0, NULL);
     hal_led_init(hal_led1, NULL);
     hal_led_init(hal_led2, NULL);
     hal_led_init(hal_led3, NULL);
     hal_led_init(hal_led4, NULL);
-    hal_led_init(hal_led5, NULL);    
+    hal_led_init(hal_led5, NULL);   
+    
+    
+
+    // the eth command task 
+    snprintf(str, sizeof(str), "starting ::taskethcommand");
+    hal_trace_puts(str);                         
+
+    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 101, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
+                                    eok_reltimeINFINITE, NULL, 
+                                    task_ethcommand, "ethcommand");
+    s_task_ethcommand = s_task_ethcommand;
+    
+    
+#if !defined(_MAINTAINER_APPL_)
+    // there is also the can gateway
+    snprintf(str, sizeof(str), "starting ::cangateway");
+    hal_trace_puts(str);    
+    eupdater_cangtw_init();
+#endif
+
+    // eval if and when jumping
+    snprintf(str, sizeof(str), "calling ::evalwhenjumping");
+    hal_trace_puts(str);  
+    eupdater_parser_evalwhenjumping(); 
 }
 
 
-static void s_udpserver_startup(EOMtask *p, uint32_t t)
+static void s_ethcommand_startup(EOMtask *p, uint32_t t)
 {
     char str[96];
  
-    // init the rx packet 
-    s_rxpkt = eo_packet_New(1024);  
-    s_txpkt = eo_packet_New(1024);
+    // init the rx and tx packets 
+    s_rxpkt_ethcmd = eo_packet_New(1024);  
+    s_txpkt_ethcmd = eo_packet_New(1024);
 
     // init the action used for various tasks
-    s_action = eo_action_New();  
+    s_action_ethcmd = eo_action_New();  
 
     // initialise the socket 
-    s_skt_rops = eo_socketdtg_New(  2, 1024, eom_mutex_New(), // input queue
-                                    2, 1024, eom_mutex_New()  // output queue
-                                 );
+    s_skt_ethcmd = eo_socketdtg_New(  2, 1024, eom_mutex_New(), // input queue
+                                      2, 1024, eom_mutex_New()  // output queue
+                                   );   
 
-
-    s_skt_data = eo_socketdtg_New(  1, 1024, eom_mutex_New(), // input queue
-                                    1, 1024, eom_mutex_New()  // output queue
-                                 );
-    
-
-    sprintf(str, "opening a txrx socket on port %d w/ immediate tx\n\r", s_server_port);
+    snprintf(str, sizeof(str), "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
     hal_trace_puts(str);
 
 
-    // set the rx action on socket to be a message s_message_from_skt_rops to this task object
-    eo_action_SetMessage(s_action, s_message_from_skt_rops, p);
-    eo_socketdtg_Open(s_skt_rops, s_server_port, eo_sktdir_TXRX, eobool_false, NULL, s_action, NULL);
-
-    // set the rx action on socket to be a message s_message_from_skt_data to this task object
-    eo_action_SetMessage(s_action, s_message_from_skt_data, p);
-    eo_socketdtg_Open(s_skt_data, s_server_port+1, eo_sktdir_TXRX, eobool_false, NULL, s_action, NULL);
-
-
-    eupdater_parser_init();
-        
+    // set the rx action on socket to be a message s_message_from_skt_ethcmd to this task object
+    eo_action_SetMessage(s_action_ethcmd, s_message_from_skt_ethcmd, p);
+    eo_socketdtg_Open(s_skt_ethcmd, s_ethcmd_port, eo_sktdir_TXRX, eobool_false, NULL, s_action_ethcmd, NULL);
+      
 }
 
-static void s_udpserver_run(EOMtask *p, uint32_t t)
+static void s_ethcommand_run(EOMtask *p, uint32_t t)
 {
     // read the packet.
     eOresult_t res;
@@ -354,16 +366,10 @@ static void s_udpserver_run(EOMtask *p, uint32_t t)
 
     switch(msg)
     {
-        case s_message_from_skt_rops:
+        case s_message_from_skt_ethcmd:
         {
-            socket = s_skt_rops;
-            parser = eupdater_parser_process_rop;
-        } break;
-
-        case s_message_from_skt_data:
-        {
-            socket = s_skt_data;
-            parser = eupdater_parser_process_data;
+            socket = s_skt_ethcmd;
+            parser = eupdater_parser_process_ethcmd;
         } break;
 
         default:
@@ -382,64 +388,21 @@ static void s_udpserver_run(EOMtask *p, uint32_t t)
 
     //hal_led_toggle(hal_led1);
 
+    res = eo_socketdtg_Get(socket, s_rxpkt_ethcmd, eok_reltimeINFINITE);
 
-    res = eo_socketdtg_Get(socket, s_rxpkt, eok_reltimeINFINITE);
-
-    if((eores_OK == res) && (eobool_true == s_eom_eupdater_main_connected2host(s_rxpkt, socket)))
+    if((eores_OK == res) && (eobool_true == s_eom_eupdater_main_connected2host(s_rxpkt_ethcmd, socket)))
     {
 
-        if(eobool_true == parser(s_rxpkt, s_txpkt))
+        if(eobool_true == parser(s_rxpkt_ethcmd, s_txpkt_ethcmd))
         {
                 // transmit a pkt back to the host
-                eo_socketdtg_Put(socket, s_txpkt);
+                eo_socketdtg_Put(socket, s_txpkt_ethcmd);
         }
  
     }
 
-
 }
 
-
-// static void s_udpserver_run_safe(EOMtask *p, uint32_t t)
-// {
-//     // read the packet.
-//     eOresult_t res;
-//     //eOipv4addr_t remaddr;
-//     //eOipv4port_t remport;
-//     //uint8_t *ipaddr;
-
-//     // the message that we have received
-//     eOmessage_t msg = (eOmessage_t)t;
-
-
-//     if(s_message_from_skt_rops == msg)
-//     {   // ok, message from the socket
-
-//         res = eo_socketdtg_Get(s_skt_rops, 
-//                                s_rxpkt, 
-//                                eok_reltimeZERO //eok_reltimeINFINITE
-//                                );
-//     
-//         if((eores_OK == res) && (eobool_true == s_eom_eupdater_main_connected2host(s_rxpkt, s_skt_rops)))
-//         {
-
-//             if(eobool_true == eupdater_parser_process_rop(s_rxpkt, s_txpkt))
-//             {
-//                 // transmit a pkt back to the host
-//                 eo_socketdtg_Put(s_skt_rops, s_txpkt);
-//             }
-//  
-//         }
-
-//     }
-//     else if(s_message_from_skt_data == msg)
-//     {   // ok, message from the socket transfer
-
-
-
-//     }
-
-// }
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt)
 {
