@@ -36,10 +36,10 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define SHALS_MODE_STATIC
-#define SHALBASE_MODE_STATICLIBRARY
-#define SHALPART_MODE_STATICLIBRARY
-#define SHALINFO_MODE_STATICLIBRARY
+// #define SHALS_MODE_STATIC
+// #define SHALBASE_MODE_STATICLIBRARY
+// #define SHALPART_MODE_STATICLIBRARY
+// #define SHALINFO_MODE_STATICLIBRARY
 
 
 
