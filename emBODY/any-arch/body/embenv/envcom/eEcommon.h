@@ -309,7 +309,7 @@ typedef enum
     ee_shalIPAL             = 5,
     ee_shalFSAL             = 6,
     ee_shalDSPAL            = 7,
-    ee_shalUser08           = 8, 
+    ee_shalSharServ         = 8, 
     ee_shalUser09           = 9
 } eEsharlib_t; 
 
