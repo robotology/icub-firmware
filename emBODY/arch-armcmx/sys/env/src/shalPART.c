@@ -152,68 +152,17 @@ static void s_shalpart_permanent_partinfo_set(partInfo_t *partinfo);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// - default values ---------------------------------------------------------------------------------------------------
-
-//#if 0 // we cannot afford such a big constant in flash space
-//static const partInfo_t s_shalpart_default_partinfo = 
-//{ 
-//    .head = 
-//    {
-//        .version = 
-//        {
-//            .major = SHALPART_MAJOR,
-//            .minor = SHALPART_MINOR
-//        }, 
-//        .defflag = DEFFLAG_TRUE,
-//        .cached  = 0
-//    },
-//    .data = 
-//    { 
-//        .NprocMax       = ee_procMaxNum,
-//        .NshalMax       = ee_shalMaxNum,
-//        .Nproc          = 0,
-//        .Nshal          = 0,
-//        .defProc2run    = ee_procNone,
-//        .tableprocs     =
-//        {
-//            ee_procNone, ee_procNone, ee_procNone, ee_procNone, ee_procNone,
-//            ee_procNone, ee_procNone, ee_procNone, ee_procNone, ee_procNone
-//        }, 
-//        .tableshals     =
-//        {   
-//            ee_shalNone, ee_shalNone, ee_shalNone, ee_shalNone, ee_shalNone,
-//            ee_shalNone, ee_shalNone, ee_shalNone, ee_shalNone, ee_shalNone
-//        },
-//        .procInfo       =
-//        {
-//            VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO,
-//            VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO
-//        },
-//        .shalInfo       =
-//        {
-//            VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO,
-//            VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO, VOID_MODINFO
-//
-//        }
-//    }
-//};
-//#endif
-
-//static const eEmoduleInfo_t s_shalpart_voidmodinfo = VOID_MODINFO;
-
-// we dont need to place the variable in here. just the SHALPART_STGADDR is required ...
-//static const partInfo_t    s_shalpart_permflash_partinfo __attribute__((at(SHALPART_STGADDR))) = { 0 }; 
-
-
-
 static volatile partInfo_t s_shalpart_temporary_partinfo __attribute__((at(SHALPART_RAMADDR))); 
 
+// - module info ------------------------------------------------------------------------------------------------------
 
-#if defined(SHALPART_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
-static const eEmoduleInfo_t s_shalpart_moduleinfo =
+#if     defined(SHALPART_MODE_STATICLIBRARY)
+    #define SHALPART_MODULEINFO_PLACED_AT
 #else
-static const eEmoduleInfo_t s_shalpart_moduleinfo __attribute__((at(SHALPART_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+    #define SHALPART_MODULEINFO_PLACED_AT       __attribute__((at(SHALPART_ROMADDR+EENV_MODULEINFO_OFFSET)))
 #endif
+
+static const eEmoduleInfo_t s_shalpart_moduleinfo   SHALPART_MODULEINFO_PLACED_AT =
 {
     .info           =
     {
@@ -271,7 +220,7 @@ static const eEmoduleInfo_t s_shalpart_moduleinfo __attribute__((at(SHALPART_ROM
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if defined(SHALPART_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
+#if     defined(SHALPART_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalpart_moduleinfo_get(void)
 {
@@ -288,6 +237,8 @@ extern eEresult_t shalpart_isvalid(void)
     return(ee_res_OK);
 }
 
+#else
+    // using inline functions
 #endif
 
 

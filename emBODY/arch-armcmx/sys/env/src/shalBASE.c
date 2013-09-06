@@ -114,10 +114,10 @@ typedef struct              // 80B
 // the ram size to be used in scatter-file and the one used by the program for static ram
 #define SHALBASE_RAMFOR_RWDATA      (EENV_MEMMAP_SHALBASE_RAMFOR_RWDATA)
 
-// the ram size to be used with __attribute__((at(SHALBASE_RAMADDR))), which is sizeof(baseInfo_t)
+// the ram size to be used with __attribute__((at(SHALBASE_RAMADDR)))
 #define SHALBASE_RAMFOR_ZIDATA      (EENV_MEMMAP_SHALBASE_RAMFOR_ZIDATA)
 
-// and its control
+// and relevant controls
 typedef int dummy1[sizeof(baseInfo_t)     <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
 typedef int dummy2[SHALBASE_RAMFOR_ZIDATA <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
 
@@ -150,16 +150,22 @@ static void s_shalbase_permanent_boardinfo_cache_invalidate(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-
+// this variable is placed in NZI section
 static volatile baseInfo_t s_shalbase_ram_baseinfo      __attribute__((at(SHALBASE_RAMADDR)));
 
+// this variable is placed in NZI section ... however it shoudl be placed in ZI section
 static volatile baseBoardInfo_t s_shalbase_temporary_baseboardinfo  __attribute__((at(SHALBASE_RAMADDR+sizeof(baseInfo_t))));
 
-#if defined(SHALBASE_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
-static const eEmoduleInfo_t s_shalbase_moduleinfo =
+
+// - module info ------------------------------------------------------------------------------------------------------
+
+#if     defined(SHALBASE_MODE_STATICLIBRARY)
+    #define SHALBASE_MODULEINFO_PLACED_AT
 #else
-static const eEmoduleInfo_t s_shalbase_moduleinfo __attribute__((at(SHALBASE_ROMADDR+EENV_MODULEINFO_OFFSET))) =  
+    #define SHALBASE_MODULEINFO_PLACED_AT       __attribute__((at(SHALBASE_ROMADDR+EENV_MODULEINFO_OFFSET)))
 #endif
+
+static const eEmoduleInfo_t s_shalbase_moduleinfo   SHALBASE_MODULEINFO_PLACED_AT =
 {
     .info           =
     {
@@ -217,7 +223,7 @@ static const eEmoduleInfo_t s_shalbase_moduleinfo __attribute__((at(SHALBASE_ROM
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(SHALBASE_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
+#if     defined(SHALBASE_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalbase_moduleinfo_get(void)
 {
@@ -234,6 +240,8 @@ extern eEresult_t shalbase_isvalid(void)
     return(ee_res_OK);
 }
 
+#else
+    // using inline functions
 #endif
 
 
