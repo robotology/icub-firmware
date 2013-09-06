@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -336,7 +337,7 @@
             <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>0</OneElfS>
+            <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -344,11 +345,12 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -359,6 +361,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -407,6 +410,16 @@
               <FileName>updater-core.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app\updater-core.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_sm_cangtw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\eOcfg_sm_cangtw.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater_cangtw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\eupdater_cangtw.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -666,15 +679,30 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-sm</GroupName>
+          <Files>
             <File>
-              <FileName>eEcommon.c</FileName>
+              <FileName>EOsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-arm-shared-services</GroupName>
+          <Files>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
             <File>
-              <FileName>shalBASE.c</FileName>
+              <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
@@ -682,9 +710,19 @@
               <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
             </File>
             <File>
-              <FileName>shalPART.c</FileName>
+              <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-any-arch</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -820,6 +858,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1017,10 +1056,10 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>0</OneElfS>
+            <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -1028,11 +1067,12 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src</IncludePath>
+              <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1043,6 +1083,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -1091,6 +1132,16 @@
               <FileName>updater-core.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app\updater-core.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_sm_cangtw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\eOcfg_sm_cangtw.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater_cangtw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\eupdater_cangtw.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1350,15 +1401,30 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-sm</GroupName>
+          <Files>
             <File>
-              <FileName>eEcommon.c</FileName>
+              <FileName>EOsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-arm-shared-services</GroupName>
+          <Files>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
             <File>
-              <FileName>shalBASE.c</FileName>
+              <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
@@ -1366,9 +1432,19 @@
               <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
             </File>
             <File>
-              <FileName>shalPART.c</FileName>
+              <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-any-arch</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
           </Files>
         </Group>
