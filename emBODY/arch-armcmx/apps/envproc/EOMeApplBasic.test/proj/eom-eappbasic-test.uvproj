@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -333,8 +334,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
             <Strict>0</Strict>
@@ -344,6 +345,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _FORCE_NETWORK_FROM_IPAL_CFG</Define>
@@ -359,6 +361,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -707,26 +710,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</FilePath>
             </File>
-            <File>
-              <FileName>eEcommon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalBASE.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalINFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -754,6 +737,41 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-arm-shared-services</GroupName>
+          <Files>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-any-arch</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -889,6 +907,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1097,6 +1116,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _FORCE_NETWORK_FROM_IPAL_CFG</Define>
@@ -1112,6 +1132,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -1424,26 +1445,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</FilePath>
             </File>
-            <File>
-              <FileName>eEcommon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalBASE.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalINFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1453,6 +1454,41 @@
               <FileName>eventviewer.cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-arm-shared-services</GroupName>
+          <Files>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-any-arch</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
             </File>
           </Files>
         </Group>
