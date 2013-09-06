@@ -178,7 +178,7 @@
 //   <i> Define max. number of messages that can be contained in all the message queues.
 //   <i> Default: 0  (Message queues not enabled)
 #ifndef OSAL_MQUEUEELEMNUM
- #define OSAL_MQUEUEELEMNUM    64
+ #define OSAL_MQUEUEELEMNUM    128
 #endif
 
 
