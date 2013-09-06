@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -344,6 +345,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC BOARD_MCBSTM32C ENABLE_USER_INPUT ENABLE_ERASE_EEPROM</Define>
@@ -359,6 +361,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -392,26 +395,6 @@
               <FileName>loader_updt.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app\loader_updt.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>arm-shalib-src</GroupName>
-          <Files>
-            <File>
-              <FileName>shalBASE.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalINFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -464,7 +447,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>any-common</GroupName>
+          <GroupName>ee-arm-shared-services</GroupName>
+          <Files>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-any-arch</GroupName>
           <Files>
             <File>
               <FileName>eEcommon.c</FileName>
@@ -605,6 +613,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -802,8 +811,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -813,6 +822,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC BOARD_EMS001</Define>
@@ -828,6 +838,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -861,26 +872,6 @@
               <FileName>loader_updt.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app\loader_updt.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>arm-shalib-src</GroupName>
-          <Files>
-            <File>
-              <FileName>shalBASE.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalINFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -933,7 +924,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>any-common</GroupName>
+          <GroupName>ee-arm-shared-services</GroupName>
+          <Files>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ee-any-arch</GroupName>
           <Files>
             <File>
               <FileName>eEcommon.c</FileName>
