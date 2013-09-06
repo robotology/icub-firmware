@@ -386,7 +386,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         {   
             eEresult_t ret = s_sys_eeprom_erase();
 
-            pktout[0] = EENV_MEMMAP_SHALSYSTEM_STGADDR;
+            pktout[0] = CMD_SYSEEPROMERASE;
             pktout[1] = (ee_res_OK == ret) ? 1 : 0;
             
             return 1;
