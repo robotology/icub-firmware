@@ -90,8 +90,8 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
 
         
-#if defined(_DEBUG_MODE_)
-    #warning --> we are in _DEBUG_MODE_ and use: POS_OPC = 1
+#if defined(_DEBUG_MODE_FULL_)
+    #warning --> we are in _DEBUG_MODE_FULL_ and use: POS_OPC = 1
     #define POS_OPC 1
 #else
     #define POS_OPC 0

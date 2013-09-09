@@ -65,7 +65,7 @@
 #include "EOtimer.h"
 
 
-
+#include "eEsharedServices.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -91,9 +91,9 @@ extern void task_ethcommand(void *p);
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(_DEBUG_MODE_)
-    #warning --> we are in _DEBUG_MODE_ and use macro _FORCE_NETWORK_FROM_IPAL_CFG 
-    #define _FORCE_NETWORK_FROM_IPAL_CFG
+#if     defined(_DEBUG_MODE_FULL_)
+    #warning --> we are in _DEBUG_MODE_FULL_ and use macro _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_ 
+    #define _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_
 #endif
 
 
@@ -123,7 +123,7 @@ static void s_ethcommand_run(EOMtask *p, uint32_t t);
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt);
 
-
+static void s_verify_init_sharserv(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ static void s_eom_eupdater_main_init(void)
     const ipal_cfg_t* ipalcfg = NULL;
     uint8_t *ipaddr = NULL;
     eOmipnet_cfg_addr_t* eomipnet_addr;
-#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+#ifndef _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_
     const eEipnetwork_t *ipnet = NULL;
 #endif    
     char str[96];
@@ -261,6 +261,9 @@ static void s_eom_eupdater_main_init(void)
 
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+    
+    s_verify_init_sharserv();
+    
 #if !defined(_MAINTAINER_APPL_)    
     eo_armenv_Initialise(&eupdater_modinfo, NULL);
 #else
@@ -269,7 +272,7 @@ static void s_eom_eupdater_main_init(void)
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
     
     
-#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+#ifndef _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_
     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
     {
         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
@@ -436,7 +439,21 @@ static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketData
 }
 
 
-
+static void s_verify_init_sharserv(void)
+{
+    if((ee_res_OK == ee_sharserv_isvalid()))
+    {
+        const uint8_t forcestorageinit = 1; 
+        if(ee_res_OK != ee_sharserv_init(forcestorageinit))
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "main()", "cannot init sharSERV");
+        }
+    }
+    else
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "main()", "sharSERV is not present");
+    }
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

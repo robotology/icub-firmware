@@ -33,7 +33,7 @@
 
 #include "eOcfg_sm_CanGtw.h"
 
-#define UDPCANSIGN  0x11
+#define UDPCANSIGN  0x12
 
 typedef struct
 {
@@ -45,9 +45,9 @@ typedef struct
 typedef struct
 {
     uint8_t         canbus;     // the can bus (1 or 2)
-    uint8_t         canid;      // the id
     uint8_t         len;        // the
-    uint8_t         dummy[5];
+    uint16_t        canid;      // the id
+    uint8_t         dummy[4];
     uint8_t         data[8];
 } eupdater_cangtw_udp_canframe_t;   // 16 bytes
 

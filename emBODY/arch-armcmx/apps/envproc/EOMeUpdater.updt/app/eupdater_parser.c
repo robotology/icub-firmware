@@ -132,8 +132,8 @@ static EOaction *s_action_led = NULL;
 
 static eObool_t s_stay_in_here_forever = eobool_false;
 
-#if defined(_DEBUG_MODE_)
-    #warning --> we are in _DEBUG_MODE_ and use: mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR(10, 255, 72, 114)
+#if defined(_DEBUG_MODE_FULL_)
+    #warning --> we are in _DEBUG_MODE_FULL_ and use: mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR(10, 255, 72, 114)
     static eOipv4addr_t mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR(10, 255, 72, 114);
 #else
     static eOipv4addr_t mostrecent_host_ipaddress = EO_COMMON_IPV4ADDR_LOCALHOST;

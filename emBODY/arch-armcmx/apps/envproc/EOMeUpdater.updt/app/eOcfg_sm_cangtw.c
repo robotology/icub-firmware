@@ -55,6 +55,10 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#if		defined(_DEBUG_MODE_FULL_)
+	#define _DEBUG_MODE_PRINTCAN_
+	#define _DEBUG_MODE_PRINTETH_
+#endif
 
 /* ------------------------------------------------------------------------------------
    <SMCFG_SPECIALISE>
@@ -157,6 +161,8 @@ static void s_parse_upd_packet(EOpacket* pkt);
 static void s_can_get(hal_can_port_t port);
 static void s_send_blmsg(EOsm *s);
 static void s_smcfg_can_clean(hal_can_port_t port);
+
+static void s_print_canframe(uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -735,7 +741,14 @@ static void s_parse_upd_packet(EOpacket* pkt)
     
     eupdater_cangtw_set_remote_addr(remaddr);
     
-#if !defined(_DEBUG_MODE_) // the true one    
+#if	defined(_DEBUG_MODE_PRINTETH_)    
+    char str[128];
+    snprintf(str, sizeof(str), "rx eth pkt = ...\n\r");
+    hal_trace_puts(str);  
+#endif
+  
+    
+#if !defined(_DEBUG_MODE_FULL_) // the true one    
     
     // do some basic checks ...
     if  (   (sizeof(eupdater_cangtw_udp_simpleframe_t) != size) || 
@@ -758,7 +771,7 @@ static void s_parse_upd_packet(EOpacket* pkt)
     
 #else   // debug
     
-    #warning --> we are in _DEBUG_MODE_ and: the gateway retrieves the udp but alwyas sends a broadcast can message on can2.
+    #warning --> we are in _DEBUG_MODE_FULL_ and: the gateway retrieves the udp but alwyas sends a broadcast can message on can2.
     
     // prepare the hal can frame
     hal_can_port_t port = hal_can_port2;
@@ -771,6 +784,10 @@ static void s_parse_upd_packet(EOpacket* pkt)
     memcpy(frame.data, s_blcanBROADCASTmsg, frame.size);
 
 #endif   
+    
+#if     defined(_DEBUG_MODE_PRINTCAN_)
+    s_print_canframe(1, port, &frame); 
+#endif    
 
     // and send it 
     hal_led_toggle((hal_can_port1 == port) ? hal_led4 : hal_led5);
@@ -811,7 +828,11 @@ static void s_can_get(hal_can_port_t port)
             eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
             eo_socketdtg_Put(eupdater_sock_cangateway, s_txpkt_gtwcan);               
         }
-             
+        
+#if     defined(_DEBUG_MODE_PRINTCAN_)                
+        s_print_canframe(0, port, &frame);        
+#endif
+        
     }
 }
     
@@ -871,7 +892,27 @@ static void s_smcfg_can_clean(hal_can_port_t port)
     hal_trace_puts(str); 
 }
 
+static void s_print_canframe(uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame)
+{
+    char str[128]; 
+    
+    uint8_t dd[8] = {0xee};
 
+    memcpy(dd, frame->data, frame->size);
+    
+    snprintf(str, sizeof(str), "%s frame: can%d, id = %x, size = %d, data[] = %x %x %x %x %x %x %x %x ", 
+                               (1 == tx) ? "tx" : "rx",
+                               (hal_can_port1==port)?1:2,
+                                frame->id,
+                                frame->size,
+                                dd[0], dd[1], dd[2], dd[3], dd[4], dd[5], dd[6], dd[7]
+             );
+
+    hal_trace_puts(str); 
+
+    
+    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
