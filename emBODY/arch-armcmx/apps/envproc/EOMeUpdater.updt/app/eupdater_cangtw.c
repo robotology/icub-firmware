@@ -253,10 +253,11 @@ static void s_cangateway_run(EOMtask *p, uint32_t t)
 {
     eOevent_t evt = (eOevent_t) t;
     
+#if defined(_DEBUG_MODE_FULL_)    
     char str[128];
     snprintf(str, sizeof(str), "received event %d", evt);
     hal_trace_puts(str);      
-    
+#endif    
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_start))
     {
