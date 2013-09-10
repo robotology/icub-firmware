@@ -115,7 +115,7 @@ EO_extern_inline const eEentity_t * ee_sharserv_moduleinfo_entity_get(void)
 EO_extern_inline eEresult_t ee_sharserv_isvalid(void) 
 { 
     const eEentity_t *en = ee_sharserv_moduleinfo_entity_get();
-    if((en->type==ee_entity_sharlib) && (en->signature==ee_shalINFO) && 
+    if((en->type==ee_entity_sharlib) && (en->signature==ee_shalSharServ) && 
        (en->version.major==SHARSERV_VER_MAJOR) && (en->version.minor==SHARSERV_VER_MINOR) &&
        (en->builddate.year==SHARSERV_BUILDDATE_YEAR) && (en->builddate.month==SHARSERV_BUILDDATE_MONTH) &&
        (en->builddate.day==SHARSERV_BUILDDATE_DAY) && (en->builddate.hour==SHARSERV_BUILDDATE_HOUR) &&
