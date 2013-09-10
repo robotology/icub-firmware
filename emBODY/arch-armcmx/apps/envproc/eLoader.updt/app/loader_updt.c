@@ -39,6 +39,7 @@
 #include "eEcommon.h"
 #include "eEmemorymap_stm32f1.h"
 
+#include "eEsharedServices.h" 
 #include "shalBASE.h" 
 #include "shalPART.h"
 #include "shalINFO.h"
@@ -343,6 +344,19 @@ static void s_loader_shalibs_init(void)
 {
     static volatile hal_result_t reshal = hal_res_NOK_generic;
     eEprocess_t defproc = ee_procNone;
+    
+    if(ee_res_OK != ee_sharserv_isvalid())
+    {
+        s_loader_manage_error(20, 80);
+    }
+    else
+    {
+        // init shalbase
+        if(ee_res_OK != ee_sharserv_init(1))
+        {
+            s_loader_manage_error(20, 80);
+        }        
+    }
 
     if(ee_res_OK != shalbase_isvalid())
     {
