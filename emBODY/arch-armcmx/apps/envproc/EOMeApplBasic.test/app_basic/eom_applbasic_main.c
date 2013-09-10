@@ -60,7 +60,7 @@
 #include "EOtheARMenvironment.h"
 #include "EOVtheEnvironment.h"
 
-
+#include "eEsharedServices.h" 
 
 
 
@@ -104,6 +104,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_eom_applbasic_main_init(void);
+
+static void s_verify_init_sharserv(void);
 
 
 
@@ -164,6 +166,9 @@ static void s_eom_applbasic_main_init(void)
     // 1. initialise eeprom and the arm-environmemnt
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+    
+    s_verify_init_sharserv();
+    
     eo_armenv_Initialise(&eom_applbasic_info_modinfo, NULL);
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
 
@@ -216,7 +221,21 @@ static void s_eom_applbasic_main_init(void)
 
 
 
-
+static void s_verify_init_sharserv(void)
+{
+    if((ee_res_OK == ee_sharserv_isvalid()))
+    {
+        const uint8_t forcestorageinit = 1; 
+        if(ee_res_OK != ee_sharserv_init(forcestorageinit))
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "main()", "cannot init sharSERV");
+        }
+    }
+    else
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "main()", "sharSERV is not present");
+    }
+}
 
 
 
