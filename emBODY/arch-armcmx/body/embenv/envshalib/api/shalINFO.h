@@ -45,14 +45,19 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#if	defined(SHARSERV_MODE_SHALIB) || defined(SHALS_MODE_STATIC)
+    #define SHALINFO_MODE_STATICLIBRARY
+#endif
+
+
 #define SHALINFO_NAME                   "shalINFO"           
 
 #define SHALINFO_VER_MAJOR              0x01                // change of APIs
-#define SHALINFO_VER_MINOR              0x01                // change of internals
+#define SHALINFO_VER_MINOR              0x02                // change of internals
 
-#define SHALINFO_BUILDDATE_YEAR         2012
-#define SHALINFO_BUILDDATE_MONTH        4
-#define SHALINFO_BUILDDATE_DAY          2
+#define SHALINFO_BUILDDATE_YEAR         2013
+#define SHALINFO_BUILDDATE_MONTH        9
+#define SHALINFO_BUILDDATE_DAY          4
 #define SHALINFO_BUILDDATE_HOUR         12
 #define SHALINFO_BUILDDATE_MIN          0
 
@@ -87,7 +92,7 @@ typedef struct                  // 256B
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-#if defined(SHALINFO_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
+#if	defined(SHALINFO_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalinfo_moduleinfo_get(void);
 extern const eEentity_t * shalinfo_moduleinfo_entity_get(void);

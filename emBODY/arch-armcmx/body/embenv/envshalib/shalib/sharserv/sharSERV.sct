@@ -1,0 +1,20 @@
+#! armcc -E
+; due to a bug in linker (in some older versions), you may need to put the whole path ... thus change it by hand
+;#include "D:\#inhere\sdl\embedded\arm\embody\body\embenv\envcom\eEmemorymap.h"
+#include "..\..\..\envcom\eEmemorymap.h"
+
+
+; flash starts from EENV_MEMMAP_SHARSERV_ROMADDR and its size is EENV_MEMMAP_SHARSERV_ROMSIZE
+LR_IROM1 EENV_MEMMAP_SHARSERV_ROMADDR EENV_MEMMAP_SHARSERV_ROMSIZE  {    ; load region size_region
+  ER_IROM1 EENV_MEMMAP_SHARSERV_ROMADDR EENV_MEMMAP_SHARSERV_ROMSIZE  {  ; load address = execution address
+	* (+RO)
+  }
+; ram starts from EENV_MEMMAP_SHARSERV_RAMADDR+EENV_MEMMAP_SHARSERV_RAMSIZE_NZI and its size is SHALBASE_RAMFOR_RWDATA
+  RW_IRAM1 (EENV_MEMMAP_SHARSERV_RAMADDR+128) UNINIT EENV_MEMMAP_SHARSERV_RAMFOR_RWDATA  { 
+   .ANY (+RW +ZI)
+  }
+}
+
+
+
+

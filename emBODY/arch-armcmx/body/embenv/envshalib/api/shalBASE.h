@@ -45,18 +45,21 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#if	defined(SHARSERV_MODE_SHALIB) || defined(SHALS_MODE_STATIC)
+    #define SHALBASE_MODE_STATICLIBRARY
+#endif
+
+
 #define SHALBASE_NAME                   "shalBASE"          // name ... 
 
 #define SHALBASE_VER_MAJOR              0x01                // change of APIs
-#define SHALBASE_VER_MINOR              0x01                // change of internals
+#define SHALBASE_VER_MINOR              0x02                // change of internals
 
-#define SHALBASE_BUILDDATE_YEAR         2012
-#define SHALBASE_BUILDDATE_MONTH        4
-#define SHALBASE_BUILDDATE_DAY          2
+#define SHALBASE_BUILDDATE_YEAR         2013
+#define SHALBASE_BUILDDATE_MONTH        9
+#define SHALBASE_BUILDDATE_DAY          4
 #define SHALBASE_BUILDDATE_HOUR         12
 #define SHALBASE_BUILDDATE_MIN          0
-
-
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -67,7 +70,7 @@
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-#if defined(SHALBASE_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
+#if defined(SHALBASE_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalbase_moduleinfo_get(void);
 extern const eEentity_t * shalbase_moduleinfo_entity_get(void);

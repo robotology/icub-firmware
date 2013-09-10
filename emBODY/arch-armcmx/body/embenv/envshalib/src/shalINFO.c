@@ -102,9 +102,9 @@ typedef struct              // 272B
 #define SHALINFO_STGSIZE            (EENV_MEMMAP_SHALINFO_STGSIZE)
 
 // the ram size to be used in scatter-file and the one used by the program for static ram
-#define SHALINFO_RAMFOR_RWDATA      (EENV_MEMMAP_SHALINFO_RAMFOR_RWDATA) // of which only ?? used
+#define SHALINFO_RAMFOR_RWDATA      (EENV_MEMMAP_SHALINFO_RAMFOR_RWDATA) 
 
-// the ram size to be used with __attribute__((at(SHALINFO_RAMADDR))), which is sizeof(infoInfo_t)
+// the ram size to be used with __attribute__((at(SHALINFO_RAMADDR)))
 #define SHALINFO_RAMFOR_ZIDATA      (EENV_MEMMAP_SHALINFO_RAMFOR_ZIDATA)
 
 
@@ -197,17 +197,18 @@ static const infoHead_t s_shalinfo_default_infohead =
 // - volatile values --------------------------------------------------------------------------------------------------
 
 static volatile infoBoardInfo_t s_shalinfo_temporary_infoboardinfo  __attribute__((at(SHALINFO_RAMADDR)));
-
 static volatile infoDeviceInfo_t s_shalinfo_temporary_infodeviceinfo  __attribute__((at(SHALINFO_RAMADDR+sizeof(infoBoardInfo_t))));
 
 
 // - module info ------------------------------------------------------------------------------------------------------
 
-#if defined(SHALINFO_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
-static const eEmoduleInfo_t s_shalinfo_moduleinfo = 
+#if     defined(SHALINFO_MODE_STATICLIBRARY)
+    #define SHALINFO_MODULEINFO_PLACED_AT
 #else
-static const eEmoduleInfo_t s_shalinfo_moduleinfo __attribute__((at(SHALINFO_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+    #define SHALINFO_MODULEINFO_PLACED_AT       __attribute__((at(SHALINFO_ROMADDR+EENV_MODULEINFO_OFFSET)))
 #endif
+
+static const eEmoduleInfo_t s_shalinfo_moduleinfo   SHALINFO_MODULEINFO_PLACED_AT =
 {
     .info           =
     {
@@ -262,7 +263,7 @@ static const eEmoduleInfo_t s_shalinfo_moduleinfo __attribute__((at(SHALINFO_ROM
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(SHALINFO_MODE_STATICLIBRARY) || defined(SHALS_MODE_STATIC)
+#if     defined(SHALINFO_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalinfo_moduleinfo_get(void)
 {
@@ -279,8 +280,9 @@ extern eEresult_t shalinfo_isvalid(void)
     return(ee_res_OK);
 }
 
+#else
+    // using inline functions
 #endif
-
 
 
 extern eEresult_t shalinfo_init(void)
