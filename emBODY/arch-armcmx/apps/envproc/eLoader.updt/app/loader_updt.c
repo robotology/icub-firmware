@@ -40,9 +40,7 @@
 #include "eEmemorymap_stm32f1.h"
 
 #include "eEsharedServices.h" 
-#include "shalBASE.h" 
-#include "shalPART.h"
-#include "shalINFO.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -69,9 +67,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #define LOADER_ADR_INVALID         0xffffffff
-#define LOADER_ADR_DEF_UPD         EENV_MEMMAP_EUPDATER_ROMADDR 
-#define LOADER_ADR_DEF_APP         EENV_MEMMAP_EAPPLICATION_ROMADDR
-
 #define LOADER_LED                 0x100
 
 
@@ -88,7 +83,7 @@
 
 static void s_loader_hardware_init(void);
 
-static void s_loader_shalibs_init(void);
+static void s_loader_shared_services_init(void);
 
 static void s_loader_Delay(uint32_t dlyTicks);
 static void s_loader_manage_error(uint32_t onmilli, uint32_t offmilli);
@@ -135,14 +130,14 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
             .signature  = ee_procLoader,
             .version    = 
             { 
-                .major = 1, 
-                .minor = 1
+                .major = 2, 
+                .minor = 0
             },  
             .builddate  = 
             {
                 .year  = 2013,
                 .month = 9,
-                .day   = 6,
+                .day   = 11,
                 .hour  = 14,
                 .min   = 0
             }
@@ -297,27 +292,34 @@ int main(void)
     static volatile hal_result_t reshal = hal_res_NOK_generic;
 
     s_loader_hardware_init();
-    s_loader_shalibs_init();
+    s_loader_shared_services_init();
     
 
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
+//    // if any user request, it either jumps or manage error. else, it returns.
+//    //s_loader_eval_user_request();
+//#endif
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-    // if any user request, it either jumps or manage error. else, it returns.
-    //s_loader_eval_user_request();
-#endif
-
-    // if any, it either jumps or manage errors. else, it returns.
+    // if any request from another eprocess, and it can satisfy it it does not return:
+    // it either jumps or stays in eloader with a forever loop. 
+    // else, the function just returns.
     s_loader_eval_jump_request_from_an_eproc();
     
-    // now we attempt to jump to updater. 
-    s_loader_attempt_jump(ee_procUpdater, EENV_MEMMAP_EUPDATER_ROMADDR);
+    // now we attempt to jump to startup process. but if reading fails then we go updater
+    // we go to updater also if the jump attempt fails
+    eEprocess_t startup = ee_procNone;
+    eEresult_t eeres = ee_sharserv_part_proc_startup_get(&startup);
+    if(ee_res_NOK_generic == eeres)
+    {
+        startup = ee_procUpdater;
+    }
+    s_loader_attempt_jump(startup, EENV_MEMMAP_EUPDATER_ROMADDR);
 
-    // nothing to do ...
+    // if we are in here we cannot jump to the startup and not even to the updater.
     s_loader_manage_error(80, 20);
 
     // just for ...
     for(;;);
-
 }
 
 
@@ -339,11 +341,21 @@ static void s_loader_hardware_init(void)
     s_loader_HW_init();
 }
 
-
-static void s_loader_shalibs_init(void)
+static void s_on_sharserv_error(void)
 {
-    static volatile hal_result_t reshal = hal_res_NOK_generic;
+    s_loader_manage_error(20, 80);
+}
+
+static void s_loader_shared_services_init(void)
+{
     eEprocess_t defproc = ee_procNone;
+    eEprocess_t startup = ee_procNone;
+    
+    sharserv_mode_t sharservmode = 
+    {
+        .onerror    = s_on_sharserv_error,
+        .initmode   = sharserv_base_initmode_forcestorageinit
+    };
     
     if(ee_res_OK != ee_sharserv_isvalid())
     {
@@ -351,103 +363,72 @@ static void s_loader_shalibs_init(void)
     }
     else
     {
-        // init shalbase
-        if(ee_res_OK != ee_sharserv_init(1))
+        // init sharserv
+        if(ee_res_OK != ee_sharserv_init(&sharservmode))
         {
             s_loader_manage_error(20, 80);
         }        
     }
-
-    if(ee_res_OK != shalbase_isvalid())
-    {
-        s_loader_manage_error(20, 80);
-    }
-    else
-    {
-        // init shalbase
-        if(ee_res_OK != shalbase_init(1))
-        {
-            s_loader_manage_error(20, 80);
-        }
-    }
-
-
-    if(ee_res_OK != shalpart_isvalid())
-    {
-        s_loader_manage_error(20, 80);
-    }
-    else
-    {
-        // init shalpart
-        if(ee_res_OK != shalpart_init())
-        {
-            s_loader_manage_error(20, 80);
-        }
-        // put signature in partition table using shalpart
-        if(ee_res_OK != shalpart_proc_synchronise(ee_procLoader, &s_loader_info))
-        {
-            s_loader_manage_error(20, 80);
-        }
-    }
-
-    if(ee_res_OK != shalinfo_isvalid())
-    {
-        s_loader_manage_error(20, 80);
-    }
-    else
-    {
-        if(ee_res_OK != shalinfo_init())
-        {
-            s_loader_manage_error(20, 80);
-        }
-        
-        s_loader_boardinfo.uniqueid = hal_arch_arm_uniqueid64_get();
-        
-        if(ee_res_OK != shalinfo_boardinfo_synchronise(&s_loader_boardinfo))
-        {
-            s_loader_manage_error(20, 80);
-        }
-    }
     
-    
-    if(ee_res_OK != shalpart_proc_def2run_get(&defproc))
+    // now all are initted. then ...
+
+    // put signature in partition table
+    if(ee_res_OK != ee_sharserv_part_proc_synchronise(ee_procLoader, &s_loader_info))
     {
-        // we impose that the default process is the application
-        shalpart_proc_def2run_set(ee_procApplication);
+        s_loader_manage_error(20, 80);
     }    
+    
+    // impose boardinfo
+    s_loader_boardinfo.uniqueid = hal_arch_arm_uniqueid64_get();
+    
+    if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(&s_loader_boardinfo))
+    {
+        s_loader_manage_error(20, 80);
+    }    
+       
+    // impose startup process
+    if(ee_res_OK != ee_sharserv_part_proc_startup_get(&startup))
+    {
+        // we impose that the startup process is the updater
+        ee_sharserv_part_proc_startup_set(ee_procUpdater);
+    }  
+    
+    // impose def2run process
+    if(ee_res_OK != ee_sharserv_part_proc_def2run_get(&defproc))
+    {
+        // we impose that the default process is the updater
+#if !defined(DEBUG_MODE)        
+        ee_sharserv_part_proc_def2run_set(ee_procUpdater);
+#else
+        ee_sharserv_part_proc_def2run_set(ee_procApplication);  
+#endif        
 
+    }  
+    
+    
+      
 }
 
 // used to eval the jump request coming from another process
 static void s_loader_eval_jump_request_from_an_eproc(void)
 {
     eEprocess_t pr = ee_procNone;
-    uint32_t addr = LOADER_ADR_INVALID;
 
-    if(ee_res_OK == shalbase_ipc_gotoproc_get(&pr))
+    if(ee_res_OK == ee_sharserv_ipc_gotoproc_get(&pr))
     {
-        shalbase_ipc_gotoproc_clr();
-        switch(pr)
-        {
-            case ee_procLoader:         addr = EENV_MEMMAP_ELOADER_ROMADDR;         break;
-            case ee_procUpdater:        addr = EENV_MEMMAP_EUPDATER_ROMADDR;        break;
-            case ee_procApplication:    addr = EENV_MEMMAP_EAPPLICATION_ROMADDR;    break;
-        }
+        ee_sharserv_ipc_gotoproc_clr();
         
         if(ee_procUpdater == pr)
         {   // we communicate to the updater to stay forever and not to jump to default after the 5 (or what) seconds
-            shalbase_ipc_gotoproc_set(ee_procUpdater);
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
         }
         
         // attempt only to the requested process.
-        s_loader_attempt_jump(pr, addr);
-        // if in here ... the jump failed, thus ... i dont go to error i just go on with other choices ... 
+        s_loader_attempt_jump(pr, LOADER_ADR_INVALID);
         
-        if(ee_procApplication == pr)
-        {   // if in here .... we have failed to jump to application thus ... we shall stay in updater forever
-            shalbase_ipc_gotoproc_set(ee_procUpdater);
-            s_loader_attempt_jump(ee_procUpdater, EENV_MEMMAP_EUPDATER_ROMADDR);            
-        }
+        // if in here ... the jump failed, thus ... it is better to go to the updater and stay there forever
+        ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+        s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
         
     }
 }
@@ -496,14 +477,14 @@ void s_loader_exec_loader(void)
 
     // i could see if anybody has given me any message on shared data.
 
-    res = shalbase_ipc_volatiledata_get(data, &size, 8);
+    res = ee_sharserv_ipc_userdefdata_get(data, &size, 8);
 
     if(ee_res_OK == res)
     {
         factor_on  = data[0];
         factor_off = data[1]; 
         
-        shalbase_ipc_volatiledata_clr();  
+        ee_sharserv_ipc_userdefdata_clr();  
     }
 
     for(;;) 
@@ -542,25 +523,37 @@ static void s_loader_attempt_jump(eEprocess_t proc, uint32_t adr_in_case_proc_fa
             s_loader_exec_loader();
         }
      
-        // attempt with the proc
-        if(ee_res_OK == shalpart_proc_runaddress_get(proc, &address))
+        // attempt to get the address of the proc from partition table.
+        // it works only if the process already run before and register itself in the partition table.
+        // if it fails ... use brute force mode
+        if(ee_res_NOK_generic == ee_sharserv_part_proc_runaddress_get(proc, &address))
         {
-            if(ee_res_OK == shalbase_system_canjump(address))
+            switch(proc)
             {
-                shalbase_system_jumpnow(address);
+                case ee_procUpdater:        address = EENV_MEMMAP_EUPDATER_ROMADDR;         break;
+                case ee_procApplication:    address = EENV_MEMMAP_EAPPLICATION_ROMADDR;     break;
+                default:                    address = LOADER_ADR_INVALID;                   break;
             }
         }
+        
+        // if we retrive the address ... attempt to jump
+        if(LOADER_ADR_INVALID != address)
+        {
+            if(ee_res_OK == ee_sharserv_sys_canjump(address))
+            {
+                ee_sharserv_sys_jumpnow(address);
+            }                
+        }        
 
     }
     
     // if in here it means the we could not jump to the address of proc, thus we attempt an alternative.
- 
     if(LOADER_ADR_INVALID != adr_in_case_proc_fails)
     {
         // attempt with adr_in_case_proc_fails 
-        if(ee_res_OK == shalbase_system_canjump(adr_in_case_proc_fails))
+        if(ee_res_OK == ee_sharserv_sys_canjump(adr_in_case_proc_fails))
         {
-            shalbase_system_jumpnow(adr_in_case_proc_fails);
+            ee_sharserv_sys_jumpnow(adr_in_case_proc_fails);
         }
     }
 
