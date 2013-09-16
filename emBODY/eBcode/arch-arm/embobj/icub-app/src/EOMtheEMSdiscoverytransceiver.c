@@ -459,7 +459,60 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
    
         } break;
 
+        case CMD_PROCS:
+        {
+            uint8_t num_procs = 0;
+            const eEprocess_t *s_proctable = NULL;
+            const eEmoduleInfo_t *s_modinfo = NULL;
+            eEprocess_t defproc;
+			eEprocess_t startup;
+			eEprocess_t running = ee_procApplication;
 
+
+            ee_sharserv_part_proc_def2run_get(&defproc);
+			ee_sharserv_part_proc_startup_get(&startup);
+
+            if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
+            {
+                pktout[0] = CMD_PROCS;
+                pktout[1] = num_procs; 
+
+                char *data = (char*)pktout;
+                uint16_t size = 2;
+
+                for (uint8_t i=0; i<num_procs; ++i)
+                {
+                    ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+
+                    size+=sprintf(data+size,"*** e-proc #%d %s %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"", running==i?"(RUNNING)":"" ) ;
+
+                    size+=sprintf(data+size, "name\t%s\r\n", s_modinfo->info.name);
+                    size+=sprintf(data+size, "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                        s_modinfo->info.entity.version.major, 
+                        s_modinfo->info.entity.version.minor,
+                        s_modinfo->info.entity.builddate.day,
+                        s_modinfo->info.entity.builddate.month,
+                        s_modinfo->info.entity.builddate.year,
+                        s_modinfo->info.entity.builddate.hour,
+                        s_modinfo->info.entity.builddate.min
+                    );
+                    size+=sprintf(data+size, "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
+                    size+=sprintf(data+size, "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
+                    size+=sprintf(data+size, "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
+                    size+=sprintf(data+size, "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
+
+                    size+=sprintf(data+size, "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
+                                                                : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
+                    size+=sprintf(data+size, "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
+                    size+=sprintf(data+size, "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
+                    size+=sprintf(data+size, "com.msk\t0x%0.8X\r\n\r\n", s_modinfo->info.communication);
+                }
+
+                *sizeout = size + 1;
+            }
+
+            retval = 2;
+        }// break
 
         case CMD_UPD_ONCE:
         {
