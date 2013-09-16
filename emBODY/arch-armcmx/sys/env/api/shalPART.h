@@ -45,23 +45,25 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#if	defined(SHARSERV_MODE_SHALIB) || defined(SHALS_MODE_STATIC)
-    #define SHALPART_MODE_STATICLIBRARY
-#endif
+// here is information used for versioning of the library
+// a process uses this info to recognise validity of the permanent or volatile data managed by the library
+// so far, data is recognised valid if the read value has the same SHALxxx_SIGN and SHALxxx_VER_MAJOR values.
+// if not recognised as valid the data is reset to the default values
 
-      
 #define SHALPART_NAME                   "shalPART"          // name ... 
 
-#define SHALPART_VER_MAJOR              0x01                // change of APIs
-#define SHALPART_VER_MINOR              0x02                // change of internals
+#define SHALPART_SIGN                   0x20                // must have least significant nibble at 0
+
+#define SHALPART_VER_MAJOR              0x04                // change of binary form of data
+#define SHALPART_VER_MINOR              0x00                // change of implementation
 
 #define SHALPART_BUILDDATE_YEAR         2013
 #define SHALPART_BUILDDATE_MONTH        9
-#define SHALPART_BUILDDATE_DAY          4
-#define SHALPART_BUILDDATE_HOUR         12
+#define SHALPART_BUILDDATE_DAY          11
+#define SHALPART_BUILDDATE_HOUR         17
 #define SHALPART_BUILDDATE_MIN          0
 
-#define SHALPART_STARTUPTIMEINUPDATER   (5*1000*1000)
+#define SHALPART_DEFAULTSTARTUPTIME     (5*1000*1000)
 
 
 
@@ -76,59 +78,22 @@ typedef enum
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-#if	defined(SHALPART_MODE_STATICLIBRARY)
+// - info about the module
 
 extern const eEmoduleInfo_t * shalpart_moduleinfo_get(void);
 extern const eEentity_t * shalpart_moduleinfo_entity_get(void);
 extern eEresult_t shalpart_isvalid(void);
 
-#else
 
-// inline and with reference only to rom addresses to make it independent from actual presence of shalib in rom
-
-EO_extern_inline const eEmoduleInfo_t * shalpart_moduleinfo_get(void)
-{ 
-    return((const eEmoduleInfo_t*)(EENV_MEMMAP_SHALPART_ROMADDR+EENV_MODULEINFO_OFFSET)); 
-}
-
-EO_extern_inline const eEentity_t * shalpart_moduleinfo_entity_get(void)
-{ 
-    return((const eEentity_t*)(EENV_MEMMAP_SHALPART_ROMADDR+EENV_MODULEINFO_OFFSET)); 
-}
-	
-EO_extern_inline eEresult_t shalpart_isvalid(void) 
-{ 
-    const eEentity_t *en = shalpart_moduleinfo_entity_get();
-    if((en->type==ee_entity_sharlib) && (en->signature==ee_shalPART) && 
-       (en->version.major==SHALPART_VER_MAJOR) && (en->version.minor==SHALPART_VER_MINOR) &&
-       (en->builddate.year==SHALPART_BUILDDATE_YEAR) && (en->builddate.month==SHALPART_BUILDDATE_MONTH) &&
-       (en->builddate.day==SHALPART_BUILDDATE_DAY) && (en->builddate.hour==SHALPART_BUILDDATE_HOUR) &&
-       (en->builddate.min==SHALPART_BUILDDATE_MIN)) 
-       { 
-            return(ee_res_OK); 
-       } 
-       else 
-       { 
-            return(ee_res_NOK_generic); 
-       }
-}
-
-#endif
-
-
+// - generic services
 
 extern eEresult_t shalpart_init(void);
 extern eEresult_t shalpart_reset(shalpart_reset_mode_t rm);
 extern eEresult_t shalpart_deinit(void);
 
+// - management of process
+
 extern eEresult_t shalpart_proc_synchronise(eEprocess_t proc, const eEmoduleInfo_t *moduleinfo);
-extern eEresult_t shalpart_proc_def2run_get(eEprocess_t *proc);
-extern eEresult_t shalpart_proc_def2run_set(eEprocess_t proc);
-extern eEresult_t shalpart_proc_runaddress_get(eEprocess_t proc, uint32_t *addr);
-
-extern eEresult_t shalpart_proc_startuptimeinupdater_get(uint32_t *startuptimeinupdater);
-extern eEresult_t shalpart_proc_startuptimeinupdater_set(uint32_t startuptimeinupdater);
-
 extern eEresult_t shalpart_proc_allavailable_get(const eEprocess_t **table, uint8_t *size);
 
 extern eEresult_t shalpart_proc_add(eEprocess_t proc, eEmoduleInfo_t *moduleinfo);
@@ -136,17 +101,37 @@ extern eEresult_t shalpart_proc_rem(eEprocess_t proc);
 extern eEresult_t shalpart_proc_set(eEprocess_t proc, eEmoduleInfo_t *moduleinfo);
 extern eEresult_t shalpart_proc_get(eEprocess_t proc, const eEmoduleInfo_t **moduleinfo);
 
-extern eEresult_t shalpart_shal_synchronise(eEsharlib_t shal, const eEmoduleInfo_t *moduleinfo);
 
+// - management of shared libraries
+
+extern eEresult_t shalpart_shal_synchronise(eEsharlib_t shal, const eEmoduleInfo_t *moduleinfo);
 extern eEresult_t shalpart_shal_allavailable_get(const eEsharlib_t **table, uint8_t *size);
 
 extern eEresult_t shalpart_shal_add(eEsharlib_t shal, eEmoduleInfo_t *moduleinfo);
 extern eEresult_t shalpart_shal_rem(eEsharlib_t shal);
 extern eEresult_t shalpart_shal_set(eEsharlib_t shal, eEmoduleInfo_t *moduleinfo);
 extern eEresult_t shalpart_shal_get(eEsharlib_t shal, const eEmoduleInfo_t **moduleinfo);
-                                                
+    
+    
+// management of bootstrap info
+
+// retrieve the address of the execution specified process
+extern eEresult_t shalpart_proc_runaddress_get(eEprocess_t proc, uint32_t *addr);
+
+
+// retrieves / sets the process which must run as startup (loaded by the eLoader)
+extern eEresult_t shalpart_proc_startup_get(eEprocess_t *proc);
+extern eEresult_t shalpart_proc_startup_set(eEprocess_t proc);
+ 
+
+// retrieves / sets the time that the system spends in the startup process
+extern eEresult_t shalpart_proc_startuptime_get(uint32_t *startuptime);
+extern eEresult_t shalpart_proc_startuptime_set(uint32_t startuptime);
 
  
+// retrieves / sets the process which must eventually run after the startup
+extern eEresult_t shalpart_proc_def2run_get(eEprocess_t *proc);
+extern eEresult_t shalpart_proc_def2run_set(eEprocess_t proc);
  
  
 

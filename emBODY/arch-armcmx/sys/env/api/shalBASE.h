@@ -45,98 +45,95 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#if	defined(SHARSERV_MODE_SHALIB) || defined(SHALS_MODE_STATIC)
-    #define SHALBASE_MODE_STATICLIBRARY
-#endif
 
+// here is information used for versioning of the library
+// a process uses this info to recognise validity of the permanent or volatile data managed by the library
+// so far, data is recognised valid if the read value has the same SHALxxx_SIGN and SHALxxx_VER_MAJOR values.
+// if not recognised as valid the data is reset to the default values
 
 #define SHALBASE_NAME                   "shalBASE"          // name ... 
 
-#define SHALBASE_VER_MAJOR              0x01                // change of APIs
-#define SHALBASE_VER_MINOR              0x02                // change of internals
+#define SHALBASE_SIGN                   0x10                // must have least significant nibble at 0
+
+#define SHALBASE_VER_MAJOR              0x04                // change of binary form of data
+#define SHALBASE_VER_MINOR              0x00                // change of implementation
 
 #define SHALBASE_BUILDDATE_YEAR         2013
 #define SHALBASE_BUILDDATE_MONTH        9
-#define SHALBASE_BUILDDATE_DAY          4
-#define SHALBASE_BUILDDATE_HOUR         12
+#define SHALBASE_BUILDDATE_DAY          11
+#define SHALBASE_BUILDDATE_HOUR         16
 #define SHALBASE_BUILDDATE_MIN          0
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-
+enum { shalbase_ipc_userdefdata_maxsize = 20 }; // max size of user-defined data that is possible to pass between e-processes
  
+typedef enum
+{
+    shalbase_initmode_dontforce         = 0,
+    shalbase_initmode_force             = 1   
+} shalbase_initmode_t;
+
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-
-#if defined(SHALBASE_MODE_STATICLIBRARY)
+// - info about the module
 
 extern const eEmoduleInfo_t * shalbase_moduleinfo_get(void);
 extern const eEentity_t * shalbase_moduleinfo_entity_get(void);
 extern eEresult_t shalbase_isvalid(void);
 
-#else
 
-// inline and with reference only to rom addresses to make it independent from actual presence of shalib in rom
-
-EO_extern_inline const eEmoduleInfo_t * shalbase_moduleinfo_get(void)
-{ 
-    return((const eEmoduleInfo_t*)(EENV_MEMMAP_SHALBASE_ROMADDR+EENV_MODULEINFO_OFFSET)); 
-}
-
-EO_extern_inline const eEentity_t * shalbase_moduleinfo_entity_get(void)
-{ 
-    return((const eEentity_t*)(EENV_MEMMAP_SHALBASE_ROMADDR+EENV_MODULEINFO_OFFSET)); 
-}
-	
-EO_extern_inline eEresult_t shalbase_isvalid(void) 
-{ 
-    const eEentity_t *en = shalbase_moduleinfo_entity_get();
-    if((en->type==ee_entity_sharlib) && (en->signature==ee_shalBASE) && 
-       (en->version.major==SHALBASE_VER_MAJOR) && (en->version.minor==SHALBASE_VER_MINOR) &&
-       (en->builddate.year==SHALBASE_BUILDDATE_YEAR) && (en->builddate.month==SHALBASE_BUILDDATE_MONTH) &&
-       (en->builddate.day==SHALBASE_BUILDDATE_DAY) && (en->builddate.hour==SHALBASE_BUILDDATE_HOUR) &&
-       (en->builddate.min==SHALBASE_BUILDDATE_MIN)) 
-       { 
-            return(ee_res_OK); 
-       } 
-       else 
-       { 
-            return(ee_res_NOK_generic); 
-       }
-}
-
-#endif	
-
-
-
-extern eEresult_t shalbase_init(uint8_t forcestorageinit);
+// init the base shared library.
+extern eEresult_t shalbase_init(shalbase_initmode_t initmode);
 extern eEresult_t shalbase_deinit(void);
 
-// only the eLoader calls shalbase_boardinfo_synchronise()
-extern eEresult_t shalbase_boardinfo_synchronise(const eEboardInfo_t* boardinfo);
-extern eEresult_t shalbase_boardinfo_get(const eEboardInfo_t** boardinfo);
 
+// offers ipc services: (1) for the gotoproc message, (2) for user-defined data
 extern eEresult_t shalbase_ipc_gotoproc_get(eEprocess_t *pr);			
 extern eEresult_t shalbase_ipc_gotoproc_set(eEprocess_t pr);
 extern eEresult_t shalbase_ipc_gotoproc_clr(void);
 
-extern eEresult_t shalbase_ipc_volatiledata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize);		
-extern eEresult_t shalbase_ipc_volatiledata_set(uint8_t *data, uint8_t size);
-extern eEresult_t shalbase_ipc_volatiledata_clr(void);
+extern eEresult_t shalbase_ipc_userdefdata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize);		
+extern eEresult_t shalbase_ipc_userdefdata_set(uint8_t *data, uint8_t size);
+extern eEresult_t shalbase_ipc_userdefdata_clr(void);
 
+// offers some system services (through hal)
 extern eEresult_t shalbase_system_canjump(uint32_t addr);
 extern eEresult_t shalbase_system_canjump_to_proc(uint32_t addr, eEmoduleInfo_t *procinfo);
 extern eEresult_t shalbase_system_jumpnow(uint32_t addr);
 extern eEresult_t shalbase_system_restart(void);
 
+// offers some basic storage services used by other modules (shalPART and shalINFO)
 extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint32_t size);
 extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data, uint32_t size);
 extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t size);
  
- 
- 
+
+
+// - declaration of extern hidden interface ---------------------------------------------------------------------------
+
+typedef struct 
+{
+    uint8_t                 cached;                 // 1B
+    uint8_t                 dummy;
+    uint16_t                datalen;                // 2B. counted after the datacrc32. if 0, crc32 is not used
+    uint32_t                datacrc32;              // 4B
+} shalbaseDataCtrl_t;       EECOMMON_VERIFYsizeof(shalbaseDataCtrl_t, 8);
+
+typedef struct                                      // 16B
+{
+    shalbaseDataCtrl_t      datactrl;
+    eEentity_t              entity;                 // 8B
+} shalbaseDataHeader_t;     EECOMMON_VERIFYsizeof(shalbaseDataHeader_t, 16); 
+
+extern eEboolval_t shalbase_hid_storage_is_valid(void* storage, const eEentity_t* refentity);
+
+extern void shalbase_hid_storage_set_valid(void* storage, const eEentity_t* refentity);
+
+extern void shalbase_hid_storage_set_invalid(void* storage, const eEentity_t* refentity);
+
 
 /** @}            
     end of group shal_base 
