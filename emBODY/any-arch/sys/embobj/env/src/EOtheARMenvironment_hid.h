@@ -28,7 +28,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "eEcommon.h"
-#include "shalINFO.h"
+#include "eEsharedServices.h"
 #include "EOVtheEnvironment.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -45,13 +45,13 @@ extern "C" {
 struct EOtheARMenvironment_hid 
 {
     // the base object
-    EOVtheEnvironment           *env;
+    EOVtheEnvironment*                      env;
     // other stuff
-    const eEmoduleInfo_t        *modinfo; 
-    const eEboardInfo_t         *brdinfo;
-    const shalinfo_deviceinfo_t *devinfo;
-    uint32_t                    codeprocoffset;
-    eEprocess_t                 eprocess; 
+    const eEmoduleInfo_t*                   modinfo; 
+    const eEboardInfo_t*                    brdinfo;
+    const ee_sharserv_info_deviceinfo_t*    devinfo;
+    uint32_t                                codeprocoffset;
+    eEprocess_t                             eprocess; 
 }; 
 
 
