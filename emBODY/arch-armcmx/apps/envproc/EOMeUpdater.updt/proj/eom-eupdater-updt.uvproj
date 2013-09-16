@@ -348,7 +348,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
               <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src</IncludePath>
             </VariousControls>
@@ -1056,8 +1056,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -1070,7 +1070,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
               <IncludePath>..\abslayer-cfg;..\app_basic;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\app_extra;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src</IncludePath>
             </VariousControls>
