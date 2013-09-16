@@ -348,7 +348,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
+              <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
               <IncludePath>.;..\app_main;..\app_cfg;..\app_nvs_cfg;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
             </VariousControls>
@@ -814,6 +814,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1771,7 +1776,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>HAL_USE_ARCH_ARM _FORCE_NETWORK_FROM_IPAL_CFG</Define>
               <Undefine></Undefine>
               <IncludePath>..\abslayer-cfg;..\app_main;..\app_cfg;..\app_nvs_cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
             </VariousControls>
@@ -2219,6 +2224,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3176,7 +3186,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api</IncludePath>
             </VariousControls>
@@ -3736,6 +3746,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4853,7 +4868,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG EVIEWER_ENABLED</Define>
+              <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG EVIEWER_ENABLED</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src</IncludePath>
             </VariousControls>
@@ -5413,6 +5428,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6490,7 +6510,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG EVIEWER_ENABLED</Define>
+              <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO _FORCE_NETWORK_FROM_IPAL_CFG EVIEWER_ENABLED</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src</IncludePath>
             </VariousControls>
@@ -7050,6 +7070,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8127,7 +8152,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
               <IncludePath>..\app_main;..\app_cfg;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-net;..\app_servicesProviders_cfg\icub-can-proto;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src;..\..\..\..\..\any-arch\sys\embobj\icub-ems\api;..\..\..\..\..\any-arch\sys\embobj\icub-ems\src;..\..\..\..\..\any-arch\sys\embobj\mc\src;..\..\..\..\..\any-arch\sys\embobj\mc\api</IncludePath>
             </VariousControls>
@@ -8687,6 +8712,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
