@@ -45,20 +45,22 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#if	defined(SHARSERV_MODE_SHALIB) || defined(SHALS_MODE_STATIC)
-    #define SHALINFO_MODE_STATICLIBRARY
-#endif
+// here is information used for versioning of the library
+// a process uses this info to recognise validity of the permanent or volatile data managed by the library
+// so far, data is recognised valid if the read value has the same SHALxxx_SIGN and SHALxxx_VER_MAJOR values.
+// if not recognised as valid the data is reset to the default values
 
+#define SHALINFO_NAME                   "shalINFO"        
 
-#define SHALINFO_NAME                   "shalINFO"           
+#define SHALINFO_SIGN                   0x30                // must have least significant nibble at 0
 
-#define SHALINFO_VER_MAJOR              0x01                // change of APIs
-#define SHALINFO_VER_MINOR              0x02                // change of internals
+#define SHALINFO_VER_MAJOR              0x04                // change of binary form of data
+#define SHALINFO_VER_MINOR              0x00                // change of implementation
 
 #define SHALINFO_BUILDDATE_YEAR         2013
 #define SHALINFO_BUILDDATE_MONTH        9
-#define SHALINFO_BUILDDATE_DAY          4
-#define SHALINFO_BUILDDATE_HOUR         12
+#define SHALINFO_BUILDDATE_DAY          11
+#define SHALINFO_BUILDDATE_HOUR         16
 #define SHALINFO_BUILDDATE_MIN          0
 
 
@@ -78,6 +80,7 @@ typedef enum
     shalinfo_page128        = 6
 } shalinfo_deviceinfo_part_t;
 
+
 typedef struct                  // 256B              
 {
     eEipnetwork_t               ipnetwork;      //016B 
@@ -92,58 +95,28 @@ typedef struct                  // 256B
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-#if	defined(SHALINFO_MODE_STATICLIBRARY)
+// - info about the module
 
 extern const eEmoduleInfo_t * shalinfo_moduleinfo_get(void);
 extern const eEentity_t * shalinfo_moduleinfo_entity_get(void);
 extern eEresult_t shalinfo_isvalid(void);
 
-#else
 
-// inline and with reference only to rom addresses to make it independent from actual presence of shalib in rom
-
-EO_extern_inline const eEmoduleInfo_t * shalinfo_moduleinfo_get(void)
-{ 
-    return((const eEmoduleInfo_t*)(EENV_MEMMAP_SHALINFO_ROMADDR+EENV_MODULEINFO_OFFSET)); 
-}
-
-EO_extern_inline const eEentity_t * shalinfo_moduleinfo_entity_get(void)
-{ 
-    return((const eEentity_t*)(EENV_MEMMAP_SHALINFO_ROMADDR+EENV_MODULEINFO_OFFSET)); 
-}
-	
-EO_extern_inline eEresult_t shalinfo_isvalid(void) 
-{ 
-    const eEentity_t *en = shalinfo_moduleinfo_entity_get();
-    if((en->type==ee_entity_sharlib) && (en->signature==ee_shalINFO) && 
-       (en->version.major==SHALINFO_VER_MAJOR) && (en->version.minor==SHALINFO_VER_MINOR) &&
-       (en->builddate.year==SHALINFO_BUILDDATE_YEAR) && (en->builddate.month==SHALINFO_BUILDDATE_MONTH) &&
-       (en->builddate.day==SHALINFO_BUILDDATE_DAY) && (en->builddate.hour==SHALINFO_BUILDDATE_HOUR) &&
-       (en->builddate.min==SHALINFO_BUILDDATE_MIN)) 
-       { 
-            return(ee_res_OK); 
-       } 
-       else 
-       { 
-            return(ee_res_NOK_generic); 
-       }
-}
-
-#endif	
-
-	
-
+// - generic services
 
 extern eEresult_t shalinfo_init(void);
 extern eEresult_t shalinfo_deinit(void);
 extern eEresult_t shalinfo_erase(void);
 
+// - board-info services: it is about the hw printed-circuit-board.
 
 // only the loader calls it with its own board-info.
 extern eEresult_t shalinfo_boardinfo_synchronise(const eEboardInfo_t* boardinfo);
 // other eprocesses or shared libraries just get it.
 extern eEresult_t shalinfo_boardinfo_get(const eEboardInfo_t** boardinfo);
 
+
+// - device-info services: it is about information used by all the e-processes. for instance mac address, ip address etc.
 
 extern eEresult_t shalinfo_deviceinfo_clr(void);
 extern eEresult_t shalinfo_deviceinfo_get(const shalinfo_deviceinfo_t** deviceinfo);

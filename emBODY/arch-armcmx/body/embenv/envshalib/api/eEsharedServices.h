@@ -52,8 +52,8 @@
 
 #define SHARSERV_NAME                   "sharSERV"          
 
-#define SHARSERV_VER_MAJOR              0x01                // change of APIs
-#define SHARSERV_VER_MINOR              0x02                // change of internals
+#define SHARSERV_VER_MAJOR              0x02                // change of APIs
+#define SHARSERV_VER_MINOR              0x00                // change of internals
 
 #define SHARSERV_BUILDDATE_YEAR         2013
 #define SHARSERV_BUILDDATE_MONTH        9
@@ -65,11 +65,22 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef enum 
+typedef     void     (*sharserv_void_fp_void_t)                       (void);
+
+typedef enum
 {
-    sharserv_part_reset_default     = 0, 
-    sharserv_part_reset_rawvals     = 1
-} ee_sharserv_part_reset_mode_t;
+    sharserv_base_initmode_dontforcestorageinit     = 0,
+    sharserv_base_initmode_forcestorageinit         = 1   
+} sharserv_base_initmode_t;
+
+typedef struct
+{
+    sharserv_void_fp_void_t     onerror;
+    sharserv_base_initmode_t    initmode;   
+} sharserv_mode_t;
+
+enum { sharserv_base_ipc_userdefdata_maxsize = 20 }; // max size of user-defined data that is possible to pass between e-processes
+
 
 typedef enum
 {
@@ -80,7 +91,7 @@ typedef enum
     sharserv_info_page32            = 4,
     sharserv_info_page64            = 5,
     sharserv_info_page128           = 6
-} ee_sharserv_info_deviceinfo_part_t;
+} ee_sharserv_info_deviceinfo_item_t;
 
 typedef struct                      // 256B              
 {
@@ -137,55 +148,51 @@ extern eEresult_t ee_sharserv_isvalid(void);
 
 #endif	
 
-extern eEresult_t ee_sharserv_init(uint8_t forcestorageinit);
+extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode);
+extern eEresult_t ee_sharserv_selfregister(void);
 extern eEresult_t ee_sharserv_deinit(void);
 
-// so far it is just a dummy wrapper. in the future we may use just ... ee_sharserv_xxxx calls
-#include "shalBASE.h"
-#include "shalPART.h"
-#include "shalINFO.h"
+
+// - sys: offers basic system services
+
+extern eEresult_t ee_sharserv_sys_canjump(uint32_t addr);
+extern eEresult_t ee_sharserv_sys_canjump_to_proc(uint32_t addr, eEmoduleInfo_t *procinfo);
+extern eEresult_t ee_sharserv_sys_jumpnow(uint32_t addr);
+extern eEresult_t ee_sharserv_sys_restart(void);
 
 
-// - base
+// - ipc: offers inter-process communication services
 
-extern eEresult_t ee_sharserv_base_init(uint8_t forcestorageinit);
-extern eEresult_t ee_sharserv_base_deinit(void);
+extern eEresult_t ee_sharserv_ipc_gotoproc_get(eEprocess_t *pr);			
+extern eEresult_t ee_sharserv_ipc_gotoproc_set(eEprocess_t pr);
+extern eEresult_t ee_sharserv_ipc_gotoproc_clr(void);
 
-// only the eLoader calls ee_sharserv_base_boardinfo_synchronise()
-extern eEresult_t ee_sharserv_base_boardinfo_synchronise(const eEboardInfo_t* boardinfo);
-extern eEresult_t ee_sharserv_base_boardinfo_get(const eEboardInfo_t** boardinfo);
+extern eEresult_t ee_sharserv_ipc_userdefdata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize);		
+extern eEresult_t ee_sharserv_ipc_userdefdata_set(uint8_t *data, uint8_t size);
+extern eEresult_t ee_sharserv_ipc_userdefdata_clr(void);
 
-extern eEresult_t ee_sharserv_base_ipc_gotoproc_get(eEprocess_t *pr);			
-extern eEresult_t ee_sharserv_base_ipc_gotoproc_set(eEprocess_t pr);
-extern eEresult_t ee_sharserv_base_ipc_gotoproc_clr(void);
-
-extern eEresult_t ee_sharserv_base_ipc_volatiledata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize);		
-extern eEresult_t ee_sharserv_base_ipc_volatiledata_set(uint8_t *data, uint8_t size);
-extern eEresult_t ee_sharserv_base_ipc_volatiledata_clr(void);
-
-extern eEresult_t ee_sharserv_base_system_canjump(uint32_t addr);
-extern eEresult_t ee_sharserv_base_system_canjump_to_proc(uint32_t addr, eEmoduleInfo_t *procinfo);
-extern eEresult_t ee_sharserv_base_system_jumpnow(uint32_t addr);
-extern eEresult_t ee_sharserv_base_system_restart(void);
-
-extern eEresult_t ee_sharserv_base_storage_get(const eEstorage_t *strg, void *data, uint32_t size);
-extern eEresult_t ee_sharserv_base_storage_set(const eEstorage_t *strg, const void *data, uint32_t size);
-extern eEresult_t ee_sharserv_base_storage_clr(const eEstorage_t *strg, const uint32_t size);
+extern eEresult_t ee_sharserv_sys_storage_get(const eEstorage_t *strg, void *data, uint32_t size);
+extern eEresult_t ee_sharserv_sys_storage_set(const eEstorage_t *strg, const void *data, uint32_t size);
+extern eEresult_t ee_sharserv_sys_storage_clr(const eEstorage_t *strg, const uint32_t size);
 
 
-// - part
+// - part: offers partition table services
 
-extern eEresult_t ee_sharserv_part_init(void);
-extern eEresult_t ee_sharserv_part_reset(ee_sharserv_part_reset_mode_t rm);
-extern eEresult_t ee_sharserv_part_deinit(void);
+
+extern eEresult_t ee_sharserv_part_reset(void);
 
 extern eEresult_t ee_sharserv_part_proc_synchronise(eEprocess_t proc, const eEmoduleInfo_t *moduleinfo);
+
 extern eEresult_t ee_sharserv_part_proc_def2run_get(eEprocess_t *proc);
 extern eEresult_t ee_sharserv_part_proc_def2run_set(eEprocess_t proc);
+
+extern eEresult_t ee_sharserv_part_proc_startup_get(eEprocess_t *proc);
+extern eEresult_t ee_sharserv_part_proc_startup_set(eEprocess_t proc);
+
 extern eEresult_t ee_sharserv_part_proc_runaddress_get(eEprocess_t proc, uint32_t *addr);
 
-extern eEresult_t ee_sharserv_part_proc_startuptimeinupdater_get(uint32_t *startuptimeinupdater);
-extern eEresult_t ee_sharserv_part_proc_startuptimeinupdater_set(uint32_t startuptimeinupdater);
+extern eEresult_t ee_sharserv_part_proc_startuptime_get(eEreltime_t *startuptime);
+extern eEresult_t ee_sharserv_part_proc_startuptime_set(eEreltime_t startuptime);
 
 extern eEresult_t ee_sharserv_part_proc_allavailable_get(const eEprocess_t **table, uint8_t *size);
 
@@ -205,24 +212,23 @@ extern eEresult_t ee_sharserv_part_shal_get(eEsharlib_t shal, const eEmoduleInfo
                                                 
                                                 
 
-// - info
+// - info: offers info services 
 
-extern eEresult_t ee_sharserv_info_init(void);
-extern eEresult_t ee_sharserv_info_deinit(void);
-extern eEresult_t ee_sharserv_info_erase(void);
+
+extern eEresult_t ee_sharserv_info_reset(void);
 
 // only the loader calls it with its own board-info.
 extern eEresult_t ee_sharserv_info_boardinfo_synchronise(const eEboardInfo_t* boardinfo);
-// other eprocesses or shared libraries just get it.
+// others just get it.
 extern eEresult_t ee_sharserv_info_boardinfo_get(const eEboardInfo_t** boardinfo);
 
 extern eEresult_t ee_sharserv_info_deviceinfo_clr(void);
 extern eEresult_t ee_sharserv_info_deviceinfo_get(const ee_sharserv_info_deviceinfo_t** deviceinfo);
 extern eEresult_t ee_sharserv_info_deviceinfo_set(const ee_sharserv_info_deviceinfo_t* deviceinfo);
 
-extern eEresult_t ee_sharserv_info_deviceinfo_part_clr(ee_sharserv_info_deviceinfo_part_t part);
-extern eEresult_t ee_sharserv_info_deviceinfo_part_get(ee_sharserv_info_deviceinfo_part_t part, const void** data);
-extern eEresult_t ee_sharserv_info_deviceinfo_part_set(ee_sharserv_info_deviceinfo_part_t part, const void* data);
+extern eEresult_t ee_sharserv_info_deviceinfo_item_clr(ee_sharserv_info_deviceinfo_item_t item);
+extern eEresult_t ee_sharserv_info_deviceinfo_item_get(ee_sharserv_info_deviceinfo_item_t item, const void** data);
+extern eEresult_t ee_sharserv_info_deviceinfo_item_set(ee_sharserv_info_deviceinfo_item_t item, const void* data);
 
 
 #endif  // include-guard
