@@ -39,8 +39,7 @@
 #include "osal_system.h"
 #include "EOtimer.h"
 #include "EOaction.h"
-#include "shalPART.h"
-#include "shalBASE.h"
+#include "eEsharedServices.h"
 #include "EOMtheCallbackmanager.h"
 
 #include "hal.h"
@@ -158,12 +157,12 @@ extern void eupdater_parser_evalwhenjumping(void)
 #if !defined(_MAINTAINER_APPL_ )    
 
 //    uncomment only if you want to debug    
-//    shalbase_ipc_gotoproc_set(ee_procUpdater);
+//    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
     
     // if the loader has set the goto and it is updater ... then we stay in here forever
-    if(ee_res_OK == shalbase_ipc_gotoproc_get(&pr))
+    if(ee_res_OK == ee_sharserv_ipc_gotoproc_get(&pr))
     {
-        shalbase_ipc_gotoproc_clr();
+        ee_sharserv_ipc_gotoproc_clr();
         
         if(ee_procUpdater == pr)
         {   // stay in this process forever
@@ -173,7 +172,7 @@ extern void eupdater_parser_evalwhenjumping(void)
     }    
     
     // then we retrieve how long we have to stay in here   
-    shalpart_proc_startuptimeinupdater_get(&time2stay);
+    ee_sharserv_part_proc_startuptime_get(&time2stay);
     
 //    uncomment one of the two only if you want to debug      
 //    time2stay = EOK_reltimeINFINITE;
@@ -355,7 +354,7 @@ static void s_eupdater_jump2app(void *par)
     s_led_countdown_stop();
     
 
-    if(ee_res_OK == shalpart_proc_def2run_get(&defproc))
+    if(ee_res_OK == ee_sharserv_part_proc_def2run_get(&defproc))
     {
 
 //      uncomment only if you want to debug         
@@ -377,8 +376,8 @@ static void s_eupdater_jump2app(void *par)
     {
         // we dont need to verify if the system can jump to defproc because eloader shall do it.
         //osal_system_scheduling_suspend();
-        shalbase_ipc_gotoproc_set(defproc);
-        shalbase_system_restart();        
+        ee_sharserv_ipc_gotoproc_set(defproc);
+        ee_sharserv_sys_restart();        
     }
     
     // if in here ... we stay in eupdater forever

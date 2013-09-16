@@ -123,7 +123,6 @@ static void s_ethcommand_run(EOMtask *p, uint32_t t);
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt);
 
-static void s_verify_init_sharserv(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -259,10 +258,11 @@ static void s_eom_eupdater_main_init(void)
 #endif  
     hal_trace_puts(str);
 
-
+    // eeprom is used for shared services but is initted also inside there
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
+    // flash MUST be unlocked if one wants to erase code space (program application, updater, loader)
+    hal_flash_unlock();
     
-    s_verify_init_sharserv();
     
 #if !defined(_MAINTAINER_APPL_)    
     eo_armenv_Initialise(&eupdater_modinfo, NULL);
@@ -438,22 +438,6 @@ static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketData
     return(host_connected);
 }
 
-
-static void s_verify_init_sharserv(void)
-{
-    if((ee_res_OK == ee_sharserv_isvalid()))
-    {
-        const uint8_t forcestorageinit = 1; 
-        if(ee_res_OK != ee_sharserv_init(forcestorageinit))
-        {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "main()", "cannot init sharSERV");
-        }
-    }
-    else
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "main()", "sharSERV is not present");
-    }
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------

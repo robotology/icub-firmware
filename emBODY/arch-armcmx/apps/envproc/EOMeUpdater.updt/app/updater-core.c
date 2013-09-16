@@ -29,9 +29,7 @@
 #include "osal.h"
 #include "ipal.h"
 
-#include "shalBASE.h"
-#include "shalPART.h"
-#include "shalINFO.h"
+#include "eEsharedServices.h"
  
 
 typedef enum {
@@ -78,6 +76,7 @@ void upd_core_init(void)
 #define PROGRAM_LOADER   0x55
 #define PROGRAM_UPDATER  0xAA
 #define PROGRAM_APP      0x5A
+#define PROGRAM_SHARSERV 0x5B
 
 uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t *sizeout)
 {
@@ -85,9 +84,11 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
     static uint32_t s_prog_mem_size  = 0;
     static uint16_t s_download_packets = 0;
     static uint8_t  s_download_state = 0;
+    
+    hal_result_t halres = hal_res_NOK_generic;
+    
 
     *sizeout=0;
-
 
         
 #if defined(_DEBUG_MODE_FULL_)
@@ -122,7 +123,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             pktout[ 3] = BOARD_TYPE_EMS;
             
             const eEipnetwork_t *ipnetworkstrg;
-            shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
 
             pktout[ 4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
             pktout[ 5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
@@ -138,6 +139,61 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
             return 1;
         }// break;
+        
+//         case CMD_ERASE:
+//         {
+//             uint8_t erase_state = pktin[1];
+//             
+//             *sizeout = 2;
+//             pktout[0] = CMD_ERASE;
+
+//             switch (erase_state)
+//             {
+//             case PROGRAM_LOADER:
+//                 s_prog_mem_start = EENV_MEMMAP_ELOADER_ROMADDR;
+//                 s_prog_mem_size  = EENV_MEMMAP_ELOADER_ROMSIZE;
+//                 break;
+
+//             case PROGRAM_UPDATER:
+//                 s_prog_mem_start = EENV_MEMMAP_EUPDATER_ROMADDR;
+//                 s_prog_mem_size  = EENV_MEMMAP_EUPDATER_ROMSIZE;
+//                 break;
+//             case PROGRAM_APP:
+//                 s_prog_mem_start = EENV_MEMMAP_EAPPLICATION_ROMADDR;
+//                 s_prog_mem_size  = EENV_MEMMAP_EAPPLICATION_ROMSIZE;
+//                 break;
+//             
+// #if defined(_MAINTAINER_APPL_)
+//             case PROGRAM_SHARSERV: // only maintainer can do that.
+//                 s_prog_mem_start = EENV_MEMMAP_SHALSYSTEM_ROMADDR;
+//                 s_prog_mem_size  = EENV_MEMMAP_SHALSYSTEM_ROMSIZE;
+//                 break;            
+// #endif
+//             
+//             default:
+//                 erase_state = 0;
+//                 pktout[1] = UPD_ERR_UNK;
+//                 return 1;    
+//             }
+//             
+//             osal_system_scheduling_suspend();
+//                 
+//             if (hal_res_OK != hal_flash_erase(s_prog_mem_start, s_prog_mem_size))
+//             {
+//                 erase_state = 0;
+//                 //hal_trace_puts("ERASE FAILED");
+//                 pktout[1] = UPD_ERR_FLASH;    
+//             }
+//             else
+//             {
+//                 //hal_trace_puts("ERASE DONE");
+//                 pktout[1] = UPD_OK;
+//             }
+//             
+//             osal_system_scheduling_restart();
+//                         
+//             return 1;
+//         }// break;        
 
         case CMD_START:
         {
@@ -165,16 +221,26 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 s_prog_mem_start = EENV_MEMMAP_EAPPLICATION_ROMADDR;
                 s_prog_mem_size  = EENV_MEMMAP_EAPPLICATION_ROMSIZE;
                 break;
-
+            
+#if defined(_MAINTAINER_APPL_)
+            case PROGRAM_SHARSERV: // only maintainer can do that.
+                s_prog_mem_start = EENV_MEMMAP_SHALSYSTEM_ROMADDR;
+                s_prog_mem_size  = EENV_MEMMAP_SHALSYSTEM_ROMSIZE;
+                break;            
+#endif
+            
             default:
                 s_download_state = 0;
                 pktout[1] = UPD_ERR_UNK;
                 return 1;    
             }
             
-            osal_system_scheduling_suspend();
+            hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
+            halres = hal_flash_erase(s_prog_mem_start, s_prog_mem_size);
+            hal_sys_irq_enable();   //osal_system_scheduling_restart();
+            
                 
-            if (hal_res_OK != hal_flash_erase(s_prog_mem_start, s_prog_mem_size))
+            if(hal_res_OK != halres)
             {
                 s_download_state = 0;
                 //hal_trace_puts("ERASE FAILED");
@@ -185,8 +251,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 //hal_trace_puts("ERASE DONE");
                 pktout[1] = UPD_OK;
             }
-            
-            osal_system_scheduling_restart();
+          
             
             if(0 != s_download_state)
             {
@@ -216,23 +281,31 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
             uint16_t size = pktin[6]<<8 | pktin[5];
 
-            void *data = pktin + 7;
+            void *data = pktin + 8;
+
                   
             if ((address >= s_prog_mem_start) && (address+size < s_prog_mem_start+s_prog_mem_size))
             {
                 hal_sys_irq_disable();
-                hal_flash_unlock();
-                hal_flash_write(address, size, data);
+                halres = hal_flash_write(address, size, data);
                 hal_sys_irq_enable();
-
+                
                 ++s_download_packets;
-
-                pktout[1] = UPD_OK;
+                
+                if(hal_res_NOK_generic == halres)
+                {
+                    pktout[1] = UPD_ERR_PROT;
+                }
+                else
+                {    
+                    pktout[1] = UPD_OK;
+                }
             }
             else
             {
                 pktout[1] = UPD_ERR_PROT;
             }
+            
             
             eupdater_parser_download_toggleled();   
                
@@ -258,16 +331,22 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 switch (s_download_state)
                 {
                 case PROGRAM_LOADER:
-                    shalpart_proc_synchronise(ee_procLoader,(eEmoduleInfo_t*)(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET));
+                    ee_sharserv_part_proc_synchronise(ee_procLoader,(eEmoduleInfo_t*)(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET));
                     break;    
                 case PROGRAM_UPDATER:
-                    shalpart_proc_synchronise(ee_procUpdater,(eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET));
-                    shalpart_proc_def2run_set(ee_procApplication);
+                    ee_sharserv_part_proc_synchronise(ee_procUpdater,(eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET));
+                    ee_sharserv_part_proc_startup_set(ee_procApplication);
                     break;
                 case PROGRAM_APP:
-                    shalpart_proc_synchronise(ee_procApplication,(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET));
-                    shalpart_proc_def2run_set(ee_procUpdater);
+                    ee_sharserv_part_proc_synchronise(ee_procApplication,(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET));
+                    ee_sharserv_part_proc_startup_set(ee_procUpdater);
                     break;
+#if defined(_MAINTAINER_APPL_)                
+                case PROGRAM_SHARSERV:
+                    ee_sharserv_part_shal_synchronise(ee_shalSharServ,(eEmoduleInfo_t*)(EENV_MEMMAP_SHALSYSTEM_ROMADDR+EENV_MODULEINFO_OFFSET));
+                    ee_sharserv_part_proc_startup_set(ee_procUpdater);
+                    break;  
+#endif                
                 }
             }
             else
@@ -296,9 +375,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
             eEprocess_t active_part = (eEprocess_t)pktin[1];
 
-            if ((active_part >= ee_procUpdater) && (active_part <= ee_procApplUser04))
+            if ((active_part >= ee_procUpdater) && (active_part <= ee_procOther05))
             {
-                shalpart_proc_def2run_set(active_part);
+                ee_sharserv_part_proc_def2run_set(active_part);
             }
 
             return 0;
@@ -307,7 +386,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         case CMD_RESET:
         {
             //hal_trace_puts("CMD_RESET");
-            shalbase_system_restart();
+            //ee_sharserv_sys_restart(); better avoiding the shared lib call
+            hal_sys_irq_disable();
+            hal_sys_systemreset();
             
             return 0;
         }// break;
@@ -321,11 +402,11 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             eEipnetwork_t ipnetwork;
             const eEipnetwork_t *ipnetworkstrg;
 
-            shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
             ipnetwork.ipaddress = EECOMMON_ipaddr_from(ip[1], ip[2], ip[3], ip[4]);
             
-            shalinfo_deviceinfo_part_set(shalinfo_ipnet, (const void*)&ipnetwork);
+            ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork);
 
             return 0;
         }// break;
@@ -339,10 +420,10 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             eEipnetwork_t ipnetwork;
             const eEipnetwork_t *ipnetworkstrg;
 
-            shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
             ipnetwork.ipnetmask = EECOMMON_ipaddr_from(ip[1], ip[2], ip[3], ip[4]);
-            shalinfo_deviceinfo_part_set(shalinfo_ipnet, (const void*)&ipnetwork);
+            ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork);
 
             return 0;
         }// break;
@@ -351,7 +432,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         {                     
             const eEipnetwork_t *ipnetworkstrg;
             
-            shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             pktout[0] = CMD_MACGET;
             memcpy(&pktout[1], &ipnetworkstrg->macaddress, sizeof(ipnetworkstrg->macaddress));      
             
@@ -366,16 +447,16 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             uint64_t mac = 0;
             memcpy(&mac, &pktin[1], 6);
 
-            shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
             ipnetwork.macaddress = mac;
-            shalinfo_deviceinfo_part_set(shalinfo_ipnet, (const void*)&ipnetwork);
+            ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork);
             
             char str[128];
             snprintf(str, sizeof(str), "mac is h = %llx, l = %llx", ipnetwork.macaddress >> 32, ipnetwork.macaddress & 0xffffffff);
             hal_trace_puts(str);    
             
-            shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             pktout[0] = CMD_MACSET;
             memcpy(&pktout[1], &ipnetworkstrg->macaddress, sizeof(ipnetworkstrg->macaddress));      
             
@@ -398,10 +479,12 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             const eEprocess_t *s_proctable = NULL;
             const eEmoduleInfo_t *s_modinfo = NULL;
             eEprocess_t defproc;
+			eEprocess_t startup;
 
-            shalpart_proc_def2run_get(&defproc);
+            ee_sharserv_part_proc_def2run_get(&defproc);
+			ee_sharserv_part_proc_startup_get(&startup);
 
-            if (ee_res_OK == shalpart_proc_allavailable_get(&s_proctable, &num_procs))
+            if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
             {
                 pktout[0] = CMD_PROCS;
                 pktout[1] = num_procs; 
@@ -411,9 +494,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
                 for (uint8_t i=0; i<num_procs; ++i)
                 {
-                    shalpart_proc_get(s_proctable[i], &s_modinfo);
+                    ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
-                    size+=sprintf(data+size,"*** e-proc #%d %s ***\r\n",i,(defproc==i?"(default)":""));
+                    size+=sprintf(data+size,"*** e-proc #%d %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"" ) ;
 
                     size+=sprintf(data+size, "name\t%s\r\n", s_modinfo->info.name);
                     size+=sprintf(data+size, "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
@@ -509,8 +592,8 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
         case CMD_UPD_ONCE:
         {
-            shalbase_ipc_gotoproc_set(ee_procUpdater);
-            shalbase_system_restart();
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+            ee_sharserv_sys_restart();
             
             return 0;
         }// break;
@@ -549,7 +632,7 @@ static eEresult_t s_sys_eeprom_erase(void)
     return(ret);
 #else    
     eEstorage_t strg = { .type = ee_strg_eeprom, .size = EENV_MEMMAP_SHALSYSTEM_STGSIZE, .addr = EENV_MEMMAP_SHALSYSTEM_STGADDR};
-    return(shalbase_storage_clr(&strg, EENV_MEMMAP_SHALSYSTEM_STGSIZE));
+    return(ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHALSYSTEM_STGSIZE));
 #endif    
 }
 
