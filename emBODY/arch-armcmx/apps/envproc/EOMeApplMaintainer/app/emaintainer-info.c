@@ -80,14 +80,14 @@ extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EA
             .signature  = ee_procApplication,
             .version    = 
             { 
-                .major = 1, 
+                .major = 2, 
                 .minor = 0
             },  
             .builddate  = 
             {
-                .year  = 2012,
-                .month = 4,
-                .day   = 4,
+                .year  = 2013,
+                .month = 9,
+                .day   = 11,
                 .hour  = 15,
                 .min   = 0
             }
