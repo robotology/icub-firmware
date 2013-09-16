@@ -25,15 +25,13 @@
 #include "string.h"
 #include "EoCommon.h"
 #include "eEcommon.h"
-#include "shalBASE.h"
-#include "shalPART.h"
-#include "shalINFO.h"
+
 #include "EOtheErrorManager.h"
 
 #include "EOVtheEnvironment_hid.h"
 #include "hal_arch_arm.h"
 
-
+#include "eEsharedServices.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -76,9 +74,9 @@ const eOarmenv_cfg_t eo_armenv_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_eo_armenv_prepare(const eEmoduleInfo_t *modinfo, const eEboardInfo_t *brdinfo);
-static void s_eo_armenv_shalib_init_sync(void);
-static void s_eo_armenv_shalib_init(void);
-static void s_eo_armenv_shalib_synchronise(void);
+static void s_eo_armenv_sharedservices_init_sync(void);
+static void s_eo_armenv_sharedservices_init(void);
+static void s_eo_armenv_sharedservices_synchronise(void);
 
 static eOresult_t s_eo_armenv_shareddata_sync(EOVtheEnvironmentDerived *p);
 static eOresult_t s_eo_armenv_code_proc_offset_get(EOVtheEnvironmentDerived *p, uint32_t *offset);
@@ -242,7 +240,7 @@ static eOresult_t s_eo_armenv_shareddata_sync(EOVtheEnvironmentDerived *p)
 
     // it is a singleton boys ... thus i dont need using armenv and i can use s_the_armenv
     
-    s_eo_armenv_shalib_init_sync();
+    s_eo_armenv_sharedservices_init_sync();
    
     return(eores_OK);
 }
@@ -278,7 +276,7 @@ static eOresult_t s_eo_armenv_shareddata_ipnet_get(EOVtheEnvironmentDerived *p, 
 
     // it is a singleton boys ... thus i dont need using armenv s_the_armenv
     
-    if(ee_res_OK != shalinfo_deviceinfo_get(&s_the_armenv.devinfo))
+    if(ee_res_OK != ee_sharserv_info_deviceinfo_get(&s_the_armenv.devinfo))
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot read deviceinfo");
         return(eores_NOK_generic);
@@ -302,7 +300,7 @@ static eOresult_t s_eo_armenv_shareddata_cannets_get(EOVtheEnvironmentDerived *p
 
     // it is a singleton boys ... thus i dont need using armenv s_the_armenv
     
-    if(ee_res_OK != shalinfo_deviceinfo_get(&s_the_armenv.devinfo))
+    if(ee_res_OK != ee_sharserv_info_deviceinfo_get(&s_the_armenv.devinfo))
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot read deviceinfo");
         return(eores_NOK_generic);
@@ -333,20 +331,20 @@ static eOresult_t s_eo_armenv_eproc_get(EOVtheEnvironmentDerived *p, eEprocess_t
 }
 
 
-static void s_eo_armenv_shalib_init_sync(void)
+static void s_eo_armenv_sharedservices_init_sync(void)
 {
-    s_eo_armenv_shalib_init();
+    s_eo_armenv_sharedservices_init();
   
-    s_eo_armenv_shalib_synchronise();      
+    s_eo_armenv_sharedservices_synchronise();      
 }
 
 
-static void s_eo_armenv_shalib_synchronise(void)
+static void s_eo_armenv_sharedservices_synchronise(void)
 {
 //    eEresult_t res;
     eEprocess_t proc = (eEprocess_t)s_the_armenv.modinfo->info.entity.signature;
     
-    if(ee_res_OK != shalpart_proc_synchronise(proc, s_the_armenv.modinfo))
+    if(ee_res_OK != ee_sharserv_part_proc_synchronise(proc, s_the_armenv.modinfo))
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot sync modinfo");
     }
@@ -357,13 +355,13 @@ static void s_eo_armenv_shalib_synchronise(void)
         eEboardInfo_t boardinfo;
         memcpy(&boardinfo, s_the_armenv.brdinfo, sizeof(eEboardInfo_t));
         boardinfo.uniqueid = hal_arch_arm_uniqueid64_get();
-        if(ee_res_OK != shalinfo_boardinfo_synchronise(&boardinfo))
+        if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(&boardinfo))
         {
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot sync brdinfo");
         }
     }
     
-    if(ee_res_OK != shalinfo_deviceinfo_get(&s_the_armenv.devinfo))
+    if(ee_res_OK != ee_sharserv_info_deviceinfo_get(&s_the_armenv.devinfo))
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot read deviceinfo");
     }
@@ -371,48 +369,67 @@ static void s_eo_armenv_shalib_synchronise(void)
 }
 
 
-static void s_eo_armenv_shalib_init(void)
+static void s_eo_armenv_sharedservices_init(void)
 {
 //     eEresult_t res = ee_res_OK;
     
-    if((ee_res_OK == shalbase_isvalid()))
+    if(ee_res_OK == ee_sharserv_isvalid())
     {
-        const uint8_t forcestorageinit = 1; 
-        if(ee_res_OK != shalbase_init(forcestorageinit))
+        // init sharserv
+        sharserv_mode_t sharservmode = 
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init shalbase");
-        }
-    }
+            .onerror    = NULL,
+            .initmode   = sharserv_base_initmode_forcestorageinit
+        };
+        
+        if(ee_res_OK != ee_sharserv_init(&sharservmode))
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init sharserv");
+        }        
+    } 
     else
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "shalbase is not present");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "sharserv is not present");    
     }
     
+    
+//     if((ee_res_OK == shalbase_isvalid()))
+//     {
+//         if(ee_res_OK != shalbase_init(shalbase_initmode_forcestorageinit))
+//         {
+//             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init shalbase");
+//         }
+//     }
+//     else
+//     {
+//         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "shalbase is not present");
+//     }
+//     
 
-    if((ee_res_OK == shalpart_isvalid()))
-    {
-        if(ee_res_OK != shalpart_init())
-        {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init shalpart");
-        }
-    }
-    else
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "shalpart is not present");
-    }    
+//     if((ee_res_OK == shalpart_isvalid()))
+//     {
+//         if(ee_res_OK != shalpart_init())
+//         {
+//             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init shalpart");
+//         }
+//     }
+//     else
+//     {
+//         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "shalpart is not present");
+//     }    
 
 
-    if((ee_res_OK == shalinfo_isvalid()))
-    {
-        if(ee_res_OK != shalinfo_init())
-        {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init shalinfo");
-        }
-    }
-    else
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "shalinfo is not present");
-    }        
+//     if((ee_res_OK == shalinfo_isvalid()))
+//     {
+//         if(ee_res_OK != shalinfo_init())
+//         {
+//             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot init shalinfo");
+//         }
+//     }
+//     else
+//     {
+//         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "shalinfo is not present");
+//     }        
 
 }
 
