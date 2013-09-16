@@ -32,9 +32,7 @@
 #include "EOaction_hid.h"
 
 #include "osal.h"
-#include "shalBASE.h"
-#include "shalPART.h"
-#include "shalINFO.h"
+#include "eEsharedServices.h" 
 
 
 //#include "appl-core.h"
@@ -223,8 +221,8 @@ extern eOresult_t eom_emsdiscoverytransceiver_GetReply(EOMtheEMSdiscoverytransce
 static void s_callback_shutdown2updater(void *p)
 {
     osal_system_scheduling_suspend();
-    shalbase_ipc_gotoproc_set(ee_procUpdater);
-    shalbase_system_restart();
+    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+    ee_sharserv_sys_restart();
 }
 
 // returns eobool_true if a tx is required
@@ -432,7 +430,7 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
                 pktout[3] = BOARD_TYPE_EMS;
                 
                 const eEipnetwork_t *ipnetworkstrg;
-                shalinfo_deviceinfo_part_get(shalinfo_ipnet, (const void**)&ipnetworkstrg);
+                ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
 
                 pktout[4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
                 pktout[5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
@@ -455,7 +453,7 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
         {
             *sizeout = 0;
 
-            shalbase_system_restart();
+            ee_sharserv_sys_restart();
             
             retval = 0;
    
@@ -467,8 +465,8 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
         {
             *sizeout = 0;
      
-            shalbase_ipc_gotoproc_set(ee_procUpdater);
-            shalbase_system_restart();
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+            ee_sharserv_sys_restart();
             
             retval = 0;
             
