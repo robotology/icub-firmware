@@ -66,13 +66,14 @@
 
 extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid)
 {
-    uint8_t ip3 = uniqueid & 0xff;
-    uint8_t ip4 = (uniqueid>>8) & 0xff;
+//     uint8_t ip3 = uniqueid & 0xff;
+//     uint8_t ip4 = (uniqueid>>8) & 0xff;
+    const uint8_t ip3 = EECOMMON_ipaddr_def3;
+    const uint8_t ip4 = EECOMMON_ipaddr_def4;    
     if(NULL == ntw)
     {
         return(ee_res_NOK_generic);
     }
-
     
     ntw->macaddress  = (((uint64_t)EECOMMON_mac_oui_iit)) | ((uint64_t)((uniqueid) & 0xFFFFFF)<<24);
     ntw->ipaddress   = (uint32_t)EECOMMON_ipaddr_base_iit | EECOMMON_ipaddr_from(0, 0, ip3, ip4); 

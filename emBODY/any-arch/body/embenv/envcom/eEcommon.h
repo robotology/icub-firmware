@@ -42,7 +42,8 @@
 #define EECOMMON_mac_oui_iit                        (0x0000000000000002)//(0x0000000000332211)
 #define EECOMMON_ipaddr_base_iit                    EECOMMON_ipaddr_from(10, 0, 0, 0)
 #define EECOMMON_ipmask_default_iit                 EECOMMON_ipaddr_from(255, 255, 0, 0)
-
+#define EECOMMON_ipaddr_def3                        0
+#define EECOMMON_ipaddr_def4                        99
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -79,6 +80,12 @@ typedef enum
  **/ 
 typedef uint8_t     eEbool_t;
 
+/** @typedef    typedef uint32_t eEreltime_t
+    @brief      eEreltime_t contains the relative time expressed in micro-seconds. It is used for relative timing
+                operations because its maximum value is about 4294 seconds. 
+ **/
+typedef uint32_t    eEreltime_t; 
+
 
 /** @typedef    typedef struct eEdate_t
     @brief      eEdate_t keeps the date of when a module is built or a board is made
@@ -110,7 +117,7 @@ typedef struct                  // 02B
 
 
 /** @typedef    typedef enum eEmoduleType_t
-    @brief      eEmoduleType_t keeps teh kinds of modules. 
+    @brief      eEmoduleType_t keeps the kinds of modules. 
  **/  
 typedef enum               
 {
@@ -208,14 +215,14 @@ typedef struct          // 4 BYTES
 
 typedef enum
 {
-    ee_entity_none                 = 0,
-    ee_entity_board                = 1, 
-    ee_entity_process              = 2,        
-    ee_entity_sharlib              = 3,
-    ee_entity_filesys              = 4,  
-    ee_entity_forfuture5           = 5,
-    ee_entity_forfuture6           = 6,
-    ee_entity_forfuture7           = 7,
+    ee_entity_none                  = 0,
+    ee_entity_board                 = 1, 
+    ee_entity_process               = 2,        
+    ee_entity_sharlib               = 3,
+    ee_entity_statlib               = 4,  
+    ee_entity_filesys               = 5,
+    ee_entity_forfuture6            = 6,
+    ee_entity_forfuture7            = 7
 } eEtypeOfEntity_t;
 
 
@@ -284,15 +291,18 @@ typedef uint8_t eEprocess_t;
  **/ 
 typedef enum               
 {
-    ee_procNone              = 255,
-    ee_procLoader            = 0, 
-    ee_procUpdater           = 1,
-    ee_procApplication       = 2,
-    ee_procApplUser03        = 3,
-    ee_procApplUser04        = 4
+    ee_procNone                 = 255,
+    ee_procLoader               = 0, 
+    ee_procUpdater              = 1,
+    ee_procApplication          = 2,
+    ee_procOther01              = 3,
+    ee_procOther02              = 4,
+    ee_procOther03              = 5,
+    ee_procOther04              = 6,
+    ee_procOther05              = 7
 } eEprocessvalues_t;
 
-enum { ee_procMaxNum = 5 };
+enum { ee_procMaxNum = 8 };
 
 
 /** @typedef    typedef enum eEsharlib_t
@@ -300,37 +310,15 @@ enum { ee_procMaxNum = 5 };
  **/ 
 typedef enum               
 {
-    ee_shalNone             = 255,
-    ee_shalBASE             = 0, 
-    ee_shalPART             = 1,
-    ee_shalINFO             = 2,
-    ee_shalHAL              = 3,
-    ee_shalOSAL             = 4,
-    ee_shalIPAL             = 5,
-    ee_shalFSAL             = 6,
-    ee_shalDSPAL            = 7,
-    ee_shalSharServ         = 8, 
-    ee_shalUser09           = 9
+    ee_shalNone                 = 255,
+    ee_shalSharServ             = 0, 
+    ee_shalOther01              = 1,
+    ee_shalOther02              = 2,
+    ee_shalOther03              = 3
 } eEsharlib_t; 
 
-enum { ee_shalMaxNum = 10 }; 
+enum { ee_shalMaxNum = 4 }; 
 
-
-///** @typedef    typedef struct eEshalflags_t
-//    @brief      eEshalflags_t keeps what shared libraries are available. 
-//  **/
-//typedef struct
-//{
-//    uint32_t    shalbase    : 1;
-//    uint32_t    shalpart    : 1;
-//    uint32_t    shalinfo    : 1; 
-//    uint32_t    shalhal     : 1;
-//    uint32_t    shalosal    : 1;
-//    uint32_t    shalipal    : 1;
-//    uint32_t    shalfsal    : 1;
-//    uint32_t    shaldspal   : 1;
-//    uint32_t    others      : 24;
-//} eEshalflags_t;
 
 
 /** @typedef    typedef struct eEinfoModule_t
