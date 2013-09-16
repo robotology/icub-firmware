@@ -20,6 +20,12 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "string.h"
+#include "stdlib.h"
+
+#include "shalBASE.h"
+#include "shalPART.h"
+#include "shalINFO.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -37,13 +43,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static void s_on_error(void)
+{
+    for(;;);
+}
+
+const sharserv_mode_t sharserv_mode_default =
+{
+    .onerror    = s_on_error,
+    .initmode   = sharserv_base_initmode_dontforcestorageinit  
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+// verify the correct value of the ...
+typedef int dummy999[(shalbase_ipc_userdefdata_maxsize == sharserv_base_ipc_userdefdata_maxsize) ? 1 : -1];
 
 
 
@@ -156,11 +174,70 @@ extern eEresult_t ee_sharserv_isvalid(void)
 #endif
 
 
-extern eEresult_t ee_sharserv_init(uint8_t forcestorageinit)
+extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
 {
-    //#warning --> do ee_sharserv_init() so that it calls shalBASE, shalPART and shalINFO
+
+    if(NULL == mode)
+    {
+        mode = &sharserv_mode_default;
+    }
+    
+    // init shalbase
+    if(ee_res_OK != shalbase_init((shalbase_initmode_t)mode->initmode))
+    {
+        if(NULL != mode->onerror)
+        {
+            mode->onerror();
+        }
+        else
+        {
+            return(ee_res_NOK_generic);
+        }
+    }
+
+    // init shalpart
+    if(ee_res_OK != shalpart_init())
+    {
+        if(NULL != mode->onerror)
+        {
+            mode->onerror();
+        }
+        else
+        {
+            return(ee_res_NOK_generic);
+        }        
+    }        
+    
+    // init shalinfo
+    if(ee_res_OK != shalinfo_init())
+    {
+        if(NULL != mode->onerror)
+        {
+            mode->onerror();
+        }
+        else
+        {
+            return(ee_res_NOK_generic);
+        }        
+    }   
+
+    
+#if     defined(SHARSERV_MODE_SHALIB)
+        // and now put sharserv in partition table
+        ee_sharserv_selfregister();
+#endif  
     
     return(ee_res_OK);
+}
+
+extern eEresult_t ee_sharserv_selfregister(void)
+{
+    eEresult_t res = ee_res_OK;
+#if     defined(SHARSERV_MODE_SHALIB)
+    res = shalpart_shal_synchronise(ee_shalSharServ, ee_sharserv_moduleinfo_get());   
+#endif
+    
+    return(res);
 }
 
 
@@ -175,88 +252,88 @@ extern eEresult_t ee_sharserv_deinit(void)
 
 // - base
 
-extern eEresult_t ee_sharserv_base_init(uint8_t forcestorageinit)
-{
-    return(shalbase_init(forcestorageinit));
-}
+// extern eEresult_t ee_sharserv_base_init(sharserv_base_initmode_t initmode)
+// {
+//     return(shalbase_init((shalbase_initmode_t)initmode));
+// }
 
-extern eEresult_t ee_sharserv_base_deinit(void)
-{
-    return(shalbase_deinit());
-}
+// extern eEresult_t ee_sharserv_base_deinit(void)
+// {
+//     return(shalbase_deinit());
+// }
 
-extern eEresult_t ee_sharserv_base_boardinfo_synchronise(const eEboardInfo_t* boardinfo)
-{
-    return(shalbase_boardinfo_synchronise(boardinfo));
-}
+// extern eEresult_t ee_sharserv_base_boardinfo_synchronise(const eEboardInfo_t* boardinfo)
+// {
+//     return(shalbase_boardinfo_synchronise(boardinfo));
+// }
 
-extern eEresult_t ee_sharserv_base_boardinfo_get(const eEboardInfo_t** boardinfo)
-{
-    return(shalbase_boardinfo_get(boardinfo));
-}
+// extern eEresult_t ee_sharserv_base_boardinfo_get(const eEboardInfo_t** boardinfo)
+// {
+//     return(shalbase_boardinfo_get(boardinfo));
+// }
 
-extern eEresult_t ee_sharserv_base_ipc_gotoproc_get(eEprocess_t *pr)
+extern eEresult_t ee_sharserv_ipc_gotoproc_get(eEprocess_t *pr)
 {
     return(shalbase_ipc_gotoproc_get(pr));
 }
 			
-extern eEresult_t ee_sharserv_base_ipc_gotoproc_set(eEprocess_t pr)
+extern eEresult_t ee_sharserv_ipc_gotoproc_set(eEprocess_t pr)
 {
     return(shalbase_ipc_gotoproc_set(pr));
 }
 
-extern eEresult_t ee_sharserv_base_ipc_gotoproc_clr(void)
+extern eEresult_t ee_sharserv_ipc_gotoproc_clr(void)
 {
     return(shalbase_ipc_gotoproc_clr());
 }
 
-extern eEresult_t ee_sharserv_base_ipc_volatiledata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize)
+extern eEresult_t ee_sharserv_ipc_userdefdata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize)
 {
-    return(shalbase_ipc_volatiledata_get(data, size, maxsize));
+    return(shalbase_ipc_userdefdata_get(data, size, maxsize));
 }
 		
-extern eEresult_t ee_sharserv_base_ipc_volatiledata_set(uint8_t *data, uint8_t size)
+extern eEresult_t ee_sharserv_ipc_userdefdata_set(uint8_t *data, uint8_t size)
 {
-    return(shalbase_ipc_volatiledata_set(data, size));
+    return(shalbase_ipc_userdefdata_set(data, size));
 }
 
-extern eEresult_t ee_sharserv_base_ipc_volatiledata_clr(void)
+extern eEresult_t ee_sharserv_ipc_userdefdata_clr(void)
 {
-    return(shalbase_ipc_volatiledata_clr());
+    return(shalbase_ipc_userdefdata_clr());
 }
 
 
-extern eEresult_t ee_sharserv_base_system_canjump(uint32_t addr)
+extern eEresult_t ee_sharserv_sys_canjump(uint32_t addr)
 {
     return(shalbase_system_canjump(addr));
 }
 
-extern eEresult_t ee_sharserv_base_system_canjump_to_proc(uint32_t addr, eEmoduleInfo_t *procinfo)
+extern eEresult_t ee_sharserv_sys_canjump_to_proc(uint32_t addr, eEmoduleInfo_t *procinfo)
 {
     return(shalbase_system_canjump_to_proc(addr, procinfo));
 }
 
-extern eEresult_t ee_sharserv_base_system_jumpnow(uint32_t addr)
+extern eEresult_t ee_sharserv_sys_jumpnow(uint32_t addr)
 {
     return(shalbase_system_jumpnow(addr));
 }
 
-extern eEresult_t ee_sharserv_base_system_restart(void)
+extern eEresult_t ee_sharserv_sys_restart(void)
 {
     return(shalbase_system_restart());
 }
 
-extern eEresult_t ee_sharserv_base_storage_get(const eEstorage_t *strg, void *data, uint32_t size)
+extern eEresult_t ee_sharserv_sys_storage_get(const eEstorage_t *strg, void *data, uint32_t size)
 {
     return(shalbase_storage_get(strg, data, size));
 }
 
-extern eEresult_t ee_sharserv_base_storage_set(const eEstorage_t *strg, const void *data, uint32_t size)
+extern eEresult_t ee_sharserv_sys_storage_set(const eEstorage_t *strg, const void *data, uint32_t size)
 {
     return(shalbase_storage_set(strg, data, size));
 }
 
-extern eEresult_t ee_sharserv_base_storage_clr(const eEstorage_t *strg, const uint32_t size)
+extern eEresult_t ee_sharserv_sys_storage_clr(const eEstorage_t *strg, const uint32_t size)
 {
     return(shalbase_storage_clr(strg, size));
 }
@@ -264,19 +341,19 @@ extern eEresult_t ee_sharserv_base_storage_clr(const eEstorage_t *strg, const ui
 
 // - part
 
-extern eEresult_t ee_sharserv_part_init(void)
-{
-    return(shalpart_init());
-}
+// extern eEresult_t ee_sharserv_part_init(void)
+// {
+//     return(shalpart_init());
+// }
 
-extern eEresult_t ee_sharserv_part_reset(ee_sharserv_part_reset_mode_t rm)
-{
-    return(shalpart_reset((shalpart_reset_mode_t)rm));
-}
+// extern eEresult_t ee_sharserv_part_deinit(void)
+// {
+//     return(shalpart_deinit());
+// }
 
-extern eEresult_t ee_sharserv_part_deinit(void)
+extern eEresult_t ee_sharserv_part_reset(void)
 {
-    return(shalpart_deinit());
+    return(shalpart_reset(shalpart_reset_default));
 }
 
 extern eEresult_t ee_sharserv_part_proc_synchronise(eEprocess_t proc, const eEmoduleInfo_t *moduleinfo)
@@ -294,20 +371,30 @@ extern eEresult_t ee_sharserv_part_proc_def2run_set(eEprocess_t proc)
     return(shalpart_proc_def2run_set(proc));
 }
 
+extern eEresult_t ee_sharserv_part_proc_startup_get(eEprocess_t *proc)
+{
+    return(shalpart_proc_startup_get(proc));
+}
+
+extern eEresult_t ee_sharserv_part_proc_startup_set(eEprocess_t proc)
+{
+    return(shalpart_proc_startup_set(proc));
+}
+
 extern eEresult_t ee_sharserv_part_proc_runaddress_get(eEprocess_t proc, uint32_t *addr)
 {
     return(shalpart_proc_runaddress_get(proc, addr));
 }
 
 
-extern eEresult_t ee_sharserv_part_proc_startuptimeinupdater_get(uint32_t *startuptimeinupdater)
+extern eEresult_t ee_sharserv_part_proc_startuptime_get(eEreltime_t *startuptime)
 {
-    return(shalpart_proc_startuptimeinupdater_get(startuptimeinupdater));
+    return(shalpart_proc_startuptime_get(startuptime));
 }
 
-extern eEresult_t ee_sharserv_part_proc_startuptimeinupdater_set(uint32_t startuptimeinupdater)
+extern eEresult_t ee_sharserv_part_proc_startuptime_set(eEreltime_t startuptime)
 {
-    return(shalpart_proc_startuptimeinupdater_set(startuptimeinupdater));
+    return(shalpart_proc_startuptime_set(startuptime));
 }
 
 
@@ -367,19 +454,19 @@ extern eEresult_t ee_sharserv_part_shal_get(eEsharlib_t shal, const eEmoduleInfo
 }
 
 
-// - info
+// - info: offers services for info storage (boardinfo + deviceinfo)
 
-extern eEresult_t ee_sharserv_info_init(void)
-{
-    return(shalinfo_init());
-}
+// extern eEresult_t ee_sharserv_info_init(void)
+// {
+//     return(shalinfo_init());
+// }
 
-extern eEresult_t ee_sharserv_info_deinit(void)
-{
-    return(shalinfo_deinit());
-}
+// extern eEresult_t ee_sharserv_info_deinit(void)
+// {
+//     return(shalinfo_deinit());
+// }
 
-extern eEresult_t ee_sharserv_info_erase(void)
+extern eEresult_t ee_sharserv_info_reset(void)
 {
     return(shalinfo_erase());
 }
@@ -410,19 +497,19 @@ extern eEresult_t ee_sharserv_info_deviceinfo_set(const ee_sharserv_info_devicei
     return(shalinfo_deviceinfo_set((const shalinfo_deviceinfo_t*)deviceinfo));
 }
 
-extern eEresult_t ee_sharserv_info_deviceinfo_part_clr(ee_sharserv_info_deviceinfo_part_t part)
+extern eEresult_t ee_sharserv_info_deviceinfo_item_clr(ee_sharserv_info_deviceinfo_item_t item)
 {
-    return(shalinfo_deviceinfo_part_clr((shalinfo_deviceinfo_part_t)part));
+    return(shalinfo_deviceinfo_part_clr((shalinfo_deviceinfo_part_t)item));
 }
 
-extern eEresult_t ee_sharserv_info_deviceinfo_part_get(ee_sharserv_info_deviceinfo_part_t part, const void** data)
+extern eEresult_t ee_sharserv_info_deviceinfo_item_get(ee_sharserv_info_deviceinfo_item_t item, const void** data)
 {
-    return(shalinfo_deviceinfo_part_get((shalinfo_deviceinfo_part_t)part, data));
+    return(shalinfo_deviceinfo_part_get((shalinfo_deviceinfo_part_t)item, data));
 }
 
-extern eEresult_t ee_sharserv_info_deviceinfo_part_set(ee_sharserv_info_deviceinfo_part_t part, const void* data)
+extern eEresult_t ee_sharserv_info_deviceinfo_item_set(ee_sharserv_info_deviceinfo_item_t item, const void* data)
 {
-    return(shalinfo_deviceinfo_part_set((shalinfo_deviceinfo_part_t)part, data));
+    return(shalinfo_deviceinfo_part_set((shalinfo_deviceinfo_part_t)item, data));
 }
 
 
