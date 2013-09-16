@@ -281,7 +281,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
             uint16_t size = pktin[6]<<8 | pktin[5];
 
-            void *data = pktin + 8;
+            void *data = pktin + 7;
 
                   
             if ((address >= s_prog_mem_start) && (address+size < s_prog_mem_start+s_prog_mem_size))
@@ -336,6 +336,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 case PROGRAM_UPDATER:
                     ee_sharserv_part_proc_synchronise(ee_procUpdater,(eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET));
                     ee_sharserv_part_proc_startup_set(ee_procApplication);
+                    //ee_sharserv_part_proc_def2run_set(ee_procApplication);
                     break;
                 case PROGRAM_APP:
                     ee_sharserv_part_proc_synchronise(ee_procApplication,(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET));
@@ -377,6 +378,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
             if ((active_part >= ee_procUpdater) && (active_part <= ee_procOther05))
             {
+                ee_sharserv_part_proc_startup_set(ee_procUpdater);
                 ee_sharserv_part_proc_def2run_set(active_part);
             }
 
@@ -480,6 +482,12 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             const eEmoduleInfo_t *s_modinfo = NULL;
             eEprocess_t defproc;
 			eEprocess_t startup;
+			eEprocess_t running =
+#if defined(_MAINTAINER_APPL_)  
+									ee_procApplication;
+#else
+                                    ee_procUpdater;
+#endif
 
             ee_sharserv_part_proc_def2run_get(&defproc);
 			ee_sharserv_part_proc_startup_get(&startup);
@@ -496,7 +504,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 {
                     ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
-                    size+=sprintf(data+size,"*** e-proc #%d %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"" ) ;
+                    size+=sprintf(data+size,"*** e-proc #%d %s %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"", running==i?"(RUNNING)":"" ) ;
 
                     size+=sprintf(data+size, "name\t%s\r\n", s_modinfo->info.name);
                     size+=sprintf(data+size, "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
