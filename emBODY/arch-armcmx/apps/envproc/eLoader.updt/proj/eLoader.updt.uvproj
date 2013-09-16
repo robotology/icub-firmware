@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>mcbstm32c-hal.lib</TargetName>
+      <TargetName>mcbstm32c</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -348,7 +348,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC BOARD_MCBSTM32C ENABLE_USER_INPUT ENABLE_ERASE_EEPROM</Define>
+              <Define>HAL_USE_ARCH_ARM BOARD_MCBSTM32C DEBUG_MODE</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\porting;..\..\..\..\sys\env\api</IncludePath>
             </VariousControls>
@@ -484,7 +484,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>ems001-hal.lib</TargetName>
+      <TargetName>ems001</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -825,7 +825,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM SHALS_MODE_STATIC BOARD_EMS001</Define>
+              <Define>HAL_USE_ARCH_ARM BOARD_EMS001</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\porting</IncludePath>
             </VariousControls>
