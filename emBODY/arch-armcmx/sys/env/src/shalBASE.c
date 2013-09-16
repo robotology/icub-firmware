@@ -60,18 +60,7 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define SHALBASE_F2USESIZE          (20) 
 
-
-typedef struct                                      // 16B
-{
-    eEentity_t              entity;                 // 8B
-    uint8_t                 defflag;                // 1B
-    uint8_t                 cached;                 // 1B
-    uint8_t                 strginitted;            // 1B
-    uint8_t                 forfutureuse1;          // 1B
-    uint8_t                 filler[4];              // 4B
-} baseHead_t;               EECOMMON_VERIFYsizeof(baseHead_t, 16); 
 
 typedef struct                                      // 24B
 {
@@ -79,26 +68,25 @@ typedef struct                                      // 24B
     eEprocess_t             gotoval;
     uint8_t                 free2useflag;
     uint8_t                 free2usesize;
-    uint8_t                 free2usedata[SHALBASE_F2USESIZE];
-} baseData_t;               EECOMMON_VERIFYsizeof(baseData_t, 24);
+    uint8_t                 free2usedata[shalbase_ipc_userdefdata_maxsize];
+} baseIPCdata_t;            EECOMMON_VERIFYsizeof(baseIPCdata_t, 24);
 
 typedef struct                                      // 40B
 {
-    baseHead_t              head;                   // 16B
-    baseData_t              data;                   // 24B
-} baseInfo_t;               EECOMMON_VERIFYsizeof(baseInfo_t, 40);
-
-
-typedef struct              // 80B
-{
-    baseHead_t              head;                   // 16B
-    eEboardInfo_t           boardinfo;              // 64B
-} baseBoardInfo_t;          EECOMMON_VERIFYsizeof(baseBoardInfo_t, 80);
+    shalbaseDataHeader_t    head;                   // 16B
+    baseIPCdata_t           ipcdata;                // 24B
+} baseIPCdataStorage_t;     EECOMMON_VERIFYsizeof(baseIPCdataStorage_t, 40);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+// always in static mode
+#define SHALBASE_MODE_STATICLIBRARY
+
+
+#define SHALBASE_DONTUSESTRGFLASH
 
 
 #define SHALBASE_ROMADDR            (EENV_MEMMAP_SHALBASE_ROMADDR)
@@ -118,11 +106,8 @@ typedef struct              // 80B
 #define SHALBASE_RAMFOR_ZIDATA      (EENV_MEMMAP_SHALBASE_RAMFOR_ZIDATA)
 
 // and relevant controls
-typedef int dummy1[sizeof(baseInfo_t)     <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
+typedef int dummy1[sizeof(baseIPCdataStorage_t)     <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
 typedef int dummy2[SHALBASE_RAMFOR_ZIDATA <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
-
-
-#define EENV_MEMMAP_SHALBASE_STGADDR_BOARDINFO    (EENV_MEMMAP_SHALBASE_STGADDR+sizeof(baseInfo_t))
 
 
 // - flags ------------------------------------------------------------------------------------------------------------
@@ -139,10 +124,12 @@ typedef int dummy2[SHALBASE_RAMFOR_ZIDATA <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_
 static void s_shalbase_storage_init(const eEstorageType_t strgtype);
 static void s_shalbase_jump_to(uint32_t appaddr);
 
-static void s_shalbase_permanent_boardinfo_init(void);
-static baseBoardInfo_t* s_shalbase_permanent_boardinfo_get(void);
-static void s_shalbase_permanent_boardinfo_set(baseBoardInfo_t *baseboardinfo);
-static void s_shalbase_permanent_boardinfo_cache_invalidate(void);
+static eEboolval_t s_shalbase_is_initted(void);
+
+static eEboolval_t s_shalbase_ipc_ram_is_valid(void);
+static void s_shalbase_ipc_ram_set_valid(void);
+static void s_shalbase_ipc_ram_set_invalid(void);
+static void s_shalbase_ipc_ram_initialise(void);
 
 
 
@@ -150,19 +137,18 @@ static void s_shalbase_permanent_boardinfo_cache_invalidate(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// this variable is placed in NZI section
-static volatile baseInfo_t s_shalbase_ram_baseinfo      __attribute__((at(SHALBASE_RAMADDR)));
-
-// this variable is placed in NZI section ... however it shoudl be placed in ZI section
-static volatile baseBoardInfo_t s_shalbase_temporary_baseboardinfo  __attribute__((at(SHALBASE_RAMADDR+sizeof(baseInfo_t))));
+// this variable is placed in NZI section. it is used for ipc
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored      __attribute__((at(SHALBASE_RAMADDR)));
 
 
 // - module info ------------------------------------------------------------------------------------------------------
 
 #if     defined(SHALBASE_MODE_STATICLIBRARY)
     #define SHALBASE_MODULEINFO_PLACED_AT
+    #define SHALBASE_ENTITY_TYPE                ee_entity_statlib   
 #else
     #define SHALBASE_MODULEINFO_PLACED_AT       __attribute__((at(SHALBASE_ROMADDR+EENV_MODULEINFO_OFFSET)))
+    #define SHALBASE_ENTITY_TYPE                ee_entity_sharlib 
 #endif
 
 static const eEmoduleInfo_t s_shalbase_moduleinfo   SHALBASE_MODULEINFO_PLACED_AT =
@@ -171,8 +157,8 @@ static const eEmoduleInfo_t s_shalbase_moduleinfo   SHALBASE_MODULEINFO_PLACED_A
     {
         .entity     =
         {
-            .type       = ee_entity_sharlib,
-            .signature  = ee_shalBASE,
+            .type       = SHALBASE_ENTITY_TYPE,
+            .signature  = ee_shalSharServ | SHALBASE_SIGN,
             .version    = 
             { 
                 .major = SHALBASE_VER_MAJOR, 
@@ -245,48 +231,28 @@ extern eEresult_t shalbase_isvalid(void)
 #endif
 
 
-extern eEresult_t shalbase_init(uint8_t forcestorageinit)
+extern eEresult_t shalbase_init(shalbase_initmode_t initmode)
 {
-    // this function can be called multiple times by any e-process or e-sharlib and should be executed only once,
-    // thus i use this guard ...   
-    if(0 == memcmp((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t)))
-    {   // the base signature is ok, thus we have already initted the shalBASE
-        if(0 == forcestorageinit)
-        {
+    if(ee_true == s_shalbase_is_initted())
+    {   // the volatile ram is ok, thus some e-process has already initted the shalBASE
+        if(shalbase_initmode_dontforce == initmode)
+        {   // if we have force storage init then we dont care that the shalBASE was already initted and we do it again
             return(ee_res_OK);
         }
     }
     
-    // set the base signature
-    memcpy((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t));
-    
-    // set the remaining of the s_shalbase_ram_baseinfo.head
-    s_shalbase_ram_baseinfo.head.defflag        = 0;
-    s_shalbase_ram_baseinfo.head.cached         = 0;
-    s_shalbase_ram_baseinfo.head.strginitted    = 1;
-    s_shalbase_ram_baseinfo.head.forfutureuse1  = 0;
-
-    // dont ever set the s_shalbase_ram_baseinfo.data
-//    shalbase_ipc_gotoproc_clr();
-//    shalbase_ipc_volatiledata_clr();
-    
     // initialise the eeprom storage
     s_shalbase_storage_init(ee_strg_eeprom);
+    
+#ifndef SHALBASE_DONTUSESTRGFLASH    
     // initialise the flash storage
     s_shalbase_storage_init(ee_strg_eflash);
+#endif    
+ 
     
-    // if we have the sharPART and it does not hold info about this shalBASE shared library, add it
-//    if(ee_res_OK == shalpart_isvalid())
-//    {
-//        shalpart_init();
-//        shalpart_shal_synchronise(ee_shalBASE, &s_shalbase_moduleinfo);
-//    }
-
-
-    // initialise the management of boardinfo
-    s_shalbase_permanent_boardinfo_init();
-    s_shalbase_permanent_boardinfo_cache_invalidate();
-
+    // initialise the ipc ram
+    s_shalbase_ipc_ram_initialise();       
+    
     // ok, return
     return(ee_res_OK);
 }
@@ -296,51 +262,27 @@ extern eEresult_t shalbase_deinit(void)
     // deinit the storage
 
     // finally, ... invalidate the ram
-    memset((void*)&s_shalbase_ram_baseinfo.head, 0, sizeof(baseHead_t));
+    s_shalbase_ipc_ram_set_invalid();
     
     return(ee_res_OK);
 }
 
 
-extern eEresult_t shalbase_boardinfo_synchronise(const eEboardInfo_t* boardinfo)
-{
-    baseBoardInfo_t* baseboardinfo = s_shalbase_permanent_boardinfo_get();
-
-    if(0 != memcmp(&baseboardinfo->boardinfo, boardinfo, sizeof(eEboardInfo_t)))
-    {
-        memcpy(&baseboardinfo->boardinfo, boardinfo, sizeof(eEboardInfo_t));
-        s_shalbase_permanent_boardinfo_set(baseboardinfo); 
-    }
-
-    // retrieve the eEboardInfo_t stored in storage. compare it w/ boardinfo. if different, then write boardinfo in storage
-    return(ee_res_OK);
-}
-
-extern eEresult_t shalbase_boardinfo_get(const eEboardInfo_t** boardinfo)
-{
-    baseBoardInfo_t* baseboardinfo = s_shalbase_permanent_boardinfo_get();
-
-    *boardinfo = &baseboardinfo->boardinfo;
-
-    // copy the eEboardInfo_t stored in storage to the local ram, and give back its pointer
-    return(ee_res_OK);
-}
 
 extern eEresult_t shalbase_ipc_gotoproc_get(eEprocess_t *pr)
 {
-    // the base signature is used to validate the ram
-    if(0 != memcmp((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t)))
+    if(ee_true != s_shalbase_ipc_ram_is_valid())
     {
         return(ee_res_NOK_generic); 
     }
     
-    if(FLAG_OK != s_shalbase_ram_baseinfo.data.gotoflag)
+    if(FLAG_OK != s_shalbase_IPCdataStored.ipcdata.gotoflag)
     {
         return(ee_res_NOK_generic);
     }
     else
     {
-        *pr = (s_shalbase_ram_baseinfo.data.gotoval);
+        *pr = (s_shalbase_IPCdataStored.ipcdata.gotoval);
         return(ee_res_OK);
     }
 
@@ -348,9 +290,9 @@ extern eEresult_t shalbase_ipc_gotoproc_get(eEprocess_t *pr)
 
 extern eEresult_t shalbase_ipc_gotoproc_set(eEprocess_t pr)
 {
-    memcpy((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t));
-    s_shalbase_ram_baseinfo.data.gotoflag  = FLAG_OK;
-    s_shalbase_ram_baseinfo.data.gotoval   = pr;
+    s_shalbase_ipc_ram_set_valid();
+    s_shalbase_IPCdataStored.ipcdata.gotoflag  = FLAG_OK;
+    s_shalbase_IPCdataStored.ipcdata.gotoval   = pr;
     
     return(ee_res_OK);
 }
@@ -358,52 +300,52 @@ extern eEresult_t shalbase_ipc_gotoproc_set(eEprocess_t pr)
 
 extern eEresult_t shalbase_ipc_gotoproc_clr(void)
 {
-    memcpy((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t));
-    s_shalbase_ram_baseinfo.data.gotoflag  = FLAG_KO;
-    s_shalbase_ram_baseinfo.data.gotoval   = ee_procNone;
+    s_shalbase_ipc_ram_set_valid();
+    s_shalbase_IPCdataStored.ipcdata.gotoflag  = FLAG_KO;
+    s_shalbase_IPCdataStored.ipcdata.gotoval   = ee_procNone;
     
     return(ee_res_OK);
 }
 
 
-extern eEresult_t shalbase_ipc_volatiledata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize)
+extern eEresult_t shalbase_ipc_userdefdata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize)
 {
 
-    if(0 != memcmp((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t)))
+    if(ee_true != s_shalbase_ipc_ram_is_valid())
     {
         return(ee_res_NOK_generic); 
     }
     
-    if(FLAG_OK != s_shalbase_ram_baseinfo.data.free2useflag)
+    if(FLAG_OK != s_shalbase_IPCdataStored.ipcdata.free2useflag)
     {
         return(ee_res_NOK_generic);
     }
     else
     {
-        *size = (maxsize > s_shalbase_ram_baseinfo.data.free2usesize) ? (s_shalbase_ram_baseinfo.data.free2usesize) : (maxsize);
-        memcpy(data, (uint8_t *)s_shalbase_ram_baseinfo.data.free2usedata, *size);
+        *size = (maxsize > s_shalbase_IPCdataStored.ipcdata.free2usesize) ? (s_shalbase_IPCdataStored.ipcdata.free2usesize) : (maxsize);
+        memcpy(data, (uint8_t *)s_shalbase_IPCdataStored.ipcdata.free2usedata, *size);
         return(ee_res_OK);
     }
 }	
 
 	
-extern eEresult_t shalbase_ipc_volatiledata_set(uint8_t *data, uint8_t size)
+extern eEresult_t shalbase_ipc_userdefdata_set(uint8_t *data, uint8_t size)
 {
-    memcpy((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t));
-    s_shalbase_ram_baseinfo.data.free2useflag         = FLAG_OK;
-    s_shalbase_ram_baseinfo.data.free2usesize         = (size < SHALBASE_F2USESIZE) ? (size) : (SHALBASE_F2USESIZE);
-    memcpy((void*)s_shalbase_ram_baseinfo.data.free2usedata, data, s_shalbase_ram_baseinfo.data.free2usesize); 
+    s_shalbase_ipc_ram_set_valid();
+    s_shalbase_IPCdataStored.ipcdata.free2useflag         = FLAG_OK;
+    s_shalbase_IPCdataStored.ipcdata.free2usesize         = (size < shalbase_ipc_userdefdata_maxsize) ? (size) : (shalbase_ipc_userdefdata_maxsize);
+    memcpy((void*)s_shalbase_IPCdataStored.ipcdata.free2usedata, data, s_shalbase_IPCdataStored.ipcdata.free2usesize); 
     
     return(ee_res_OK);
 }
 
 
-extern eEresult_t shalbase_ipc_volatiledata_clr(void)
+extern eEresult_t shalbase_ipc_userdefdata_clr(void)
 {
-    memcpy((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t));
-    s_shalbase_ram_baseinfo.data.free2useflag  = FLAG_KO;
-    s_shalbase_ram_baseinfo.data.free2usesize  = 0;
-    memset((void*)s_shalbase_ram_baseinfo.data.free2usedata, 0, SHALBASE_F2USESIZE);
+    s_shalbase_ipc_ram_set_valid();
+    s_shalbase_IPCdataStored.ipcdata.free2useflag  = FLAG_KO;
+    s_shalbase_IPCdataStored.ipcdata.free2usesize  = 0;
+    memset((void*)s_shalbase_IPCdataStored.ipcdata.free2usedata, 0, shalbase_ipc_userdefdata_maxsize);
     
     return(ee_res_OK);
 }
@@ -465,12 +407,11 @@ extern eEresult_t shalbase_system_restart(void)
 }
 
 
-
 extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint32_t size)
 {
     volatile hal_result_t res = hal_res_NOK_generic;
 
-    if(0 != memcmp((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t)))
+    if(ee_true != s_shalbase_ipc_ram_is_valid())
     {
         return(ee_res_NOK_generic); 
     }
@@ -488,7 +429,7 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
     
     if(ee_strg_eflash == strg->type)
     {
-#ifndef EECOMMON_DONTUSESTRGFLASH
+#ifndef SHALBASE_DONTUSESTRGFLASH
         // just read from flash
         memcpy(data, (const void*)strg->addr, size);
 #else
@@ -510,7 +451,7 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
 {
     volatile hal_result_t res = hal_res_NOK_generic;
 
-    if(0 != memcmp((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t)))
+    if(ee_true != s_shalbase_ipc_ram_is_valid())
     {
         return(ee_res_NOK_generic); 
     }
@@ -528,7 +469,7 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
 
     if(ee_strg_eflash == strg->type)
     {
-#ifndef EECOMMON_DONTUSESTRGFLASH
+#ifndef SHALBASE_DONTUSESTRGFLASH
         hal_flash_erase(strg->addr, 2048);
         hal_flash_write(strg->addr, size, (void*)data);
 #endif
@@ -546,7 +487,7 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
 {
     volatile hal_result_t res = hal_res_NOK_generic;
 
-    if(0 != memcmp((void*)&s_shalbase_ram_baseinfo.head.entity, (void*)&s_shalbase_moduleinfo, sizeof(eEentity_t)))
+    if(ee_true != s_shalbase_ipc_ram_is_valid())
     {
         return(ee_res_NOK_generic); 
     }
@@ -563,7 +504,7 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
 
     if(ee_strg_eflash == strg->type)
     {
-#ifndef EECOMMON_DONTUSESTRGFLASH
+#ifndef SHALBASE_DONTUSESTRGFLASH
         hal_flash_erase(strg->addr, 2048);
 #endif
     }
@@ -583,18 +524,64 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+extern eEboolval_t shalbase_hid_storage_is_valid(void* storage, const eEentity_t* refentity)
+{   
+    // to verify that the data is consistent we use the shalbaseDataHeader_t placed
+    // at beginning of data.
+    // so far we just compare the DATAhead->entity vs the reference entity (and only: type and signature)
+    // later on we migth use the crc32 to do the same thing.
+    
+    // if consistent then we check version.major code.
+    
+    
+    shalbaseDataHeader_t* DATAhead = (shalbaseDataHeader_t*)storage;
+    eEentity_t* ramentity = (eEentity_t*)&DATAhead->entity;
+    if(0 != memcmp(ramentity, refentity, 2)) 
+    {
+        return(ee_false);
+    }
+    else
+    {   // ok, now we verify version, and ... builddate
+//         if(DATAhead->entity.version.major != refentity->version.major)
+//         {
+//             return(ee_false);
+//         }
+        // any minor and any buildate are ok.
+        return(ee_true);
+    }
+}
+
+extern void shalbase_hid_storage_set_valid(void* storage, const eEentity_t* refentity)
+{
+    // we set the volatile ram as valid by copying some known data in its inside. 
+    // this known data is the entire s_shalbase_moduleinfo.info.entity
+    shalbaseDataHeader_t* DATAhead = (shalbaseDataHeader_t*)storage;   
+    eEentity_t* ramentity = (eEentity_t*)&DATAhead->entity;
+    memset(&DATAhead->datactrl, 0, sizeof(shalbaseDataCtrl_t));
+    memcpy(ramentity, refentity, sizeof(eEentity_t));    
+}
+
+extern void shalbase_hid_storage_set_invalid(void* storage, const eEentity_t* refentity)
+{
+    // we set the volatile ram as invalid by assigning 0 to its data header.
+    shalbaseDataHeader_t* DATAhead = (shalbaseDataHeader_t*)storage;  
+    memset(&DATAhead->datactrl, 0, sizeof(shalbaseDataCtrl_t));
+    memset(DATAhead, 0, sizeof(shalbaseDataHeader_t)); 
+}
+
+
 extern void shalbase_entrypoint(void)
 {
-    shalbase_init(0);
+    shalbase_init(shalbase_initmode_dontforce);
     shalbase_deinit();
 
     shalbase_ipc_gotoproc_get(NULL);			
     shalbase_ipc_gotoproc_set((eEprocess_t)0);
     shalbase_ipc_gotoproc_clr();
 
-    shalbase_ipc_volatiledata_get(NULL, NULL, 0);		
-    shalbase_ipc_volatiledata_set(NULL, 0);
-    shalbase_ipc_volatiledata_clr();
+    shalbase_ipc_userdefdata_get(NULL, NULL, 0);		
+    shalbase_ipc_userdefdata_set(NULL, 0);
+    shalbase_ipc_userdefdata_clr();
 
     shalbase_system_canjump(0);
     shalbase_system_canjump_to_proc(0, NULL);
@@ -637,7 +624,7 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
     
     if(ee_strg_eflash == strgtype)
     {
-#ifndef EECOMMON_DONTUSESTRGFLASH
+#ifndef SHALBASE_DONTUSESTRGFLASH
         hal_flash_unlock();
 #endif
     }
@@ -650,42 +637,89 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
 // removed:   hal_sys_irq_enable();
 }
 
-
-
-
-
-
-static void s_shalbase_permanent_boardinfo_init(void)
+static eEboolval_t s_shalbase_is_initted(void)
 {
-    memset((void*)&s_shalbase_temporary_baseboardinfo, 0, sizeof(s_shalbase_temporary_baseboardinfo));
+    return(s_shalbase_ipc_ram_is_valid());
 }
 
-static baseBoardInfo_t* s_shalbase_permanent_boardinfo_get(void)
-{
-    if(0 == s_shalbase_temporary_baseboardinfo.head.cached)
+static eEboolval_t s_shalbase_ipc_ram_is_valid(void)
+{   
+#if 0    
+    // we verify that the eEentity_t fields in head and in moduleinfo are consistent. 
+    // however ... in versions before 1.1 we compared the whole entity. now we compares only the first two bytes: type, signature
+    // and about version.major
+    eEentity_t* ramentity = (eEentity_t*)&s_shalbase_IPCdataStored.head.entity;
+    const eEentity_t* ROMentity = &s_shalbase_moduleinfo.info.entity;
+    if(0 != memcmp(ramentity, ROMentity, 2)) 
     {
-        shalbase_storage_get(&s_shalbase_moduleinfo.info.storage, (void*)&s_shalbase_temporary_baseboardinfo, sizeof(baseBoardInfo_t));
+        return(ee_false);
     }
-
-    s_shalbase_temporary_baseboardinfo.head.cached = 1;
-
-    return((baseBoardInfo_t*)&s_shalbase_temporary_baseboardinfo);
+    else
+    {   // ok, now we verify version, and ... builddate
+        if(ramentity->version.major != ROMentity->version.major)
+        {
+            return(ee_false);
+        }
+        // any minor and any buildate are ok.
+        return(ee_true);
+    }
+#else
+    
+    const eEentity_t* ROMentity = &s_shalbase_moduleinfo.info.entity;
+    
+    if(ee_true == shalbase_hid_storage_is_valid((void*)&s_shalbase_IPCdataStored, ROMentity))
+    {   // ok. check vs major number
+        eEentity_t* ramentity = (eEentity_t*)&s_shalbase_IPCdataStored.head.entity;
+        if(ramentity->version.major == ROMentity->version.major)
+        {   // only the same major number is ok
+            return(ee_true);
+        }
+        
+    }
+    
+    // ... unlucky !
+    return(ee_false);
+    
+#endif
 }
 
 
-static void s_shalbase_permanent_boardinfo_set(baseBoardInfo_t *baseboardinfo)
+static void s_shalbase_ipc_ram_set_valid(void)
 {
-    baseboardinfo->head.cached = 0;
-    shalbase_storage_set(&s_shalbase_moduleinfo.info.storage, baseboardinfo, sizeof(baseBoardInfo_t));
+#if 0    
+    // we set the volatile ram as valid by copying some known data in its inside. 
+    // this known data is the entire s_shalbase_moduleinfo.info.entity
+    eEentity_t* ramentity = (eEentity_t*)&s_shalbase_IPCdataStored.head.entity;
+    const eEentity_t* ROMentity = &s_shalbase_moduleinfo.info.entity;
+    memcpy(ramentity, ROMentity, sizeof(eEentity_t));
+#else
+    const eEentity_t* ROMentity = &s_shalbase_moduleinfo.info.entity;
+    shalbase_hid_storage_set_valid((void*)&s_shalbase_IPCdataStored, ROMentity);
+#endif    
 }
 
-static void s_shalbase_permanent_boardinfo_cache_invalidate(void)
+static void s_shalbase_ipc_ram_set_invalid(void)
 {
-    s_shalbase_temporary_baseboardinfo.head.cached = 0;
+#if 0    
+    // we set the volatile ram as invalid by assigning 0 to it.
+//    eEentity_t* ramentity = (eEentity_t*)&s_shalbase_IPCdataStored.head.entity;
+//    memset(ramentity, 0, sizeof(eEentity_t));
+    memset((void*)&s_shalbase_IPCdataStored.head, 0, sizeof(shalbaseDataHeader_t));
+#else
+    const eEentity_t* ROMentity = &s_shalbase_moduleinfo.info.entity;
+    shalbase_hid_storage_set_invalid((void*)&s_shalbase_IPCdataStored, ROMentity);
+#endif    
 }
 
-
-
+static void s_shalbase_ipc_ram_initialise(void)
+{
+    // validate the volatile ram
+    s_shalbase_ipc_ram_set_valid();
+  
+    // set the remaining of the s_shalbase_IPCdataStored.head
+    s_shalbase_IPCdataStored.head.datactrl.cached         = 0;
+  
+}
 
 
 
