@@ -54,7 +54,7 @@
 
 #define SHALPART_SIGN                   0x20                // must have least significant nibble at 0
 
-#define SHALPART_VER_MAJOR              0x04                // change of binary form of data
+#define SHALPART_VER_MAJOR              0x02                // change of binary form of data
 #define SHALPART_VER_MINOR              0x00                // change of implementation
 
 #define SHALPART_BUILDDATE_YEAR         2013

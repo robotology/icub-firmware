@@ -54,7 +54,7 @@
 
 #define SHALINFO_SIGN                   0x30                // must have least significant nibble at 0
 
-#define SHALINFO_VER_MAJOR              0x04                // change of binary form of data
+#define SHALINFO_VER_MAJOR              0x02                // change of binary form of data
 #define SHALINFO_VER_MINOR              0x00                // change of implementation
 
 #define SHALINFO_BUILDDATE_YEAR         2013
