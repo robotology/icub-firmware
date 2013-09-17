@@ -289,8 +289,6 @@ static const hal_gpio_cfg_t s_loader_input_button =
 
 int main(void) 
 {
-    static volatile hal_result_t reshal = hal_res_NOK_generic;
-
     s_loader_hardware_init();
     s_loader_shared_services_init();
     
@@ -300,20 +298,23 @@ int main(void)
 //    //s_loader_eval_user_request();
 //#endif
 
-    // if any request from another eprocess, and it can satisfy it it does not return:
+    // if any jump request from another eprocess, and it can satisfy that the function does not return:
     // it either jumps or stays in eloader with a forever loop. 
     // else, the function just returns.
     s_loader_eval_jump_request_from_an_eproc();
     
-    // now we attempt to jump to startup process. but if reading fails then we go updater
-    // we go to updater also if the jump attempt fails
+    // now we attempt to jump to startup process. reading cannot fail ... but we put control anyway and 
+    // in such a case we force to updater
     eEprocess_t startup = ee_procNone;
     eEresult_t eeres = ee_sharserv_part_proc_startup_get(&startup);
     if(ee_res_NOK_generic == eeres)
     {
         startup = ee_procUpdater;
     }
-    s_loader_attempt_jump(startup, EENV_MEMMAP_EUPDATER_ROMADDR);
+    s_loader_attempt_jump(startup, LOADER_ADR_INVALID);
+    
+    // if it fails a jump to startup ... do a last attempt to jump to eUpdater
+    s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
 
     // if we are in here we cannot jump to the startup and not even to the updater.
     s_loader_manage_error(80, 20);
@@ -426,9 +427,12 @@ static void s_loader_eval_jump_request_from_an_eproc(void)
         // attempt only to the requested process.
         s_loader_attempt_jump(pr, LOADER_ADR_INVALID);
         
-        // if in here ... the jump failed, thus ... it is better to go to the updater and stay there forever
-        ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
-        s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
+        // if in here ... the jump failed, thus ... behave as if no order at all
+        ee_sharserv_ipc_gotoproc_clr();
+        
+//        // if in here ... the jump failed, thus ... it is better to go to the updater and stay there forever
+//        ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+//        s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
         
     }
 }
