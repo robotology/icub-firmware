@@ -41,7 +41,7 @@
                                                       (((uint32_t)(ip1) << 0)&0x000000ff) )
 #define EECOMMON_mac_oui_iit                        (0x0000000000000002)//(0x0000000000332211)
 #define EECOMMON_ipaddr_base_iit                    EECOMMON_ipaddr_from(10, 0, 0, 0)
-#define EECOMMON_ipmask_default_iit                 EECOMMON_ipaddr_from(255, 255, 0, 0)
+#define EECOMMON_ipmask_default_iit                 EECOMMON_ipaddr_from(255, 255, 255, 0)
 #define EECOMMON_ipaddr_def3                        1
 #define EECOMMON_ipaddr_def4                        99
 
