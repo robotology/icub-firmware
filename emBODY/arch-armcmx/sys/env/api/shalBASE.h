@@ -55,7 +55,7 @@
 
 #define SHALBASE_SIGN                   0x10                // must have least significant nibble at 0
 
-#define SHALBASE_VER_MAJOR              0x04                // change of binary form of data
+#define SHALBASE_VER_MAJOR              0x02                // change of binary form of data
 #define SHALBASE_VER_MINOR              0x00                // change of implementation
 
 #define SHALBASE_BUILDDATE_YEAR         2013
