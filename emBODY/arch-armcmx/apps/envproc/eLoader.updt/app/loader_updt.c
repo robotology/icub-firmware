@@ -35,6 +35,7 @@
 
 #include "string.h"
 #include "stdlib.h"
+#include "stdio.h"
 
 #include "eEcommon.h"
 #include "eEmemorymap_stm32f1.h"
