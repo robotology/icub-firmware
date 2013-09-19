@@ -64,9 +64,13 @@ enum {
 
 #define BOARD_TYPE_EMS 0x0A
 
+#define MAX0(a) ( ((a)>0) ? (a) : (0) )
+
 
 // static functions
 static eEresult_t s_sys_eeprom_erase(void);
+
+static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size);
 
 void upd_core_init(void)
 {
@@ -78,7 +82,7 @@ void upd_core_init(void)
 #define PROGRAM_APP      0x5A
 #define PROGRAM_SHARSERV 0x5B
 
-uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t *sizeout)
+uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
 {
     static uint32_t s_prog_mem_start = 0xFFFFFFFF;
     static uint32_t s_prog_mem_size  = 0;
@@ -233,6 +237,13 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 s_download_state = 0;
                 pktout[1] = UPD_ERR_UNK;
                 return 1;    
+            }
+            
+            if(1 == s_overlapping_with_code_space(s_prog_mem_start, s_prog_mem_size))
+            {
+                s_download_state = 0;
+                pktout[1] = UPD_ERR_UNK;
+                return 1;                    
             }
             
             hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
@@ -436,8 +447,15 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             
             ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             pktout[0] = CMD_MACGET;
-            memcpy(&pktout[1], &ipnetworkstrg->macaddress, sizeof(ipnetworkstrg->macaddress));      
             
+            pktout[1] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+            pktout[2] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+            pktout[3] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+            pktout[4] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+            pktout[5] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+            pktout[6] = (ipnetworkstrg->macaddress)     & 0xFF;
+
+            *sizeout = 7;
             return 1;
         }// break;        
         
@@ -447,22 +465,26 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             eEipnetwork_t ipnetwork;
             const eEipnetwork_t *ipnetworkstrg;
             uint64_t mac = 0;
-            memcpy(&mac, &pktin[1], 6);
+            //memcpy(&mac, &pktin[1], 6);
+            uint64_t tmp = 0;
+            tmp = pktin[1];     mac |= (tmp<<40);
+            tmp = pktin[2];     mac |= (tmp<<32);
+            tmp = pktin[3];     mac |= (tmp<<24);
+            tmp = pktin[4];     mac |= (tmp<<16);
+            tmp = pktin[5];     mac |= (tmp<<8);
+            tmp = pktin[6];     mac |= (tmp);
 
             ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
             memcpy(&ipnetwork, ipnetworkstrg, sizeof(eEipnetwork_t));
             ipnetwork.macaddress = mac;
             ee_sharserv_info_deviceinfo_item_set(sharserv_info_ipnet, (const void*)&ipnetwork);
             
-            char str[128];
-            snprintf(str, sizeof(str), "mac is h = %llx, l = %llx", ipnetwork.macaddress >> 32, ipnetwork.macaddress & 0xffffffff);
-            hal_trace_puts(str);    
+            //char str[128];
+            //snprintf(str, sizeof(str), "mac is h = %llx, l = %llx", ipnetwork.macaddress >> 32, ipnetwork.macaddress & 0xffffffff);
+            //hal_trace_puts(str);    
             
-            ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
-            pktout[0] = CMD_MACSET;
-            memcpy(&pktout[1], &ipnetworkstrg->macaddress, sizeof(ipnetworkstrg->macaddress));      
             
-            return 1;
+            return 0;
         }// break;
                 
         case CMD_SYSEEPROMERASE:
@@ -470,7 +492,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             eEresult_t ret = s_sys_eeprom_erase();
 
             pktout[0] = CMD_SYSEEPROMERASE;
-            pktout[1] = (ee_res_OK == ret) ? 1 : 0;
+            pktout[1] = (ee_res_OK == ret) ? UPD_OK : UPD_ERR_UNK;
+            
+            *sizeout = 2;
             
             return 1;
         }// break;   
@@ -496,6 +520,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             {
                 pktout[0] = CMD_PROCS;
                 pktout[1] = num_procs; 
+                
 
                 char *data = (char*)pktout;
                 uint16_t size = 2;
@@ -504,10 +529,10 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 {
                     ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
-                    size+=sprintf(data+size,"*** e-proc #%d %s %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"", running==i?"(RUNNING)":"" ) ;
+                    size+=snprintf(data+size, MAX0(capacityout-size), "*** e-proc #%d %s %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"", running==i?"(RUNNING)":"" ) ;
 
-                    size+=sprintf(data+size, "name\t%s\r\n", s_modinfo->info.name);
-                    size+=sprintf(data+size, "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                    size+=snprintf(data+size, MAX0(capacityout-size), "name\t%s\r\n", s_modinfo->info.name);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
                         s_modinfo->info.entity.version.major, 
                         s_modinfo->info.entity.version.minor,
                         s_modinfo->info.entity.builddate.day,
@@ -516,16 +541,16 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                         s_modinfo->info.entity.builddate.hour,
                         s_modinfo->info.entity.builddate.min
                     );
-                    size+=sprintf(data+size, "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
-                    size+=sprintf(data+size, "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
-                    size+=sprintf(data+size, "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
-                    size+=sprintf(data+size, "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
 
-                    size+=sprintf(data+size, "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
+                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
                                                                 : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
-                    size+=sprintf(data+size, "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
-                    size+=sprintf(data+size, "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
-                    size+=sprintf(data+size, "com.msk\t0x%0.8X\r\n\r\n", s_modinfo->info.communication);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "com.msk\t0x%0.8X\r\n\r\n", s_modinfo->info.communication);
                 }
 
                 *sizeout = size + 1;
@@ -644,3 +669,37 @@ static eEresult_t s_sys_eeprom_erase(void)
 #endif    
 }
 
+
+static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
+{
+    uint32_t end = addr+size;
+    
+#if defined(_MAINTAINER_APPL_)
+    //  maintainer cannnot program the application space
+    #define BEG     EENV_MEMMAP_EAPPLICATION_ROMADDR 
+    #define END     (EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MEMMAP_EAPPLICATION_ROMSIZE)
+#else
+    //  updater cannnot program the updater space
+    #define BEG     EENV_MEMMAP_EUPDATER_ROMADDR 
+    #define END     (EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MEMMAP_EAPPLICATION_ROMSIZE)
+#endif    
+    
+    
+    if((addr > BEG) && (addr < END))
+    {   // addr is within
+        return(1);
+    }
+    
+    if((end > BEG) && (end < END))
+    {   // end is within
+        return(1);
+    }
+
+    if((addr < BEG) && (end > END))
+    {   // addr and end are across
+        return(1);
+    }
+    
+    
+    return(0);
+}
