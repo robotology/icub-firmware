@@ -279,6 +279,7 @@ static eObool_t s_eupdater_parser_process_ethcmd_alessandro(EOpacket *rxpkt, EOp
     uint8_t *datatx;
     uint16_t sizerx;
     uint16_t sizetx;
+    uint16_t capacitytx;
 
     eOipv4addr_t remaddr = 0;
     eOipv4port_t remport = 0;
@@ -299,8 +300,9 @@ static eObool_t s_eupdater_parser_process_ethcmd_alessandro(EOpacket *rxpkt, EOp
 
     eo_packet_Payload_Get(rxpkt, &datarx, &sizerx);
     eo_packet_Payload_Get(txpkt, &datatx, &sizetx);
+    eo_packet_Capacity_Get(txpkt, &capacitytx);
 
-    if(1 == upd_core_manage_cmd(datarx, remaddr, datatx, &sizetx))
+    if(1 == upd_core_manage_cmd(datarx, remaddr, datatx, capacitytx, &sizetx))
     {
         eo_packet_Payload_Set(txpkt, (uint8_t*)datatx, sizetx);
         //eo_packet_Destination_Set(txpkt, remaddr, remport);
