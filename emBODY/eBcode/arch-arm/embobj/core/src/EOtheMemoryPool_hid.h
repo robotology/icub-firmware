@@ -42,6 +42,7 @@ extern "C" {
 struct EOtheMemoryPool_hid 
 {
     const eOmempool_cfg_t   *cfg;
+    eOvoidp_fp_uint32_t     memallocator;
     EOVmutex                *mutex;
     eOreltime_t             tout;
     eOmempool_allocmode_t   allocmode;
