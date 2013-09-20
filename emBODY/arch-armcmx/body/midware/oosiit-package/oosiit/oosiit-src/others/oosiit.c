@@ -938,11 +938,12 @@ extern oosiit_result_t oosiit_mbx_send(oosiit_objptr_t mailbox, void* message, u
     {
         return(oosiit_res_NOK);
     } 
-    
-    if(NULL == message)
-    {
-        return(oosiit_res_NOK);
-    }
+ 
+// i must be able to send messages which are zero.    
+//     if(NULL == message)
+//     {
+//         return(oosiit_res_NOK);
+//     }
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -1452,12 +1453,12 @@ void rt_stk_check(void)
 
 extern void* svc_oosiit_memory_new(uint32_t size)
 {
-    return(calloc(size, 1));
+    return(oosiit_ext_calloc(size, 1));
 }
 
 extern oosiit_result_t svc_oosiit_memory_del(void* mem)
 {
-    free(mem);
+    oosiit_ext_free(mem);
     return(oosiit_res_OK);
 }
 
