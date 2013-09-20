@@ -154,6 +154,12 @@ static const eOmsystem_cfg_t* psyscfg = &eupdater_syscfg;
 static const eOmsystem_cfg_t* psyscfg = &emaintainer_syscfg;
 #endif
 
+static const eOmempool_cfg_t memcfg =
+{
+    .mode               = eo_mempool_alloc_dynamic,
+    .memallocator       = osal_base_memory_new
+};
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,7 +168,7 @@ static const eOmsystem_cfg_t* psyscfg = &emaintainer_syscfg;
 int main(void)
 {
     eom_sys_Initialise( psyscfg,
-                        NULL,                           // mempool
+                        &memcfg,                           // mempool
                         &errmancfg,                     // errman
                         &eom_timerman_DefaultCfg,
                         &eom_callbackman_DefaultCfg

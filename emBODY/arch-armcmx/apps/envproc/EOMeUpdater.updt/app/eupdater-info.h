@@ -56,7 +56,7 @@ extern const eEmoduleInfo_t             eupdater_modinfo;
 
 extern const eOmsystem_cfg_t            eupdater_syscfg;
 
-extern const ipal_cfg_t*                eupdater_ipal_cfg;
+extern const ipal_cfg_t*  const         eupdater_ipal_cfg;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

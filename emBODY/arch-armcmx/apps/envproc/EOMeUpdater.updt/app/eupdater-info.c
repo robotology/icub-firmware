@@ -130,7 +130,7 @@ extern const eOmsystem_cfg_t eupdater_syscfg =
     .fsalcfg            = NULL
 };
 
-extern const ipal_cfg_t* eupdater_ipal_cfg = &ipal_cfg;
+extern const ipal_cfg_t* const eupdater_ipal_cfg = &ipal_cfg;
 
 
 // --------------------------------------------------------------------------------------------------------------------
