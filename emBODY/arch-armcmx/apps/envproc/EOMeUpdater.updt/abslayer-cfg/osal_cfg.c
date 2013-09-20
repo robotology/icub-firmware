@@ -32,6 +32,7 @@
 #include "osal.h"
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
+#include "stdlib.h"
 
 
 
