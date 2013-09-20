@@ -53,6 +53,7 @@
 const eOmempool_cfg_t eom_mempool_DefaultCfg = 
 {
     EO_INIT(.mode)          eo_mempool_alloc_dynamic,
+    EO_INIT(.memallocator)  NULL,
     EO_INIT(.size08)        0,
     EO_INIT(.data08)        NULL,
     EO_INIT(.size16)        0,
@@ -77,6 +78,8 @@ const eOmempool_cfg_t eom_mempool_DefaultCfg =
 
 static void * s_eo_mempool_get_static(eOmempool_alignment_t alignmode, uint16_t size, uint16_t number);
 
+static void * s_memallocator(uint32_t s);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -87,6 +90,7 @@ static const char s_eobj_ownname[] = "EOtheMemoryPool";
 static EOtheMemoryPool s_the_mempool = 
 { 
     EO_INIT(.cfg)           NULL, 
+    EO_INIT(.memallocator)  s_memallocator,
     EO_INIT(.mutex)         NULL, 
     EO_INIT(.tout)          0, 
     EO_INIT(.allocmode)     eo_mempool_alloc_dynamic, 
@@ -118,11 +122,21 @@ extern EOtheMemoryPool * eo_mempool_Initialise(const eOmempool_cfg_t *cfg)
         {
             s_the_mempool.cfg = &eom_mempool_DefaultCfg;
             s_the_mempool.allocmode = eo_mempool_alloc_dynamic;
+            s_the_mempool.memallocator  = s_memallocator;
         }
         else
         {
             s_the_mempool.cfg = cfg;
             s_the_mempool.allocmode = cfg->mode; 
+            
+            if(NULL != cfg->memallocator)
+            {
+                s_the_mempool.memallocator  = cfg->memallocator;
+            }
+            else
+            {
+                s_the_mempool.memallocator  = s_memallocator;   
+            }
     
             if(eo_mempool_alloc_dynamic != s_the_mempool.allocmode)
             {
@@ -151,6 +165,11 @@ extern EOtheMemoryPool * eo_mempool_Initialise(const eOmempool_cfg_t *cfg)
                 }            
             }
         }
+    }
+    
+    if(NULL == s_the_mempool.memallocator)
+    {
+        s_the_mempool.memallocator  = s_memallocator;
     }
 
     return(&s_the_mempool);
@@ -213,8 +232,8 @@ extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t ali
         // manage the ... warning 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "not initialised yet. using calloc()");
 
-        ret = calloc(number, size);
-        //ret = osal_base_memory_new(number*size);
+        //ret = calloc(number, size);
+        ret = s_the_mempool.memallocator(number*size);
 
         if(NULL == ret)
         {
@@ -232,8 +251,8 @@ extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t ali
     {
         case eo_mempool_alloc_dynamic:
         {
-            ret = calloc(number, size);
-            //ret = osal_base_memory_new(number*size);
+            //ret = calloc(number, size);
+            ret = s_the_mempool.memallocator(number*size);
         } break;
         
         case eo_mempool_alloc_mixed:
@@ -246,8 +265,8 @@ extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t ali
             }
             else
             {
-                ret = calloc(number, size);
-                //ret = osal_base_memory_new(number*size);
+                //ret = calloc(number, size);
+                ret = s_the_mempool.memallocator(number*size);
             }
 
         } break;
@@ -367,6 +386,11 @@ static void * s_eo_mempool_get_static(eOmempool_alignment_t alignmode, uint16_t 
     eov_mutex_Release(s_the_mempool.mutex);
 
     return(ret);
+}
+
+static void * s_memallocator(uint32_t s)
+{
+    return(calloc(s, 1));
 }
 
 
