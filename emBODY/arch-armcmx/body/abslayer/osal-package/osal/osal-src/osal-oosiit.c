@@ -53,6 +53,10 @@ extern void osal_hid_entrypoint(void);
 // i keep it extern to allow its name in microvision
 void osal_launcher(void* p);
 
+extern void* osal_ext_calloc(uint32_t s, uint32_t n);
+
+extern void osal_ext_free(void* m);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -457,10 +461,11 @@ extern void osal_system_start(void (*launcher_fn)(void))
     tskpinit.function   = osal_launcher;
     tskpinit.param      = NULL;
     tskpinit.priority   = osal_prio_systsk_launcher;
-    tskpinit.stacksize  = s_osal_stacklauncher_size-8;
-    tskpinit.stackdata  = &s_osal_stacklauncher_data[1];
+    tskpinit.stacksize  = s_osal_stacklauncher_size;
+    tskpinit.stackdata  = &s_osal_stacklauncher_data[0];
     tskpinit.extdata    = s_osal_task_launcher;
-    
+
+
 
            
     // start the system
@@ -1649,6 +1654,15 @@ extern void osal_arch_arm_armc99stdlib_mutex_release(void *m)
 }
 
 
+extern void* oosiit_ext_calloc(uint32_t s, uint32_t n)
+{
+    return(osal_ext_calloc(s, n));
+}
+
+extern void oosiit_ext_free(void* m)
+{
+    osal_ext_free(m);    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
