@@ -152,7 +152,7 @@ extern EOtheMemoryPool * eo_mempool_GetHandle(void);
                 was previously assigned.
     @warning    It is better to call this function before the start of the MEE.
  **/
-extern eOresult_t eo_mempool_SetMutex(EOtheMemoryPool *p, EOVmutex *mutex, eOreltime_t tout);
+extern eOresult_t eo_mempool_SetMutex(EOtheMemoryPool *p, EOVmutexDerived *mutex, eOreltime_t tout);
 
  
 /** @fn         extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t alignmode, 
