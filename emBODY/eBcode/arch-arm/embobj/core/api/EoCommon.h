@@ -426,6 +426,7 @@ typedef     uint8_t     (*eOuint8_fp_uint16_t)                      (uint16_t);
 typedef     uint8_t     (*eOuint8_fp_cvoidp_t)                      (const void *);
 typedef     void        (*eOvoid_fp_void_t)                         (void);
 typedef     void*       (*eOvoidp_fp_void_t)                        (void);
+typedef     void*       (*eOvoidp_fp_uint32_t)                      (uint32_t);
 typedef     void        (*eOvoid_fp_voidp_uint32_t)                 (void *, uint32_t);
 typedef     void        (*eOvoid_fp_vuint32p_uint32_t)              (volatile uint32_t *, uint32_t);
 typedef     void        (*eOvoid_fp_voidp_t)                        (void *);
