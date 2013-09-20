@@ -234,7 +234,7 @@ extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08
 
 extern void* osal_base_memory_new(uint32_t size)
 {   // it is ok as long as ... no calloc (malloc) or free is called inside a svc function.
-    return(calloc(size, 1));
+    return(osal_ext_calloc(size, 1));
 }
 
 
@@ -245,7 +245,7 @@ extern osal_result_t osal_base_memory_del(void* mem)
         return(osal_res_NOK_generic);
     }
     
-    free(mem);
+    osal_ext_free(mem);
     
     return(osal_res_OK);
 }
