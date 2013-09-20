@@ -105,6 +105,9 @@ typedef U32 TMRSIG_iit;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+extern void* oosiit_ext_calloc(uint32_t s, uint32_t n);
+extern void oosiit_ext_free(void* m);
+
 //void oosiit_hid_initialise(void);
 
 extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t *stdlib32size);;

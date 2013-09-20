@@ -990,7 +990,7 @@ static void s_rt_iit_advtmr_synchronise_dynamicversion(U64 oldtime)
 
     if(numberofstoredabsolutetimers > 0)
     {
-        storedabsolutetimers = calloc(sizeof(PIIT_ADVTMR), numberofstoredabsolutetimers);
+        storedabsolutetimers = oosiit_ext_calloc(sizeof(PIIT_ADVTMR), numberofstoredabsolutetimers);
     }
 
     // stage 1: remove from the list every absolute timer
@@ -1067,7 +1067,7 @@ static void s_rt_iit_advtmr_synchronise_dynamicversion(U64 oldtime)
     
     
     // finally delete the temporary memory
-    free(storedabsolutetimers);
+    oosiit_ext_free(storedabsolutetimers);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

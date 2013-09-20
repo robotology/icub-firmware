@@ -208,12 +208,12 @@ static uint8_t s_dbg_previous_id = ev_ID_idle;
 
 extern void* rt_iit_memory_new(uint32_t size)
 {
-    return(calloc(size, 1));
+    return(oosiit_ext_calloc(size, 1));
 }
 
 extern void rt_iit_memory_del(void* mem)
 {
-    free(mem);
+    oosiit_ext_free(mem);
 }
 
 extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
@@ -558,7 +558,7 @@ extern U32* rt_iit_libspace_init(void)
     {   
         if(NULL == oosiit_params_stdlib32data)
         {
-            ret = calloc(sizes[0], 4);
+            ret = oosiit_ext_calloc(sizes[0], 4);
         }
         else
         {
@@ -2080,9 +2080,10 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
     }
     else
     {
-        if(NULL == task_context->ptr_perthread_libspace)
+        if(NULL != task_context->ptr_perthread_libspace)
         {
             rt_iit_memory_del(task_context->ptr_perthread_libspace);
+            task_context->ptr_perthread_libspace = NULL;
         }
         rt_iit_memory_del(os_tsk.run);
     }
