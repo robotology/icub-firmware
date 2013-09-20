@@ -61,7 +61,7 @@ const eOmcallbackman_cfg_t eom_callbackman_DefaultCfg =
 {
     .priority   = 202, 
     .stacksize  = 512, 
-    .queuesize  = 8
+    .queuesize  = 16
 };
 
 
