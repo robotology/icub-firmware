@@ -195,6 +195,17 @@ extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+/** @fn         extern void* oosiit_ext_calloc(uint32_t s, uint32_t n)
+    @brief      memory allocator such as the normal calloc(). It must be externally defined for use in 
+                oosiit_memory_new()
+ **/ 
+extern void* oosiit_ext_calloc(uint32_t s, uint32_t n);
+
+/** @fn         extern void oosiit_ext_free(void* m)
+    @brief      memory deallocator such as the normal free(). It must be externally defined for use in 
+                oosiit_memory_del()
+ **/ 
+extern void oosiit_ext_free(void* m);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // memory functions
@@ -203,6 +214,7 @@ extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
     @brief      Thread safe memory allocator. 
     @param      size            the size of the requested memory in bytes.
     @return     if successful a proper 8-aligned memory pointer, otherwise it returns NULL.
+    @warning    needs the definition of an external oosiit_ext_calloc() function.
  **/ 
 extern void* oosiit_memory_new(uint32_t size);
 
@@ -211,6 +223,7 @@ extern void* oosiit_memory_new(uint32_t size);
     @brief      Thread-safe memory free. 
     @param      mem             the pointer to the memory to be de-allocated.
     @return     if successful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called with NULL pointer)
+    @warning    needs the definition of an external oosiit_ext_free() function.
  **/ 
 extern oosiit_result_t oosiit_memory_del(void* mem);
 
