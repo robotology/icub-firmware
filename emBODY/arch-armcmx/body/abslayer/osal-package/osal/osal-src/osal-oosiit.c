@@ -53,9 +53,6 @@ extern void osal_hid_entrypoint(void);
 // i keep it extern to allow its name in microvision
 void osal_launcher(void* p);
 
-extern void* osal_ext_calloc(uint32_t s, uint32_t n);
-
-extern void osal_ext_free(void* m);
 
 
 // --------------------------------------------------------------------------------------------------------------------
