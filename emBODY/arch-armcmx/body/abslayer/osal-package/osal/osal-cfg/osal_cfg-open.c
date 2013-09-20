@@ -31,6 +31,8 @@
 #include "osal.h"
 #include "osal_arch_arm.h"
 
+#include "stdlib.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -94,6 +96,18 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 static void s_osal_cfg_on_idle(void)
 {
     for(;;);
+}
+
+extern void* osal_ext_calloc(uint32_t s, uint32_t n)
+{
+    void* ret = calloc(s, n);
+    
+    return(ret);
+}
+
+extern void oosiit_ext_free(void* m)
+{
+    free(m);
 }
 
 
