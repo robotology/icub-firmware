@@ -97,6 +97,7 @@ typedef enum
 typedef struct
 {
     eOmempool_allocmode_t       mode;
+    eOvoidp_fp_uint32_t         memallocator;
     uint32_t                    size08;
     uint8_t                     *data08;
     uint32_t                    size16;
