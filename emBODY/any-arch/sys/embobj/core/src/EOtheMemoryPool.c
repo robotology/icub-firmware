@@ -163,7 +163,7 @@ extern EOtheMemoryPool* eo_mempool_GetHandle(void)
 }
 
 
-extern eOresult_t eo_mempool_SetMutex(EOtheMemoryPool *p, EOVmutex *mutex, eOreltime_t tout) 
+extern eOresult_t eo_mempool_SetMutex(EOtheMemoryPool *p, EOVmutexDerived *mutex, eOreltime_t tout) 
 { 
     // avoid assigning more than one mutex to the mempool
     if(NULL != s_the_mempool.mutex) 
@@ -214,6 +214,7 @@ extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t ali
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "not initialised yet. using calloc()");
 
         ret = calloc(number, size);
+        //ret = osal_base_memory_new(number*size);
 
         if(NULL == ret)
         {
@@ -232,6 +233,7 @@ extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t ali
         case eo_mempool_alloc_dynamic:
         {
             ret = calloc(number, size);
+            //ret = osal_base_memory_new(number*size);
         } break;
         
         case eo_mempool_alloc_mixed:
@@ -245,6 +247,7 @@ extern void * eo_mempool_GetMemory(EOtheMemoryPool *p, eOmempool_alignment_t ali
             else
             {
                 ret = calloc(number, size);
+                //ret = osal_base_memory_new(number*size);
             }
 
         } break;
