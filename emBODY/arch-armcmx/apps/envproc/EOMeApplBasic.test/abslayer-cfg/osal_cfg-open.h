@@ -34,7 +34,7 @@
 //   <o> RTOS type         <0=>   IITmodified-RTXARM    <1=>    OOSIIT
 //   <i> Only IITmodified-RTXARM and OOSIIT are so far supported.
 #ifndef OSAL_RTOSTYPE
- #define OSAL_RTOSTYPE      0
+ #define OSAL_RTOSTYPE      1
 #endif
 
 
@@ -126,7 +126,7 @@
 //   <i> with static allocation all the memory needed by OSAL objects is allocate at startup and retrieved when required.
 //   <i> with dynamic allocation the memry is retrieved just when it is needed
 #ifndef OSAL_MEMMODEL
- #define OSAL_MEMMODEL      0
+ #define OSAL_MEMMODEL      1
 #endif
 
 

@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       osal_cfg.c
-	@brief      This file keeps internal implementation of the osal.
+/* @file       osal_cfg-open.c
+	@brief      This file keeps internal configuration of the osal.
 	@author     marco.accame@iit.it
     @date       11/27/2009
 **/
@@ -40,7 +40,33 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "osal_cfg.h"
+
+#include "osal_cfg-open.h"
+
+
+
+
+extern void* osal_ext_calloc(uint32_t s, uint32_t n)
+{
+//    char str[64];
+  
+    void* ret = calloc(s, n);
+        
+//    snprintf(str, sizeof(str), "mycalloc %d bytes: [%x, %x]", n*s, (uint32_t)ret, (uint32_t)ret+n*s);
+//    hal_trace_puts(str);
+    
+    return(ret);
+}
+
+extern void osal_ext_free(void* m)
+{
+//    char str[64];
+//    snprintf(str, sizeof(str), "myfree %x", (uint32_t)m);
+//    hal_trace_puts(str);
+
+    free(m);
+}
+
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg);
 static void s_osal_cfg_on_idle(void);
@@ -79,7 +105,7 @@ extern const osal_cfg_t osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
+extern const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
 
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
@@ -98,16 +124,6 @@ static void s_osal_cfg_on_idle(void)
     for(;;);
 }
 
-extern void* osal_ext_calloc(uint32_t s, uint32_t n)
-{
-    void* ret = calloc(s, n);
-    return(ret);
-}
-
-extern void osal_ext_free(void* m)
-{
-    free(m);
-}
 
 // -- redefinition of ...
 

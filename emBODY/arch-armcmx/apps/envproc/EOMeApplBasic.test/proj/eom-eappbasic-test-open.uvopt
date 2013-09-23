@@ -561,8 +561,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.cm3.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm3.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.open.cm3.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -697,8 +697,8 @@
       <TopLine>1</TopLine>
       <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.c</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg-open.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -745,8 +745,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.h</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg-open.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
