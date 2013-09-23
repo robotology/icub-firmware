@@ -113,7 +113,11 @@ static void s_eom_applbasic_main_init(void);
 
 
 
-
+static const eOmempool_cfg_t memcfg =
+{
+    .mode               = eo_mempool_alloc_dynamic,
+    .memallocator       = osal_base_memory_new
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -124,7 +128,7 @@ int main(void)
 {
 
     eom_sys_Initialise( &eom_applbasic_info_syscfg,
-                        NULL,                                           // mempool uses calloc
+                        &memcfg,                                        // mempool 
                         &eom_applbasic_specialise_errcfg,               // errman
                         &eom_timerman_DefaultCfg,
                         &eom_callbackman_DefaultCfg
