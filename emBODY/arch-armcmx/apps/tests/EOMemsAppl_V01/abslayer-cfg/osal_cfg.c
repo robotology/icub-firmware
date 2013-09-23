@@ -33,6 +33,7 @@
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
 #include "userdef_onerror.h"
+#include "stdlib.h"
 
 
 
@@ -85,6 +86,17 @@ extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
 static void s_osal_cfg_on_idle(void)
 {
     for(;;);
+}
+
+extern void* osal_ext_calloc(uint32_t s, uint32_t n)
+{
+    void* ret = calloc(s, n);
+    return(ret);
+}
+
+extern void osal_ext_free(void* m)
+{
+    free(m);
 }
 
 
