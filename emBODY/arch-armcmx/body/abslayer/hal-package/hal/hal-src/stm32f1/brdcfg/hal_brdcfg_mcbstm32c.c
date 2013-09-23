@@ -557,7 +557,7 @@ extern void hal_brdcfg_eth__phy_start(void)
 #ifdef HAL_USE_ETH
 extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num)
 {
-    #error hal_brdcfg_eth__check_links NOT IMPLEMENTED!!
+    #warning hal_brdcfg_eth__check_links NOT IMPLEMENTED!!
     return(hal_res_OK);
 }
 #endif //HAL_USE_ETH
@@ -567,7 +567,7 @@ extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *l
 extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num)
 {
     
-    #error hal_brdcfg_eth__get_links_status NOT IMPLEMENTED!!
+    #warning hal_brdcfg_eth__get_links_status NOT IMPLEMENTED!!
     return(hal_res_OK);
 }
 
