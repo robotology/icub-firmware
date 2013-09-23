@@ -681,7 +681,7 @@ static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
 #else
     //  updater cannnot program the updater space
     #define BEG     EENV_MEMMAP_EUPDATER_ROMADDR 
-    #define END     (EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MEMMAP_EAPPLICATION_ROMSIZE)
+    #define END     (EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MEMMAP_EUPDATER_ROMSIZE)
 #endif    
     
     
