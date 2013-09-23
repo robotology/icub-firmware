@@ -82,14 +82,14 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 0
+                .minor = 1
             },  
             .builddate  = 
             {
                 .year  = 2013,
-                .month = 8,
-                .day   = 26,
-                .hour  = 18,
+                .month = 9,
+                .day   = 23,
+                .hour  = 12,
                 .min   = 0
             }
         },
@@ -110,7 +110,7 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
             .addr   = 0
         },
         .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-        .name           = "EOMeUpdater"
+        .name           = "eUpdGWTopen"
     },
     .protocols  =
     {
