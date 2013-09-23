@@ -31,7 +31,7 @@
 #include "osal.h"
 #include "osal_arch_arm.h"
 
-
+#include "stdlib.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -88,6 +88,17 @@ static void s_osal_cfg_on_idle(void)
     for(;;);
 }
 
+extern void* osal_ext_calloc(uint32_t s, uint32_t n)
+{
+    void* ret = calloc(s, n);
+    
+    return(ret);
+}
+
+extern void oosiit_ext_free(void* m)
+{
+    free(m);
+}
 
 // -- redefinition of ...
 
