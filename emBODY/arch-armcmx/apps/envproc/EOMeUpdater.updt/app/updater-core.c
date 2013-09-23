@@ -242,6 +242,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             if(1 == s_overlapping_with_code_space(s_prog_mem_start, s_prog_mem_size))
             {
                 s_download_state = 0;
+                // XYX: uncomment next 2
+                //s_prog_mem_start = 0;
+                //s_prog_mem_size  = 0;
                 pktout[1] = UPD_ERR_UNK;
                 return 1;                    
             }
@@ -277,6 +280,12 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         {
             if (!s_download_state)
             {
+                #warning --> in next versions ... send back a nack packet. uncomment XYZ
+                // XYZ: uncomment next 3
+                //*sizeout = 2;
+                //pktout[0] = CMD_DATA;
+                //pktout[1] = UPD_ERR_UNK;
+                //return 1;
                 return 0;
             }
 
