@@ -325,6 +325,19 @@ extern const osal_abstime_t osal_abstimeNONE;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+/** @fn         extern void* osal_ext_calloc(uint32_t s, uint32_t n)
+    @brief      memory allocator such as the normal calloc(). It must be externally defined for use in 
+                osal_memory_new()
+ **/ 
+extern void* osal_ext_calloc(uint32_t s, uint32_t n);
+
+
+/** @fn         extern void osal_ext_free(void* m)
+    @brief      memory deallocator such as the normal free(). It must be externally defined for use in 
+                osal_memory_del()
+ **/ 
+extern void osal_ext_free(void* m);
+
 
 /** @fn         extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08aligned)
     @brief      Gets the size of the 8-byte aligned memory required by the osal for configuration @e cfg.
@@ -344,7 +357,7 @@ extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08
 extern void* osal_base_memory_new(uint32_t size);
 
 
-/** @fn         extern oosiit_result_t osal_base_memory_del(void* mem)
+/** @fn         extern osal_result_t osal_base_memory_del(void* mem)
     @brief      Thread-safe memory free. It cannot be called from within an ISR. 
     @param      mem             the pointer to the memory to be de-allocated.
     @return     if successful osal_res_OK, otherwise it returns osal_res_NOK_generic (for instance if called with NULL pointer)
