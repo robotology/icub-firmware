@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       osal_cfg.c
-	@brief      This file keeps internal implementation of the osal.
+/* @file       osal_cfg-open.c
+	@brief      This file keeps internal configuration of the osal.
 	@author     marco.accame@iit.it
     @date       11/27/2009
 **/
@@ -40,7 +40,12 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "osal_cfg.h"
+
+#include "osal_cfg-open.h"
+
+
+
+
 extern void* osal_ext_calloc(uint32_t s, uint32_t n)
 {
 //    char str[64];
@@ -100,7 +105,7 @@ extern const osal_cfg_t osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
+extern const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
 
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
