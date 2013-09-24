@@ -37,6 +37,8 @@ extern "C" {
 #include "EOVtheSystem.h"
 
 
+
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOYtheSystem.h"
@@ -60,9 +62,8 @@ struct EOYtheSystem_hid
     // base object
     EOVtheSystem                *thevsys;
 
-//    const eOvtimerman_cfg_t     *tmrmancfg;
-//    const eOvcallbackman_cfg_t  *cbkmancfg;
     eOvoid_fp_void_t            user_init_fn;
+    double                      start;      // using yarp time, which is storead as a double at its maximum resolution (sec and usec)
 }; 
 
 

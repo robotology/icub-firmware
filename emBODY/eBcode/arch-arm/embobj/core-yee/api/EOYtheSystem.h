@@ -48,10 +48,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
-//#include "EOYtheTimerManager.h"
-//#include "EOYtheCallbackManager.h"
-//#include "hal.h"
-//#include "osal.h"
+
 
 
 
@@ -147,7 +144,7 @@ extern void eoy_sys_Start(EOYtheSystem *p, eOvoid_fp_void_t userinit_fn);
 
 
 
-extern uint64_t eoy_sys_abstime_get(EOYtheSystem *p);
+extern eOabstime_t eoy_sys_abstime_get(EOYtheSystem *p);
 
 
 /** @}            

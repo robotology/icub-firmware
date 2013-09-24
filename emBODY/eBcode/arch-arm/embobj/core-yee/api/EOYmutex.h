@@ -77,7 +77,7 @@ typedef struct EOYmutex_hid EOYmutex;
 extern EOYmutex * eoy_mutex_New(void);
 
 
-/** @fn         extern eOresult_t eoy_mutex_Take(EOYmutex *const m, eOreltime_t tout)
+/** @fn         extern eOresult_t eoy_mutex_Take(EOYmutex *m, eOreltime_t tout)
     @brief      It takes a YARP mutex with a given timeout. If the mutex is already taken by another task,
                 the function waits its release according to the value of @e tout. The mutex has priority inversion.
     @param      m               The mutex
@@ -87,16 +87,16 @@ extern EOYmutex * eoy_mutex_New(void);
     @return     eores_OK in case of success. eores_NOK_timeout upon failure to take the mutex, or 
                 or eores_NOK_nullpointer if mutex is NULL.
  **/
-extern eOresult_t eoy_mutex_Take(EOYmutex *const m, eOreltime_t tout);
+extern eOresult_t eoy_mutex_Take(EOYmutex *m, eOreltime_t tout);
 
 
-/** @fn         extern eOresult_t eoy_mutex_Release(EOYmutex *const m)
+/** @fn         extern eOresult_t eoy_mutex_Release(EOYmutex *m)
     @brief      It releases a YARP mutex previously taken by the same thread.
     @param      m               The mutex
     @return     eores_OK in case of success. osal_res_NOK_generic upon failure to release the mutex, or 
                 or eores_NOK_nullpointer if mutex is NULL.
  **/
-extern eOresult_t eoy_mutex_Release(EOYmutex *const m); 
+extern eOresult_t eoy_mutex_Release(EOYmutex *m); 
 
 
 

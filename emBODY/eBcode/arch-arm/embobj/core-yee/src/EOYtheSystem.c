@@ -19,31 +19,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
-#include "EoCommon.h"
 
 
 #include "stdlib.h"
-
+#include "EoCommon.h"
 #include "string.h"
-//#include "stdio.h"
+#include "stdio.h"
+#include "math.h"
+
+#include "FeatureInterface.h"
 
 
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem_hid.h" 
-
-
-#if     defined(EO_TAILOR_CODE_FOR_WINDOWS)
-    #pragma message("WARNING-> cannot use linux api in the project... use ACE")
-#elif   defined(EO_TAILOR_CODE_FOR_LINUX)
-    #warning  WARNING-> cannot use linux api in the project... use ACE
-#elif   defined(EO_TAILOR_CODE_FOR_ARM)
-    #error("cannot use this file on ARM ....")
-#endif
-
-#if   defined(EO_TAILOR_CODE_FOR_LINUX)
-#include <time.h>
-#include <sys/time.h>
-#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -89,14 +77,12 @@ static void s_eoy_thecreation(void);
 
 static EOVtaskDerived* s_eoy_sys_gettask(void);
 
-static uint64_t s_eoy_sys_abstime_get(void);
+static eOabstime_t s_eoy_sys_abstime_get(void);
 static void s_eoy_sys_abstime_set(uint64_t time);
 static uint64_t s_eoy_sys_nanotime_get(void);
 static void s_eoy_sys_stop(void);
-static uint64_t s_eoy_sys_ticks_abstime_set(void);
-#if   defined(EO_TAILOR_CODE_FOR_LINUX)
-static int s_timeval_subtract(struct timespec *_result, struct timespec *_x, struct timespec *_y);
-#endif
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -113,12 +99,13 @@ static const eOysystem_cfg_t s_eoy_sys_defaultconfig =
 static EOYtheSystem s_eoy_system = 
 {
     EO_INIT(thevsys)        NULL,               
-    EO_INIT(user_init_fn)   NULL               
+    EO_INIT(user_init_fn)   NULL,
+    EO_INIT(.start)         0
 };
 
-#if   defined(EO_TAILOR_CODE_FOR_LINUX)
-static struct timespec start_time;
-#endif
+//#if   defined(EO_TAILOR_CODE_FOR_LINUX)
+//static struct timespec start_time;
+//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -159,13 +146,8 @@ extern EOYtheSystem * eoy_sys_Initialise(const eOysystem_cfg_t *syscfg,
 
 
     // initialise y-environment
-    // add in here whatever is required.
     
-    //#warning --> if needed initialise something related to yarp.
-
-#if   defined(EO_TAILOR_CODE_FOR_LINUX)
-    clock_gettime(CLOCK_REALTIME, &start_time);
-#endif
+    s_eoy_system.start = yarp_time_now();
 
     return(&s_eoy_system);  
 }
@@ -187,7 +169,7 @@ extern void eoy_sys_Start(EOYtheSystem *p, eOvoid_fp_void_t userinit_fn)
     s_eoy_sys_start(userinit_fn);
 }
 
-extern uint64_t eoy_sys_abstime_get(EOYtheSystem *p)
+extern eOabstime_t eoy_sys_abstime_get(EOYtheSystem *p)
 {
 	if(p==NULL)
 	{
@@ -232,84 +214,34 @@ static EOVtaskDerived* s_eoy_sys_gettask(void)
     return(NULL);
 }
 
-static uint64_t s_eoy_sys_abstime_get(void)
+static eOabstime_t s_eoy_sys_abstime_get(void)
 {
-    uint64_t time = 0xEABABABABABABABF;
+    eOabstime_t time = 0xEABABABABABABABF;
 
-#if   defined(EO_TAILOR_CODE_FOR_LINUX)
-    struct timespec curr_time, diff;
+    double delta = yarp_time_now() - s_eoy_system.start;
 
-    //#warning --> retrieve time with YARP
+    delta *= (1e6);
+    time = (eOabstime_t)floor(delta);
 
-    clock_gettime(CLOCK_REALTIME, &curr_time);
-
-    s_timeval_subtract(&diff, &curr_time, &start_time);
-
-//    //trasformo in microsec
-    time = ((diff.tv_sec * 1000 * 1000) + (diff.tv_nsec/1000));
-//    time = diff.tv_sec;
-#endif
     return(time);
+
 }
 
 
-#if   defined(EO_TAILOR_CODE_FOR_LINUX)
-// risultato= stop - start, cioè _result = _x - _y
-static int s_timeval_subtract(struct timespec *_result, struct timespec *_x, struct timespec *_y)
+static void s_eoy_sys_abstime_set(eOabstime_t time)
 {
-	//difftime();
-	/* Perform the carry for the later subtraction by updating y. */
-	static const long int MULTIPLIER = 1000 * 1000 * 1000;
-
-	if(_x->tv_nsec < _y->tv_nsec)
-	{
-		int nsec = (_y->tv_nsec - _x->tv_nsec) / MULTIPLIER + 1;
-
-		_y->tv_nsec -= MULTIPLIER * nsec;
-		_y->tv_sec += nsec;
-	}
-
-	if(_x->tv_nsec - _y->tv_nsec > MULTIPLIER)
-	{
-		int nsec = (_x->tv_nsec - _y->tv_nsec) / MULTIPLIER;
-
-		_y->tv_nsec += MULTIPLIER * nsec;
-		_y->tv_sec -= nsec;
-	}
-
-	/* Compute the time remaining to wait. tv_usec is certainly positive. */
-
-	_result->tv_sec = _x->tv_sec - _y->tv_sec;
-	_result->tv_nsec = _x->tv_nsec - _y->tv_nsec;
-
-	/* Return 1 if result is negative. */
-
-	return _x->tv_sec < _y->tv_sec;
-}
-#endif
-
-
-static uint64_t s_eoy_sys_ticks_abstime_set(void)
-{
-    uint64_t time = 0;
-    
-    //#warning --> retrieve time with YARP
-    
-    return(time);
+    s_eoy_system.start = ((double) time)/ 1e6;
 }
 
-
-static void s_eoy_sys_abstime_set(uint64_t time)
+static eOnanotime_t s_eoy_sys_nanotime_get(void)
 {
-    // do nothing ...
-}
+    eOnanotime_t nanotime = 0;
 
-static uint64_t s_eoy_sys_nanotime_get(void)
-{
-    uint64_t nanotime = 0;
-    
-    //#warning --> retrieve nanotime time with YARP
-    
+    double delta = yarp_time_now() - s_eoy_system.start;
+
+    delta *= 1e9;
+    nanotime = (eOnanotime_t)floor(delta);
+
     return(nanotime);
 }
 
