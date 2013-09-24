@@ -188,8 +188,9 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
             .fsalcfg                = NULL    
         },
         .mempoolcfg     =
-        {   // so far it is the default one
+        {   
             .mode                   = eo_mempool_alloc_dynamic,
+            .memallocator           = osal_base_memory_new,
             .size08                 = 0,
             .data08                 = NULL,
             .size16                 = 0,
