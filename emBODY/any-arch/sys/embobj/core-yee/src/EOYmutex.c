@@ -27,9 +27,9 @@
 #include "EOtheErrorManager.h"
 #include "EOVmutex_hid.h"
 
-// we use YARP
-ADD_YARP_REF:
-#include ".h"
+
+#include <FeatureInterface.h>   // to see the acemutex_* functions
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -99,14 +99,10 @@ extern EOYmutex* eoy_mutex_New(void)
     eov_mutex_hid_SetVTABLE(retptr->mutex, s_eoy_mutex_take, s_eoy_mutex_release); 
     
     // i get a new yarp mutex
-    was:
-    //retptr->yarpmutex = osal_mutex_new();
-    becomes:
-    ADD_YARP_REF
-    retptr->yarpmutex = ..... non piu' osal_mutex_new() ma qualcosa che ritorni un handle al mutex
+    retptr->acemutex = ace_mutex_new();
 
     // need to check because yarp may return NULL
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->yarpmutex), s_eobj_ownname, "osal cannot give a mutex");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->acemutex), s_eobj_ownname, "ace cannot give a mutex");
     
     return(retptr);    
 }
@@ -148,24 +144,18 @@ extern eOresult_t eoy_mutex_Release(EOYmutex *m)
 static eOresult_t s_eoy_mutex_take(void *p, eOreltime_t tout) 
 {
     EOYmutex *m = (EOYmutex *)p;
-    // p it is never NULL because the base function calls checks it before calling this function, then osal will
-    // check m->osalmutex vs NULL
-    was:
-    //return((eOresult_t)osal_mutex_take(m->osalmutex, tout));
-    becomes:
-    ADD_YARP_REF
+    // p it is never NULL because the base function calls checks it before calling this function, then ace will
+    // check m->acemutex vs NULL
+    return((eOresult_t)ace_mutex_take(m->acemutex, tout));
 }
 
 
 static eOresult_t s_eoy_mutex_release(void *p) 
 {
     EOYmutex *m = (EOYmutex *)p;
-    // p it is never NULL because the base function calls checks it before calling this function, then osal will
-    // check m->osalmutex vs NULL
-    was:
-    //return((eOresult_t)osal_mutex_release(m->osalmutex));
-    becomes:
-    ADD_YARP_REF
+    // p it is never NULL because the base function calls checks it before calling this function, then ace will
+    // check m->acemutex vs NULL
+    return((eOresult_t)ace_mutex_release(m->acemutex));
 }
 
 

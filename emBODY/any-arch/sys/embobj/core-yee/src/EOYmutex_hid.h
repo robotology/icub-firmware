@@ -37,6 +37,8 @@ extern "C" {
 #include "EOVmutex.h"
 
 
+
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOYmutex.h"
@@ -61,8 +63,7 @@ struct EOYmutex_hid
     EOVmutex                *mutex;
 
     // - other stuff
-    ADD_YARP:
-    YARPmutex               *yarpmutex;
+    void                    *acemutex;
 }; 
 
 
