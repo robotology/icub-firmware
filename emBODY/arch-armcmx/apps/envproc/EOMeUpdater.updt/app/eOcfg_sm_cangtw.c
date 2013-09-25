@@ -164,6 +164,8 @@ static void s_smcfg_can_clean(hal_can_port_t port);
 
 static void s_print_canframe(uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame);
 
+static eOresult_t s_valid_canid_class(uint32_t id);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -816,25 +818,28 @@ static void s_can_get(hal_can_port_t port)
     res = hal_can_get(port, &frame, &remaining);
     
     if(hal_res_OK == res)
-    {          
-        simpleudpframe->header.signature        = UDPCANSIGN;
-        simpleudpframe->header.canframenumof    = 1;
-        memset(&simpleudpframe->header.dummy, 0, sizeof(simpleudpframe->header.dummy));
-        simpleudpframe->onecanframe.canbus      = (hal_can_port1 == port) ? (1) : (2);
-        simpleudpframe->onecanframe.canid       = frame.id;
-        simpleudpframe->onecanframe.len         = frame.size;
-        memset(&simpleudpframe->onecanframe.dummy, 0, sizeof(simpleudpframe->onecanframe.dummy));
-        memset(&simpleudpframe->onecanframe.data, 0, sizeof(simpleudpframe->onecanframe.data));
-        memcpy(&simpleudpframe->onecanframe.data, frame.data, simpleudpframe->onecanframe.len);
-        
-        size = sizeof(eupdater_cangtw_udp_simpleframe_t);
-        eo_packet_Size_Set(s_txpkt_gtwcan, size);
-        
-        eOipv4addr_t remhostaddr = eupdater_cangtw_get_remote_addr();
-        if(eok_ipv4addr_localhost != remhostaddr)
+    {    
+        if(eores_OK == s_valid_canid_class(frame.id))
         {
-            eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
-            eo_socketdtg_Put(eupdater_sock_cangateway, s_txpkt_gtwcan);               
+            simpleudpframe->header.signature        = UDPCANSIGN;
+            simpleudpframe->header.canframenumof    = 1;
+            memset(&simpleudpframe->header.dummy, 0, sizeof(simpleudpframe->header.dummy));
+            simpleudpframe->onecanframe.canbus      = (hal_can_port1 == port) ? (1) : (2);
+            simpleudpframe->onecanframe.canid       = frame.id;
+            simpleudpframe->onecanframe.len         = frame.size;
+            memset(&simpleudpframe->onecanframe.dummy, 0, sizeof(simpleudpframe->onecanframe.dummy));
+            memset(&simpleudpframe->onecanframe.data, 0, sizeof(simpleudpframe->onecanframe.data));
+            memcpy(&simpleudpframe->onecanframe.data, frame.data, simpleudpframe->onecanframe.len);
+            
+            size = sizeof(eupdater_cangtw_udp_simpleframe_t);
+            eo_packet_Size_Set(s_txpkt_gtwcan, size);
+            
+            eOipv4addr_t remhostaddr = eupdater_cangtw_get_remote_addr();
+            if(eok_ipv4addr_localhost != remhostaddr)
+            {
+                eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
+                eo_socketdtg_Put(eupdater_sock_cangateway, s_txpkt_gtwcan);               
+            }
         }
         
 #if     defined(_DEBUG_MODE_PRINTCAN_)                
@@ -917,9 +922,24 @@ static void s_print_canframe(uint8_t tx, hal_can_port_t port, hal_can_frame_t* f
              );
 
     hal_trace_puts(str); 
+    
+}
 
+#define PASS_ALL
+static eOresult_t s_valid_canid_class(uint32_t id)
+{
+#ifdef PASS_ALL
+    return(eores_OK);
+#else
+    #define BL_MASK 0x00000700
+    if((id & BL_MASK) == BL_MASK)
+    {
+        return(eores_OK);
+    }
     
+    return(eores_NOK_generic);
     
+#endif
 }
 
 // --------------------------------------------------------------------------------------------------------------------
