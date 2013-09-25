@@ -446,9 +446,15 @@ static EOtimer* s_smcfg_CanGtw_service_timer    = NULL;
 static EOpacket* s_rxpkt_gtwcan                 = NULL;
 static EOpacket* s_txpkt_gtwcan                 = NULL;
 
+#if 1
 static const eOreltime_t time4canstabilisation  =  500*1000; 
 static const eOreltime_t time4canbootloader     = 1000*1000; 
 static const eOreltime_t time4stayinbootloader  =  500*1000;  
+#else
+static const eOreltime_t time4canstabilisation  = 6*1000*1000; 
+static const eOreltime_t time4canbootloader     =   1000*1000; 
+static const eOreltime_t time4stayinbootloader  =    500*1000;  
+#endif
 
 // at command BOARD:
 // the bootloader if in idle or update-connected replies with a ACK abd goes to update-readytorecbin
@@ -471,12 +477,14 @@ static const uint8_t s_blcanBOARDmsg[PAYLOAD_CMD_BOARD_LEN] =
     0,              // update-eeprom
 };
 
-#define PAYLOAD_CMD_BROADCAST_LEN       0x01    // Data length (in byte) for BOARDCAST command
+#define PAYLOAD_CMD_BROADCAST_LEN       0x01    // Data length (in byte) for BROADCAST command
 #define CMD_BROADCAST                   0xff
 static const uint8_t s_blcanBROADCASTmsg[PAYLOAD_CMD_BROADCAST_LEN] = 
 {
     CMD_BROADCAST
 };
+
+#define CANMSG2SEND s_blcanBROADCASTmsg
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -846,8 +854,8 @@ static void s_send_blmsg(EOsm *s)
     frame.id            = BOOTLOADER_BROADCAST_ADDRESS;
     frame.id_type       = hal_can_frameID_std;
     frame.frame_type    = hal_can_frame_data;
-    frame.size          = sizeof(s_blcanBOARDmsg);
-    memcpy(frame.data, s_blcanBOARDmsg, frame.size);
+    frame.size          = sizeof(CANMSG2SEND);
+    memcpy(frame.data, CANMSG2SEND, frame.size);
     
     hal_can_put(hal_can_port1, &frame, hal_can_send_normprio_now);
     hal_led_toggle(hal_led4);
