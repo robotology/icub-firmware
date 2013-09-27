@@ -694,10 +694,10 @@
 // Deadtime in seconds (range 1.6 us to 25 ns)
 #ifdef ENCODER_DHES
  // HES accept a greater zero cross distortion in order to keep lower temperature
- #define DEADTIMESEC	   0.0000025 
+ #define DEADTIMESEC	   0.000001 
 #else
  // hi-res encoders try to minimize zero cross distortion
- #define DEADTIMESEC	   0.0000020 
+ #define DEADTIMESEC	   0.000001 
 #endif
 
 // this forces the 2foc interrupt to delay PWM registers update when it is 
