@@ -256,6 +256,13 @@ typedef struct
 } eOdgn_errorlog_t;
 
 
+
+typedef struct
+{
+    eOenum08_t jLastRecCmd[12]; //on ems there are 12 motor max.Each element of array contains the last received cmd 
+} eOdgn_jointsStateCmd_t;
+
+
 /** @}            
     end of group eo_cevcwervcrev5555  
  **/
