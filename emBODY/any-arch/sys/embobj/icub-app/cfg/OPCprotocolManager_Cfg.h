@@ -50,8 +50,11 @@ extern "C" {
 #define eodgn_nvidbdoor_emsapplcommon   4
 #define eodgn_nvidbdoor_emsapplmc       5
 #define eodgn_nvidbdoor_motorstatus     6
+#define eodgn_nvidbdoor_jointsStateCmd  7
 
-#define eodgn_nvidbdoor_max             7
+
+
+#define eodgn_nvidbdoor_max             8
 
 
 
