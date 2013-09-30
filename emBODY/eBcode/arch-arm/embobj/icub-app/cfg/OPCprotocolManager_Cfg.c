@@ -84,6 +84,12 @@ static opcprotman_var_map_t s_myarray[] =
         .size       = sizeof(eOdgn_motorstatusflags_t),
         .ptr        = NULL,
         .onrec      = NULL
+    },
+    {
+        .var        = eodgn_nvidbdoor_jointsStateCmd,
+        .size       = sizeof(eOdgn_jointsStateCmd_t),
+        .ptr        = NULL,
+        .onrec      = NULL
     }
 };
 
