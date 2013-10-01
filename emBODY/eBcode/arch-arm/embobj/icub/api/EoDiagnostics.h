@@ -259,7 +259,8 @@ typedef struct
 
 typedef struct
 {
-    eOenum08_t jLastRecCmd[12]; //on ems there are 12 motor max.Each element of array contains the last received cmd 
+    eOenum08_t jLastRecCmd[12];     //on ems there are 12 motor max.Each element of array contains the last received cmd
+    uint8_t    lastTwoEqual[12];    //if 1 then ems received two sequential equal commnd (two idle or position cmds)
 } eOdgn_jointsStateCmd_t;
 
 
