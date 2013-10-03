@@ -22,7 +22,8 @@
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-
+#define USE_PROG_ID
+#undef USE_EXTRA64
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -39,7 +40,12 @@ typedef struct
 {
     uint8_t         signature;      // must be 0x12
     uint8_t         canframenumof;  // 
+#ifdef USE_PROG_ID
+    uint8_t         dummy[2];    
+    uint32_t        progressive;
+#else
     uint8_t         dummy[6];
+#endif
 } eupdater_cangtw_udp_header_t; // 8 bytes
 
 typedef struct
@@ -55,7 +61,12 @@ typedef struct
 {
     eupdater_cangtw_udp_header_t    header;
     eupdater_cangtw_udp_canframe_t  onecanframe;
+#ifdef USE_EXTRA64
+    uint8_t         extra64[64];
+#endif    
 } eupdater_cangtw_udp_simpleframe_t;
+
+enum { eupdater_cangtw_udp_packet_maxsize = sizeof(eupdater_cangtw_udp_simpleframe_t)+8 };
 
 typedef enum 
 {

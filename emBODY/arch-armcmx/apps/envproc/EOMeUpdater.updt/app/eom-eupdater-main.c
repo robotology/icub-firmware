@@ -101,7 +101,7 @@ extern void task_ethcommand(void *p);
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#undef PARSE_ETH_ISR
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -123,7 +123,9 @@ static void s_ethcommand_run(EOMtask *p, uint32_t t);
 
 static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt);
 
-
+#ifdef PARSE_ETH_ISR
+static void s_verify_eth_isr(uint8_t* pkt_ptr, uint32_t size);
+#endif    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -291,7 +293,11 @@ static void s_eom_eupdater_main_init(void)
         eomipnet_addr = NULL;
         ipaddr = (uint8_t*)&(ipalcfg->eth_ip);
     }
-
+ 
+#ifdef PARSE_ETH_ISR   
+    extern void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size);    
+    hal_eth_lowLevelUsePacket_ptr = s_verify_eth_isr;
+#endif
 
     // start the ipnet
     snprintf(str, sizeof(str), "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
@@ -444,6 +450,169 @@ static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketData
     return(host_connected);
 }
 
+#ifdef PARSE_ETH_ISR
+
+// parse the packet
+
+// -- init ddddddd
+//* default snap length (maximum bytes per packet to capture) */
+#define SNAP_LEN 1518
+
+/* ethernet headers are always exactly 14 bytes [1] */
+#define ETHERNET_HEADER_SIZE 14 //SIZE_ETHERNET
+
+/* Ethernet addresses are 6 bytes */
+#define ETHER_ADDR_LEN	6
+
+typedef uint32_t in_addr_t;
+
+struct in_addr {
+    in_addr_t s_addr;
+};
+
+
+/* Ethernet header */
+typedef struct
+{
+        uint8_t  ether_dhost[ETHER_ADDR_LEN];    /* destination host address */
+        uint8_t  ether_shost[ETHER_ADDR_LEN];    /* source host address */
+        uint16_t ether_type;                     /* IP? ARP? RARP? etc */
+}eo_lowLevParser_ethernetHeader;
+
+
+
+/* IP header */
+typedef struct
+{
+        uint8_t  ip_vhl;                 /* version << 4 | header length >> 2 */
+        uint8_t  ip_tos;                 /* type of service */
+        uint16_t ip_len;                 /* total length */
+        uint16_t ip_id;                  /* identification */
+        uint16_t ip_off;                 /* fragment offset field */
+        #define IP_RF 0x8000            /* reserved fragment flag */
+        #define IP_DF 0x4000            /* dont fragment flag */
+        #define IP_MF 0x2000            /* more fragments flag */
+        #define IP_OFFMASK 0x1fff       /* mask for fragmenting bits */
+        uint8_t  ip_ttl;                 /* time to live */
+        uint8_t  ip_p;                   /* protocol */
+        uint16_t ip_sum;                 /* checksum */
+        struct  in_addr ip_src,ip_dst;  /* source and dest address */
+}eo_lowLevParser_IPHeader;
+#define GET_IP_HEADER_LENGTH(ip)               (((ip)->ip_vhl) & 0x0f)
+#define IP_V(ip)                (((ip)->ip_vhl) >> 4)
+
+/* TCP header */
+typedef uint32_t tcp_seq;
+
+typedef struct{
+        uint16_t th_sport;               /* source port */
+        uint16_t th_dport;               /* destination port */
+        tcp_seq th_seq;                 /* sequence number */
+        tcp_seq th_ack;                 /* acknowledgement number */
+        uint8_t  th_offx2;               /* data offset, rsvd */
+#define TH_OFF(th)      (((th)->th_offx2 & 0xf0) >> 4)
+        uint8_t  th_flags;
+        #define TH_FIN  0x01
+        #define TH_SYN  0x02
+        #define TH_RST  0x04
+        #define TH_PUSH 0x08
+        #define TH_ACK  0x10
+        #define TH_URG  0x20
+        #define TH_ECE  0x40
+        #define TH_CWR  0x80
+        #define TH_FLAGS        (TH_FIN|TH_SYN|TH_RST|TH_ACK|TH_URG|TH_ECE|TH_CWR)
+        uint16_t th_win;                 /* window */
+        uint16_t th_sum;                 /* checksum */
+        uint16_t th_urp;                 /* urgent pointer */
+}eo_lowLevParser_TCPHeader;
+
+
+/* UDP header */
+typedef struct
+{
+		uint16_t srcport;
+		uint16_t dstport;
+		uint16_t len;
+		uint16_t chksum;
+}eo_lowLevParser_UDPHeader;
+
+#define IPPROTO_UDP             17              /* user datagram protocol */
+
+//net2host conversion order
+#define ntohs(A) ((((uint16_t)(A) & 0xff00) >> 8) | \
+(((uint16_t)(A) & 0x00ff) << 8))
+
+#define htonl(A) ((((uint32_t)(A) & 0xff000000) >> 24) | \
+(((uint32_t)(A) & 0x00ff0000) >> 8) | \
+(((uint32_t)(A) & 0x0000ff00) << 8) | \
+(((uint32_t)(A) & 0x000000ff) << 24))
+
+static void s_verify_eth_isr(uint8_t* packet, uint32_t size)
+{
+    uint8_t* udp_data = NULL;
+    uint32_t udp_size = 0;
+//    
+//    char str[64];
+ //   snprintf(str, sizeof(str), "HALE %x %d", udp[0], udp[1]);
+ //   hal_trace_puts(str);
+    
+const eo_lowLevParser_ethernetHeader         *ethernet;  /* The ethernet header [1] */
+    const eo_lowLevParser_IPHeader               *ip;              /* The IP header */
+    const eo_lowLevParser_UDPHeader              *udp_h;         /* The UDP header */
+//    /*const*/ uint8_t                            *payload = NULL;                    /* Packet payload */
+
+    int32_t size_ip;
+    int32_t size_udp = sizeof(eo_lowLevParser_UDPHeader);
+    
+    ip = (eo_lowLevParser_IPHeader*)(packet + ETHERNET_HEADER_SIZE);
+    size_ip = GET_IP_HEADER_LENGTH(ip)*4;
+    if (size_ip < 20) 
+    {
+        //Invalid IP header length
+        return;
+    }
+    
+    
+    /* determine protocol */
+    switch(ip->ip_p)
+    {
+ 
+        case IPPROTO_UDP:
+        {
+            udp_h = (eo_lowLevParser_UDPHeader*)(packet + ETHERNET_HEADER_SIZE + size_ip); 
+
+            /* define/compute udp payload (segment) offset */
+            udp_data = (uint8_t *)(packet + ETHERNET_HEADER_SIZE + size_ip + size_udp);
+
+            /* compute udp payload (segment) size */
+            udp_size = ntohs(ip->ip_len) - (size_ip + size_udp);
+  
+        } break;
+
+        default: //Protocol: unknown
+        {
+        } break;
+
+    } 
+
+    if(NULL == udp_data)
+    {
+        return;
+    }  
+
+
+    if(0x12 == udp_data[0])
+    {
+        char str[64];
+        uint32_t *nums = (uint32_t*)udp_data;
+        snprintf(str, sizeof(str), "HALE %d", nums[1]);
+        hal_trace_puts(str);        
+    }
+
+    
+}
+
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -538,9 +538,10 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 {
                     ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
-                    size+=snprintf(data+size, MAX0(capacityout-size), "*** e-proc #%d %s %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"", running==i?"(RUNNING)":"" ) ;
+                    size+=snprintf(data+size, MAX0(capacityout-size), "*** e-proc #%d ***\r\n", i) ;
+                    size+=snprintf(data+size, MAX0(capacityout-size), "props\t\t%s %s %s \r\n", defproc==i?"DEF":"", startup==i?"STR":"", running==i?"RUNNING":"" ) ;
 
-                    size+=snprintf(data+size, MAX0(capacityout-size), "name\t%s\r\n", s_modinfo->info.name);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "name\t\t%s\r\n", s_modinfo->info.name);
                     size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
                         s_modinfo->info.entity.version.major, 
                         s_modinfo->info.entity.version.minor,
@@ -634,9 +635,10 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
         case CMD_UPD_ONCE:
         {
+#if defined(_MAINTAINER_APPL_) 
             ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
             ee_sharserv_sys_restart();
-            
+#endif            
             return 0;
         }// break;
 

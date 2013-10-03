@@ -82,15 +82,15 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 2
+                .minor = 3
             },  
             .builddate  = 
             {
                 .year  = 2013,
-                .month = 9,
-                .day   = 25,
-                .hour  = 13,
-                .min   = 0
+                .month = 10,
+                .day   = 3,
+                .hour  = 18,
+                .min   = 37
             }
         },
         .rom        = 

@@ -34,6 +34,7 @@
 // abslayer 
 #include "hal.h"
 #include "hal_trace.h"
+#include "osal_system.h"
 
 
 // embobj  
@@ -227,8 +228,8 @@ static void s_cangateway_startup(EOMtask *p, uint32_t t)
 
     // initialise the socket
     // up to 16 packets of 64 bytes ...    
-    eupdater_sock_cangateway = eo_socketdtg_New (   16, 64, eom_mutex_New(), // input queue
-                                                    16, 64, eom_mutex_New()  // output queue
+    eupdater_sock_cangateway = eo_socketdtg_New (   16, eupdater_cangtw_udp_packet_maxsize, eom_mutex_New(), // input queue
+                                                    16, eupdater_cangtw_udp_packet_maxsize, eom_mutex_New()  // output queue
                                                 );
    
 

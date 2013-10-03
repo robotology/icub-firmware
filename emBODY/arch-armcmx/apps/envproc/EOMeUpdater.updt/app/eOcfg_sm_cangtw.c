@@ -38,6 +38,9 @@
 #include "EOtimer.h"
 #include "EOaction.h"
 
+#include "osal_task.h"
+#include "osal_system.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,7 +165,7 @@ static void s_can_get(hal_can_port_t port);
 static void s_send_blmsg(EOsm *s);
 static void s_smcfg_can_clean(hal_can_port_t port);
 
-static void s_print_canframe(uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame);
+static void s_print_canframe(uint32_t progr, uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame);
 
 static eOresult_t s_valid_canid_class(uint32_t id);
 
@@ -448,14 +451,14 @@ static EOtimer* s_smcfg_CanGtw_service_timer    = NULL;
 static EOpacket* s_rxpkt_gtwcan                 = NULL;
 static EOpacket* s_txpkt_gtwcan                 = NULL;
 
-#if 1
+#if 0
 static const eOreltime_t time4canstabilisation  =  500*1000; 
 static const eOreltime_t time4canbootloader     = 1000*1000; 
 static const eOreltime_t time4stayinbootloader  =  500*1000;  
 #else
-static const eOreltime_t time4canstabilisation  = 6*1000*1000; 
-static const eOreltime_t time4canbootloader     =   1000*1000; 
-static const eOreltime_t time4stayinbootloader  =    500*1000;  
+static const eOreltime_t time4canstabilisation  =  200*1000; 
+static const eOreltime_t time4txgap1            =   25*1000; 
+static const eOreltime_t time4txgap2  			=   25*1000;  
 #endif
 
 // at command BOARD:
@@ -487,6 +490,7 @@ static const uint8_t s_blcanBROADCASTmsg[PAYLOAD_CMD_BROADCAST_LEN] =
 };
 
 #define CANMSG2SEND s_blcanBROADCASTmsg
+//#define CANMSG2SEND NULL
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -567,8 +571,8 @@ static void s_smcfg_CanGtw_on_entry_IDLE(EOsm *s)
     s_smcfg_CanGtw_service_timer = eo_timer_New();   
     
     // allocate the packets
-    s_rxpkt_gtwcan = eo_packet_New(64);  
-    s_txpkt_gtwcan = eo_packet_New(64);    
+    s_rxpkt_gtwcan = eo_packet_New(eupdater_cangtw_udp_packet_maxsize);  
+    s_txpkt_gtwcan = eo_packet_New(eupdater_cangtw_udp_packet_maxsize);    
 }
 
 
@@ -620,11 +624,11 @@ static void s_smcfg_CanGtw_on_trans_IDLE_evstart(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_STARTUP_evcanblmsg1(EOsm *s)
 {  
-    // send a first can message in can1 + can2 to force bootloader
+    // send a first can message in can1 + can2
     s_send_blmsg(s);
     
 
-    // start a timer which shall trigger the event which sends second can frame. 
+    // start a timer which shall trigger a second event. 
     // we give the time for application to reset and start bootloader: xx ms is well enough.     
     EOaction_strg action_strg;
     EOaction* act = (EOaction*)&action_strg;    
@@ -633,14 +637,14 @@ static void s_smcfg_CanGtw_on_trans_STARTUP_evcanblmsg1(EOsm *s)
                             eupdater_task_cangateway
                         );
                                 
-    eo_timer_Start(s_smcfg_CanGtw_service_timer, eok_abstimeNOW, time4canbootloader, eo_tmrmode_ONESHOT, act);
+    eo_timer_Start(s_smcfg_CanGtw_service_timer, eok_abstimeNOW, time4txgap1, eo_tmrmode_ONESHOT, act);
 }
 
 
 static void s_smcfg_CanGtw_on_trans_STARTUP_evcanblmsg2(EOsm *s)
 {
-    // send a second can message in can1 + can2 to force bootloader
-    s_send_blmsg(s);
+    // send a second can message in can1 + can2
+    //s_send_blmsg(s);
     
     
     // start a timer which shall trigger the event which goes in run mode. 
@@ -652,7 +656,7 @@ static void s_smcfg_CanGtw_on_trans_STARTUP_evcanblmsg2(EOsm *s)
                             eupdater_task_cangateway
                         );
                                 
-    eo_timer_Start(s_smcfg_CanGtw_service_timer, eok_abstimeNOW, time4stayinbootloader, eo_tmrmode_ONESHOT, act);           
+    eo_timer_Start(s_smcfg_CanGtw_service_timer, eok_abstimeNOW, time4txgap2, eo_tmrmode_ONESHOT, act);           
 }
 
 
@@ -665,6 +669,7 @@ static void s_smcfg_CanGtw_on_trans_STARTUP_evgo2run(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_RUN_evrxeth(EOsm *s)
 {
+#if 1
     eOresult_t res;
     
     // retrieve the packet
@@ -680,6 +685,20 @@ static void s_smcfg_CanGtw_on_trans_RUN_evrxeth(EOsm *s)
    
     // finally verify if socket has any other udp packet in rx fifo
     s_refresh_eth_state();
+#else
+	eOresult_t res;
+    // retrieve the packet
+    res = eo_socketdtg_Get(eupdater_sock_cangateway, s_rxpkt_gtwcan, eok_reltimeINFINITE);
+    
+    while(eores_OK == res)
+    {
+        s_parse_upd_packet(s_rxpkt_gtwcan);
+        res = eo_socketdtg_Get(eupdater_sock_cangateway, s_rxpkt_gtwcan, eok_reltimeINFINITE);
+    }
+
+	// finally verify if socket has any other udp packet in rx fifo
+    s_refresh_eth_state();
+#endif
 }
 
 
@@ -738,6 +757,7 @@ static void s_refresh_can2_state(void)
 
 static void s_parse_upd_packet(EOpacket* pkt)
 {
+	static uint32_t prevprog = 0;
     // extract the can frame   
     // send it to relevant can bus    
     eOipv4addr_t remaddr;
@@ -753,7 +773,8 @@ static void s_parse_upd_packet(EOpacket* pkt)
     
 #if	defined(_DEBUG_MODE_PRINTETH_)    
     char str[128];
-    snprintf(str, sizeof(str), "rx eth pkt = ...\n\r");
+    uint32_t ms = osal_system_ticks_abstime_get() / 1000;
+    snprintf(str, sizeof(str), "ETH2: #%d \t\t @ ms %d", simpleudpframe->header.progressive, ms);
     hal_trace_puts(str);  
 #endif
   
@@ -796,8 +817,25 @@ static void s_parse_upd_packet(EOpacket* pkt)
 #endif   
     
 #if     defined(_DEBUG_MODE_PRINTCAN_)
-    s_print_canframe(1, port, &frame); 
+#ifdef  USE_PROG_ID
+    uint32_t prog = simpleudpframe->header.progressive;
+#else
+    uint32_t prog = 0;
 #endif    
+    s_print_canframe(prog, 1, port, &frame); 
+#endif 
+
+	uint32_t prog = simpleudpframe->header.progressive;
+    if(0 != prevprog)
+	{
+		if(prog != (prevprog+1))
+		{
+			char strerror[64];
+			snprintf(strerror, sizeof(strerror), "CAN-GTW: LOST ETH #%d from host", prevprog+1);
+			hal_trace_puts(strerror);
+		}
+	} 
+	prevprog = prog;  
 
     // and send it 
     hal_led_toggle((hal_can_port1 == port) ? hal_led4 : hal_led5);
@@ -843,7 +881,7 @@ static void s_can_get(hal_can_port_t port)
         }
         
 #if     defined(_DEBUG_MODE_PRINTCAN_)                
-        s_print_canframe(0, port, &frame);        
+        s_print_canframe(0, 0, port, &frame);        
 #endif
         
     }
@@ -854,18 +892,22 @@ static void s_send_blmsg(EOsm *s)
     eOsmDynamicDataCanGtw_t *ram = eo_sm_GetDynamicData(s);
     ram->number_of_sent_canblmsg ++;
     
-    hal_can_frame_t frame;
-          
-    frame.id            = BOOTLOADER_BROADCAST_ADDRESS;
-    frame.id_type       = hal_can_frameID_std;
-    frame.frame_type    = hal_can_frame_data;
-    frame.size          = sizeof(CANMSG2SEND);
-    memcpy(frame.data, CANMSG2SEND, frame.size);
-    
-    hal_can_put(hal_can_port1, &frame, hal_can_send_normprio_now);
-    hal_led_toggle(hal_led4);
-    hal_can_put(hal_can_port2, &frame, hal_can_send_normprio_now);  
-    hal_led_toggle(hal_led5);    
+    if(NULL != CANMSG2SEND)
+    {    
+        hal_can_frame_t frame;
+              
+        frame.id            = BOOTLOADER_BROADCAST_ADDRESS;
+        frame.id_type       = hal_can_frameID_std;
+        frame.frame_type    = hal_can_frame_data;
+        frame.size          = sizeof(CANMSG2SEND);
+        memcpy(frame.data, CANMSG2SEND, frame.size);
+        
+        hal_can_put(hal_can_port1, &frame, hal_can_send_normprio_now);
+        hal_can_put(hal_can_port2, &frame, hal_can_send_normprio_now);      
+        
+        hal_led_toggle(hal_led4);
+        hal_led_toggle(hal_led5); 
+    }        
 }
 
 static void s_smcfg_can_clean(hal_can_port_t port)
@@ -905,16 +947,25 @@ static void s_smcfg_can_clean(hal_can_port_t port)
     hal_trace_puts(str); 
 }
 
-static void s_print_canframe(uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame)
+static void s_print_canframe(uint32_t progr, uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame)
 {
     char str[128]; 
     
     uint8_t dd[8] = {0xee};
 
+    static osal_abstime_t tt = 0;
+    osal_abstime_t t = osal_system_ticks_abstime_get();
+    uint32_t delta = (t - tt)/1000;
+    uint32_t ms = t/1000;
+    tt = t;
+
     memcpy(dd, frame->data, frame->size);
     
-    snprintf(str, sizeof(str), "%s frame: can%d, id = %x, size = %d, data[] = %x %x %x %x %x %x %x %x ", 
+    snprintf(str, sizeof(str), "%s frame #%d \t\t @ ms %d \t (d %d): \t\tcan%d, id = %3.3x, s = %d, d[] = %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x ", 
                                (1 == tx) ? "tx" : "rx",
+                                progr,
+                                ms,
+                                delta,
                                (hal_can_port1==port)?1:2,
                                 frame->id,
                                 frame->size,

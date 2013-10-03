@@ -120,10 +120,10 @@
 #endif
 
 
-//   <o> Size of DMA RX buffers  <1=> One frame  <2=> Two frames <3=> Three frames <4=> Four frames
+//   <o> Size of DMA RX buffers  <1=> One frame  <2=> Two frames <3=> Three frames <4=> Four frames <6=> Six frames <8=> Eight frames <10=> Ten frames <40=> 40 frames
 //   <i> One ETH frame is 1536 bytes
 #ifndef HAL_ETH_DMA_RX_BUF
- #define HAL_ETH_DMA_RX_BUF  2     
+ #define HAL_ETH_DMA_RX_BUF  8     
 #endif
 
 // </h>Ethernet
