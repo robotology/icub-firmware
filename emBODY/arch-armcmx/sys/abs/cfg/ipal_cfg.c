@@ -29,7 +29,15 @@
 
 
 #include "ipal.h"
+#include <stdarg.h>
 
+
+#include <stdio.h>
+
+#include <string.h>
+
+
+#include "stdlib.h"
 
 #include "hal.h"
 #include "osal.h"
@@ -232,6 +240,19 @@ static void onethframerx(void)
     b = b;
 }
 
+// extern void mydebug(const char *format, ...)
+// { 
+//     char tmpbuf[256];
+// //     sprintf(tmpbuf,format, ##__VA_ARGS__);
+// //     hal_trace_puts(tmpbuf);
+// //     
+
+//     va_list args;
+//     va_start( args, format );
+//     vsprintf(tmpbuf, format, args );
+//     va_end( args );
+//     hal_trace_puts(tmpbuf);
+// } 
 
 
 
