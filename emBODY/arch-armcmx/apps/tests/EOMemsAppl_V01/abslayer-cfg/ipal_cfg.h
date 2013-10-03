@@ -32,7 +32,7 @@
 // <h> Porting specifics 
 // <i> sssssssss
 
-//   <o> Used TCP/IP stack         <0=>   IIT modified TCPNET
+//   <o> Used TCP/IP stack         <0=>   IIT modified TCPNET <1=> IIT modified LWIP
 //   <i> Only IIT modified TCPNET is now supported.
 #ifndef IPAL_TCPIPTYPE
  #define IPAL_TCPIPTYPE      0
@@ -218,7 +218,7 @@
 // <e> IGMP
 // <i> The Internet Group Management Protocol (IGMP) is a communications protocol used 
 // <i> to manage the membership of Internet Protocol multicast groups.
-#define IPAL_IGMP_ENABLE     1
+#define IPAL_IGMP_ENABLE     0
 
 //     <o> Max number of IGMP groups <2-10>
 //     <i> Number of groups this host can join
@@ -369,9 +369,9 @@
 
 // - some controls ----------------------------------------------------------------------------------------------------
 
-#if(0 != IPAL_TCPIPTYPE)
-    #error only tcpnet is supported so far
-#endif
+// #if(0 != IPAL_TCPIPTYPE)
+//     #error only tcpnet is supported so far
+// #endif
 
 #if(0 == IPAL_ETH_ENABLE)
     #error must have ethernet network interface enabled
