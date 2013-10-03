@@ -21,9 +21,21 @@ signed char DHES_TRANSITION_LUT[7][7] = {
 	{-2, 0,-2, 0,-2,-1,-2}, // from 1 (ok 1 3 5)
 	{-2,-2, 0, 0,-2,-2, 0}, // from 2 (ok 2 3 6)
 	{-2, 0, 0, 0,-2,-2,-2}, // from 3 (ok 3 1 2)
-	{-2,-2,-2, 0, 0, 0, 0}, // from 4 (ok 4 6 5)
+	{-2,-2,-2,-2, 0, 0, 0}, // from 4 (ok 4 6 5)
 	{-2, 1,-2,-2, 0, 0,-2}, // from 5 (ok 5 1 4)
 	{-2,-2, 0,-2, 0,-2, 0}, // from 6 (ok 6 2 4)
+};
+
+signed char DHES_ROTATION_LUT[7][7] = {
+ 
+ //to 0  1  2  3  4  5  6 
+	{ 0, 0, 0, 0, 0, 0, 0}, // from 0 all ok (init val)
+	{ 0, 0, 0, 1, 0,-1, 0}, // from 1 (ok 1 3 5)
+	{ 0, 0, 0,-1, 0, 0, 1}, // from 2 (ok 2 3 6)
+	{ 0,-1, 1, 0, 0, 0, 0}, // from 3 (ok 3 1 2)
+	{ 0, 0, 0, 0, 0, 1,-1}, // from 4 (ok 4 6 5)
+	{ 0, 1, 0, 0,-1, 0, 0}, // from 5 (ok 5 1 4)
+	{ 0, 0,-1, 0, 1, 0, 0}, // from 6 (ok 6 2 4)
 };
 
 unsigned int DHES_UNALIGNEDMECANGLE_LUT[7] = {
@@ -33,7 +45,7 @@ unsigned int DHES_UNALIGNEDMECANGLE_LUT[7] = {
   0x2AAAU/NPOLEPAIRS, // 60°
   0xAAA8U/NPOLEPAIRS, // 240°
   0xD552U/NPOLEPAIRS, // 300°
-  0x7FFFU/NPOLEPAIRS, // 180°
+  0x8000U/NPOLEPAIRS, // 180°
 };
 
 

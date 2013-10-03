@@ -301,7 +301,14 @@ inline void EncoderPositionDHS()
   extern tSysError SysError;
   static int round = 0; // ELECTRICAL round conter inside a MECHANICAL round
   static int encoder_dhes_state = 0;
-  signed char transition;
+  signed char transition = 0;
+  
+  signed char rotation = 0;
+  static int time_old = 0;
+  static int time_new = 0;
+  static int angle_interp = 0;
+  static unsigned int UMA_stored = 0;
+  static const int SLICE = 0xFFFFU/(6*NPOLEPAIRS);
 
     // Read HES vaue from the uC pins of choice
 #ifdef HES_CONNECTED_TO_P2_P5
@@ -328,6 +335,8 @@ inline void EncoderPositionDHS()
      return;
   }
 
+  if (time_new < 30000) ++time_new;
+  
   // the HES read the same val of last time. The angle
   // has not to change. Do nothing.
   // do not place before check for 0 and 7 : if the first time
@@ -335,12 +344,44 @@ inline void EncoderPositionDHS()
   // first time encoder_dhes_state is 000 because it is
   // init val
   if(encoder_dhes_state == encoder_buffer)
-    return;
+  {
+    UnalignedMecchanicalAngle = UMA_stored;
+	
+    if (!rotation) return;
+	
+	  if (time_new < time_old)
+	  {
+	    angle_interp = __builtin_divsd(__builtin_mulss(SLICE,time_new),time_old);
+    }
+	  else if (time_new < 30000)
+	  {
+	    angle_interp = __builtin_divsd(__builtin_mulss(SLICE,time_old),time_new);
+	  }
+    else
+    {
+      return;
+    }
+	
+    if (rotation == 1)
+    {
+      UnalignedMecchanicalAngle += angle_interp;
+    }
+    else
+    {
+      UnalignedMecchanicalAngle -= angle_interp;
+    }
 
+    return;
+  }
+    
+  time_old = time_new;
+  time_new = 0;
+  
   // if 0 no turn has been done
   // if 1 or -1 a CW or CCW turn has been done
   // if -2 error: invalid transition
   transition = DHES_TRANSITION_LUT[encoder_dhes_state][encoder_buffer];
+  rotation   = DHES_ROTATION_LUT[encoder_dhes_state][encoder_buffer];
 
   if(-2 == transition){
     SysError.HESInvalidSequence = 1;
@@ -348,10 +389,10 @@ inline void EncoderPositionDHS()
     FaultConditionsHandler();
     return;
   }
-
+  
   round += transition;
 
-  UnalignedMecchanicalAngle = DHES_UNALIGNEDMECANGLE_LUT[encoder_buffer];
+  UMA_stored = DHES_UNALIGNEDMECANGLE_LUT[encoder_buffer];
 
  // round += DHES_TURN_LUT[encoder_dhes_state][encoder_buffer];
 
@@ -365,8 +406,9 @@ inline void EncoderPositionDHS()
 
   // combine the electrical angle information with the 
   // electrical turn count to get mechanical angle
-  UnalignedMecchanicalAngle  += round * (0xFFFFU/NPOLEPAIRS);
-
+  UMA_stored += round * (0xFFFFU/NPOLEPAIRS);
+  
+  UnalignedMecchanicalAngle = UMA_stored;
 }
 
 
