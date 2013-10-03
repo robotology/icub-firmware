@@ -32,7 +32,7 @@
 // <h> Porting specifics 
 // <i> sssssssss
 
-//   <o> Used TCP/IP stack         <0=>   IIT modified TCPNET
+//   <o> Used TCP/IP stack         <0=>   IIT modified TCPNET <1=> IIT modified LWIP
 //   <i> Only IIT modified TCPNET is now supported.
 #ifndef IPAL_TCPIPTYPE
  #define IPAL_TCPIPTYPE      0
@@ -368,10 +368,6 @@
 
 
 // - some controls ----------------------------------------------------------------------------------------------------
-
-#if(0 != IPAL_TCPIPTYPE)
-    #error only tcpnet is supported so far
-#endif
 
 #if(0 == IPAL_ETH_ENABLE)
     #error must have ethernet network interface enabled
