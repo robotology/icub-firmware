@@ -8,6 +8,7 @@ copy /Y hal-lib\hal.stm32f1.mcbstm32c.lib ..\..\..\..\sys\abs\lib
 copy /Y hal-lib\hal.stm32f1.mcbstm32c.slim.lib ..\..\..\..\sys\abs\lib
 copy /Y hal-lib\hal.stm32f1.ems001.lib ..\..\..\..\sys\abs\lib
 copy /Y hal-lib\hal.stm32f1.ems001.slim.lib ..\..\..\..\sys\abs\lib
+copy /Y hal-lib\hal.stm32f1.ems001.lwip.lib ..\..\..\..\sys\abs\lib
 copy /Y hal-lib\hal.stellaris.lib ..\..\..\..\sys\abs\lib
 attrib +R ..\..\..\..\sys\abs\lib\*.lib
 
