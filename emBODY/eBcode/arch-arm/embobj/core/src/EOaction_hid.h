@@ -77,7 +77,10 @@ struct EOaction_hid
         } cbk;
 
     } data;
-};  EO_VERIFYsizeof(EOaction, EOaction_sizeof);   
+}; EO_VERIFYproposition(sss, (EOaction_sizeof >= sizeof(EOaction)));  
+//EO_VERIFYsizeof(EOaction, EOaction_sizeof);  
+
+EO_VERIFYproposition(sss, (EOaction_sizeof >= sizeof(EOaction)));
  
 #define EOACTION_DUMMY      { eo_actypeNONE, {0} }
 
