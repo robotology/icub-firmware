@@ -34,6 +34,12 @@
 **
 **1.5   7 Jun 2010  Added a check in CMD_BOARD if the destination of the message is the current board          M.Maggiali  
 **-------------------------------------------------------------------------**
+**-------------------------------------------------------------------------
+**Rev:   Date:        Details:                                    Who:
+**-------------------------------------------------------------------------
+**
+**1.6   7 Oct 2013  Changed the behaviour of the LED              M.Maggiali  
+**-------------------------------------------------------------------------**
 ***************************************/
 
 
@@ -50,7 +56,7 @@
 
 
 #define VERSION   1
-#define BUILD     5
+#define BUILD     6
 
 #define CONFIG_WORD_WRITE  0x4008
 
@@ -208,7 +214,7 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 _FWDT(WDT_OFF);     // WD disabled
 //_FWDT(WDT_ON & WDTPSA_512 & WDTPSB_1); // WD enabled 1:512*16
 
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
+_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 
 //TODO: Error queue / error flag set/reset
 //TODO: Erroristica CAN 
@@ -363,7 +369,7 @@ UWord16 FWDT_Val;
 UWord16 FBORPOR_Val;
 uReg32 ConfAdr;
 
-unsigned char BoardType;           //Used to identify the board type (MAIS or STRAIN)
+unsigned char BoardType= BOARD_TYPE_SKIN;           //Used to identify the board type (MAIS or STRAIN)
 unsigned int EnableLOG = 0;        //Used to enable error messages (see CMD_ENABLELOG parsing)
 
 
@@ -423,33 +429,23 @@ void Init_Buffer(void)
 // Setup for I/O ports
 void InitPorts(void)
 {    
-  unsigned char BoardId;
   // set pin 2 as input
   // active weak pull-up device connected to the pin CN18 (pin 2)
   // used to select a STRAIN or MAIS device
-  TRISFbits.TRISF5 = 1;
-
-  CNPU2bits.CN18PUE = 1;    
-  
+  TRISFbits.TRISF5 = 0;
+     
   //Detect the board type reading RF5 bit from RF port
   //and set a bit as out for a LED (according the board type)
   //It's necessary a double read for a correct reading after
   //the weak pull-up enabling
-  BoardId = PORTFbits.RF5;
-  BoardId = PORTFbits.RF5;
+  PORTFbits.RF5=1;
 
-  if(BoardId)
-  //STRAIN boaard (RF5 is unconnected with an weak pull-up)
-  {
-    BoardType = BOARD_TYPE_SKIN;
-//    TRISBbits.TRISB12 = 0; // set B12 as out (LED)
-  }
-  else
-  //MAIS board (RF5 is connected to pulldown)
-  {
-    BoardType = BOARD_TYPE_SKIN;
- //   TRISFbits.TRISF4 = 0; // set F4 as out (LED Yellow)
-  }
+  //ALL THE NOT USED PINS ARE SET TO OUTPUT AND SETTED TO 0
+	TRISB=0;
+    PORTB=0;
+	TRISE=0;
+    PORTE=0;
+ 
 }
 
 void SwOffLED(void)
@@ -470,7 +466,7 @@ void ToggleLED(void)
 //For STRAIN the LED is on RB port
 {
  // if(BoardType == BOARD_TYPE_MAIS)
- //   LATFbits.LATF4  = ~LATFbits.LATF4;
+    LATFbits.LATF5  = ~LATFbits.LATF5;
 //  else
  //   LATBbits.LATB12 = ~LATBbits.LATB12;
 } 
@@ -1068,7 +1064,7 @@ int main(void)
 
   ConfAdr.Val32 = FBORPOR;
   FBORPOR_Val = ReadLatchCM(ConfAdr.Word.HW,ConfAdr.Word.LW);        //Save FBORPOR configuration register
-  ConfVal = (MCLR_EN & PWRT_64 & PBOR_ON & BORV_27) & FBORPOR_MASK;  //Update register value to run bootloader (WD disabled)
+  ConfVal = (MCLR_EN & PWRT_64 & PBOR_ON & BORV27) & FBORPOR_MASK;  //Update register value to run bootloader (WD disabled)
   WriteLatchCM(ConfAdr.Word.HW,ConfAdr.Word.LW,ConfVal);
   WriteMem(CONFIG_WORD_WRITE);
 
@@ -1099,7 +1095,7 @@ int main(void)
   CAN1SetTXMode(tx_rx_no, CAN_TX_PRIORITY_HIGH );
   CAN1SetRXMode(tx_rx_no, CAN_RXFUL_CLEAR & CAN_BUF0_DBLBUFFER_EN);
 
- // Configure CAN IRQs 
+  // Configure CAN IRQs 
   ConfigIntCAN1(CAN_INDI_INVMESS_EN & CAN_INDI_WAK_DIS & CAN_INDI_ERR_DIS &
     CAN_INDI_TXB2_DIS & CAN_INDI_TXB1_DIS & CAN_INDI_TXB0_DIS &  // CAN TX IRQ OFF
     CAN_INDI_RXB1_EN & CAN_INDI_RXB0_EN ,                        // CANRX IRQ ON 
