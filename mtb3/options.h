@@ -27,7 +27,7 @@
 
 
 #define _version  0x0210
-#define _build_number  5     //changed the I2C speed
+#define _build_number  7     //changed the I2C speed
 
 enum skin_type
 {

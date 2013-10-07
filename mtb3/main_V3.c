@@ -462,7 +462,7 @@ if (DIG_GYRO || DIG_ACC)
 //
 //
 	led_counter=0;
-	led0=0;
+	led0=1;
         EnableIntCAN1;
         DisableIntT1;
         DisableIntT2;

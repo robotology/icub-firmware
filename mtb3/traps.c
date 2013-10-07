@@ -29,23 +29,27 @@ of their application.
 void __attribute__((interrupt, no_auto_psv)) _OscillatorFail(void)
 {
         INTCON1bits.OSCFAIL = 0;        //Clear the trap flag
+        asm ("reset");
         while (1);
 }
 
 void __attribute__((interrupt, no_auto_psv)) _AddressError(void)
 {
         INTCON1bits.ADDRERR = 0;        //Clear the trap flag
+        asm ("reset");
         while (1);
 }
 void __attribute__((interrupt, no_auto_psv)) _StackError(void)
 {
         INTCON1bits.STKERR = 0;         //Clear the trap flag
+        asm ("reset");
         while (1);
 }
 
 void __attribute__((interrupt, no_auto_psv)) _MathError(void)
 {
         INTCON1bits.MATHERR = 0;        //Clear the trap flag
+        asm ("reset");
         while (1);
 }
 
@@ -61,24 +65,28 @@ of their application.
 void __attribute__((interrupt, no_auto_psv)) _AltOscillatorFail(void)
 {
         INTCON1bits.OSCFAIL = 0;
+        asm ("reset");
         while (1);
 }
 
 void __attribute__((interrupt, no_auto_psv)) _AltAddressError(void)
 {
         INTCON1bits.ADDRERR = 0;
+        asm ("reset");
         while (1);
 }
 
 void __attribute__((interrupt, no_auto_psv)) _AltStackError(void)
 {
         INTCON1bits.STKERR = 0;
+        asm ("reset");
         while (1);
 }
 
 void __attribute__((interrupt, no_auto_psv)) _AltMathError(void)
 {
         INTCON1bits.MATHERR = 0;
+        asm ("reset");
         while (1);
 }
 
