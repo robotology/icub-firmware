@@ -78,9 +78,10 @@ extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign);
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out);
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel);
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc);
+extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
-extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel);
+//extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel);
 
 
 // asynchronous

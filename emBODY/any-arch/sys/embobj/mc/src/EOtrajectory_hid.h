@@ -42,8 +42,8 @@ struct EOtrajectory_hid
     int32_t vel_max;
     int32_t acc_max;
 
-    int32_t Xdebug;
-    int32_t Vdebug;
+    //int32_t Xdebug;
+    //int32_t Vdebug;
     
     //////////////////
     // position
@@ -51,15 +51,12 @@ struct EOtrajectory_hid
     float xV;
     float xA;
     
-    //float xXf;
-    
     float xT;
     float xTimer;
     
     //////////////////
     // velocity
     eObool_t bVelocityMove;
-    //eObool_t bIsBraking;
     
     float vX;
     float vV;

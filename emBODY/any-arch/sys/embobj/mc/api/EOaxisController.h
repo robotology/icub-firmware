@@ -83,12 +83,13 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
 
 //extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 
-extern void eo_axisController_GetPosRef(EOaxisController *o, int32_t *pos, int32_t *avg_vel);
+//extern void eo_axisController_GetPosRef(EOaxisController *o, int32_t *pos, int32_t *avg_vel);
 
 extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out);
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
+extern void eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
 
 extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_flag);
 
