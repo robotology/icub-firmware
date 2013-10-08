@@ -402,9 +402,9 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -425,9 +425,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -501,9 +501,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -516,9 +516,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -714,6 +714,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1610,14 +1615,14 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1691,9 +1696,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -1706,9 +1711,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1904,6 +1909,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2800,14 +2810,14 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2881,9 +2891,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -2896,9 +2906,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3094,6 +3104,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3990,9 +4005,9 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -4013,9 +4028,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
             </File>
             <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
@@ -4071,9 +4086,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -4086,9 +4101,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4284,6 +4299,11 @@
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
             </File>
           </Files>
         </Group>
