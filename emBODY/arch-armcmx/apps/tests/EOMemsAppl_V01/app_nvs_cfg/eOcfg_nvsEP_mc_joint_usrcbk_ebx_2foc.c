@@ -315,6 +315,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             eo_emsController_SetPosRef(jxx, setPoint->to.position.value, setPoint->to.position.withvelocity);
         }break;
         
+        case eomc_setpoint_positionraw:
+        {
+            eo_emsController_SetPosRaw(jxx, setPoint->to.position.value);
+        }break;
+        
         case eomc_setpoint_velocity:
         {
             eo_emsController_SetVelRef(jxx, setPoint->to.velocity.value, setPoint->to.velocity.withacceleration);    
