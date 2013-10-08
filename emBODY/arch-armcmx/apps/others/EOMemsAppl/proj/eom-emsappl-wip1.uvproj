@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>.;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\wip-prot\src;..\..\..\..\..\any-arch\sys\embobj\wip-prot\api;..\..\..\..\..\any-arch\sys\embobj\wip-icub\api;..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\api;..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src;..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\api;..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src; ..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\cfg</IncludePath>
+              <IncludePath>.;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src;..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\api;..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub\api;..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\api;..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src;..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\api;..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src; ..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -402,14 +402,14 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -483,9 +483,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -498,9 +498,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -697,6 +697,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -705,57 +710,57 @@
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheAgent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheAgent.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransmitter.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnvSet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -765,7 +770,7 @@
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -775,12 +780,12 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b02.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -790,12 +795,12 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -805,12 +810,12 @@
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -820,12 +825,12 @@
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -835,12 +840,12 @@
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -850,12 +855,12 @@
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -885,67 +890,67 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1005,7 +1010,7 @@
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOhostTransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1407,14 +1412,14 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1488,9 +1493,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -1503,9 +1508,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1702,6 +1707,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1710,57 +1720,57 @@
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheAgent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheAgent.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransmitter.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnvSet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1770,7 +1780,7 @@
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1780,12 +1790,12 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b02.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1795,12 +1805,12 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1810,12 +1820,12 @@
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1825,12 +1835,12 @@
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1840,12 +1850,12 @@
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1855,12 +1865,12 @@
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1890,67 +1900,67 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2010,7 +2020,7 @@
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOhostTransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2412,14 +2422,14 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2493,9 +2503,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -2508,9 +2518,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2707,6 +2717,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2715,57 +2730,57 @@
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheAgent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheAgent.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransmitter.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnvSet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2775,7 +2790,7 @@
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2785,12 +2800,12 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b02.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2800,12 +2815,12 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2815,12 +2830,12 @@
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2830,12 +2845,12 @@
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2845,12 +2860,12 @@
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2860,12 +2875,12 @@
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2895,67 +2910,67 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3015,7 +3030,7 @@
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOhostTransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3417,9 +3432,9 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>osal.cm3.lib</FileName>
+              <FileName>osal.open.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3440,9 +3455,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>osal.cm3.dbg.lib</FileName>
+              <FileName>osal.open.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</FilePath>
             </File>
             <File>
               <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
@@ -3498,9 +3513,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.c</FileName>
+              <FileName>osal_cfg-open.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.c</FilePath>
             </File>
             <File>
               <FileName>hal_cfg.h</FileName>
@@ -3513,9 +3528,9 @@
               <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>osal_cfg.h</FileName>
+              <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\osal_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3712,6 +3727,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
             </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3720,57 +3740,57 @@
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheAgent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheAgent.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransmitter.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnvSet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3780,7 +3800,7 @@
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheBOARDtransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3790,12 +3810,12 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b02.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3805,12 +3825,12 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolEPs.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3820,12 +3840,12 @@
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3835,12 +3855,12 @@
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3850,12 +3870,12 @@
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3865,12 +3885,12 @@
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3900,67 +3920,67 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMStransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\OPCprotocolManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4020,7 +4040,7 @@
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOhostTransceiver.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -958,7 +958,7 @@
 
   <Group>
     <GroupName>app_main</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -997,8 +997,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.cm3.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm3.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.open.cm3.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1013,8 +1013,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm3.dbg.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.open.cm3.dbg.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1133,8 +1133,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.c</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg-open.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1181,8 +1181,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.h</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg-open.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1778,6 +1778,22 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>49</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\sys\env\src\eEsharedServices.c</PathWithFileName>
+      <FilenameWithoutPath>eEsharedServices.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -1788,33 +1804,17 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>49</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>51</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOconfirmationManager.c</PathWithFileName>
-      <FilenameWithoutPath>EOconfirmationManager.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
       <FileNumber>50</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnv.c</PathWithFileName>
-      <FilenameWithoutPath>EOnv.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOconfirmationManager.c</PathWithFileName>
+      <FilenameWithoutPath>EOconfirmationManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1824,13 +1824,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOreceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOreceiver.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnv.c</PathWithFileName>
+      <FilenameWithoutPath>EOnv.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1840,13 +1840,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>42</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOrop.c</PathWithFileName>
-      <FilenameWithoutPath>EOrop.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOreceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOreceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1861,8 +1861,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOropframe.c</PathWithFileName>
-      <FilenameWithoutPath>EOropframe.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOrop.c</PathWithFileName>
+      <FilenameWithoutPath>EOrop.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1872,13 +1872,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>22</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheAgent.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheAgent.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOropframe.c</PathWithFileName>
+      <FilenameWithoutPath>EOropframe.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1893,8 +1893,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheFormer.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheFormer.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheAgent.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheAgent.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1909,8 +1909,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheParser.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheParser.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheFormer.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheFormer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1920,13 +1920,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>39</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOtransceiver.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheParser.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheParser.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1936,13 +1936,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>40</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtransmitter.c</PathWithFileName>
-      <FilenameWithoutPath>EOtransmitter.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOtransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1952,12 +1952,28 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>68</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOnvSet.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtransmitter.c</PathWithFileName>
+      <FilenameWithoutPath>EOtransmitter.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>60</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOnvSet.c</PathWithFileName>
       <FilenameWithoutPath>EOnvSet.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1966,22 +1982,22 @@
 
   <Group>
     <GroupName>eo-comm-board</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>9</GroupNumber>
-      <FileNumber>60</FileNumber>
+      <FileNumber>61</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>65</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOtheBOARDtransceiver.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOtheBOARDtransceiver.c</PathWithFileName>
       <FilenameWithoutPath>EOtheBOARDtransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1990,26 +2006,10 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-board</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>61</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>1</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>185</TopLine>
-      <CurrentLine>207</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b01.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b01.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
     <File>
       <GroupNumber>10</GroupNumber>
       <FileNumber>62</FileNumber>
@@ -2018,10 +2018,26 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>201</TopLine>
-      <CurrentLine>221</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-nvscfg\eOprot_b02.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b01.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b01.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>63</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-nvscfg\eOprot_b02.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b02.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2030,26 +2046,10 @@
 
   <Group>
     <GroupName>protocol</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>63</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>693</TopLine>
-      <CurrentLine>1</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocol.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocol.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
     <File>
       <GroupNumber>11</GroupNumber>
       <FileNumber>64</FileNumber>
@@ -2061,7 +2061,23 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolEPs.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocol.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocol.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>65</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolEPs.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolEPs.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2070,52 +2086,28 @@
 
   <Group>
     <GroupName>protocol-as</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>65</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>43</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>68</TopLine>
-      <CurrentLine>91</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_fun.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolAS_fun.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
     <File>
       <GroupNumber>12</GroupNumber>
       <FileNumber>66</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>236</TopLine>
-      <CurrentLine>311</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolAS_rom.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolAS_rom.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_fun.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolAS_fun.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>protocol-mc</GroupName>
-    <tvExp>1</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>13</GroupNumber>
+      <GroupNumber>12</GroupNumber>
       <FileNumber>67</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2125,11 +2117,19 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_fun.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolMC_fun.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolAS_rom.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolAS_rom.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>protocol-mc</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>13</GroupNumber>
       <FileNumber>68</FileNumber>
@@ -2141,7 +2141,23 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMC_rom.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_fun.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolMC_fun.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>69</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMC_rom.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolMC_rom.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2150,26 +2166,10 @@
 
   <Group>
     <GroupName>protocol-mn</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>69</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>6</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_fun.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolMN_fun.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
     <File>
       <GroupNumber>14</GroupNumber>
       <FileNumber>70</FileNumber>
@@ -2181,7 +2181,23 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolMN_rom.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_fun.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolMN_fun.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>71</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolMN_rom.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolMN_rom.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2196,32 +2212,32 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>71</FileNumber>
+      <FileNumber>72</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>50</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_fun.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_fun.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolSK_fun.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
-      <FileNumber>72</FileNumber>
+      <FileNumber>73</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>100</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-prot\src\EoProtocolSK_rom.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-prot\src\EoProtocolSK_rom.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolSK_rom.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2230,13 +2246,13 @@
 
   <Group>
     <GroupName>eo-nvs-cfg-usrcbk</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>73</FileNumber>
+      <FileNumber>74</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2260,7 +2276,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>17</GroupNumber>
-      <FileNumber>74</FileNumber>
+      <FileNumber>75</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2284,7 +2300,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>18</GroupNumber>
-      <FileNumber>75</FileNumber>
+      <FileNumber>76</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2293,24 +2309,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\eOcfg_sm_EMSappl.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\eOcfg_sm_EMSappl.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_sm_EMSappl.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>76</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>35</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSappl.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSappl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2325,8 +2325,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSapplCfg.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSapplCfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSappl.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSappl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2341,8 +2341,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSconfigurator.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSconfigurator.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSapplCfg.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSapplCfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2352,13 +2352,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>27</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSerror.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSconfigurator.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSconfigurator.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2373,8 +2373,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSrunner.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSrunner.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSerror.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2389,8 +2389,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSsocket.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSsocket.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSrunner.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSrunner.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2400,13 +2400,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>88</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMStransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMStransceiver.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSsocket.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSsocket.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2421,8 +2421,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSdiscoverylistener.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMStransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMStransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2437,8 +2437,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSdiscoverytransceiver.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverylistener.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSdiscoverylistener.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2453,8 +2453,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\OPCprotocolManager.c</PathWithFileName>
-      <FilenameWithoutPath>OPCprotocolManager.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSdiscoverytransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSdiscoverytransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2469,8 +2469,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoor.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSbackdoor.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\OPCprotocolManager.c</PathWithFileName>
+      <FilenameWithoutPath>OPCprotocolManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2485,7 +2485,23 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoor.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSbackdoor.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>88</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-icub-app\src\EOMtheEMSbackdoortransceiver.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSbackdoortransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2500,7 +2516,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>19</GroupNumber>
-      <FileNumber>88</FileNumber>
+      <FileNumber>89</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2524,7 +2540,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>89</FileNumber>
+      <FileNumber>90</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2540,7 +2556,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>90</FileNumber>
+      <FileNumber>91</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2556,7 +2572,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>91</FileNumber>
+      <FileNumber>92</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2572,7 +2588,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>92</FileNumber>
+      <FileNumber>93</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2588,7 +2604,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>93</FileNumber>
+      <FileNumber>94</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2604,7 +2620,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>94</FileNumber>
+      <FileNumber>95</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2620,7 +2636,7 @@
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>95</FileNumber>
+      <FileNumber>96</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2638,22 +2654,22 @@
 
   <Group>
     <GroupName>host-transceiver</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>21</GroupNumber>
-      <FileNumber>96</FileNumber>
+      <FileNumber>97</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>50</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\wip-prot\src\EOhostTransceiver.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj-wip\wip-prot\src\EOhostTransceiver.c</PathWithFileName>
       <FilenameWithoutPath>EOhostTransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
