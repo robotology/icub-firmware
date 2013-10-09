@@ -129,6 +129,19 @@ extern hal_result_t hal_arch_dspic_hid_setmem(const hal_cfg_t *cfg, uint32_t *me
 }
 
 
+#ifdef HAL_DONT_INLINE
+extern uint32_t hal_arch_dspic_convert_halflash_address_to_dspicflash_address(uint32_t addr)
+{   // in libpic30.h: typedef unsigned long _prog_addressT; thus i use a uint32_t
+    //return(addr/2);
+    return(addr);
+}
+
+extern uint32_t hal_arch_dspic_convert_ptr_to_halflash_address(void *ptr)
+{   // in libpic30.h: typedef unsigned long _prog_addressT; thus i use a uint32_t
+    return(2L*(uint32_t)((uint16_t)ptr));
+}
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------

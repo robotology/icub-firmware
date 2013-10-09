@@ -452,6 +452,90 @@ extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * 
     }
 }
 
+#ifdef HAL_DONT_INLINE
+extern hal_boolval_t hal_base_hid_byte_bitcheck(uint8_t byte, uint8_t bit)
+{
+    if(byte & (1<<bit))
+    {
+        return(hal_true);
+    }
+    else
+    {
+        return(hal_false);
+    }  
+}
+
+extern void hal_base_hid_byte_bitset(uint8_t* byte, uint8_t bit)
+{
+    (*byte) |= (1<<bit);    
+}
+
+extern void hal_base_hid_byte_bitclear(uint8_t* byte, uint8_t bit)
+{
+    (*byte) &= (~(1<<bit));    
+}
+
+extern void hal_base_hid_byte_bittoggle(uint8_t* byte, uint8_t bit)
+{
+    (*byte) ^= (1<<bit);    
+}
+
+extern hal_boolval_t hal_base_hid_halfword_bitcheck(uint16_t hword, uint8_t bit)
+{
+    if(hword & (1<<bit))
+    {
+        return(hal_true);
+    }
+    else
+    {
+        return(hal_false);
+    }
+}
+
+extern void hal_base_hid_halfword_bitset(uint16_t* hword, uint8_t bit)
+{
+    (*hword) |= (1<<bit);    
+}
+
+extern void hal_base_hid_halfword_bitclear(uint16_t* hword, uint8_t bit)
+{
+    (*hword) &= (~(1<<bit));    
+}
+
+extern void hal_base_hid_halfword_bittoggle(uint16_t* hword, uint8_t bit)
+{
+    (*hword) ^= (1<<bit);    
+}
+
+extern hal_boolval_t hal_base_hid_word_bitcheck(uint32_t word, uint8_t bit)
+{
+    if(word & (1<<bit))
+    {
+        return(hal_true);
+    }
+    else
+    {
+        return(hal_false);
+    }
+ 
+}
+
+extern void hal_base_hid_word_bitset(uint32_t* word, uint8_t bit)
+{
+    (*word) |= (1<<bit);    
+}
+
+extern void hal_base_hid_word_bitclear(uint32_t* word, uint8_t bit)
+{
+    (*word) &= (~(1<<bit));    
+}
+
+extern void hal_base_hid_word_bittoggle(uint32_t* word, uint8_t bit)
+{
+    (*word) ^= (1<<bit);    
+}
+
+#endif
  
 
 // --------------------------------------------------------------------------------------------------------------------

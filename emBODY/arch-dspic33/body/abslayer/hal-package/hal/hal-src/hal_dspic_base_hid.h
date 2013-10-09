@@ -78,6 +78,33 @@ extern void hal_base_hid_osal_scheduling_restart(void);
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------
 
+#ifdef HAL_DONT_INLINE
+
+extern hal_boolval_t hal_base_hid_byte_bitcheck(uint8_t byte, uint8_t bit);
+
+extern void hal_base_hid_byte_bitset(uint8_t* byte, uint8_t bit);
+
+extern void hal_base_hid_byte_bitclear(uint8_t* byte, uint8_t bit);
+
+extern void hal_base_hid_byte_bittoggle(uint8_t* byte, uint8_t bit);
+
+extern hal_boolval_t hal_base_hid_halfword_bitcheck(uint16_t hword, uint8_t bit);
+
+extern void hal_base_hid_halfword_bitset(uint16_t* hword, uint8_t bit);
+
+extern void hal_base_hid_halfword_bitclear(uint16_t* hword, uint8_t bit);
+
+extern void hal_base_hid_halfword_bittoggle(uint16_t* hword, uint8_t bit);
+
+extern hal_boolval_t hal_base_hid_word_bitcheck(uint32_t word, uint8_t bit);
+
+extern void hal_base_hid_word_bitset(uint32_t* word, uint8_t bit);
+
+extern void hal_base_hid_word_bitclear(uint32_t* word, uint8_t bit);
+
+extern void hal_base_hid_word_bittoggle(uint32_t* word, uint8_t bit);
+
+#else
 
 inline extern hal_boolval_t hal_base_hid_byte_bitcheck(uint8_t byte, uint8_t bit)
 {
@@ -160,6 +187,8 @@ inline extern void hal_base_hid_word_bittoggle(uint32_t* word, uint8_t bit)
 {
     (*word) ^= (1<<bit);    
 }
+
+#endif
 
 #endif  // include guard
 
