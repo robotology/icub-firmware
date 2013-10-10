@@ -139,7 +139,7 @@
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros"
-                  value="__DSPIC__;HAL_BOARD_6SG;HAL_USE_ARCH_DSPIC;HAL_DONT_INLINE"/>
+                  value="__DSPIC__;HAL_USE_ARCH_DSPIC;HAL_DONT_INLINE;HAL_BOARD_6SGor2FOC"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>

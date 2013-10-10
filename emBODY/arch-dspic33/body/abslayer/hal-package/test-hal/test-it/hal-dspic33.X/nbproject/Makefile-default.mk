@@ -83,112 +83,112 @@ ${OBJECTDIR}/_ext/55005602/main.o: ../../app-test/main.c  nbproject/Makefile-${C
 	@${MKDIR} ${OBJECTDIR}/_ext/55005602 
 	@${RM} ${OBJECTDIR}/_ext/55005602/main.o.d 
 	@${RM} ${OBJECTDIR}/_ext/55005602/main.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app-test/main.c  -o ${OBJECTDIR}/_ext/55005602/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/55005602/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app-test/main.c  -o ${OBJECTDIR}/_ext/55005602/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/55005602/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/55005602/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1482636426/hal_cfg.o: ../../hal-cfg/hal_cfg.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1482636426 
 	@${RM} ${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1482636426/hal_cfg.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../hal-cfg/hal_cfg.c  -o ${OBJECTDIR}/_ext/1482636426/hal_cfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../hal-cfg/hal_cfg.c  -o ${OBJECTDIR}/_ext/1482636426/hal_cfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o: ../../../hal/hal-src/hal_dspic_arch.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_arch.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_arch.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o: ../../../hal/hal-src/hal_dspic_base.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_base.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_base.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o: ../../../hal/hal-src/hal_dspic_can.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_can.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_can.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o: ../../../hal/hal-src/hal_dspic_eeprom.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_eeprom.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_eeprom.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o: ../../../hal/hal-src/hal_dspic_gpio.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_gpio.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_gpio.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o: ../../../hal/hal-src/hal_dspic_led.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_led.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_led.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o: ../../../hal/hal-src/hal_dspic_sys.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_sys.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_sys.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o: ../../../hal/hal-src/hal_dspic_timer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_timer.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_timer.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o: ../../../hal/hal-src/hal_dspic_flash.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_flash.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_flash.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o: ../../../hal/hal-src/hal_brdcfg.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_brdcfg.c  -o ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_brdcfg.c  -o ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o: ../../../hal/hal-src/hal_dspic_crc.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_crc.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_crc.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o: ../../../hal/hal-stg/hal_dspic_startup.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798207 
 	@${RM} ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-stg/hal_dspic_startup.c  -o ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-stg/hal_dspic_startup.c  -o ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1393882463/crc16.o: ../../../hal/hal-src/utils/crc16.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1393882463 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc16.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc16.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc16.c  -o ${OBJECTDIR}/_ext/1393882463/crc16.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc16.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc16.c  -o ${OBJECTDIR}/_ext/1393882463/crc16.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc16.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1393882463/crc16.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1393882463/crc32.o: ../../../hal/hal-src/utils/crc32.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1393882463 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc32.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc32.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc32.c  -o ${OBJECTDIR}/_ext/1393882463/crc32.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc32.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc32.c  -o ${OBJECTDIR}/_ext/1393882463/crc32.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc32.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1393882463/crc32.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
@@ -196,112 +196,112 @@ ${OBJECTDIR}/_ext/55005602/main.o: ../../app-test/main.c  nbproject/Makefile-${C
 	@${MKDIR} ${OBJECTDIR}/_ext/55005602 
 	@${RM} ${OBJECTDIR}/_ext/55005602/main.o.d 
 	@${RM} ${OBJECTDIR}/_ext/55005602/main.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app-test/main.c  -o ${OBJECTDIR}/_ext/55005602/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/55005602/main.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app-test/main.c  -o ${OBJECTDIR}/_ext/55005602/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/55005602/main.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/55005602/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1482636426/hal_cfg.o: ../../hal-cfg/hal_cfg.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1482636426 
 	@${RM} ${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1482636426/hal_cfg.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../hal-cfg/hal_cfg.c  -o ${OBJECTDIR}/_ext/1482636426/hal_cfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../hal-cfg/hal_cfg.c  -o ${OBJECTDIR}/_ext/1482636426/hal_cfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1482636426/hal_cfg.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o: ../../../hal/hal-src/hal_dspic_arch.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_arch.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_arch.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_arch.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o: ../../../hal/hal-src/hal_dspic_base.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_base.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_base.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_base.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_base.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o: ../../../hal/hal-src/hal_dspic_can.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_can.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_can.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_can.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_can.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o: ../../../hal/hal-src/hal_dspic_eeprom.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_eeprom.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_eeprom.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_eeprom.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o: ../../../hal/hal-src/hal_dspic_gpio.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_gpio.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_gpio.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_gpio.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o: ../../../hal/hal-src/hal_dspic_led.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_led.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_led.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_led.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_led.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o: ../../../hal/hal-src/hal_dspic_sys.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_sys.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_sys.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_sys.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o: ../../../hal/hal-src/hal_dspic_timer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_timer.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_timer.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_timer.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o: ../../../hal/hal-src/hal_dspic_flash.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_flash.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_flash.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_flash.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o: ../../../hal/hal-src/hal_brdcfg.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_brdcfg.c  -o ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_brdcfg.c  -o ${OBJECTDIR}/_ext/527798273/hal_brdcfg.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_brdcfg.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o: ../../../hal/hal-src/hal_dspic_crc.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798273 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_crc.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/hal_dspic_crc.c  -o ${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798273/hal_dspic_crc.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o: ../../../hal/hal-stg/hal_dspic_startup.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/527798207 
 	@${RM} ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d 
 	@${RM} ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-stg/hal_dspic_startup.c  -o ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-stg/hal_dspic_startup.c  -o ${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/527798207/hal_dspic_startup.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1393882463/crc16.o: ../../../hal/hal-src/utils/crc16.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1393882463 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc16.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc16.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc16.c  -o ${OBJECTDIR}/_ext/1393882463/crc16.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc16.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc16.c  -o ${OBJECTDIR}/_ext/1393882463/crc16.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc16.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1393882463/crc16.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1393882463/crc32.o: ../../../hal/hal-src/utils/crc32.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1393882463 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc32.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1393882463/crc32.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc32.c  -o ${OBJECTDIR}/_ext/1393882463/crc32.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc32.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_BOARD_6SG -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../hal/hal-src/utils/crc32.c  -o ${OBJECTDIR}/_ext/1393882463/crc32.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1393882463/crc32.o.d"      -g -omf=elf -O0 -I"../../../../../embenv/envcom" -I"../../../hal/hal-src" -I".." -I"../../../hal/hal-api" -I"../../../hal/hal-cfg" -D__DSPIC__ -DHAL_USE_ARCH_DSPIC -DHAL_DONT_INLINE -DHAL_BOARD_6SGor2FOC -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1393882463/crc32.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
