@@ -56,26 +56,26 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define 			my_CONFIG_REGISTERS_BASIC(dummy)                          		\
-                                                                                    \
-                    /* no Boot sector and write protection disabled */              \
-                    _FBS (BSS_NO_FLASH & BWRP_WRPROTECT_OFF);                       \
-                    /* no secure sector and write protection disabled */            \
-                    _FSS (RSS_NO_RAM & SSS_NO_FLASH & SWRP_WRPROTECT_OFF);          \
-                    /* Code protection disabled */                                  \
-                    _FGS(GSS_OFF);                                                  \
-                    /* Clock switching disabled Fail safe Clock Monitor disabled  */ \
-                    _FOSCSEL(IESO_OFF & FNOSC_FRC);                                 \
-                    /* Clock switching and clock monitor disabled, */               \
-                    /* EC external clock, OSCOUT as IOPIN */                        \
-                    _FOSC(FCKSM_CSECMD & POSCMD_EC & OSCIOFNC_ON);                  \
-                    /* Turn off Watchdog Timer */                                   \
-                    _FWDT (FWDTEN_OFF);                                             \
-                    /* PWM mode is Port registers PWM high & low active high */     \
-                    /* alternate I2C mapped to SDA1/SCL1 */                         \
-                    /* FPOR power on reset 128ms  */                                \
-                    _FPOR (PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);           \
-                    /* Use PGC3/PGD3 for programming and debugging */               \
+    #define         my_CONFIG_REGISTERS_BASIC(dummy)                                    \
+                                                                                        \
+                    /* no Boot sector and write protection disabled */                  \
+                    _FBS (BSS_NO_FLASH & BWRP_WRPROTECT_OFF);                           \
+                    /* no secure sector and write protection disabled */                \
+                    _FSS (RSS_NO_RAM & SSS_NO_FLASH & SWRP_WRPROTECT_OFF);              \
+                    /* Code protection disabled */                                      \
+                    _FGS(GSS_OFF);                                                      \
+                    /* Clock switching disabled Fail safe Clock Monitor disabled  */    \
+                    _FOSCSEL(IESO_OFF & FNOSC_FRC);                                     \
+                    /* Clock switching and clock monitor disabled, */                   \
+                    /* EC external clock, OSCOUT as IOPIN */                            \
+                    _FOSC(FCKSM_CSECMD & POSCMD_EC & OSCIOFNC_ON);                      \
+                    /* Turn off Watchdog Timer */                                       \
+                    _FWDT (FWDTEN_OFF);                                                 \
+                    /* PWM mode is Port registers PWM high & low active high */         \
+                    /* alternate I2C mapped to SDA1/SCL1 */                             \
+                    /* FPOR power on reset 128ms  */                                    \
+                    _FPOR (PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);               \
+                    /* Use PGC3/PGD3 for programming and debugging */                   \
                     _FICD (ICS_PGD3 & JTAGEN_OFF);                                  
 
 
