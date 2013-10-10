@@ -182,7 +182,7 @@ static void s_app_can_start(uint32_t canaddr)
         .priorx         = hal_int_priorityNONE,
         .priotx         = hal_int_priorityNONE,
         .callback_on_rx = NULL,
-        .arg            = NULL
+        .arg_cb_rx      = NULL
     };
     
     hal_can_init(hal_can_port1, &cfg);

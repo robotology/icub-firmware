@@ -83,14 +83,14 @@ ${OBJECTDIR}/_ext/1445257345/main.o: ../../app/main.c  nbproject/Makefile-${CND_
 	@${MKDIR} ${OBJECTDIR}/_ext/1445257345 
 	@${RM} ${OBJECTDIR}/_ext/1445257345/main.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1445257345/main.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/main.c  -o ${OBJECTDIR}/_ext/1445257345/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/main.o.d"      -g -D__DEBUG   -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/main.c  -o ${OBJECTDIR}/_ext/1445257345/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o: ../../../../../body/embenv/envshalib/eEbasicStorage.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1266031256 
 	@${RM} ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../body/embenv/envshalib/eEbasicStorage.c  -o ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d"      -g -D__DEBUG   -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../body/embenv/envshalib/eEbasicStorage.c  -o ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
@@ -127,7 +127,7 @@ endif
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 dist/${CND_CONF}/${IMAGE_TYPE}/appl-basic.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    ../eElinkerscript_applic.gld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/appl-basic.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG   -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,,$(MP_LINKER_FILE_OPTION),--heap=4096,--stack=1024,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library-path="..",--no-force-link,--smart-io,-Map="${DISTDIR}/appl-basic.X.${IMAGE_TYPE}.map",--report-mem,--warn-section-align$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/appl-basic.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,$(MP_LINKER_FILE_OPTION),--heap=4096,--stack=1024,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--library-path="..",--no-force-link,--smart-io,-Map="${DISTDIR}/appl-basic.X.${IMAGE_TYPE}.map",--report-mem,--warn-section-align$(MP_EXTRA_LD_POST) 
 	
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/appl-basic.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   ../eElinkerscript_applic.gld
