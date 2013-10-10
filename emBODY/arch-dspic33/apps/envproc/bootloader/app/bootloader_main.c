@@ -55,29 +55,29 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#define hal_arch_dspic_base_CONFIG_REGISTERS_BOOTLOADER(dummy)                                                 		\
-                                    // no Boot sector and write protection disabled                                 \
-                                    _FBS (BSS_NO_FLASH & BWRP_WRPROTECT_OFF);                                       \
-                                    // no secure sector and write protection disabled                               \
-                                    _FSS (RSS_NO_RAM & SSS_NO_FLASH & SWRP_WRPROTECT_OFF);                          \
-                                    // Code protection disabled                                                     \
-                                    _FGS(GSS_OFF);                                                                  \
-                                    // Clock switching disabled Fail safe Clock Monitor disabled                    \
-                                    // External clock with PLL x8 (10MHz*8->Fcycle=80/4=20MIPS)                     \
-                                    //_FOSCSEL(IESO_OFF & FNOSC_PRIPLL);  NON PARTO CON PLL                         \
-                                    _FOSCSEL(IESO_OFF & FNOSC_FRC);                                                 \
-                                    //Clock switching and clock monitor disabled, EC external clock, OSCOUT as IOPIN\
-                                    //_FOSC(FCKSM_CSDCMD & POSCMD_EC & OSCIOFNC_ON); NON PARTO CON PLL              \
-                                    _FOSC(FCKSM_CSECMD & POSCMD_EC & OSCIOFNC_ON &IOL1WAY_OFF)                      \
-                                    // Turn off Watchdog Timer                                                      \
-                                    _FWDT (FWDTEN_OFF);                                                             \
-                                    //_FWDT(WDT_ON & WDTPSA_512 & WDTPSB_1); // WD enabled 1:512*16                 \
-                                    // PWM mode is Port registers PWM high & low active high                        \
-                                    // alternate I2C mapped to SDA1/SCL1                                            \
-                                    // FPOR power on reset 128ms                                                    \
-                                    _FPOR (PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);                           \
-                                    // Use PGC3/PGD3 for programming and debugging                                  \
-                                    _FICD (ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF                       
+#define hal_arch_dspic_base_CONFIG_REGISTERS_BOOTLOADER(dummy)                                      \
+            /* - no Boot sector and write protection disabled */                                    \
+            _FBS (BSS_NO_FLASH & BWRP_WRPROTECT_OFF);                                               \
+            /* - no secure sector and write protection disabled  */                                 \
+            _FSS (RSS_NO_RAM & SSS_NO_FLASH & SWRP_WRPROTECT_OFF);                                  \
+            /* - Code protection disabled  */                                                       \
+            _FGS(GSS_OFF);                                                                          \
+            /* - Clock switching dsabled Fail safe Clock Monitor disabled */                        \
+            /* - External clock with PLL x8 (10MHz*8->Fcycle=80/4=20MIPS) */                        \
+            /* rem: _FOSCSEL(IESO_OFF & FNOSC_PRIPLL);  NON PARTO CON PLL   */                      \
+            _FOSCSEL(IESO_OFF & FNOSC_FRC);                                                         \
+            /* - Clock switching and clock monitor disabled, EC external clock, OSCOUT as IOPIN */  \
+            /* rem: _FOSC(FCKSM_CSDCMD & POSCMD_EC & OSCIOFNC_ON); NON PARTO CON PLL */             \
+            _FOSC(FCKSM_CSECMD & POSCMD_EC & OSCIOFNC_ON &IOL1WAY_OFF)                              \
+            /* - Turn off Watchdog Timer */                                                         \
+            _FWDT (FWDTEN_OFF);                                                                     \
+            /* rem: _FWDT(WDT_ON & WDTPSA_512 & WDTPSB_1); // WD enabled 1:512*16  */               \
+            /* - PWM mode is Port registers PWM high & low active high */                           \
+            /* - alternate I2C mapped to SDA1/SCL1  */                                              \
+            /* - FPOR power on reset 128ms */                                                       \
+            _FPOR (PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);                                   \
+            /* - Use PGC3/PGD3 for programming and debugging */                                     \
+            _FICD (ICS_PGD3 & JTAGEN_OFF); /* & COE_ON ); //BKBUG_OFF  */                           
                                     
 
 
