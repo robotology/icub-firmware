@@ -224,7 +224,9 @@ static void s_ap_hal_init(void)
         .priorx = hal_int_priority05,
         .priotx = hal_int_priority05,
         .callback_on_rx = NULL,
-        .arg = NULL    
+        .arg_cb_rx = NULL,
+        .callback_on_tx = NULL,
+        .arg_cb_tx = NULL
     };
     
     static uint8_t flash[1024];
