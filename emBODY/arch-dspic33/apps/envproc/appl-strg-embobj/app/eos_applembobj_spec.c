@@ -275,14 +275,12 @@ extern void eos_applembobj_spec_user_init(void)
 {
     #warning --> add in here whatever is needed
 
-	// we init the led and we put it on.
-	hal_led_init(hal_led1, 0);
+    // we init the led and we put it on.
+    hal_led_init(hal_led1, 0);
 
-	hal_led_on(hal_led1);
+    hal_led_on(hal_led1);
 
-
-	s_eos_applembobj_spec_user_initstorages();
-
+    s_eos_applembobj_spec_user_initstorages();
 
 }
 
@@ -301,9 +299,9 @@ static uint32_t s_canaddr = 7;
 
 static void s_eos_applembobj_spec_user_initstorages(void)
 {
-	#warning --> add in here initialisation of shared storage and of private storage.
+    #warning --> add in here initialisation of shared storage and of private storage.
 
-	// 1. init eeprom and crc.
+    // 1. init eeprom and crc.
 
     static uint8_t flash[1024];
 #define CRC16_USE_CRC16TABLE_IN_ROM
@@ -326,28 +324,27 @@ static void s_eos_applembobj_spec_user_initstorages(void)
     crccfg.crctblram            = crc16table; // not when hal_crc_poly_crc16_ccitt uses a precalculated const internal table
     hal_crc_init(hal_crc0, &crccfg);
 
-	// 2. init shared storage
+    // 2. init shared storage
 
-	if(ee_res_OK != ee_sharedstorage_init(ee_procApplication, &s_moduleinfo_application, NULL, 0))
+    if(ee_res_OK != ee_sharedstorage_init(ee_procApplication, &s_moduleinfo_application, NULL, 0))
     {
         s_eos_applembobj_spec_user_manage_error();
     }
 
 
-	// 3. get something from shared storage. the can address for instance.
+    // 3. get something from shared storage. the can address for instance.
 
-	if(ee_res_OK != ee_sharedstorage_deviceinfo_canaddress_get(&s_canaddr))
+    if(ee_res_OK != ee_sharedstorage_deviceinfo_canaddress_get(&s_canaddr))
     {
          s_eos_applembobj_spec_user_manage_error(); 
     }
 
-	// 4. init private storage
+    // 4. init private storage
 
-	privstrgcfg.size 	= sizeof(myPrivateData_t);
+    privstrgcfg.size 	= sizeof(myPrivateData_t);
     privstrgcfg.defval	= &s_myprivate_data_default;
 
-	ee_privatestorage_init(&privstrgcfg, (void**)&s_myprivate_data_ptr);
-
+    ee_privatestorage_init(&privstrgcfg, (void**)&s_myprivate_data_ptr);
 	 
 }
 
