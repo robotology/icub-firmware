@@ -459,6 +459,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
     void                                    *val_ptr = NULL;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOmc_joint_config_t                     *jconfig_ptr;
+    eOicubCanProto_position_t               pos;
 
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
@@ -540,6 +541,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             val_ptr =  &(setPoint->to.current.value);    
         }break;
 
+        case eomc_setpoint_positionraw:
+        {    
+            pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_COMMAND_POSITION; 
+            val_ptr =  &pos; 
+        }break;
+        
         default:
         {
             return;

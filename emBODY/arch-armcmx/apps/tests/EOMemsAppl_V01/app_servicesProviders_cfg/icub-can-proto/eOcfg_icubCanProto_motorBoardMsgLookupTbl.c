@@ -630,8 +630,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubC
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getBoardId(p, frame, canPort);
         }break;
-
-
+        
         default:
         {
             res = eo_icubCanProto_parser_pol_mb_unexpected_cmd(p, frame, canPort);
@@ -761,6 +760,10 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
             res = eo_icubCanProto_former_pol_mb_cmd__getBoardId(p, nv_ptr, dest, canFrame);
         }break;
 
+        case ICUBCANPROTO_POL_MB_CMD__SET_COMMAND_POSITION:  /* 62 */
+        {
+            res = eo_icubCanProto_former_pol_mb_cmd__setCmdPos(p, nv_ptr, dest, canFrame);
+        }break;
 
         default:
         {

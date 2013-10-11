@@ -1191,6 +1191,16 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getI2TParams(EOicubCanProto
 }
 
 
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCmdPos(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 5;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_COMMAND_POSITION;
+    *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)nv_ptr);
+    return(eores_OK);
+}
 
 
 
