@@ -1346,7 +1346,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>__CORTEX_M3 NDBG_MSG</Define>
+              <Define>__CORTEX_M3 NDBG_MSG OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -1885,7 +1885,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>__CORTEX_M3 OOSIIT_DBG_ENABLE</Define>
+              <Define>__CORTEX_M3 OOSIIT_DBG_ENABLE OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -3422,7 +3422,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>__CORTEX_M4 __FPU_PRESENT</Define>
+              <Define>__CORTEX_M4 __FPU_PRESENT OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -3961,7 +3961,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>__CORTEX_M4 __FPU_PRESENT OOSIIT_DBG_ENABLE</Define>
+              <Define>__CORTEX_M4 __FPU_PRESENT OOSIIT_DBG_ENABLE OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>.\oosiit-api;.\oosiit-src\cmsis-rtx-modified\cm;.\oosiit-src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
