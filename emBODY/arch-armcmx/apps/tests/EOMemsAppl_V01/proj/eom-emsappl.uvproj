@@ -1200,6 +1200,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2609,6 +2614,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4095,6 +4105,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5742,6 +5757,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7384,6 +7404,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9025,6 +9050,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -10708,6 +10738,11 @@
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -12389,6 +12424,11 @@
               <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rxtools.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
