@@ -90,6 +90,12 @@ static opcprotman_var_map_t s_myarray[] =
         .size       = sizeof(eOdgn_jointsStateCmd_t),
         .ptr        = NULL,
         .onrec      = NULL
+    },
+    {
+        .var        = eodgn_nvidbdoor_rxcheckSetpoints,
+        .size       = sizeof(eOdgn_rxCheckSetpoints_t),
+        .ptr        = NULL,
+        .onrec      = NULL
     }
 };
 
