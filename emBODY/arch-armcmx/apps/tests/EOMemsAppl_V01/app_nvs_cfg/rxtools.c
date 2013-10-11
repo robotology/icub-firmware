@@ -77,16 +77,16 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern int32_t rxtools_verify_reception(rxtools_rec_status_t* status, rxtools_tx_inrop_t* txinrop, uint64_t maxtimegap, uint8_t* retflags)
+extern int32_t rxtools_verify_reception(rxtools_rec_status_t* status, rxtools_tx_inrop_t* txinrop, uint32_t maxtimegap, rxtools_results_t* results)
 {
     int32_t retvalue = 0;
     
-    if((NULL == status) || (NULL == retflags) || (NULL == txinrop))
+    if((NULL == status) || (NULL == results) || (NULL == txinrop))
     {
         return(-2);
     }
         
-    *retflags = 0;
+    results->flags = 0;
     
     // verification on progressive number
     if((0xffffffff != txinrop->txprog) && (0xffffffff != status->receiverprog))
@@ -94,7 +94,8 @@ extern int32_t rxtools_verify_reception(rxtools_rec_status_t* status, rxtools_tx
         if(txinrop->txprog != (status->receiverprog+1))
         {
             retvalue = -1;
-            (*retflags) |= 0x01;                       
+            results->flags |= 0x01;    
+            results->deltaprognumber = txinrop->txprog - status->receiverprog;          
         }
         
         status->receiverprog = txinrop->txprog;
@@ -102,16 +103,18 @@ extern int32_t rxtools_verify_reception(rxtools_rec_status_t* status, rxtools_tx
 
 
     // verification on delta rx time
-    if(status->receivertime != 0xffffffffffffffff)
+    if(status->receivertime != 0xffffffff)
     {   // the verification on gap between two receptions is enabled only if we pass a valid previous received time
         
-        uint64_t timenow = osal_system_ticks_abstime_get();
-        uint64_t timegap = timenow - status->receivertime;
+        uint64_t t = osal_system_ticks_abstime_get() / 1000;
+        uint32_t timenow = (uint32_t)t;
+        uint32_t timegap = timenow - status->receivertime;
         
         if(timegap > maxtimegap)
         {
             retvalue = -1;
-            (*retflags) |= 0x02;                       
+            results->flags |= 0x02;    
+            results->deltarxtime = timegap;  
         }
         
         status->receivertime = timenow;
