@@ -266,22 +266,18 @@ typedef struct
 
 typedef struct
 {   // time is in milli-sec
-    uint32_t    receivertime;
-//    uint64_t    transmittime;
-    uint32_t    receiverprog;    
-} eOdgn_rxSetPointsInfo_t;
-
-
-typedef struct
-{   // time is in milli-sec
-    uint8_t     flags;
+//     uint8_t     flags;
+//     uint8_t     type;
+//     uint8_t     dummy;
+//     uint8_t     dummy2;
     int32_t     deltaprognumber;
     uint32_t    deltarxtime; 
 } eOdgn_rxSetPointsInfo_t;
 
 typedef struct
 {
-    eOdgn_rxSetPointsInfo_t info[4];
+    eOdgn_rxSetPointsInfo_t position[4];
+    eOdgn_rxSetPointsInfo_t impedence[4];
 } eOdgn_rxCheckSetpoints_t;
 
 /** @}            
