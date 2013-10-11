@@ -51,6 +51,7 @@
 #include "EOappMeasuresConverter.h"
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,8 +67,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+//#define VERIFY_ROP_SETIMPEDANCE
+//#define VERIFY_ROP_SETPOSITIONRAW
+
+#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
+    #include "rxtools.h"
+    #define MAXJ 4
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -86,8 +93,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+#if defined(VERIFY_ROP_SETIMPEDANCE)
+    const uint32_t maxtimegap_impedance = 25; // 25 ms expressed in milli-sec
+    static rxtools_rec_status_t status_rop_impedance[MAXJ] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+#endif
+    
+    
+#if defined(VERIFY_ROP_SETPOSITIONRAW)
+    const uint32_t maxtimegap_setpositionraw = 25; // 25 ms expressed in milli-sec
+    static rxtools_rec_status_t status_rop_setpositionraw[MAXJ] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -211,8 +227,35 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->loc;
     
+#if defined(VERIFY_ROP_SETIMPEDANCE)   
+    
+    if(jxx < MAXJ)
+    {
+        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
+        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
+        txinrop.txprog = sign;
+        rxtools_results_t results = {0, 0, 0};        
+        int32_t ret = rxtools_verify_reception(&status_rop_impedance[jxx], &txinrop, maxtimegap_impedance, &results);
+        if(-1 == ret)
+        {   // error: eval retflags
+            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
+            {
+                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
+                #warning -> fill inside the backdoor
+            }
+            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
+            {
+                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
+                #warning -> fill inside the backdoor
+            }        
+        }
+    }
+    
+#endif  
+
+
+    eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->loc;   
     eo_emsController_SetImpedance(jxx, cfg->stiffness, cfg->damping, cfg->offset);
 }
 
@@ -317,6 +360,33 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
         
         case eomc_setpoint_positionraw:
         {
+            
+#if defined(VERIFY_ROP_SETPOSITIONRAW)   
+    
+    if(jxx < MAXJ)
+    {
+        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
+        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
+        txinrop.txprog = sign;
+        rxtools_results_t results = {0, 0, 0};        
+        int32_t ret = rxtools_verify_reception(&status_rop_setpositionraw[jxx], &txinrop, maxtimegap_setpositionraw, &results);
+        if(-1 == ret)
+        {   // error: eval retflags
+            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
+            {
+                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
+                #warning -> fill inside the backdoor
+            }
+            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
+            {
+                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
+                #warning -> fill inside the backdoor
+            }        
+        }
+    }
+    
+#endif              
+            
             eo_emsController_SetPosRaw(jxx, setPoint->to.position.value);
         }break;
         
