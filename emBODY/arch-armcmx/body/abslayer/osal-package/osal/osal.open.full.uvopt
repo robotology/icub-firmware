@@ -73,7 +73,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <DllOpt>
@@ -705,7 +705,7 @@
   </Target>
 
   <Target>
-    <TargetName>osal.open.cm4.dbg</TargetName>
+    <TargetName>osal.open.full.cm4.dbg</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -757,7 +757,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>255</CpuCode>
       <DllOpt>
@@ -1154,8 +1154,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Time.c</PathWithFileName>
       <FilenameWithoutPath>rt_Time.c</FilenameWithoutPath>
@@ -1184,10 +1184,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>13</ColumnNumber>
+      <ColumnNumber>31</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1472</TopLine>
-      <CurrentLine>1485</CurrentLine>
+      <TopLine>701</TopLine>
+      <CurrentLine>708</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\others\oosiit.c</PathWithFileName>
       <FilenameWithoutPath>oosiit.c</FilenameWithoutPath>
@@ -1278,7 +1278,7 @@
 
   <Group>
     <GroupName>osal</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1286,12 +1286,12 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>22</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>3</ColumnNumber>
+      <ColumnNumber>58</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>462</TopLine>
-      <CurrentLine>471</CurrentLine>
+      <TopLine>533</TopLine>
+      <CurrentLine>542</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\osal-src\osal-oosiit.c</PathWithFileName>
       <FilenameWithoutPath>osal-oosiit.c</FilenameWithoutPath>

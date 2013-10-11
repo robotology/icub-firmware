@@ -348,7 +348,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3 __CORTEX_M3 NDBG_MSG</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3 __CORTEX_M3 NDBG_MSG OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\midware\oosiit-package\oosiit\oosiit-api;..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm;..\..\..\midware\oosiit-package\oosiit\oosiit-src\others;..\..\..\midware\oosiit-package\oosiit\oosiit-stg</IncludePath>
             </VariousControls>
@@ -892,7 +892,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3 __CORTEX_M3 OOSIIT_DBG_ENABLE</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3 __CORTEX_M3 OOSIIT_DBG_ENABLE OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\midware\oosiit-package\oosiit\oosiit-api;..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm;..\..\..\midware\oosiit-package\oosiit\oosiit-src\others;..\..\..\midware\oosiit-package\oosiit\oosiit-stg;..\..\..\..\sys\mid</IncludePath>
             </VariousControls>
@@ -1436,7 +1436,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4 __CORTEX_M4 __FPU_PRESENT</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4 __CORTEX_M4 __FPU_PRESENT OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\midware\oosiit-package\oosiit\oosiit-api;..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm;..\..\..\midware\oosiit-package\oosiit\oosiit-src\others;..\..\..\midware\oosiit-package\oosiit\oosiit-stg</IncludePath>
             </VariousControls>
@@ -1639,7 +1639,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>osal.open.cm4.dbg</TargetName>
+      <TargetName>osal.open.full.cm4.dbg</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1980,7 +1980,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4 __CORTEX_M4 __FPU_PRESENT OOSIIT_DBG_ENABLE</Define>
+              <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4 __CORTEX_M4 __FPU_PRESENT OOSIIT_DBG_ENABLE OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
               <IncludePath>..\osal\osal-api;..\..\..\midware\oosiit-package\oosiit\oosiit-api;..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm;..\..\..\midware\oosiit-package\oosiit\oosiit-src\others;..\..\..\midware\oosiit-package\oosiit\oosiit-stg;..\..\..\..\sys\mid</IncludePath>
             </VariousControls>
