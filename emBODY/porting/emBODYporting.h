@@ -75,15 +75,15 @@ extern "C" {
     #define EO_static_inline       static inline
     #define EO_INIT(f)
     #pragma pack(8)
-    #define snprintf        snprintf  
-    #define float32_t       float    
-	#define __weak __attribute__((weak))
+    #define snprintf        snprintf
+    #define float32_t       float
+    #define __weak          __attribute__((weak))
     #define EO_TAILOR_CODE_FOR_LINUX
     #define EO_WARNING(a)   _Pragma(message("EOWARNING-> "##a))
     #define OVERRIDE_eo_receiver_callback_incaseoferror_in_sequencenumberReceived
-    //	#define EOCFG_NVSEP_MC_OVERRIDE
-//	#define EOCFG_NVSEP_SK_OVERRIDE
-//	#define EOCFG_NVSEP_AS_OVERRIDE
+    #define _PEDANT_WARNING_ON_COMPILATION_CALLBACK_
+    #define _STATS_DEBUG_FOR_CYCLE_TIME_
+
 #elif defined(__arm__)
     // __arm__ or __ARMCC_VERSION are always defined in armcc compiler
     #define EO_extern_inline        extern inline
