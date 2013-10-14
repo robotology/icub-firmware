@@ -54,6 +54,8 @@ struct EOemsController_hid
     uint8_t n_joints;
     uint8_t n_calibrated;
     
+    uint8_t limited_motors_mask;
+    
     EMSdefcon_t defcon;
     
     eObool_t cable_length_alarm;
