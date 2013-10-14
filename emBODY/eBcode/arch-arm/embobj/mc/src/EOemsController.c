@@ -101,6 +101,7 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         s_emsc->n_joints   = MAX_JOINTS;
         s_emsc->motors     = NULL;
         
+        s_emsc->limited_motors_mask_changed = eobool_false;
         s_emsc->limited_motors_mask = 0;
         
         s_emsc->n_calibrated = 0;
@@ -260,11 +261,13 @@ extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
 }
 #endif
 
-extern uint8_t eo_emsController_GetLimitedCurrentMask(void)
+extern eObool_t eo_emsController_GetLimitedCurrentMask(uint8_t* mask)
 {
-    if (s_emsc) return s_emsc->limited_motors_mask;
+    if (!s_emsc || !s_emsc->limited_motors_mask_changed) return eobool_false; 
+        
+    *mask = s_emsc->limited_motors_mask;
     
-    return 0;
+    return eobool_true;
 }
 
 extern void eo_emsController_PWM(int16_t* pwm_motor)
@@ -330,6 +333,9 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, s_emsc->boardType, pwm_joint, pwm_motor, &alarm_mask);
     
     // alarm mask is now the mask of current-limited motors
+    
+    s_emsc->limited_motors_mask_changed = (s_emsc->limited_motors_mask != alarm_mask);
+    
     s_emsc->limited_motors_mask = alarm_mask;
     
     JOINTS(j)
