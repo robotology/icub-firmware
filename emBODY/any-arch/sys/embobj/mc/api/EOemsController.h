@@ -82,7 +82,7 @@ extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
 //extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel);
-extern uint8_t eo_emsController_GetLimitedCurrentMask(void);
+extern eObool_t eo_emsController_GetLimitedCurrentMask(uint8_t* mask);
 
 // asynchronous
 extern void eo_emsController_CheckCalibrations(void);
