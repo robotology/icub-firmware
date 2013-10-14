@@ -571,41 +571,19 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 }
             }
         case eomc_controlmode_position:
-        {
-            /*
-            if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref))
-            {
-                eo_pid_Reset(o->pidP); // position limit reached 
-            }
-            */
-            
+        {            
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
-            
-            #ifdef MC_CAN_DEBUG
-            if (o->axisID == 0)
-            {
-                encoder_can_pos = pos;
-                encoder_can_vel = vel;
-            }
-            #endif
             
             o->err = pos_ref - pos;
 
             int32_t pwm = eo_pid_PWM_piv(o->pidP, o->err, vel, vel_ref, acc_ref);
-            //int32_t pwm = eo_pid_PWM_pid(o->pidP, o->err, vel_ref);
             
             if (big_error_flag)
             {
                 if (OUT_OF_RANGE(o->err,1820/*10 deg*/))
                 {
                     *big_error_flag = eobool_true;
-                }
-                
-                //else if (OUT_OF_RANGE(pwm,3000) && OUT_OF_RANGE(o->err,728/*4 deg*/) && IN_RANGE(vel,1000))
-                //{
-                //    *big_error_flag = eobool_true;
-                //}
-                
+                }                
             }
             
             return pwm;
@@ -624,14 +602,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 }
             }
         case eomc_controlmode_impedance_pos:
-        {
-            /*
-            if (eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref))
-            {
-                eo_pid_Reset(o->pidT); // position limit reached
-            }
-            */
-       
+        {       
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
             
             int32_t err = pos_ref - pos;
@@ -670,10 +641,15 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 break;
             }
             
-            if ((pos <= o->pos_min && o->torque_ref < 0) || (pos >= o->pos_max && o->torque_ref > 0))
+            if (big_error_flag)
             {
-                if (pwm >  2500) pwm =  2500;
-                if (pwm < -2500) pwm = -2500;
+                if ((pos <= o->pos_min && o->torque_ref < 0) || (pos >= o->pos_max && o->torque_ref > 0))
+                {
+                    //if (pwm >  2500) pwm =  2500;
+                    //if (pwm < -2500) pwm = -2500;
+                
+                    *big_error_flag = eobool_true;
+                }
             }
             
             return pwm;
