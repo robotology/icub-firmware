@@ -759,7 +759,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
         {
             return;
         }
-        jstatus_ptr->basic.controlmodestatus = eomc_controlmode_idle;
+        //jstatus_ptr->basic.controlmodestatus = eomc_controlmode_idle;
 
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
@@ -770,7 +770,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
     else // pos-controlmode, vel-controlmode, etc (see enum type eOmc_controlmode_t) 
     {
         //this cast can be done because id definition types we use EO_VERIFYproposition
-        jstatus_ptr->basic.controlmodestatus = (eOmc_controlmode_t)*controlmode_cmd_ptr;
+        //jstatus_ptr->basic.controlmodestatus = (eOmc_controlmode_t)*controlmode_cmd_ptr;
 
         //translate control mode command in control mode for icub can proto
         res = s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode_cmd_ptr, &icubcanProto_controlmode);
