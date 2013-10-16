@@ -22,7 +22,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // include the cmsis api file which is relevant to the used mpu
-#if     defined(USE_BRD_MCBSTM32_C)
+#if     defined(USE_BRD_MCBSTM32)
+    #include "cmsis_stm32f1.h"
+#elif   defined(USE_BRD_MCBSTM32_C)
     #include "cmsis_stm32f1.h"
 #elif   defined(USE_BRD_MCBSTM32_F200)
     #include "cmsis_stm32f2.h"
