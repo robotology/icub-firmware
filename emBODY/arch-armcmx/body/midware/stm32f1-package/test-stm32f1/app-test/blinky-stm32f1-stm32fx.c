@@ -100,7 +100,7 @@ int main(void)
     
     test_flash();
     
-    test_timer(10*1000);    // 10 microsecs
+    test_timer(10*1000);    // 10 millisecs
     
     for(;;)
     {
@@ -161,12 +161,15 @@ static void test_timer(uint16_t microsecs)
     NVIC_InitTypeDef NVIC_InitStructure;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 
-    /* TIM7 clock enable */
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+//     /* TIM7 clock enable */
+//     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+    /* TIM4 clock enable */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 
-
-    /* Enable the TIM7 global Interrupt */
-    NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+//     /* Enable the TIM7 global Interrupt */
+//     NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+    /* Enable the TIM4 global Interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;    
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -181,25 +184,37 @@ static void test_timer(uint16_t microsecs)
     TIM_TimeBaseStructure.TIM_Prescaler = 71;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit( TIM7, &TIM_TimeBaseStructure );
-    // important: stop the timer 7 in debug mode
-    DBGMCU_Config(DBGMCU_TIM7_STOP, ENABLE);
-    TIM_Cmd( TIM7, ENABLE );
+    
+//     TIM_TimeBaseInit( TIM7, &TIM_TimeBaseStructure );
+//     // important: stop the timer 7 in debug mode
+//     DBGMCU_Config(DBGMCU_TIM7_STOP, ENABLE);
+//     TIM_Cmd( TIM7, ENABLE );
+
+//     // enable isr
+//     TIM_ITConfig( TIM7, TIM_IT_Update, ENABLE );
+
+    TIM_TimeBaseInit( TIM4, &TIM_TimeBaseStructure );
+    // important: stop the timer 4 in debug mode
+    DBGMCU_Config(DBGMCU_TIM4_STOP, ENABLE);
+    TIM_Cmd( TIM4, ENABLE );
 
     // enable isr
-    TIM_ITConfig( TIM7, TIM_IT_Update, ENABLE );
+    TIM_ITConfig( TIM4, TIM_IT_Update, ENABLE );
 }
 
 
-void TIM7_IRQHandler(void)
+//void TIM7_IRQHandler(void)
+void TIM4_IRQHandler(void)
 {
     static volatile uint32_t delta = 0;
     static volatile uint32_t prev = 0;
-    static volatile uint8_t val = 0;
+    static volatile uint32_t val = 0;
 
-    if(TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET)
+    //if(TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET)
+    if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
     {
-        TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+        //TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+        TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 
         delta = systickserv_numofticks - prev;
         prev = systickserv_numofticks;
@@ -209,11 +224,11 @@ void TIM7_IRQHandler(void)
         //val = (0 == val) ? (1) : (0);
         val ++;
         
-        if(20 == val)
+        if(50 == val)
         {
             brd_mcbstm32x_led_on(brd_mcbstm32x_led_7);
         }
-        else if(40 == val)
+        else if(100 == val)
         {
             brd_mcbstm32x_led_off(brd_mcbstm32x_led_7);
             val = 0;
