@@ -928,6 +928,79 @@ extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link
 
 #endif
 
+#ifdef HAL_USE_ETH
+static uint8_t hal_brdcfg_eth__get_errors_code(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype)
+{
+    if(0 == phynum)
+    {
+        return(0x07);
+    }
+    else
+    {
+        return(0x27);
+    }
+}
+extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{
+
+    uint8_t errorcode;
+    uint8_t buff_write = 0x1c; // read MIB counters selected
+    uint8_t buff_read[4];
+    
+    if(phynum>1)
+    {
+        return(hal_res_NOK_nodata);
+    }
+    
+    if(NULL == result)
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    
+    errorcode = hal_brdcfg_eth__get_errors_code(phynum, errortype);
+    
+    hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x79);
+
+    buff_write = errorcode;
+    hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x7A);
+    
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[3], 0x80); //reads bits from 24-31
+   
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[2], 0x80); //reads bits from 23-16
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[1], 0x80); //reads bits from 15-8
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[0], 0x80); //reads bits from 7-0
+    
+    result->value = ((buff_read[3]&0x3F)<< 24) | (buff_read[2]<<16) || (buff_read[1]<<8) || buff_read[0];
+    if((buff_read[3]&0x80) == 0x80)
+    {
+        result->counteroverflow = 1;
+    }
+    else
+    {
+        result->counteroverflow = 0;
+    }
+    
+    if((buff_read[3]&0x80) == 0x40)  
+    {
+        result->invalidvalue = 1;
+    }
+    else
+    {
+        result->invalidvalue = 0;
+    }
+    return(hal_res_OK);
+}
+#endif
+
+
+
+
+
+
+
+
+
 #ifdef HAL_USE_SYS
 extern void hal_brdcfg_sys__clock_config(void)
 {

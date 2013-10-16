@@ -459,6 +459,11 @@ extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t** link_list, u
     return(hal_brdcfg_eth__get_links_status(link_list, links_num));
 }
 
+
+extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{
+    return(hal_brdcfg_eth__get_errors_info(phynum, errortype, result));
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
