@@ -155,6 +155,20 @@ typedef struct
     uint32_t linkduplex:1; //1==full 0==half
     uint32_t dummy:27;
 } hal_eth_phy_status_t;
+
+typedef enum
+{
+    rxCrcError  = 0
+} hal_eth_phy_errors_info_type_t;
+
+typedef struct
+{
+    uint32_t value;
+    uint32_t counteroverflow:1;
+    uint32_t invalidvalue:1;
+    uint32_t dummy:30;
+} hal_eth_phy_errorsinfo_t;
+    
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
@@ -218,6 +232,13 @@ extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num
  **/
 extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num);
 
+
+/** @fn         extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, uint32_t *result)
+    @brief      in output @result will contain num of errors of tyepe @errortype on physical link @phynum
+    @return     hal_res_OK or hal_res_NOK_...
+    @warning    It is board dependent
+ **/
+ extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
 /** @}            
     end of group arm_hal_eth  
  **/
