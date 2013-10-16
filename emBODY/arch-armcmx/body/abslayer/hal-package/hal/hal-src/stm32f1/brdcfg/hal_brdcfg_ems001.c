@@ -981,7 +981,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
         result->counteroverflow = 0;
     }
     
-    if((buff_read[3]&0x80) == 0x40)  
+    if((buff_read[3]&0x40) == 0x40)  
     {
         result->invalidvalue = 1;
     }
