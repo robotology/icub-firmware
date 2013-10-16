@@ -23,7 +23,11 @@
 
 #include "stdint.h"
 
-#if     defined(USE_BRD_MCBSTM32_C)
+#if     defined(USE_BRD_MCBSTM32)
+
+    #include "cmsis_stm32f1.h" 
+
+#elif   defined(USE_BRD_MCBSTM32_C)
 
     #include "cmsis_stm32f1.h"
 

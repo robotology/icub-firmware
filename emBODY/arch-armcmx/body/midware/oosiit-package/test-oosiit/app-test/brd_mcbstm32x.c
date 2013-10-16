@@ -18,7 +18,11 @@
 
 #include "brd_mcbstm32x.h"
 
-#if     defined(USE_BRD_MCBSTM32_C)
+#if     defined(USE_BRD_MCBSTM32)
+
+    #include "brd_mcbstm32.c" 
+
+#elif   defined(USE_BRD_MCBSTM32_C)
 
     #include "brd_mcbstm32c.c" 
 
