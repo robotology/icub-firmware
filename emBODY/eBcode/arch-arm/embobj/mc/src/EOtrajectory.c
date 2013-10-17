@@ -154,7 +154,7 @@ extern void eo_trajectory_GetPosReference(EOtrajectory *o, int32_t *xStar, int32
 }
 */
 
-extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t xStar, int32_t velAvg)
+extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t x0, int32_t xStar, int32_t velAvg)
 {
     if (!o) return;
     
@@ -165,6 +165,10 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t xStar, int32_
     if (!velAvg) velAvg = o->vel_max;
     
     LIMIT(-o->vel_max, velAvg, o->vel_max)
+    
+    ///////////
+    o->xX = x0;
+    ///////////
     
     float D = (float)xStar - o->xX;
     
