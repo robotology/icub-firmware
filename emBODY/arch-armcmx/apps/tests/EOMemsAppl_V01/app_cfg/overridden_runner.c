@@ -565,6 +565,9 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
     uint32_t            encvalue[4] = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
     int16_t             pwm[4];
+    static uint8_t             mask = 0;
+//     static uint32_t             count_mask = 0;
+//     #define     COUNT_MASK_MAX      2000
 
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
 
@@ -595,6 +598,15 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     /* 4) update joint status */
     s_eom_emsrunner_hid_UpdateJointstatus(p);
     /*Note: motor status is updated with data sent by 2foc by can */
+    
+    /* 5) update */
+    if(eo_emsController_GetLimitedCurrentMask(&mask))
+    {
+        eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(eo_theEMSdgn_GetHandle(), (uint32_t)mask);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
+    }
+
+    
 }
 
 
