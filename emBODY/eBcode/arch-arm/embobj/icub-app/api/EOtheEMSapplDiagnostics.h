@@ -72,6 +72,7 @@ extern eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 extern eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 extern eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
 extern eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
+extern eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
 
 
 
@@ -96,6 +97,16 @@ extern eOresult_t eo_theEMSdgn_ClearMotorStFlags(EOTheEMSdiagnostics_t* p);
 extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *str_error, uint16_t size);
 
 extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup);
+
+extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p);
+
+extern eOresult_t eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(EOTheEMSdiagnostics_t* p, uint32_t data);
+
+#if 0
+extern eOresult_t eo_theEMSdgn_checkErrors(EOTheEMSdiagnostics_t* p);
+
+extern eOresult_t eo_theEMSdgn_checkLinksStatus(EOTheEMSdiagnostics_t* p);
+#endif
 /** @}            
     end of group 
     
