@@ -66,6 +66,7 @@ eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
 eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
+eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -99,6 +100,7 @@ extern EOTheEMSdiagnostics_t* eo_theEMSdgn_Initialize(void)
     memset(&eo_dgn_emsapplcore, 0, sizeof(eOdgn_emsapplication_common_t));
     memset(&eo_dgn_emsappmc, 0, sizeof(eOdgn_emsapplication_emswithmc_t));
     memset(&eo_dgn_motorstflag, 0, sizeof(eOdgn_motorstatusflags_t));
+    memset(&eo_dgn_rxchecksepoints, 0, sizeof(eOdgn_rxCheckSetpoints_t));
     
     return(&s_thedgn);
 }
@@ -199,6 +201,15 @@ extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappE
     return(eores_OK);
 }
 
+extern eOresult_t eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(EOTheEMSdiagnostics_t* p, uint32_t data)
+{
+
+    eo_dgn_emsappmc.encreads.dummy = data;
+    return(eores_OK);
+}
+
+
+
 extern eOresult_t eo_theEMSdgn_UpdateMotorStFlags(EOTheEMSdiagnostics_t* p, eOmc_motorId_t mId, uint8_t flags)
 {
     if(mId >= 12)
@@ -274,10 +285,24 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
      if((linkst_mask & 0x02) == 0x02)
     {
         *link2_isup = 1;
+         if(link_st[1] == 0)
+        {
+            snprintf(str, sizeof(str)-1, "Link 1 down --> up (mask=%d)", linkst_mask);
+            hal_trace_puts(str);
+            link_st[1] = 1;
+            state2notify = 1;
+        }
     }
     else
     {
         hal_led_on(hal_led2);
+        if(link_st[1] == 1)
+        {
+            snprintf(str, sizeof(str)-1, "Link 1 up --> down (mask=%d)", linkst_mask);
+            hal_trace_puts(str);
+            link_st[1] = 0;
+            state2notify = 1;
+        }
     }
     
     if(state2notify)
@@ -315,6 +340,69 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
     return(eores_OK);
 
 }
+
+
+extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p)
+{
+    uint8_t i;
+    for(i=0; i<4; i++)
+    {
+        eo_dgn_rxchecksepoints.position[i].deltaprognumber = INT32_MAX;
+        eo_dgn_rxchecksepoints.position[i].deltarxtime = UINT32_MAX;
+        eo_dgn_rxchecksepoints.impedence[i].deltaprognumber = INT32_MAX;
+        eo_dgn_rxchecksepoints.impedence[i].deltarxtime = UINT32_MAX;
+    } 
+    return(eores_OK);    
+}
+#if 0
+extern eOresult_t eo_theEMSdgn_checkErrors(EOTheEMSdiagnostics_t* p)
+{
+    
+    hal_result_t res;
+    hal_eth_phy_errorsinfo_t result;
+    char str[50];
+    
+    result.value = 0xAA;
+    res = hal_eth_get_errors_info(0, rxCrcError, &result);
+    if(res != hal_res_OK)
+    {
+        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy 0");
+    }
+    else
+    {
+        snprintf(str, sizeof(str)-1, "ERR ETH PHY 0: val=%d overflow=%d validVal=%d", result.value, result.counteroverflow, result.invalidvalue);
+    }
+    hal_trace_puts(str);
+    
+    
+    
+    res = hal_eth_get_errors_info(1, rxCrcError, &result);
+    if(res != hal_res_OK)
+    {
+        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy 1");
+    }
+    else
+    {
+        snprintf(str, sizeof(str)-1, "ERR ETH PHY 1: val=%d overflow=%d validVal=%d", result.value, result.counteroverflow, result.invalidvalue);
+    }
+    hal_trace_puts(str);
+    
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eo_theEMSdgn_checkLinksStatus(EOTheEMSdiagnostics_t* p)
+{
+    hal_eth_phy_status_t* link_list[2];
+    uint8_t links_num = 0;
+    
+    hal_eth_get_links_status(link_list, &links_num);
+    
+    return(eores_OK);
+}
+
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
