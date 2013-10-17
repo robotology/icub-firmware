@@ -335,14 +335,14 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
     case eomc_controlmode_velocity:
         o->control_mode = eomc_controlmode_position;
     case eomc_controlmode_position:
-        eo_trajectory_SetPosReference(o->trajectory, pos, avg_vel);
+        eo_trajectory_SetPosReference(o->trajectory, GET_AXIS_POSITION(), pos, avg_vel);
         break;
         
     case eomc_controlmode_torque:
     case eomc_controlmode_impedance_vel:
         o->control_mode = eomc_controlmode_impedance_pos;
     case eomc_controlmode_impedance_pos:
-        eo_trajectory_SetPosReference(o->trajectory, pos, avg_vel);
+        eo_trajectory_SetPosReference(o->trajectory, GET_AXIS_POSITION(), pos, avg_vel);
         break;
 
     case eomc_controlmode_idle: 
@@ -645,9 +645,6 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             {
                 if ((pos <= o->pos_min && o->torque_ref < 0) || (pos >= o->pos_max && o->torque_ref > 0))
                 {
-                    //if (pwm >  2500) pwm =  2500;
-                    //if (pwm < -2500) pwm = -2500;
-                
                     *big_error_flag = eobool_true;
                 }
             }
