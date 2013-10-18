@@ -93,7 +93,10 @@ typedef struct
 
 typedef struct 
 {
-    uint8_t linksmask;
+    uint16_t linksmask;
+    uint8_t crcErrorCnt_overflow;
+    uint8_t crcErrorCnt_validVal;
+    uint32_t crcErrorCnt[3];
 } eOdgn_ethstatus_t;
 
 typedef struct 
@@ -105,7 +108,6 @@ typedef struct
 {
     eOdgn_canstatus_t   can_dev[2];
     eOdgn_ethstatus_t   eth_dev;
-    uint8_t             dummy[5];
 } eOdgn_emsperipheralstatus_t; //8 B
 
 typedef struct
@@ -241,6 +243,7 @@ typedef struct
 {
     uint8_t enable; //if true then all errrors are signaled else none!
     uint8_t signalExtFault; //if true external fault is signaled
+    uint8_t signalEthCounters; 
 }eOdgn_commands_t;
 
 typedef struct
