@@ -577,9 +577,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>startup_stm32f4xx.s</FileName>
+              <FileName>startup_stm32f40_41xxx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f4xx.s</FilePath>
+              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f40_41xxx.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1211,9 +1211,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>startup_stm32f4xx.s</FileName>
+              <FileName>startup_stm32f40_41xxx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f4xx.s</FilePath>
+              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f40_41xxx.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1845,9 +1845,9 @@
               <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f2xx.s</FilePath>
             </File>
             <File>
-              <FileName>startup_stm32f4xx.s</FileName>
+              <FileName>startup_stm32f40_41xxx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f4xx.s</FilePath>
+              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f40_41xxx.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2250,7 +2250,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>STM32F4XX USE_BRD_MCBSTM32_F400 __CORTEX_M4  __FPU_PRESENT</Define>
+              <Define>STM32F40_41xxx __CORTEX_M4  __FPU_PRESENT USE_BRD_MCBSTM32_F400</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc</IncludePath>
             </VariousControls>
@@ -2514,9 +2514,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>startup_stm32f4xx.s</FileName>
+              <FileName>startup_stm32f40_41xxx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f4xx.s</FilePath>
+              <FilePath>..\cmsis-cfg\stm32-armcc\startup_stm32f40_41xxx.s</FilePath>
             </File>
           </Files>
         </Group>
