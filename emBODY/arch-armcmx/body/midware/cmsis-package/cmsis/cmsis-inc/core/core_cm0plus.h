@@ -1,6 +1,6 @@
 /**************************************************************************//**
- * @file     core_sc000.h
- * @brief    CMSIS SC000 Core Peripheral Access Layer Header File
+ * @file     core_cm0plus.h
+ * @brief    CMSIS Cortex-M0+ Core Peripheral Access Layer Header File
  * @version  V3.20
  * @date     25. February 2013
  *
@@ -43,8 +43,8 @@
  extern "C" {
 #endif
 
-#ifndef __CORE_SC000_H_GENERIC
-#define __CORE_SC000_H_GENERIC
+#ifndef __CORE_CM0PLUS_H_GENERIC
+#define __CORE_CM0PLUS_H_GENERIC
 
 /** \page CMSIS_MISRA_Exceptions  MISRA-C:2004 Compliance Exceptions
   CMSIS violates the following MISRA-C:2004 rules:
@@ -63,17 +63,17 @@
 /*******************************************************************************
  *                 CMSIS definitions
  ******************************************************************************/
-/** \ingroup SC000
+/** \ingroup Cortex-M0+
   @{
  */
 
-/*  CMSIS SC000 definitions */
-#define __SC000_CMSIS_VERSION_MAIN  (0x03)                                   /*!< [31:16] CMSIS HAL main version */
-#define __SC000_CMSIS_VERSION_SUB   (0x20)                                   /*!< [15:0]  CMSIS HAL sub version  */
-#define __SC000_CMSIS_VERSION       ((__SC000_CMSIS_VERSION_MAIN << 16) | \
-                                      __SC000_CMSIS_VERSION_SUB          )   /*!< CMSIS HAL version number       */
+/*  CMSIS CM0P definitions */
+#define __CM0PLUS_CMSIS_VERSION_MAIN (0x03)                                /*!< [31:16] CMSIS HAL main version   */
+#define __CM0PLUS_CMSIS_VERSION_SUB  (0x20)                                /*!< [15:0]  CMSIS HAL sub version    */
+#define __CM0PLUS_CMSIS_VERSION      ((__CM0PLUS_CMSIS_VERSION_MAIN << 16) | \
+                                       __CM0PLUS_CMSIS_VERSION_SUB)        /*!< CMSIS HAL version number         */
 
-#define __CORTEX_SC                (0)                                       /*!< Cortex secure core             */
+#define __CORTEX_M                (0x00)                                   /*!< Cortex-M Core                    */
 
 
 #if   defined ( __CC_ARM )
@@ -127,23 +127,28 @@
 #include <core_cmInstr.h>                /* Core Instruction Access                         */
 #include <core_cmFunc.h>                 /* Core Function Access                            */
 
-#endif /* __CORE_SC000_H_GENERIC */
+#endif /* __CORE_CM0PLUS_H_GENERIC */
 
 #ifndef __CMSIS_GENERIC
 
-#ifndef __CORE_SC000_H_DEPENDANT
-#define __CORE_SC000_H_DEPENDANT
+#ifndef __CORE_CM0PLUS_H_DEPENDANT
+#define __CORE_CM0PLUS_H_DEPENDANT
 
 /* check device defines and use defaults */
 #if defined __CHECK_DEVICE_DEFINES
-  #ifndef __SC000_REV
-    #define __SC000_REV             0x0000
-    #warning "__SC000_REV not defined in device header file; using default!"
+  #ifndef __CM0PLUS_REV
+    #define __CM0PLUS_REV             0x0000
+    #warning "__CM0PLUS_REV not defined in device header file; using default!"
   #endif
 
   #ifndef __MPU_PRESENT
     #define __MPU_PRESENT             0
     #warning "__MPU_PRESENT not defined in device header file; using default!"
+  #endif
+
+  #ifndef __VTOR_PRESENT
+    #define __VTOR_PRESENT            0
+    #warning "__VTOR_PRESENT not defined in device header file; using default!"
   #endif
 
   #ifndef __NVIC_PRIO_BITS
@@ -173,7 +178,7 @@
 #define     __O     volatile             /*!< Defines 'write only' permissions                */
 #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
 
-/*@} end of group SC000 */
+/*@} end of group Cortex-M0+ */
 
 
 
@@ -312,15 +317,17 @@ typedef struct
 {
   __I  uint32_t CPUID;                   /*!< Offset: 0x000 (R/ )  CPUID Base Register                                   */
   __IO uint32_t ICSR;                    /*!< Offset: 0x004 (R/W)  Interrupt Control and State Register                  */
+#if (__VTOR_PRESENT == 1)
   __IO uint32_t VTOR;                    /*!< Offset: 0x008 (R/W)  Vector Table Offset Register                          */
+#else
+       uint32_t RESERVED0;
+#endif
   __IO uint32_t AIRCR;                   /*!< Offset: 0x00C (R/W)  Application Interrupt and Reset Control Register      */
   __IO uint32_t SCR;                     /*!< Offset: 0x010 (R/W)  System Control Register                               */
   __IO uint32_t CCR;                     /*!< Offset: 0x014 (R/W)  Configuration Control Register                        */
-       uint32_t RESERVED0[1];
+       uint32_t RESERVED1;
   __IO uint32_t SHP[2];                  /*!< Offset: 0x01C (R/W)  System Handlers Priority Registers. [0] is RESERVED   */
   __IO uint32_t SHCSR;                   /*!< Offset: 0x024 (R/W)  System Handler Control and State Register             */
-       uint32_t RESERVED1[154];
-  __IO uint32_t SFCR;                    /*!< Offset: 0x290 (R/W)  Security Features Register                            */
 } SCB_Type;
 
 /* SCB CPUID Register Definitions */
@@ -367,9 +374,11 @@ typedef struct
 #define SCB_ICSR_VECTACTIVE_Pos             0                                             /*!< SCB ICSR: VECTACTIVE Position */
 #define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL << SCB_ICSR_VECTACTIVE_Pos)           /*!< SCB ICSR: VECTACTIVE Mask */
 
+#if (__VTOR_PRESENT == 1)
 /* SCB Interrupt Control State Register Definitions */
-#define SCB_VTOR_TBLOFF_Pos                 7                                             /*!< SCB VTOR: TBLOFF Position */
-#define SCB_VTOR_TBLOFF_Msk                (0x1FFFFFFUL << SCB_VTOR_TBLOFF_Pos)           /*!< SCB VTOR: TBLOFF Mask */
+#define SCB_VTOR_TBLOFF_Pos                 8                                             /*!< SCB VTOR: TBLOFF Position */
+#define SCB_VTOR_TBLOFF_Msk                (0xFFFFFFUL << SCB_VTOR_TBLOFF_Pos)            /*!< SCB VTOR: TBLOFF Mask */
+#endif
 
 /* SCB Application Interrupt and Reset Control Register Definitions */
 #define SCB_AIRCR_VECTKEY_Pos              16                                             /*!< SCB AIRCR: VECTKEY Position */
@@ -408,35 +417,7 @@ typedef struct
 #define SCB_SHCSR_SVCALLPENDED_Pos         15                                             /*!< SCB SHCSR: SVCALLPENDED Position */
 #define SCB_SHCSR_SVCALLPENDED_Msk         (1UL << SCB_SHCSR_SVCALLPENDED_Pos)            /*!< SCB SHCSR: SVCALLPENDED Mask */
 
-/* SCB Security Features Register Definitions */
-#define SCB_SFCR_UNIBRTIMING_Pos            0                                             /*!< SCB SFCR: UNIBRTIMING Position */
-#define SCB_SFCR_UNIBRTIMING_Msk           (1UL << SCB_SHCSR_SVCALLPENDED_Pos)            /*!< SCB SFCR: UNIBRTIMING Mask */
-
-#define SCB_SFCR_SECKEY_Pos                16                                             /*!< SCB SFCR: SECKEY Position */
-#define SCB_SFCR_SECKEY_Msk               (0xFFFFUL << SCB_SHCSR_SVCALLPENDED_Pos)        /*!< SCB SFCR: SECKEY Mask */
-
 /*@} end of group CMSIS_SCB */
-
-
-/** \ingroup  CMSIS_core_register
-    \defgroup CMSIS_SCnSCB System Controls not in SCB (SCnSCB)
-    \brief      Type definitions for the System Control and ID Register not in the SCB
-  @{
- */
-
-/** \brief  Structure type to access the System Control and ID Register not in the SCB.
- */
-typedef struct
-{
-       uint32_t RESERVED0[2];
-  __IO uint32_t ACTLR;                   /*!< Offset: 0x008 (R/W)  Auxiliary Control Register      */
-} SCnSCB_Type;
-
-/* Auxiliary Control Register Definitions */
-#define SCnSCB_ACTLR_DISMCYCINT_Pos         0                                          /*!< ACTLR: DISMCYCINT Position */
-#define SCnSCB_ACTLR_DISMCYCINT_Msk        (1UL << SCnSCB_ACTLR_DISMCYCINT_Pos)        /*!< ACTLR: DISMCYCINT Mask */
-
-/*@} end of group CMSIS_SCnotSCB */
 
 
 /** \ingroup  CMSIS_core_register
@@ -577,7 +558,7 @@ typedef struct
 
 /** \ingroup  CMSIS_core_register
     \defgroup CMSIS_CoreDebug       Core Debug Registers (CoreDebug)
-    \brief      SC000 Core Debug Registers (DCB registers, SHCSR, and DFSR)
+    \brief      Cortex-M0+ Core Debug Registers (DCB registers, SHCSR, and DFSR)
                 are only accessible over DAP and not via processor. Therefore
                 they are not covered by the Cortex-M0 header file.
   @{
@@ -591,13 +572,12 @@ typedef struct
   @{
  */
 
-/* Memory mapping of SC000 Hardware */
+/* Memory mapping of Cortex-M0+ Hardware */
 #define SCS_BASE            (0xE000E000UL)                            /*!< System Control Space Base Address */
 #define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address              */
 #define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address                 */
 #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Base Address */
 
-#define SCnSCB              ((SCnSCB_Type    *)     SCS_BASE      )   /*!< System control Register not in SCB */
 #define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct           */
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct       */
 #define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct          */
@@ -804,7 +784,7 @@ __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 
 
 
-#endif /* __CORE_SC000_H_DEPENDANT */
+#endif /* __CORE_CM0PLUS_H_DEPENDANT */
 
 #endif /* __CMSIS_GENERIC */
 
