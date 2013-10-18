@@ -1,4 +1,6 @@
 
+#warning --> cmsis 3.0 removed this file. remove it also from your code
+
 #if 0   // cmsis 3.0 does not use this file anymore
     
 /**************************************************************************//**

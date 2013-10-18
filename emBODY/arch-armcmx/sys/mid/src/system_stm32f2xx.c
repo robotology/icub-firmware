@@ -168,7 +168,8 @@
   */
   
 
-  uint32_t SystemCoreClock = 120000000;
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock = 120000000;
 
 //IIT-changed
 //IIT-comment: made constant to place it in flash
@@ -213,7 +214,8 @@ extern void cmsis_stm32f2_hid_set_system_core_clock(void)
   * @param  None
   * @retval None
   */
-void SystemInit(void)
+// IIT-changed: ...
+__weak  void SystemInit(void)
 {
 
     //IIT-added
@@ -291,7 +293,8 @@ void SystemInit(void)
   * @param  None
   * @retval None
   */
-void SystemCoreClockUpdate(void)
+// IIT-changed: ...
+__weak  void SystemCoreClockUpdate(void)
 {
   uint32_t tmp = 0, pllvco = 0, pllp = 2, pllsource = 0, pllm = 2;
   

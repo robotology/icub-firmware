@@ -169,23 +169,29 @@
 *  Clock Definitions
 *******************************************************************************/
 #ifdef SYSCLK_FREQ_HSE
-  uint32_t SystemCoreClock         = SYSCLK_FREQ_HSE;        /*!< System Clock Frequency (Core Clock) */
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock         = SYSCLK_FREQ_HSE;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_24MHz
-  uint32_t SystemCoreClock         = SYSCLK_FREQ_24MHz;        /*!< System Clock Frequency (Core Clock) */
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock         = SYSCLK_FREQ_24MHz;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_36MHz
-  uint32_t SystemCoreClock         = SYSCLK_FREQ_36MHz;        /*!< System Clock Frequency (Core Clock) */
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock         = SYSCLK_FREQ_36MHz;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_48MHz
-  uint32_t SystemCoreClock         = SYSCLK_FREQ_48MHz;        /*!< System Clock Frequency (Core Clock) */
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock         = SYSCLK_FREQ_48MHz;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_56MHz
-  uint32_t SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Clock) */
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock         = SYSCLK_FREQ_56MHz;        /*!< System Clock Frequency (Core Clock) */
 #elif defined SYSCLK_FREQ_72MHz
   uint32_t SystemCoreClock         = SYSCLK_FREQ_72MHz;        /*!< System Clock Frequency (Core Clock) */
 #else /*!< HSI Selected as System Clock source */
-  uint32_t SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
+// IIT-changed: ...
+__weak  uint32_t SystemCoreClock         = HSI_VALUE;        /*!< System Clock Frequency (Core Clock) */
 #endif
 
 //IIT-changed
-//IIT-comment: made constant to palce it in flash
+//IIT-comment: made constant to place it in flash
 // __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 /**
@@ -236,7 +242,8 @@ static void SetSysClock(void);
   * @param  None
   * @retval None
   */
-void SystemInit (void)
+// IIT-changed: ...
+__weak void SystemInit (void)
 {
 
     //IIT-added
@@ -335,7 +342,8 @@ void SystemInit (void)
   * @param  None
   * @retval None
   */
-void SystemCoreClockUpdate (void)
+// IIT-changed: ...
+__weak void SystemCoreClockUpdate (void)
 {
   uint32_t tmp = 0, pllmull = 0, pllsource = 0;
 
