@@ -18,7 +18,7 @@
 */
 
 we use:
-cmsis:      CMSIS_V3P00.zip from http://www.onarm.com/cmsis/download/
+cmsis:      CMSIS-SP-00300-r3p2-00rel1.zip from http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php
 stm32f1x:   stm32f10x_stdperiph_lib-v3.5.0 from http://www.st.com    
 stm32f2x:   from http://www.st.com
-stm32f4x:   from http://www.st.com
+stm32f4x:   stm32f4_dsp_stdperiph_lib.zip version 1.2.1 from http://www.st.com
