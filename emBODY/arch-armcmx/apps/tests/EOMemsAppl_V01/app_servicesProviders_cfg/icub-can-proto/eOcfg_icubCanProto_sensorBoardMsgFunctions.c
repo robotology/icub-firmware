@@ -598,13 +598,22 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
 
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
     canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
+//     canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
+// 	canFrame->data[2]=0x01;  //==> invia ogni 40 milli
+// 	canFrame->data[3]=0x01;
+// 	canFrame->data[4]=0;
+// 	canFrame->data[5]=0x22;
+// 	canFrame->data[6]=0;
+// 	canFrame->data[7]=0;
+
+    
     canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
 	canFrame->data[2]=0x01;  //==> invia ogni 40 milli
-	canFrame->data[3]=0x01;
+	canFrame->data[3]=0x03;
 	canFrame->data[4]=0;
-	canFrame->data[5]=0x22;
+	canFrame->data[5]=0x20;
 	canFrame->data[6]=0;
-	canFrame->data[7]=0;
+	canFrame->data[7]=35;
 
     return(eores_OK);
 }
