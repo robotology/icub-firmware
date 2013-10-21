@@ -264,6 +264,9 @@ static void s_eom_thecreation(void)
     
     // run user defined initialisation ...
     s_eom_system.user_init_fn();
+    
+    snprintf(str, sizeof(str)-1, "quitting the init task");
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
 }
 
 
