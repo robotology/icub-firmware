@@ -88,6 +88,14 @@ static calculator_data_t calc_data =
 };
 
 
+static int16_t s_identity_matrix[AN_CHANNEL_NUM][AN_CHANNEL_NUM] = 
+{   {0x7FFF,0,0,0,0,0},  // TT_TF_TMatrix
+    {0,0x7FFF,0,0,0,0},
+    {0,0,0x7FFF,0,0,0},
+    {0,0,0,0x7FFF,0,0},
+    {0,0,0,0,0x7FFF,0},
+    {0,0,0,0,0,0x7FFF}
+};
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -163,6 +171,38 @@ extern hal_result_t calculate_torque_and_force_data(int16_t *input, calc_data_ou
 //    {
 //        output->array[i] += HEX_VALC;
 //    }
+    
+    return(hal_res_OK);
+
+}
+
+
+
+extern hal_result_t calculate_uncalibrated_data(int16_t *input, calc_data_output_t *output)
+{
+    //uint8_t i;
+    int16_t raw_data[AN_CHANNEL_NUM];
+
+
+
+    if( (NULL == output) || (NULL == input) )
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+
+    VectorAdd (AN_CHANNEL_NUM, (fractional*)raw_data, (fractional*)input, calc_data.SIXsg_config_ptr->SIXsg_ee_data.calibration_tare);
+    
+    MatrixMultiply( AN_CHANNEL_NUM, // int numRows1,
+                    AN_CHANNEL_NUM, // int numCols1Rows2,
+                    1, // int numCols2,
+                    (fractional*)&output[0],   // fractional* dstM,
+                    (fractional*)&(s_identity_matrix[0][0]),    // fractional* identityMatrix,
+                    (fractional*)&raw_data[0] ); // fractional* srcM2 
+
+
+
+    VectorAdd (AN_CHANNEL_NUM, (fractional*)output->array, (fractional*)output->array, calc_data.current_tare);
+    
     
     return(hal_res_OK);
 

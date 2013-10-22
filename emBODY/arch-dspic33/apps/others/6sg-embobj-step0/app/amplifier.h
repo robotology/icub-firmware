@@ -63,6 +63,10 @@ extern hal_result_t ampl_init(SIXsg_config_data_t *cfg_ptr);
  **/
 extern void ampl_set_gain_and_offset(void);
 
+extern void ampl_set_gain(void);
+
+extern void ampl_set_offset(void);
+
 // - doxy end ---------------------------------------------------------------------------------------------------------
 // empty-section
 

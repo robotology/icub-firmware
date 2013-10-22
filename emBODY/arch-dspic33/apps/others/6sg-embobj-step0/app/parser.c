@@ -40,6 +40,7 @@
 #include "sender_outMsg.h"
 #include "amplifier.h"
 #include "adc.h"
+#include "EOStheSystem.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -72,7 +73,7 @@
 #define CFG_GEN_EEDATA                  parser_data.SIXsg_config_ptr->gen_ee_data
 #define CFG_6SG_EEDATA                  parser_data.SIXsg_config_ptr->SIXsg_ee_data
 
-
+#define EVT_MSG_RECEIVED            (0x1<<3)    // evt pos is 4 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -236,16 +237,23 @@ extern hal_result_t parse_message(void)
 {
     hal_result_t res;
     hal_can_frame_t msg_in, msg_out;
-    uint8_t len_data_out;
+    uint8_t len_data_out = 0;
     uint8_t data_out[8];
     uint8_t cmd;
+    static int ena_ack = 255;
+    static int len = hal_can_frame_payload_maxlen;
+    static uint8_t remaining_msg = 0;
     
-    res = hal_can_get(hal_can_port1, &msg_in, NULL); 
+    res = hal_can_get(hal_can_port1, &msg_in, &remaining_msg); 
     if(hal_res_OK != res)
     {
         return(res);
     }
 
+len =len;
+ena_ack = CFG_6SG_BEHAV.send_ack_each_cmd;
+ena_ack = 255;
+ena_ack = parser_data.SIXsg_config_ptr->behaviour_cfg.send_ack_each_cmd;
     switch(GET_CMD_CLASS(msg_in.id))
     {
         case CAN_MSG_CLASS_POLLING:
@@ -296,7 +304,7 @@ extern hal_result_t parse_message(void)
         if message_out's length is equal to 0 and the application was been configured to send ack each message
             I must send ack (empty message)
     */
-    if( ((len_data_out > 0) && (len_data_out <=  hal_can_frame_payload_maxlen)) || ( (CFG_6SG_BEHAV.send_ack_each_cmd) && (len_data_out == 0)) )
+    if( ((len_data_out > 0) && (len_data_out <=  len)) || ( (ena_ack) && (len_data_out == 0)) )
     {
         //s_frame_fill(&msg_out,  /*src*/CFG_GEN_EEDATA.board_address, /*dest*/(GET_CMD_SRC(msg_in.id)), data_out, len_data_out);msg_in.id
         s_frame_fill(&msg_out, msg_in.id, data_out, len_data_out);
@@ -308,8 +316,96 @@ extern hal_result_t parse_message(void)
         }
     }
     
+    
+    if(remaining_msg >0)
+    {
+        eos_foop_SetEvent(eos_foop_GetHandle(), EVT_MSG_RECEIVED);
+    }
     return (res);
 }
+
+
+
+
+
+
+extern hal_result_t parse_test(void)
+{
+    hal_can_frame_t msg_in, msg_out;
+    uint8_t len_data_out;
+    uint8_t data_out[8];
+    uint8_t cmd;
+    uint8_t remaining_msg = 0;
+    hal_result_t res = hal_res_NOK_generic;
+    hal_result_t txres = hal_res_NOK_generic;
+    uint8_t txattempts = 0;
+    
+    res = hal_can_get(hal_can_port1, &msg_in, &remaining_msg); 
+    if(hal_res_OK != res)
+    {
+        return(res);
+    }
+
+
+    if((msg_in.data[0] == 0x04) && (msg_in.size != 8))
+    {
+        res = s_cmd_set_ch_dac(&msg_in.data[0], &data_out, &len_data_out);
+        return(res);
+    }
+    
+    if((msg_in.data[0] == 0x0B) && (msg_in.size != 8))
+    {
+        res = s_cmd_get_ch_dac(&msg_in.data[0], &data_out, &len_data_out);
+        s_frame_fill(&msg_out, msg_in.id, data_out, len_data_out);
+    }
+    else
+    {
+
+        msg_out.id = msg_in.id;  
+        msg_out.id_type = msg_in.id_type;
+        msg_out.frame_type = msg_in.frame_type;
+        msg_out.size = msg_in.size;
+        
+        memcpy(&msg_out.data[0], &msg_in.data[0], msg_in.size);
+        msg_out.data[0] = 0xA0;
+        txattempts = 0;
+    }
+    
+//    cmd = msg_in.data[0];
+//    if((cmd%100) == 0)
+//    {
+//        ampl_set_gain_and_offset();
+//    }
+    
+    do
+    {
+        txattempts++;
+        txres = hal_can_put(hal_can_port1, &msg_out, hal_can_send_normprio_now);
+        msg_out.data[0]++;
+    } 
+    while((txattempts < 10) && (hal_res_OK != txres));
+
+
+    
+//    if(hal_res_OK != res)
+//    {
+//        s_error_manage(res);
+//        return(hal_res_OK); //actually doesn't care of unkown message and message with invaid params
+//    }
+
+    
+    
+    if(remaining_msg >0)
+    {
+        eos_foop_SetEvent(eos_foop_GetHandle(), EVT_MSG_RECEIVED);
+    }
+    return (res);
+}
+
+
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -421,7 +517,7 @@ static hal_result_t s_cmd_set_ch_dac(uint8_t *data_in, uint8_t *data_out, uint8_
     CFG_6SG_EEDATA.an_channel_offset[data_in[1]] = (data_in[2]<<8) | data_in[3];
     /* TODO: pensare bene a come farlo...attualmente l'amplificatore
      riconfigura tutti e sei i canali, ma poi dovremmo permettere che ne faccia uno alla volta!! */
-    ampl_set_gain_and_offset();
+    ampl_set_offset();
     
     *len_data_out = 0;
 
@@ -458,7 +554,7 @@ static hal_result_t s_cmd_get_ch_adc(uint8_t *data_in, uint8_t *data_out, uint8_
     }
     else //calibrated data
     {   
-        adc_get_data(ch_values);
+        res = adc_get_data(ch_values);
         calculate_torque_and_force_data(ch_values, &tf_values);
         value = tf_values.array[data_in[1]];
     }
@@ -473,7 +569,8 @@ static hal_result_t s_cmd_get_ch_adc(uint8_t *data_in, uint8_t *data_out, uint8_
     {
         return(hal_res_NOK_wrongparam);
     }
- 
+    value = value + 0x8000;
+    
     data_out[0] = CAN_CMD_GET_CH_ADC; 
     data_out[1] = data_in[1];  //channel number
     data_out[2] = data_in[2]; //mode
@@ -786,7 +883,7 @@ static hal_result_t s_cmd_set_curr_tare(uint8_t *data_in, uint8_t *data_out, uin
 //
 //        case 3: //TODO: transmit not calibrated data
 //        {
-//            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_torqueForceData_on;
+//            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_uncalibData_on;
 //            adc_start();
 //            sender_start();
 //        }
@@ -821,19 +918,19 @@ static hal_result_t s_cmd_set_tx_mode(uint8_t *data_in, uint8_t *data_out, uint8
 
         case 1: //do acquisition, but do not transmit
         {
-            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_off;
+            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_readOnly;
+            adc_start();
         } break;
 
         case 2: //debug mode
         {
-            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_forceData_on;
-            adc_start();
-            sender_start();
+            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_off;
+            
         } break;
 
         case 3: //TODO: transmit not calibrated data
         {
-            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_torqueForceData_on;
+            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_uncalibData_on;
             adc_start();
             sender_start();
         } break;
@@ -891,12 +988,12 @@ static hal_result_t s_cmd_save2eeprom(uint8_t *data_in, uint8_t *data_out, uint8
         return(hal_res_OK);
     }
     
-    res = SIXsg_config_save_to_eeprom(parser_data.SIXsg_config_ptr);
+    res = SIXsg_config_save_to_eeprom(parser_data.SIXsg_config_ptr); 
     if(hal_res_OK != res)
     {
         return(res); 
     }
-
+    
     parser_data.ee_data_is_saved=1;
     return(hal_res_OK);
 }
@@ -997,6 +1094,10 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
 #warning -> acemor: qui al CMD_BROADCAST si risponde con tre bytes: version, release, build mentre nel bootloader con due. ???    
         case CMD_BROADCAST: 
         {
+            CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_off;
+            sender_stop();
+            adc_stop();
+            
             data_out[0] = CMD_BROADCAST;
             data_out[1] = BOARD_TYPE_6SG; 
             data_out[2] = src_ver_ptr->exe_file.major;    //Firmware version number for BOOTLOADER

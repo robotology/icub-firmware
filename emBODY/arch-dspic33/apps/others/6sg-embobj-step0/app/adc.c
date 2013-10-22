@@ -439,12 +439,12 @@ extern void adc_filtering_start(void)
 //            adc_data.values[5][sample] = adc_spi_dmabuf1[5 + offs] + HEX_VALC;
 
 //con swap            
-            adc_data.values[1][sample] = adc_spi_dmabuf1[0 + offs] + HEX_VALC;
-            adc_data.values[2][sample] = adc_spi_dmabuf1[1 + offs] + HEX_VALC;
-            adc_data.values[3][sample] = adc_spi_dmabuf1[2 + offs] + HEX_VALC;
-            adc_data.values[4][sample] = adc_spi_dmabuf1[3 + offs] + HEX_VALC;
-            adc_data.values[5][sample] = adc_spi_dmabuf1[4 + offs] + HEX_VALC;
-            adc_data.values[0][sample] = adc_spi_dmabuf1[5 + offs] + HEX_VALC;
+            adc_data.values[1][sample] = adc_spi_dmabuf1[0 + offs] - HEX_VALC;
+            adc_data.values[2][sample] = adc_spi_dmabuf1[1 + offs] - HEX_VALC;
+            adc_data.values[3][sample] = adc_spi_dmabuf1[2 + offs] - HEX_VALC;
+            adc_data.values[4][sample] = adc_spi_dmabuf1[3 + offs] - HEX_VALC;
+            adc_data.values[5][sample] = adc_spi_dmabuf1[4 + offs] - HEX_VALC;
+            adc_data.values[0][sample] = adc_spi_dmabuf1[5 + offs] - HEX_VALC;
 
 
 //            adc_data.values[0][sample] = 0x1 + HEX_VALC;
@@ -469,12 +469,20 @@ extern void adc_filtering_start(void)
 //            adc_data.values[5][sample] = adc_spi_dmabuf2[5 + offs] + HEX_VALC;
 
 //con swap            
-            adc_data.values[1][sample] = adc_spi_dmabuf2[0 + offs] + HEX_VALC;
-            adc_data.values[2][sample] = adc_spi_dmabuf2[1 + offs] + HEX_VALC;
-            adc_data.values[3][sample] = adc_spi_dmabuf2[2 + offs] + HEX_VALC;
-            adc_data.values[4][sample] = adc_spi_dmabuf2[3 + offs] + HEX_VALC;
-            adc_data.values[5][sample] = adc_spi_dmabuf2[4 + offs] + HEX_VALC;
-            adc_data.values[0][sample] = adc_spi_dmabuf2[5 + offs] + HEX_VALC;
+            adc_data.values[1][sample] = adc_spi_dmabuf2[0 + offs] - HEX_VALC;
+            adc_data.values[2][sample] = adc_spi_dmabuf2[1 + offs] - HEX_VALC;
+            adc_data.values[3][sample] = adc_spi_dmabuf2[2 + offs] - HEX_VALC;
+            adc_data.values[4][sample] = adc_spi_dmabuf2[3 + offs] - HEX_VALC;
+            adc_data.values[5][sample] = adc_spi_dmabuf2[4 + offs] - HEX_VALC;
+            adc_data.values[0][sample] = adc_spi_dmabuf2[5 + offs] - HEX_VALC;
+
+
+
+          
+
+
+
+
 
 //            adc_data.values[0][sample] = 0x1 + HEX_VALC;
 //            adc_data.values[1][sample] = 0x2 + HEX_VALC;
@@ -576,13 +584,13 @@ extern hal_result_t adc_get_ch_value(uint8_t ch_num, uint8_t filtered, int16_t *
         return(hal_res_NOK_wrongparam);
     }
 
-    if(adc_spi_dmabuf_none == adc_data.flt_wd.last_flt_data_buff_index)
-    {
-        return(hal_res_NOK_nodata);
-    }
 
     if(filtered)
     {
+        if(adc_spi_dmabuf_none == adc_data.flt_wd.last_flt_data_buff_index)
+        {
+            return(hal_res_NOK_nodata);
+        }
         *value = adc_data.filtered_values[adc_data.flt_wd.last_flt_data_buff_index-1][ch_num];
     }
     else

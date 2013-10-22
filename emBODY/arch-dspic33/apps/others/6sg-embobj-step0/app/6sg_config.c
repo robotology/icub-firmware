@@ -131,7 +131,7 @@ hal_arch_dspic_eeprom_emfl_DECLARE_VAR_IN_EE(ee_6sg_cfg, SIXsg_ee_config_data_t,
 static const SIXsg_ee_config_data_t ee_cfg_data_default =
 {
     .additional_info = {'6', 's', 'g'},
-    .serial_number = {1,2,3,4,5,6,7},  
+    .serial_number = {'S','N','0','0','0',0,0},  
     .an_channel_offset = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }, //{0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5 },  //ofset to apply to each channel.
     .tr_matrix =
     {
@@ -144,8 +144,8 @@ static const SIXsg_ee_config_data_t ee_cfg_data_default =
     },
     .an_channel_gain = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0} },
     .calibration_tare = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0 },
-    .full_scales = {1,2,3,4,5,6},
-    .sw_matrix_gain = 0XC,
+    .full_scales = {100,100,100,100,100,100},
+    .sw_matrix_gain = 0X1,
     .can_msg_datarate = 1,
     .iir_tr_coef =
     {
@@ -259,14 +259,14 @@ static const eEmoduleInfo_t s_ap_moduleinfo_application =
             .version    = 
             { 
                 .major = 1, 
-                .minor = 1
+                .minor = 3
             },  
             .builddate  = 
             {
                 .year  = 2013,
-                .month = 1,
-                .day   = 23,
-                .hour  = 18,
+                .month = 10,
+                .day   = 22,
+                .hour  = 15,
                 .min   = 0
             }
         },
@@ -302,14 +302,18 @@ static const eEmoduleInfo_t s_ap_moduleinfo_application =
 
 static SIXsg_config_data_t s_the_appcfg =
 {
-    .gen_ee_data = {0},
+    .gen_ee_data = 
+    {
+        .board_address = 0xd,
+        .verinfo = {0}
+    },
     .SIXsg_ee_data = {0},  /**< contains specific information for 6SG application.*/
     .behaviour_cfg = 
     {
         .send_ack_each_cmd = 1, //if = 1 send ack for each command (polling msg)
         .save_in_ee_immediately = 1, //if = 1 save current values of ee_data in eeprom each time a cmd change a value of data in eeprom.      
         .filt_data_mode = filtMode_iir, // filtMode_iir, //TODO: da spostare per adc
-        .tx_outMsg_mode = tx_outMsg_off  //tx_outMsg_torqueData_on
+        .tx_outMsg_mode = tx_outMsg_readOnly 
     }
 };
 
@@ -318,6 +322,7 @@ static uint8_t s_the_appcfg_is_inited = 0;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern hal_result_t SIXsg_config_init(config_behaviour_t *cfg_behav)
 {
     const eEsharinfoPartable_t *ptab;
@@ -380,6 +385,20 @@ extern hal_result_t SIXsg_config_init(config_behaviour_t *cfg_behav)
     return(hal_res_OK);
 }
 
+
+
+/*
+extern hal_result_t SIXsg_config_init(config_behaviour_t *cfg_behav)
+{
+
+    memcpy(&s_the_appcfg.behaviour_cfg, cfg_behav, sizeof(config_behaviour_t));
+    
+    memcpy(&s_the_appcfg.SIXsg_ee_data, &ee_cfg_data_default, sizeof(SIXsg_ee_config_data_t));
+    
+    s_the_appcfg_is_inited = 1;
+    return(hal_res_OK);
+}
+*/
 
 extern SIXsg_config_data_t * SIXsg_config_get(void)
 {

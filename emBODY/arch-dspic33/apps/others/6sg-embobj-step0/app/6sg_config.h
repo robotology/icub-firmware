@@ -133,8 +133,8 @@ typedef enum
 {
     tx_outMsg_off = 0,              /**< don't send anything */
     tx_outMsg_torqueData_on,        /**< send only torque value (normal running mode)  */
-    tx_outMsg_forceData_on,         /**< send only force value (debuging mode)  */
-    tx_outMsg_torqueForceData_on    /**< send torque and force data (calibrate phase) */
+    tx_outMsg_readOnly,         /**< read from adc, but don't send data  */
+    tx_outMsg_uncalibData_on //tx_outMsg_torqueForceData_on    /**< send uncalib data (all six axes) */
 } trasmission_outgoingMsg_mode_t;
 
 

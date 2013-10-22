@@ -62,6 +62,7 @@
     #include "debug_util.h"
 #endif
 
+#include "EOaction_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -222,10 +223,10 @@ static const eOsfoop_cfg_t s_thefoopcfg =
 
 static config_behaviour_t my_6sg_cfg_behav =
 {
-    .send_ack_each_cmd = 1, //if = 1 send ack for each command (polling msg)
+    .send_ack_each_cmd = 0, //if = 1 send ack for each command (polling msg)
     .save_in_ee_immediately = 1, //if = 1 save current values of ee_data in eeprom each time a cmd change a value of data in eeprom.      
     .filt_data_mode = filtMode_none,// filtMode_iir, //TODO: da spostare per adc
-    .tx_outMsg_mode = tx_outMsg_off  //tx_outMsg_torqueData_on
+    .tx_outMsg_mode = tx_outMsg_readOnly  //tx_outMsg_torqueData_on
 };
 
 
@@ -487,6 +488,7 @@ static void s_on_event(uint32_t evtpos, eOevent_t evtmsk)
         case 3: //EVT_MSG_RECEIVED
         {
             parse_message();
+            //parse_test();
         }
         break;
 
@@ -587,39 +589,53 @@ static void s_send_outgoing_msg(void)
     calc_data_output_t output;
     int16_t adc_values[AN_CHANNEL_NUM];
 
+    
+    // 1) get values from ADC
     res = adc_get_data(adc_values);
     if(hal_res_NOK_nodata == res)
     {
         return;
     }
 
-    calculate_torque_and_force_data(adc_values, &output);
 
+    // 2) calculate data 
+    if(tx_outMsg_torqueData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode)
+    {
+        calculate_torque_and_force_data(adc_values, &output);
+    }
+    else if(tx_outMsg_uncalibData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode)
+    {
+        calculate_uncalibrated_data(adc_values, &output);
+    }
+    else
+    {
+        return;
+    }
+
+    
+    // 3) send data
     frame.id_type = hal_can_frameID_std;
     frame.frame_type = hal_can_frame_data;
     frame.size = 6; //o 7 con saturazione!!!
-    if(tx_outMsg_torqueData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode)
-    {
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;
-        memcpy(frame.data, output.s.torque, sizeof(int16_t) *3);
-        hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
-    }
-    else if(tx_outMsg_torqueForceData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
-    {
-        //send torque values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ; //0xB
-//since board 6sg does not differcnces torque value from force, but they are all force, here I use arry
-        //memcpy(frame.data, output.s.torque, sizeof(int16_t) *3);
-        memcpy(frame.data, &output.array[3], sizeof(int16_t) *3);
-        hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
+    
+    output.array[0] += 0x8000; 
+    output.array[1] += 0x8000; 
+    output.array[2] += 0x8000; 
+    output.array[3] += 0x8000; 
+    output.array[4] += 0x8000; 
+    output.array[5] += 0x8000; 
+    
+    //send first 3 values
+    //(note: since board 6sg does not distinguish torque value from force, but they are all force, here I use array)
+    frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ; //0xB
+    memcpy(frame.data, &output.array[3], sizeof(int16_t) *3);
+    hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
 
-        //send force values
-        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ; //0xA
-        //memcpy(frame.data, output.s.force, sizeof(int16_t) *3);
-//since board 6sg does not differcnces torque value from force, but they are all force, here I use arry
-        memcpy(frame.data, &output.array[0], sizeof(int16_t) *3);
-        hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
-    }
+    //send last 3 values
+    frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ; //0xA
+    memcpy(frame.data, &output.array[0], sizeof(int16_t) *3);
+    hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
+
 #ifdef _DEBUG_
     LATAbits.LATA3 =  ~LATAbits.LATA3;
 #endif
@@ -656,7 +672,7 @@ static void s_send_outgoing_msg_TEST(void)
         memcpy(frame.data, &adc_values[0], sizeof(int16_t)*3);
         hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
     }
-    else if(tx_outMsg_torqueForceData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
+    else if(tx_outMsg_uncalibData_on ==  cfg_ptr->behaviour_cfg.tx_outMsg_mode) 
     {
         //send torque values
         frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ;

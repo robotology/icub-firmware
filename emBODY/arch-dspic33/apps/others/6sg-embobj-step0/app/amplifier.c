@@ -232,6 +232,26 @@ extern void ampl_set_gain_and_offset(void)
 }
 
 
+extern void ampl_set_offset(void)
+{
+  // write initial offset
+  while(s_ampl_is_busy());
+  s_ampl_reg_set(PAR_OUTPUT_OFFSET);
+}
+
+
+extern void ampl_set_gain(void)
+{
+  
+  // write initial gain 1
+  while(s_ampl_is_busy());
+  s_ampl_reg_set(PAR_FIRST_STAGE_GAIN);
+
+  // write initial gain 2
+  while(s_ampl_is_busy());
+  s_ampl_reg_set(PAR_SECOND_STAGE_GAIN);
+
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

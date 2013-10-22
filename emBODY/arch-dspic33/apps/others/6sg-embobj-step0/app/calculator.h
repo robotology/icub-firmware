@@ -80,6 +80,16 @@ extern hal_result_t calculate_torque_and_force_data(int16_t *input, calc_data_ou
 
 
 /** @fn         extern hal_result_t calculate_torque_and_force_data(int16_t *input, data_output_t *output);
+    @brief      Adds tare to input value only.
+    @param      input          array of input values.
+    @param      output         pointer to memory where function puts force and torque values
+    @return     hal_res_NOK_nullpointer if input or output is null pointer
+                hal_res_OK otherwise
+ **/
+extern hal_result_t calculate_uncalibrated_data(int16_t *input, calc_data_output_t *output);
+
+
+/** @fn         extern hal_result_t calculate_torque_and_force_data(int16_t *input, data_output_t *output);
     @brief      gets current tare value of channle @ch_num
     @param      ch_num         numbero of analog channel
     @param      value          pointer where function will put the required value

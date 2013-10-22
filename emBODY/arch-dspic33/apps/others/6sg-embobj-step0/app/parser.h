@@ -69,6 +69,9 @@ extern hal_result_t parser_init(SIXsg_config_data_t *cfg_ptr);
 extern hal_result_t parse_message(void);
 
 
+extern hal_result_t parse_test(void);
+
+
 // - doxy end ---------------------------------------------------------------------------------------------------------
 // empty-section
 
