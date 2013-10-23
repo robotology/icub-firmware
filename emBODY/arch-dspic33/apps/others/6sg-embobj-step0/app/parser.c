@@ -77,7 +77,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+    uint8_t sendAmsg = 1;
+    uint8_t sendBmsg = 1;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -156,6 +157,8 @@ static hal_result_t s_parse_can_loaderMsg(uint8_t *data_in, uint8_t *data_out, u
 static void s_error_manage(hal_result_t error);
 
 static void s_frame_fill(hal_can_frame_t *msg_out, uint32_t receivedId, uint8_t *data, uint8_t len);
+
+static void s_tx_mode_check(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -912,6 +915,7 @@ static hal_result_t s_cmd_set_tx_mode(uint8_t *data_in, uint8_t *data_out, uint8
         case 0://transmit calibrated data
         {
             CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_torqueData_on;
+            s_tx_mode_check();
             adc_start();
             sender_start();
         } break;
@@ -931,6 +935,8 @@ static hal_result_t s_cmd_set_tx_mode(uint8_t *data_in, uint8_t *data_out, uint8
         case 3: //TODO: transmit not calibrated data
         {
             CFG_6SG_BEHAV.tx_outMsg_mode = tx_outMsg_uncalibData_on;
+            sendAmsg = 1;
+            sendBmsg = 1;
             adc_start();
             sender_start();
         } break;
@@ -948,7 +954,34 @@ static hal_result_t s_cmd_set_tx_mode(uint8_t *data_in, uint8_t *data_out, uint8
 }
     
 
-            
+static void s_tx_mode_check(void)
+{
+    uint8_t ri, ci;
+    sendAmsg = 0;
+    sendBmsg = 0;
+    
+    for(ci=0; (ci<3) && (sendAmsg==0); ci++)
+    {
+        for(ri=0; (ri<6) && (sendAmsg==0); ri++)
+        {
+            if(CFG_6SG_EEDATA.tr_matrix[ci][ri] != 0)
+            {
+                sendAmsg = 1;
+            }
+        }
+    }
+    
+    for(ci=3; (ci<6) && (sendBmsg==0); ci++)
+    {
+        for(ri=0; (ri<6) && (sendBmsg==0); ri++)
+        {
+            if(CFG_6SG_EEDATA.tr_matrix[ci][ri] != 0)
+            {
+                sendBmsg = 1;
+            }
+        }
+    }
+}            
 
 static hal_result_t s_cmd_set_can_data_rate(uint8_t *data_in, uint8_t *data_out, uint8_t *len_data_out) // CAN_CMD_SET_CANDATARATE: // set datarate for transmission in milliseconds 
 {
@@ -967,6 +1000,9 @@ static hal_result_t s_cmd_set_can_data_rate(uint8_t *data_in, uint8_t *data_out,
 
     CFG_6SG_EEDATA.can_msg_datarate = data_in[1];
 
+    #ifdef _TIMER_HW_
+        sender_config_datarate();
+    #endif
     if(sender_status)
     {
         sender_start();

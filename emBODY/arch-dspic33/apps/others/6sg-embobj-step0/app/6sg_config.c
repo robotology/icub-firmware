@@ -259,7 +259,7 @@ static const eEmoduleInfo_t s_ap_moduleinfo_application =
             .version    = 
             { 
                 .major = 1, 
-                .minor = 3
+                .minor = 5
             },  
             .builddate  = 
             {

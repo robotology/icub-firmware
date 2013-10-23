@@ -73,7 +73,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+extern uint8_t sendAmsg;
+extern uint8_t sendBmsg;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
@@ -625,17 +626,22 @@ static void s_send_outgoing_msg(void)
     output.array[4] += 0x8000; 
     output.array[5] += 0x8000; 
     
-    //send first 3 values
-    //(note: since board 6sg does not distinguish torque value from force, but they are all force, here I use array)
-    frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ; //0xB
-    memcpy(frame.data, &output.array[3], sizeof(int16_t) *3);
-    hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
-
-    //send last 3 values
-    frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ; //0xA
-    memcpy(frame.data, &output.array[0], sizeof(int16_t) *3);
-    hal_can_put(hal_can_port1, &frame, hal_can_send_highprio_now );
-
+    if(sendBmsg)
+    {
+        //send first 3 values
+        //(note: since board 6sg does not distinguish torque value from force, but they are all force, here I use array)
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_TORQUE_VECTOR) ; //0xB
+        memcpy(frame.data, &output.array[3], sizeof(int16_t) *3);
+        hal_can_put(hal_can_port1, &frame, hal_can_send_normprio_now/*hal_can_send_highprio_now*/ );
+    }
+    
+   if(sendAmsg)
+   {
+        //send last 3 values
+        frame.id = (CAN_MSG_CLASS_PERIODIC) | (cfg_ptr->gen_ee_data.board_address<<4) | (CAN_CMD_FORCE_VECTOR) ; //0xA
+        memcpy(frame.data, &output.array[0], sizeof(int16_t) *3);
+        hal_can_put(hal_can_port1, &frame, hal_can_send_normprio_now/*hal_can_send_highprio_now*/ );
+   } 
 #ifdef _DEBUG_
     LATAbits.LATA3 =  ~LATAbits.LATA3;
 #endif

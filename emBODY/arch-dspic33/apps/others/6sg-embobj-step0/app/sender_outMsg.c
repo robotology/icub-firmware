@@ -133,7 +133,7 @@ extern void sender_start(void)
     if( tx_outMsg_off != sender_data.SIXsg_config_ptr->behaviour_cfg.tx_outMsg_mode)
     { 
 
-#ifdef _TIMER_HW_
+#ifdef _TIMER_HW_      
         hal_timer_start(hal_timer4);
 #else
         eo_timer_Start(s_timer_ptr, eok_abstimeNOW, (sender_data.SIXsg_config_ptr->SIXsg_ee_data.can_msg_datarate*1000),
@@ -141,6 +141,12 @@ extern void sender_start(void)
 #endif
     }
 
+}
+
+
+extern void sender_config_datarate(void)
+{
+    s_sender_tmr_hw_init();
 }
 
 extern void sender_stop(void)

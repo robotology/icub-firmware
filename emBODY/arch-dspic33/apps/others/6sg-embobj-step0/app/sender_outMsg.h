@@ -75,6 +75,8 @@ extern void sender_stop(void);
 **/
 extern int16_t sender_is_running(void);
 
+extern void sender_config_datarate(void);
+
 
 // - doxy end ---------------------------------------------------------------------------------------------------------
 // empty-section
