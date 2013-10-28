@@ -907,22 +907,20 @@ extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *l
 
 
 #ifdef HAL_USE_ETH
-static hal_eth_phy_status_t phy_list[2] = {0};
-
-extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num)
+extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
 {
+    uint8_t i; 
     
-    if((NULL == link_list) || (NULL == links_num))
+    if((NULL == link_list) || (links_num>3))
     {
         return(hal_res_NOK_nullpointer);
     }
 
-    s_hal_brdcfg_eth__get_links_status(&phy_list[0], 1);//first phy
-    
-    s_hal_brdcfg_eth__get_links_status(&phy_list[1], 2);//second phy
+    for(i=0; (i<links_num); i++)
+    {
+        s_hal_brdcfg_eth__get_links_status(&link_list[i], i);
+    }
 
-    *link_list = &phy_list[0];
-    *links_num = 2;   
     return(hal_res_OK);
 }
 
@@ -931,23 +929,59 @@ extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link
 #ifdef HAL_USE_ETH
 static uint8_t hal_brdcfg_eth__get_errors_code(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype)
 {
-    if(0 == phynum)
+    switch(phynum)
     {
-        return(0x07);
-    }
-    else
-    {
-        return(0x27);
-    }
+        case 0:
+        {
+            return(errortype);
+        }
+        
+        case 1:
+        {
+            return(0x20+errortype);
+        }
+        
+        case 2:
+        {
+            return(0x40+errortype);
+        }
+        default:
+        {
+            return(0);
+        }
+    };
+//     if(0 == phynum)
+//     {
+//         return(errortype);
+//     }
+//     else
+//     {
+//         return(0x20+errortype);
+//     }
 }
+// static uint8_t has_finished_to_read(void)
+// {
+//     uint8_t read_op = 0;
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     while((read_op & 0x80) ==0x80)
+//     {
+// //         asm("nop");
+// //         asm("nop");
+//         hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     }
+//     return 1;
+// }
 extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
 {
 
     uint8_t errorcode;
     uint8_t buff_write = 0x1c; // read MIB counters selected
-    uint8_t buff_read[4];
+    uint8_t buff_read[4] = {0};
     
-    if(phynum>1)
+//    char str[150];
+
+    
+    if(phynum>2)
     {
         return(hal_res_NOK_nodata);
     }
@@ -956,7 +990,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
     {
         return(hal_res_NOK_nullpointer);
     }
-    
+   
     errorcode = hal_brdcfg_eth__get_errors_code(phynum, errortype);
     
     hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x79);
@@ -964,14 +998,44 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
     buff_write = errorcode;
     hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x7A);
     
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x79);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x79 =0x%x", read_op);
+//     hal_trace_puts(str);
+//     
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7a);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7a =0x%x errorcode=%0x", read_op, errorcode);
+//     hal_trace_puts(str);
+//     
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
     
     hal_brdcfg_switch__reg_read_byI2C(&buff_read[3], 0x80); //reads bits from 24-31
-   
-    hal_brdcfg_switch__reg_read_byI2C(&buff_read[2], 0x80); //reads bits from 23-16
-    hal_brdcfg_switch__reg_read_byI2C(&buff_read[1], 0x80); //reads bits from 15-8
-    hal_brdcfg_switch__reg_read_byI2C(&buff_read[0], 0x80); //reads bits from 7-0
+    //has_finished_to_read();
     
-    result->value = ((buff_read[3]&0x3F)<< 24) | (buff_read[2]<<16) || (buff_read[1]<<8) || buff_read[0];
+//      hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[2], 0x81); //reads bits from 23-16
+    //has_finished_to_read();
+//      hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[1], 0x82); //reads bits from 15-8
+    //has_finished_to_read();
+//      hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[0], 0x83); //reads bits from 7-0
+    //has_finished_to_read();
+    
+    result->value = (((uint32_t)(buff_read[3]&0x3F))<< 24) | (((uint32_t)buff_read[2])<<16) | (((uint32_t)buff_read[1])<<8) | buff_read[0];
+    //result->value = aux3 <<24 | aux2<<16 | aux1<<8 | aux0;
+
+    
     if((buff_read[3]&0x80) == 0x80)
     {
         result->counteroverflow = 1;
@@ -983,11 +1047,11 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
     
     if((buff_read[3]&0x40) == 0x40)  
     {
-        result->invalidvalue = 1;
+        result->validvalue = 1;
     }
     else
     {
-        result->invalidvalue = 0;
+        result->validvalue = 0;
     }
     return(hal_res_OK);
 }
@@ -1259,29 +1323,51 @@ static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uin
 {
     uint16_t regaddr_status0, regaddr_status1;
     uint8_t  buff_read = 0xFF;
+ //   char str[60];
     
-    if(1 == phy_num)
+    switch(phy_num)
     {
-        regaddr_status0 = 0x1E;
-        regaddr_status1 = 0x1F;
+        case 0:
+        {
+            regaddr_status0 = 0x1E;
+            regaddr_status1 = 0x1F;
+        }break;
+        
+        case 1:
+        {
+            regaddr_status0 = 0x2E;
+            regaddr_status1 = 0x2F;
+        }break;
+        
+        case 2:
+        {
+            regaddr_status0 = 0x0; //reserved, not applied to port 3. (see datasheet)
+            regaddr_status1 = 0x3F;
+        }break;
+        
+        default:
+        {
+            return;
+        }
     }
-    else // (2 == phy_num)
-    {
-        regaddr_status0 = 0x2E;
-        regaddr_status1 = 0x2F;
-    }
+
     
     memset(status, 0, sizeof(hal_eth_phy_status_t));
     
-    hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status0); //port1
-    if(buff_read&0x0040)// autoneg completed
+    if(phy_num <2)
     {
-        status->autoNeg_done = 1;
+        hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status0); //port1
+        if(buff_read&0x0040)// autoneg completed
+        {
+            status->autoNeg_done = 1;
+        }
+        if(buff_read&0x0020)// link is good
+        {
+            status->linkisgood = 1;
+        }
     }
-    if(buff_read&0x0020)// link is good
-    {
-        status->linkisgood = 1;
-    }
+//     snprintf(str, sizeof(str), "get_links_status phynum=%d read=0x%x",phy_num, buff_read);
+//     hal_trace_puts(str);
     
     buff_read = 0;
     hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status1); //port1
@@ -1293,8 +1379,9 @@ static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uin
     {
         status->linkduplex = 1;
     }
-
-
+//     snprintf(str, sizeof(str), "get_links_status phynum=%d read=0x%x",phy_num, buff_read);
+//     hal_trace_puts(str);
+    
 }
 
 #endif

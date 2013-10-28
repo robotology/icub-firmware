@@ -564,15 +564,25 @@ extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *l
 
 
 #ifdef HAL_USE_ETH
-extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num)
+extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
 {
-    
+
     #warning hal_brdcfg_eth__get_links_status NOT IMPLEMENTED!!
-    return(hal_res_OK);
+    return(hal_res_NOK_unsupported);
+
+
 }
 
 #endif //HAL_USE_ETH
 
+#ifdef HAL_USE_ETH
+
+extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{
+    #warning hal_brdcfg_eth__get_links_status NOT IMPLEMENTED!!
+    return(hal_res_NOK_unsupported);
+}
+#endif //HAL_USE_ETH
 
 
 #ifdef HAL_USE_SYS

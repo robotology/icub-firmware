@@ -454,7 +454,7 @@ extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num
 }
 
 
-extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num)
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
 {
     return(hal_brdcfg_eth__get_links_status(link_list, links_num));
 }
