@@ -158,14 +158,17 @@ typedef struct
 
 typedef enum
 {
-    rxCrcError  = 0
+    rxCrcError  = 0x07,
+    rxUnicast   = 0x0D,
+    rx64Octets  = 0x0E,
+    txUnicast   = 0x1A
 } hal_eth_phy_errors_info_type_t;
 
 typedef struct
 {
     uint32_t value;
     uint32_t counteroverflow:1;
-    uint32_t invalidvalue:1;
+    uint32_t validvalue:1;
     uint32_t dummy:30;
 } hal_eth_phy_errorsinfo_t;
     
@@ -220,17 +223,20 @@ extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void);
                 if bit in pos x values 1 then phy num x is up, else is down. phy num starts to count from 0.
                 links_num in output contains num of used phy.
     @return     if linkst_mask or links_num is null returns hal_res_NOK_nullpointer else hal_res_OK
-    @warning    It is board dependent. curr
+    @warning    It is board dependent.
  **/
 extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num);
 
 
 /** @fn         extern hal_result_t hal_eth_check_links(void)
     @brief      check all physical links.
-    @return     in output link list contains pointer to an array of hal_eth_phy_status with links_num element
+    @param      links_num           num of links to check. 
+                For example, in ems board @links_num can value 1-3.(third links is rmii)
+    @param      link_list           pointer to vector of @links_num elements. In output contains links' status.
+    @return     error if @links_list is null or links_num is bigger than num of link present on boards.
     @warning    It is board dependent
  **/
-extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t** link_list, uint8_t *links_num);
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num);
 
 
 /** @fn         extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, uint32_t *result)
