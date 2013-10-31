@@ -602,7 +602,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     {
         return;
     }
-    jstatus_ptr->basic.controlmodestatus = eomc_controlmode_calib;
+    //jstatus_ptr->basic.controlmodestatus = eomc_controlmode_calib;
 
     
     // 2) send control mode value to mc4
@@ -713,8 +713,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     }
-
-   
+ 
 }
 
 
@@ -752,45 +751,42 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
 
     //set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
-    
-    if(eomc_controlmode_cmd_switch_everything_off == *controlmode_cmd_ptr)
+
+    if(eomc_controlmode_idle == jstatus_ptr->basic.controlmodestatus)
     {
-        if(jstatus_ptr->basic.controlmodestatus == eomc_controlmode_idle)
+        if(eomc_controlmode_cmd_position != *controlmode_cmd_ptr)
         {
+            //i can exit from idle only if i received set control mode position command
             return;
         }
-        //jstatus_ptr->basic.controlmodestatus = eomc_controlmode_idle;
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-    }
-    else // pos-controlmode, vel-controlmode, etc (see enum type eOmc_controlmode_t) 
-    {
-        //this cast can be done because id definition types we use EO_VERIFYproposition
-        //jstatus_ptr->basic.controlmodestatus = (eOmc_controlmode_t)*controlmode_cmd_ptr;
-
-        //translate control mode command in control mode for icub can proto
-        res = s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode_cmd_ptr, &icubcanProto_controlmode);
-        if(eores_OK != res)
-        {
-            return;
-        }
-        
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        
-        #warning VALE-->check if PWM can be enable?? see fault.
-        
+    
         msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
-        
     }
+    else
+    {
+        if(eomc_controlmode_cmd_switch_everything_off == *controlmode_cmd_ptr)
+        {
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+        }
+        else
+        {
+            res = s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode_cmd_ptr, &icubcanProto_controlmode);
+            if(eores_OK != res)
+            {
+                return;
+            }
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
+        }
+    }
+
 }
 
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
