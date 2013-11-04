@@ -50,25 +50,12 @@ extern "C" {
 #define eodgn_nvidbdoor_emsapplcommon   4
 #define eodgn_nvidbdoor_emsapplmc       5
 #define eodgn_nvidbdoor_motorstatus     6
-#define eodgn_nvidbdoor_jointsStateCmd  7
+#define eodgn_nvidbdoor_canQueueStatistics  7
 #define eodgn_nvidbdoor_rxcheckSetpoints 8
 
 
 #define eodgn_nvidbdoor_max             9
 
-
-
-//use nv id of backdoor from 11 because values from 1 to 10 are used for diagnostics porpouse.
-#define opcCfg_nvid_bdoor_dgn_offset                       10
-
-//pay attention: update nvid_bdoor_user_num value. it is the numeber of nvid you use.
-#define  opcCfg_nvid_bdoor_user_num                         0
-
-
-/*example: 
-#define 	eom_ipnet_hid_DEBUG_id 		nvid_bdoor_offset +	1
-#define  nvid_bdoor_user_num            1
-*/
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 

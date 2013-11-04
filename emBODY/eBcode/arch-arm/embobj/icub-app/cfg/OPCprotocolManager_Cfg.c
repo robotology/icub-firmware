@@ -86,8 +86,8 @@ static opcprotman_var_map_t s_myarray[] =
         .onrec      = NULL
     },
     {
-        .var        = eodgn_nvidbdoor_jointsStateCmd,
-        .size       = sizeof(eOdgn_jointsStateCmd_t),
+        .var        = eodgn_nvidbdoor_canQueueStatistics,
+        .size       = sizeof(eOdgn_can_statistics_t),
         .ptr        = NULL,
         .onrec      = NULL
     },
@@ -101,8 +101,8 @@ static opcprotman_var_map_t s_myarray[] =
 
 opcprotman_cfg_t opcprotmanCFGv0x1234 =
 {
-    .databaseversion        = 0x1235,
-    .numberofvariables      = opcCfg_nvid_bdoor_user_num + eodgn_nvidbdoor_max,
+    .databaseversion        = 0x1236,
+    .numberofvariables      = eodgn_nvidbdoor_max,
     .arrayofvariablemap     = s_myarray
 };
 
