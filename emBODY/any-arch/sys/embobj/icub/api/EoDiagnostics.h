@@ -91,13 +91,46 @@ typedef struct
     eOdgn_canswstatus_t sw;
 } eOdgn_canstatus_t; //2 B
 
+typedef struct
+{
+    uint8_t min;
+    uint8_t max;
+    uint8_t dummy1;
+    uint8_t dummy2;
+} eOdgn_can_stat_info_t; // 4B
+
+typedef struct
+{
+    eOdgn_can_stat_info_t info_rx;
+    eOdgn_can_stat_info_t info_tx;
+} eOdgn_can_statistics_perPort_t; //8 B
+
+typedef struct
+{
+    eOdgn_can_statistics_perPort_t stat[2];
+} eOdgn_can_statistics_configMode_t; //16 B
+
+
+typedef struct
+{
+    eOdgn_can_statistics_perPort_t stat[2];  //2 = num can port
+} eOdgn_can_statistics_runMode_t; //16 B
+
+typedef struct
+{
+    eOdgn_can_statistics_configMode_t config_mode;
+    eOdgn_can_statistics_runMode_t    run_mode;
+} eOdgn_can_statistics_t; //32 B
+
+
+
 typedef struct 
 {
     uint16_t linksmask;
     uint8_t crcErrorCnt_overflow;
     uint8_t crcErrorCnt_validVal;
     uint32_t crcErrorCnt[3];
-} eOdgn_ethstatus_t;
+} eOdgn_ethstatus_t; //4 B
 
 typedef struct 
 {
@@ -108,7 +141,7 @@ typedef struct
 {
     eOdgn_canstatus_t   can_dev[2];
     eOdgn_ethstatus_t   eth_dev;
-} eOdgn_emsperipheralstatus_t; //8 B
+} eOdgn_emsperipheralstatus_t; //40 B
 
 typedef struct
 {
@@ -258,13 +291,6 @@ typedef struct
     char errorstate_str[eOdgn_errorlog_str_size]; //in string contains the reason of switch to error state.
 } eOdgn_errorlog_t;
 
-
-
-typedef struct
-{
-    eOenum08_t jLastRecCmd[12];     //on ems there are 12 motor max.Each element of array contains the last received cmd
-    uint8_t    lastTwoEqual[12];    //if 1 then ems received two sequential equal commnd (two idle or position cmds)
-} eOdgn_jointsStateCmd_t;
 
 
 typedef struct
