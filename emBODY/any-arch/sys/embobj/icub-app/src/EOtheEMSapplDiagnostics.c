@@ -66,6 +66,7 @@ eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
 eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
+eOdgn_can_statistics_t              eo_dgn_canstatistics;
 eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
 
 
@@ -101,7 +102,15 @@ extern EOTheEMSdiagnostics_t* eo_theEMSdgn_Initialize(void)
     memset(&eo_dgn_emsappmc, 0, sizeof(eOdgn_emsapplication_emswithmc_t));
     memset(&eo_dgn_motorstflag, 0, sizeof(eOdgn_motorstatusflags_t));
     memset(&eo_dgn_rxchecksepoints, 0, sizeof(eOdgn_rxCheckSetpoints_t));
-    
+    memset(&eo_dgn_canstatistics, 0, sizeof(eOdgn_can_statistics_t));
+    eo_dgn_canstatistics.config_mode.stat[0].info_rx.min = 255;
+    eo_dgn_canstatistics.config_mode.stat[0].info_tx.min = 255;
+    eo_dgn_canstatistics.config_mode.stat[1].info_rx.min = 255;
+    eo_dgn_canstatistics.config_mode.stat[1].info_tx.min = 255;
+    eo_dgn_canstatistics.run_mode.stat[0].info_rx.min = 255;
+    eo_dgn_canstatistics.run_mode.stat[0].info_tx.min = 255;
+    eo_dgn_canstatistics.run_mode.stat[1].info_rx.min = 255;
+    eo_dgn_canstatistics.run_mode.stat[1].info_tx.min = 255;
     return(&s_thedgn);
 }
 
@@ -354,6 +363,59 @@ extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p)
     } 
     return(eores_OK);    
 }
+
+
+extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport_t canport, uint8_t numofRXcanframe)
+{
+    if(eo_dgn_canstatistics.run_mode.stat[canport].info_rx.max < numofRXcanframe)
+    {
+        eo_dgn_canstatistics.run_mode.stat[canport].info_rx.max = numofRXcanframe;
+    }
+    if((eo_dgn_canstatistics.run_mode.stat[canport].info_rx.min > numofRXcanframe) && (numofRXcanframe >0))
+    {
+        eo_dgn_canstatistics.run_mode.stat[canport].info_rx.min = numofRXcanframe;
+    }
+}
+
+extern void eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport_t canport, uint8_t numofTXcanframe)
+{
+    if(eo_dgn_canstatistics.run_mode.stat[canport].info_tx.max < numofTXcanframe)
+    {
+        eo_dgn_canstatistics.run_mode.stat[canport].info_tx.max = numofTXcanframe;
+    }
+    if( (eo_dgn_canstatistics.run_mode.stat[canport].info_tx.min > numofTXcanframe) && (numofTXcanframe >0))
+    {
+        eo_dgn_canstatistics.run_mode.stat[canport].info_tx.min = numofTXcanframe;
+    }
+}
+
+
+
+
+extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport_t canport, uint8_t numofRXcanframe)
+{
+    if(eo_dgn_canstatistics.config_mode.stat[canport].info_rx.max < numofRXcanframe)
+    {
+        eo_dgn_canstatistics.config_mode.stat[canport].info_rx.max = numofRXcanframe;
+    }
+    if((eo_dgn_canstatistics.config_mode.stat[canport].info_rx.min > numofRXcanframe) && (numofRXcanframe >0))
+    {
+        eo_dgn_canstatistics.config_mode.stat[canport].info_rx.min = numofRXcanframe;
+    }
+}
+
+extern void eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(eOcanport_t canport, uint8_t numofTXcanframe)
+{
+    if(eo_dgn_canstatistics.config_mode.stat[canport].info_tx.max < numofTXcanframe)
+    {
+        eo_dgn_canstatistics.config_mode.stat[canport].info_tx.max = numofTXcanframe;
+    }
+    if((eo_dgn_canstatistics.config_mode.stat[canport].info_tx.min > numofTXcanframe) && (numofTXcanframe >0))
+    {
+        eo_dgn_canstatistics.config_mode.stat[canport].info_tx.min = numofTXcanframe;
+    }
+}
+
 #if 0
 extern eOresult_t eo_theEMSdgn_checkErrors(EOTheEMSdiagnostics_t* p)
 {
@@ -400,6 +462,31 @@ extern eOresult_t eo_theEMSdgn_checkLinksStatus(EOTheEMSdiagnostics_t* p)
     hal_eth_get_links_status(link_list, &links_num);
     
     return(eores_OK);
+}
+
+
+
+
+extern void eo_theEMSdgn_updateCanQueuesStatistics(eOdgn_appl_phase_t phase)
+{
+    eOresult_t res;
+    uint8_t numofRXcanframe = 0;
+    uint8_t numofTXcanframe = 0;
+    eOdgn_can_statistics_perPort_t *stat_ptr = NULL;
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+
+//port 1
+    res = eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport1, &numofRXcanframe);
+    res = eo_appCanSP_GetNumOfTxCanframe(appCanSP_ptr, eOcanport1, &numofTXcanframe);
+    stat_ptr = &eo_dgn_canstatistics.run_mode.rxPhase_stat[phase][eOcanport1];
+    s_theEMSdgn_calculateCanQueuesStatistics(stat_ptr, numofRXcanframe, numofTXcanframe);
+
+
+//port 2    
+    res = eo_appCanSP_GetNumOfRecCanframe(appCanSP_ptr, eOcanport1, &numofRXcanframe);
+    res = eo_appCanSP_GetNumOfTxCanframe(appCanSP_ptr, eOcanport1, &numofTXcanframe);
+    stat_ptr = &eo_dgn_canstatistics.run_mode.rxPhase_stat[phase][eOcanport1];
+    s_theEMSdgn_calculateCanQueuesStatistics(stat_ptr, numofRXcanframe, numofTXcanframe);      
 }
 
 #endif

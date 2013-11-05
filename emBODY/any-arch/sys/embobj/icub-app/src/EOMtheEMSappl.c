@@ -59,6 +59,8 @@
 
 #include "EOMtheLEDpulser.h"
 
+#include "EOtheEMSapplDiagnostics.h"
+
 #ifdef _TEST_SEQNUM_
     #include "eOtheEthLowLevelParser.h"
     #include "eODeb_eoProtoParser.h"
@@ -520,6 +522,7 @@ static void s_eom_emsappl_backdoor_init(void)
 {
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
     
+    eo_theEMSdgn_Initialize();
     eom_emsbackdoor_Initialise(&emscfg->backdoorcfg);
 }
 
