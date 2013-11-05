@@ -94,6 +94,10 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     {
         return;
     }
+    
+#ifdef _GET_CANQUEUE_STATISTICS_
+   eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
+#endif
    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
     
 
@@ -106,6 +110,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
         {
             return;
         }
+#ifdef _GET_CANQUEUE_STATISTICS_
+        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
+#endif
         eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
     }
 }

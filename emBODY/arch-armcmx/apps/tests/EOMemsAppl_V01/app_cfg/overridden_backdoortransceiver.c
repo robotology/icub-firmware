@@ -177,6 +177,19 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
         return(res);
     }
 
+    
+/* personalize eodgn_nvidbdoor_motorstatus var*/
+	res = opcprotman_personalize_var(   p, 
+                                        eodgn_nvidbdoor_canQueueStatistics,
+                                        (uint8_t*)&eo_dgn_canstatistics, 
+                                        NULL); //on ems i don't receive this data
+
+    if(opcprotman_OK != res)
+    {
+        return(res);
+    }
+    
+    
 #if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
 
     /* personalize eodgn_nvidbdoor_rxcheckSetpoints var*/

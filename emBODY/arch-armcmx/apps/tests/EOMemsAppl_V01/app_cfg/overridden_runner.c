@@ -68,7 +68,7 @@
 //if defined SET_DESIRED_CURR_IN_ONLY_ONE_MSG, the appl sends all desered current to 2fon in only one msg
 #define SET_DESIRED_CURR_IN_ONLY_ONE_MSG
 #define runner_timeout_send_diagnostics         1000
-#define runner_countmax_check_ethlink_status    1000 //every one second
+#define runner_countmax_check_ethlink_status    5000 //every one second
 
 #define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        50
 
@@ -237,6 +237,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 {
 
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
+    uint8_t numoftxframe_p1, numoftxframe_p2;
     //eOresult_t res;
     
 #ifdef _USE_PROTO_TEST_
@@ -306,8 +307,13 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 //         return;
 //     }        
     
-    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
-    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
+    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numoftxframe_p1);
+    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numoftxframe_p2);
+    
+#ifdef _GET_CANQUEUE_STATISTICS_
+    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport1, numoftxframe_p1);
+    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport2, numoftxframe_p2);
+#endif
 
 }
 
@@ -347,7 +353,8 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
         uint8_t link2_isup;
 		//this func chacks if one of link change state and notify it.
 		//the pkt arrived on pc104 backdoor when one link change down->up.
-        eo_theEMSdgn_checkEthLinkStatus(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
+        //eo_theEMSdgn_checkEthLinkStatus(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
         count_ethlink_status = 0;
     }
 /* METODO 4*/
@@ -404,12 +411,22 @@ static void s_eom_emsrunner_hid_taskRX_act_afterdgramrec_2foc_mode(EOtheEMSapplB
     //read can msg from port 1
     res = eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, &numofRXcanframe);
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
+    
+#ifdef _GET_CANQUEUE_STATISTICS_
+   eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport1, numofRXcanframe);
+#endif
 
     eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, numofRXcanframe, NULL);
 
+    
+    
     //read msg from port 2
     res = eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, &numofRXcanframe);
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
+    
+#ifdef _GET_CANQUEUE_STATISTICS_
+   eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport2, numofRXcanframe);
+#endif
     
     eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, numofRXcanframe, NULL);
 }
@@ -432,6 +449,7 @@ static void s_eom_emsrunner_hid_readSkin(EOtheEMSapplBody *p)
 //    eOskin_status_t     *skstatus_ptr;
     EOarray_of_10canframes *arrayof10canframes_ptr = NULL;
     eOresult_t res;
+    uint8_t numofRXcanframe=0;
 
 //uncomment this code when status and config nvvar are used.   
 //     res = eo_appTheDB_GetSkinStatusPtr(eo_appTheDB_GetHandle(), sId,  &skstatus_ptr);
@@ -446,7 +464,11 @@ static void s_eom_emsrunner_hid_readSkin(EOtheEMSapplBody *p)
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetSkinStArray10CanFramesPtr");
     
     eo_array_Reset((EOarray*)arrayof10canframes_ptr);
-    
+
+#ifdef _GET_CANQUEUE_STATISTICS_
+    eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, &numofRXcanframe);
+    eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport2, numofRXcanframe);
+#endif
     eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, 10, NULL); //10 is the max size of sk_array
 
 }
@@ -469,6 +491,9 @@ static void s_eom_emsrunner_hid_readMc4andMais(EOtheEMSapplBody *p)
     res = eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, &numofRXcanframe);
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
 
+#ifdef _GET_CANQUEUE_STATISTICS_
+   eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport1, numofRXcanframe);
+#endif
     eo_appCanSP_read(eo_emsapplBody_GetCanServiceHandle(p), eOcanport1, numofRXcanframe, NULL);
 
 }

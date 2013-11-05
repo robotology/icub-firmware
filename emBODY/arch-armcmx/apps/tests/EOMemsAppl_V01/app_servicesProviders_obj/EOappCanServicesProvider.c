@@ -238,7 +238,7 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     return(retptr);
 }
 
-extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
+extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port, uint8_t *numofTXframe)
 {
     uint8_t                 numofoutframe = 0;
     hal_arch_arm_irqn_t     irqn;
@@ -273,6 +273,10 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port)
         s_eo_appCanSP_clearDiagnosticValues(p, port);
     }
 
+    if(NULL != numofTXframe)
+    {
+        *numofTXframe = numofoutframe;
+    }
     return(eores_OK);
 }
 
@@ -429,40 +433,22 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         return(eores_NOK_nullpointer);
     }
 
-    if(p->periphstatus[canport].isnewvalue)
-    {
-        s_eo_appCanSP_updateDiagnosticValues(p, canport);
-        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
-        s_eo_appCanSP_clearDiagnosticValues(p, canport);
-    }
-    
     for(i=0; i<numofcanframe ; i++)
     {
         memset(&rec_frame, 0, sizeof(hal_can_frame_t));
         
         res = (eOresult_t)hal_can_get((hal_can_port_t)canport, &rec_frame, NULL);
-        if(eores_OK != res) 
+        if( (eores_OK != res)  && (hal_res_NOK_nodata != res))
         {
-            if(eores_NOK_nodata == res)
-            {
-                if(NULL != numofREADcanframe)
-                {
-                    *numofREADcanframe = i;    
-                }
-                return(eores_OK);
-            }
-            else
-            {
-                return(res); 
-            }
-                                     
+            //insert diagnostics
+            continue;                         
         }
 
        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canport);
         #warning remove comment and insert in diagnostics
 //         if(eores_OK != res) 
 //         {
-//             return(res);                    
+//             //return(res);                    
 //         }
     }
     
@@ -471,6 +457,13 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         *numofREADcanframe = i;    
     }
 
+    if(p->periphstatus[canport].isnewvalue)
+    {
+        s_eo_appCanSP_updateDiagnosticValues(p, canport);
+        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
+        s_eo_appCanSP_clearDiagnosticValues(p, canport);
+    }
+    
     return(eores_OK);
 
 }
@@ -1155,7 +1148,10 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
 {
     eOresult_t          res;
     eOcanframe_t        canFrame;
-
+#ifdef _GET_CANQUEUE_STATISTICS_
+    uint8_t             numofoutframe=0;
+#endif
+    
     res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, val_ptr, &canFrame);
     if(eores_OK != res)
     {
@@ -1163,6 +1159,11 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     }
     if(eo_appCanSP_runMode__onEvent == p->runmode)
     {
+        
+#ifdef _GET_CANQUEUE_STATISTICS_
+        hal_can_out_get((hal_can_port_t)emscanport, &numofoutframe);
+        eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(emscanport, numofoutframe+1);
+#endif
         res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
         if(eores_OK != res)
         {
