@@ -258,7 +258,9 @@ ICUBCANPROTO_PER_SB_CMD_
 #define ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL        0x04
 #define ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT     0x08
 #define ICUBCANPROTO_PER_MB_STATUS_FLAG_I2TFAILURE      0x20//in data[5]
- 
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECWARNING   0x20 //in data[4]   
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECERROR     0x08 //in data[4]  
+#define ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECHWOVERRUN 0x40 //in data[4]  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef     enum             eOicubCanProto_boardType_t
