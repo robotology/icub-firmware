@@ -73,6 +73,7 @@ extern eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 extern eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
 extern eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
 extern eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
+extern eOdgn_can_statistics_t              eo_dgn_canstatistics;
 
 
 
@@ -102,7 +103,20 @@ extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p);
 
 extern eOresult_t eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(EOTheEMSdiagnostics_t* p, uint32_t data);
 
+extern eOresult_t eo_theEMSdgn_UpdateCanQueuesStatistics(EOTheEMSdiagnostics_t* p, eOcanport_t canport, uint8_t numofRXcanframe, uint8_t numofXcanframe);
+
+extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport_t canport, uint8_t numofRXcanframe);
+
+extern void eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport_t canport, uint8_t numofTXcanframe);
+
+extern void eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(eOcanport_t canport, uint8_t numofTXcanframe);
+
+extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport_t canport, uint8_t numofRXcanframe);
+
 #if 0
+extern void eo_theEMSdgn_updateCanQueuesStatistics(eOdgn_appl_phase_t phase, eOcanport_t canport);
+
+
 extern eOresult_t eo_theEMSdgn_checkErrors(EOTheEMSdiagnostics_t* p);
 
 extern eOresult_t eo_theEMSdgn_checkLinksStatus(EOTheEMSdiagnostics_t* p);
