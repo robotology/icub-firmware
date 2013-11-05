@@ -1,0 +1,3 @@
+
+It contains source code for boards built with MPUs with ARM architecture (ARM-CM3 and ARM-CM4).
+It also contains projects for applications and libraries. 

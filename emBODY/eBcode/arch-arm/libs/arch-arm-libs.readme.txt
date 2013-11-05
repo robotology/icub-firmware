@@ -1,0 +1,37 @@
+
+It contains source code for libraries used in boards built with MPUs with ARM architecture (ARM-CM3 and ARM-CM4).
+It also contains projects for the libraries. 
+
+- abslayer
+  contains an abstraction layer for RTOS, TCP/IP, and HW use.  The abstraction layer allows the applications to make
+  simpler calls to those services.
+  They are:
+  - hal:            offers simplified HW services to the application.
+  - ipal:           offers TCP/IP services.
+  - osal:           offers RTOS services with APIs which not depends on the midware RTOS (which may be free or commercial)
+
+  
+- embobj
+  contains embedded objects which are specific of ARM architecture (not of a simple MEE type)
+  SHALL I USE IT ??
+  
+  
+- midware
+  contains simple access to an RTOS and more detailed access to HW functionalities down to HW registers. 
+  It offers the basis of the abstraction layer which wraps only some of functionalities offers by midware. 
+  However, the skilled programmer may use the midware to achieve specific behaviours not offered by abslayer.
+  They are:
+  - hl:             offers HW services ranging from a bare register access, up to use of silicon vendor libraries 
+                    (CMSIS and ST standard peripheral libraries), and even upper up to simple HW services (I2C etc.)
+                    and support of some external chips (EEPROMS, MEMS, etc.).
+  - oosiit:         it is an RTOS based on the free-source RTOS from ARM-KEIL (RTX) with better APIs, better code
+                    separation and some extra features (32 bit timing, protected heap management, etc.).
+  
+  
+- services
+  contains services based upon abslayer (or midware), such as management of permanent storage, which are shared by
+  the applications.
+  They are:
+  - sharserv:       Library based upon the abslayer whcih offers storage, inter-process communication, application info, partition 
+                    table for the e-processes inside the MPU: eLoader, eUpdater, eApplication (see eBODY\eB\arch-arm\apps folder). 
+                    

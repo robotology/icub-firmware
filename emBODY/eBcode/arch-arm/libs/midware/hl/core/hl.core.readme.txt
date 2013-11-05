@@ -1,0 +1,19 @@
+
+It is possible to use HL at various levels. The CORE level allows the use of CMSIS plus the
+standard peripheral libraries of the relevant MPU. 
+
+- CMSIS
+  Allows to use only CMSIS and access to the registers of the chosen MPUS.
+  
+- STM32F1
+  It is the standard peripheral library by ST Microelectronics for MPUs of family STM32F1xx.
+  It adds proper functions for the internal peripherals of the MPU.
+  
+- STM32F4
+  It is the standard peripheral library by ST Microelectronics for MPUs of family STM32F4xx.
+  It adds proper functions for the internal peripherals of the MPU.  
+  
+  
+The CORE layer can be used in two ways:
+1. CMSIS only:      see file hl.core.cmsis.readme.txt for more details
+2. CMSIS+STM32Fx:   see file hl.core.stm32fx.readme.txt for more details.

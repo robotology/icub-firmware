@@ -1,0 +1,13 @@
+
+It contains source code for use in iCub platform.
+
+- arch-arm:         contains code used in boards inside iCub which mount an ARM CMX MPU, such as the
+                    EMS001 and EMS004.
+
+- arch-dspic;       contains code used in boards inside iCub which mount a DSPIC33 MPU, such as the 2FOC
+                    and the 6SG (bootloader and application).
+
+- embobj:           contains a set of embedded objects which are used in a cross-platform way. For instance
+                    they are used in EMS001 and EMS004, in the robotInterface process inside the PC104 
+                    for the management of the UDP-based protocol used inside iCub blue, and in 6SG boards.
+                    

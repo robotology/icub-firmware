@@ -1,0 +1,66 @@
+
+It is possible to use HL at various levels. The PLUS level adds extra functionalities to the CORE level. 
+  
+- PLUS
+  Extends the CORE with services which are built using CORE. For instance there is a simple I2C driver, 
+  system utilities, support to some chips (EEPROMs, accelerometer, gyroscope).
+  
+  
+USE OF PLUS  
+
+To use PLUS it is necessary to follow these steps:
+1. choose the target,
+2. add inside the project the source code,
+3. add startup file and set heap and stak size
+4. tailor the compilation by defining what modules of source code to compile and what behaviour they must have,
+5. tailor specific constant data or code to the chosen board.
+6. perform advanced optional CMSIS configuration.
+  
+PLUS can be configured in a minimal way to be exactly the CORE level, or it can add support of chips 
+from a library of available ones.  
+  
+1. Choose the target
+   Define the following macros: HL_USE_MPU_NAME_*, HL_USE_MPU_ARCH_*, and possibly define a HL_USE_BRD_* macro.
+   You can do that in the following way:
+   -  by using -DHL_CFG_PLUS_TARGET_BY_FILE in your compiler and by filling a hl_cfg_plus_target.h file with 
+      the required macros. The file must have that precise name and must be placed in the include path of the 
+      project. A sample file is in hl/plus/hl_cfg_plus_target.template.h
+   As an alternative more difficult option you can use the -D option of your compiler with whatever is 
+   required both for hl-plus and hl-core;
+
+2. Add the source code
+   The source code is in following folders:
+   a. in hl/plus/src/wrappers there are containers of the files in hl/core which are selected according to
+      the chosen target (HL_USE_MPU_NAME_* and HL_USE_MPU_ARCH_* macros). If none is defined, then a pragma
+      error is issued.
+   b. in hl/plus/src/utils there are utilities built upon the hl core. These files use the macro HL_USE_MPU_ARCH_*
+      when it is necessary to choose between APIs of different names dues to incompatibilities in the STM32Fx libraries.    
+   c. in hl/plus/src/chips there are drivers for the various chips. These files typically use the utilities but can
+      also use the hl core. Also the use the macro HL_USE_MPU_ARCH_*. 
+      
+3. Add the startup file and set heap and stack size      
+   a. choose from hl/plus/cfg the hl_startup_xxx.template.s file which matches the chosen HL_USE_MPU_NAME_* and copy it
+      in your project. IMPORTANT: copy and rename the file as it can be changed to fix heap and stack sizes. 
+   b. configure heap and stack size by adding to your project the file hl_cfg_plus_heapstack.h and editing the
+      macros HL_PLUS_SIZEOF_HEAP and HL_PLUS_SIZEOF_STACK to the desired values.   
+      
+4. Tailor the code to compile.
+   The source code can be tailored by defining or un-defining macros in file hl_cfg_plus_modules.h placed in the 
+   include path of the project. All macros must be listed in the file hl/plus/cfg/hl_cfg_plus_modules.template.h 
+   with some description. The macros allows to tailor the code in the following two ways. 
+   a. to include or exclude files from being compiled. Remember however that modern compiler can removed un-used code.
+      The macros are: HL_USE_CORE_CMSIS (cannot be undefined), HL_USE_CORE_STM32, HL_USE_UTIL_*, and
+      HL_USE_CHIP_*. The utilities and the chip can be selected one by one. With selection of only HL_USE_CORE_CMSIS
+      the project has the same code and functionalities as hl/core/cmsis.
+   b. to activate or deactivate some behaviours.  The macros are: HL_BEH_REMOVE_RUNTIME_PARAM_CHECK, and others.     
+
+5. Tailor to the board
+   The source code of some utilities or chip drivers may refer to pins mapping which are specific to the way the MPU
+   has been connected to the board.  For instance, a write-protection of an EEPROM is mapped to a specific port-pin.
+   This information is modelled in software by means of const data structures which must be defined externally to the
+   module. In PLUS we use the file hl_cfg_plus_board_*.c to contain definition of such data structures.
+
+6. Advanced CMSIS configuration
+   The file hl_cfg_plus_advancedcmsis.c may contain redefinitions of those functions which are weakly defined in
+   hl/core/cmsis/src/system_xxx.c and included in PLUS by means of hl_wrap_system.c. The functions are:
+   SystemInit() and SystemCoreClockUpdate().

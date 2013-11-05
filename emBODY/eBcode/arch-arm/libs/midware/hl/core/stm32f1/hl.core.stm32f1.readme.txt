@@ -1,0 +1,15 @@
+
+It is possible to use HL at various levels. The core/stm32f1 adds to core/cmsis some extra functionalities provided
+by ST Microelectronics with the standard peripheral library for MPUs of family STM32F1xx.
+
+
+- STM32F1
+  Adds to CMSIS the support of peripherals specific of STM32F1xx MPUs. 
+  To use STM32F1 it is necessary to start from a CMSIS project and then to add the core/stm32f1/src files.
+  The header file core/stm32f1/api/stm32f1.h give access to whatever the library offers.
+
+  
+  The STM32 files are coming from original ST distribution. They however have some changes, all marked with IIT-EXT tag.
+  1. It is forced inclusion of core/cmsis/api files with the purpose to prevent the compiler to use old files with the same name
+     which it finds in its system include folders.
+  2. It is added a CRC_CalcBlockCRC_networkorder() function.
