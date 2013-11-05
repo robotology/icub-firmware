@@ -1820,6 +1820,7 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     eOresult_t              res;
     uint8_t                 flag0 = frame->data[0];
     uint8_t                 flag5 = frame->data[5];
+    uint8_t                  flag4 = frame->data[4];
     EOTheEMSdiagnostics_t*  dgn_ptr = NULL;
     
     res = eo_appTheDB_GetMotorStatusPtr(eo_appTheDB_GetHandle(), mId,  &mstatus_ptr);
@@ -1862,6 +1863,24 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
         }
     }
 
+    
+    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECWARNING)) //can receive warning   
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECWARNING;
+    }
+    
+    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECERROR)) //can receive error   
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECERROR;
+    }
+    
+    
+    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECHWOVERRUN)) //can hw over-run   
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECHWOVERRUN;
+    }
+        
+    
     if(0 != mstatus_ptr->chamaleon04[0])
     {
         eo_theEMSdgn_UpdateMotorStFlags(dgn_ptr, mId, mstatus_ptr->chamaleon04[0]);
