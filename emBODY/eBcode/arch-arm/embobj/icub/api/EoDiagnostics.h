@@ -51,6 +51,9 @@ extern "C" {
 #define DGN_MOTOR_FAULT_EXTERNAL        0x00000004
 #define DGN_MOTOR_FAULT_OVERCURRENT     0x00000008
 #define DGN_MOTOR_FAULT_I2TFAILURE      0x00000010
+#define DGN_MOTOR_FAULT_CANRECWARNING   0x00000020
+#define DGN_MOTOR_FAULT_CANRECERROR     0x00000040
+#define DGN_MOTOR_FAULT_CANRECHWOVERRUN 0x00000080
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
