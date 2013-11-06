@@ -97,7 +97,7 @@ extern eOresult_t eo_theEMSdgn_ClearMotorStFlags(EOTheEMSdiagnostics_t* p);
 
 extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *str_error, uint16_t size);
 
-extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup);
+extern eOresult_t eo_theEMSdgn_checkEthLinksStatus_quickly(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup);
 
 extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p);
 
@@ -115,12 +115,18 @@ extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport_t canp
 
 #if 0
 extern void eo_theEMSdgn_updateCanQueuesStatistics(eOdgn_appl_phase_t phase, eOcanport_t canport);
-
-
-extern eOresult_t eo_theEMSdgn_checkErrors(EOTheEMSdiagnostics_t* p);
-
-extern eOresult_t eo_theEMSdgn_checkLinksStatus(EOTheEMSdiagnostics_t* p);
 #endif
+
+extern eOresult_t eo_theEMSdgn_checkEthLinksErrors(EOTheEMSdiagnostics_t* p);
+
+extern eOresult_t eo_theEMSdgn_checkEthLinkErrors(EOTheEMSdiagnostics_t* p, uint8_t linuknum);
+
+extern uint8_t eo_theEMSdgn_EthLinksInError(EOTheEMSdiagnostics_t* p);
+
+extern eOresult_t eo_theEMSdgn_checkEthLinksStatus(EOTheEMSdiagnostics_t* p);
+
+extern eOresult_t eo_theEMSdgn_setEthError2check(EOTheEMSdiagnostics_t* p, eOdgn_ethCounters_type_t errortype);
+
 /** @}            
     end of group 
     
