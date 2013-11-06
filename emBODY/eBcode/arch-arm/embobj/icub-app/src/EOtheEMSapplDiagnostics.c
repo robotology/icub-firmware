@@ -85,7 +85,10 @@ eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOTheEMSdiagnostics_t s_thedgn = {0};
+static EOTheEMSdiagnostics_t s_thedgn = 
+{
+    .ethError2signal = 0
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -246,7 +249,7 @@ extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *st
 }
 
 
-extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup)
+extern eOresult_t eo_theEMSdgn_checkEthLinksStatus_quickly(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup)
 {
 
 //     uint8_t PHYaddr = 0x1;
@@ -316,7 +319,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkStatus(EOTheEMSdiagnostics_t* p, uint
     
     if(state2notify)
     {
-         eo_dgn_emsperiph.eth_dev.linksmask = linkst_mask;
+        eo_dgn_emsperiph.eth_dev.linksmask = linkst_mask;
         eo_theEMSdgn_Signalerror(&s_thedgn, eodgn_nvidbdoor_emsperiph , 0);
         snprintf(str, sizeof(str)-1, "Signal error %d ", linkst_mask);
         hal_trace_puts(str);
@@ -416,57 +419,171 @@ extern void eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(eOcanport_t canp
     }
 }
 
-#if 0
-extern eOresult_t eo_theEMSdgn_checkErrors(EOTheEMSdiagnostics_t* p)
+
+extern eOresult_t eo_theEMSdgn_checkEthLinksErrors(EOTheEMSdiagnostics_t* p)
 {
     
     hal_result_t res;
-    hal_eth_phy_errorsinfo_t result;
+    hal_eth_phy_errorsinfo_t result = {0};
     char str[50];
+    uint8_t i;
     
-    result.value = 0xAA;
-    res = hal_eth_get_errors_info(0, rxCrcError, &result);
-    if(res != hal_res_OK)
-    {
-        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy 0");
-    }
-    else
-    {
-        snprintf(str, sizeof(str)-1, "ERR ETH PHY 0: val=%d overflow=%d validVal=%d", result.value, result.counteroverflow, result.invalidvalue);
-    }
-    hal_trace_puts(str);
+
+//     if(0 == eo_dgn_cmds.signalEthCounters)
+//     {
+//         return(eores_OK);
+//     }
     
     
+    //reset net var bdoor
+    memset(&eo_dgn_emsperiph.eth_dev.crcErrorCnt[0], 0, sizeof(uint32_t)*3);
+    eo_dgn_emsperiph.eth_dev.crcErrorCnt_validVal=0;
+    eo_dgn_emsperiph.eth_dev.crcErrorCnt_overflow = 0;
     
-    res = hal_eth_get_errors_info(1, rxCrcError, &result);
-    if(res != hal_res_OK)
+    
+    for(i=0; i<3; i++)
     {
-        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy 1");
+        res = hal_eth_get_errors_info(i, rxCrcError, &result);
+        if(res != hal_res_OK)
+        {
+            snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy %d", i);
+        }
+        else
+        {
+            snprintf(str, sizeof(str)-1, "ERR ETH PHY %d: val=%d overflow=%d validVal=%d", i, result.value, result.counteroverflow, result.validvalue);
+            if(result.validvalue)
+            {   
+                eo_dgn_emsperiph.eth_dev.crcErrorCnt_validVal |= 1<<i;
+                eo_dgn_emsperiph.eth_dev.crcErrorCnt[i] = result.value;
+                eo_dgn_emsperiph.eth_dev.crcErrorCnt_overflow |=  result.counteroverflow << i;
+            }
+        }
+        hal_trace_puts(str);
     }
-    else
-    {
-        snprintf(str, sizeof(str)-1, "ERR ETH PHY 1: val=%d overflow=%d validVal=%d", result.value, result.counteroverflow, result.invalidvalue);
-    }
-    hal_trace_puts(str);
+    eo_theEMSdgn_Signalerror(p, eodgn_nvidbdoor_emsperiph , 0);
+    
     
     return(eores_OK);
+
 }
 
-
-
-extern eOresult_t eo_theEMSdgn_checkLinksStatus(EOTheEMSdiagnostics_t* p)
+extern eOresult_t eo_theEMSdgn_checkEthLinkErrors(EOTheEMSdiagnostics_t* p, uint8_t linknum)
 {
-    hal_eth_phy_status_t* link_list[2];
-    uint8_t links_num = 0;
     
-    hal_eth_get_links_status(link_list, &links_num);
+    hal_result_t res;
+    hal_eth_phy_errorsinfo_t result = {0};
+    char str[50];
+    uint8_t i = linknum;
     
+
+    if(0 == eo_dgn_cmds.signalEthCounters)
+    {
+        return(eores_OK);
+    }
+
+    if(linknum>2)
+    {
+        return(eores_NOK_nodata);
+    }
+    
+    
+    //reset net var bdoor
+    eo_dgn_emsperiph.eth_dev.crcErrorCnt[i] = 0;
+    eo_dgn_emsperiph.eth_dev.crcErrorCnt_validVal &= ~(1<<i);
+    eo_dgn_emsperiph.eth_dev.crcErrorCnt_overflow &= ~(1<<i);
+    
+    
+   
+    res = hal_eth_get_errors_info(i, s_thedgn.ethError2signal, &result);
+    if(res != hal_res_OK)
+    {
+        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy %d", i);
+    }
+    else
+    {
+        snprintf(str, sizeof(str)-1, "ERR ETH PHY %d: val=%d overflow=%d validVal=%d", i, result.value, result.counteroverflow, result.validvalue);
+        if(result.validvalue)
+        {   
+            eo_dgn_emsperiph.eth_dev.crcErrorCnt_validVal |= 1<<i;
+            eo_dgn_emsperiph.eth_dev.crcErrorCnt[i] = result.value;
+            eo_dgn_emsperiph.eth_dev.crcErrorCnt_overflow |=  result.counteroverflow << i;
+        }
+    }
+    hal_trace_puts(str);
+    
+    return(eores_OK);
+
+}
+
+
+extern uint8_t eo_theEMSdgn_EthLinksInError(EOTheEMSdiagnostics_t* p)
+{
+    if( (eo_dgn_emsperiph.eth_dev.crcErrorCnt[0] == 0) &&
+        (eo_dgn_emsperiph.eth_dev.crcErrorCnt[1] == 0) &&
+        (eo_dgn_emsperiph.eth_dev.crcErrorCnt[2] == 0) )
+    {
+        return(0);
+    }
+    return(1);
+}
+
+
+extern eOresult_t eo_theEMSdgn_setEthError2check(EOTheEMSdiagnostics_t* p, eOdgn_ethCounters_type_t errortype)
+{
+
+    switch(errortype)
+    {
+        case dgn_rxCrcError:
+        {
+            s_thedgn.ethError2signal = rxCrcError;
+        }break;
+        case dgn_rxUnicast:
+        {
+            s_thedgn.ethError2signal = rxUnicast;
+        }break;
+        case dgn_rx64Octets:
+        {
+            s_thedgn.ethError2signal = rx64Octets;
+        }break;
+        case dgn_txUnicast:
+        {
+            s_thedgn.ethError2signal = txUnicast;
+        }break;
+        
+        default:
+        {
+            s_thedgn.ethError2signal = 0; //disable
+        }
+    }
+    
+    return(eores_OK);
+    
+
+}
+
+
+extern eOresult_t eo_theEMSdgn_checkEthLinksStatus(EOTheEMSdiagnostics_t* p)
+{
+//     hal_eth_phy_status_t link_list[2];
+//     hal_eth_phy_status_t* l_ptr;
+//     uint8_t links_num = 0, i;
+//     char str[150];
+//     
+
+//     hal_eth_get_links_status(link_list, 2);
+
+//     for(i=0; i<2; i++)
+//     {
+//         l_ptr = &link_list[i];
+//         snprintf(str, sizeof(str), "LinkStatus %d: up=%d  autoNegDone=%d, good=%d, speed=%d, duplex=%d ", i, l_ptr->linkisup, l_ptr->autoNeg_done, l_ptr->linkisgood,  l_ptr->linkspeed, l_ptr->linkduplex);
+//         hal_trace_puts(str);
+//     }
     return(eores_OK);
 }
 
 
 
-
+#if 0
 extern void eo_theEMSdgn_updateCanQueuesStatistics(eOdgn_appl_phase_t phase)
 {
     eOresult_t res;

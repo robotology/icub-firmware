@@ -49,7 +49,7 @@ extern "C" {
 
 struct EOTheEMSdiagnostics_hid_t
 {
-    uint8_t dummy;
+    uint8_t ethError2signal;
 };
 
 
