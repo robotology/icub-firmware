@@ -84,10 +84,11 @@ static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, voi
         case opcprotman_opc_set:
         default:
         {   
-            char str[50];
-            snprintf(str, sizeof(str)-1, "diagnostics cmd=%d, extFault=%d ", cmd_ptr->enable, cmd_ptr->signalExtFault);
+            char str[70];
+            snprintf(str, sizeof(str)-1, "diagnostics cmd=%d, extFault=%d ethCounters=%d canstat=%d", cmd_ptr->enable, cmd_ptr->signalExtFault, cmd_ptr->signalEthCounters, cmd_ptr->signalCanStatistics);
             hal_trace_puts(str);
             memcpy(&eo_dgn_cmds, (eOdgn_commands_t*)recdata, sizeof(eOdgn_commands_t));
+            eo_theEMSdgn_setEthError2check(eo_theEMSdgn_GetHandle(), (eOdgn_ethCounters_type_t)eo_dgn_cmds.signalEthCounters);
         } break;
     }       
     

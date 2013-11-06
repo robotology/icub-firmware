@@ -68,16 +68,18 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 #include "EOMtheEMSapplCfg_hid.h"
-#define VERIFY_ROP_SETIMPEDANCE
-#define VERIFY_ROP_SETPOSITIONRAW
+// #define VERIFY_ROP_SETIMPEDANCE
+// #define VERIFY_ROP_SETPOSITIONRAW
 
-#if   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-    #define VERIFY_ROP_SETPOINT_EB5
-#endif
+
 #if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
     #include "EOtheEMSapplDiagnostics.h"
     #include "rxtools.h"
     #define MAXJ 4
+    
+    #if   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define VERIFY_ROP_SETPOINT_EB5
+    #endif
 #endif
 
 

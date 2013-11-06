@@ -45,7 +45,7 @@
 
 #include "EOtheEMSapplDiagnostics.h"
 
-
+#include "eventviewer.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,6 +71,19 @@
 #define runner_countmax_check_ethlink_status    5000 //every one second
 
 #define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        50
+
+
+
+#if defined(EVIEWER_ENABLED)
+#define EVIEWER_userDef_IDbase             (ev_ID_first_usrdef+1)
+//#define EVIEWER_userDef_RUNRecRopframe     (EVIEWER_userDef_IDbase +1) see definition in EOMtheEMSrunner.c
+#define EVIEWER_userDef_hwErrCntr     (EVIEWER_userDef_IDbase +3)
+#endif
+
+#if defined(EVIEWER_ENABLED)
+void userDef_hwErrCntr(void){}
+#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -119,7 +132,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 #endif
 EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
-
+static void s_checkEthLinks(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -129,7 +142,9 @@ EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSappl
 static uint16_t motionDoneJoin2Use = 0;
 static uint16_t count_ethlink_status = 0;
 static uint8_t count_watchdog_virtaulStrain = 0;
-
+#if defined(EVIEWER_ENABLED) 
+static uint8_t event_view = 0;
+#endif 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -148,6 +163,15 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     {
          eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
     }
+    
+    #if defined(EVIEWER_ENABLED)   
+    if(0 == event_view)
+    {   
+        eventviewer_load(EVIEWER_userDef_hwErrCntr, userDef_hwErrCntr);
+        event_view = 1;
+    }
+    #endif    
+
 
 }
 
@@ -323,6 +347,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 {
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOresult_t res[2];
+    eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
     
 /* METODO 1 */
 //     res[0] = eo_appCanSP_WaitTransmitCanFrames(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
@@ -353,8 +378,11 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
         uint8_t link2_isup;
 		//this func chacks if one of link change state and notify it.
 		//the pkt arrived on pc104 backdoor when one link change down->up.
-        //eo_theEMSdgn_checkEthLinkStatus(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
-        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
+        //eo_theEMSdgn_checkEthLinksStatus_quickly(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
+        if(eo_dgn_cmds.signalCanStatistics)
+        {
+            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
+        }
         count_ethlink_status = 0;
     }
 /* METODO 4*/
@@ -631,7 +659,9 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
     }
 
-    
+
+    s_checkEthLinks();
+
 }
 
 
@@ -767,7 +797,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         msgCmd.cmdId = ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
     }
-    
+    s_checkEthLinks();
     
 //     for(jId = 0; jId<numofjoint; jId++)
 //     {
@@ -793,6 +823,67 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 //     }   
 }
 
+
+
+
+#define ethLinksCount_max 3000 //5 sec
+static void s_checkEthLinks(void)
+{
+    static uint32_t ethLinksCount;
+    static uint32_t ethLinksCount_partial;
+    static uint8_t linknum = 255;
+    
+    ethLinksCount++;
+    
+    if((ethLinksCount< ethLinksCount_max) && (255 == linknum))
+    {
+        return;
+    }
+
+    if(255 == linknum)
+    {
+        linknum = 0;
+        #if defined(EVIEWER_ENABLED)    
+        evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
+        #endif
+        
+        eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
+        
+        #if defined(EVIEWER_ENABLED)    
+        eventviewer_switch_to(prev);
+        #endif  
+        linknum++;
+    }
+    else
+    {
+        if(ethLinksCount_partial == 20)
+        {
+            ethLinksCount_partial = 0;
+            #if defined(EVIEWER_ENABLED)    
+            evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
+            #endif
+            
+            eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
+            
+            #if defined(EVIEWER_ENABLED)    
+            eventviewer_switch_to(prev);
+            #endif  
+            linknum++;
+            if(linknum == 3)
+            {
+                if((eo_dgn_cmds.signalEthCounters) && (eo_theEMSdgn_EthLinksInError(eo_theEMSdgn_GetHandle())) )
+                //if((eo_dgn_cmds.signalEthCounters) )
+                {
+                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , 0);
+                }
+
+                linknum = 255;
+                ethLinksCount = 0;
+            }
+        }
+    }
+    ethLinksCount_partial++;
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
