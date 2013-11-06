@@ -273,13 +273,21 @@ typedef struct
 } eOdgn_emsdiagnostic_emswithmc_t;  //ems with motion controller
 
 
+typedef enum
+{
+    dgn_rxCrcError  = 1,
+    dgn_rxUnicast   = 2,
+    dgn_rx64Octets  = 3,
+    dgn_txUnicast   = 4
+} eOdgn_ethCounters_type_t;
 
 
 typedef struct
 {
     uint8_t enable; //if true then all errrors are signaled else none!
     uint8_t signalExtFault; //if true external fault is signaled
-    uint8_t signalEthCounters; 
+    uint8_t signalEthCounters; // 0==>disable else num in eOdgn_ethCounters_type_t
+    uint8_t signalCanStatistics;
 }eOdgn_commands_t;
 
 typedef struct
