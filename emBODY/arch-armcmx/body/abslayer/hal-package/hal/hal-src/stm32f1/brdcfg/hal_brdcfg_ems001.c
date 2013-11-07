@@ -798,18 +798,33 @@ extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAdd
     }
 
 
-    /* Enable Acknowledgement to be ready for another reception */
-    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
-    /* Send STOP Condition */
-    I2C_GenerateSTOP(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
+//     /* Enable Acknowledgement to be ready for another reception */
+//     I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);
+//     /* Send STOP Condition */
+//     I2C_GenerateSTOP(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
 
     while(!I2C_CheckEvent(HAL_BRDCFG_I2C4HAL__PERIPHERAL, I2C_EVENT_MASTER_BYTE_RECEIVED))
     {
     }
     *pBuffer = I2C_ReceiveData(HAL_BRDCFG_I2C4HAL__PERIPHERAL);
 
-    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
+//    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
 
+    // disable acknowledgement
+    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, DISABLE);   
+    
+    // send stop condition
+    I2C_GenerateSTOP(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);
+
+    
+    // wait to make sure that the stop bit has been cleared by hw before writing CR1 again
+    
+    while(((HAL_BRDCFG_I2C4HAL__PERIPHERAL)->CR1 & I2C_CR1_STOP) == I2C_CR1_STOP)
+    {
+    }  
+
+    // re-enable acknowledgement to be ready for another reception 
+    I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);  
 }
 #endif//HAL_USE_SWITCH
 
