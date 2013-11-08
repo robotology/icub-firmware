@@ -32,7 +32,6 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-//#include "hl_common.h"
 
 #if     defined(HL_CFG_PLUS_TARGET_BY_FILE)
 #include "hl_cfg_plus_target.h"

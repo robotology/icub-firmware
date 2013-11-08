@@ -42,6 +42,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hl_common.h"
+#include "hl_gpio.h"
 
 
 
@@ -65,6 +66,9 @@ typedef enum
 enum { hl_i2cs_number = 3 };
 
 
+/** @typedef    typedef enum hl_i2c_speed_t 
+    @brief      contains the possible I2C speeds 
+ **/
 typedef enum
 {
     hl_i2c_speed_100kbps       = 1,
@@ -73,52 +77,94 @@ typedef enum
 } hl_i2c_speed_t;
 
 
+/** @typedef    typedef enum hl_i2c_mode_t 
+    @brief      contains the possible I2C modes 
+ **/
 typedef enum
 {
-    hl_i2c_mode_master         = 0,
-    hl_i2c_mode_slave          = 1     // not supported yet
+    hl_i2c_mode_master         = 0,     /**< the mode is master */
+    hl_i2c_mode_slave          = 1      /**< the mode is slave (not yet supported) */
 } hl_i2c_mode_t;
 
 
+/** @typedef    typedef enum hl_i2c_behaviour_t 
+    @brief      contains the possible I2C behaviours.  
+ **/
 typedef enum
 {
-    hl_i2c_behaviour_polling    = 0,
-    hl_i2c_behaviour_irq        = 1,    // not supported yet
-    hl_i2c_behaviour_dma        = 2     // not supported yet
+    hl_i2c_behaviour_polling    = 0,    /**< internal operations are done by polling / directly writing the registers */
+    hl_i2c_behaviour_irq        = 1,    /**< internal operations are done using IRQ handler (not supported yet) */
+    hl_i2c_behaviour_dma        = 2     /**< data transfer is done using DMA (not supported yet) */
 } hl_i2c_behaviour_t;
 
 
+
+/** @typedef    typedef uint8_t hl_i2c_devaddr_t 
+    @brief      contains the address for the I2C device.
+ **/
+typedef uint8_t hl_i2c_devaddr_t;
+
+
+/** @typedef    typedef struct hl_i2c_regaddr_t 
+    @brief      contains the address for the registers internal to the I2C device.
+ **/
 typedef struct 
 {
-    uint8_t     numofbytes;         // only 1, 2, 3
+    uint8_t     numofbytes;             /**< tells is register address is on one, two or three bytes */
     union
     {
         uint8_t     one;
         uint16_t    two;  
         uint8_t     three[3];        
-    } bytes;
+    } bytes;                            /** the address of the register */
 } hl_i2c_regaddr_t;
 
-typedef uint8_t hl_i2c_devaddr_t;
 
 
-/** @typedef    typedef enum hl_i2c_cfg_t 
-    @brief      hl_i2c_cfg_t contains the configuration for i2c.
+/** @typedef    typedef struct hl_i2c_gpiomap_t 
+    @brief      hl_i2c_gpiomap_t contains the pin mapping for an i2c peripherals
+ **/
+typedef struct
+{
+    hl_gpio_t       gpio_scl;       /**< gpio used for scl pin */
+    hl_gpio_t       gpio_sda;       /**< gpio used for sda pin */
+    hl_gpio_altf_t  altf_scl;       /**< alt config of scl pin */
+    hl_gpio_altf_t  altf_sda;       /**< alt config of sda pin */    
+} hl_i2c_gpiomap_t;
+
+
+/** @typedef    typedef struct hl_i2c_mapping_t 
+    @brief      hl_i2c_mapping_t contains the pin mapping for all i2c peripherals
+ **/
+typedef struct
+{
+    uint8_t             supported_mask;             /**< bit in position hl_i2cx must be 1 if portx is supported */
+    hl_i2c_gpiomap_t    gpiomap[hl_i2cs_number];    /**< in position hl_i2cx there is gpio map of ICx */
+} hl_i2c_mapping_t;
+
+
+
+/** @typedef    typedef struct hl_i2c_cfg_t 
+    @brief      hl_i2c_cfg_t contains the runtime configuration for i2c.
                 there are some hw configuration which are hidden: dutycycle mode is tlow/thigh = 2, the ack is enabled.
                 if slave mode (not supported yet) the ack address is 7 bit.
  **/
 typedef struct
 {
-    hl_i2c_mode_t           mode;
-    hl_i2c_behaviour_t      behaviour;
-    hl_i2c_speed_t          speed;  
-    hl_i2c_devaddr_t        ownaddress; // used only if slave mode
+    hl_i2c_mode_t           mode;       /**< the mode of the drive: so far only hl_i2c_mode_master */
+    hl_i2c_behaviour_t      behaviour;  /**< the behavior of the drive: so far only hl_i2c_behaviour_polling */
+    hl_i2c_speed_t          speed;      /**< the i2c speed */      
+    hl_i2c_devaddr_t        ownaddress; /**< address of the slave: used only if mode is hl_i2c_mode_slave */
 } hl_i2c_cfg_t;
+
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const hl_i2c_cfg_t hl_i2c_cfg_default; // = { .mode = hl_i2c_mode_master, .behaviour = hl_i2c_behaviour_polling, .speed = hl_i2c_speed_400kbps, .ownaddress = 0 };
+
+// it must be externally declared.
+extern const hl_i2c_mapping_t hl_i2c_mapping;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -127,10 +173,11 @@ extern const hl_i2c_cfg_t hl_i2c_cfg_default; // = { .mode = hl_i2c_mode_master,
 /** @fn			extern hl_result_t hl_i2c_init(hl_i2c_t id, const hl_i2c_cfg_t *cfg)
     @brief  	this function initializes an i2c port
     @param  	id              the id of i2c
-    @param  	cfg 	        pointer to configuration data
+    @param  	cfg 	        pointer to configuration. If NULL it is used hl_i2c_cfg_default.
     @return 	hl_res_OK on success
   */
 extern hl_result_t hl_i2c_init(hl_i2c_t id, const hl_i2c_cfg_t *cfg);
+
 
 /** @fn			extern hl_bool_t hl_i2c_initted_is(hl_i2c_t id)
     @brief  	this function tells if an i2c port has already been initted

@@ -193,7 +193,7 @@ extern hl_result_t hl_fifo_init(hl_fifo_t *fifo, uint8_t capacity, uint8_t sizeo
         } break;
         
         default:
-        {
+        {	// prefer using NULL rather than a standard function to avoid adding a 5-th argument which uses stack
             fifo->itemaddr  = NULL;  
             fifo->itemcopy  = NULL;            
         } break;
@@ -262,6 +262,7 @@ extern hl_result_t hl_fifo_put(hl_fifo_t *fifo, uint8_t *data)
         return(hl_res_NOK_generic);
     }
     
+    // cannot move up this control because it is legal to have data equal to NULL. in this case we dont copy. 
     if(NULL != data)
     {   // copy data inside ...
         if(NULL != fifo->itemcopy)
@@ -832,7 +833,6 @@ extern hl_result_t hl_fifo_hid_static_memory_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
 
 
 static void s_hl_fifo_itemofsize01copy(uint8_t* dst, uint32_t offsetdst, uint8_t* src, uint32_t offsetsrc)

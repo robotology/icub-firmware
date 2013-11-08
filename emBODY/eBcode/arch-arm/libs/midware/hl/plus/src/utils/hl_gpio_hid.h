@@ -22,7 +22,7 @@
 #define _HL_GPIO_HID_H_
 
 
-/* @file       hl_periph_gpio_hid.h
+/* @file       hl_gpio_hid.h
     @brief      This header file implements hidden interface to hl gpio.
     @author     marco.accame@iit.it
     @date       10/21/2013

@@ -384,7 +384,7 @@ extern hl_result_t hl_i2c_standby(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
 
 static hl_boolval_t s_hl_i2c_supported_is(hl_i2c_t id)
 {
-    return(hl_bits_byte_bitcheck(hl_brdcfg_i2c__theconfig.supported_mask, HL_i2c_id2index(id)) );
+    return(hl_bits_byte_bitcheck(hl_i2c_mapping.supported_mask, HL_i2c_id2index(id)) );
 }
 
 static void s_hl_i2c_initted_set(hl_i2c_t id)
@@ -793,9 +793,9 @@ static void s_hl_i2c_write_bytes_with_polling(I2C_TypeDef* I2Cx, uint8_t* data, 
         
         // test on ev8 (or ev8_2 = I2C_EVENT_MASTER_BYTE_TRANSMITTED which is slower but more reliable)    
         timeout = s_hl_i2c_timeout_flag;
-        while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTING))
+        while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
         {
-            if(0 == (timeout--)) {s_hl_i2c_timeoutexpired("s_hl_i2c_write_bytes_with_polling:ev8"); return;}
+            if(0 == (timeout--)) {s_hl_i2c_timeoutexpired("s_hl_i2c_write_bytes_with_polling:ev8_2"); return;}
         }
     
     }
@@ -1002,12 +1002,12 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of scl and sda
-    hl_gpio_fill_init(sclinit, (hl_gpio_t*)&hl_brdcfg_i2c__theconfig.gpio_scl[HL_i2c_id2index(id)]);
-    hl_gpio_fill_init(sdainit, (hl_gpio_t*)&hl_brdcfg_i2c__theconfig.gpio_sda[HL_i2c_id2index(id)]);
+    hl_gpio_fill_init(sclinit, (hl_gpio_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].gpio_scl);
+    hl_gpio_fill_init(sdainit, (hl_gpio_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].gpio_sda);
     
     // then we set altfun of scl and sda
-    memcpy(sclaltf, &hl_brdcfg_i2c__theconfig.altf_scl[HL_i2c_id2index(id)], sizeof(hl_gpio_altf_t));
-    memcpy(sdaaltf, &hl_brdcfg_i2c__theconfig.altf_sda[HL_i2c_id2index(id)], sizeof(hl_gpio_altf_t));
+    memcpy(sclaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].altf_scl, sizeof(hl_gpio_altf_t));
+    memcpy(sdaaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].altf_sda, sizeof(hl_gpio_altf_t));
 }
 
 

@@ -134,7 +134,7 @@ typedef uint8_t     hl_bool_t;
 
 
 /** @typedef    typedef uint32_t hl_reltime_t 
-    @brief      hl_reltime_t express time in hal in form of usec (micro-seconds). It is used for relative timing
+    @brief      hl_reltime_t express time in hl in form of usec (micro-seconds). It is used for relative timing
                 operations because its maximum value is about 4294 seconds (1 hour, 11 min, and 34 sec), which is 
                 more than enough for most needs. As such it is used in systick, HW timers, watchdog.
  **/  
@@ -142,7 +142,7 @@ typedef uint32_t    hl_reltime_t;
 
 
 /** @typedef    typedef uint64_t hl_abstime_t 
-    @brief      hl_abstime_t express absolute time in hal in form of usec (micro-seconds) on a very long range.
+    @brief      hl_abstime_t express absolute time in hl in form of usec (micro-seconds) on a very long range.
                 A hl_absttime_t variable keeps time up to 584 thousand years. It can be used to count time of 
                 a system synce its bootstrap.
  **/  
@@ -150,7 +150,7 @@ typedef uint64_t    hl_abstime_t;
 
 
 /** @typedef    typedef uint64_t hl_nanotime_t 
-    @brief      hl_nanotime_t express very precise relative time in hal in form of nsec (nano-seconds).
+    @brief      hl_nanotime_t express very precise relative time in hl in form of nsec (nano-seconds).
                 A hl_nanotime_t variable keeps time up to 584 years. It can be used in such peripherals where
                 a precision sub-microsecond is required.
  **/  

@@ -46,20 +46,10 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-
-
-typedef struct
-{
-    uint8_t         supported_mask;             /**< bit in position hl_can_portx must be 1 if portx is supported */
-    hl_gpio_t       gpio_scl[hl_i2cs_number];   /**< in position hl_i2cx there is mapping of gpio used for its scl pin */
-    hl_gpio_t       gpio_sda[hl_i2cs_number];   /**< in position hl_i2cx there is mapping of gpio used for its sda pin */
-    hl_gpio_altf_t  altf_scl[hl_i2cs_number];   /**< in position hl_i2cx there is alt config of scl pin */
-    hl_gpio_altf_t  altf_sda[hl_i2cs_number];   /**< in position hl_i2cx there is alt config of sda pin */    
-} hl_i2c_hid_brdcfg_t;
+// empty-section
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-
-extern const hl_i2c_hid_brdcfg_t hl_brdcfg_i2c__theconfig;
+// empty-section
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
