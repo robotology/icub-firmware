@@ -60,186 +60,218 @@
 
 #if     defined(HL_USE_UTIL_I2C)
 
-#include "hl_i2c_hid.h"
+#include "hl_i2c.h"
 
 #if     defined(HL_USE_BRD_MCBSTM32_C)
-extern const hl_i2c_hid_brdcfg_t hl_brdcfg_i2c__theconfig =
+
+extern const hl_i2c_mapping_t hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
-    .gpio_scl           =
-    {
-        {   // hl_i2c1
-            .port   = hl_gpio_portB,
-            .pin    = hl_gpio_pin8   
-        },
-        {   // hl_i2c2
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        },
-        {   // hl_i2c3
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
+    .gpiomap             =
+    {   
+        {   // hl_i2c1 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portB, 
+                .pin            = hl_gpio_pin8
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portB, 
+                .pin            = hl_gpio_pin9
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = GPIO_Remap_I2C1
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = GPIO_Remap_I2C1
+            } 
+        }, 
+        {   // hl_i2c2 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            } 
+        },  
+        {   // hl_i2c3 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            } 
         }        
-    },
-    .gpio_sda           =
-    {
-        {   // hl_i2c1
-            .port   = hl_gpio_portB,
-            .pin    = hl_gpio_pin9   
-        },
-        {   // hl_i2c2
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        },
-        {   // hl_i2c3
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        }            
-    },
-    .altf_scl           =
-    {
-        {   // hl_i2c1
-            .f1.gpio_remap  = GPIO_Remap_I2C1 
-        },
-        {   // hl_i2c2
-            .f1.gpio_remap  = hl_NA32 
-        },
-        {   // hl_i2c3
-            .f1.gpio_remap  = hl_NA32 
-        }           
-    },
-    .altf_sda           =
-    {
-        {   // hl_i2c1
-            .f1.gpio_remap  = GPIO_Remap_I2C1 
-        },
-        {   // hl_i2c2
-            .f1.gpio_remap  = hl_NA32 
-        },
-        {   // hl_i2c3
-            .f1.gpio_remap  = hl_NA32 
-        }           
-    }          
+    }       
 };
+
 #elif   defined(HL_USE_BRD_MCBSTM32)
-extern const hl_i2c_hid_brdcfg_t hl_brdcfg_i2c__theconfig =
+
+extern const hl_i2c_mapping_t hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
-    .gpio_scl           =
-    {
-        {   // hl_i2c1
-            .port   = hl_gpio_portB,
-            .pin    = hl_gpio_pin8   
-        },
-        {   // hl_i2c2
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        },
-        {   // hl_i2c3
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
+    .gpiomap             =
+    {   
+        {   // hl_i2c1 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portB, 
+                .pin            = hl_gpio_pin8
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portB, 
+                .pin            = hl_gpio_pin9
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = GPIO_Remap_I2C1
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = GPIO_Remap_I2C1
+            } 
+        }, 
+        {   // hl_i2c2 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            } 
+        },  
+        {   // hl_i2c3 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            } 
         }        
-    },
-    .gpio_sda           =
-    {
-        {   // hl_i2c1
-            .port   = hl_gpio_portB,
-            .pin    = hl_gpio_pin9   
-        },
-        {   // hl_i2c2
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        },
-        {   // hl_i2c3
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        }            
-    },
-    .altf_scl           =
-    {
-        {   // hl_i2c1
-            .f1.gpio_remap  = GPIO_Remap_I2C1 
-        },
-        {   // hl_i2c2
-            .f1.gpio_remap  = hl_NA32 
-        },
-        {   // hl_i2c3
-            .f1.gpio_remap  = hl_NA32 
-        }           
-    },
-    .altf_sda           =
-    {
-        {   // hl_i2c1
-            .f1.gpio_remap  = GPIO_Remap_I2C1 
-        },
-        {   // hl_i2c2
-            .f1.gpio_remap  = hl_NA32 
-        },
-        {   // hl_i2c3
-            .f1.gpio_remap  = hl_NA32 
-        }           
-    }          
+    }       
 };
 
 #elif   defined(HL_USE_BRD_EMS001)
-extern const hl_i2c_hid_brdcfg_t hl_brdcfg_i2c__theconfig =
+
+extern const hl_i2c_mapping_t hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
-    .gpio_scl           =
-    {
-        {   // hl_i2c1
-            .port   = hl_gpio_portB,
-            .pin    = hl_gpio_pin8   
-        },
-        {   // hl_i2c2
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        },
-        {   // hl_i2c3
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
+    .gpiomap             =
+    {   
+        {   // hl_i2c1 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portB, 
+                .pin            = hl_gpio_pin8
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portB, 
+                .pin            = hl_gpio_pin9
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = GPIO_Remap_I2C1
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = GPIO_Remap_I2C1
+            } 
+        }, 
+        {   // hl_i2c2 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            } 
+        },  
+        {   // hl_i2c3 
+            .gpio_scl = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .gpio_sda = 
+            {
+                .port           = hl_gpio_portNONE, 
+                .pin            = hl_gpio_pinNONE
+            }, 
+            .altf_scl = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            }, 
+            .altf_sda = 
+            {
+                .f1.gpio_remap  = hl_NA32
+            } 
         }        
-    },
-    .gpio_sda           =
-    {
-        {   // hl_i2c1
-            .port   = hl_gpio_portB,
-            .pin    = hl_gpio_pin9   
-        },
-        {   // hl_i2c2
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        },
-        {   // hl_i2c3
-            .port   = hl_gpio_portNONE,
-            .pin    = hl_gpio_pinNONE   
-        }            
-    },
-    .altf_scl           =
-    {
-        {   // hl_i2c1
-            .f1.gpio_remap  = GPIO_Remap_I2C1 
-        },
-        {   // hl_i2c2
-            .f1.gpio_remap  = hl_NA32 
-        },
-        {   // hl_i2c3
-            .f1.gpio_remap  = hl_NA32 
-        }           
-    },
-    .altf_sda           =
-    {
-        {   // hl_i2c1
-            .f1.gpio_remap  = GPIO_Remap_I2C1 
-        },
-        {   // hl_i2c2
-            .f1.gpio_remap  = hl_NA32 
-        },
-        {   // hl_i2c3
-            .f1.gpio_remap  = hl_NA32 
-        }           
-    }          
+    }       
 };
+
 #endif
 
 #endif//defined(HL_USE_UTIL_I2C)

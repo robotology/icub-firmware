@@ -690,10 +690,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>23</TopLine>
-      <CurrentLine>32</CurrentLine>
+      <TopLine>98</TopLine>
+      <CurrentLine>111</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\core\blinky-stm32f1-stm32fx.c</PathWithFileName>
       <FilenameWithoutPath>blinky-stm32f1-stm32fx.c</FilenameWithoutPath>
@@ -794,10 +794,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>44</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>20</TopLine>
-      <CurrentLine>29</CurrentLine>
+      <TopLine>17</TopLine>
+      <CurrentLine>26</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\hl-plus-cfg-core\hl_cfg_plus_advancedcmsis.c</PathWithFileName>
       <FilenameWithoutPath>hl_cfg_plus_advancedcmsis.c</FilenameWithoutPath>
@@ -850,10 +850,10 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>25</TopLine>
-      <CurrentLine>33</CurrentLine>
+      <TopLine>17</TopLine>
+      <CurrentLine>18</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\hl-plus-cfg\hl_startup_stm32f103.s</PathWithFileName>
       <FilenameWithoutPath>hl_startup_stm32f103.s</FilenameWithoutPath>
