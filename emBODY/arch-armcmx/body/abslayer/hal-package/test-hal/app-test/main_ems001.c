@@ -141,6 +141,7 @@ void s_tick(void);
 
 #ifdef _CHECK_SWITCH_STATUS_
 #error pay attention: s_check_switch checks only phy2!!
+static void s_ena_check_switch(void);
 void s_check_switch(void);
 static volatile uint32_t count;
 static uint8_t enacheckswitch = 0;
@@ -218,7 +219,7 @@ int main(void)
     
     hal_trace_init();
 #ifdef _CHECK_SWITCH_STATUS_
-    hal_sys_systick_sethandler(s_check_switch, 1000, hal_int_priority00);
+    hal_sys_systick_sethandler(s_ena_check_switch, 10000, hal_int_priority00);
 #else
     hal_sys_systick_sethandler(s_tick, 1000*1000, hal_int_priority00);
 #endif
@@ -765,9 +766,6 @@ static void s_test_hal_eth(void)
     hal_switch_init(&switch_cfg);
 
     hal_eth_init(&cfg);
-#ifdef _CHECK_SWITCH_STATUS_
-    enacheckswitch = 1;
-#endif   
     
     //    hal_eth_enable();
 //    
@@ -777,6 +775,7 @@ static void s_test_hal_eth(void)
     for(;;)
     {
         pframe= pframe;
+        s_check_switch();
     }   
 }
 
@@ -1069,82 +1068,49 @@ static void s_tick(void)
     msTicks++;
 }
 #ifdef _CHECK_SWITCH_STATUS_
+static void s_ena_check_switch(void)
+{
+    enacheckswitch = 1;
+}
+
 static void s_check_switch(void)
 {
-/*
-//these types will be defined in hal_switch.h asap
-typedef struct
-{
-    uint32_t autoNeg_done:1;
-    uint32_t linkisgood:1;
-    uint32_t linkspeed:1; // 1== 100Mb 0==10Mb
-    uint32_t linkduplex:1; //1==full 0==half
-    uint32_t dummy:28;
-} hal_switch_portstatus;
-
-typedef struct
-{
-    hal_switch_portstatus port1;
-    hal_switch_portstatus port2;
-} hal_switch_status;
-*/
-    static hal_switch_status status = {0};
-    count++;
     
-    if( count < 100)
-    {
-        return;
-    }
-    count = 0;
+    hal_result_t res;
+    hal_eth_phy_errorsinfo_t result;
+    char str[50];
+   
+
     if(enacheckswitch == 0)
     {
         return;
     }        
-
-#define emsappl_ledred          hal_led0
-#define emsappl_ledgreen        hal_led1 
-#define emsappl_ledyellow       hal_led2
-#define emsappl_ledorange       hal_led3
-
-    hal_switch_getStatus(&status);
-
-    if(status.port2.autoNeg_done)
-    {
-        hal_led_on(emsappl_ledgreen);
-    }
-    else
-    {
-        hal_led_off(emsappl_ledgreen);
-    }
     
-    if(status.port2.linkspeed)
+    result.value = 0xAA;
+    res = hal_eth_get_errors_info(0, rxUnicast, &result);
+    if(res != hal_res_OK)
     {
-        hal_led_on(emsappl_ledred);
+        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy 0");
     }
     else
     {
-        hal_led_off(emsappl_ledred);
+        snprintf(str, sizeof(str)-1, "ERR ETH PHY 0: val=%d overflow=%d validVal=%d", result.value, result.counteroverflow, result.invalidvalue);
     }
+    hal_trace_puts(str);
     
+    result.value = 0xAA;
+    res = hal_eth_get_errors_info(1, rxUnicast, &result);
+    if(res != hal_res_OK)
+    {
+        snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy 1");
+    }
+    else
+    {
+        snprintf(str, sizeof(str)-1, "ERR ETH PHY 1: val=%d overflow=%d validVal=%d", result.value, result.counteroverflow, result.invalidvalue);
+    }
+    hal_trace_puts(str);
     
-    if(status.port2.linkduplex)
-    {
-        hal_led_on(emsappl_ledyellow);
-    }
-    else
-    {
-        hal_led_off(emsappl_ledyellow);
-    }
-
-    if(status.port2.linkisgood)
-    {
-        hal_led_on(emsappl_ledorange);
-    }
-    else
-    {
-        hal_led_off(emsappl_ledorange);
-    }
-
+    enacheckswitch = 0;
 }
 #endif
 
