@@ -150,17 +150,31 @@ extern hl_result_t hl_gpio_init(hl_gpio_init_t* init)
     {
         return(hl_res_NOK_generic);
     }
+
+    hl_gpio_port_t      port = hl_gpio_portNONE;
+    GPIO_InitTypeDef*   mode = NULL;    
     
-    if(init->port > hl_gpio_hid_maxports)
+#if     defined(HL_USE_MPU_ARCH_STM32F1)
+    port = init->f1.port;
+    mode = (GPIO_InitTypeDef*)&init->f1.mode;    
+#elif   defined(HL_USE_MPU_ARCH_STM32F4)
+    port = init->fx.port;
+    mode = (GPIO_InitTypeDef*)&init->fx.mode;
+#else //defined(HL_USE_MPU_ARCH_*)
+    #error ERROR --> choose a HL_USE_MPU_ARCH_*
+#endif 
+
+    
+    if(port > hl_gpio_hid_maxports)
     {
         return(hl_res_NOK_generic);
     }
                 
     // 1. enable GPIO clock 
-    HL_RCC_AxBx_PeriphClockCmd(hl_gpio_hid_clocks[init->port], ENABLE);
+    HL_RCC_AxBx_PeriphClockCmd(hl_gpio_hid_clocks[port], ENABLE);
     
     // 2. init
-    GPIO_Init(hl_gpio_hid_ports[init->port], (GPIO_InitTypeDef*)&(init->mode));
+    GPIO_Init(hl_gpio_hid_ports[port], mode);
       
     return(hl_res_OK);
 }
@@ -206,11 +220,23 @@ extern hl_result_t hl_gpio_pin_write(hl_gpio_t gpio, hl_gpio_val_t val)
     return(hl_res_OK);
 }
 
-// extern hl_result_t hl_gpio_pin_toggle(hl_gpio_t gpio)
-// {       
-//     GPIO_ToggleBits(hl_gpio_hid_ports[gpio.port], gpio.pin);    
-//     return(hl_res_OK);
-// }
+extern hl_result_t hl_gpio_pin_toggle(hl_gpio_t gpio)
+{       
+    
+#if     defined(HL_USE_MPU_ARCH_STM32F1)
+    
+    uint8_t v = GPIO_ReadOutputDataBit(hl_gpio_hid_ports[gpio.port], gpio.pin);
+    GPIO_WriteBit(hl_gpio_hid_ports[gpio.port], gpio.pin, (1 == v) ? (Bit_RESET) : (Bit_SET));
+    
+#elif   defined(HL_USE_MPU_ARCH_STM32F4)
+    
+    GPIO_ToggleBits(hl_gpio_hid_ports[gpio.port], gpio.pin);
+    
+#else //defined(HL_USE_MPU_ARCH_*)
+    #error ERROR --> choose a HL_USE_MPU_ARCH_*
+#endif     
+    return(hl_res_OK);
+}
 
 extern hl_gpio_val_t hl_gpio_pin_input_read(hl_gpio_t gpio) 
 {
@@ -237,29 +263,55 @@ extern hl_gpio_val_t hl_gpio_pin_output_read(hl_gpio_t gpio)
 } 
 
 
-extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, hl_gpio_t* gpio)
+extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* gpiomap)
 {
     
-    if((NULL == gpio) || (NULL == init))
+    if((NULL == gpiomap) || (NULL == init))
     {
         return(hl_res_NOK_generic);
     }    
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
-    init->port              = gpio->port;
-    init->mode.f1.gpio_pins = gpio->pin;
+    init->f1.port               = gpiomap->gpio.port;
+    init->f1.mode.gpio_pins     = gpiomap->gpio.pin;
  
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
 
-    init->port              = gpio->port;
-    init->mode.fx.gpio_pins = gpio->pin;
+    init->fx.port              = gpiomap->gpio.port;
+    init->fx.mode.gpio_pins     = gpiomap->gpio.pin;
     
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERROR --> choose a HL_USE_MPU_ARCH_*
 #endif 
     
     return(hl_res_OK);    
+}
+
+
+extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* gpiomap)
+{
+    if((NULL == gpiomap) || (NULL == altf))
+    {
+        return(hl_res_NOK_generic);
+    }    
+
+#if     defined(HL_USE_MPU_ARCH_STM32F1)
+
+    altf->f1.gpio_remap = gpiomap->af32;
+ 
+#elif   defined(HL_USE_MPU_ARCH_STM32F4)
+
+    altf->fx.gpio.port  = gpiomap.gpio.port;
+    altf->fx.gpio.pin   = gpiomap.gpio.pin;
+    altf->fx.gpio_af    = (uint8_t)gpiomap->af32;
+    
+#else //defined(HL_USE_MPU_ARCH_*)
+    #error ERROR --> choose a HL_USE_MPU_ARCH_*
+#endif 
+    
+    return(hl_res_OK);     
+    
 }
 
 

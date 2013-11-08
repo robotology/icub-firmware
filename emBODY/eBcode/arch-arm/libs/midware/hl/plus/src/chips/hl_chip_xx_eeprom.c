@@ -395,17 +395,19 @@ static hl_result_t s_hl_chip_xx_eeprom_wrprcfg_init(hl_chip_xx_eeprom_cfg_t* cfg
 {
     hl_result_t res = hl_res_OK;
     
-    static const hl_gpio_initmode_t wpgpioinitmode = 
+    static const hl_gpio_init_t wpgpioinit = 
     {
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-        .f1     =
+        .f1.port        = hl_gpio_portNONE,
+        .f1.mode        =
         {
             .gpio_pins  = 0,
             .gpio_speed = GPIO_Speed_50MHz,
             .gpio_mode  = GPIO_Mode_Out_PP            
         }
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-        .fx     =
+        .fx.port        = hl_gpio_portNONE,
+        .fx.mode        =
         {
             .gpio_pins  = 0,
             .gpio_mode  = GPIO_Mode_OUT,
@@ -421,9 +423,14 @@ static hl_result_t s_hl_chip_xx_eeprom_wrprcfg_init(hl_chip_xx_eeprom_cfg_t* cfg
     if(hl_gpio_valUNDEF != cfg->wp_val)
     {
         hl_gpio_init_t gpioinit;
-        memcpy(&gpioinit.mode, &wpgpioinitmode, sizeof(hl_gpio_initmode_t));
-        hl_gpio_fill_init(&gpioinit, &cfg->wp_gpio);
-        res = hl_gpio_init(&gpioinit);    
+        hl_gpio_map_t gpiomap;
+        memcpy(&gpioinit, &wpgpioinit, sizeof(hl_gpio_init_t));
+        gpiomap.gpio.port = cfg->wp_gpio.port;
+        gpiomap.gpio.pin  = cfg->wp_gpio.pin;
+        gpiomap.af32      = hl_NA32;
+        hl_gpio_fill_init(&gpioinit, &gpiomap);
+        res = hl_gpio_init(&gpioinit);  
+        // no altcfg ...
     }
     
     return(res);

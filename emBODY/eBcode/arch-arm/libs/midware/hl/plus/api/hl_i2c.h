@@ -126,11 +126,10 @@ typedef struct
  **/
 typedef struct
 {
-    hl_gpio_t       gpio_scl;       /**< gpio used for scl pin */
-    hl_gpio_t       gpio_sda;       /**< gpio used for sda pin */
-    hl_gpio_altf_t  altf_scl;       /**< alt config of scl pin */
-    hl_gpio_altf_t  altf_sda;       /**< alt config of sda pin */    
+    hl_gpio_map_t   scl;       /**< gpio map used for scl pin */
+    hl_gpio_map_t   sda;       /**< gpio map used for sda pin */ 
 } hl_i2c_gpiomap_t;
+
 
 
 /** @typedef    typedef struct hl_i2c_mapping_t 
@@ -141,7 +140,6 @@ typedef struct
     uint8_t             supported_mask;             /**< bit in position hl_i2cx must be 1 if portx is supported */
     hl_i2c_gpiomap_t    gpiomap[hl_i2cs_number];    /**< in position hl_i2cx there is gpio map of ICx */
 } hl_i2c_mapping_t;
-
 
 
 /** @typedef    typedef struct hl_i2c_cfg_t 
@@ -165,6 +163,7 @@ extern const hl_i2c_cfg_t hl_i2c_cfg_default; // = { .mode = hl_i2c_mode_master,
 
 // it must be externally declared.
 extern const hl_i2c_mapping_t hl_i2c_mapping;
+
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

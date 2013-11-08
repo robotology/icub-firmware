@@ -130,13 +130,13 @@ typedef struct
 } hl_gpio_initmode_f1_t;
 
 
-/** @typedef    typedef struct hl_gpio_altfmode_f1_t 
+/** @typedef    typedef struct hl_gpio_altf_f1_t 
     @brief      contains the alternate function initialisation mode for stm32f1 library.
  **/
 typedef struct
 {
     uint32_t        gpio_remap;     /**< the remap mode. use hl_NA32 for no remap, else use a GPIO_Remap*, GPIO_PartialRemap*, GPIO_FullRemap* macro (e.g., GPIO_Remap1_CAN1 = 0x001D4000, etc.) */
-} hl_gpio_altfmode_f1_t;
+} hl_gpio_altf_f1_t;
 
 
 /** @typedef    typedef struct hl_gpio_initmode_fx_t 
@@ -152,34 +152,44 @@ typedef struct
 } hl_gpio_initmode_fx_t;
 
 
-/** @typedef    typedef struct hl_gpio_altfmode_fx_t 
+/** @typedef    typedef struct hl_gpio_altf_fx_t 
     @brief      contains the alternate function initialisation mode for stm32f2/f4 library.
  **/
 typedef struct
 {
     hl_gpio_t       gpio;           /**< the pair port-pin to remap in alternate mode */
     uint8_t         gpio_af;        /**< the af mode. use hl_NA08 for no remap, else use a GPIO_AF_* macro with values from 0 to 15 (e.g., GPIO_AF_CAN1 = 0x09, GPIO_AF_ETH = 0x0B, etc.) */       
-} hl_gpio_altfmode_fx_t;
+} hl_gpio_altf_fx_t;
 
 
-/** @typedef    typedef union hl_gpio_initmode_t 
-    @brief      contains the gpio initialisation mode. It is a union so that it can be used with both stm32f1 and stm32f2/4
-                standard peripheral libraries.
+/** @typedef    typedef struct hl_gpio_init_fx_t 
+    @brief      contains the gpio initialisation parameters for stm32f2/f4 library.
+ **/
+typedef struct
+{   
+    hl_gpio_port_t          port;       /**< the port */
+    hl_gpio_initmode_f1_t   mode;       /**< the mode */
+} hl_gpio_init_f1_t;
+
+
+
+/** @typedef    typedef struct hl_gpio_init_f1_t 
+    @brief      contains the gpio initialisation parameters for stm32f1 library.
+ **/
+typedef struct
+{   
+    hl_gpio_port_t          port;       /**< the port */
+    hl_gpio_initmode_fx_t   mode;       /**< the mode */
+} hl_gpio_init_fx_t;
+
+
+/** @typedef    typedef union hl_gpio_init_t 
+    @brief      contains the gpio initialisation parameters.
  **/
 typedef union
 {
-    hl_gpio_initmode_f1_t   f1;     /**< to be used with stm32f1 peripheral library */
-    hl_gpio_initmode_fx_t   fx;     /**< to be used with stm32f2/4 peripheral library */
-} hl_gpio_initmode_t;
-
-
-/** @typedef    typedef struct hl_gpio_init_t 
-    @brief      contains the gpio initialisation parameters.
- **/
-typedef struct
-{
-    hl_gpio_port_t      port;       /**< the port */
-    hl_gpio_initmode_t  mode;       /**< the mode */
+    hl_gpio_init_f1_t       f1;     /**< to be used with stm32f1 peripheral library */
+    hl_gpio_init_fx_t       fx;     /**< to be used with stm32f2/4 peripheral library */
 } hl_gpio_init_t;
 
 
@@ -189,10 +199,21 @@ typedef struct
  **/
 typedef union
 {
-    hl_gpio_altfmode_f1_t  f1;      /**< to be used with stm32f1 peripheral library */
-    hl_gpio_altfmode_fx_t  fx;      /**< to be used with stm32f2/4 peripheral library */
+    hl_gpio_altf_f1_t       f1;      /**< to be used with stm32f1 peripheral library */
+    hl_gpio_altf_fx_t       fx;      /**< to be used with stm32f2/4 peripheral library */
 } hl_gpio_altf_t;
+
+
+/** @typedef    typedef strcut hl_gpio_map_t 
+    @brief      hl_gpio_map_t is used to map a peripheral to relevant gpio and alternate function.                
+ **/
+typedef struct 
+{
+    hl_gpio_t           gpio;       /**< the gpio */
+    uint32_t            af32;       /**< the alternate function. use hl_NA32 for none, else what is specified by stm32fx */
+} hl_gpio_map_t;
  
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
@@ -231,7 +252,7 @@ extern hl_result_t hl_gpio_pin_write(hl_gpio_t gpio, hl_gpio_val_t val);
     @param      gpio            The gpio. 
     @return     If successful hl_res_OK
  **/
-//extern hl_result_t hl_gpio_pin_toggle(hl_gpio_t gpio);
+extern hl_result_t hl_gpio_pin_toggle(hl_gpio_t gpio);
 
 
 /** @fn         extern hl_gpio_val_t hl_gpio_pin_input_read(hl_gpio_t gpio)
@@ -251,9 +272,24 @@ extern hl_gpio_val_t hl_gpio_pin_output_read(hl_gpio_t gpio);
 
 
 
-extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, hl_gpio_t* gpio);
+/** @fn         extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* gpiomap)
+    @brief      fills the init data structure with info coming from gpiomap. it extracts from gpiomap
+                the port and the pin and copies it in relevant part of init.
+    @param      init            The gpio init pointer.  
+    @param      gpiomap         The gpio map pointer. 
+    @return     If successful hl_res_OK
+ **/
+extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* gpiomap);
 
-extern hl_result_t hl_gpio_fill_altf(hl_gpio_init_t* init, hl_gpio_t* gpio);
+
+/** @fn         extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* gpiomap)
+    @brief      fills the altf data structure with info coming from gpiomap. it extracts from gpiomap
+                the af32 and copies it in relevant part of altf.
+    @param      altf            The gpio altf pointer.  
+    @param      gpiomap         The gpio map pointer. 
+    @return     If successful hl_res_OK
+ **/
+extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* gpiomap);
 
 
 

@@ -969,16 +969,17 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
 {
     static const hl_gpio_init_t s_hl_i2c_sclsda_gpio_init  =
     {
-        .port           = hl_gpio_portNONE,
-#if     defined(HL_USE_MPU_ARCH_STM32F1)        
-        .mode.f1        =
+#if     defined(HL_USE_MPU_ARCH_STM32F1)  
+        .f1.port        = hl_gpio_portNONE,
+        .f1.mode        =
         {
             .gpio_pins      = hl_gpio_pinNONE,
             .gpio_speed     = GPIO_Speed_50MHz,
             .gpio_mode      = GPIO_Mode_AF_OD        
         }
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)  
-        .mode.fx        =
+        .fx.port        = hl_gpio_portNONE,
+        .fx.mode        =
         {
             .gpio_pins      = hl_gpio_pinNONE,
             .gpio_mode      = GPIO_Mode_AF,
@@ -996,18 +997,18 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
     
     memcpy(sclinit, &s_hl_i2c_sclsda_gpio_init, sizeof(hl_gpio_init_t));   
     memcpy(sdainit, &s_hl_i2c_sclsda_gpio_init, sizeof(hl_gpio_init_t));
-
     
     // then we verify the pin mapping and the altfun ... ok don't do it.
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of scl and sda
-    hl_gpio_fill_init(sclinit, (hl_gpio_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].gpio_scl);
-    hl_gpio_fill_init(sdainit, (hl_gpio_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].gpio_sda);
+    hl_gpio_fill_init(sclinit, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl.gpio);
+    hl_gpio_fill_init(sdainit, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda.gpio);
     
     // then we set altfun of scl and sda
-    memcpy(sclaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].altf_scl, sizeof(hl_gpio_altf_t));
-    memcpy(sdaaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].altf_sda, sizeof(hl_gpio_altf_t));
+    hl_gpio_fill_altf(sclaltf, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl.gpio);
+    hl_gpio_fill_altf(sdaaltf, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda.gpio);    
+    
 }
 
 
