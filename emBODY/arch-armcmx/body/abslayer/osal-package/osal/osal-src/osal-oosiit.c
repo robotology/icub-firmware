@@ -33,7 +33,7 @@
 
 #include "oosiit.h"
 
-
+#include "stdio.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -1669,6 +1669,7 @@ extern void oosiit_ext_free(void* m)
 // used only by osiit
 void oosiit_sys_error(oosiit_error_code_t errorcode) 
 {
+    char str[100];
     switch(errorcode)
     {
         case oosiit_error_stackoverflow:
@@ -1687,7 +1688,8 @@ void oosiit_sys_error(oosiit_error_code_t errorcode)
  
         default:
         {
-            s_osal_error(osal_error_unknownfromrtos, "osal: unknown error from rtos");
+            snprintf(str, sizeof(str), "osal: unknown error from rtos err=0x%x", errorcode);
+            s_osal_error(osal_error_unknownfromrtos, str);
         } break;
     }
 }
