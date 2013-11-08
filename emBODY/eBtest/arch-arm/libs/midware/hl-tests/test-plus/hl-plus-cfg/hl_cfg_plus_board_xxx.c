@@ -67,136 +67,137 @@
 extern const hl_i2c_mapping_t hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
-    .gpiomap             =
+    .gpiomap            =
     {   
         {   // hl_i2c1 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portB, 
-                .pin            = hl_gpio_pin8
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin8
+                },
+                .af32       = GPIO_Remap_I2C1          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portB, 
-                .pin            = hl_gpio_pin9
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = GPIO_Remap_I2C1
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = GPIO_Remap_I2C1
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin9
+                },
+                .af32       = GPIO_Remap_I2C1          
             } 
         }, 
         {   // hl_i2c2 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = hl_NA32
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = hl_NA32
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32           
             } 
         },  
         {   // hl_i2c3 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = hl_NA32
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = hl_NA32
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32           
             } 
         }        
     }       
 };
+
 
 #elif   defined(HL_USE_BRD_MCBSTM32)
 
 extern const hl_i2c_mapping_t hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
-    .gpiomap             =
+    .gpiomap            =
     {   
         {   // hl_i2c1 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portB, 
-                .pin            = hl_gpio_pin8
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin8
+                },
+                .af32       = GPIO_Remap_I2C1          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portB, 
-                .pin            = hl_gpio_pin9
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = GPIO_Remap_I2C1
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = GPIO_Remap_I2C1
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin9
+                },
+                .af32       = GPIO_Remap_I2C1          
             } 
         }, 
         {   // hl_i2c2 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = hl_NA32
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = hl_NA32
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32           
             } 
         },  
         {   // hl_i2c3 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = hl_NA32
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = hl_NA32
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32           
             } 
         }        
     }       
@@ -207,66 +208,66 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
 extern const hl_i2c_mapping_t hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
-    .gpiomap             =
+    .gpiomap            =
     {   
         {   // hl_i2c1 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portB, 
-                .pin            = hl_gpio_pin8
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin8
+                },
+                .af32       = GPIO_Remap_I2C1          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portB, 
-                .pin            = hl_gpio_pin9
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = GPIO_Remap_I2C1
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = GPIO_Remap_I2C1
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin9
+                },
+                .af32       = GPIO_Remap_I2C1          
             } 
         }, 
         {   // hl_i2c2 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = hl_NA32
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = hl_NA32
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32           
             } 
         },  
         {   // hl_i2c3 
-            .gpio_scl = 
+            .scl = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32          
             }, 
-            .gpio_sda = 
+            .sda = 
             {
-                .port           = hl_gpio_portNONE, 
-                .pin            = hl_gpio_pinNONE
-            }, 
-            .altf_scl = 
-            {
-                .f1.gpio_remap  = hl_NA32
-            }, 
-            .altf_sda = 
-            {
-                .f1.gpio_remap  = hl_NA32
+                .gpio   =
+                {
+                    .port   = hl_gpio_portNONE, 
+                    .pin    = hl_gpio_pinNONE
+                },
+                .af32       = hl_NA32           
             } 
         }        
     }       
