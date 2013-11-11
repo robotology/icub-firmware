@@ -39,7 +39,7 @@
 #include "string.h"
 #include "hl_core.h"        // contains the required stm32f10x_*.h or stm32f4xx*.h header files
 
-
+#include "hl_arch.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -398,16 +398,16 @@ static hl_result_t s_hl_chip_xx_eeprom_wrprcfg_init(hl_chip_xx_eeprom_cfg_t* cfg
     static const hl_gpio_init_t wpgpioinit = 
     {
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-        .f1.port        = hl_gpio_portNONE,
-        .f1.mode        =
+        .port           = hl_gpio_portNONE,
+        .mode           =
         {
             .gpio_pins  = 0,
             .gpio_speed = GPIO_Speed_50MHz,
             .gpio_mode  = GPIO_Mode_Out_PP            
         }
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-        .fx.port        = hl_gpio_portNONE,
-        .fx.mode        =
+        .port           = hl_gpio_portNONE,
+        .mode           =
         {
             .gpio_pins  = 0,
             .gpio_mode  = GPIO_Mode_OUT,

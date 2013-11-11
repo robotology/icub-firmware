@@ -39,7 +39,8 @@
 #include "string.h"
 #include "hl_core.h"        // contains the required stm32f10x_*.h or stm32f4xx*.h header files
 
- 
+#include "hl_arch.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -155,11 +156,11 @@ extern hl_result_t hl_gpio_init(hl_gpio_init_t* init)
     GPIO_InitTypeDef*   mode = NULL;    
     
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-    port = init->f1.port;
-    mode = (GPIO_InitTypeDef*)&init->f1.mode;    
+    port = init->port;
+    mode = (GPIO_InitTypeDef*)&init->mode;    
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    port = init->fx.port;
-    mode = (GPIO_InitTypeDef*)&init->fx.mode;
+    port = init->port;
+    mode = (GPIO_InitTypeDef*)&init->mode;
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERROR --> choose a HL_USE_MPU_ARCH_*
 #endif 
@@ -191,7 +192,7 @@ extern hl_result_t hl_gpio_altf(hl_gpio_altf_t* altf)
     // 1. enable AFIO clock
     HL_RCC_AxBx_PeriphClockCmd(HL_RCC_AxBxPeriph_AFIO, ENABLE);    
     // 2. remap
-    GPIO_PinRemapConfig(altf->f1.gpio_remap, ENABLE); 
+    GPIO_PinRemapConfig(altf->gpio_remap, ENABLE); 
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
     uint8_t pinpos = s_hl_gpio_pin2pos(altf->fx.gpio.pin);     
     if((0xff == pinpos) || (altf->fx.gpio.port > hl_gpio_hid_maxports))
@@ -273,13 +274,13 @@ extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* 
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
-    init->f1.port               = gpiomap->gpio.port;
-    init->f1.mode.gpio_pins     = gpiomap->gpio.pin;
+    init->port                  = gpiomap->gpio.port;
+    init->mode.gpio_pins        = gpiomap->gpio.pin;
  
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
 
-    init->fx.port              = gpiomap->gpio.port;
-    init->fx.mode.gpio_pins     = gpiomap->gpio.pin;
+    init->port                  = gpiomap->gpio.port;
+    init->mode.gpio_pins        = gpiomap->gpio.pin;
     
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERROR --> choose a HL_USE_MPU_ARCH_*
@@ -298,13 +299,13 @@ extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* 
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
-    altf->f1.gpio_remap = gpiomap->af32;
+    altf->gpio_remap    = gpiomap->af32;
  
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
 
-    altf->fx.gpio.port  = gpiomap.gpio.port;
-    altf->fx.gpio.pin   = gpiomap.gpio.pin;
-    altf->fx.gpio_af    = (uint8_t)gpiomap->af32;
+    altf->gpio.port     = gpiomap.gpio.port;
+    altf->gpio.pin      = gpiomap.gpio.pin;
+    altf->gpio_af       = (uint8_t)gpiomap->af32;
     
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERROR --> choose a HL_USE_MPU_ARCH_*

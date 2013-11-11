@@ -101,15 +101,20 @@ typedef enum
 
 enum { hl_gpio_pins_number = 16 };
 
+
+/** @typedef    typedef struct hl_gpio_t 
+    @brief      hl_gpio_t specifies the gpio (port, pin). It is 4 bytes long on most compilers, thus it can be 
+                safely used as a single function argument.
+ **/
 typedef struct
 {
-    hl_gpio_port_t  port;
-    hl_gpio_pin_t   pin;
+    hl_gpio_port_t  port;       /**< the port */
+    hl_gpio_pin_t   pin;        /**< the pin */
 } hl_gpio_t;
 
  
 /** @typedef    typedef enum hl_gpio_val_t 
-    @brief      hl_gpio_val_t contains the values that a  pin can have.
+    @brief      hl_gpio_val_t contains the values that a pin can have.
  **/
 typedef enum  
 { 
@@ -119,92 +124,8 @@ typedef enum
 } hl_gpio_val_t; 
  
 
-/** @typedef    typedef struct hl_gpio_initmode_f1_t 
-    @brief      contains the gpio initialisation mode for stm32f1 library.
- **/
-typedef struct
-{
-    uint16_t        gpio_pins;      /**< the mask of pins. use one hl_gpio_pin_t value or an OR combination of them */
-    uint8_t         gpio_speed;     /**< the speed. use GPIOSpeed_TypeDef values (GPIO_Speed_10MHz = 1, GPIO_Speed_2MHz = 2, GPIO_Speed_50MHz = 3) */
-    uint8_t         gpio_mode;      /**< the mode. use GPIOMode_TypeDef values (GPIO_Mode_AIN = 0x0, GPIO_Mode_IN_FLOATING = 0x04, GPIO_Mode_IPD = 0x28, etc.) */
-} hl_gpio_initmode_f1_t;
 
-
-/** @typedef    typedef struct hl_gpio_altf_f1_t 
-    @brief      contains the alternate function initialisation mode for stm32f1 library.
- **/
-typedef struct
-{
-    uint32_t        gpio_remap;     /**< the remap mode. use hl_NA32 for no remap, else use a GPIO_Remap*, GPIO_PartialRemap*, GPIO_FullRemap* macro (e.g., GPIO_Remap1_CAN1 = 0x001D4000, etc.) */
-} hl_gpio_altf_f1_t;
-
-
-/** @typedef    typedef struct hl_gpio_initmode_fx_t 
-    @brief      contains the gpio initialisation mode for stm32f2/f4 library.
- **/
-typedef struct
-{
-    uint32_t        gpio_pins;      /**< the mask of pins. use one hl_gpio_pin_t value or an OR combination of them */  
-    uint8_t         gpio_mode;      /**< the mode. use GPIOMode_TypeDef values (GPIO_Mode_IN = 0x00, GPIO_Mode_OUT = 0x01, GPIO_Mode_AF = 0x02, GPIO_Mode_AN = 0x03) */
-    uint8_t         gpio_speed;     /**< the speed. use GPIOSpeed_TypeDef values (GPIO_Speed_2MHz = 0x00, GPIO_Speed_25MHz = 0x01, GPIO_Speed_50MHz = 0x03, GPIO_Speed_100MHz = 0x04) */
-    uint8_t         gpio_otype;     /**< the output type. use GPIOOType_TypeDef (GPIO_OType_PP = 0x00, GPIO_OType_OD = 0x01) */
-    uint8_t         gpio_pupd;      /**< the pull-up/pull-down mode. use GPIOPuPd_TypeDef (GPIO_PuPd_NOPULL = 0x00, GPIO_PuPd_UP = 0x01, GPIO_PuPd_DOWN = 0x02) */
-} hl_gpio_initmode_fx_t;
-
-
-/** @typedef    typedef struct hl_gpio_altf_fx_t 
-    @brief      contains the alternate function initialisation mode for stm32f2/f4 library.
- **/
-typedef struct
-{
-    hl_gpio_t       gpio;           /**< the pair port-pin to remap in alternate mode */
-    uint8_t         gpio_af;        /**< the af mode. use hl_NA08 for no remap, else use a GPIO_AF_* macro with values from 0 to 15 (e.g., GPIO_AF_CAN1 = 0x09, GPIO_AF_ETH = 0x0B, etc.) */       
-} hl_gpio_altf_fx_t;
-
-
-/** @typedef    typedef struct hl_gpio_init_fx_t 
-    @brief      contains the gpio initialisation parameters for stm32f2/f4 library.
- **/
-typedef struct
-{   
-    hl_gpio_port_t          port;       /**< the port */
-    hl_gpio_initmode_f1_t   mode;       /**< the mode */
-} hl_gpio_init_f1_t;
-
-
-
-/** @typedef    typedef struct hl_gpio_init_f1_t 
-    @brief      contains the gpio initialisation parameters for stm32f1 library.
- **/
-typedef struct
-{   
-    hl_gpio_port_t          port;       /**< the port */
-    hl_gpio_initmode_fx_t   mode;       /**< the mode */
-} hl_gpio_init_fx_t;
-
-
-/** @typedef    typedef union hl_gpio_init_t 
-    @brief      contains the gpio initialisation parameters.
- **/
-typedef union
-{
-    hl_gpio_init_f1_t       f1;     /**< to be used with stm32f1 peripheral library */
-    hl_gpio_init_fx_t       fx;     /**< to be used with stm32f2/4 peripheral library */
-} hl_gpio_init_t;
-
-
-/** @typedef    typedef union hl_gpio_altf_t 
-    @brief      contains the alternate function mode. It is an union so that it can be used with both stm32f1 and stm32f2/4
-                standard peripheral libraries.
- **/
-typedef union
-{
-    hl_gpio_altf_f1_t       f1;      /**< to be used with stm32f1 peripheral library */
-    hl_gpio_altf_fx_t       fx;      /**< to be used with stm32f2/4 peripheral library */
-} hl_gpio_altf_t;
-
-
-/** @typedef    typedef strcut hl_gpio_map_t 
+/** @typedef    typedef struct hl_gpio_map_t 
     @brief      hl_gpio_map_t is used to map a peripheral to relevant gpio and alternate function.                
  **/
 typedef struct 
@@ -214,12 +135,27 @@ typedef struct
 } hl_gpio_map_t;
  
 
+/** @typedef    typedef struct hl_gpio_init_opaque_t hl_gpio_init_t
+    @brief      contains the opaque declaration of the initialisation parameters of a gpio. As such, hl_gpio_init_t
+                can be used only as a pointer to a struct hl_gpio_init_opaque_t which is defined in hl_arch.h.
+                The reason is that the initialisation mode depends on the architecture. 
+ **/
+typedef struct hl_gpio_init_opaque_t hl_gpio_init_t;
+
+
+/** @typedef    typedef struct hl_gpio_altf_opaque_t hl_gpio_altf_t
+    @brief      contains the opaque declaration of the alternate function parameters of a gpio. As such, hl_gpio_altf_t
+                can be used only as a pointer to a struct hl_gpio_altf_opaque_t which is defined in hl_arch.h.
+                The reason is that the alternate function mode depends on the architecture. 
+ **/
+typedef struct hl_gpio_altf_opaque_t hl_gpio_altf_t;
+
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-
 
 
 /** @fn         extern hl_result_t hl_gpio_init(hl_gpio_init_t* init)

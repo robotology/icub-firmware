@@ -51,7 +51,8 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// empty-section
+
+
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

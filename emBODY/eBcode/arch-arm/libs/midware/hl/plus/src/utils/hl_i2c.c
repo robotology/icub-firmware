@@ -44,6 +44,8 @@
 
 #include "hl_bits.h" 
 
+#include "hl_arch.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -970,16 +972,16 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
     static const hl_gpio_init_t s_hl_i2c_sclsda_gpio_init  =
     {
 #if     defined(HL_USE_MPU_ARCH_STM32F1)  
-        .f1.port        = hl_gpio_portNONE,
-        .f1.mode        =
+        .port           = hl_gpio_portNONE,
+        .mode           =
         {
             .gpio_pins      = hl_gpio_pinNONE,
             .gpio_speed     = GPIO_Speed_50MHz,
             .gpio_mode      = GPIO_Mode_AF_OD        
         }
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)  
-        .fx.port        = hl_gpio_portNONE,
-        .fx.mode        =
+        .port        = hl_gpio_portNONE,
+        .mode        =
         {
             .gpio_pins      = hl_gpio_pinNONE,
             .gpio_mode      = GPIO_Mode_AF,
