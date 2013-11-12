@@ -354,13 +354,13 @@ extern const hl_eth_mapping_t hl_eth_mapping =
 
 
 
-#if defined(HL_USE_UTIL_ETHTRANSCEIVER)
+#if defined(HL_USE_UTIL_ETHTRANS)
 
-#include "hl_ethtransceiver.h"
+#include "hl_ethtrans.h"
 
 #if defined(HL_USE_BRD_EMS001)
 
-extern const hl_ethtransceiver_mapping_t hl_ethtransceiver_mapping = 
+extern const hl_ethtrans_mapping_t hl_ethtrans_mapping = 
 {
     .supported  = hl_true
 };

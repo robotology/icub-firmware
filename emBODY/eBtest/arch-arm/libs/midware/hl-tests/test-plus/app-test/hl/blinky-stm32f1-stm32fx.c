@@ -26,6 +26,7 @@
 #include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "string.h"
 
 #include "hl_core.h"
 
@@ -219,6 +220,7 @@ static void test_eeprom(void)
     r = hl_chip_xx_eeprom_read(address, size, buffer, &readbytes);
     
     r = hl_chip_xx_eeprom_write(address, 10, target, &writtenbytes);
+    memset(buffer, 0, sizeof(buffer));
     
     r = hl_chip_xx_eeprom_read(address, size, buffer, &readbytes);
     

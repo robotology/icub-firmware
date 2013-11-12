@@ -697,9 +697,9 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hl_ethtransceiver.c</FileName>
+              <FileName>hl_ethtrans.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtrans.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -717,9 +717,19 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_st_lis3x.c</FilePath>
             </File>
             <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
               <FileName>hl_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1416,9 +1426,9 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hl_ethtransceiver.c</FileName>
+              <FileName>hl_ethtrans.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtrans.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1436,9 +1446,19 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_st_lis3x.c</FilePath>
             </File>
             <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
               <FileName>hl_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2135,9 +2155,9 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hl_ethtransceiver.c</FileName>
+              <FileName>hl_ethtrans.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtrans.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2155,9 +2175,19 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_st_lis3x.c</FilePath>
             </File>
             <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
               <FileName>hl_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
           </Files>
         </Group>

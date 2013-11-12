@@ -100,7 +100,7 @@
 #define HL_USE_UTIL_FIFO
 #define HL_USE_UTIL_I2C
 #define HL_USE_UTIL_ETH
-#define HL_USE_UTIL_ETHTRANSCEIVER
+#define HL_USE_UTIL_ETHTRANS
 
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
@@ -108,6 +108,8 @@
 #define HL_USE_CHIP_XX_EEPROM
 #define HL_USE_CHIP_ST_L3G4200D
 #define HL_USE_CHIP_ST_LIS3X
+#define HL_USE_CHIP_MICREL_KS8893
+#define HL_USE_CHIP_XX_ETHPHY
 
 #else
     #error HL: specify the modules
