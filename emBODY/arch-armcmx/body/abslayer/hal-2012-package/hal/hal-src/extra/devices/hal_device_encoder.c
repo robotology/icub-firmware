@@ -318,7 +318,10 @@ static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame)
 {
     uint32_t pos = 0;
     
-    pos = frame[0] | (frame[1] << 8) | (frame[2] << 16);
+    //pos = frame[0] | (frame[1] << 8) | (frame[2] << 16);
+    // VALE formatting result
+    pos = ((frame[0] & 0x7F) << 16) | (frame[1] << 8) | (frame[2] & 0xE0);
+    pos = pos >> 5;
     return(pos);
 }
 

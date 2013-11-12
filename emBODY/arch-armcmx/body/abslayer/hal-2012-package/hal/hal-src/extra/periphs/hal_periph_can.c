@@ -101,6 +101,20 @@
 
 #warning WIP --> CAN2 does not trigger the rx handler... WE MUST FIX IT ...
 
+
+
+//VALE added following macro
+#define CAN_IT_ERROR        (CAN_IT_ERR | CAN_IT_EWG | CAN_IT_EPV | CAN_IT_BOF | /*CAN_IT_LEC |*/ CAN_IT_FOV0) 
+/*NOTE: 
+    - CAN_IT_ERR  ==> Error Interrupt: an interrupt is genereted when an error condition is pending in esr register
+    - CAN_IT_EWG  ==> Error warning Interrupt 
+    - CAN_IT_EPV  ==> Error passive Interrupt
+    - CAN_IT_BOF  ==> Bus-off Interrupt
+*/
+#define CAN_IT_ERR_ENA(p)   CAN_ITConfig( ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) ), CAN_IT_ERROR,  ENABLE);
+#define CAN_IT_ERR_DISA(p)  CAN_ITConfig( ( ( hal_can_port1 == (p) ) ? (CAN1) : (CAN2) ), CAN_IT_ERROR,  DISABLE);
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -117,7 +131,9 @@ const hal_can_cfg_t hal_can_cfg_default =
     .callback_on_rx             = NULL,
     .arg_cb_rx                  = NULL,
     .callback_on_tx             = NULL,
-    .arg_cb_tx                  = NULL
+    .arg_cb_tx                  = NULL,
+    .callback_on_err            = NULL, //VALE added field 
+    .arg_cb_err                 = NULL  //VALE added field 
 };
 
 
@@ -133,6 +149,8 @@ typedef struct
     hal_utility_fifo_t          canframes_tx_norm;    
     uint8_t                     enabled;
     uint8_t                     txisrisenabled;
+    uint8_t                     swrxcanfifo_isfull;
+    uint8_t                     swtxcanfifo_isfull;
 } hal_can_internal_item_t;
 
 typedef struct
@@ -170,7 +188,11 @@ static void s_hal_can_isr_tx_enable(hal_can_t id);
 static void s_hal_can_isr_tx_disable(hal_can_t id);
 static void s_hal_can_isr_rx_enable(hal_can_t id);
 static void s_hal_can_isr_rx_disable(hal_can_t id);
+static void s_hal_can_isr_err_enable(hal_can_t id); // VALE
+static void s_hal_can_isr_err_disable(hal_can_t id);// VALE
 
+//error
+void s_hal_can_isr_error(hal_can_t id); // VALE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
@@ -355,7 +377,9 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     
     // clear other fields of internal item
     intitem->enabled = 0;
-    intitem->txisrisenabled = 0;    
+    intitem->txisrisenabled = 0;   // VALE
+    intitem->swrxcanfifo_isfull = 0;// VALE
+    intitem->swtxcanfifo_isfull = 0;    // VALE
     
         
     // init the phy of id
@@ -415,13 +439,16 @@ extern hal_result_t hal_can_enable(hal_can_t id)
     CAN_ITConfig(HAL_can_port2peripheral(id), (CAN_IT_FMP0 | CAN_IT_TME), ENABLE);
     //CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_FMP0, ENABLE);
     //CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_TME, ENABLE);
-
+    CAN_ITConfig( HAL_can_port2peripheral(id), CAN_IT_ERROR,  ENABLE); // VALE
+    
     // nvic 
     s_hal_can_isr_rx_enable(id);
     // dont enable the nvic for the tx
     //s_hal_can_tx_enable(id);
     s_hal_can_isr_tx_disable(id);
     intitem->txisrisenabled = 0;
+    
+    s_hal_can_isr_err_enable(id);// VALE
     
     // it is in can driver by K&%L. it was not in hal-1. it seems not be important. it does not make can2 work ..
     CANx->MCR &= ~(1 << 0);             /* normal operating mode, reset INRQ   */
@@ -460,12 +487,14 @@ extern hal_result_t hal_can_disable(hal_can_t id)
     CAN_ITConfig(HAL_can_port2peripheral(id), (CAN_IT_FMP0 | CAN_IT_TME), DISABLE);
     CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_TME, DISABLE);
     CAN_ITConfig(HAL_can_port2peripheral(id), CAN_IT_FMP0, DISABLE);
-
+    CAN_ITConfig( HAL_can_port2peripheral(id), CAN_IT_ERROR,  DISABLE); // VALE
     // nvic 
     s_hal_can_isr_rx_disable(id);
     // dont disable the nvic for the tx. it was never enabled
     s_hal_can_isr_tx_disable(id);
     intitem->txisrisenabled = 0;
+    
+    s_hal_can_isr_err_disable(id); // VALE
     
     // enable scheduling 
     hal_base_osal_scheduling_restart();
@@ -628,8 +657,31 @@ extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof)
     
     return(hal_res_OK);
 }
-
-
+// VALE
+extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status_ptr)
+{
+    
+    if(NULL == status_ptr)
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    
+    hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
+    CAN_TypeDef *can_ptr =  HAL_can_port2peripheral(id); 
+       
+    status_ptr->u.s.hw_status.REC = (can_ptr->ESR & CAN_ESR_REC)>>24;          
+    status_ptr->u.s.hw_status.TEC = (can_ptr->ESR & CAN_ESR_TEC)>>16;   ;           
+    status_ptr->u.s.hw_status.warning = ((can_ptr->ESR & CAN_ESR_EWGF) == CAN_ESR_EWGF);     
+    status_ptr->u.s.hw_status.passive = ((can_ptr->ESR & CAN_ESR_EPVF) == CAN_ESR_EPVF);       
+    status_ptr->u.s.hw_status.busoff = ((can_ptr->ESR & CAN_ESR_BOFF) == CAN_ESR_BOFF);          
+    status_ptr->u.s.hw_status.txqueueisfull = 0; 
+    status_ptr->u.s.hw_status.rxqueueisfull = ((can_ptr->RF0R & CAN_RF0R_FOVR0) == CAN_RF0R_FOVR0); 
+    status_ptr->u.s.hw_status.dummy3b = 0;
+    status_ptr->u.s.sw_status.txqueueisfull = intitem->swtxcanfifo_isfull; 
+    status_ptr->u.s.sw_status.rxqueueisfull = intitem->swrxcanfifo_isfull; 
+    
+    return(hal_res_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -662,6 +714,17 @@ void CAN2_RX0_IRQHandler(void)
 {
     // as we configured with CAN_IT_FMP0, the isr is triggered when a frame is received on fifo-0 of can2 peripheral
 	s_hal_can_isr_recvframe_canx(hal_can2);
+}
+
+// VALE
+void CAN1_SCE_IRQHandler(void)
+{
+    s_hal_can_isr_error(hal_can1);
+}
+// VALE
+void CAN2_SCE_IRQHandler(void)
+{
+    s_hal_can_isr_error(hal_can2);
 }
 
 // ---- isr of the module: end ------
@@ -837,13 +900,25 @@ static void s_hal_can_isr_recvframe_canx(hal_can_t id)
     //hal_can_internals_t *intitem = s_hal_can_internals[HAL_can_id2index(id)];
     hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
     hal_utility_fifo_t* fiforx = &intitem->canframes_rx_norm;
+    CAN_TypeDef *can_ptr =  HAL_can_port2peripheral(id); // VALE
     
     //hal_can_frame_t* pcanframe =  NULL;
     CanRxMsg RxMessage;    
     
+    
+    /*NOTE: both hw fifo and sw fifo contains always newest messages. so in case of error(fifo overun) don't return, but go on to recive frame*/
+    
+    //if hardware fifo is in overrun call the error callback and then go to get receive frame
+    if((can_ptr->RF0R & CAN_RF0R_FOVR0) == CAN_RF0R_FOVR0) // VALE
+    {
+        s_hal_can_isr_error(id);  
+    }
+    
     if(hal_true == hal_utility_fifo_full(fiforx))
     {   // remove oldest frame
-        hal_utility_fifo_pop(fiforx);        
+        hal_utility_fifo_pop(fiforx);      
+        intitem->swrxcanfifo_isfull = 1; // VALE
+        s_hal_can_isr_error(id); // VALE
     }
 
     //pcanframe = hal_utility_fifo_next_free(fiforx); // the pointer of the position where a new canframe would be put.
@@ -895,7 +970,38 @@ static void s_hal_can_isr_recvframe_canx(hal_can_t id)
 //     }
 
 }
+// VALE
+/*
+  * @brief  Interrupt service routine for error.
+  * @param  port identifies CAN port 
+  * @retval none
+  */
+void s_hal_can_isr_error(hal_can_t id)
+{
+    hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
+    CAN_TypeDef *can_ptr =  HAL_can_port2peripheral(id);
+    
+    if(NULL != intitem->config.callback_on_err)
+    {
+        intitem->config.callback_on_err(intitem->config.arg_cb_err);
+    }
+    
+    //clear sw queue is full.
+    intitem->swtxcanfifo_isfull = 0; 
+    intitem->swrxcanfifo_isfull = 0;
+    
+    //clear all pendig bits
+    CAN_ClearITPendingBit(can_ptr, CAN_IT_ERR);
+    CAN_ClearITPendingBit(can_ptr, CAN_IT_LEC);
+    CAN_ClearITPendingBit(can_ptr, CAN_IT_BOF);
+    CAN_ClearITPendingBit(can_ptr, CAN_IT_EPV);
+    CAN_ClearITPendingBit(can_ptr, CAN_IT_EWG);
+    CAN_ClearITPendingBit(can_ptr, CAN_IT_FOV0);
+    
+    can_ptr->MSR |= CAN_MSR_ERRI;   //reset bit this bit is reseted with 1.
+    
 
+}
 
 static void s_hal_can_hw_gpio_init(hal_can_t id)
 {
@@ -1111,6 +1217,7 @@ static void s_hal_can_hw_nvic_init(hal_can_t id)
     hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
     IRQn_Type CANx_RX0_IRQn = (hal_can1 == id) ? (CAN1_RX0_IRQn) : (CAN2_RX0_IRQn);
     IRQn_Type CANx_TX_IRQn  = (hal_can1 == id) ? (CAN1_TX_IRQn) : (CAN2_TX_IRQn);
+    IRQn_Type CANx_err      = (hal_can1 == id) ? (CAN1_SCE_IRQn) : (CAN2_SCE_IRQn); // VALE
 
     if(hal_int_priorityNONE != intitem->config.priorx)
     {
@@ -1125,6 +1232,8 @@ static void s_hal_can_hw_nvic_init(hal_can_t id)
         hal_sys_irqn_priority_set(CANx_TX_IRQn, intitem->config.priotx);
         hal_sys_irqn_disable(CANx_TX_IRQn);
     }
+     //configure error interrupt prio
+     hal_sys_irqn_priority_set(CANx_err, hal_int_priority01); //high prio // VALE
 }
 
 
@@ -1213,6 +1322,9 @@ static hal_result_t s_hal_can_tx_normprio(hal_can_t id, hal_can_frame_t *frame, 
     // failed to put in fifo
     if(hal_res_OK != res)
     {   // if i cannot tx means that the queue is full, thus ... 
+        intitem->swtxcanfifo_isfull = 1; // VALE
+        s_hal_can_isr_error(id); // VALE
+        
         if(hal_can_send_normprio_now == sm)
         {   // if send-now i empty the queue
             s_hal_can_isr_sendframes_canx(id); //s_hal_can_sendframes_canx(id);
@@ -1323,6 +1435,19 @@ static void s_hal_can_isr_rx_disable(hal_can_t id)
 {
     IRQn_Type CANx_RX0_IRQn = (hal_can1 == id) ? (CAN1_RX0_IRQn) : (CAN2_RX0_IRQn);
     hal_sys_irqn_disable(CANx_RX0_IRQn);
+}
+
+// VALE
+static void s_hal_can_isr_err_disable(hal_can_t id)
+{
+    IRQn_Type CANx_err = (hal_can1 == id) ? (CAN1_SCE_IRQn) : (CAN2_SCE_IRQn);
+    hal_sys_irqn_disable(CANx_err);
+}
+// VALE
+static void s_hal_can_isr_err_enable(hal_can_t id)
+{
+    IRQn_Type CANx_err = (hal_can1 == id) ? (CAN1_SCE_IRQn) : (CAN2_SCE_IRQn);
+    hal_sys_irqn_enable(CANx_err);
 }
 
 

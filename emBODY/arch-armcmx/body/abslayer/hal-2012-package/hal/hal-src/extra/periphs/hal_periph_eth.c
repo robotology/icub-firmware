@@ -354,6 +354,14 @@ extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support =
     .fn_inside_eth_isr  = NULL
 };
 
+// VALE
+/* This variable can contain a ptr to a function that want to use a eth raw pkt (with ethernet and udp/tcp headers, etc)
+   For example this function can be a parser to check a particular info in a pkt, like sequence number
+   In oreder to use this variable, an external program have to declare hal_eth_lowLevelUsePacket_ptr like external and set
+   to the ptr of application's function.
+*/
+void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size) = NULL;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -755,10 +763,16 @@ void ETH_IRQHandler(void)
         //sp = (U32 *)(Rx_Desc[i].Addr & ~3);
         sp = (U32 *)(intitem->rx_desc[i].Addr & ~3);
         dp = (U32 *)&frame->datafirstbyte[0];
-        rxframedata = (uint8_t*)sp;
+        rxframedata = (uint8_t*)dp/*sp*/; // VALE
         for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
           *dp++ = *sp++;
         }
+        
+        if(hal_eth_lowLevelUsePacket_ptr != NULL) // VALE
+        {
+            hal_eth_lowLevelUsePacket_ptr(&frame->datafirstbyte[0], rxframesize);
+        }
+        
         //put_in_queue (frame);
         intitem->onframerx.frame_movetohigherlayer(frame);
 

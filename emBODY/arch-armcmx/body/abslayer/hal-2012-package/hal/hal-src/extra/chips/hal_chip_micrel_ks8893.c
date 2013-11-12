@@ -181,7 +181,8 @@ extern hal_result_t hal_chip_micrel_ks8893_configure(hal_eth_phymode_t targetphy
     
     //const uint8_t fd100 = 0x60;
     //const uint8_t fd010 = 0x20;
-    uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
+    //uint8_t buff_write = 0x60; //FORCE FULL DUPLEX AND 100T // VALE commented old values
+    uint8_t buff_write = 0x88; //AUTONEGOTATION + ADVERTISE FULLDUPLEX 100 // VALE added new values
     uint8_t buff_read = 0xFF; 
     volatile uint32_t i = 1;
     hal_i2c_regaddr_t regadr = {.numofbytes = 1, .bytes.one = 0};
