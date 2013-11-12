@@ -84,8 +84,21 @@ typedef enum
 typedef int32_t hl_irqn_t;  
 
 
+/** @typedef    typedef struct hl_sys_speeds_t 
+    @brief      hl_sys_speeds_t contains the main speeds of the system 
+ **/
+typedef struct
+{
+    uint32_t            cpuspeed;   /**< the cpu speed in Hz */
+    uint32_t            fastbus;    /**< the fast bus in Hz */
+    uint32_t            slowbus;    /**< the slow bus in Hz */
+} hl_sys_speeds_t;
+
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+// it must be defined externally to be coherent with the chosen cpu speed and slow and fast bus
+extern const hl_sys_speeds_t hl_sys_speeds;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
