@@ -46,7 +46,7 @@
 
 #include "hl_bits.h" 
 
-#include "hl_ethtransceiver.h" 
+#include "hl_ethtrans.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -385,7 +385,9 @@ typedef struct
 
 typedef struct
 {
-    hl_bool_t                   initted;
+    hl_bool_t                   eth_initted;
+    hl_bool_t                   smi_initted;
+    hl_bool_t                   rmiirefclock_initted;
     hl_eth_internal_item_t*     items[1];
 } hl_eth_theinternals_t;
 
@@ -407,7 +409,7 @@ static void s_hl_eth_rmii_init(void);
 
 
 static void s_hl_eth_mac_reset(void);
-static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_eth_phymode_t phymode);
+static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_ethtrans_phymode_t phymode);
 
 static void s_hl_eth_rmii_prepare(void);
 static void s_hl_eth_rmii_rx_init(void);
@@ -441,8 +443,10 @@ static void s_hl_eth_fill_gpio_rmii_tx_init_altf(   hl_gpio_init_t* txeninit, hl
 
 static hl_eth_theinternals_t s_hl_eth_theinternals =
 {
-    .initted            = hl_false,
-    .items              = { NULL }   
+    .eth_initted            = hl_false,
+    .smi_initted            = hl_false,
+    .rmiirefclock_initted   = hl_false,
+    .items                  = { NULL }   
 };
 
 
@@ -455,7 +459,7 @@ static hl_eth_theinternals_t s_hl_eth_theinternals =
 
 extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
 {
-    hl_eth_phymode_t usedphymode;
+    hl_ethtrans_phymode_t usedphymode;
     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
 
     if(hl_true != s_hl_eth_supported_is())
@@ -513,9 +517,9 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     // in here we allow a specific board to init all what is related to the phy.
     // in case of a phy accessed through the smi, this function must: a. init the smi, b. reset the phy, ... that's it.
     // instead in case of a switch accessed through i2c, this function must: a. init the i2c, reset the switch, that's it.    
-    if(hl_res_OK != hl_ethtransceiver_init(NULL))
+    if(hl_res_OK != hl_ethtrans_init(NULL))
     {
-         hl_sys_on_error(hl_error_generic, "hl_eth_init() called hl_ethtransceiver_init() which failed");
+         hl_sys_on_error(hl_error_generic, "hl_eth_init() called hl_ethtrans_init() which failed");
     }        
 
  
@@ -530,16 +534,16 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     // in case of a phy accessed through the smi, this function must set the mode and the speed and return the result
     // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
 
-    hl_ethtransceiver_config(hl_eth_phymode_auto, &usedphymode);
+    hl_ethtrans_config(hl_ethtrans_phymode_auto, &usedphymode);
     
     
-    if(hl_eth_phymode_none == usedphymode)
+    if(hl_ethtrans_phymode_none == usedphymode)
     {
-        hl_sys_on_error(hl_error_generic, "hl_eth_init() called hl_ethtransceiver_config() which does not support a phy mode");
+        hl_sys_on_error(hl_error_generic, "hl_eth_init() called hl_ethtrans_config() which does not support a phy mode");
     }
     
     // for rmii we use the same config at the phy ...
-    hl_eth_phymode_t rmiiphymode = usedphymode;
+    hl_ethtrans_phymode_t rmiiphymode = usedphymode;
     s_hl_eth_mac_init(cfg, rmiiphymode);
     
 
@@ -601,7 +605,11 @@ extern hl_result_t hl_eth_disable(void)
 
 
 extern void hl_eth_smi_init(void)
-{
+{   
+    if(hl_true == s_hl_eth_theinternals.smi_initted)
+    {
+        return;
+    }
 
     hl_gpio_init_t gpio_init_mdc;    
     hl_gpio_altf_t gpio_altf_mdc;    
@@ -628,7 +636,10 @@ extern void hl_eth_smi_init(void)
     #error ERR --> choose a HL_USE_MPU_ARCH_*
 #endif 
     // MDC Clock range
-    ETH->MACMIIAR   = mdcclockrange;      
+    ETH->MACMIIAR   = mdcclockrange;   
+
+
+    s_hl_eth_theinternals.smi_initted = hl_true;
    
 }
 
@@ -636,8 +647,15 @@ extern void hl_eth_smi_init(void)
 // reads the 16 bits of register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
 extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
 {
-    uint32_t tout;
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+    if(hl_false == s_hl_eth_theinternals.smi_initted)
+    {
+        return(0);
+    } 
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)   
     
+    uint32_t tout;
+        
     ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((REGaddr & 0x1F) << 6) | MMAR_MB;
     
     // wait until operation is completed 
@@ -653,8 +671,15 @@ extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
 
 // writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
 extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
-{
-    uint32_t tout;
+{ 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+    if(hl_false == s_hl_eth_theinternals.smi_initted)
+    {
+        return;
+    } 
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
+    
+    uint32_t tout = 0;   
     
     ETH->MACMIIDR = value;
     ETH->MACMIIAR = ((PHYaddr & 0x1F) << 11) | ((REGaddr & 0x1F) << 6) | MMAR_MW | MMAR_MB;
@@ -674,15 +699,18 @@ extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
 
 extern void hl_eth_rmii_refclock_init(void)
 {   // used by mac but also by external phy or switch
-
+    if(hl_true == s_hl_eth_theinternals.rmiirefclock_initted)
+    {
+        return;
+    }
+    
     hl_gpio_init_t gpio_init_refclock;    
     hl_gpio_altf_t gpio_altf_refclock;
 
     s_hl_eth_fill_gpio_rmii_refclock_init_altf(&gpio_init_refclock, &gpio_altf_refclock);
     
     hl_gpio_init(&gpio_init_refclock);
-    hl_gpio_altf(&gpio_altf_refclock);
-    
+    hl_gpio_altf(&gpio_altf_refclock);    
 }
 
 
@@ -854,12 +882,12 @@ static hl_bool_t s_hl_eth_supported_is(void)
 
 static void s_hl_eth_initted_set(void)
 {
-    s_hl_eth_theinternals.initted = hl_true;
+    s_hl_eth_theinternals.eth_initted = hl_true;
 }
 
 static hl_bool_t s_hl_eth_initted_is(void)
 {
-    return(s_hl_eth_theinternals.initted);
+    return(s_hl_eth_theinternals.eth_initted);
 }
 
 
@@ -891,7 +919,7 @@ static void s_hl_eth_mac_reset(void)
 
 
 
-static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_eth_phymode_t phymode)
+static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_ethtrans_phymode_t phymode)
 {
     uint8_t *macaddr = (uint8_t*)&(cfg->macaddress);
     // reset mac register
@@ -905,7 +933,7 @@ static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_eth_phymode_t phymode)
     #warning --> TOBEDONE: add autonegotiation (as valentina put in hal)
 
    
-    if((hl_eth_phymode_halfduplex100mbps == phymode) || (hl_eth_phymode_fullduplex100mbps == phymode))
+    if((hl_ethtrans_phymode_halfduplex100mbps == phymode) || (hl_ethtrans_phymode_fullduplex100mbps == phymode))
     {
         ETH->MACCR |= MCR_FES;              // config 100mbs 
     }
@@ -914,7 +942,7 @@ static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_eth_phymode_t phymode)
 //         ETH->MACCR &= ~MCR_FES;             // nothing needed for 10 mbps
 //     }
     
-    if((hl_eth_phymode_fullduplex10mbps == phymode) || (hl_eth_phymode_fullduplex100mbps == phymode))
+    if((hl_ethtrans_phymode_fullduplex10mbps == phymode) || (hl_ethtrans_phymode_fullduplex100mbps == phymode))
     {
         ETH->MACCR |= MCR_DM;               // config full duplex mode
     }

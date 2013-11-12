@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -16,14 +16,13 @@
  * Public License for more details
 */
 
-
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HL_ETH_HID_H_
-#define _HL_ETH_HID_H_
+#ifndef _HL_CHIP_XX_ETHPHY_HID_H_
+#define _HL_CHIP_XX_ETHPHY_HID_H_
 
 
-/* @file       hl_eth_hid.h
-    @brief      This header file implements hidden interface to eth.
+/* @file       hl_chip_xx_ethphy_hid.h
+    @brief      This header file implements hidden interface 
     @author     marco.accame@iit.it
     @date       11/11/2013
  **/
@@ -32,12 +31,12 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hl_common.h"
-#include "hl_gpio.h"
+
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hl_eth.h"
+#include "hl_chip_xx_ethphy.h"
 
 
 
@@ -48,14 +47,12 @@
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 // empty-section
 
+
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 // empty-section
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
-
-
-
 
 
 #endif  // include guard

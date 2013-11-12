@@ -140,18 +140,6 @@ typedef enum
 } hl_eth_behaviour_t;
 
 
-
-typedef enum
-{
-    hl_eth_phymode_auto                = 0,
-    hl_eth_phymode_halfduplex10mbps    = 1,
-    hl_eth_phymode_halfduplex100mbps   = 2,
-    hl_eth_phymode_fullduplex10mbps    = 3,
-    hl_eth_phymode_fullduplex100mbps   = 4,
-    hl_eth_phymode_none                = 255
-} hl_eth_phymode_t;
-
-
 /** @typedef    typedef uint64_t hl_eth_macaddress_t 
     @brief      hl_eth_macaddress_t is used to store a mac address in its 6 least significant bytes
  **/ 
@@ -218,16 +206,22 @@ extern hl_result_t hl_eth_enable(void);
 extern hl_result_t hl_eth_disable(void);
 
 
+// protection vs multiple calls. it called internally to hl_eth_init()
 extern void hl_eth_rmii_refclock_init(void);
 
+
+// protection vs multiple calls. it NOT called internally to hl_eth_init()
 extern void hl_eth_smi_init(void);
 
+// if hl_eth_smi_init() never called it does nothing and returns 0
 extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
 
+// if hl_eth_smi_init() never called it does nothing
 extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
 
 extern hl_eth_frame_t* hl_eth_frame_new(uint32_t len);
+
 
 extern void hl_eth_on_frame_received(hl_eth_frame_t* frame);
 

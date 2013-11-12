@@ -18,18 +18,18 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HL_CHIP_MICREL_KS8893_H_
-#define _HL_CHIP_MICREL_KS8893_H_
+#ifndef _HL_CHIP_XX_ETHPHY_H_
+#define _HL_CHIP_XX_ETHPHY_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hl_chip_micrel_ks8893.h
-    @brief      This header file implements interface to a micrel eth switch KS8893
+/** @file       hl_chip_xx_ethphy.h
+    @brief      This header file implements interface to a number of ethernet phy chips
     @author     marco.accame@iit.it
     @date       11/11/2013
 **/
 
-/** @defgroup arm_hl_chip_micrel_ks8893 HL DEV_ACC
+/** @defgroup arm_hl_chip_xx_ethphy HL DEV_PHY
 
     The HL ...
  
@@ -43,8 +43,6 @@
 
 #include "hl_common.h"
 #include "hl_ethtrans.h"
-#include "hl_i2c.h"
-
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -54,52 +52,56 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+/** @typedef    typedef enum hl_chip_xx_ethphy_chip_t 
+    @brief      contains every supported PHY chip
+ **/ 
+typedef enum  
+{ 
+    hl_chip_xx_ethphy_chip_ti_dp83848       = 0,    /**< capacity 8kbytes; page size 4 bytes; i2c speeds: 400khz. it is also wireless, but we don't care. */
+    hl_chip_xx_ethphy_chip_st_802rt1a       = 1,
+    hl_chip_xx_ethphy_chip_autodetect      = 15,   /**< it detects the chip */
+    hl_chip_xx_ethphy_chip_none             = 255   /**< just no device ... yet. */
+} hl_chip_xx_ethphy_chip_t;
 
 
-/** @typedef    typedef enum hl_chip_micrel_ks8893_cfg_t 
-    @brief      hl_chip_micrel_ks8893_cfg_t contains the configuration for the eth switch.
+
+/** @typedef    typedef enum hl_chip_xx_ethphy_cfg_t 
+    @brief      hl_chip_xx_ethphy_cfg_t contains the configuration for the phy.
  **/
 typedef struct
 {
-    hl_i2c_t            i2cid;          /**< the I2C bus used by the chip */
-    hl_gpio_t           resetpin;       /**< the pinout of the reset pin */
-    hl_gpio_val_t       resetval;       /**< the value which puts the chip in reset mode */
-    hl_res_fp_void_t    extclockinit;   /**< the function which initialises the external clock used by the chip */
-} hl_chip_micrel_ks8893_cfg_t;
+    hl_chip_xx_ethphy_chip_t            chip;
+} hl_chip_xx_ethphy_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const hl_chip_xx_ethphy_cfg_t hl_chip_xx_ethphy_cfg_default; // = {.chip = hl_chip_xx_ethphy_chip_autodetect};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern hl_result_t hl_chip_micrel_ks8893_init(const hl_chip_micrel_ks8893_cfg_t *cfg)
-    @brief  	this function initializes a micrel ks8893 
-    @param  	cfg 	        pointer to configuration data. it cannot be NULL
+/** @fn			extern hl_result_t hl_chip_xx_ethphy_init(const hl_chip_xx_ethphy_cfg_t *cfg)
+    @brief  	this function initializes a eth phy chip 
+    @param  	cfg 	        pointer to configuration
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
-extern hl_result_t hl_chip_micrel_ks8893_init(const hl_chip_micrel_ks8893_cfg_t *cfg);
+extern hl_result_t hl_chip_xx_ethphy_init(const hl_chip_xx_ethphy_cfg_t *cfg);
 
 
-/** @fn			extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode)
-    @brief  	this function configure the switch with a target phy mode.
+/** @fn			extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode)
+    @brief  	this function configures the phy.
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
-extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode);
+extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode);
 
 
-/** @fn			extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedphymode)
-    @brief  	this function retrieves the used phy mode.
-    @return 	hl_res_NOK_generic on error else hl_res_OK
-  */
-extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedphymode);
-
+extern hl_result_t hl_chip_xx_ethphy_getphymode(hl_ethtrans_phymode_t* usedphymode);
 
 
 /** @}            
-    end of group arm_hl_chip_micrel_ks8893  
+    end of group arm_hl_chip_xx_ethphy  
  **/
 
 #endif  // include-guard

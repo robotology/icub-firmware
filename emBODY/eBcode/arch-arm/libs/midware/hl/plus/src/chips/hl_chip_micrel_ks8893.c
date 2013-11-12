@@ -111,7 +111,7 @@ static hl_bool_t s_hl_chip_micrel_ks8893_initted_is(void);
 
 static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_cfg_t *cfg, hl_chip_micrel_ks8893_internal_item_t *intitem);
 
-static void s_hl_chip_micrel_ks8893_phymode_get(hl_eth_phymode_t* usedphymode);
+static void s_hl_chip_micrel_ks8893_phymode_get(hl_ethtrans_phymode_t* usedphymode);
 
 static hl_result_t s_hl_chip_micrel_ks8893_resetpin_init(hl_gpio_t gpio);
 
@@ -178,7 +178,7 @@ extern hl_result_t hl_chip_micrel_ks8893_init(const hl_chip_micrel_ks8893_cfg_t 
 }
 
 
-extern hl_result_t hl_chip_micrel_ks8893_configure(hl_eth_phymode_t targetphymode, hl_eth_phymode_t* usedphymode)
+extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode)
 {
     hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
     
@@ -208,11 +208,11 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_eth_phymode_t targetphymod
     }
     
     
-    if(hl_eth_phymode_none == targetphymode)
+    if(hl_ethtrans_phymode_none == targetphymode)
     {
         if(NULL != usedphymode)
         {
-            *usedphymode = hl_eth_phymode_none;    
+            *usedphymode = hl_ethtrans_phymode_none;    
         }   
         return(hl_res_OK);        
     }
@@ -233,11 +233,11 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_eth_phymode_t targetphymod
     // 1. configure  switch's ports 1 and 2
     switch(targetphymode)
     {
-        case hl_eth_phymode_auto:                   buff_write = 0x9F; break;
-        case hl_eth_phymode_halfduplex10mbps:       buff_write = 0x00; break;
-        case hl_eth_phymode_halfduplex100mbps:      buff_write = 0x40; break;
-        case hl_eth_phymode_fullduplex10mbps:       buff_write = 0x20; break;
-        case hl_eth_phymode_fullduplex100mbps:      buff_write = 0x60; break;
+        case hl_ethtrans_phymode_auto:                   buff_write = 0x9F; break;
+        case hl_ethtrans_phymode_halfduplex10mbps:       buff_write = 0x00; break;
+        case hl_ethtrans_phymode_halfduplex100mbps:      buff_write = 0x40; break;
+        case hl_ethtrans_phymode_fullduplex10mbps:       buff_write = 0x20; break;
+        case hl_ethtrans_phymode_fullduplex100mbps:      buff_write = 0x60; break;
         default:                                    buff_write = 0x00; break;
     }    
     
@@ -275,12 +275,14 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_eth_phymode_t targetphymod
 }
 
 
-extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_eth_phymode_t* usedphymode)
+extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedphymode)
 {
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
     if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
     {
         return(hl_res_NOK_generic);
     }  
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
     
     s_hl_chip_micrel_ks8893_phymode_get(usedphymode);
     return(hl_res_OK);
@@ -380,7 +382,7 @@ static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_c
 
 
 
-static void s_hl_chip_micrel_ks8893_phymode_get(hl_eth_phymode_t* usedphymode)
+static void s_hl_chip_micrel_ks8893_phymode_get(hl_ethtrans_phymode_t* usedphymode)
 {
     hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
     hl_i2c_t i2cid = intitem->config.i2cid;
@@ -409,10 +411,10 @@ static void s_hl_chip_micrel_ks8893_phymode_get(hl_eth_phymode_t* usedphymode)
     {
         speed = 1;
     }
-    if((0==mux)&&(0==speed))        *usedphymode = hl_eth_phymode_halfduplex10mbps;
-    else if((0==mux)&&(1==speed))   *usedphymode = hl_eth_phymode_halfduplex100mbps; 
-    else if((1==mux)&&(0==speed))   *usedphymode = hl_eth_phymode_fullduplex10mbps; 
-    else if((1==mux)&&(1==speed))   *usedphymode = hl_eth_phymode_fullduplex100mbps;          
+    if((0==mux)&&(0==speed))        *usedphymode = hl_ethtrans_phymode_halfduplex10mbps;
+    else if((0==mux)&&(1==speed))   *usedphymode = hl_ethtrans_phymode_halfduplex100mbps; 
+    else if((1==mux)&&(0==speed))   *usedphymode = hl_ethtrans_phymode_fullduplex10mbps; 
+    else if((1==mux)&&(1==speed))   *usedphymode = hl_ethtrans_phymode_fullduplex100mbps;          
     
 }
 

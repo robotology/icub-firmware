@@ -23,7 +23,7 @@
 #include "hl_cfg_plus_modules.h"
 
 
-#if     defined(HL_USE_UTIL_ETHTRANSCEIVER)
+#if     defined(HL_USE_UTIL_ETHTRANS)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -45,14 +45,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hl_ethtransceiver.h"
+#include "hl_ethtrans.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hl_ethtransceiver_hid.h" 
+#include "hl_ethtrans_hid.h" 
 
 
 
@@ -65,7 +65,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hl_ethtransceiver_cfg_t hl_ethtransceiver_cfg_default = 
+const hl_ethtrans_cfg_t hl_ethtrans_cfg_default = 
 { 
     .dummy = 0 
 };
@@ -78,28 +78,28 @@ const hl_ethtransceiver_cfg_t hl_ethtransceiver_cfg_default =
 
 typedef struct
 {
-    hl_ethtransceiver_cfg_t                        config;
-} hl_ethtransceiver_internal_item_t;
+    hl_ethtrans_cfg_t                        config;
+} hl_ethtrans_internal_item_t;
 
 typedef struct
 {
     uint8_t                                         initted;
     uint8_t                                         started;
-    hl_ethtransceiver_internal_item_t*              items[1];   
-} hl_ethtransceiver_theinternals_t;
+    hl_ethtrans_internal_item_t*              items[1];   
+} hl_ethtrans_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hl_bool_t s_hl_ethtransceiver_supported_is(void);
-static void s_hl_ethtransceiver_initted_set(void);
-static hl_bool_t s_hl_ethtransceiver_initted_is(void);
-static void s_hl_ethtransceiver_started_set(void);
-static hl_bool_t s_hl_ethtransceiver_started_is(void);
+static hl_bool_t s_hl_ethtrans_supported_is(void);
+static void s_hl_ethtrans_initted_set(void);
+static hl_bool_t s_hl_ethtrans_initted_is(void);
+static void s_hl_ethtrans_started_set(void);
+static hl_bool_t s_hl_ethtrans_started_is(void);
 
 
-//static hl_result_t s_hl_ethtransceiver_lowlevel_init(const hl_ethtransceiver_cfg_t *cfg);
+//static hl_result_t s_hl_ethtrans_lowlevel_init(const hl_ethtrans_cfg_t *cfg);
 
 
 
@@ -114,7 +114,7 @@ static hl_bool_t s_hl_ethtransceiver_started_is(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hl_ethtransceiver_theinternals_t s_hl_ethtransceiver_theinternals =
+static hl_ethtrans_theinternals_t s_hl_ethtrans_theinternals =
 {
     .initted            = 0,
     .started            = 0,
@@ -128,92 +128,93 @@ static hl_ethtransceiver_theinternals_t s_hl_ethtransceiver_theinternals =
 
 
 
-extern hl_result_t hl_ethtransceiver_init(const hl_ethtransceiver_cfg_t *cfg)
+extern hl_result_t hl_ethtrans_init(const hl_ethtrans_cfg_t *cfg)
 {
     hl_result_t res = hl_res_NOK_generic;
 
 
-    if(hl_true != s_hl_ethtransceiver_supported_is())
+    if(hl_true != s_hl_ethtrans_supported_is())
     {
         return(hl_res_NOK_unsupported);
     }
 
 
-    if(hl_true == s_hl_ethtransceiver_initted_is())
+    if(hl_true == s_hl_ethtrans_initted_is())
     {
         return(hl_res_OK);
     }
 
     if(NULL == cfg)
     {
-        cfg = &hl_ethtransceiver_cfg_default;
+        cfg = &hl_ethtrans_cfg_default;
     }
 
     
-    res = hl_ethtransceiver_chip_init(cfg);
+    res = hl_ethtrans_chip_init(cfg);
 
-    s_hl_ethtransceiver_initted_set();
+    s_hl_ethtrans_initted_set();
 
     return(res);
 }
 
 
-extern hl_result_t hl_ethtransceiver_config(hl_eth_phymode_t targetphymode, hl_eth_phymode_t *usedphymode)
+extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
 {
 
-    if(hl_true != s_hl_ethtransceiver_supported_is())
+    if(hl_true != s_hl_ethtrans_supported_is())
     {
         return(hl_res_NOK_unsupported);
     }
 
 
-    if(hl_false == s_hl_ethtransceiver_initted_is())
+    if(hl_false == s_hl_ethtrans_initted_is())
     {
         return(hl_res_NOK_generic);
     }
     
 
-    if(hl_true == s_hl_ethtransceiver_started_is())
+    if(hl_true == s_hl_ethtrans_started_is())
     {
-//        hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode(usedphymode);
+//        hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.getphymode(usedphymode);
         return(hl_res_OK);
     }    
  
-//    targetphymode = (hl_eth_phymode_auto == targetphymode) ? (hl_brdcfg_device_ethtransceiver__theconfig.devcfg.targetphymode) : (targetphymode);
+//    targetphymode = (hl_eth_phymode_auto == targetphymode) ? (hl_brdcfg_device_ethtrans__theconfig.devcfg.targetphymode) : (targetphymode);
  
-//    hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
+//    hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
 
-    hl_ethtransceiver_chip_config(targetphymode, usedphymode);
+    hl_ethtrans_chip_config(targetphymode, usedphymode);
 
-    s_hl_ethtransceiver_started_set();
+    s_hl_ethtrans_started_set();
 
     return(hl_res_OK); 
 }
 
 
-extern hl_bool_t hl_ethtransceiver_initted_is(void)
+extern hl_bool_t hl_ethtrans_initted_is(void)
 {
-    return(s_hl_ethtransceiver_initted_is());
+    return(s_hl_ethtrans_initted_is());
 }
 
 
-extern hl_bool_t hl_ethtransceiver_started_is(void)
+extern hl_bool_t hl_ethtrans_started_is(void)
 {
-    return(s_hl_ethtransceiver_started_is());
+    return(s_hl_ethtrans_started_is());
 }
 
-__weak extern hl_result_t hl_ethtransceiver_chip_init(const hl_ethtransceiver_cfg_t *cfg)
+__weak extern hl_result_t hl_ethtrans_chip_init(const hl_ethtrans_cfg_t *cfg)
 {
     return(hl_res_OK);
 }
 
 
-__weak extern hl_result_t hl_ethtransceiver_chip_config(hl_eth_phymode_t targetphymode, hl_eth_phymode_t *usedphymode)
+__weak extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
 {
     *usedphymode = targetphymode;
     
     return(hl_res_OK);
 }
+
 
 
 
@@ -230,49 +231,49 @@ __weak extern hl_result_t hl_ethtransceiver_chip_config(hl_eth_phymode_t targetp
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hl_bool_t s_hl_ethtransceiver_supported_is(void)
+static hl_bool_t s_hl_ethtrans_supported_is(void)
 {
-    return(hl_ethtransceiver_mapping.supported); 
+    return(hl_ethtrans_mapping.supported); 
 }
 
-static hl_bool_t s_hl_ethtransceiver_initted_is(void)
+static hl_bool_t s_hl_ethtrans_initted_is(void)
 {
-    return(s_hl_ethtransceiver_theinternals.initted);
+    return(s_hl_ethtrans_theinternals.initted);
 }
 
-static void s_hl_ethtransceiver_initted_set(void)
+static void s_hl_ethtrans_initted_set(void)
 {
-    s_hl_ethtransceiver_theinternals.initted = hl_true;
-}
-
-
-static hl_bool_t s_hl_ethtransceiver_started_is()
-{
-    return(s_hl_ethtransceiver_theinternals.started);
+    s_hl_ethtrans_theinternals.initted = hl_true;
 }
 
 
-static void s_hl_ethtransceiver_started_set(void)
+static hl_bool_t s_hl_ethtrans_started_is()
 {
-     s_hl_ethtransceiver_theinternals.started = hl_true;
+    return(s_hl_ethtrans_theinternals.started);
+}
+
+
+static void s_hl_ethtrans_started_set(void)
+{
+     s_hl_ethtrans_theinternals.started = hl_true;
 }
 
 
 
-// static hl_result_t s_hl_ethtransceiver_lowlevel_init(const hl_ethtransceiver_cfg_t *cfg)
+// static hl_result_t s_hl_ethtrans_lowlevel_init(const hl_ethtrans_cfg_t *cfg)
 // {
-// //    if((NULL != hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init)   && 
-// //       (NULL != hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config) &&
-// //        (NULL != hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode) )
+// //    if((NULL != hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.init)   && 
+// //       (NULL != hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.config) &&
+// //        (NULL != hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.getphymode) )
 // //    {
-// //        return(hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init(hl_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.initpar));
+// //        return(hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.init(hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.initpar));
 // //    }
 
 //     return(hl_res_NOK_generic);    
 // }
 
 
-#endif//HL_USE_UTIL_ETHTRANSCEIVER
+#endif//HL_USE_UTIL_ETHTRANS
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

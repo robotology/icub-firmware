@@ -21,7 +21,7 @@
 #define _HL_ETHTRANSCEIVER_HID_H_
 
 
-/* @file       hl_ethtransceiver_hid.h
+/* @file       hl_ethtrans_hid.h
     @brief      This header file implements hidden interface to ...
     @author     valentina.gaggero@iit.it / marco.accame@iit.it
     @date       09/09/2010
@@ -34,7 +34,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hl_ethtransceiver.h"
+#include "hl_ethtrans.h"
 
 
 
@@ -44,28 +44,28 @@
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 #if 0
-typedef hl_result_t (*hl_ethtransceiver_hid_fn_config_t) (hl_eth_phymode_t targetphymode, hl_eth_phymode_t* usedphymode);
-typedef hl_result_t (*al_device_ethtransceiver_hid_fn_getphymode_t) (hl_eth_phymode_t* usedphymode);
+typedef hl_result_t (*hl_ethtrans_hid_fn_config_t) (hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode);
+typedef hl_result_t (*al_device_ethtrans_hid_fn_getphymode_t) (hl_ethtrans_phymode_t* usedphymode);
 typedef struct
-{   // used inside the public functions of hl_ethtransceiver to communicate to the chip, but defined inside brdcfg
+{   // used inside the public functions of hl_ethtrans to communicate to the chip, but defined inside brdcfg
     hl_res_fp_voidp_t                               init;
     void*                                           initpar;
-    hl_ethtransceiver_hid_fn_config_t               config;
-    al_device_ethtransceiver_hid_fn_getphymode_t    getphymode;
-} hl_ethtransceiver_hid_chip_interface_t;
+    hl_ethtrans_hid_fn_config_t               config;
+    al_device_ethtrans_hid_fn_getphymode_t    getphymode;
+} hl_ethtrans_hid_chip_interface_t;
 
 
 typedef struct
 {   
-    hl_eth_phymode_t                                targetphymode;
-    hl_ethtransceiver_hid_chip_interface_t          chipif;
-} hl_ethtransceiver_hid_dev_cfg_t;
+    hl_ethtrans_phymode_t                                targetphymode;
+    hl_ethtrans_hid_chip_interface_t          chipif;
+} hl_ethtrans_hid_dev_cfg_t;
 
 typedef struct
 {
     hl_bool_t                                       supported;
-    hl_ethtransceiver_hid_dev_cfg_t                 devcfg;
-} hl_ethtransceiver_hid_brdcfg_t;
+    hl_ethtrans_hid_dev_cfg_t                 devcfg;
+} hl_ethtrans_hid_brdcfg_t;
 
 #endif
 
