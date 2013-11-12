@@ -987,7 +987,6 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
             .gpio_mode      = GPIO_Mode_AF,
             .gpio_speed     = GPIO_Speed_50MHz,
             .gpio_otype     = GPIO_OType_OD,
-            .gpio_mode      = GPIO_Mode_AF_OD,
             .gpio_pupd      = GPIO_PuPd_NOPULL
         }
 #else //defined(HL_USE_MPU_ARCH_*)
@@ -1004,12 +1003,12 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of scl and sda
-    hl_gpio_fill_init(sclinit, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl.gpio);
-    hl_gpio_fill_init(sdainit, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda.gpio);
+    hl_gpio_fill_init(sclinit, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl);
+    hl_gpio_fill_init(sdainit, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda);
     
     // then we set altfun of scl and sda
-    hl_gpio_fill_altf(sclaltf, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl.gpio);
-    hl_gpio_fill_altf(sdaaltf, (hl_gpio_map_t*)&hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda.gpio);    
+    hl_gpio_fill_altf(sclaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl);
+    hl_gpio_fill_altf(sdaaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda);    
     
 }
 
