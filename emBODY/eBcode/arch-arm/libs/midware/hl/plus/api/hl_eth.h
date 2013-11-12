@@ -173,6 +173,13 @@ typedef struct
 } hl_eth_cfg_t;
 
 
+#warning --> it is to be modified later on with a more flexible data structure
+typedef struct
+{
+    uint16_t length;                /**< the length of the frame in bytes */
+    uint16_t index;                 /**< index to the used byte */
+    uint8_t  datafirstbyte[1];    
+} hl_eth_frame_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -219,6 +226,13 @@ extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
 
 extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
+
+extern hl_eth_frame_t* hl_eth_frame_new(uint32_t len);
+
+extern void hl_eth_on_frame_received(hl_eth_frame_t* frame);
+
+
+extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame);
 
 
 

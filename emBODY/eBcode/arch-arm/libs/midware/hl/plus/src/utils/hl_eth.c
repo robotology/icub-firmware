@@ -30,7 +30,6 @@
 
 #if     defined(HL_USE_UTIL_ETH)
 
-#warning --> mettere la isr + fne che trasmette + fne che toglie da isr
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -47,6 +46,7 @@
 
 #include "hl_bits.h" 
 
+#include "hl_ethtransceiver.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -687,13 +687,157 @@ extern void hl_eth_rmii_refclock_init(void)
 
 
 
+extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame)
+{
+    // called by tcpnet's send_frame(OS_FRAME *frame)
+    
+    // il caller passa (U32 *)&frame->data[0] e frame->length
+
+    /* Send frame to ETH ethernet controller */
+    U32 *sp,*dp;
+    U32 i,j;
+    
+    hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
+    if(hl_true != s_hl_eth_initted_is())
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+
+    j = intitem->txbufindex; 
+    /* Wait until previous packet transmitted. */
+    while (intitem->tx_desc[j].CtrlStat & DMA_TX_OWN);
+
+    sp = (U32 *)&frame->datafirstbyte[0];
+    dp = (U32 *)(intitem->tx_desc[j].Addr & ~3);
+
+
+    /* Copy frame data to ETH IO buffer. */
+    for (i = (frame->length + 3) >> 2; i; i--) {
+        *dp++ = *sp++;
+    }
+
+    intitem->tx_desc[j].Size      = frame->length;
+    intitem->tx_desc[j].CtrlStat |= DMA_TX_OWN;    
+    if (++j == intitem->config.capacityoftxfifoofframes) j = 0;
+    intitem->txbufindex = j; 
+    /* Start frame transmission. */
+    ETH->DMASR   = DSR_TPSS;
+    ETH->DMATPDR = 0;
+
+    return(hl_res_OK);    
+}
+
+
+__weak extern hl_eth_frame_t* hl_eth_frame_new(uint32_t len)
+{
+    return(NULL);
+}
+
+__weak extern void hl_eth_on_frame_received(hl_eth_frame_t* frame)
+{
+    
+}
+
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
 
 // ---- isr of the module: begin ----
-// empty-section
+
+void ETH_IRQHandler(void) 
+{
+    hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
+    
+  // questa non va cambiata. pero' .... usa OS_FRAME e chiama alloc_mem() e put_in_queue().
+  // bisogna usare alcuni puntatori a funzione che siano inizializzati / passati in hl_eth_init().
+  // inoltre, se si vuole segnalare l'arrivo di un frame gia' qui dentro, allora bisogna definire
+  // un altro puntatore a funzione hl_on_rx_frame().
+
+    uint8_t* rxframedata = NULL;
+    uint16_t rxframesize = 0;
+
+  /* Ethernet Controller Interrupt function. */
+  hl_eth_frame_t *frame;
+  U32 i,RxLen;
+  volatile U32 int_stat;
+  U32 *sp,*dp;
+
+
+  
+  while (((int_stat = ETH->DMASR) & INT_NISE) != 0) {   // -> read dma status register until we have the normal interrupt bit set
+    ETH->DMASR = int_stat;                              // -> reset the dma status register
+    if (int_stat & INT_RIE) {                           // -> in case of received frame ...
+      /* Valid frame has been received. */
+      i = intitem->rxbufindex; //RxBufIndex;
+      if (intitem->rx_desc[i].Stat & DMA_RX_ERROR_MASK) {  
+        goto rel;
+      }
+
+      if ((intitem->rx_desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+        goto rel;
+      }
+      
+      RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
+      rxframesize = RxLen;
+      if (RxLen > ETH_MTU) {
+        /* Packet too big, ignore it and free buffer. */
+        goto rel;
+      }
+      /* Flag 0x80000000 to skip sys_error() call when out of memory. */
+      //frame = intitem->onframerx.frame_new(RxLen | 0x80000000);
+      frame = hl_eth_frame_new(RxLen | 0x80000000);
+      /* if 'frame_new()' has failed, ignore this packet. */
+      if (frame != NULL) {
+        sp = (U32 *)(intitem->rx_desc[i].Addr & ~3);
+        dp = (U32 *)&frame->datafirstbyte[0];
+        rxframedata = (uint8_t*)sp;
+        for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
+          *dp++ = *sp++;
+        }
+
+//        intitem->onframerx.frame_movetohigherlayer(frame);
+//         if(NULL != intitem->onframerx.frame_alerthigherlayer)
+//         {
+//             intitem->onframerx.frame_alerthigherlayer();
+//         }
+        
+        // it moves and alerts 
+        hl_eth_on_frame_received(frame);
+        
+      }
+      else
+      {
+          rxframedata = 0;          
+      }
+      
+//     if(NULL != hl_eth_hid_DEBUG_support.fn_inside_eth_isr)
+//     {            
+//         hl_eth_hid_DEBUG_support.fn_inside_eth_isr(rxframedata, rxframesize);
+//     }
+        
+      /* Release this frame from ETH IO buffer. */
+
+rel:  intitem->rx_desc[i].Stat = DMA_RX_OWN;
+    
+      
+    if (++i == intitem->config.capacityofrxfifoofframes) i = 0;
+      intitem->rxbufindex = i; 
+    }
+    if (int_stat & INT_TIE) {
+      /* Frame transmit completed. */
+
+    }
+  }             // -> we execute a new cycle only if in the execution time of the loop a new interrupt has arrived. 
+
+}
+
 // ---- isr of the module: end ------
 
 
