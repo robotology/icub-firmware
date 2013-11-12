@@ -101,6 +101,7 @@
 #define HL_USE_UTIL_I2C
 #define HL_USE_UTIL_ETH
 #define HL_USE_UTIL_ETHTRANS
+#define HL_USE_UTIL_CAN
 
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip

@@ -701,6 +701,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtrans.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1430,6 +1435,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtrans.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2158,6 +2168,11 @@
               <FileName>hl_ethtrans.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtrans.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_can.c</FilePath>
             </File>
           </Files>
         </Group>

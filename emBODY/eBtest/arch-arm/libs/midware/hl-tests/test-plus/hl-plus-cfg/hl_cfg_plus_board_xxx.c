@@ -58,6 +58,44 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#if     defined(HL_USE_UTIL_SYS)
+
+#include "hl_sys.h"
+
+#if     defined(HL_USE_BRD_MCBSTM32_C)
+
+extern const hl_sys_speeds_t hl_sys_speeds = 
+{
+    .cpuspeed   = 72000000,
+    .fastbus    = 72000000,
+    .slowbus    = 36000000
+};
+
+#elif   defined(HL_USE_BRD_MCBSTM32)
+
+extern const hl_sys_speeds_t hl_sys_speeds = 
+{
+    .cpuspeed   = sss,
+    .fastbus    = sss,
+    .slowbus    = sss
+};
+
+#elif   defined(HL_USE_BRD_EMS001)
+
+extern const hl_sys_speeds_t hl_sys_speeds = 
+{
+    .cpuspeed   = 72000000,
+    .fastbus    = 72000000,
+    .slowbus    = 36000000
+};
+
+#endif//defined(HL_USE_BRD_EMS001)
+
+#endif//defined(HL_USE_UTIL_SYS)
+
+
+
 #if     defined(HL_USE_UTIL_I2C)
 
 #include "hl_i2c.h"
@@ -368,6 +406,72 @@ extern const hl_ethtrans_mapping_t hl_ethtrans_mapping =
 #endif//defined(HL_USE_BRD_EMS001)
 
 #endif//defined(HL_USE_UTIL_ETHTRANSCEIVER)
+
+
+
+#if     defined(HL_USE_UTIL_CAN)
+
+#include "hl_can.h"
+
+#if     defined(HL_USE_BRD_MCBSTM32_C)
+
+
+#elif   defined(HL_USE_BRD_MCBSTM32)
+
+
+#elif   defined(HL_USE_BRD_EMS001)
+
+extern const hl_can_mapping_t hl_can_mapping =
+{
+    .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
+    .gpiomap            =
+    {   
+        {   // hl_can1 
+            .rx = 
+            {
+                .gpio   =
+                {
+                    .port   = hl_gpio_portD, 
+                    .pin    = hl_gpio_pin0
+                },
+                .af32       = GPIO_Remap2_CAN1          
+            }, 
+            .tx = 
+            {
+                .gpio   =
+                {
+                    .port   = hl_gpio_portD, 
+                    .pin    = hl_gpio_pin1
+                },
+                .af32       = GPIO_Remap2_CAN1          
+            } 
+        }, 
+        {   // hl_can2 
+            .rx = 
+            {
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin5
+                },
+                .af32       = GPIO_Remap_CAN2          
+            }, 
+            .tx = 
+            {
+                .gpio   =
+                {
+                    .port   = hl_gpio_portB, 
+                    .pin    = hl_gpio_pin6
+                },
+                .af32       = GPIO_Remap_CAN2          
+            } 
+        }   
+    }       
+};
+
+#endif
+
+#endif//defined(HL_USE_UTIL_I2C)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
