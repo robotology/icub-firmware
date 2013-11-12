@@ -44,7 +44,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>CMSIS_Example</OutputName>
+          <OutputName>plus-stm32f1</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -691,6 +691,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_sys.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -753,7 +763,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>plus</OutputName>
+          <OutputName>plus-stm32f1</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -1400,6 +1410,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_sys.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtransceiver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1462,7 +1482,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>CMSIS_Example</OutputName>
+          <OutputName>plus-stm32f1</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -2108,6 +2128,16 @@
               <FileName>hl_sys.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_ethtransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_ethtransceiver.c</FilePath>
             </File>
           </Files>
         </Group>

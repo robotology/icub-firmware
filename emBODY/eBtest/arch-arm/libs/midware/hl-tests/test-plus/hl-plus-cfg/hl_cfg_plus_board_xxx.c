@@ -278,6 +278,97 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
 #endif//defined(HL_USE_UTIL_I2C)
 
 
+#if     defined(HL_USE_UTIL_ETH)
+
+#include "hl_eth.h"
+
+#if     defined(HL_USE_BRD_EMS001)
+
+extern const hl_eth_mapping_t hl_eth_mapping =
+{
+    .supported          = hl_true,
+    .gpiomap            =
+    {
+        .mif            = hl_eth_mif_rmii,
+        .gpio_mif.rmii  =
+        {   // if ETH_RMII_CRS_DV is on portD <-> use GPIO_Remap_ETH on rx-rmii
+            .ETH_RMII_REF_CLK   =            
+            {   
+                .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin1 }, 
+                .af32   = hl_NA32
+            },  
+            .ETH_RMII_TX_EN     =            
+            {   
+                .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin11 }, 
+                .af32   = hl_NA32
+            },
+            .ETH_RMII_TXD0      =            
+            {   
+                .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin12 }, 
+                .af32   = hl_NA32
+            },
+            .ETH_RMII_TXD1      =            
+            {   
+                .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin13 }, 
+                .af32   = hl_NA32
+            },
+            .ETH_RMII_CRS_DV    =            
+            {   
+                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin8 }, 
+                .af32   = GPIO_Remap_ETH
+            },
+            .ETH_RMII_RXD0      =            
+            {   
+                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin9 }, 
+                .af32   = GPIO_Remap_ETH
+            },
+            .ETH_RMII_RXD1      =            
+            {   
+                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin10 }, 
+                .af32   = GPIO_Remap_ETH
+            } 
+        },
+        .gpio_smi       =
+        {
+            .ETH_MDC        =            
+            {   
+                .gpio   = { .port = hl_gpio_portC,     .pin = hl_gpio_pin1 }, 
+                .af32   = hl_NA32
+            },     
+            .ETH_MDIO       =            
+            {   
+                .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin2 }, 
+                .af32   = hl_NA32
+            }     
+        }
+        
+        
+    }
+    
+};
+
+#endif//defined(HL_USE_BRD_EMS001)
+
+#endif//defined(HL_USE_UTIL_ETH)
+
+
+
+
+#if defined(HL_USE_UTIL_ETHTRANSCEIVER)
+
+#include "hl_ethtransceiver.h"
+
+#if defined(HL_USE_BRD_EMS001)
+
+extern const hl_ethtransceiver_mapping_t hl_ethtransceiver_mapping = 
+{
+    .supported  = hl_true
+};
+
+#endif//defined(HL_USE_BRD_EMS001)
+
+#endif//defined(HL_USE_UTIL_ETHTRANSCEIVER)
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
