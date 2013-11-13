@@ -15,8 +15,6 @@ DebugData           pc104ToEms[BOARD_NUM]    = {0};
 FILE                *outFile                = stdout;
 
 
-
-
 int ipL2boardNum(in_addr_t addr)
 {
     int board;
@@ -32,7 +30,7 @@ int ipL2boardNum(in_addr_t addr)
             break;
 
         case eb3_hex_addr:
-            board = 2;
+            board = 3;
             break;
 
         case eb4_hex_addr:
@@ -179,7 +177,7 @@ void check_seqNum(int boardNum, EOropframeHeader_t *pkt, DebugData *debugData, c
     {
         memcpy(&(debugData->previousPkt), pkt, sizeof(EOropframeHeader_t) );
         debugData->totPcktRecv++;
-
+        debugData->sniffTimePrev = sniffTime;
         printf("First packet from board %d; seq num is %lu\n", boardNum, pkt->sequencenumber);
     }
     else
