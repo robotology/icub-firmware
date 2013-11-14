@@ -79,8 +79,20 @@ const hl_i2c_cfg_t hl_i2c_cfg_default =
     .mode           = hl_i2c_mode_master, 
     .behaviour      = hl_i2c_behaviour_polling,
     .speed          = hl_i2c_speed_400kbps, 
-    .ownaddress     = 0
+    .ownaddress     = 0,
+    .advcfg         = NULL
 };
+
+
+const hl_i2c_advcfg_t hl_i2c_advcfg_default =
+{
+   .I2C_ClockSpeed             = 400000,                       // changed by cfg->speed
+   .I2C_Mode                   = I2C_Mode_I2C,
+   .I2C_DutyCycle              = I2C_DutyCycle_2,
+   .I2C_OwnAddress1            = 0,                            // changed by cfg->ownaddress
+   .I2C_Ack                    = I2C_Ack_Enable,
+   .I2C_AcknowledgedAddress    = I2C_AcknowledgedAddress_7bit
+}; 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,15 +145,6 @@ static const uint32_t s_hl_i2c_timeout_flag = 0x00010000;
 static const uint32_t s_hl_i2c_timeout_long = 0x01000000;
 static const uint32_t s_hl_i2c_ackaddress_maxtrials = 1000;
 
-static const I2C_InitTypeDef   s_hl_i2c_stm32_cfg =
-{
-    .I2C_ClockSpeed             = 400000,                       // PARAMETER
-    .I2C_Mode                   = I2C_Mode_I2C,
-    .I2C_DutyCycle              = I2C_DutyCycle_2,
-    .I2C_OwnAddress1            = 0,                            // PARAMETER
-    .I2C_Ack                    = I2C_Ack_Enable,
-    .I2C_AcknowledgedAddress    = I2C_AcknowledgedAddress_7bit
-};
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 static I2C_TypeDef* const s_hl_i2c_stmI2Cmap[] = { I2C1, I2C2, NULL };
@@ -457,23 +460,32 @@ static void s_hl_i2c_hw_gpio_init(hl_i2c_t id)
 
 static void s_hl_i2c_hw_enable(hl_i2c_t id, const hl_i2c_cfg_t* cfg)
 {
-#if     defined(HL_USE_MPU_ARCH_STM32F1) || defined(HL_USE_MPU_ARCH_STM32F4)
     
     I2C_TypeDef* I2Cx = HL_i2c_id2stmI2C(id);
     
-    I2C_InitTypeDef i2c_cfg;
+    I2C_InitTypeDef* init2use = NULL;
+    I2C_InitTypeDef i2cinit;
     
-    memcpy(&i2c_cfg, &s_hl_i2c_stm32_cfg, sizeof(I2C_InitTypeDef));
-    // apply the clockspeed 
-    i2c_cfg.I2C_ClockSpeed  = (uint32_t)cfg->speed * 100 * 1000;
-    i2c_cfg.I2C_OwnAddress1 = cfg->ownaddress;
+    if(NULL != cfg->advcfg)
+    {
+        init2use = (I2C_InitTypeDef*) cfg->advcfg;
+    }
+    else
+    {
+        init2use = &i2cinit;
+        
+        memcpy(init2use, &hl_i2c_advcfg_default, sizeof(I2C_InitTypeDef)); 
+        
+        // apply what in cfg 
+        init2use->I2C_ClockSpeed  = (uint32_t)cfg->speed * 100 * 1000;
+        init2use->I2C_OwnAddress1 = cfg->ownaddress;        
+    }
+     
+    
     // i2c peripheral enable
     I2C_Cmd(I2Cx, ENABLE);
     // apply configuration
-    I2C_Init(I2Cx, &i2c_cfg);
-#else //defined(HL_USE_MPU_ARCH_*)
-    #error ERR --> choose a HL_USE_MPU_ARCH_*
-#endif 
+    I2C_Init(I2Cx, init2use);
 }
 
     

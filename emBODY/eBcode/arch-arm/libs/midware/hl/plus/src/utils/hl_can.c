@@ -78,10 +78,25 @@
 
 const hl_can_cfg_t hl_can_cfg_default =
 {
-    .baudrate   = hl_can_baudrate_1mbps
+    .baudrate   = hl_can_baudrate_1mbps,
+    .advcfg     = NULL
 };
 
-//__weak extern const hl_can_advcfg_t *hl_can_advcfg = NULL;
+const hl_can_advcfg_t hl_can_advcfg_default =
+{   // good for canclock @ 36mhz and bitrate 1mbps 
+    .CAN_Prescaler      = 4,                    // depends on: cfg->baudrate, canclock, sjw, bs1, bs2    
+    .CAN_Mode           = CAN_Mode_Normal,         
+    .CAN_SJW            = CAN_BS1_3tq,          // depends on: canclock
+    .CAN_BS1            = CAN_BS1_5tq,          // depends on: canclock
+    .CAN_BS2            = CAN_BS1_3tq,          // depends on: canclock         
+    .CAN_TTCM           = DISABLE,              // time-triggered communication mode
+    .CAN_ABOM           = DISABLE,              // automatic bus-off
+    .CAN_AWUM           = DISABLE,              // automatic wake-up 
+    .CAN_NART           = DISABLE,              // no-automatic retransmission mode 
+    .CAN_RFLM           = DISABLE,              // receive fifo locked mode 
+    .CAN_TXFP           = ENABLE                // transmit fifo priority (if ENABLEd, priority amongst the pending mailboxes is driven by the request order) 
+};
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,6 +118,22 @@ typedef struct
 } hl_can_theinternals_t;
 
 
+/* @typedef    typedef struct hl_can_bitsampling_t 
+    @brief      contains the quantisation bit timing for stm32f1/2/4 library. The bit is divided in N quanta, N = bs1 + 1 + bs2.
+                value bs1 is the number of quanta before the sampling quanta, and bs2 the number after. value sjw is the number
+                of quanta that are possible to stretch to perform resynchronization.
+    @warning    the can clock (slow APB bus) divided by 1000 must be multiple of value N = bs1+1+bs2.
+                for can clock at 36MHz good values are: (CAN_BS1_5tq, CAN_BS2_3tq, CAN_SJW_3tq) because 5+1+3=9    
+                for can clock at 42MHz good values are: (CAN_BS1_4tq, CAN_BS2_2tq, CAN_SJW_3tq) because 4+1+2=7 
+ */
+typedef struct
+{
+    uint8_t     bs1;    /*< use CAN_BS1_1tq -> CAN_BS1_16tq */
+    uint8_t     bs2;    /*< use CAN_BS2_1tq -> CAN_BS1_8tq */
+    uint8_t     sjw;    /*< use CAN_SJW_1tq -> CAN_SJW_4tq */
+} hl_can_bitsampling_t;
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -117,6 +148,8 @@ static hl_boolval_t s_hl_can_initted_is(hl_can_t id);
 static void s_hl_can_hw_gpio_init(hl_can_t id);
 static void s_hl_can_hw_clock_init(hl_can_t id);
 static hl_result_t s_hl_can_hw_registers_init(hl_can_t id);
+
+static const hl_can_bitsampling_t* s_hl_can_get_bitsampling(uint32_t canclock);
 
 static void s_hl_can_fill_gpio_init_altf(hl_can_t id, hl_gpio_init_t* rxinit, hl_gpio_altf_t* rxaltf, hl_gpio_init_t* txinit, hl_gpio_altf_t* txaltf);
 
@@ -322,66 +355,114 @@ static void s_hl_can_hw_clock_init(hl_can_t id)
 #endif 
 #endif
 
-static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
-{
-    static const  hl_can_advcfg_bitsampling_t s_hl_can_bitsampling_default = 
-    {
-    #if     defined(HL_USE_MPU_ARCH_STM32F1)    
-        // for 36mhz
+
+static const hl_can_bitsampling_t* s_hl_can_get_bitsampling(uint32_t canclock)
+{  
+    // we chose to have the number of time quanta tqtotal equal to an integral divisor of 
+    // (canclock / 1mhz). in such a way the CAN_Prescaler is simply = (canclock / tqtotal) / baudrate
+    // for 36mhz and 42 mhz we took the values from examples of stm32f1x and stm32f4x by st microelectronics.
+    // only tested values are 36mhz and 42mhz.
+    static const hl_can_bitsampling_t s_hl_can_bitsampling_9tq = 
+    {   // for canclocks: 36mhz, 18mhz, 9mhz (and multiples of 9)
         .bs1        = CAN_BS1_5tq,
         .bs2        = CAN_BS2_3tq,        
         .sjw        = CAN_SJW_3tq
-    #elif    defined(HL_USE_MPU_ARCH_STM32F4)
-        // for 42mhz
+    };
+    static const hl_can_bitsampling_t s_hl_can_bitsampling_8tq = 
+    {    // for canclocks: multiples of 8mhz
+        .bs1        = CAN_BS1_4tq,
+        .bs2        = CAN_BS2_3tq,        
+        .sjw        = CAN_SJW_3tq
+    };    
+    static const hl_can_bitsampling_t s_hl_can_bitsampling_7tq = 
+    {    // for canclocks: 42mhz, 21mHz (and multiples of 7mhz)
         .bs1        = CAN_BS1_4tq,
         .bs2        = CAN_BS2_2tq,        
-        .sjw        = CAN_SJW_3tq        
-    #else //defined(HL_USE_CPU_ARC_*)
-        #error ERR --> choose a HL_USE_CPU_ARCH_*
-    #endif     
-    };
+        .sjw        = CAN_SJW_3tq
+    };    
+    
+
+    const hl_can_bitsampling_t* ret = NULL;
+    
+    switch(canclock)
+    {
+        case 36000000:
+        case 27000000:
+        case 18000000:
+        case  9000000:
+        {
+            ret = &s_hl_can_bitsampling_9tq;
+        } break;
+                
+        case 40000000:
+        case 32000000:
+        case 24000000:
+        case 16000000:
+        case  8000000:
+        {
+            ret = &s_hl_can_bitsampling_8tq;
+        } break;        
+        
+        case 42000000:
+        case 35000000:
+        case 28000000:
+        case 21000000:
+        case 14000000:
+        case  7000000:
+        {
+            ret = &s_hl_can_bitsampling_7tq;
+        } break;
+        
+        default:
+        {
+            ret = NULL;
+        }   break;           
+    }
+    
+    if(NULL == ret)
+    {
+        hl_sys_on_error(hl_error_unsupportedbehaviour, "can: bit sampling not supported for this canclock");       
+    }
+    
+    return(ret);  
+}
+
+
+static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
+{
     
     hl_can_internal_item_t* intitem = s_hl_can_theinternals.items[HL_can_id2index(id)];
+    hl_can_cfg_t *cfg = &intitem->config;
     CAN_TypeDef* CANx = HL_can_port2peripheral(id);
     
     CAN_InitTypeDef* init2use = NULL;
-    const hl_can_advcfg_bitsampling_t* bits2use = NULL;
-    
-    
+    const hl_can_bitsampling_t* bits2use = NULL;
+        
     CAN_InitTypeDef CAN_InitStructure;
-    CAN_StructInit(&CAN_InitStructure);       
-    
 
-    if(NULL != hl_can_mapping.advconf[HL_can_id2index(id)].full)
+
+    if(NULL != cfg->advcfg)
     {
-        // use: the full as specified
-        init2use = (CAN_InitTypeDef*) hl_can_mapping.advconf[HL_can_id2index(id)].full;    
-        bits2use = NULL;       
+        // use advcfg. it has the same layout as CAN_InitTypeDef
+        init2use = (CAN_InitTypeDef*) cfg->advcfg;      
     }
     else
     {
-        // use: the standard initstructure
-        init2use = &CAN_InitStructure;
+        // use CAN_InitStructure.
+        init2use = &CAN_InitStructure;       
         
-        if(NULL != hl_can_mapping.advconf[HL_can_id2index(id)].bitsampling)
-        {
-            // use: the bitsampling as specified. 
-            bits2use = hl_can_mapping.advconf[HL_can_id2index(id)].bitsampling;             
-        }
-        else
-        {
-            // use: standard bitsampling.
-            bits2use = &s_hl_can_bitsampling_default; 
-        }             
-    }
-    
+        // which i must init according to some cfg params and other constant choices
+        
+        CAN_StructInit(init2use); 
+        
 
-    // in case we use the standard initstructure, we complete init2use with the chosen bits2use
-    
-    if(init2use == (&CAN_InitStructure))
-    {
         RCC_ClocksTypeDef clocks;
         RCC_GetClocksFreq(&clocks);  
+        
+        uint32_t canclock = clocks.PCLK1_Frequency;
+        
+        bits2use = s_hl_can_get_bitsampling(canclock);
+        uint8_t tqtotal = bits2use->bs1 + 1 + bits2use->bs2;
         
         uint32_t baudrate = 0;              
         switch(intitem->config.baudrate)
@@ -391,26 +472,23 @@ static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
             default:                        baudrate =  500000;     break;
         }
         
-        uint8_t tqtotal = bits2use->bs1 + 1 + bits2use->bs2;
+        // copy the default configuration
+        memcpy(init2use, &hl_can_advcfg_default, sizeof(CAN_InitTypeDef));
+        
+        // and now change it
+        
         
         // CAN_Prescaler is the prescaler to apply to PCLK1_Frequency so that the bit has tqtotal time quanta (or ticks of the clock)
         // where tqtotal = CAN_BS1 + 1 + CAN_BS2        
-        init2use->CAN_Prescaler = (clocks.PCLK1_Frequency / tqtotal) / baudrate;      
-        init2use->CAN_Mode      = CAN_Mode_Normal;  // operating mode
+        init2use->CAN_Prescaler = (canclock / tqtotal) / baudrate;      
         init2use->CAN_SJW       = bits2use->sjw;    // max num of time quanta the hw is allowed to stretch a bit in order to re-synch
         init2use->CAN_BS1       = bits2use->bs1;    // number of time quanta in bit-segment-1 (the one before the sampling time quantum)
-        init2use->CAN_BS2       = bits2use->bs2;    // number of time quanta in bit-segment-2 (the one after the sampling time quantum)
-        init2use->CAN_TTCM      = DISABLE;          // time-triggered communication mode
-        init2use->CAN_ABOM      = DISABLE;          // automatic bus-off
-        init2use->CAN_AWUM      = DISABLE;          // automatic wake-up
-        init2use->CAN_NART      = DISABLE;          // no-automatic retransmission mode 
-        init2use->CAN_RFLM      = DISABLE;          // receive fifo locked mode
-        init2use->CAN_TXFP      = ENABLE;           // transmit fifo priority (if ENABLEd, priority amongst the pending mailboxes is driven by the request order)    
+        init2use->CAN_BS2       = bits2use->bs2;    // number of time quanta in bit-segment-2 (the one after the sampling time quantum)       
     }
     
     
-    // ok, we init teh can
-	 
+    // ok, we init the can
+    
     CAN_DeInit(CANx);
 
 	if(CAN_InitStatus_Failed == CAN_Init(CANx, init2use))
@@ -418,7 +496,7 @@ static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
 		return(hl_res_NOK_generic);
 	}
     
-    // we not init the filters: just a basic init
+    // we do just a basic init to the filters
 
 	// TODO: rendere configurabile i filtri
     // #warning VALE->filter doesn't work!!!

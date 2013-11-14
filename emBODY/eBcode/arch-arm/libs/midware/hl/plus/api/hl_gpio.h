@@ -228,6 +228,14 @@ extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* 
 extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* gpiomap);
 
 
+/** @fn         extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio)
+    @brief      initialises a pin as output.
+    @param      gpio            The gpio. 
+    @return     If successful hl_res_OK
+ **/
+extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio);
+
+
 
 /** @}            
     end of group doxy_group_hl_gpio  

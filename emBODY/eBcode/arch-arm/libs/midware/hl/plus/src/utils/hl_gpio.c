@@ -315,6 +315,48 @@ extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* 
     
 }
 
+extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio)
+{
+    hl_result_t res = hl_res_OK;
+    
+    static const hl_gpio_init_t outgpioinit = 
+    {
+#if     defined(HL_USE_MPU_ARCH_STM32F1)
+        .port           = hl_gpio_portNONE,
+        .mode           =
+        {
+            .gpio_pins  = 0,
+            .gpio_speed = GPIO_Speed_50MHz,
+            .gpio_mode  = GPIO_Mode_Out_PP            
+        }
+#elif   defined(HL_USE_MPU_ARCH_STM32F4)
+        .port           = hl_gpio_portNONE,
+        .mode           =
+        {
+            .gpio_pins  = 0,
+            .gpio_mode  = GPIO_Mode_OUT,
+            .gpio_speed = GPIO_Speed_50MHz,
+            .gpio_otype = GPIO_OType_PP,
+            .gpio_pupd  = GPIO_PuPd_UP
+        }
+#else
+    #error ERROR --> choose a HL_USE_MPU_ARCH_*
+#endif        
+    };
+    
+
+    hl_gpio_init_t gpioinit;
+    hl_gpio_map_t gpiomap;
+    memcpy(&gpioinit, &outgpioinit, sizeof(hl_gpio_init_t));
+    gpiomap.gpio.port = gpio.port;
+    gpiomap.gpio.pin  = gpio.pin;
+    gpiomap.af32      = hl_NA32;
+    hl_gpio_fill_init(&gpioinit, &gpiomap);
+    res = hl_gpio_init(&gpioinit);  
+   
+    return(res);
+}
+
 
 
 

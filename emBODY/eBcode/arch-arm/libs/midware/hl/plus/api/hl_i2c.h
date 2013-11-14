@@ -131,17 +131,6 @@ typedef struct
 } hl_i2c_gpiomap_t;
 
 
-typedef struct hl_i2c_advcfg_full_opaque_t hl_i2c_advcfg_full_t;
-
-/** @typedef    typedef struct hl_i2c_advcfg_t;
-    @brief      enables advanced configuration for i2c. 
- **/
-typedef struct
-{
-    const hl_i2c_advcfg_full_t*     full;
-} hl_i2c_advconf_t;
-
-
 /** @typedef    typedef struct hl_i2c_mapping_t 
     @brief      hl_i2c_mapping_t contains the pin mapping for all i2c peripherals
  **/
@@ -149,8 +138,14 @@ typedef struct
 {
     uint8_t             supported_mask;             /**< bit in position hl_i2cx must be 1 if portx is supported */
     hl_i2c_gpiomap_t    gpiomap[hl_i2cs_number];    /**< in position hl_i2cx there is gpio map of I2Cx */
-    hl_i2c_advconf_t    advconf[hl_i2cs_number];    /**< advanced configuration */
 } hl_i2c_mapping_t;
+
+
+/** @typedef    typedef struct hl_i2c_advcfg_opaque_t hl_i2c_advcfg_t
+    @brief      contains full configuration for i2c bus as specified by the silicon vendor. 
+                it is opaquely declared. see hl_arch.h for definition.                
+ **/
+typedef struct hl_i2c_advcfg_opaque_t hl_i2c_advcfg_t;
 
 
 /** @typedef    typedef struct hl_i2c_cfg_t 
@@ -164,13 +159,14 @@ typedef struct
     hl_i2c_behaviour_t      behaviour;  /**< the behavior of the drive: so far only hl_i2c_behaviour_polling */
     hl_i2c_speed_t          speed;      /**< the i2c speed */      
     hl_i2c_devaddr_t        ownaddress; /**< address of the slave: used only if mode is hl_i2c_mode_slave */
+    const hl_i2c_advcfg_t*  advcfg;     /**< used if not NULL. it overrides ... speed, ownaddress, */
 } hl_i2c_cfg_t;
 
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hl_i2c_cfg_t hl_i2c_cfg_default; // = { .mode = hl_i2c_mode_master, .behaviour = hl_i2c_behaviour_polling, .speed = hl_i2c_speed_400kbps, .ownaddress = 0 };
+extern const hl_i2c_cfg_t hl_i2c_cfg_default; // = { .mode = hl_i2c_mode_master, .behaviour = hl_i2c_behaviour_polling, .speed = hl_i2c_speed_400kbps, .ownaddress = 0, .advcfg = NULL };
 
 // it must be externally declared.
 extern const hl_i2c_mapping_t hl_i2c_mapping;
