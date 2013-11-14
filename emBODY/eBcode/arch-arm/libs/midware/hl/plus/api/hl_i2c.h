@@ -131,6 +131,16 @@ typedef struct
 } hl_i2c_gpiomap_t;
 
 
+typedef struct hl_i2c_advcfg_full_opaque_t hl_i2c_advcfg_full_t;
+
+/** @typedef    typedef struct hl_i2c_advcfg_t;
+    @brief      enables advanced configuration for i2c. 
+ **/
+typedef struct
+{
+    const hl_i2c_advcfg_full_t*     full;
+} hl_i2c_advconf_t;
+
 
 /** @typedef    typedef struct hl_i2c_mapping_t 
     @brief      hl_i2c_mapping_t contains the pin mapping for all i2c peripherals
@@ -138,7 +148,8 @@ typedef struct
 typedef struct
 {
     uint8_t             supported_mask;             /**< bit in position hl_i2cx must be 1 if portx is supported */
-    hl_i2c_gpiomap_t    gpiomap[hl_i2cs_number];    /**< in position hl_i2cx there is gpio map of ICx */
+    hl_i2c_gpiomap_t    gpiomap[hl_i2cs_number];    /**< in position hl_i2cx there is gpio map of I2Cx */
+    hl_i2c_advconf_t    advconf[hl_i2cs_number];    /**< advanced configuration */
 } hl_i2c_mapping_t;
 
 

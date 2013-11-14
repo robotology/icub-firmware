@@ -164,6 +164,59 @@ struct hl_gpio_altf_opaque_t
 // -- gpio section: end
 
 
+// -- i2c section: begin
+// --
+
+struct hl_i2c_advcfg_full_opaque_t
+{
+    uint8_t     nothingsofar;
+};
+
+// --
+// -- i2c section: end
+
+
+
+// -- can section: begin
+// --
+
+
+/** @typedef    struct hl_can_advcfg_bitsampling_opaque_t 
+    @brief      contains the quantisation bit timing for stm32f1/2/4 library. The bit is divided in N quanta, N = bs1 + 1 + bs2.
+                value bs1 is the number of quanta before the sampling quanta, and bs2 the number after. value sjw is the number
+                of quanta that are possible to stretch to perform resynchronization.
+    @warning    the can clock (slow APB bus) divided by 1000 must be multiple of value N = bs1+1+bs2.
+                for can clock at 36MHz good values are: (CAN_BS1_5tq, CAN_BS2_3tq, CAN_SJW_3tq) because 5+1+3=9    
+                for can clock at 42MHz good values are: (CAN_BS1_4tq, CAN_BS2_2tq, CAN_SJW_3tq) because 4+1+2=7 
+ **/
+struct hl_can_advcfg_bitsampling_opaque_t
+{
+    uint8_t     bs1;    /**< use CAN_BS1_1tq -> CAN_BS1_16tq */
+    uint8_t     bs2;    /**< use CAN_BS2_1tq -> CAN_BS1_8tq */
+    uint8_t     sjw;    /**< use CAN_SJW_1tq -> CAN_SJW_4tq */
+};
+
+
+struct hl_can_advcfg_full_opaque_t
+{   // the same as CAN_InitTypeDef   
+    uint16_t        CAN_Prescaler;    
+    uint8_t         CAN_Mode;         
+    uint8_t         CAN_SJW;
+    uint8_t         CAN_BS1;
+    uint8_t         CAN_BS2;
+    FunctionalState CAN_TTCM;
+    FunctionalState CAN_ABOM;
+    FunctionalState CAN_AWUM; 
+    FunctionalState CAN_NART;
+    FunctionalState CAN_RFLM; 
+    FunctionalState CAN_TXFP; 
+};
+
+// --
+// -- can section: end
+
+
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 

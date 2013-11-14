@@ -74,14 +74,29 @@ typedef struct
 } hl_can_gpiomap_t;
 
 
+typedef struct hl_can_advcfg_bitsampling_opaque_t hl_can_advcfg_bitsampling_t;
+typedef struct hl_can_advcfg_full_opaque_t hl_can_advcfg_full_t;
+
+/** @typedef    typedef struct hl_can_advcfg_t;
+    @brief      enables advanced configuration for can. 
+ **/
+typedef struct
+{
+    const hl_can_advcfg_bitsampling_t*  bitsampling;    /**< if not NULL it specifies how to sample the can bit. */    
+    const hl_can_advcfg_full_t*         full;           /**< if not NULL it contains the full options of can hw initialisation. it overrides hl_can_cfg_t::baudrate */
+} hl_can_advconf_t;
+
+
 /** @typedef    typedef struct hl_can_mapping_t 
-    @brief      hl_can_mapping_t contains the pin mapping for all can peripherals
+    @brief      hl_can_mapping_t contains the pin mapping for all can peripherals plus some advanced configuration
  **/
 typedef struct
 {
     uint8_t             supported_mask;             /**< bit in position hl_canx must be 1 if portx is supported */
     hl_can_gpiomap_t    gpiomap[hl_cans_number];    /**< in position hl_canx there is gpio map of CANx */
+    hl_can_advconf_t    advconf[hl_cans_number];
 } hl_can_mapping_t;
+
 
 
 /** @typedef    typedef enum hl_can_baudrate_t;
@@ -109,6 +124,7 @@ typedef struct
 extern const hl_can_cfg_t hl_can_cfg_default;
 
 extern const hl_can_mapping_t hl_can_mapping;
+
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
