@@ -364,9 +364,7 @@ extern const hl_eth_mapping_t hl_eth_mapping =
                 .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin2 }, 
                 .af32   = hl_NA32
             }     
-        }
-        
-        
+        }      
     }
     
 };
@@ -406,13 +404,6 @@ extern const hl_ethtrans_mapping_t hl_ethtrans_mapping =
 
 
 #elif   defined(HL_USE_BRD_EMS001)
-
-static const hl_can_advcfg_bitsampling_t s_hl_can_advcfg_bitsampling = 
-{
-    .bs1    = CAN_BS1_5tq,
-    .bs2    = CAN_BS2_3tq,        
-    .sjw    = CAN_SJW_3tq
-};
 
 
 extern const hl_can_mapping_t hl_can_mapping =
@@ -460,18 +451,7 @@ extern const hl_can_mapping_t hl_can_mapping =
                 .af32       = GPIO_Remap_CAN2          
             } 
         }   
-    },
-    .advconf    =
-    {
-        {   // hl_can1
-            .bitsampling    = &s_hl_can_advcfg_bitsampling,
-            .full           = NULL            
-        },
-        {   // hl_can2
-            .bitsampling    = &s_hl_can_advcfg_bitsampling,
-            .full           = NULL               
-        }
-    }    
+    } 
 };
 
 #endif
