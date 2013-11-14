@@ -33,9 +33,10 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdlib.h"
 #include "hl_common.h"
 #include "hl_core.h"        // contains the required stm32f10x_*.h or stm32f4xx*.h header files
-
+#include "hl_arch.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -65,30 +66,15 @@
 
 #if     defined(HL_USE_BRD_MCBSTM32_C)
 
-extern const hl_sys_speeds_t hl_sys_speeds = 
-{
-    .cpuspeed   = 72000000,
-    .fastbus    = 72000000,
-    .slowbus    = 36000000
-};
+
 
 #elif   defined(HL_USE_BRD_MCBSTM32)
 
-extern const hl_sys_speeds_t hl_sys_speeds = 
-{
-    .cpuspeed   = sss,
-    .fastbus    = sss,
-    .slowbus    = sss
-};
+
 
 #elif   defined(HL_USE_BRD_EMS001)
 
-extern const hl_sys_speeds_t hl_sys_speeds = 
-{
-    .cpuspeed   = 72000000,
-    .fastbus    = 72000000,
-    .slowbus    = 36000000
-};
+
 
 #endif//defined(HL_USE_BRD_EMS001)
 
@@ -421,6 +407,14 @@ extern const hl_ethtrans_mapping_t hl_ethtrans_mapping =
 
 #elif   defined(HL_USE_BRD_EMS001)
 
+static const hl_can_advcfg_bitsampling_t s_hl_can_advcfg_bitsampling = 
+{
+    .bs1    = CAN_BS1_5tq,
+    .bs2    = CAN_BS2_3tq,        
+    .sjw    = CAN_SJW_3tq
+};
+
+
 extern const hl_can_mapping_t hl_can_mapping =
 {
     .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
@@ -466,12 +460,27 @@ extern const hl_can_mapping_t hl_can_mapping =
                 .af32       = GPIO_Remap_CAN2          
             } 
         }   
-    }       
+    },
+    .advconf    =
+    {
+        {   // hl_can1
+            .bitsampling    = &s_hl_can_advcfg_bitsampling,
+            .full           = NULL            
+        },
+        {   // hl_can2
+            .bitsampling    = &s_hl_can_advcfg_bitsampling,
+            .full           = NULL               
+        }
+    }    
 };
 
 #endif
 
-#endif//defined(HL_USE_UTIL_I2C)
+#endif//defined(HL_USE_UTIL_CAN)
+
+
+
+    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
