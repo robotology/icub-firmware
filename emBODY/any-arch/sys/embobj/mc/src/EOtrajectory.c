@@ -246,6 +246,9 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t vStar, int32_
 
 extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc)
 {
+    eo_trajectory_SetPosRaw(o, pos);
+ 
+    /*
     if (!o) return;
     
     if (o->bVelocityMove || (o->vTimer < o->vT)) eo_trajectory_VelocityStop(o);
@@ -278,6 +281,7 @@ extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc)
     float O5A = 0.5f*o->xA;
     o->xK0 = -o->xK2+O5A;
     o->xK1 = -o->xK3-O5A;
+    */
 }
 
 extern void eo_trajectory_VelocityStop(EOtrajectory *o)
