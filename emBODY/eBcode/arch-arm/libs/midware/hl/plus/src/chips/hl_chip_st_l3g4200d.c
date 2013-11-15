@@ -347,7 +347,7 @@ static hl_result_t s_hl_chip_st_l3g4200d_hw_init(const hl_chip_st_l3g4200d_cfg_t
     {
         return(res);
     }
-    hl_i2c_standby(i2cid, I2CADDRESS);
+    //hl_i2c_is_device_ready(i2cid, I2CADDRESS); // it should not be necessary
 
     regaddr.bytes.one = REGADR_CTR4;       
     data = 0x00;        // continuous update of data + lbs @lower address + full scale is 250 dps + self test disable + spi disabled
@@ -373,7 +373,7 @@ static hl_result_t s_hl_chip_st_l3g4200d_hw_init(const hl_chip_st_l3g4200d_cfg_t
     {
         return(res);
     }  
-    hl_i2c_standby(i2cid, I2CADDRESS);  
+    //hl_i2c_is_device_ready(i2cid, I2CADDRESS); // it should not be necessary
  
     regaddr.bytes.one = REGADR_CTR5;       
     data = 0x40;        // enable fifo
@@ -381,7 +381,7 @@ static hl_result_t s_hl_chip_st_l3g4200d_hw_init(const hl_chip_st_l3g4200d_cfg_t
     {
         return(res);
     }
-    hl_i2c_standby(i2cid, I2CADDRESS);    
+    //hl_i2c_is_device_ready(i2cid, I2CADDRESS); // it should not be necessary   
     
     
     memcpy(&intitem->config, cfg, sizeof(hl_chip_st_l3g4200d_cfg_t));

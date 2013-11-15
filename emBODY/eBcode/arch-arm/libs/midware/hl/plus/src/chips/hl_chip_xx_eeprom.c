@@ -38,7 +38,8 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hl_core.h"        // contains the required stm32f10x_*.h or stm32f4xx*.h header files
-
+#include "hl_sys.h"
+#include "stdio.h"
 #include "hl_arch.h"
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -129,6 +130,8 @@ static hl_result_t s_hl_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t Wr
 static hl_result_t s_hl_chip_xx_eeprom_waiteepromstandbystate(void);
 
 static hl_result_t s_hl_chip_xx_eeprom_wait4operation2complete(void);
+
+static hl_result_t s_hl_chip_xx_eeprom_chip_timeoutexpired(char *fname);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -654,26 +657,27 @@ static hl_result_t s_hl_chip_xx_eeprom_waiteepromstandbystate(void)
 {
     hl_chip_xx_eeprom_internal_item_t *intitem = s_hl_chip_xx_eeprom_theinternals.items[0];
     
-    return(hl_i2c_standby(intitem->config.i2cid, intitem->hwaddress)); 
-}
-
-
-
-#if 0
-static hl_result_t s_hl_chip_xx_eeprom_chip_timeoutexpired(void) 
-{
-//    if(NULL != intitem->config.functionontimeout)
-//    {
-//        intitem->config.functionontimeout();
-//    }
-//    else
-//    {
-        for(;;);
-//    }
+    volatile uint32_t trials = hl_chip_xx_eeprom_hid_ackaddress_maxtrials;
     
-//    return(hl_res_NOK_generic);
+    while( hl_res_OK != hl_i2c_is_device_ready(intitem->config.i2cid, intitem->hwaddress) )
+    {
+        if(0 == (trials--)) return(s_hl_chip_xx_eeprom_chip_timeoutexpired("s_hl_chip_xx_eeprom_waiteepromstandbystate()"));
+    }
+
+    return(hl_res_OK); 
 }
-#endif
+
+
+
+
+static hl_result_t s_hl_chip_xx_eeprom_chip_timeoutexpired(char *fname) 
+{
+    char str[64];
+    snprintf(str, sizeof(str), "eeprom timeout in function %s", fname);
+    hl_sys_on_error(hl_error_runtimefault, str);
+    return(hl_res_NOK_generic);
+}
+
 
 // this function is useless for current implementation of s_hl_chip_xx_eeprom_writepage() which uses a blocking mode for i2c writing
 // with hl_i2c_write(), and which internally sets numberofbyte2writeinpage to zero.

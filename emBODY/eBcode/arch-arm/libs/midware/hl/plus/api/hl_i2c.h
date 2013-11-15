@@ -110,7 +110,7 @@ typedef uint8_t hl_i2c_devaddr_t;
  **/
 typedef struct 
 {
-    uint8_t     numofbytes;             /**< tells is register address is on one, two or three bytes */
+    uint8_t     numofbytes;             /**< tells if register address is on one, two or three bytes. If zero, register is not used */
     union
     {
         uint8_t     one;
@@ -230,14 +230,17 @@ extern hl_result_t hl_i2c_read(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_reg
 extern hl_result_t hl_i2c_write(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size);
 
 
-/** @fn			extern hl_result_t hl_i2c_standby(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
-    @brief  	this function is used to put in standby a device after it has sent data to the master. Basically, it sends a START followed by the address of the
-                device. Then it waits an ACK or NACK from it. It repeats this cycle until an ACK is received. This function is specific for EEPROM use.
+/** @fn			extern hl_result_t hl_i2c_is_device_ready(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
+    @brief  	this function is used to wait for a device (an EEPROM) until it is ready again after it has received data. 
+                Basically, it sends a START followed by the address of the device. Then it waits an ACK or NACK from it
+                for some time. If it receives an ACK it returns hl_res_OK to tell that the device is ready. If it returns
+                hl_res_NOK_generic it may be that teh device is not ready yet and some more calls to hl_i2c_is_device_ready()
+                are required.  This function is specific for EEPROM use.
     @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
-    @return 	hl_res_NOK_generic on error else hl_res_OK
+    @return 	hl_res_OK if teh device is ready, hl_res_NOK_generic if not. 
   */
-extern hl_result_t hl_i2c_standby(hl_i2c_t id, hl_i2c_devaddr_t devaddr);
+extern hl_result_t hl_i2c_is_device_ready(hl_i2c_t id, hl_i2c_devaddr_t devaddr);
 
 
 /** @}            

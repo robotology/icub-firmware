@@ -405,7 +405,7 @@ static hl_result_t s_hl_chip_st_lis3x_hw_init(const hl_chip_st_lis3x_cfg_t *cfg,
     {
         return(res);
     }
-    hl_i2c_standby(i2cid, I2CADDRESS);
+    //hl_i2c_is_device_ready(i2cid, I2CADDRESS); it should not be necessary.
  
  
     regaddr.bytes.one = REGADR_CTRL_REG4;       
@@ -456,7 +456,7 @@ static hl_result_t s_hl_chip_st_lis3x_hw_init(const hl_chip_st_lis3x_cfg_t *cfg,
         return(res);
     } 
     
-    hl_i2c_standby(i2cid, I2CADDRESS);
+    hl_i2c_is_device_ready(i2cid, I2CADDRESS);
  
 
 
@@ -468,7 +468,7 @@ static hl_result_t s_hl_chip_st_lis3x_hw_init(const hl_chip_st_lis3x_cfg_t *cfg,
         {
             return(res);
         }
-        hl_i2c_standby(i2cid, I2CADDRESS);    
+        hl_i2c_is_device_ready(i2cid, I2CADDRESS);    
             
             
         regaddr.bytes.one = REGADR_TEMP_CFG;       
@@ -477,7 +477,7 @@ static hl_result_t s_hl_chip_st_lis3x_hw_init(const hl_chip_st_lis3x_cfg_t *cfg,
         {
             return(res);
         }
-        hl_i2c_standby(i2cid, I2CADDRESS);  
+        hl_i2c_is_device_ready(i2cid, I2CADDRESS);  
     }
     
     memcpy(&intitem->config, cfg, sizeof(hl_chip_st_lis3x_cfg_t));
