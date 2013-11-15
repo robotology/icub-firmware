@@ -213,13 +213,19 @@ static void test_eeprom(void)
     uint32_t address = 258;
     uint32_t size = 14;
     static uint8_t buffer[32] = {0};
-    static uint8_t target[10] = {0, 0, 2, 3, 4, 5, 6, 7, 8, 9};
+    static uint8_t target1[10] = {0, 0, 2, 3, 4, 5, 6, 7, 8, 9};
+    static uint8_t target2[10] = {10, 10, 12, 13, 14, 15, 16, 17, 18, 19};
     uint32_t readbytes = 0;
     uint32_t writtenbytes = 0;
     
     r = hl_chip_xx_eeprom_read(address, size, buffer, &readbytes);
     
-    r = hl_chip_xx_eeprom_write(address, 10, target, &writtenbytes);
+    r = hl_chip_xx_eeprom_write(address, 10, target1, &writtenbytes);
+    memset(buffer, 0, sizeof(buffer));
+    
+    r = hl_chip_xx_eeprom_read(address, size, buffer, &readbytes);
+    
+    r = hl_chip_xx_eeprom_write(address, 10, target2, &writtenbytes);
     memset(buffer, 0, sizeof(buffer));
     
     r = hl_chip_xx_eeprom_read(address, size, buffer, &readbytes);
