@@ -469,7 +469,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>267</TopLine>
+      <TopLine>268</TopLine>
       <CurrentLine>278</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\hl\blinky-stm32f1-stm32fx.c</PathWithFileName>
@@ -501,7 +501,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>95</TopLine>
+      <TopLine>96</TopLine>
       <CurrentLine>102</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\hl\systickservices.c</PathWithFileName>
@@ -557,7 +557,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>48</TopLine>
+      <TopLine>49</TopLine>
       <CurrentLine>56</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\hl-plus-stm32f4-cfg\hl_cfg_plus_board_stm32f4.c</PathWithFileName>
@@ -592,7 +592,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\hl-plus-cfg\hl_cfg_plus_heapstack.h</PathWithFileName>
+      <PathWithFileName>..\hl-plus-stm32f4-cfg\hl_cfg_plus_heapstack.h</PathWithFileName>
       <FilenameWithoutPath>hl_cfg_plus_heapstack.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -613,7 +613,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>181</TopLine>
+      <TopLine>182</TopLine>
       <CurrentLine>190</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\hl-plus-stm32f4-cfg\hl_startup_stm32f407.s</PathWithFileName>
@@ -1161,7 +1161,7 @@
 
   <Group>
     <GroupName>hl-plus-utils</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1253,7 +1253,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>247</TopLine>
+      <TopLine>249</TopLine>
       <CurrentLine>267</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_sys.c</PathWithFileName>
@@ -1301,7 +1301,7 @@
       <Focus>0</Focus>
       <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>325</TopLine>
+      <TopLine>326</TopLine>
       <CurrentLine>330</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_can.c</PathWithFileName>
@@ -1313,7 +1313,7 @@
 
   <Group>
     <GroupName>hl-plus-chips</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

@@ -434,7 +434,7 @@
             <File>
               <FileName>hl_cfg_plus_heapstack.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\hl-plus-cfg\hl_cfg_plus_heapstack.h</FilePath>
+              <FilePath>..\hl-plus-stm32f4-cfg\hl_cfg_plus_heapstack.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1128,7 +1128,7 @@
             <File>
               <FileName>hl_cfg_plus_heapstack.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\hl-plus-cfg\hl_cfg_plus_heapstack.h</FilePath>
+              <FilePath>..\hl-plus-stm32f4-cfg\hl_cfg_plus_heapstack.h</FilePath>
             </File>
           </Files>
         </Group>
