@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any

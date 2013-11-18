@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -18,14 +18,14 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HL_PERIPH_I2C_HID_H_
-#define _HL_PERIPH_I2C_HID_H_
+#ifndef _HL_I2C_HID_H_
+#define _HL_I2C_HID_H_
 
 
-/* @file       hl_periph_i2c_hid.h
+/* @file       hl_i2c_hid.h
     @brief      This header file implements hidden interface to i2c.
     @author     marco.accame@iit.it
-    @date       09/12/2011
+    @date       11/11/2013
  **/
 
 
