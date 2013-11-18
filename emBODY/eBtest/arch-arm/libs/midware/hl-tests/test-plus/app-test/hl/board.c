@@ -23,6 +23,8 @@
     #include "brd_mcbstm32c.c" 
 #elif   defined(HL_USE_BRD_EMS001)
     #include "brd_ems001.c" 
+#elif     defined(HL_USE_BRD_MCBSTM32_F400)
+    #include "brd_mcbstm32f400.c"     
 #else
     #error --> define a board
 #endif

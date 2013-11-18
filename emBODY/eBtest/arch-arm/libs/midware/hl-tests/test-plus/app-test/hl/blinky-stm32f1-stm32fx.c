@@ -196,7 +196,7 @@ static void test_eeprom(void)
         .wp_val         = hl_gpio_valSET,
         .wp_gpio        = { .port = hl_gpio_portB, .pin = hl_gpio_pin10 }           
     };
-#else    
+#elif   defined(HL_USE_BRD_MCBSTM32) | defined(HL_USE_BRD_MCBSTM32_C)
     const hl_chip_xx_eeprom_cfg_t eepromcfg = 
     {
         .chip           = hl_chip_xx_eeprom_chip_st_m24c64, 
@@ -205,6 +205,17 @@ static void test_eeprom(void)
         .wp_val         = hl_gpio_valUNDEF,
         .wp_gpio        = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }           
     };
+#elif   defined(HL_USE_BRD_MCBSTM32_F400)
+    const hl_chip_xx_eeprom_cfg_t eepromcfg = 
+    {
+        .chip           = hl_chip_xx_eeprom_chip_st_m24lr64, 
+        .i2cid          = hl_i2c1,
+        .hwaddra2a1a0   = 0,
+        .wp_val         = hl_gpio_valUNDEF,
+        .wp_gpio        = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }           
+    }; 
+#else
+    #error -> define an eeprom cfg
 #endif    
     hl_result_t r = hl_res_NOK_generic;
     
@@ -280,19 +291,20 @@ static void test_mems_get(void)
 
 static void test_timer(uint16_t microsecs)
 {
-    // this code is based onto 72Mhz
-    //uint32_t div = SystemCoreClock/1000000 - 1;
+    // the timer 4 uses the fast bus as its reference clock.
+    // thus ...
+    
+    RCC_ClocksTypeDef clocks;
+    RCC_GetClocksFreq(&clocks);  
+
+    uint32_t div = clocks.PCLK2_Frequency/1000000 - 1;
 
     NVIC_InitTypeDef NVIC_InitStructure;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 
-//     /* TIM7 clock enable */
-//     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
     /* TIM4 clock enable */
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 
-//     /* Enable the TIM7 global Interrupt */
-//     NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
     /* Enable the TIM4 global Interrupt */
     NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;    
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
@@ -303,20 +315,14 @@ static void test_timer(uint16_t microsecs)
     //http://www.keil.com/forum/13480/stm32-timer-does-not-work-like-expected/http://www.keil.com/forum/13480/stm32-timer-does-not-work-like-expected/
 
     // set the counter to expiry at multiples of one microsec.
-    // the clock is divided by 1, we work at 72MHz, thus use a prescaler of 71 to be at 1 MHz (1 microsec).
+    // the clock is divided by 1, if we work at 72MHz then use a prescaler of 71 to be at 1 MHz (1 microsec).
+    // the same applies for any other fast clock (e.g., 84Mhz in stm32f407)
     TIM_TimeBaseStructInit( &TIM_TimeBaseStructure );
     TIM_TimeBaseStructure.TIM_Period = 1*microsecs;
-    TIM_TimeBaseStructure.TIM_Prescaler = 71; // div
+    TIM_TimeBaseStructure.TIM_Prescaler = div;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     
-//     TIM_TimeBaseInit( TIM7, &TIM_TimeBaseStructure );
-//     // important: stop the timer 7 in debug mode
-//     DBGMCU_Config(DBGMCU_TIM7_STOP, ENABLE);
-//     TIM_Cmd( TIM7, ENABLE );
-
-//     // enable isr
-//     TIM_ITConfig( TIM7, TIM_IT_Update, ENABLE );
 
     TIM_TimeBaseInit( TIM4, &TIM_TimeBaseStructure );
     // important: stop the timer 4 in debug mode
@@ -328,17 +334,17 @@ static void test_timer(uint16_t microsecs)
 }
 
 
-//void TIM7_IRQHandler(void)
+
 void TIM4_IRQHandler(void)
 {
     static volatile uint32_t delta = 0;
     static volatile uint32_t prev = 0;
     static volatile uint32_t val = 0;
 
-    //if(TIM_GetITStatus(TIM7, TIM_IT_Update) != RESET)
+
     if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
     {
-        //TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+
         TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
 
         delta = systickserv_numofticks - prev;
