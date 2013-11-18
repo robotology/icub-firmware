@@ -596,6 +596,11 @@
               <FileType>1</FileType>
               <FilePath>.\hal-src\utils\crc32.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal-src\utils\hl_i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1189,6 +1194,11 @@
               <FileName>crc32.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\hal-src\utils\crc32.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal-src\utils\hl_i2c.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1784,6 +1794,11 @@
               <FileType>1</FileType>
               <FilePath>.\hal-src\utils\crc32.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal-src\utils\hl_i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2378,6 +2393,11 @@
               <FileType>1</FileType>
               <FilePath>.\hal-src\utils\crc32.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal-src\utils\hl_i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2971,6 +2991,11 @@
               <FileName>crc32.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\hal-src\utils\crc32.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal-src\utils\hl_i2c.c</FilePath>
             </File>
           </Files>
         </Group>

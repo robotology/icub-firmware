@@ -706,6 +706,38 @@ void  hal_brdcfg_spi4encoder__chipSelect_init(hal_spi_port_t spix)
 //}
 
 
+// marco.accame: added hl_i2c tools
+
+#define USE_HL_I2C_FUNCTIONS
+
+
+#if     defined(USE_HL_I2C_FUNCTIONS)
+
+#include "../../utils/hl_i2c.h"
+
+// i dont verify constants. i just map to i2c1 and address of micrel 0xbe
+
+#define HL_I2CID                    hl_i2c1
+#define HL_MICREL_DEVADR            0xBE  
+
+
+extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
+{
+    hl_i2c_regaddr_t regaddr = { .numofbytes = 1, .bytes.one = 0 };
+    regaddr.bytes.one = (uint8_t) (WriteAddr & 0xff);
+    hl_i2c_write(HL_I2CID, HL_MICREL_DEVADR, regaddr, pBuffer, 1);    
+}
+
+extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr)
+{
+    hl_i2c_regaddr_t regaddr = { .numofbytes = 1, .bytes.one = 0 };
+    regaddr.bytes.one = (uint8_t) (ReadAddr & 0xff);
+    hl_i2c_read(HL_I2CID, HL_MICREL_DEVADR, regaddr, pBuffer, 1);     
+}
+
+
+#else
+
 extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
 { 
 
@@ -826,6 +858,9 @@ extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAdd
     // re-enable acknowledgement to be ready for another reception 
     I2C_AcknowledgeConfig(HAL_BRDCFG_I2C4HAL__PERIPHERAL, ENABLE);  
 }
+
+#endif
+
 #endif//HAL_USE_SWITCH
 
 
