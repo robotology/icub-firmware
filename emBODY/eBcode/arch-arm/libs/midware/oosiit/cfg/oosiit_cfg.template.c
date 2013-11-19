@@ -17,7 +17,7 @@
 */
 
 /* @file       oosiit_cfg.c
-	@brief      This file keeps internal implementation of the osiit.
+	@brief      This file keeps internal implementation of the oosiit.
 	@author     marco.accame@iit.it
     @date       07/30/2012
 **/
