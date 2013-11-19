@@ -1,0 +1,89 @@
+/*
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+
+Main differences between osiit and FreeRTOS
+
+
+- memory model
+  osal:     preallocated
+  freertos: preallocated or even using heap
+  APImodif: could add a memorymodel fiels in osal_params_cfg_t to be memmode_static or memmode_dynamic (uses malloc and free).
+  FRTmodif: NONE
+  OSALmod:  the memory for teh stack must be passed to the freertos
+  
+- time
+  osal:     it is counted in microsecs with 32 bits (relative time) or 64 bits (absolute time)
+  freertos: there is support for ticks of 32 bits, but the global time is a 32-bit variable. there is also nanotime.
+  APImodif: NONE
+  FRTmodif: use 64 bits for absolute time
+  
+- used entities
+  osal:     eventflag, message, timer, priority inversion mutex, semaphore, task, etc.
+  freertos: the eventflag is missing
+  APImodif: TODO revision
+  FRTmodif: add the eventflag management w/ APIs similar to the osal ones. It is necessary to add two 32bit words in task-control-block
+
+- periodic wakeup
+  osal:     uses the api from rtx-arm: osal_system_task_period_set(period) + osal_system_task_period_wait().
+  freertos: requires: (a) LastWakeTime = xTaskGetTickCount(); (b) vTaskDelayUntil( &xLastWakeTime, period );
+  APImodif: NONE. because we may change the definition of the type tskTaskControlBlock of frertos to keep use two additional variables:
+            the period (set by a new function) and the xLastWakeTime (initted by the call of a new iit_vTaskDelayUntil()).
+            as an alternative ... we could do the change in osal.c: osal_task_opaque_t coudl have a u32_period and a u64_lastwaketime
+            and in osal_system_task_period_set(period) we set u32_period = period and u64_lastwaketime = get_time().
+            then ... osal_system_task_period_wait shall call vTaskDelayUntil with the &u64_ and u32_ variables.
+            however, we need to retrieve the currently running task and get those values. ... we can do it.
+  FRTmodif: NONE
+  
+- task creation
+  osal:     requires a run function with void* argument,  argument etc.
+  freertos: the same, plus name of task
+  APImodif: NONE 
+  
+- system time set/get
+  freertos: needs a function whcih sets the system time
+            needs a function whcih gets the idle time ... ok, but we need to add also a counter in kernel.
+            
+- message queues
+  osal:     osiit does not have peek / push_front (it only has push_back). 
+            TODO: add a parameter so that adding to a queue can be done in front or in back. rtx shall not
+            support the put2front feature.
+  problem:  rtx puts and gets by reference (get() uses a void **msg) and freertos puts and gets by copy.
+            SEE how to fix things ...
+
+- eventflags
+  osal:     they are available.
+  freertos: add them.   
+  
+- mutex
+  osal:     ok
+  freertos: ok
+
+- semaphore
+  osal:     ok  
+  freertos: ok, but we probably should change some code to be able to set the token 
+  
+- timer
+  osal:     it has a time for a first shot and then time for a second optional shot. then option for absolute time.
+            it executes a callback w/ timer pointer plus argument of type void*
+  freertos: does not have the two time shots but only one and then the periodic flag. no option for absolute time.
+            it executes a function but with a param only: the timer pointer. however, it seems that we can pass a void*
+            which can be retrieved. There is no absolute time.
+            TODO: some understanding and possibly some changes to free-rtos
+  APImodif: MAYBE just one shot.             
+    
