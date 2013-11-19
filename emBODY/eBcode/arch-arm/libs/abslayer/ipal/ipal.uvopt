@@ -1072,7 +1072,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_arp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_arp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_arp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1088,7 +1088,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_base.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_base.c</PathWithFileName>
       <FilenameWithoutPath>ipal_base.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1104,7 +1104,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_dhcp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_dhcp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_dhcp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1120,7 +1120,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_eth.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_eth.c</PathWithFileName>
       <FilenameWithoutPath>ipal_eth.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1136,7 +1136,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_ftp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_ftp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_ftp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1152,7 +1152,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_igmp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_igmp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_igmp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1168,7 +1168,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_sys.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_sys.c</PathWithFileName>
       <FilenameWithoutPath>ipal_sys.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1184,7 +1184,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_tcp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_tcp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_tcp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1200,7 +1200,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_telnet.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_telnet.c</PathWithFileName>
       <FilenameWithoutPath>ipal_telnet.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1216,7 +1216,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_tftp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_tftp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_tftp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1232,7 +1232,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\ipal_udp.c</PathWithFileName>
+      <PathWithFileName>.\src\tcpnet\ipal_udp.c</PathWithFileName>
       <FilenameWithoutPath>ipal_udp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

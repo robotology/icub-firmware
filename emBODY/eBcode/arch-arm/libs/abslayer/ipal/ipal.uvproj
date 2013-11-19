@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_FULL IPAL_MEMORY_SMALL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src\tcpnet;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -394,57 +394,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_arp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_base.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_eth.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_sys.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_udp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -814,7 +814,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_FULL IPAL_MEMORY_MEDIUM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src\tcpnet;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -858,57 +858,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_arp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_base.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_eth.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_sys.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_udp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1278,7 +1278,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_BASE IPAL_MEMORY_SMALL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src\tcpnet;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1322,57 +1322,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_arp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_base.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_eth.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_sys.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_udp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1742,7 +1742,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_BASE IPAL_MEMORY_MEDIUM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src\tcpnet;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1786,57 +1786,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_arp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_base.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_eth.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_sys.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_udp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2206,7 +2206,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_BASE IPAL_MEMORY_LARGE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src\tcpnet;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2250,57 +2250,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_arp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_base.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_eth.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_sys.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\ipal_udp.c</FilePath>
+              <FilePath>.\src\tcpnet\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
