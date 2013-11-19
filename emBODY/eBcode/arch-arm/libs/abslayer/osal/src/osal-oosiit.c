@@ -984,7 +984,7 @@ extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message
 //        case oosiit_res_TMO:        res = (osal_callerTSK == caller) ? (osal_res_NOK_timeout) : (osal_res_NOK_isrnowait);             break;
         case oosiit_res_TMO:        res = osal_res_NOK_timeout;     break;
         case oosiit_res_NOK: 
-        case oosiit_res_OBJDEL:
+//        case oosiit_res_OBJDEL:
         default:                    res = osal_res_NOK_nullpointer; break; 
     }
     
@@ -1451,7 +1451,7 @@ extern osal_result_t osal_timer_start(osal_timer_t *timer, osal_timer_timing_t *
     { 
         return(osal_res_NOK_nullpointer);
     }
-    #warning -> protect it w/ mutex?
+    //#warning -> protect it w/ mutex?
     
 
     void* rtosobj = NULL;
@@ -1676,19 +1676,46 @@ void oosiit_sys_error(oosiit_error_code_t errorcode)
         {
             s_osal_error(osal_error_stackoverflow, "osal: stack overflow");
         } break;
-
+        
         case oosiit_error_isrfifooverflow:
         {
-             s_osal_error(osal_error_internal0, "osal: known error from rtos");
-        } break;
+             s_osal_error(osal_error_internal0, "osal: known error from rtos (isrfifooverflow)");
+        } break;  
+
         case oosiit_error_mbxoverflow:
         {
-            s_osal_error(osal_error_internal1, "osal: known error from rtos");
+            s_osal_error(osal_error_internal1, "osal: known error from rtos (mbxoverflow)");
+        } break;
+        
+        case oosiit_error_internal_stdlibspace:
+        {
+            s_osal_error(osal_error_internal2, "osal: known error from rtos (stdlibspace)");
+        } break;
+        
+        case oosiit_error_internal_sysmutex:
+        {
+            s_osal_error(osal_error_internal3, "osal: known error from rtos (sysmutex)");
+        } break;
+        
+        case oosiit_error_memory_allocation:
+        case oosiit_error_memory_preallocated:
+        {
+            s_osal_error(osal_error_missingmemory, "osal: memory is missing");
+        } break;
+        
+        case oosiit_error_invalid_tskptr:
+        {
+            s_osal_error(osal_error_internal4, "osal: known error from rtos (used an invalid tskptr)");
+        } break;
+        
+        case oosiit_error_invalid_objptr:
+        {
+            s_osal_error(osal_error_internal5, "osal: known error from rtos (used an invalid objptr)");
         } break;
  
         default:
         {
-            snprintf(str, sizeof(str), "osal: unknown error from rtos err=0x%x", errorcode);
+            snprintf(str, sizeof(str), "osal: error 0x%x from rtos", errorcode);
             s_osal_error(osal_error_unknownfromrtos, str);
         } break;
     }

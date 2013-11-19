@@ -83,12 +83,9 @@
 typedef enum 
 {
     osal_res_OK                     = 0,    /**< correct result */
-//    osal_res_OK_immediate         = +1,   // the task has gained the resource without waiting
-//    osal_res_OK_butwaited         = +2,   // the task has gained the resource waiting for some time
     osal_res_NOK_generic            = -1,   /**< generic error */
     osal_res_NOK_nullpointer        = -2,   /**< error due to a null pointer */
     osal_res_NOK_timeout            = -3    /**< the task did not get the resource after it waited for some time (or also zero time). */
-//    osal_res_NOK_isrnowait          = -4    /**< the isr did not get the resource when called the non-waiting version of the lock */
 } osal_result_t;
 
 
@@ -287,7 +284,7 @@ typedef struct
     osal_extfn_cfg_t    extfn;                  /**< User-defined behaviour defined with external function pointers */
 } osal_cfg_t;
 
-
+#warning --> maybe ... remove osal_arch_cfg_t
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 

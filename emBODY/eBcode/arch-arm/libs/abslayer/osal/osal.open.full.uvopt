@@ -949,7 +949,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\HAL_CM.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\HAL_CM.c</PathWithFileName>
       <FilenameWithoutPath>HAL_CM.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -965,7 +965,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\HAL_CM3.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\HAL_CM3.c</PathWithFileName>
       <FilenameWithoutPath>HAL_CM3.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -981,7 +981,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\HAL_CM4.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\HAL_CM4.c</PathWithFileName>
       <FilenameWithoutPath>HAL_CM4.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -997,7 +997,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Event.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Event.c</PathWithFileName>
       <FilenameWithoutPath>rt_Event.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1013,7 +1013,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_List.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_List.c</PathWithFileName>
       <FilenameWithoutPath>rt_List.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1029,7 +1029,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Mailbox.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Mailbox.c</PathWithFileName>
       <FilenameWithoutPath>rt_Mailbox.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1045,7 +1045,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_MemBox.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_MemBox.c</PathWithFileName>
       <FilenameWithoutPath>rt_MemBox.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1061,7 +1061,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Memory.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Memory.c</PathWithFileName>
       <FilenameWithoutPath>rt_Memory.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1077,7 +1077,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Mutex.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Mutex.c</PathWithFileName>
       <FilenameWithoutPath>rt_Mutex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1093,7 +1093,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Robin.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Robin.c</PathWithFileName>
       <FilenameWithoutPath>rt_Robin.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1109,7 +1109,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Semaphore.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Semaphore.c</PathWithFileName>
       <FilenameWithoutPath>rt_Semaphore.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1125,7 +1125,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_System.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_System.c</PathWithFileName>
       <FilenameWithoutPath>rt_System.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1141,7 +1141,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Task.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Task.c</PathWithFileName>
       <FilenameWithoutPath>rt_Task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1154,10 +1154,10 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Time.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Time.c</PathWithFileName>
       <FilenameWithoutPath>rt_Time.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1173,7 +1173,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\rt_Timer.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\rt_Timer.c</PathWithFileName>
       <FilenameWithoutPath>rt_Timer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1184,12 +1184,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>31</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>701</TopLine>
-      <CurrentLine>708</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\others\oosiit.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\others\oosiit.c</PathWithFileName>
       <FilenameWithoutPath>oosiit.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1205,7 +1205,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\others\rt_iit_AdvTimer.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\others\rt_iit_AdvTimer.c</PathWithFileName>
       <FilenameWithoutPath>rt_iit_AdvTimer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1216,12 +1216,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1967</TopLine>
-      <CurrentLine>1980</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\others\rt_iit_changes.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\others\rt_iit_changes.c</PathWithFileName>
       <FilenameWithoutPath>rt_iit_changes.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1237,7 +1237,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\others\rt_iit_memory.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\others\rt_iit_memory.c</PathWithFileName>
       <FilenameWithoutPath>rt_iit_memory.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1253,7 +1253,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-src\cmsis-rtx-modified\cm\SVC_Table.s</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\cmsis-rtx-modified\cm\SVC_Table.s</PathWithFileName>
       <FilenameWithoutPath>SVC_Table.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1269,7 +1269,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\midware\oosiit-package\oosiit\oosiit-stg\oosiit_storage.c</PathWithFileName>
+      <PathWithFileName>..\..\midware\oosiit\src\others\oosiit_storage.c</PathWithFileName>
       <FilenameWithoutPath>oosiit_storage.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1286,14 +1286,14 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>22</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>58</ColumnNumber>
+      <ColumnNumber>69</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>533</TopLine>
-      <CurrentLine>542</CurrentLine>
+      <TopLine>1896</TopLine>
+      <CurrentLine>1911</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\osal-src\osal-oosiit.c</PathWithFileName>
+      <PathWithFileName>.\src\osal-oosiit.c</PathWithFileName>
       <FilenameWithoutPath>osal-oosiit.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
