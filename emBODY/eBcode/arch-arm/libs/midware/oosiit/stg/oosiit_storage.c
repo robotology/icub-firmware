@@ -17,7 +17,7 @@
 */
 
 /* @file       oosiit_storage.c
-	@brief      This file keeps ram storage and implementation of some internals of osiit and rl-rtx
+	@brief      This file keeps ram storage and implementation of some internals of oosiit and rl-rtx
 	@author     marco.accame@iit.it
     @date       07/30/2012
 **/
