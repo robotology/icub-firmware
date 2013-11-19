@@ -61,14 +61,13 @@ extern "C" {
  **/ 
 typedef enum
 {
-    oosiit_res_OK       = 0x00,
-    oosiit_res_NOK      = 0xff,
-    oosiit_res_TMO      = 0x01,
-    oosiit_res_EVT      = 0x02,
-    oosiit_res_SEM      = 0x03,
-    oosiit_res_MBX      = 0x04,
-    oosiit_res_MUT      = 0x05,
-    oosiit_res_OBJDEL   = 0x10
+    oosiit_res_OK       = 0x00,     /**< generic success */
+    oosiit_res_NOK      = 0xff,     /**< generic error */
+    oosiit_res_TMO      = 0x01,     /**< the function returned for a timeout */
+    oosiit_res_EVT      = 0x02,     /**< the function successfully received an event before the timeout */
+    oosiit_res_SEM      = 0x03,     /**< the function has successfully acquired a semaphore, but waited for some time no longer than the timeout */  
+    oosiit_res_MBX      = 0x04,     /**< the function has successfully retrieved a mailbox, but waited for some time no longer than the timeout */
+    oosiit_res_MUT      = 0x05      /**< the function has successfully acquired a mutex, but waited for some time no longer than the timeout */
 } oosiit_result_t;
 
 
