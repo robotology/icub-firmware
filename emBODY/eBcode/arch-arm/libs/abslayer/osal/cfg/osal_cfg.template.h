@@ -41,14 +41,14 @@
 //   <o> CPU family         <0=>   Cortex M3 <1=>   Cortex M4
 //   <i> Only Cortex M3 and M4 are now supported.
 #ifndef OSAL_CPUFAM
- #define OSAL_CPUFAM      1
+ #define OSAL_CPUFAM      0
 #endif
 
 //   <o> CPU Frequency [Hz] <1-1000000000>
 //   <i> Specify CPU frequency.
-//   <i> Default: 72000000  (72MHz on STM32F107)
+//   <i> Default: 72000000  (72MHz on STM32F107, 168Mhz on STM32F407)
 #ifndef OSAL_CPUFREQ
- #define OSAL_CPUFREQ       168000000
+ #define OSAL_CPUFREQ       72000000
 #endif
 
 
@@ -221,6 +221,8 @@
     #endif
 
 #endif
+
+
 
 // - end of controls --------------------------------------------------------------------------------------------------
 
