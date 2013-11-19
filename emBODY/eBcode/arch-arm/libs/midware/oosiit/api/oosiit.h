@@ -70,6 +70,7 @@ typedef enum
     oosiit_res_MUT      = 0x05      /**< the function has successfully acquired a mutex, but waited for some time no longer than the timeout */
 } oosiit_result_t;
 
+#warning WIP-> think about fixing result_t so that nok are negative (nok and tmo) and ok are positive or zero.
 
 /** @typedef    typedef uint32_t oosiit_taskid_t 
     @brief      contains the identifier of a oosiit task.
