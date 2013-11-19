@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>eventviewer-cm3</TargetName>
+      <TargetName>eview-cm3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -75,7 +75,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\eventviewer.cm3.lib .\eventviewer-lib\eventviewer.cm3.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\eventviewer.cm3.lib .\lib\eventviewer.cm3.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -136,6 +136,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>-1</TargetSelection>
@@ -349,7 +350,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\eventviewer-api</IncludePath>
+              <IncludePath>.\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -393,14 +394,14 @@
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\eventviewer-src\eventviewer.c</FilePath>
+              <FilePath>.\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>eventiviewer-cm4</TargetName>
+      <TargetName>eview-cm4</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -468,7 +469,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\eventviewer.cm4.lib .\eventviewer-lib\eventviewer.cm4.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\eventviewer.cm4.lib .\lib\eventviewer.cm4.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -529,6 +530,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>-1</TargetSelection>
@@ -742,7 +744,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\eventviewer-api</IncludePath>
+              <IncludePath>.\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -786,7 +788,7 @@
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\eventviewer-src\eventviewer.c</FilePath>
+              <FilePath>.\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>
