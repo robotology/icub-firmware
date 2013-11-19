@@ -48,8 +48,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -75,7 +75,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.full.small.lib .\ipal-lib\ipal.full.small.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.full.small.lib .\lib\ipal.full.small.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_FULL IPAL_MEMORY_SMALL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\ipal-api;.\ipal-src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -394,57 +394,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_arp.c</FilePath>
+              <FilePath>.\src\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_base.c</FilePath>
+              <FilePath>.\src\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_eth.c</FilePath>
+              <FilePath>.\src\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_sys.c</FilePath>
+              <FilePath>.\src\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_udp.c</FilePath>
+              <FilePath>.\src\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -512,8 +512,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -539,7 +539,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.full.medium.lib .\ipal-lib\ipal.full.medium.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.full.medium.lib .\lib\ipal.full.medium.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -814,7 +814,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_FULL IPAL_MEMORY_MEDIUM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\ipal-api;.\ipal-src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -858,57 +858,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_arp.c</FilePath>
+              <FilePath>.\src\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_base.c</FilePath>
+              <FilePath>.\src\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_eth.c</FilePath>
+              <FilePath>.\src\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_sys.c</FilePath>
+              <FilePath>.\src\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_udp.c</FilePath>
+              <FilePath>.\src\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -976,8 +976,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -1003,7 +1003,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.base.small.lib .\ipal-lib\ipal.base.small.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.base.small.lib .\lib\ipal.base.small.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1278,7 +1278,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_BASE IPAL_MEMORY_SMALL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\ipal-api;.\ipal-src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1322,57 +1322,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_arp.c</FilePath>
+              <FilePath>.\src\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_base.c</FilePath>
+              <FilePath>.\src\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_eth.c</FilePath>
+              <FilePath>.\src\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_sys.c</FilePath>
+              <FilePath>.\src\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_udp.c</FilePath>
+              <FilePath>.\src\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1440,8 +1440,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -1467,7 +1467,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.base.medium.lib .\ipal-lib\ipal.base.medium.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.base.medium.lib .\lib\ipal.base.medium.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1742,7 +1742,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_BASE IPAL_MEMORY_MEDIUM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\ipal-api;.\ipal-src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1786,57 +1786,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_arp.c</FilePath>
+              <FilePath>.\src\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_base.c</FilePath>
+              <FilePath>.\src\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_eth.c</FilePath>
+              <FilePath>.\src\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_sys.c</FilePath>
+              <FilePath>.\src\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_udp.c</FilePath>
+              <FilePath>.\src\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1904,8 +1904,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -1931,7 +1931,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.base.large.lib .\ipal-lib\ipal.base.large.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\ipal.base.large.lib .\lib\ipal.base.large.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -2206,7 +2206,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>IPAL_MODE_BASE IPAL_MEMORY_LARGE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\ipal\ipal-api;.\ipal-src;.\ipal-extra</IncludePath>
+              <IncludePath>..\ipal\api;.\src;.\ipal-extra</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2250,57 +2250,57 @@
             <File>
               <FileName>ipal_arp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_arp.c</FilePath>
+              <FilePath>.\src\ipal_arp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_base.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_base.c</FilePath>
+              <FilePath>.\src\ipal_base.c</FilePath>
             </File>
             <File>
               <FileName>ipal_dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_dhcp.c</FilePath>
+              <FilePath>.\src\ipal_dhcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_eth.c</FilePath>
+              <FilePath>.\src\ipal_eth.c</FilePath>
             </File>
             <File>
               <FileName>ipal_ftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_ftp.c</FilePath>
+              <FilePath>.\src\ipal_ftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_igmp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_igmp.c</FilePath>
+              <FilePath>.\src\ipal_igmp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_sys.c</FilePath>
+              <FilePath>.\src\ipal_sys.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tcp.c</FilePath>
+              <FilePath>.\src\ipal_tcp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_telnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_telnet.c</FilePath>
+              <FilePath>.\src\ipal_telnet.c</FilePath>
             </File>
             <File>
               <FileName>ipal_tftp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_tftp.c</FilePath>
+              <FilePath>.\src\ipal_tftp.c</FilePath>
             </File>
             <File>
               <FileName>ipal_udp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ipal-src\ipal_udp.c</FilePath>
+              <FilePath>.\src\ipal_udp.c</FilePath>
             </File>
           </Files>
         </Group>
