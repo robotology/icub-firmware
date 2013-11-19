@@ -21,7 +21,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>osal.open.full.cm3</TargetName>
+    <TargetName>osal.cm3</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -249,7 +249,7 @@
   </Target>
 
   <Target>
-    <TargetName>osal.open.full.cm3.dbg</TargetName>
+    <TargetName>osal.cm3.dbg</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -477,7 +477,7 @@
   </Target>
 
   <Target>
-    <TargetName>osal.open.full.cm4</TargetName>
+    <TargetName>osal.cm4</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -705,7 +705,7 @@
   </Target>
 
   <Target>
-    <TargetName>osal.open.full.cm4.dbg</TargetName>
+    <TargetName>osal.cm4.dbg</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -1290,7 +1290,7 @@
       <Focus>0</Focus>
       <ColumnNumber>69</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1896</TopLine>
+      <TopLine>1899</TopLine>
       <CurrentLine>1911</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\src\osal-oosiit.c</PathWithFileName>
