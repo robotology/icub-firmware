@@ -1,0 +1,30 @@
+
+Library embEnv contains services for the embedded environment which are of support for the all 
+applications (see note 1) present on the MPU (memory mapping, shared EEPROM storage, board and application
+info, partition table, etc.).
+
+
+In embEnv are available the following.
+
+- Templates for assigning the memory resources of RAM and FLASH to the eProcesses running on a given board.
+  This information is contained in file eEmemorymap.h which must define some macro used in other files of embEnv.
+  They are in embenv/cfg.
+  Usage.  ... to be written yet.
+  
+  
+- Templates for the scatter files used in ARM CC Keil compiler for mapping each eProcess in RAM / FLASH.
+  They are in embenv/cfg. 
+  Usage. Copy the relevant scatter file and use it in your project. Change to include eEmemorymap.h with 
+         the exact relative path.
+  
+- Source code based upon abslayer and midware, for the management of various tasks which are common to all
+  eProcesses. They are grouped in the following.
+  - sharserv:       Library which offers EEPROM storage, inter-process communication, application info, partition 
+                    table for the ePocesses inside the MPU. 
+                    It is usable by including embenv/api/eEsharedServices.h and by compiling all files in embenv/src
+                    
+                    
+                    
+Note 1.
+  The MPU has three (or more) code spaces (or eProcesses) in its inside: the eLoader, the eUpdater, and 
+  the eApplication.                   

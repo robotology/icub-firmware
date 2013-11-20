@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+/*
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -25,29 +25,26 @@
 /** @file       eEsharedServices.c
     @brief      This header file implements public interface to ....
     @author     marco.accame@iit.it
-    @date       12/12/2011
+    @date       11/20/2013
 **/
+
+
+// it is possible using shared-services in two modes:
+// - shared library mode by defining SHARSERV_MODE_SHALIB
+// - static library mode by undefining  SHARSERV_MODE_SHALIB
+// the static library mode is the recommended one
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "eEcommon.h"
-#include "eEmemorymap.h"
-
-
-// - public #define  --------------------------------------------------------------------------------------------------
-
 
 #if defined(SHARSERV_MODE_SHALIB)
-
-#if !defined(SHALS_MODE_STATIC)
-#define SHALBASE_MODE_STATICLIBRARY
-#define SHALPART_MODE_STATICLIBRARY
-#define SHALINFO_MODE_STATICLIBRARY  
+// it is required the memory map of shared services to know: EENV_MEMMAP_SHARSERV_ROMADDR, EENV_MODULEINFO_OFFSET
+#include "eEmemorymap.h"    
 #endif
 
-#endif
-
+// - public #define  --------------------------------------------------------------------------------------------------
 
 
 #define SHARSERV_NAME                   "sharSERV"          
@@ -93,6 +90,7 @@ typedef enum
     sharserv_info_page128           = 6
 } ee_sharserv_info_deviceinfo_item_t;
 
+
 typedef struct                      // 256B              
 {
     eEipnetwork_t                   ipnetwork;      //016B 
@@ -107,7 +105,13 @@ typedef struct                      // 256B
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-#if     defined(SHARSERV_MODE_SHALIB)
+#if     !defined(SHARSERV_MODE_SHALIB)
+
+extern const eEmoduleInfo_t * ee_sharserv_moduleinfo_get(void);
+extern const eEentity_t * ee_sharserv_moduleinfo_entity_get(void);
+extern eEresult_t ee_sharserv_isvalid(void);
+
+#else
 
 // inline and with reference only to rom addresses to make it independent from presence of shalib in rom
 // in such a way the functions are executed with secure code and not with a jump to a location where the
@@ -140,13 +144,8 @@ EO_extern_inline eEresult_t ee_sharserv_isvalid(void)
        }
 }
 
-#else
-
-extern const eEmoduleInfo_t * ee_sharserv_moduleinfo_get(void);
-extern const eEentity_t * ee_sharserv_moduleinfo_entity_get(void);
-extern eEresult_t ee_sharserv_isvalid(void);
-
 #endif	
+
 
 extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode);
 extern eEresult_t ee_sharserv_selfregister(void);

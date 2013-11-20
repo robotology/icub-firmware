@@ -23,15 +23,28 @@
 #include "string.h"
 #include "stdlib.h"
 
+#include "eEmemorymap.h"  
+
+
+// VERY IMPORTANT: these must stay before inclusion of shalBASE.h etc.
+#if !defined(SHALS_MODE_STATIC)
+    #define SHALBASE_MODE_STATICLIBRARY
+    #define SHALPART_MODE_STATICLIBRARY
+    #define SHALINFO_MODE_STATICLIBRARY  
+#endif
+
+
 #include "shalBASE.h"
 #include "shalPART.h"
 #include "shalINFO.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "eEsharedServices.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -152,9 +165,7 @@ static const eEmoduleInfo_t s_sharserv_moduleinfo   SHARSERV_MODULEINFO_PLACED_A
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     defined(SHARSERV_MODE_SHALIB)
-    // using inline functions
-#else
+#if     !defined(SHARSERV_MODE_SHALIB)
     
 extern const eEmoduleInfo_t * ee_sharserv_moduleinfo_get(void)
 {
@@ -171,6 +182,8 @@ extern eEresult_t ee_sharserv_isvalid(void)
     return(ee_res_OK);
 }
 
+#else
+    // nothing as i have used inline functions defined in header
 #endif
 
 
@@ -516,6 +529,9 @@ extern eEresult_t ee_sharserv_info_deviceinfo_item_set(ee_sharserv_info_devicein
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+#if     defined(SHARSERV_MODE_SHALIB)
+
 extern void shalbase_entrypoint(void);
 
 extern void shalpart_hid_entrypoint(void);
@@ -527,6 +543,7 @@ extern void sharserv_entrypoint(void)
     shalpart_hid_entrypoint();  
 }
 
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

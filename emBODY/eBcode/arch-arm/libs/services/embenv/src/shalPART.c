@@ -27,7 +27,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "string.h"
-
+#include "eEmemorymap.h" 
 #include "shalBASE.h"
 
 
@@ -94,6 +94,22 @@ typedef struct              // 808B
 #define SHALPART_MODE_STATICLIBRARY
 
 
+
+#if     defined(SHALPART_MODE_STATICLIBRARY)
+
+
+#define SHALPART_ROMADDR            (0)
+#define SHALPART_ROMSIZE            (0)
+
+#define SHALPART_RAMADDR            (0)
+#define SHALPART_RAMSIZE            (0)
+
+#define SHALPART_STGTYPE            (ee_strg_eeprom)
+#define SHALPART_STGADDR            (EENV_MEMMAP_SHALPART_STGADDR)
+#define SHALPART_STGSIZE            (EENV_MEMMAP_SHALPART_STGSIZE)
+
+#else   // shared lib
+
 #define SHALPART_ROMADDR            (EENV_MEMMAP_SHALPART_ROMADDR)
 #define SHALPART_ROMSIZE            (EENV_MEMMAP_SHALPART_ROMSIZE)
 
@@ -116,6 +132,7 @@ typedef int dummy1[sizeof(partTableStorage_t)     <= (SHALPART_RAMSIZE) ? 1 : -1
 typedef int dummy2[SHALPART_RAMFOR_ZIDATA <= ((SHALPART_RAMSIZE-SHALPART_RAMFOR_RWDATA)) ? 1 : -1];
 
 
+#endif
 
 
 
@@ -141,7 +158,7 @@ static eEboolval_t s_shalpart_storage_is_valid(void* storage);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#warning ENHANCE IT: by not mapping s_shalpart_tableStored at SHALPART_RAMADDR
 static volatile partTableStorage_t s_shalpart_tableStored __attribute__((at(SHALPART_RAMADDR))); 
 
 // - module info ------------------------------------------------------------------------------------------------------

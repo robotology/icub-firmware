@@ -40,7 +40,6 @@
 
 #include "stdint.h"
 #include "eEcommon.h"
-#include "eEmemorymap.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------

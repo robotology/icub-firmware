@@ -29,7 +29,7 @@
 
 
 #include "string.h"
-
+#include "eEmemorymap.h" 
 #include "shalBASE.h"
 #include "shalPART.h"
 
@@ -85,6 +85,21 @@ typedef struct              // 272B
 #define SHALINFO_MODE_STATICLIBRARY
 
 
+
+#if     defined(SHALINFO_MODE_STATICLIBRARY)
+
+#define SHALINFO_ROMADDR            (0)
+#define SHALINFO_ROMSIZE            (0)
+
+#define SHALINFO_RAMADDR            (0)
+#define SHALINFO_RAMSIZE            (0)
+
+#define SHALINFO_STGTYPE            (ee_strg_eeprom)
+#define SHALINFO_STGADDR            (EENV_MEMMAP_SHALINFO_STGADDR)
+#define SHALINFO_STGSIZE            (EENV_MEMMAP_SHALINFO_STGSIZE)
+
+#else   // shared lib
+
 #define SHALINFO_ROMADDR            (EENV_MEMMAP_SHALINFO_ROMADDR)
 #define SHALINFO_ROMSIZE            (EENV_MEMMAP_SHALINFO_ROMSIZE)
 
@@ -105,7 +120,7 @@ typedef struct              // 272B
 typedef int dummy1[(sizeof(infoBoardInfoStorage_t)+sizeof(infoDeviceInfoStorage_t))     <= (SHALINFO_RAMSIZE) ? 1 : -1];
 typedef int dummy2[SHALINFO_RAMFOR_ZIDATA <= ((SHALINFO_RAMSIZE-SHALINFO_RAMFOR_RWDATA)) ? 1 : -1];
 
-
+#endif  // shared lib
 
 
 
@@ -210,6 +225,8 @@ static const eEboardInfo_t s_shalinfo_boardinfo_default =
 
 
 // - volatile values --------------------------------------------------------------------------------------------------
+
+#warning ENHANCE IT: by not mapping s_shalinfo_boardinfoStored and s_shalinfo_deviceinfoStored at SHALINFO_RAMADDR
 
 // used for board-info services 
 static volatile infoBoardInfoStorage_t s_shalinfo_boardinfoStored  __attribute__((at(SHALINFO_RAMADDR)));

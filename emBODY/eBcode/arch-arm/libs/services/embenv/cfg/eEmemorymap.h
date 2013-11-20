@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+/*
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EEMEMORYMAP_H_
 #define _EEMEMORYMAP_H_
@@ -26,11 +27,16 @@
 /** @file       eEmemorymap.h
     @brief      This header file defines memory map for the cmx system.
     @author     marco.accame@iit.it
-    @date       09/21/2011
+    @date       11/20/2013
 **/
 
-#include "eEmemorymap_stm32f1.h"
+#define EENV_USE_MEMORYMAP_STM32F1_256K_V1
 
+#if     defined(EENV_USE_MEMORYMAP_STM32F1_256K_V1)
+
+#include "eEmemorymap_stm32f1_256k_v1.h"
+
+#endif//defined()
 
 #endif  // include-guard
 

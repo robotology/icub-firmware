@@ -31,9 +31,8 @@
 #endif
 
 #include "hal.h"
-
 #include "string.h"
-
+#include "eEmemorymap.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,9 +84,23 @@ typedef struct                                      // 40B
 // always in static mode
 #define SHALBASE_MODE_STATICLIBRARY
 
-
 #define SHALBASE_DONTUSESTRGFLASH
 
+
+
+#if     defined(SHALBASE_MODE_STATICLIBRARY)
+
+#define SHALBASE_ROMADDR            (0)
+#define SHALBASE_ROMSIZE            (0)
+
+#define SHALBASE_RAMADDR            (0)
+#define SHALBASE_RAMSIZE            (0)
+
+#define SHALBASE_STGTYPE            (ee_strg_eeprom)
+#define SHALBASE_STGADDR            (EENV_MEMMAP_SHALBASE_STGADDR)
+#define SHALBASE_STGSIZE            (EENV_MEMMAP_SHALBASE_STGSIZE)
+
+#else   // shared lib 
 
 #define SHALBASE_ROMADDR            (EENV_MEMMAP_SHALBASE_ROMADDR)
 #define SHALBASE_ROMSIZE            (EENV_MEMMAP_SHALBASE_ROMSIZE)
@@ -109,6 +122,7 @@ typedef struct                                      // 40B
 typedef int dummy1[sizeof(baseIPCdataStorage_t)     <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
 typedef int dummy2[SHALBASE_RAMFOR_ZIDATA <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
 
+#endif   // shared lib 
 
 // - flags ------------------------------------------------------------------------------------------------------------
 #define FLAG_OK                         0x01

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EECOMMON_H_
@@ -6,13 +23,13 @@
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       eEcommon.h
-    @brief      This header file implements public interface to the embENV.
+    @brief      This header file contains common data structures used in the embEenv.
     @author     marco.accame@iit.it
-    @date       11/03/2011
+    @date       11/20/2013
 **/
 
-/** @defgroup embenv embENV environment
-    The embENV allows ...... 
+/** @defgroup embenv embEenv environment
+    The embEnv allows ...... 
  
     @todo acemor-facenda: do documentation.
     
@@ -24,43 +41,74 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "emBODYporting.h"
 
 #include "stdint.h"
-//#include "eEmemorymap.h"
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define EECOMMON_VERIFYsizeof(sname, ssize)         __emBODYportingVERIFYsizeof(sname, ssize)
+// it holds a c-preprocessor mode to verify that the size of a type is exactly size bytes.
+#define EECOMMON_VERIFYsizeof(type, size)     typedef uint8_t EEGUARD_##type[ ( size == sizeof(type) ) ? (1) : (-1)];
 
-
+// it builds an ip address in embEnv format starting from the dot decimal value ip1.ip2.ip3.ip4
 #define EECOMMON_ipaddr_from(ip1, ip2, ip3, ip4)    ( (((uint32_t)(ip4) << 24)&0xff000000) | \
                                                       (((uint32_t)(ip3) << 16)&0x00ff0000) | \
                                                       (((uint32_t)(ip2) << 8)&0x0000ff00)  | \
                                                       (((uint32_t)(ip1) << 0)&0x000000ff) )
+// the used mac oui                                                     
 #define EECOMMON_mac_oui_iit                        (0x0000000000000002)//(0x0000000000332211)
-#define EECOMMON_ipaddr_base_iit                    EECOMMON_ipaddr_from(10, 0, 0, 0)
-#define EECOMMON_ipmask_default_iit                 EECOMMON_ipaddr_from(255, 255, 255, 0)
+
+// the default bytes of the address
+#define EECOMMON_ipaddr_def1                        10
+#define EECOMMON_ipaddr_def2                        0
 #define EECOMMON_ipaddr_def3                        1
 #define EECOMMON_ipaddr_def4                        99
+
+// the base ip address: it is 
+#define EECOMMON_ipaddr_base_iit                    EECOMMON_ipaddr_from(EECOMMON_ipaddr_def1, EECOMMON_ipaddr_def2, EECOMMON_ipaddr_def3, 0)
+
+// the defaul ip address
+#define EECOMMON_ipaddr_default                     EECOMMON_ipaddr_from(EECOMMON_ipaddr_def1, EECOMMON_ipaddr_def2, EECOMMON_ipaddr_def3, EECOMMON_ipaddr_def4)
+
+// the ip mask
+#define EECOMMON_ipmask_default_iit                 EECOMMON_ipaddr_from(255, 255, 255, 0)
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef emBODYporting_enum08_t eEenum08_t
+/** @typedef    typedef int8_t eEenum08_t
     @brief      eEenum08_t contains a generic enum which must be contained in exactly 8 bit. It is a int8_t
  **/
-typedef emBODYporting_enum08_t eEenum08_t;
+typedef int8_t eEenum08_t;
+
+
+/** @typedef    typedef uint32_t eEipaddr_t
+    @brief      contains the ip address
+ **/
+typedef uint32_t eEipaddr_t;
+
+
+/** @typedef    typedef uint64_t eEmacaddr_t
+    @brief      contains the mac address in the 6 LSBs
+ **/
+typedef uint64_t eEmacaddr_t;
+
+
+/** @typedef    typedef uint32_t eEcanaddr_t
+    @brief      contains the can address
+ **/
+typedef uint32_t eEcanaddr_t;
 
 
 /** @typedef    typedef enum eEresult_t
-    @brief      eEresult_t is used to communicate function result. 
+    @brief      eEresult_t is keeps results of functions. It holds values which are compatible
+                with other %&^result_t types (OK is 0, generic NOK is -1).
  **/  
 typedef enum               
 {
-    ee_res_OK               = 0,        // compatible with common type for future change
+    ee_res_OK               = 0,        
     ee_res_NOK_generic      = -1 
 } eEresult_t; 
 
@@ -80,6 +128,7 @@ typedef enum
  **/ 
 typedef uint8_t     eEbool_t;
 
+
 /** @typedef    typedef uint32_t eEreltime_t
     @brief      eEreltime_t contains the relative time expressed in micro-seconds. It is used for relative timing
                 operations because its maximum value is about 4294 seconds. 
@@ -89,9 +138,9 @@ typedef uint32_t    eEreltime_t;
 
 /** @typedef    typedef struct eEdate_t
     @brief      eEdate_t keeps the date of when a module is built or a board is made
-    @warning    this type must be of a given fized size: 4B
+    @warning    this type must be of a given fixed size: 4B
  **/ 
-typedef struct          // 4B               
+typedef struct                     
 {
     uint32_t            year  : 12;    /**< the year a.d. upto 2047 */
     uint32_t            month : 4;     /**< the month, where jan is 1, dec is 12 */
@@ -103,36 +152,33 @@ typedef struct          // 4B
 
 /** @typedef    typedef struct eEversion_t
     @brief      eEversion_t is used to keep the version of an eEmodule. 
-    @warning    this type must be of a given fized size: 4B
+    @warning    this type must be of a given fixed size: 2B
  **/  
-typedef struct                  // 02B
+typedef struct      
 {
     uint8_t             major;          /**< major number   */ 
     uint8_t             minor;          /**< minor number  */  
 } eEversion_t;          EECOMMON_VERIFYsizeof(eEversion_t, 2);
 
 
-  
-//typedef uint8_t eEmodule_t;
-
-
 /** @typedef    typedef enum eEmoduleType_t
-    @brief      eEmoduleType_t keeps the kinds of modules. 
+    @brief      eEmoduleType_t keeps the kinds of module. 
  **/  
 typedef enum               
 {
-    ee_none                 = 0,
-    ee_process              = 1,        
-    ee_sharlib              = 2,
-    ee_storage              = 3    
+    ee_none                 = 0,    /**< module of no type */
+    ee_process              = 1,    /**< the module is an eProcess: it contains executable code **/        
+    ee_sharlib              = 2,    /**< the module is a shared library: it contains a library mapped at a fixed address and available to all eProcesses) */
+    ee_storage              = 3     /**< the module is used for storage of data */    
 } eEmoduleType_t;
 
 
 /** @typedef    typedef struct eEsysmemory_t
-    @brief      eEsysmemory_t keeps information on memory. 
-    @warning    this type must be of a given fized size: 8B
+    @brief      eEsysmemory_t keeps information on memory. It can be used for instance to tell 
+                which FLASH / RAM / EEPROM is used by an eProcess.
+    @warning    this type must be of a given fixed size: 8B
   **/
-typedef struct          // 8B 
+typedef struct    
 {
     uint32_t            addr;               /**< the address of memory */
     uint32_t            size;               /**< the size of memory */
@@ -140,22 +186,22 @@ typedef struct          // 8B
 
 
 /** @typedef    typedef enum eEstorageType_t
-    @brief      eEstorageType_t specifies what kind of storage it can be used. 
+    @brief      eEstorageType_t specifies the kind of storage in use 
  **/  
 typedef enum
 {
     ee_strg_none            = 0,                    /**< no storage */
     ee_strg_eflash          = 1,                    /**< embedded flash */
-    ee_strg_emuleeprom      = 2,                    /**< eeprom emulated on flash */
-    ee_strg_eeprom          = 3                     /**< eeprom */
+    ee_strg_emuleeprom      = 2,                    /**< EEPROM emulated on flash */
+    ee_strg_eeprom          = 3                     /**< EEPROM */
 } eEstorageType_t;
 
 
 /** @typedef    typedef struct eEstorage_t
     @brief      eEstorage_t keeps information on storage. 
-    @warning    this type must be of a given fized size: 8B
+    @warning    this type must be of a given fixed size: 8B
   **/
-typedef struct          // 08 BYTES 
+typedef struct          
 {
     uint32_t            type   : 2;         /**< the type of storage medium: use eEstorageType_t */
     uint32_t            size   : 30;        /**< the size of storage medium */
@@ -163,6 +209,9 @@ typedef struct          // 08 BYTES
 } eEstorage_t;          EECOMMON_VERIFYsizeof(eEstorage_t, 8);
 
 
+/** @typedef    typedef enum eEcommunicationType_t
+    @brief      keeps information on communication type 
+  **/
 typedef enum
 {
     ee_commtype_none    = 0,
@@ -179,9 +228,9 @@ typedef enum
 
 /** @typedef    typedef struct eEprotocolInfo_t
     @brief      eEprotocolInfo_t keeps information on protocol. 
-    @warning    this type must be of a given fized size: 8B
+    @warning    this type must be of a given fixed size: 8B
   **/
-typedef struct          // 08 BYTES
+typedef struct          
 {
     eEversion_t         udpprotversion;     /**< the protocol version of the udp communication (non-zero if exists) */
     eEversion_t         can1protversion;    /**< the protocol version of the can1 communication (non-zero if exists) */
@@ -192,45 +241,47 @@ typedef struct          // 08 BYTES
 
 /** @typedef    typedef struct eEipnetwork_t
     @brief      eEipnetwork_t keeps information on the ipnetwork. 
-    @warning    this type must be of a given fized size: 16B
+    @warning    this type must be of a given fixed size: 16B
   **/
-typedef struct          // 16 BYTES
+typedef struct          
 {
-    uint64_t            macaddress;         /**< the mac address is contained in the 6 lsb */
-    uint32_t            ipaddress;          /**< the ip address. if zero dchp is used */
-    uint32_t            ipnetmask;          /**< the netmask */
+    eEmacaddr_t         macaddress;         /**< the mac address */
+    eEipaddr_t          ipaddress;          /**< the ip address */
+    eEipaddr_t          ipnetmask;          /**< the netmask */
 } eEipnetwork_t;        EECOMMON_VERIFYsizeof(eEipnetwork_t, 16);
 
 
 
 /** @typedef    typedef struct eEcannetwork_t
     @brief      eEcannetwork_t keeps information on the can network. 
-    @warning    this type must be of a given fized size: 4B
+    @warning    this type must be of a given fixed size: 4B
   **/
 typedef struct          // 4 BYTES
 {
-    uint32_t            idcan;
+    eEcanaddr_t         idcan;
 } eEcannetwork_t;       EECOMMON_VERIFYsizeof(eEcannetwork_t, 4);
 
 
+/** @typedef    typedef enum eEtypeOfEntity_t
+    @brief      specifies the entity. 
+  **/
 typedef enum
 {
-    ee_entity_none                  = 0,
-    ee_entity_board                 = 1, 
-    ee_entity_process               = 2,        
-    ee_entity_sharlib               = 3,
-    ee_entity_statlib               = 4,  
-    ee_entity_filesys               = 5,
-    ee_entity_forfuture6            = 6,
-    ee_entity_forfuture7            = 7
+    ee_entity_none                  = 0,    /**< none */
+    ee_entity_board                 = 1,    /**< a board. */
+    ee_entity_process               = 2,    /**< an eProcess. */        
+    ee_entity_sharlib               = 3,    /**< a shared library. */ 
+    ee_entity_forfuture4            = 4     /**< for future use */
 } eEtypeOfEntity_t;
 
 
-/** @typedef    typedef struct eEcannetwork_t
-    @brief      eEcannetwork_t keeps information on the can network. 
-    @warning    this type must be of a given fized size: 8B
+/** @typedef    typedef struct eEentity_t
+    @brief      Keeps basic information which specifies an entity. The entity can be one of what specified in eEtypeOfEntity_t.
+                If for instance it is an eProcess, its type is ee_entity_process, its signature is the kind of eProcess 
+                (e.g., the eLoader), its version is the software version, and buildate keeps the date of build.
+    @warning    this type must be of a given fixed size: 8B
   **/
-typedef struct          // 8 BYTES (1+1+2+4)
+typedef struct          
 {
     eEenum08_t          type;               /**< the type of entity: use enum type eEtypeOfEntity_t */
     eEenum08_t          signature;          /**< the signature of the entity. use enum values in eEprocess_t or eEsharlib_t or eEboard_t etc. */
@@ -240,61 +291,61 @@ typedef struct          // 8 BYTES (1+1+2+4)
 
 
 /** @typedef    typedef struct eEinfo_t
-    @brief      eEinfo_t keeps information about a basic embedded entity: a board, a sw module, a shared library, etc. 
-    @warning    this type must be of a given fized size: 48B
+    @brief      Keeps extended information about an embedded entity: a board, a sw module, a shared library, etc. 
+    @warning    this type must be of a given fixed size: 48B
   **/
-typedef struct          // 48 BYTES upto name[15]
+typedef struct
 {
-    eEentity_t          entity;             /**< the entity */
-    eEsysmemory_t       rom;                /**< the total size of rom which is available */
-    eEsysmemory_t       ram;                /**< the total size of ram which is available */
-    eEstorage_t         storage;            /**< the storage space available and its medium */
+    eEentity_t          entity;             /**< basic information about the entity */
+    eEsysmemory_t       rom;                /**< the total size of rom which the entity has */
+    eEsysmemory_t       ram;                /**< the total size of ram which the entity has */
+    eEstorage_t         storage;            /**< the storage available to the entity */
     uint8_t             communication;      /**< the supported communication types: use enum eEcommunicationType_t in | combination */
-    uint8_t             name[15];           /**< a string containing a descriptive name */
+    uint8_t             name[15];           /**< a string containing a descriptive name of the entity */
 } eEinfo_t;             EECOMMON_VERIFYsizeof(eEinfo_t, 48);
         
 
 /** @typedef    typedef struct eEinfoBoard_t
-    @brief      eEinfoBoard_t keeps information about a hw board. 
-    @warning    this type must be of a given fized size: 64B
+    @brief      eEinfoBoard_t keeps extended information about a HW board. 
+    @warning    this type must be of a given fixed size: 64B
   **/
-typedef struct          // 64 BYTES (48 + 8 + 8)              
+typedef struct                 
 {
-    eEinfo_t            info;               /**< the base info                                                  */
-    uint64_t            uniqueid;           /**< a unique id for the board                                      */
-    uint8_t             extra[8];           /**< extra space for information                                    */
+    eEinfo_t            info;               /**< the extended info for the generic module   */
+    uint64_t            uniqueid;           /**< a unique id for the board                  */
+    uint8_t             extra[8];           /**< extra space for other information          */
 } eEboardInfo_t;        EECOMMON_VERIFYsizeof(eEboardInfo_t, 64);
 
 
 
 /** @typedef    typedef struct eEinfoModule_t
-    @brief      eEinfoModule_t keeps information about a sw module (process or sharlib).
-    @warning    this type must be of a given fized size: 64B    
+    @brief      eEinfoModule_t keeps extended information about a software module (process or shared lib).
+    @warning    this type must be of a given fixed size: 64B    
   **/
-typedef struct          // 64 BYTES (48 + 8 + 8)              
+typedef struct                   
 {
-    eEinfo_t            info;               /**< the base info                                                  */
-    eEprotocolInfo_t    protocols;          /**< information on communication capabilities of the sw module     */
-    uint8_t             extra[8];           /**< extra space for information                                    */
+    eEinfo_t            info;               /**< the extended info for the generic module                   */
+    eEprotocolInfo_t    protocols;          /**< information on communication capabilities of the sw module */
+    uint8_t             extra[8];           /**< extra space for other information                          */
 } eEmoduleInfo_t;       EECOMMON_VERIFYsizeof(eEmoduleInfo_t, 64);
 
 
 /** @typedef    typedef enum eEprocess_t
-    @brief      eEprocess_t keep the allowed eprocesses in embENV.
-    @warning    this type must be of a given fized size: 1B    
+    @brief      eEprocess_t keep the allowed eProcesses in embENV.
+    @warning    this type must be of a given fixed size: 1B    
  **/ 
 typedef uint8_t eEprocess_t;
 
 
 /** @typedef    typedef enum eEprocessvalues_t
-    @brief      eEprocess_t keep identifiers of the allowed eprocesses in embENV. 
+    @brief      eEprocess_t keep identifiers of the allowed eProcesses in embENV. 
  **/ 
 typedef enum               
 {
-    ee_procNone                 = 255,
-    ee_procLoader               = 0, 
-    ee_procUpdater              = 1,
-    ee_procApplication          = 2,
+    ee_procNone                 = 255,  /**< none */
+    ee_procLoader               = 0,    /**< the eLoader: the one executed just after reset which loads any other eProcess */
+    ee_procUpdater              = 1,    /**< the eUpdater: the one responsible for performing FW update */
+    ee_procApplication          = 2,    /**< the eApplication: the standard application */
     ee_procOther01              = 3,
     ee_procOther02              = 4,
     ee_procOther03              = 5,
@@ -310,8 +361,8 @@ enum { ee_procMaxNum = 8 };
  **/ 
 typedef enum               
 {
-    ee_shalNone                 = 255,
-    ee_shalSharServ             = 0, 
+    ee_shalNone                 = 255,  /**< none */
+    ee_shalSharServ             = 0,    /**< the shared services when used as a shared library */
     ee_shalOther01              = 1,
     ee_shalOther02              = 2,
     ee_shalOther03              = 3
@@ -321,11 +372,11 @@ enum { ee_shalMaxNum = 4 };
 
 
 
-/** @typedef    typedef struct eEinfoModule_t
-    @brief      eEinfoModule_t keeps information about a sw module (process or sharlib).
-    @warning    this type must be of a given fized size: 40B    
+/** @typedef    typedef struct eEbasicPartable_t
+    @brief      eEbasicPartable_t keeps information about partition table in simpler systems (dspic33, not ARM).
+    @warning    this type must be of a given fixed size: 40B    
   **/
-typedef struct          // 40 BYTES
+typedef struct          
 {
     eEsysmemory_t       proc_loader;        /**< the loader and the updater process */
     eEsysmemory_t       proc_applic;        /**< the application process */
