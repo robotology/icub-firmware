@@ -438,7 +438,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         memset(&rec_frame, 0, sizeof(hal_can_frame_t));
         
         res = (eOresult_t)hal_can_get((hal_can_port_t)canport, &rec_frame, NULL);
-        if( (eores_OK != res)  && (hal_res_NOK_nodata != res))
+        if( (eores_OK != res)  /*&& (hal_res_NOK_nodata != res)*/)
         {
             //insert diagnostics
             continue;                         
