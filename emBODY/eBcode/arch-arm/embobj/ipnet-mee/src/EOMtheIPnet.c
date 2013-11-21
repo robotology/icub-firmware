@@ -647,8 +647,8 @@ static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t
             }
             else
             {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in tx fifo");  
                 eom_ipnet_diagnosticsInfo.datagrams_failed_to_go_in_txosalqueue ++;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in tx fifo");  
             }
 
         } break;
@@ -1198,13 +1198,15 @@ static void s_eom_ipnet_process_transmission_datagram(void)
                          // remove the datagram being transmitted also if you fail to tx it.
                         eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
                         // but put a warning on it.
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot send a datagram");
                         eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_sent_by_ipal ++;
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot send a datagram");
+
                     }
                 }
                 else
                 {
-                    eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_retrieved_from_txfifo ++;               
+                    eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_retrieved_from_txfifo ++;       
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot get datagram from txfifo");                    
                 }
             
             }
