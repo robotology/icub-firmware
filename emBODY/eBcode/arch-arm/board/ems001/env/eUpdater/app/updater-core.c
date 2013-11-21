@@ -30,6 +30,8 @@
 #include "ipal.h"
 
 #include "eEsharedServices.h"
+
+#include "eEmemorymap.h"
  
 
 typedef enum {

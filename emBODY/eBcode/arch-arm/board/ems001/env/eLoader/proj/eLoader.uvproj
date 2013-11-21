@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM BOARD_MCBSTM32C DEBUG_MODE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\porting;..\..\..\..\sys\env\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\services\embenv\api;..\..\cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -412,9 +412,14 @@
               <FilePath>..\app\hal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal.stm32f1.ems001.lib</FileName>
+              <FileName>hal_startup_stm32f107.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\app\hal_startup_stm32f107.s</FilePath>
+            </File>
+            <File>
+              <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -435,49 +440,39 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
+              <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
-            </File>
-            <File>
-              <FileName>hal_stm32f1_startup.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>ee-arm-shared-services</GroupName>
-          <Files>
-            <File>
-              <FileName>eEsharedServices.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalBASE.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalINFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>ee-any-arch</GroupName>
+          <GroupName>arm-services-embenv</GroupName>
           <Files>
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -827,7 +822,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM BOARD_EMS001</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\porting</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\services\embenv\api;..\..\cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -889,14 +884,19 @@
               <FilePath>..\app\hal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal.stm32f1.ems001.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</FilePath>
+              <FileName>hal_startup_stm32f107.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\app\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
-              <FileName>hal.stm32f1.mcbstm32c.lib</FileName>
+              <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal.mcbstm32c.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -916,45 +916,35 @@
                 <FileArmAds/>
               </FileOption>
             </File>
-            <File>
-              <FileName>hal_stm32f1_startup.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>ee-arm-shared-services</GroupName>
-          <Files>
-            <File>
-              <FileName>eEsharedServices.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\eEsharedServices.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalBASE.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalBASE.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalINFO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalINFO.c</FilePath>
-            </File>
-            <File>
-              <FileName>shalPART.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\sys\env\src\shalPART.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>ee-any-arch</GroupName>
+          <GroupName>arm-services-embenv</GroupName>
           <Files>
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -38,7 +38,7 @@
 #include "stdio.h"
 
 #include "eEcommon.h"
-#include "eEmemorymap_stm32f1.h"
+#include "eEmemorymap.h"
 
 #include "eEsharedServices.h" 
 
