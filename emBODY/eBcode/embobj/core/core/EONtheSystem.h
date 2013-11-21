@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -27,14 +27,11 @@ extern "C" {
 /** @file       EONtheSystem.h
     @brief      This header file implements public interface to the system singleton.
     @author     marco.accame@iit.it
-    @date       04/07/2011
+    @date       11/21/2013
 **/
 
 /** @defgroup eos_thesystem Singleton EONtheSystem
-    The EONtheSystem is derived from abstract object EOVtheSystem to give to EmbObj a singletask execution environment
-    (SEE) based on just a timer.  The EONtheSystem must be first initialised and then started. 
-    The initialisation requires parameters such as the configuration for the memory pool and the error manager
-     
+    The EONtheSystem is derived from abstract object EOVtheSystem      
     @{        
  **/
 
@@ -44,19 +41,11 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
-//#include "EOStheTimerManager.h"
-//#include "EOStheCallbackManager.h"
-//#include "EOStheTimerManager.h"
-//#include "EOStheFOOP.h"
-
-
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-//#define     EOSSYS_min_systickperiod    10ul
-//#define     EOSSYS_max_systickperiod    999999ul
-  
+
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 

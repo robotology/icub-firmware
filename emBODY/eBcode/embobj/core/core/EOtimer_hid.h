@@ -69,6 +69,7 @@ struct EOtimer_hid
     {
         void        *osaltimer;     /**< used only in multitasking execution environment       */
         uint64_t    nextexpiry;     /**< used only in singletask execution environment         */
+        void        *other;         /**< used in yee or nee                                    */
     } envir;
     uint8_t     status: 2;          /**< status of the timer: idle 0, running 1, completed 2   */
     uint8_t     mode:   1;          /**< mode of the timer, singleshot 0, forever 1            */

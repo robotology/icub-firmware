@@ -16,62 +16,55 @@
  * Public License for more details
 */
 
-
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOSTHESYSTEM_HID_H_
-#define _EOSTHESYSTEM_HID_H_
+#ifndef _EONTASK_HID_H_
+#define _EONTASK_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* @file       EONtheSystem_hid.h
-    @brief      This header file implements hidden interface to the system singleton.
+/* @file       EONtask_hid.h
+    @brief      This header file implements hidden interface to the rtos task object.
     @author     marco.accame@iit.it
-    @date       04/07/2011
+    @date       08/03/2011
 **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOVtheSystem.h"
+#include "EOVtask.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EONtheSystem.h"
+#include "EONtask.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 // empty-section
 
 
-
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-/** @struct     EONtheSystem_hid
+
+/** @struct     EONtask_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
  
-struct EONtheSystem_hid 
-{
-    // base object
-    EOVtheSystem                *thevsys;
-    // other stuff
-    eOabstime_t                 lifetime;
+struct EONtask_hid 
+{ 
+    // - base object
+    EOVtask                 *tsk;
+    void                    *none; 
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-extern uint64_t eon_sys_hid_tickperiodget(void);
-
-extern uint64_t eon_sys_hid_tickoflifeget(void);
-
-
+// empty-section
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
@@ -80,4 +73,7 @@ extern uint64_t eon_sys_hid_tickoflifeget(void);
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
 

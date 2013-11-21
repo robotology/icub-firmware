@@ -16,7 +16,6 @@
  * Public License for more details
 */
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -24,10 +23,13 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 #include "string.h"
-
-
+#include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
-#include "EOVtheSystem_hid.h" 
+
+
+#include "EONtask.h"
+
+#include "EOVtask.h"
 
 
 
@@ -35,14 +37,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EONtheSystem.h"
+#include "EONtheCallbackManager.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EONtheSystem_hid.h" 
+#include "EONtheCallbackManager_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -50,11 +52,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,177 +69,101 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static eOresult_t s_eon_sys_start(void (*init_fn)(void));
-static EOVtaskDerived * s_eon_sys_gettask(void);
+static void s_eon_callbackman_tsk_aftercallbackorontimeout(EONtask *rt, uint32_t msg);
 
-static eOabstime_t s_eon_sys_timelifeget(void);
-static void s_eon_sys_timelifeset(eOabstime_t ltime);
-static eOnanotime_t s_eon_sys_nanotimeget(void);
+static eOresult_t s_eon_callbackman_execute(EOVtheCallbackManager *v, eOcallback_t cbk, void *arg, eOreltime_t tout);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-
-static const char s_eobj_ownname[] = "EONtheSystem";
-
-static EONtheSystem s_eos_the_system = 
+static const char s_eobj_ownname[] = "EONtheCallbackManager";
+ 
+static EONtheCallbackManager s_eon_callbackmanager = 
 {
-    EO_INIT(.thevsys)       NULL,
-    EO_INIT(.lifetime)      0
-};
+    .vcm    = NULL,
+    .tsk    = NULL
+}; 
 
-extern const eOnsystem_cfg_t eon_system_cfg_default = {0}; 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EONtheSystem * eon_sys_Initialise(const eOnsystem_cfg_t *syscfg,
-                                         const eOmempool_cfg_t *mpoolcfg, 
-                                         const eOerrman_cfg_t *errmancfg)
+extern EONtheCallbackManager * eon_callbackman_Initialise(const eOmcallbackman_cfg_t *cbkmancfg) 
 {
-
-    if(NULL != s_eos_the_system.thevsys) 
+    if(NULL != s_eon_callbackmanager.tsk) 
     {
         // already initialised
-        return(&s_eos_the_system);
-    }
-    
-    if(NULL == syscfg)
-    {
-        syscfg = &eon_system_cfg_default;
-    }
-    
-    
-    // mpoolcfg can be NULL: in such a case we use eo_mempool_alloc_dynamic mode
-    // errmancfg can be NULL
-
-    // mempool and error manager initialised inside here.
-    s_eos_the_system.thevsys = eov_sys_hid_Initialise(  mpoolcfg,
-                                                        errmancfg,
-                                                        s_eon_sys_start, 
-                                                        s_eon_sys_gettask, 
-                                                        s_eon_sys_timelifeget, 
-                                                        s_eon_sys_timelifeset, 
-                                                        s_eon_sys_nanotimeget,
-                                                        NULL
-                                                     );
-                                                  
-
-
-    // and reset the lifetime
-    s_eos_the_system.lifetime = 0;
-
-
-    return(&s_eos_the_system);
-}
-
-
-
-extern EONtheSystem* eon_sys_GetHandle(void)
-{
-    if(NULL == s_eos_the_system.thevsys)
-    {
-        return(NULL);
+        return(&s_eon_callbackmanager);
     }
 
-    return(&s_eos_the_system);
+
+ 
+    // i prepare the task able to execute callbacks actions associated to expiry of the timers or on gpio
+    s_eon_callbackmanager.tsk = eon_task_New();
+
+    // i initialise the base callback manager
+    eov_callbackman_hid_Initialise(s_eon_callbackman_execute, s_eon_callbackmanager.tsk);
+    
+    return(&s_eon_callbackmanager);
 }    
 
 
-extern void eon_sys_Start(EONtheSystem *p, eOvoid_fp_void_t userinit_fn)
+extern EONtheCallbackManager* eon_callbackman_GetHandle(void)
 {
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), s_eobj_ownname, "eon_sys_Start() uses a NULL handle");
-
-    s_eon_sys_start(userinit_fn);
-} 
-
-
-extern eOabstime_t eon_sys_LifeTimeGet(EONtheSystem *p)
-{
-    return(s_eon_sys_timelifeget());
-}
-
-extern eOresult_t eon_sys_LifeTimeSet(EONtheSystem *p, eOabstime_t ltime)
-{
-    s_eon_sys_timelifeset(ltime);
-    return(eores_OK);
-}
-
-extern eOresult_t eon_sys_NanoTimeGet(EONtheSystem *p, eOnanotime_t *nt)
-{
-    if(NULL == nt)
-    {   
-        return(eores_NOK_nullpointer);
+    if(NULL == s_eon_callbackmanager.tsk) 
+    {
+        return(NULL);
     }
     
-    *nt  = s_eon_sys_nanotimeget();
-    return(eores_OK);
+    return(&s_eon_callbackmanager);
 }
 
+
+extern eOresult_t eon_callbackman_Execute(EONtheCallbackManager *p, eOcallback_t cbk, void *arg, eOreltime_t tout) 
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    return(eores_NOK_generic);
+}
+
+
+extern EONtask * eon_callbackman_GetTask(EONtheCallbackManager *p) 
+{
+    if(NULL == p) 
+    {
+        return(NULL);
+    }
+    
+    return(s_eon_callbackmanager.tsk);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
 
-extern uint64_t eon_sys_hid_tickoflifeget(void)
-{
-    return(0);
-}
 
 
-extern uint64_t eon_sys_hid_tickperiodget(void)
-{
-    return(0);
-}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static EOVtaskDerived * s_eon_sys_gettask(void)
-{
-    return(NULL);
-}
-
-static eOabstime_t s_eon_sys_timelifeget(void)
-{
-    return(s_eos_the_system.lifetime);
-}
-
-static void s_eon_sys_timelifeset(eOabstime_t ltime)
-{
-    s_eos_the_system.lifetime = ltime;
-}
-
-static eOnanotime_t s_eon_sys_nanotimeget(void)
-{
-    return(1000*s_eos_the_system.lifetime);
-}
-
-
-static eOresult_t s_eon_sys_start(void (*init_fn)(void))
-{
-    // exec the init belonging to the system object: do it before any tick is started
-    if(NULL != init_fn)
-    {
-        init_fn();
-    }
-
- 
-    return(eores_OK);
-}
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
+
 
 
 
