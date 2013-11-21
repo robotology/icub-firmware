@@ -578,7 +578,8 @@ extern void hal_base_hid_on_fatalerror(hal_fatalerror_t errorcode, const char * 
     }
 }
 
- 
+#if 0
+// acemor removed on 21nov13 because ... it is useless if we dont use hal as a shared library
 void hal_hid_link_to_all_files(void)
 {
 #ifdef HAL_USE_ARCH
@@ -648,7 +649,7 @@ extern void hal_base_hid_ram_basic_init(void)
     s_hal_fn_osal_system_scheduling_restart = NULL;
 
 }
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
