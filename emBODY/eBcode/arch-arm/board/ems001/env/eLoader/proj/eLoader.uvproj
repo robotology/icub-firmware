@@ -412,11 +412,6 @@
               <FilePath>..\app\hal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_stm32f107.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\app\hal_startup_stm32f107.s</FilePath>
-            </File>
-            <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
@@ -443,6 +438,11 @@
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_stm32f107.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -884,11 +884,6 @@
               <FilePath>..\app\hal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_stm32f107.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\app\hal_startup_stm32f107.s</FilePath>
-            </File>
-            <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
@@ -915,6 +910,11 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
+            </File>
+            <File>
+              <FileName>hal_startup_stm32f107.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
           </Files>
         </Group>
