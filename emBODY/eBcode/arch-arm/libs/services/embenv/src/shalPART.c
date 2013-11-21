@@ -101,8 +101,8 @@ typedef struct              // 808B
 #define SHALPART_ROMADDR            (0)
 #define SHALPART_ROMSIZE            (0)
 
-#define SHALPART_RAMADDR            (0)
-#define SHALPART_RAMSIZE            (0)
+#define SHALPART_RAMADDR            (EENV_MEMMAP_SHALPART_RAMADDR)
+#define SHALPART_RAMSIZE            (EENV_MEMMAP_SHALPART_RAMSIZE)
 
 #define SHALPART_STGTYPE            (ee_strg_eeprom)
 #define SHALPART_STGADDR            (EENV_MEMMAP_SHALPART_STGADDR)

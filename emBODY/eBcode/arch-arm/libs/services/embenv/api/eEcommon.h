@@ -270,8 +270,11 @@ typedef enum
     ee_entity_none                  = 0,    /**< none */
     ee_entity_board                 = 1,    /**< a board. */
     ee_entity_process               = 2,    /**< an eProcess. */        
-    ee_entity_sharlib               = 3,    /**< a shared library. */ 
-    ee_entity_forfuture4            = 4     /**< for future use */
+    ee_entity_sharlib               = 3,    /**< a shared library. */
+    ee_entity_statlib               = 4,    /**< a static library. */     
+    ee_entity_forfutureuse5         = 5,    /**< for future use */
+    ee_entity_forfutureuse6         = 6,    /**< for future use */
+    ee_entity_forfutureuse7         = 7     /**< for future use */
 } eEtypeOfEntity_t;
 
 
@@ -388,7 +391,7 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-EO_extern_inline const eEentity_t * ee_common_moduleinfo_to_entity(const eEmoduleInfo_t *mi)
+extern inline const eEentity_t * ee_common_moduleinfo_to_entity(const eEmoduleInfo_t *mi)
 { 
     return((const eEentity_t*)&(mi->info.entity)); 
 }

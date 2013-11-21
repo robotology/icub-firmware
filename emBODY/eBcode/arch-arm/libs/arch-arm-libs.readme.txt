@@ -8,7 +8,7 @@ It also contains projects for the libraries.
   They are:
   - hal:            offers simplified HW services to the application.
   - ipal:           offers TCP/IP services.
-  - osal:           offers RTOS services with APIs which not depends on the midware RTOS (which may be free or commercial)
+  - osal:           offers RTOS services with APIs which depends on the midware RTOS (which may be free or commercial)
 
   
 - embobj
@@ -21,6 +21,7 @@ It also contains projects for the libraries.
   It offers the basis of the abstraction layer which wraps only some of functionalities offers by midware. 
   However, the skilled programmer may use the midware to achieve specific behaviours not offered by abslayer.
   They are:
+  - eventviewer:    offers visualisation on keil's u-vision. 
   - hl:             offers HW services ranging from a bare register access, up to use of silicon vendor libraries 
                     (CMSIS and ST standard peripheral libraries), and even upper up to simple HW services (I2C etc.)
                     and support of some external chips (EEPROMS, MEMS, etc.).
@@ -32,6 +33,6 @@ It also contains projects for the libraries.
   contains services based upon abslayer (or midware), such as management of permanent storage, which are shared by
   the applications.
   They are:
-  - sharserv:       Library based upon the abslayer whcih offers storage, inter-process communication, application info, partition 
+  - sharserv:       Library based upon the abslayer which offers storage, inter-process communication, application info, partition 
                     table for the e-processes inside the MPU: eLoader, eUpdater, eApplication (see eBODY\eB\arch-arm\apps folder). 
                     

@@ -9,7 +9,9 @@ In embEnv are available the following.
 - Templates for assigning the memory resources of RAM and FLASH to the eProcesses running on a given board.
   This information is contained in file eEmemorymap.h which must define some macro used in other files of embEnv.
   They are in embenv/cfg.
-  Usage.  ... to be written yet.
+  Usage.  The set of eProcesses used on a given board must all use the same eEmemorymap.h copied from embenv/cfg
+          and tailored to ones needs. As an example, file embenv/cfg /eEmemorymap_stm32f1_256k_v1.template 
+          uses 256KB of FLASH and 64KB of RAM plus 2KB of EEPROM for the three eLoader, eUpdater, eApplication.          
   
   
 - Templates for the scatter files used in ARM CC Keil compiler for mapping each eProcess in RAM / FLASH.
@@ -21,7 +23,8 @@ In embEnv are available the following.
   eProcesses. They are grouped in the following.
   - sharserv:       Library which offers EEPROM storage, inter-process communication, application info, partition 
                     table for the ePocesses inside the MPU. 
-                    It is usable by including embenv/api/eEsharedServices.h and by compiling all files in embenv/src
+                    Usage. Compile all files in embenv/src, include embenv/api/eEsharedServices.h.
+                    A customised file eEmemorymap.h must be included in the project.
                     
                     
                     

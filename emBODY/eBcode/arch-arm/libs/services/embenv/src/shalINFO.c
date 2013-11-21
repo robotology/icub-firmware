@@ -91,8 +91,8 @@ typedef struct              // 272B
 #define SHALINFO_ROMADDR            (0)
 #define SHALINFO_ROMSIZE            (0)
 
-#define SHALINFO_RAMADDR            (0)
-#define SHALINFO_RAMSIZE            (0)
+#define SHALINFO_RAMADDR            (EENV_MEMMAP_SHALINFO_RAMADDR)
+#define SHALINFO_RAMSIZE            (EENV_MEMMAP_SHALINFO_RAMSIZE)
 
 #define SHALINFO_STGTYPE            (ee_strg_eeprom)
 #define SHALINFO_STGADDR            (EENV_MEMMAP_SHALINFO_STGADDR)

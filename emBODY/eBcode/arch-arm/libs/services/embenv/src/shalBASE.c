@@ -93,8 +93,8 @@ typedef struct                                      // 40B
 #define SHALBASE_ROMADDR            (0)
 #define SHALBASE_ROMSIZE            (0)
 
-#define SHALBASE_RAMADDR            (0)
-#define SHALBASE_RAMSIZE            (0)
+#define SHALBASE_RAMADDR            (EENV_MEMMAP_SHALBASE_RAMADDR)
+#define SHALBASE_RAMSIZE            (EENV_MEMMAP_SHALBASE_RAMSIZE)
 
 #define SHALBASE_STGTYPE            (ee_strg_eeprom)
 #define SHALBASE_STGADDR            (EENV_MEMMAP_SHALBASE_STGADDR)
