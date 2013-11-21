@@ -133,6 +133,7 @@ typedef struct
     uint8_t crcErrorCnt_overflow;
     uint8_t crcErrorCnt_validVal;
     uint32_t crcErrorCnt[3];
+    uint32_t i2c_error[4];
 } eOdgn_ethstatus_t; //4 B
 
 typedef struct 
