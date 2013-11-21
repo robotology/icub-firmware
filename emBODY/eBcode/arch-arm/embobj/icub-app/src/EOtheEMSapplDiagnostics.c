@@ -446,6 +446,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinksErrors(EOTheEMSdiagnostics_t* p)
         res = hal_eth_get_errors_info(i, rxCrcError, &result);
         if(res != hal_res_OK)
         {
+            eo_dgn_emsperiph.eth_dev.i2c_error[i]++;
             snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy %d", i);
         }
         else
