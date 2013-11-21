@@ -427,6 +427,11 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
+              <FileName>hal_startup_stm32f107.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+            </File>
+            <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
@@ -469,11 +474,6 @@
         <Group>
           <GroupName>abslayer-cfg</GroupName>
           <Files>
-            <File>
-              <FileName>hal_startup_stm32f107.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\abslayer-cfg\hal_startup_stm32f107.s</FilePath>
-            </File>
             <File>
               <FileName>hal_cfg.c</FileName>
               <FileType>1</FileType>
@@ -1144,6 +1144,11 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
+              <FileName>hal_startup_stm32f107.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+            </File>
+            <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
@@ -1186,11 +1191,6 @@
         <Group>
           <GroupName>abslayer-cfg</GroupName>
           <Files>
-            <File>
-              <FileName>hal_startup_stm32f107.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\abslayer-cfg\hal_startup_stm32f107.s</FilePath>
-            </File>
             <File>
               <FileName>hal_cfg.c</FileName>
               <FileType>1</FileType>
