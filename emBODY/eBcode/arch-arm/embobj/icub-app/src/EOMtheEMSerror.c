@@ -247,7 +247,7 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
         hal_trace_puts(str);
     }
     
-    if(errtype <= eo_errortype_warning)
+    if(errtype < eo_errortype_warning)
     {
         return;
     }
