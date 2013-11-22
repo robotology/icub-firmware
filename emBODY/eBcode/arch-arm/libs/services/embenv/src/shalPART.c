@@ -94,43 +94,22 @@ typedef struct              // 808B
 #define SHALPART_MODE_STATICLIBRARY
 
 
-
 #if     defined(SHALPART_MODE_STATICLIBRARY)
 
 
 #define SHALPART_ROMADDR            (0)
 #define SHALPART_ROMSIZE            (0)
 
-#define SHALPART_RAMADDR            (EENV_MEMMAP_SHALPART_RAMADDR)
-#define SHALPART_RAMSIZE            (EENV_MEMMAP_SHALPART_RAMSIZE)
+#define SHALPART_RAMADDR            (0)
+#define SHALPART_RAMSIZE            (0)
 
 #define SHALPART_STGTYPE            (ee_strg_eeprom)
-#define SHALPART_STGADDR            (EENV_MEMMAP_SHALPART_STGADDR)
-#define SHALPART_STGSIZE            (EENV_MEMMAP_SHALPART_STGSIZE)
+#define SHALPART_STGADDR            (EENV_MEMMAP_SHARSERV_PART_STGADDR)
+#define SHALPART_STGSIZE            (EENV_MEMMAP_SHARSERV_PART_STGSIZE)
 
 #else   // shared lib
 
-#define SHALPART_ROMADDR            (EENV_MEMMAP_SHALPART_ROMADDR)
-#define SHALPART_ROMSIZE            (EENV_MEMMAP_SHALPART_ROMSIZE)
-
-#define SHALPART_RAMADDR            (EENV_MEMMAP_SHALPART_RAMADDR)
-#define SHALPART_RAMSIZE            (EENV_MEMMAP_SHALPART_RAMSIZE)
-
-#define SHALPART_STGTYPE            (ee_strg_eeprom)
-#define SHALPART_STGADDR            (EENV_MEMMAP_SHALPART_STGADDR)
-#define SHALPART_STGSIZE            (EENV_MEMMAP_SHALPART_STGSIZE)
-
-
-// the ram size to be used in scatter-file and the one used by the program for static ram
-#define SHALPART_RAMFOR_RWDATA      (EENV_MEMMAP_SHALPART_RAMFOR_RWDATA) 
-
-// the ram size to be used with __attribute__((at(SHALPART_RAMADDR))), which is sizeof(partTableStorage_t)
-#define SHALPART_RAMFOR_ZIDATA      (EENV_MEMMAP_SHALPART_RAMFOR_ZIDATA)
-
-
-typedef int dummy1[sizeof(partTableStorage_t)     <= (SHALPART_RAMSIZE) ? 1 : -1];
-typedef int dummy2[SHALPART_RAMFOR_ZIDATA <= ((SHALPART_RAMSIZE-SHALPART_RAMFOR_RWDATA)) ? 1 : -1];
-
+    #error --> only mode SHALPART_MODE_STATICLIBRARY is allowed
 
 #endif
 
@@ -158,26 +137,20 @@ static eEboolval_t s_shalpart_storage_is_valid(void* storage);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning ENHANCE IT: by not mapping s_shalpart_tableStored at SHALPART_RAMADDR
-static volatile partTableStorage_t s_shalpart_tableStored __attribute__((at(SHALPART_RAMADDR))); 
+
+typedef uint8_t verify_size_t[(SHALPART_STGSIZE > sizeof(partTableStorage_t)) ? (1) : (-1)];
+
+static volatile partTableStorage_t s_shalpart_tableStored = {0};
 
 // - module info ------------------------------------------------------------------------------------------------------
 
-#if     defined(SHALPART_MODE_STATICLIBRARY)
-    #define SHALPART_MODULEINFO_PLACED_AT
-    #define SHALPART_ENTITY_TYPE                ee_entity_statlib
-#else
-    #define SHALPART_MODULEINFO_PLACED_AT       __attribute__((at(SHALPART_ROMADDR+EENV_MODULEINFO_OFFSET)))
-    #define SHALPART_ENTITY_TYPE                ee_entity_sharlib
-#endif
-
-static const eEmoduleInfo_t s_shalpart_moduleinfo   SHALPART_MODULEINFO_PLACED_AT =
+static const eEmoduleInfo_t s_shalpart_moduleinfo =
 {
     .info           =
     {
         .entity     =
         {
-            .type       = SHALPART_ENTITY_TYPE,
+            .type       = ee_entity_statlib,
             .signature  = ee_shalSharServ | SHALPART_SIGN,
             .version    = 
             { 
@@ -229,8 +202,6 @@ static const eEmoduleInfo_t s_shalpart_moduleinfo   SHALPART_MODULEINFO_PLACED_A
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     defined(SHALPART_MODE_STATICLIBRARY)
-
 extern const eEmoduleInfo_t * shalpart_moduleinfo_get(void)
 {
     return((const eEmoduleInfo_t*)&s_shalpart_moduleinfo);
@@ -245,11 +216,6 @@ extern eEresult_t shalpart_isvalid(void)
 {
     return(ee_res_OK);
 }
-
-#else
-    // using inline functions
-#endif
-
 
 
 extern eEresult_t shalpart_init(void)

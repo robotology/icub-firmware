@@ -17,7 +17,7 @@
 */
 
 /* @file       shalBASE.c
-    @brief      This header file implements the shalIPC library.
+    @brief      This header file implements the shalBASE library.
     @author     marco.accame@iit.it
     @date       05/07/2010
 **/
@@ -84,8 +84,6 @@ typedef struct                                      // 40B
 // always in static mode
 #define SHALBASE_MODE_STATICLIBRARY
 
-#define SHALBASE_DONTUSESTRGFLASH
-
 
 
 #if     defined(SHALBASE_MODE_STATICLIBRARY)
@@ -93,34 +91,16 @@ typedef struct                                      // 40B
 #define SHALBASE_ROMADDR            (0)
 #define SHALBASE_ROMSIZE            (0)
 
-#define SHALBASE_RAMADDR            (EENV_MEMMAP_SHALBASE_RAMADDR)
-#define SHALBASE_RAMSIZE            (EENV_MEMMAP_SHALBASE_RAMSIZE)
+#define SHALBASE_RAMADDR            (EENV_MEMMAP_SHARSERV_BASE_RAMADDR)
+#define SHALBASE_RAMSIZE            (EENV_MEMMAP_SHARSERV_BASE_RAMSIZE)
 
-#define SHALBASE_STGTYPE            (ee_strg_eeprom)
-#define SHALBASE_STGADDR            (EENV_MEMMAP_SHALBASE_STGADDR)
-#define SHALBASE_STGSIZE            (EENV_MEMMAP_SHALBASE_STGSIZE)
+#define SHALBASE_STGTYPE            (ee_strg_none)
+#define SHALBASE_STGADDR            (0)
+#define SHALBASE_STGSIZE            (0)
 
 #else   // shared lib 
 
-#define SHALBASE_ROMADDR            (EENV_MEMMAP_SHALBASE_ROMADDR)
-#define SHALBASE_ROMSIZE            (EENV_MEMMAP_SHALBASE_ROMSIZE)
-
-#define SHALBASE_RAMADDR            (EENV_MEMMAP_SHALBASE_RAMADDR)
-#define SHALBASE_RAMSIZE            (EENV_MEMMAP_SHALBASE_RAMSIZE)
-
-#define SHALBASE_STGTYPE            (ee_strg_eeprom)
-#define SHALBASE_STGADDR            (EENV_MEMMAP_SHALBASE_STGADDR)
-#define SHALBASE_STGSIZE            (EENV_MEMMAP_SHALBASE_STGSIZE)
-
-// the ram size to be used in scatter-file and the one used by the program for static ram
-#define SHALBASE_RAMFOR_RWDATA      (EENV_MEMMAP_SHALBASE_RAMFOR_RWDATA)
-
-// the ram size to be used with __attribute__((at(SHALBASE_RAMADDR)))
-#define SHALBASE_RAMFOR_ZIDATA      (EENV_MEMMAP_SHALBASE_RAMFOR_ZIDATA)
-
-// and relevant controls
-typedef int dummy1[sizeof(baseIPCdataStorage_t)     <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
-typedef int dummy2[SHALBASE_RAMFOR_ZIDATA <= ((SHALBASE_RAMSIZE-SHALBASE_RAMFOR_RWDATA)) ? 1 : -1];
+    #error --> must use only SHALBASE_MODE_STATICLIBRARY
 
 #endif   // shared lib 
 
@@ -151,27 +131,22 @@ static void s_shalbase_ipc_ram_initialise(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+typedef uint8_t verify_size_t[(SHALBASE_RAMSIZE > sizeof(baseIPCdataStorage_t)) ? (1) : (-1)];
+
 // this variable is placed in NZI section. it is used for ipc
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored      __attribute__((at(SHALBASE_RAMADDR)));
 
 
 // - module info ------------------------------------------------------------------------------------------------------
 
-#if     defined(SHALBASE_MODE_STATICLIBRARY)
-    #define SHALBASE_MODULEINFO_PLACED_AT
-    #define SHALBASE_ENTITY_TYPE                ee_entity_statlib   
-#else
-    #define SHALBASE_MODULEINFO_PLACED_AT       __attribute__((at(SHALBASE_ROMADDR+EENV_MODULEINFO_OFFSET)))
-    #define SHALBASE_ENTITY_TYPE                ee_entity_sharlib 
-#endif
 
-static const eEmoduleInfo_t s_shalbase_moduleinfo   SHALBASE_MODULEINFO_PLACED_AT =
+static const eEmoduleInfo_t s_shalbase_moduleinfo =
 {
     .info           =
     {
         .entity     =
         {
-            .type       = SHALBASE_ENTITY_TYPE,
+            .type       = ee_entity_statlib,
             .signature  = ee_shalSharServ | SHALBASE_SIGN,
             .version    = 
             { 
@@ -223,7 +198,6 @@ static const eEmoduleInfo_t s_shalbase_moduleinfo   SHALBASE_MODULEINFO_PLACED_A
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(SHALBASE_MODE_STATICLIBRARY)
 
 extern const eEmoduleInfo_t * shalbase_moduleinfo_get(void)
 {
@@ -240,10 +214,6 @@ extern eEresult_t shalbase_isvalid(void)
     return(ee_res_OK);
 }
 
-#else
-    // using inline functions
-#endif
-
 
 extern eEresult_t shalbase_init(shalbase_initmode_t initmode)
 {
@@ -257,13 +227,7 @@ extern eEresult_t shalbase_init(shalbase_initmode_t initmode)
     
     // initialise the eeprom storage
     s_shalbase_storage_init(ee_strg_eeprom);
-    
-#ifndef SHALBASE_DONTUSESTRGFLASH    
-    // initialise the flash storage
-    s_shalbase_storage_init(ee_strg_eflash);
-#endif    
- 
-    
+       
     // initialise the ipc ram
     s_shalbase_ipc_ram_initialise();       
     
@@ -443,12 +407,7 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
     
     if(ee_strg_eflash == strg->type)
     {
-#ifndef SHALBASE_DONTUSESTRGFLASH
-        // just read from flash
-        memcpy(data, (const void*)strg->addr, size);
-#else
         return(ee_res_NOK_generic);
-#endif
     }
     else if(ee_strg_eeprom == strg->type)
     {
@@ -483,10 +442,7 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
 
     if(ee_strg_eflash == strg->type)
     {
-#ifndef SHALBASE_DONTUSESTRGFLASH
-        hal_flash_erase(strg->addr, 2048);
-        hal_flash_write(strg->addr, size, (void*)data);
-#endif
+        res = hal_res_NOK_generic;
     }
     else if(ee_strg_eeprom == strg->type)
     {
@@ -518,9 +474,7 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
 
     if(ee_strg_eflash == strg->type)
     {
-#ifndef SHALBASE_DONTUSESTRGFLASH
-        hal_flash_erase(strg->addr, 2048);
-#endif
+        res = hal_res_NOK_generic;
     }
     else if(ee_strg_eeprom == strg->type)
     {
@@ -638,9 +592,7 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
     
     if(ee_strg_eflash == strgtype)
     {
-#ifndef SHALBASE_DONTUSESTRGFLASH
-        hal_flash_unlock();
-#endif
+        res = hal_res_NOK_generic;
     }
     else if(ee_strg_eeprom == strgtype)
     {

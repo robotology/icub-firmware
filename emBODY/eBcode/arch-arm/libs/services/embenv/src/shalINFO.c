@@ -91,36 +91,18 @@ typedef struct              // 272B
 #define SHALINFO_ROMADDR            (0)
 #define SHALINFO_ROMSIZE            (0)
 
-#define SHALINFO_RAMADDR            (EENV_MEMMAP_SHALINFO_RAMADDR)
-#define SHALINFO_RAMSIZE            (EENV_MEMMAP_SHALINFO_RAMSIZE)
+#define SHALINFO_RAMADDR            (0)
+#define SHALINFO_RAMSIZE            (0)
 
 #define SHALINFO_STGTYPE            (ee_strg_eeprom)
-#define SHALINFO_STGADDR            (EENV_MEMMAP_SHALINFO_STGADDR)
-#define SHALINFO_STGSIZE            (EENV_MEMMAP_SHALINFO_STGSIZE)
+#define SHALINFO_STGADDR            (EENV_MEMMAP_SHARSERV_INFO_STGADDR)
+#define SHALINFO_STGSIZE            (EENV_MEMMAP_SHARSERV_INFO_STGSIZE)
 
-#else   // shared lib
+#else   
 
-#define SHALINFO_ROMADDR            (EENV_MEMMAP_SHALINFO_ROMADDR)
-#define SHALINFO_ROMSIZE            (EENV_MEMMAP_SHALINFO_ROMSIZE)
+    #error --> only SHALINFO_MODE_STATICLIBRARY is allowed
 
-#define SHALINFO_RAMADDR            (EENV_MEMMAP_SHALINFO_RAMADDR)
-#define SHALINFO_RAMSIZE            (EENV_MEMMAP_SHALINFO_RAMSIZE)
-
-#define SHALINFO_STGTYPE            (ee_strg_eeprom)
-#define SHALINFO_STGADDR            (EENV_MEMMAP_SHALINFO_STGADDR)
-#define SHALINFO_STGSIZE            (EENV_MEMMAP_SHALINFO_STGSIZE)
-
-// the ram size to be used in scatter-file and the one used by the program for static ram
-#define SHALINFO_RAMFOR_RWDATA      (EENV_MEMMAP_SHALINFO_RAMFOR_RWDATA) 
-
-// the ram size to be used with __attribute__((at(SHALINFO_RAMADDR)))
-#define SHALINFO_RAMFOR_ZIDATA      (EENV_MEMMAP_SHALINFO_RAMFOR_ZIDATA)
-
-
-typedef int dummy1[(sizeof(infoBoardInfoStorage_t)+sizeof(infoDeviceInfoStorage_t))     <= (SHALINFO_RAMSIZE) ? 1 : -1];
-typedef int dummy2[SHALINFO_RAMFOR_ZIDATA <= ((SHALINFO_RAMSIZE-SHALINFO_RAMFOR_RWDATA)) ? 1 : -1];
-
-#endif  // shared lib
+#endif  
 
 
 
@@ -226,32 +208,22 @@ static const eEboardInfo_t s_shalinfo_boardinfo_default =
 
 // - volatile values --------------------------------------------------------------------------------------------------
 
-#warning ENHANCE IT: by not mapping s_shalinfo_boardinfoStored and s_shalinfo_deviceinfoStored at SHALINFO_RAMADDR
 
-// used for board-info services 
-static volatile infoBoardInfoStorage_t s_shalinfo_boardinfoStored  __attribute__((at(SHALINFO_RAMADDR)));
+typedef uint8_t verify_size_t[(SHALINFO_STGSIZE > 2*sizeof(infoBoardInfoStorage_t)) ? (1) : (-1)];
 
-// used for device-info services
-static volatile infoDeviceInfoStorage_t s_shalinfo_deviceinfoStored  __attribute__((at(SHALINFO_RAMADDR+sizeof(infoBoardInfoStorage_t))));
+static volatile infoBoardInfoStorage_t s_shalinfo_boardinfoStored = {0};
 
+static volatile infoDeviceInfoStorage_t s_shalinfo_deviceinfoStored = {0};
 
 // - module info ------------------------------------------------------------------------------------------------------
 
-#if     defined(SHALINFO_MODE_STATICLIBRARY)
-    #define SHALINFO_MODULEINFO_PLACED_AT
-    #define SHALINFO_ENTITY_TYPE                ee_entity_statlib
-#else
-    #define SHALINFO_MODULEINFO_PLACED_AT       __attribute__((at(SHALINFO_ROMADDR+EENV_MODULEINFO_OFFSET)))
-    #define SHALINFO_ENTITY_TYPE                ee_entity_sharlib /* or ee_entity_statlib ?*/
-#endif
-
-static const eEmoduleInfo_t s_shalinfo_moduleinfo   SHALINFO_MODULEINFO_PLACED_AT =
+static const eEmoduleInfo_t s_shalinfo_moduleinfo =
 {
     .info           =
     {
         .entity     =
         {
-            .type       = SHALINFO_ENTITY_TYPE,
+            .type       = ee_entity_statlib,
             .signature  = ee_shalSharServ | SHALINFO_SIGN,
             .version    = 
             { 
@@ -300,8 +272,6 @@ static const eEmoduleInfo_t s_shalinfo_moduleinfo   SHALINFO_MODULEINFO_PLACED_A
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(SHALINFO_MODE_STATICLIBRARY)
-
 extern const eEmoduleInfo_t * shalinfo_moduleinfo_get(void)
 {
     return((const eEmoduleInfo_t*)&s_shalinfo_moduleinfo);
@@ -316,10 +286,6 @@ extern eEresult_t shalinfo_isvalid(void)
 {
     return(ee_res_OK);
 }
-
-#else
-    // using inline functions
-#endif
 
 
 extern eEresult_t shalinfo_init(void)

@@ -54,12 +54,12 @@
 
 #define SHALBASE_SIGN                   0x10                // must have least significant nibble at 0
 
-#define SHALBASE_VER_MAJOR              0x02                // change of binary form of data
+#define SHALBASE_VER_MAJOR              0x03                // change of binary form of data
 #define SHALBASE_VER_MINOR              0x00                // change of implementation
 
 #define SHALBASE_BUILDDATE_YEAR         2013
-#define SHALBASE_BUILDDATE_MONTH        9
-#define SHALBASE_BUILDDATE_DAY          11
+#define SHALBASE_BUILDDATE_MONTH        11
+#define SHALBASE_BUILDDATE_DAY          22
 #define SHALBASE_BUILDDATE_HOUR         16
 #define SHALBASE_BUILDDATE_MIN          0
 

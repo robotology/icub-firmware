@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+/*
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -24,15 +24,6 @@
 #include "stdlib.h"
 
 #include "eEmemorymap.h"  
-
-
-// VERY IMPORTANT: these must stay before inclusion of shalBASE.h etc.
-#if !defined(SHALS_MODE_STATIC)
-    #define SHALBASE_MODE_STATICLIBRARY
-    #define SHALPART_MODE_STATICLIBRARY
-    #define SHALINFO_MODE_STATICLIBRARY  
-#endif
-
 
 #include "shalBASE.h"
 #include "shalPART.h"
@@ -81,14 +72,15 @@ typedef int dummy999[(shalbase_ipc_userdefdata_maxsize == sharserv_base_ipc_user
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define SHARSERV_ROMADDR    EENV_MEMMAP_SHALSYSTEM_ROMADDR 
-#define SHARSERV_ROMSIZE    EENV_MEMMAP_SHALSYSTEM_ROMSIZE
 
-#define SHARSERV_RAMADDR    EENV_MEMMAP_SHALSYSTEM_RAMADDR
-#define SHARSERV_RAMSIZE    EENV_MEMMAP_SHALSYSTEM_RAMSIZE
+#define SHARSERV_ROMADDR    EENV_MEMMAP_SHARSERV_ROMADDR 
+#define SHARSERV_ROMSIZE    EENV_MEMMAP_SHARSERV_ROMSIZE
 
-#define SHARSERV_STGADDR    EENV_MEMMAP_SHALSYSTEM_STGADDR
-#define SHARSERV_STGSIZE    EENV_MEMMAP_SHALSYSTEM_STGSIZE
+#define SHARSERV_RAMADDR    EENV_MEMMAP_SHARSERV_RAMADDR
+#define SHARSERV_RAMSIZE    EENV_MEMMAP_SHARSERV_RAMSIZE
+
+#define SHARSERV_STGADDR    EENV_MEMMAP_SHARSERV_STGADDR
+#define SHARSERV_STGSIZE    EENV_MEMMAP_SHARSERV_STGSIZE
 #define SHARSERV_STGTYPE    (ee_strg_eeprom)
 
 
@@ -105,8 +97,10 @@ typedef int dummy999[(shalbase_ipc_userdefdata_maxsize == sharserv_base_ipc_user
 
 #if     defined(SHARSERV_MODE_SHALIB)
     #define SHARSERV_MODULEINFO_PLACED_AT       __attribute__((at(SHARSERV_ROMADDR+EENV_MODULEINFO_OFFSET)))
+    #define SHARSERV_TYPE                       ee_entity_sharlib
 #else
-    #define SHARSERV_MODULEINFO_PLACED_AT    
+    #define SHARSERV_MODULEINFO_PLACED_AT  
+    #define SHARSERV_TYPE                       ee_entity_statlib    
 #endif
 
 static const eEmoduleInfo_t s_sharserv_moduleinfo   SHARSERV_MODULEINFO_PLACED_AT =
@@ -115,7 +109,7 @@ static const eEmoduleInfo_t s_sharserv_moduleinfo   SHARSERV_MODULEINFO_PLACED_A
     {
         .entity     =
         {
-            .type       = ee_entity_sharlib,
+            .type       = SHARSERV_TYPE,
             .signature  = ee_shalSharServ,
             .version    = 
             { 

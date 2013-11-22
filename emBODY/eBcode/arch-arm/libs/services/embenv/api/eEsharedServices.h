@@ -49,13 +49,13 @@
 
 #define SHARSERV_NAME                   "sharSERV"          
 
-#define SHARSERV_VER_MAJOR              0x02                // change of APIs
+#define SHARSERV_VER_MAJOR              0x03                // change of APIs
 #define SHARSERV_VER_MINOR              0x00                // change of internals
 
 #define SHARSERV_BUILDDATE_YEAR         2013
-#define SHARSERV_BUILDDATE_MONTH        9
-#define SHARSERV_BUILDDATE_DAY          4
-#define SHARSERV_BUILDDATE_HOUR         15
+#define SHARSERV_BUILDDATE_MONTH        11
+#define SHARSERV_BUILDDATE_DAY          22
+#define SHARSERV_BUILDDATE_HOUR         16
 #define SHARSERV_BUILDDATE_MIN          0
 
 
