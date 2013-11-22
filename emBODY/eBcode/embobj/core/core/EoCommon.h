@@ -481,6 +481,8 @@ typedef     void        (*eOvoid_fp_uint8_uint8_voidp_t)            (uint8_t, ui
 typedef     void*       (*eOvoidp_fp_uint8_uint32_voidp_t)          (uint8_t, uint32_t, void*);
 typedef     eOresult_t  (*eOres_fp_uint8_voidp_uint16_t)            (uint8_t, void*, uint16_t);
 typedef     eOresult_t  (*eOres_fp_uint8_uint8_voidp_uint16_t)      (uint8_t, uint8_t, void*, uint16_t);
+typedef     int8_t      (*eOint8_fp_uint8_cvoidp_t)                 (int8_t, const void*);
+typedef     int8_t      (*eOint8_fp_uint8_t)                        (int8_t);
 
 
 

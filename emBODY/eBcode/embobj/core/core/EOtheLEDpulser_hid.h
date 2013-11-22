@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOMTHELEDPULSER_HID_H_
-#define _EOMTHELEDPULSER_HID_H_
+#ifndef _EOTHELEDPULSER_HID_H_
+#define _EOTHELEDPULSER_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* @file       EOMtheLEDpulser_hid.h
+/* @file       EOtheLEDpulser_hid.h
     @brief      This header file implements .... singleton used in MEE
     @author     marco.accame@iit.it
     @date       02/05/2013
@@ -34,12 +34,12 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOaction.h"
 #include "EOtimer.h"
-#include "EOMtask.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOMtheLEDpulser.h"
+#include "EOtheLEDpulser.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
@@ -50,18 +50,13 @@ extern "C" {
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-/** @struct     EOMtheLEDpulser_hid
-    @brief      Hidden definition. Implements private data used only internally by the 
-                public or private (static) functions of the object and protected data
-                used also by its derived objects.
- **/  
  
-struct EOMtheLEDpulser_hid 
+struct EOtheLEDpulser_hid 
 {    
-    eOmledpulser_cfg_t          config;    
+    eOledpulser_cfg_t           config;    
     EOaction                    *action;
-    EOtimer                     *timer[eom_ledpulser_leds_number];
-    uint16_t                    ticks[eom_ledpulser_leds_number];
+    EOtimer                     *timer[eo_ledpulser_leds_number];
+    uint32_t                    ticks[eo_ledpulser_leds_number];
 }; 
 
 
