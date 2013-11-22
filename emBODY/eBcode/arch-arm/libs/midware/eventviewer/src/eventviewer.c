@@ -31,11 +31,6 @@
 
 #include "stdlib.h"
 
-//#include "stm32f1.h"
-//#include "cmsis_stm32f1.h"
-
-//#include "hal_stm32_base_hid.h" 
-
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -50,22 +45,21 @@ extern void evIDLE(void);
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-
-//#include "eventviewer_hid.h"
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define EVENTVIEWER_USE_CORTEX_M3
+#define EVENTVIEWER_USE_CORTEX_M3M4
 
 #define ENTITY_ID_IDLE  ev_ID_idle
 
 
-// -- specific for cortex m3 ----
+// -- specific for cortex m3/m4 ----
 
-#if defined(EVENTVIEWER_USE_CORTEX_M3)
+#if defined(EVENTVIEWER_USE_CORTEX_M3M4)
 
 #define DEMCR_TRCENA    0x01000000
 #define ITM_ITMENA      0x00000001
