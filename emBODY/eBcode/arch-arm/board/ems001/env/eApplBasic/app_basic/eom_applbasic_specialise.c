@@ -52,6 +52,7 @@
 #include "EOaction.h"
 #include "EOMtheCallbackmanager.h"
 
+#include "EOtheLEDpulser.h"
 
 extern const ipal_cfg_t    ipal_cfg;
 
@@ -189,13 +190,13 @@ extern void eom_applbasic_specialise_otherthings(void)
 
     eom_applbasic_extra_transceiver_init();
     
-    // init the 6 led and blink every second
+    // init the 5 leds and blink every second
     hal_led_init(hal_led0, NULL);
     hal_led_init(hal_led1, NULL);
     hal_led_init(hal_led2, NULL);
     hal_led_init(hal_led3, NULL);
     hal_led_init(hal_led4, NULL);
-    hal_led_init(hal_led5, NULL);
+    //hal_led_init(hal_led5, NULL);
     
     s_timer_blink = eo_timer_New();
     s_action_blink = eo_action_New();
@@ -205,7 +206,24 @@ extern void eom_applbasic_specialise_otherthings(void)
                          );
     
     eo_timer_Start(s_timer_blink, eok_abstimeNOW, 500*1000, eo_tmrmode_FOREVER, s_action_blink);    
-
+    
+    
+    
+    // init teh ledpulser with led 5
+    
+    eOledpulser_cfg_t ledpulsercfg = 
+    {
+        .led_enable_mask    = 1 << eo_ledpulser_led_five,
+        .led_init           = (eOint8_fp_uint8_cvoidp_t)hal_led_init,
+        .led_on             = (eOint8_fp_uint8_t)hal_led_on,
+        .led_off            = (eOint8_fp_uint8_t)hal_led_off,
+        .led_toggle         = (eOint8_fp_uint8_t)hal_led_toggle
+    };
+    
+    eo_ledpulser_Initialise(&ledpulsercfg);    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 1*1000*1000, 0);
+    
+    //eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_five);
 }
 
 
@@ -399,10 +417,10 @@ static void s_specialise_blink(void *param)
         case 2: hal_led_toggle(hal_led2); break;
         case 3: hal_led_toggle(hal_led3); break;
         case 4: hal_led_toggle(hal_led4); break;
-        case 5: hal_led_toggle(hal_led5); break;
+        //case 5: hal_led_toggle(hal_led5); break;
     }
     
-    pos = (pos+1)%6;
+    pos = (pos+1)%5;
 }
 
 

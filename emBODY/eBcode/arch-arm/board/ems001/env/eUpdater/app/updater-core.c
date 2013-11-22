@@ -171,8 +171,8 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 //             
 // #if defined(_MAINTAINER_APPL_)
 //             case PROGRAM_SHARSERV: // only maintainer can do that.
-//                 s_prog_mem_start = EENV_MEMMAP_SHALSYSTEM_ROMADDR;
-//                 s_prog_mem_size  = EENV_MEMMAP_SHALSYSTEM_ROMSIZE;
+//                 s_prog_mem_start = EENV_MEMMAP_SHARSERV_ROMADDR;
+//                 s_prog_mem_size  = EENV_MEMMAP_SHARSERV_ROMSIZE;
 //                 break;            
 // #endif
 //             
@@ -230,8 +230,8 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             
 #if defined(_MAINTAINER_APPL_)
             case PROGRAM_SHARSERV: // only maintainer can do that.
-                s_prog_mem_start = EENV_MEMMAP_SHALSYSTEM_ROMADDR;
-                s_prog_mem_size  = EENV_MEMMAP_SHALSYSTEM_ROMSIZE;
+                s_prog_mem_start = EENV_MEMMAP_SHARSERV_ROMADDR;
+                s_prog_mem_size  = EENV_MEMMAP_SHARSERV_ROMSIZE;
                 break;            
 #endif
             
@@ -366,7 +366,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                     break;
 #if defined(_MAINTAINER_APPL_)                
                 case PROGRAM_SHARSERV:
-                    ee_sharserv_part_shal_synchronise(ee_shalSharServ,(eEmoduleInfo_t*)(EENV_MEMMAP_SHALSYSTEM_ROMADDR+EENV_MODULEINFO_OFFSET));
+                    ee_sharserv_part_shal_synchronise(ee_shalSharServ,(eEmoduleInfo_t*)(EENV_MEMMAP_SHARSERV_ROMADDR+EENV_MODULEINFO_OFFSET));
                     ee_sharserv_part_proc_startup_set(ee_procUpdater);
                     break;  
 #endif                
@@ -677,8 +677,8 @@ static eEresult_t s_sys_eeprom_erase(void)
 
     return(ret);
 #else    
-    eEstorage_t strg = { .type = ee_strg_eeprom, .size = EENV_MEMMAP_SHALSYSTEM_STGSIZE, .addr = EENV_MEMMAP_SHALSYSTEM_STGADDR};
-    return(ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHALSYSTEM_STGSIZE));
+    eEstorage_t strg = { .type = ee_strg_eeprom, .size = EENV_MEMMAP_SHARSERV_STGSIZE, .addr = EENV_MEMMAP_SHARSERV_STGADDR};
+    return(ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHARSERV_STGSIZE));
 #endif    
 }
 

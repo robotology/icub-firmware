@@ -30,11 +30,11 @@
     @date       11/20/2013
 **/
 
-#define EENV_USE_MEMORYMAP_STM32F1_256K_V1
+#define EENV_USE_MEMORYMAP_STM32F1_256K_V2
 
-#if     defined(EENV_USE_MEMORYMAP_STM32F1_256K_V1)
+#if     defined(EENV_USE_MEMORYMAP_STM32F1_256K_V2)
 
-#include "eEmemorymap_stm32f1_256k_v1.h"
+#include "eEmemorymap_stm32f1_256k_v2.h"
 
 #endif//defined()
 
