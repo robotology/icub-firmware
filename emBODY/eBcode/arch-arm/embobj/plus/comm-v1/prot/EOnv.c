@@ -32,7 +32,7 @@
 #include "EOarray.h" 
 
 
-
+#warning OPTIMISATION step 1: remove storage from the EOnv to save some FLASH.
 
 
 // --------------------------------------------------------------------------------------------------------------------
