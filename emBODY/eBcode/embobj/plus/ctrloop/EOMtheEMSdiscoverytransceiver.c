@@ -34,6 +34,7 @@
 #include "osal.h"
 #include "eEsharedServices.h" 
 
+#include "eEmemorymap.h" 
 
 //#include "appl-core.h"
 
