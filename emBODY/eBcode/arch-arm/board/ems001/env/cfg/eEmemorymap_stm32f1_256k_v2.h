@@ -18,12 +18,12 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EEMEMORYMAP_STM32F1_256K_V1_H_
-#define _EEMEMORYMAP_STM32F1_256K_V1_H_
+#ifndef _EEMEMORYMAP_STM32F1_256K_V2_H_
+#define _EEMEMORYMAP_STM32F1_256K_V2_H_
 
 
-/** @file       eEmemorymap_stm32f1_256k_v1.h
-    @brief      This header file defines the memory map for the ems001 board (v1).
+/** @file       eEmemorymap_stm32f1_256k_v2.h
+    @brief      This header file defines the memory map for the ems001 board (v2).
     @author     marco.accame@iit.it
     @date       11/20/2013
 **/
@@ -64,19 +64,23 @@
 #define EENV_MEMMAP_SHARSERV_STGSIZE                (2*1024)
 #define EENV_MEMMAP_SHARSERV_STGADDR                (EENV_STGSTART + EENV_STGSIZE - EENV_MEMMAP_SHARSERV_STGSIZE)
 
-// now the modules of shared-services which require memory. only part and info. 1k eack 
+// now the modules of shared-services which require memory. 1024 bytes for part, 768 bytes for info, 256 bytes for itself. 
 
 // placed at 64k-64 or at 0x200FFC0 in ram
 #define EENV_MEMMAP_SHARSERV_BASE_RAMSIZE           (64)
 #define EENV_MEMMAP_SHARSERV_BASE_RAMADDR           (EENV_MEMMAP_SHARSERV_RAMADDR)
 
 // placed at 6k
-#define EENV_MEMMAP_SHARSERV_PART_STGSIZE           (1*1024)
+#define EENV_MEMMAP_SHARSERV_PART_STGSIZE           (1024)
 #define EENV_MEMMAP_SHARSERV_PART_STGADDR           (EENV_MEMMAP_SHARSERV_STGADDR)
 
 // placed at 7k
-#define EENV_MEMMAP_SHARSERV_INFO_STGSIZE           (1*1024)
+#define EENV_MEMMAP_SHARSERV_INFO_STGSIZE           (768)
 #define EENV_MEMMAP_SHARSERV_INFO_STGADDR           (EENV_MEMMAP_SHARSERV_PART_STGADDR + EENV_MEMMAP_SHARSERV_PART_STGSIZE)
+
+// placed at 7k+768
+#define EENV_MEMMAP_SHARSERV_OWN_STGSIZE            (256)
+#define EENV_MEMMAP_SHARSERV_OWN_STGADDR            (EENV_MEMMAP_SHARSERV_INFO_STGADDR + EENV_MEMMAP_SHARSERV_INFO_STGSIZE)
 
 #endif
 
@@ -88,36 +92,39 @@
 #define EENV_MEMMAP_ELOADER_ROMADDR                 (EENV_ROMSTART + 0)
 #define EENV_MEMMAP_ELOADER_RAMSIZE                 (EENV_RAMSIZE-EENV_MEMMAP_SHARSERV_RAMSIZE)
 #define EENV_MEMMAP_ELOADER_RAMADDR                 (EENV_RAMSTART) 
+#define EENV_MEMMAP_ELOADER_STGADDR                 (EENV_STGSTART) 
+#define EENV_MEMMAP_ELOADERSTGSIZE                  (0)
 
 
 // --- eupdater
 #ifdef EENV_EUPDATER_FORCE_CODE_OFFSET_TO_ZERO            
    #define EENV_MEMMAP_EUPDATER_ROMADDR             (EENV_ROMSTART + 0)              
 #else
-#define EENV_MEMMAP_EUPDATER_ROMADDR                (EENV_MEMMAP_ELOADER_ROMADDR + EENV_MEMMAP_ELOADER_ROMSIZE)
+    #define EENV_MEMMAP_EUPDATER_ROMADDR            (EENV_MEMMAP_ELOADER_ROMADDR + EENV_MEMMAP_ELOADER_ROMSIZE)
 #endif
 #define EENV_MEMMAP_EUPDATER_ROMSIZE                (72*1024)
 #define EENV_MEMMAP_EUPDATER_RAMADDR                (EENV_RAMSTART) 
 #define EENV_MEMMAP_EUPDATER_RAMSIZE                (EENV_RAMSIZE-EENV_MEMMAP_SHARSERV_RAMSIZE)
+#define EENV_MEMMAP_EUPDATER_STGADDR                (EENV_STGSTART) 
+#define EENV_MEMMAP_EUPDATERSTGSIZE                 (0)
 
 
 // --- eapplication
 #ifdef EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO
 	// the application starts from zero and can stay in all the flash           
-   	#define EENV_MEMMAP_EAPPLICATION_ROMADDR         	(EENV_ROMSTART + 0)              
-   	#define EENV_MEMMAP_EAPPLICATION_ROMSIZE       		(EENV_ROMSIZE-EENV_MEMMAP_SHARSERV_ROMSIZE)
+   	#define EENV_MEMMAP_EAPPLICATION_ROMADDR        (EENV_ROMSTART + 0)              
+   	#define EENV_MEMMAP_EAPPLICATION_ROMSIZE        (EENV_ROMSIZE-EENV_MEMMAP_SHARSERV_ROMSIZE)
 #else
     // the application starts from top of e-updater until end of flash    
-	#define EENV_MEMMAP_EAPPLICATION_ROMADDR       		(EENV_MEMMAP_EUPDATER_ROMADDR + EENV_MEMMAP_EUPDATER_ROMSIZE)
-    #define EENV_MEMMAP_EAPPLICATION_ROMSIZE            (160*1024)
+	#define EENV_MEMMAP_EAPPLICATION_ROMADDR        (EENV_MEMMAP_EUPDATER_ROMADDR + EENV_MEMMAP_EUPDATER_ROMSIZE)
+    #define EENV_MEMMAP_EAPPLICATION_ROMSIZE        (160*1024)
 #endif
-
 #define EENV_MEMMAP_EAPPLICATION_RAMADDR            (EENV_RAMSTART) 
 #define EENV_MEMMAP_EAPPLICATION_RAMSIZE            (EENV_RAMSIZE-EENV_MEMMAP_SHARSERV_RAMSIZE)
 #define EENV_MEMMAP_EAPPLICATION_STGADDR            (EENV_STGSTART) 
 #define EENV_MEMMAP_EAPPLICATION_STGSIZE            (EENV_STGSIZE-EENV_MEMMAP_SHARSERV_STGSIZE)
 
-// 24+72+160 = 5256
+// 24+72+160 = 256
 
 #endif  // include-guard
 
