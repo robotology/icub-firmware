@@ -95,7 +95,7 @@ static uint16_t s_hash(uint16_t id);
 #define SMACRO_NUM       0    
 #define SMACRO_OFF      (SMACRO_NUM*sizeof(eOsnsr_strain_t))
 
-#include "eOcfg_nvsEP_as_any_con_sxxmacro.c"
+#include "macros/eOcfg_nvsEP_as_any_con_sxxmacro.c"
 
 
 #define OFFSET_OF_END_OF_STRAINS    (strainOneStrain_TOTALnumber*sizeof(eOsnsr_strain_t))
