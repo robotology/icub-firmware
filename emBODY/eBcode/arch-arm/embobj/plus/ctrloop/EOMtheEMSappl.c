@@ -57,9 +57,13 @@
 
 #include "EOMtheEMSdiscoverylistener.h"
 
-#include "EOMtheLEDpulser.h"
+#include "EOtheLEDpulser.h"
 
-#include "EOtheEMSapplDiagnostics.h"
+#warning --> removed EOtheEMSapplDiagnostics.h from here
+//#include "EOtheEMSapplDiagnostics.h"
+
+
+#warning TODO -> move stuff related to _TEST_SEQNUM_ to somewhere else.
 
 #ifdef _TEST_SEQNUM_
     #include "eOtheEthLowLevelParser.h"
@@ -521,8 +525,10 @@ static void s_eom_emsappl_thelistener_init(void)
 static void s_eom_emsappl_backdoor_init(void)
 {
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
-    
-    eo_theEMSdgn_Initialize();
+
+#warning --> removed eo_theEMSdgn_Initialize() from here
+    #warning TODO -> move initialisation of EOtheEMSapplDiagnostics somewhere else.
+//    eo_theEMSdgn_Initialize();
     eom_emsbackdoor_Initialise(&emscfg->backdoorcfg);
 }
 
