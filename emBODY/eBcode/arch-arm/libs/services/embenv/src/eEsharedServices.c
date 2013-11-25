@@ -60,6 +60,8 @@ const sharserv_mode_t sharserv_mode_default =
 };
 
 
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -88,12 +90,21 @@ typedef int dummy999[(shalbase_ipc_userdefdata_maxsize == sharserv_base_ipc_user
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eEboolval_t s_sharserv_storage_is_valid(eEmoduleInfo_t* stored);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+const eEstorage_t s_sharserv_strg_info =
+{
+    .type   = ee_strg_eeprom,
+    .size   = sizeof(eEmoduleInfo_t),
+    .addr   = EENV_MEMMAP_SHARSERV_OWN_STGADDR    
+};
+
+static eEmoduleInfo_t s_sharserv_moduleinfo_eeprom = {0};
 
 #if     defined(SHARSERV_MODE_SHALIB)
     #define SHARSERV_MODULEINFO_PLACED_AT       __attribute__((at(SHARSERV_ROMADDR+EENV_MODULEINFO_OFFSET)))
@@ -166,6 +177,7 @@ extern const eEmoduleInfo_t * ee_sharserv_moduleinfo_get(void)
     return((const eEmoduleInfo_t*)&s_sharserv_moduleinfo);
 }
 
+
 extern const eEentity_t * ee_sharserv_moduleinfo_entity_get(void)
 {
     return((const eEentity_t*)&s_sharserv_moduleinfo.info.entity);
@@ -175,6 +187,8 @@ extern eEresult_t ee_sharserv_isvalid(void)
 {
     return(ee_res_OK);
 }
+
+
 
 #else
     // nothing as i have used inline functions defined in header
@@ -188,6 +202,20 @@ extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
     {
         mode = &sharserv_mode_default;
     }
+    
+    // init sharserv data structure
+    
+    shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));
+    // now compare with the s_sharserv_moduleinfo ... it must have the major number equal ... otherwise we erase 
+    // the full eeprom
+    if(ee_true != s_sharserv_storage_is_valid(&s_sharserv_moduleinfo_eeprom))
+    {
+        // clear all eeprom
+        //shalbase_storage_clr(&s_sharserv_strg_info, s_sharserv_strg_info.size);
+        shalbase_storage_set(&s_sharserv_strg_info, &s_sharserv_moduleinfo, sizeof(eEmoduleInfo_t));    
+        shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));        
+    }
+    
     
     // init shalbase
     if(ee_res_OK != shalbase_init((shalbase_initmode_t)mode->initmode))
@@ -255,6 +283,22 @@ extern eEresult_t ee_sharserv_deinit(void)
     return(ee_res_OK);
 }
 
+
+extern eEresult_t ee_sharserv_storage_isvalid(void)
+{
+    shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));
+    
+    return((ee_true == s_sharserv_storage_is_valid(&s_sharserv_moduleinfo_eeprom)) ? (ee_res_OK) : (ee_res_NOK_generic));
+}
+
+extern const eEmoduleInfo_t * ee_sharserv_storage_moduleinfo_get(void)
+{
+    // always read it from eeprom at EENV_MEMMAP_SHARSERV_OWN_STGADDR
+    
+    shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));   
+        
+    return((const eEmoduleInfo_t*)&s_sharserv_moduleinfo_eeprom);
+}
 
 
 // - base
@@ -520,6 +564,7 @@ extern eEresult_t ee_sharserv_info_deviceinfo_item_set(ee_sharserv_info_devicein
 }
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -544,6 +589,23 @@ extern void sharserv_entrypoint(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
+static eEboolval_t s_sharserv_storage_is_valid(eEmoduleInfo_t* stored)
+{   
+    const eEentity_t* ROMentity = &s_sharserv_moduleinfo.info.entity;
+    const eEentity_t* STRentity = &stored->info.entity;
+    
+    if((STRentity->type == ROMentity->type) && (STRentity->signature == ROMentity->signature))
+    {   // ok. check vs major number
+        if(ROMentity->version.major == STRentity->version.major)
+        {   // only the same major number is ok
+            return(ee_true);
+        }
+        
+    }
+    
+    // ... unlucky !
+    return(ee_false);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

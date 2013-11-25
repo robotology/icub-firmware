@@ -389,7 +389,7 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
 {
     volatile hal_result_t res = hal_res_NOK_generic;
 
-    if(ee_true != s_shalbase_ipc_ram_is_valid())
+    if(ee_true != s_shalbase_is_initted())
     {
         return(ee_res_NOK_generic); 
     }
@@ -415,7 +415,6 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
         res =  res;
     }
 
-
     return(ee_res_OK);  
 }
 
@@ -424,7 +423,7 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
 {
     volatile hal_result_t res = hal_res_NOK_generic;
 
-    if(ee_true != s_shalbase_ipc_ram_is_valid())
+    if(ee_true != s_shalbase_is_initted())
     {
         return(ee_res_NOK_generic); 
     }
@@ -457,7 +456,7 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
 {
     volatile hal_result_t res = hal_res_NOK_generic;
 
-    if(ee_true != s_shalbase_ipc_ram_is_valid())
+    if(ee_true != s_shalbase_is_initted())
     {
         return(ee_res_NOK_generic); 
     }

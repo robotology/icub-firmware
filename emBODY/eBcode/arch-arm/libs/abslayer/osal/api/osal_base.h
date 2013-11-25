@@ -284,7 +284,6 @@ typedef struct
     osal_extfn_cfg_t    extfn;                  /**< User-defined behaviour defined with external function pointers */
 } osal_cfg_t;
 
-#warning --> maybe ... remove osal_arch_cfg_t
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 

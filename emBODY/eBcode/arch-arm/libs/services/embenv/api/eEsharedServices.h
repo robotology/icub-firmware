@@ -152,6 +152,13 @@ extern eEresult_t ee_sharserv_selfregister(void);
 extern eEresult_t ee_sharserv_deinit(void);
 
 
+// - storage: the eeprom storage of shar-serv has a descriptive module-info and some data: 
+// - some private to shar-serv, partition table, info
+
+extern const eEmoduleInfo_t * ee_sharserv_storage_moduleinfo_get(void);
+extern eEresult_t ee_sharserv_storage_isvalid(void);
+
+
 // - sys: offers basic system services
 
 extern eEresult_t ee_sharserv_sys_canjump(uint32_t addr);
