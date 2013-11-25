@@ -505,6 +505,11 @@
           <GroupName>eo-core</GroupName>
           <Files>
             <File>
+              <FileName>EOtheLEDpulser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+            </File>
+            <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
@@ -633,11 +638,6 @@
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheLEDpulser.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
@@ -1222,6 +1222,11 @@
           <GroupName>eo-core</GroupName>
           <Files>
             <File>
+              <FileName>EOtheLEDpulser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+            </File>
+            <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
@@ -1350,11 +1355,6 @@
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheLEDpulser.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
