@@ -111,7 +111,7 @@ static uint16_t s_hash(uint16_t id);
 #define MMACRO_NUM    0    
 #define MMACRO_OFF    (OFFSET_OF_END_OF_STRAINS+MMACRO_NUM*sizeof(eOsnsr_mais_t))
 
-#include "eOcfg_nvsEP_as_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_as_any_con_mxxmacro.c"
 
 
 

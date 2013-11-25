@@ -99,7 +99,7 @@
 #define MXXMACRO_BOARD       _ebx
 #define MXXMACRO_MSTR        _m00
 #define MXXMACRO_MNUM        0
-#include "eOcfg_nvsEP_as_any_usr_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_as_any_usr_mxxmacro.c"
 #endif
 
 

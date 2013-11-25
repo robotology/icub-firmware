@@ -126,7 +126,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    0    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 01
@@ -136,7 +136,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    1    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 
@@ -147,7 +147,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    2    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 03
@@ -157,7 +157,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    3    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 04
@@ -167,7 +167,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    4    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 05
@@ -177,7 +177,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    5    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 06
@@ -187,7 +187,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    6    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 07
@@ -197,7 +197,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    7    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 08
@@ -207,7 +207,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    8    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 09
@@ -217,7 +217,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    9    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 10
@@ -227,7 +227,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    10    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 // joint 11
@@ -237,7 +237,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define JMACRO_JNUM    11    
 #define JMACRO_JOFF    (JMACRO_JNUM*sizeof(eOmc_joint_t))
 
-#include "eOcfg_nvsEP_mc_any_con_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_jxxmacro.c"
 
 
 #define OFFSET_OF_END_OF_JOINTS    (EOK_cfg_nvsEP_mc_lowerarm_NUMofJOINTS*sizeof(eOmc_joint_t))
@@ -255,7 +255,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    0    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 01
@@ -265,7 +265,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    1    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 
@@ -276,7 +276,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    2    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 03
@@ -286,7 +286,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    3    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 04
@@ -296,7 +296,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    4    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 05
@@ -306,7 +306,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    5    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 06
@@ -316,7 +316,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    6    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 07
@@ -326,7 +326,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    7    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 08
@@ -336,7 +336,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    8    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 09
@@ -346,7 +346,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    9    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 10
@@ -356,7 +356,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    10    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 // motor 11
@@ -366,7 +366,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define MMACRO_MNUM    11    
 #define MMACRO_MOFF    (OFFSET_OF_END_OF_JOINTS+MMACRO_MNUM*sizeof(eOmc_motor_t))
 
-#include "eOcfg_nvsEP_mc_any_con_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_mxxmacro.c"
 
 
 #define OFFSET_OF_END_OF_MOTORS    (OFFSET_OF_END_OF_JOINTS+EOK_cfg_nvsEP_mc_lowerarm_NUMofMOTORS*sizeof(eOmc_motor_t))
@@ -384,7 +384,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_lowerarm_con_defaultvalue =
 #define CMACRO_CNUM    0    
 #define CMACRO_COFF    (OFFSET_OF_END_OF_MOTORS+CMACRO_CNUM*sizeof(eOmc_controller_t))
 
-#include "eOcfg_nvsEP_mc_any_con_cxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_con_cxxmacro.c"
 
 
 

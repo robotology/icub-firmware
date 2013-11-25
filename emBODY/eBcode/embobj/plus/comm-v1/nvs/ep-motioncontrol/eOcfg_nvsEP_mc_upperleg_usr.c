@@ -94,7 +94,7 @@
 #define JXXMACRO_BOARD       _ebx
 #define JXXMACRO_JSTR        _j00
 #define JXXMACRO_JNUM        0
-#include "eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
 
 
 #define JXXMACRO_INIT        upperleg_usr_hid_INIT_Jxx
@@ -103,7 +103,7 @@
 #define JXXMACRO_BOARD       _ebx
 #define JXXMACRO_JSTR        _j01
 #define JXXMACRO_JNUM        1
-#include "eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
 
 #define JXXMACRO_INIT        upperleg_usr_hid_INIT_Jxx
 #define JXXMACRO_UPDT        upperleg_usr_hid_UPDT_Jxx
@@ -111,7 +111,7 @@
 #define JXXMACRO_BOARD       _ebx
 #define JXXMACRO_JSTR        _j02
 #define JXXMACRO_JNUM        2
-#include "eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
 
 #define JXXMACRO_INIT        upperleg_usr_hid_INIT_Jxx
 #define JXXMACRO_UPDT        upperleg_usr_hid_UPDT_Jxx
@@ -119,7 +119,7 @@
 #define JXXMACRO_BOARD       _ebx
 #define JXXMACRO_JSTR        _j03
 #define JXXMACRO_JNUM        3
-#include "eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_jxxmacro.c"
 
 
 #define MXXMACRO_INIT        upperleg_usr_hid_INIT_Mxx
@@ -128,7 +128,7 @@
 #define MXXMACRO_BOARD       _ebx
 #define MXXMACRO_MSTR        _m00
 #define MXXMACRO_MNUM        0
-#include "eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
 
 
 #define MXXMACRO_INIT        upperleg_usr_hid_INIT_Mxx
@@ -137,7 +137,7 @@
 #define MXXMACRO_BOARD       _ebx
 #define MXXMACRO_MSTR        _m01
 #define MXXMACRO_MNUM        1
-#include "eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
 
 
 #define MXXMACRO_INIT        upperleg_usr_hid_INIT_Mxx
@@ -146,7 +146,7 @@
 #define MXXMACRO_BOARD       _ebx
 #define MXXMACRO_MSTR        _m02
 #define MXXMACRO_MNUM        2
-#include "eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
 
 #define MXXMACRO_INIT        upperleg_usr_hid_INIT_Mxx
 #define MXXMACRO_UPDT        upperleg_usr_hid_UPDT_Mxx
@@ -154,7 +154,7 @@
 #define MXXMACRO_BOARD       _ebx
 #define MXXMACRO_MSTR        _m03
 #define MXXMACRO_MNUM        3
-#include "eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_mxxmacro.c"
 
 
 #define CXXMACRO_INIT        upperleg_usr_hid_INIT_Cxx
@@ -163,7 +163,7 @@
 #define CXXMACRO_BOARD       _ebx
 #define CXXMACRO_CSTR        _c00
 #define CXXMACRO_CNUM        0
-#include "eOcfg_nvsEP_mc_any_usr_cxxmacro.c"
+#include "macros/eOcfg_nvsEP_mc_any_usr_cxxmacro.c"
 
 
 // --------------------------------------------------------------------------------------------------------------------

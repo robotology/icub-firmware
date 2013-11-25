@@ -89,7 +89,7 @@
 #define SXXMACRO_BOARD       _ebx
 #define SXXMACRO_SSTR        _s00
 #define SXXMACRO_SNUM        0
-#include "eOcfg_nvsEP_as_any_usr_sxxmacro.c"
+#include "macros/eOcfg_nvsEP_as_any_usr_sxxmacro.c"
 #endif
 
 #if 0
