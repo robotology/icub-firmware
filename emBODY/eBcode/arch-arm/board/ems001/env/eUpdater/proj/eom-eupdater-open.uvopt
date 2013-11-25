@@ -384,12 +384,27 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>s_eom_system.osalcfg</ItemText>
+          <ItemText>s_sharserv_strg_info</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ram08size,0x0A</ItemText>
+          <ItemText>s_sharserv_moduleinfo_eeprom</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ROMentity</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>STRentity</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>s_sharserv_moduleinfo</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -423,7 +438,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -456,7 +471,7 @@
 
   <Group>
     <GroupName>app</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -468,8 +483,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>165</TopLine>
-      <CurrentLine>179</CurrentLine>
+      <TopLine>159</TopLine>
+      <CurrentLine>171</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eom-eupdater-main.c</PathWithFileName>
       <FilenameWithoutPath>eom-eupdater-main.c</FilenameWithoutPath>
@@ -484,8 +499,8 @@
       <Focus>0</Focus>
       <ColumnNumber>27</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>69</TopLine>
-      <CurrentLine>93</CurrentLine>
+      <TopLine>72</TopLine>
+      <CurrentLine>92</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eupdater-info.c</PathWithFileName>
       <FilenameWithoutPath>eupdater-info.c</FilenameWithoutPath>
@@ -498,10 +513,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>24</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>510</TopLine>
-      <CurrentLine>524</CurrentLine>
+      <TopLine>305</TopLine>
+      <CurrentLine>314</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eupdater_parser.c</PathWithFileName>
       <FilenameWithoutPath>eupdater_parser.c</FilenameWithoutPath>
@@ -514,10 +529,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>53</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>350</TopLine>
-      <CurrentLine>370</CurrentLine>
+      <TopLine>275</TopLine>
+      <CurrentLine>285</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\updater-core.c</PathWithFileName>
       <FilenameWithoutPath>updater-core.c</FilenameWithoutPath>
@@ -530,10 +545,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>478</TopLine>
-      <CurrentLine>493</CurrentLine>
+      <CurrentLine>479</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eOcfg_sm_cangtw.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_sm_cangtw.c</FilenameWithoutPath>
@@ -548,8 +563,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app\eupdater_cangtw.c</PathWithFileName>
       <FilenameWithoutPath>eupdater_cangtw.c</FilenameWithoutPath>
@@ -572,8 +587,8 @@
       <Focus>0</Focus>
       <ColumnNumber>41</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>34</TopLine>
-      <CurrentLine>62</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</PathWithFileName>
       <FilenameWithoutPath>hal_startup_stm32f107.s</FilenameWithoutPath>
@@ -660,8 +675,8 @@
       <Focus>0</Focus>
       <ColumnNumber>48</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>53</TopLine>
-      <CurrentLine>57</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\hal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
@@ -692,7 +707,7 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>118</TopLine>
+      <TopLine>116</TopLine>
       <CurrentLine>124</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\osal_cfg-open.c</PathWithFileName>
@@ -708,8 +723,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>116</TopLine>
-      <CurrentLine>123</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\hal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.h</FilenameWithoutPath>
@@ -740,8 +755,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\osal_cfg-open.h</PathWithFileName>
       <FilenameWithoutPath>osal_cfg-open.h</FilenameWithoutPath>
@@ -1284,8 +1299,8 @@
       <Focus>0</Focus>
       <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>27</TopLine>
-      <CurrentLine>36</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</PathWithFileName>
       <FilenameWithoutPath>EOtheARMenvironment.c</FilenameWithoutPath>
@@ -1312,7 +1327,7 @@
 
   <Group>
     <GroupName>arm-services-embenv</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1336,12 +1351,12 @@
       <GroupNumber>8</GroupNumber>
       <FileNumber>52</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>37</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>280</TopLine>
+      <CurrentLine>287</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</PathWithFileName>
       <FilenameWithoutPath>eEsharedServices.c</FilenameWithoutPath>
@@ -1352,12 +1367,12 @@
       <GroupNumber>8</GroupNumber>
       <FileNumber>53</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>377</TopLine>
+      <CurrentLine>387</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</PathWithFileName>
       <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
@@ -1370,10 +1385,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>51</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>139</TopLine>
+      <CurrentLine>97</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</PathWithFileName>
       <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
@@ -1388,8 +1403,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>383</TopLine>
+      <CurrentLine>395</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalPART.c</PathWithFileName>
       <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>

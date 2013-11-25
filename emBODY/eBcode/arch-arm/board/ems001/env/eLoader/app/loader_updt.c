@@ -134,14 +134,14 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
             .version    = 
             { 
                 .major = 2, 
-                .minor = 1
+                .minor = 2
             },  
             .builddate  = 
             {
                 .year  = 2013,
                 .month = 11,
-                .day   = 07,
-                .hour  = 15,
+                .day   = 25,
+                .hour  = 13,
                 .min   = 0
             }
         },
@@ -543,7 +543,7 @@ static void s_loader_attempt_jump(eEprocess_t proc, uint32_t adr_in_case_proc_fa
             }
         }
         
-        // if we retrive the address ... attempt to jump
+        // if we retrieve the address ... attempt to jump
         if(LOADER_ADR_INVALID != address)
         {
             if(ee_res_OK == ee_sharserv_sys_canjump(address))

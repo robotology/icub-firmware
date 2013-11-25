@@ -82,14 +82,14 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 4
+                .minor = 5
             },  
             .builddate  = 
             {
                 .year  = 2013,
                 .month = 11,
-                .day   = 7,
-                .hour  = 15,
+                .day   = 25,
+                .hour  = 13,
                 .min   = 00
             }
         },

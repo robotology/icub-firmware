@@ -88,14 +88,14 @@ extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_ME
             .version    = 
             { 
                 .major = 2, 
-                .minor = 0
+                .minor = 1
             },  
             .builddate  = 
             {
                 .year  = 2013,
-                .month = 9,
-                .day   = 11,
-                .hour  = 18,
+                .month = 11,
+                .day   = 25,
+                .hour  = 13,
                 .min   = 0
             }
         },
