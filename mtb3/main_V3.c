@@ -88,6 +88,12 @@
 //  MPLAB 8.76
 //
 
+//  Rev 2.10.8 del 26/11/2013
+//  Now the accelerometer and the gyro works on the SDA_number 2
+//  MPLABX v1.90
+//
+
+
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"

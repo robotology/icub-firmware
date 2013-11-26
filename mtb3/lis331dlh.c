@@ -16,21 +16,21 @@ tLISI2COps LISI2COps;
 void LISRegWrite( unsigned char reg, unsigned char val)
 {
  
-	LISI2COps.i2c_write(LIS_I2C_ADDR, reg, val );	
+	LISI2COps.i2c_write(LIS_I2C_CHANNEL,LIS_I2C_ADDR, reg, val );
 }
 
 
 char LISRegRead(char reg, unsigned char *rbuf)
 {
 	unsigned char ret;
-	ret = LISI2COps.i2c_read(LIS_I2C_ADDR, reg, rbuf);
+	ret = LISI2COps.i2c_read(LIS_I2C_CHANNEL,LIS_I2C_ADDR, reg, rbuf);
 
 	return ret;
 }
 
 void LISRegBurst(char reg,char naxis, unsigned int *data )
 {
-	LISI2COps.i2c_burst(2, LIS_I2C_ADDR,reg|0x80, naxis, data);
+	LISI2COps.i2c_burst(LIS_I2C_CHANNEL, LIS_I2C_ADDR,reg|0x80, naxis, data);
 }
 
 unsigned int LISInit(tLISI2COps ops)

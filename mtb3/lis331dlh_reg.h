@@ -10,7 +10,7 @@
 #define __LIS331DLH
 
 #define LIS_I2C_ADDR 0x18
-
+#define LIS_I2C_CHANNEL 0x0 //for the palm
 #define LIS_REG_WHOIAM		0xf
 #define LIS_REG_WHOIAM_MAGIC 0x32
 

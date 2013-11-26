@@ -10,8 +10,8 @@
 #define __LIS331DLH_H
 
 typedef struct{
-	unsigned char (*i2c_write)(unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
-	unsigned char (*i2c_read) (unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+	unsigned char (*i2c_write)(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
+	unsigned char (*i2c_read) (unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
 	unsigned char (*i2c_burst)(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
 
 } tLISI2COps;

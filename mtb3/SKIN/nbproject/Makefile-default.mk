@@ -44,12 +44,18 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 # Distribution Directory
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
+# Source Files Quoted if spaced
+SOURCEFILES_QUOTED_IF_SPACED=../can_interface.c ../can_protocol.c ../I2C.c ../LED.c ../main_V3.c ../traps.c "../AD7147 - Configuration.c" ../eeprom.c ../timers.c ../ADC.c ../lis331dlh.c ../l3g4200d.c
+
 # Object Files Quoted if spaced
 OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1472/can_interface.o ${OBJECTDIR}/_ext/1472/can_protocol.o ${OBJECTDIR}/_ext/1472/I2C.o ${OBJECTDIR}/_ext/1472/LED.o ${OBJECTDIR}/_ext/1472/main_V3.o ${OBJECTDIR}/_ext/1472/traps.o "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o" ${OBJECTDIR}/_ext/1472/eeprom.o ${OBJECTDIR}/_ext/1472/timers.o ${OBJECTDIR}/_ext/1472/ADC.o ${OBJECTDIR}/_ext/1472/lis331dlh.o ${OBJECTDIR}/_ext/1472/l3g4200d.o
 POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1472/can_interface.o.d ${OBJECTDIR}/_ext/1472/can_protocol.o.d ${OBJECTDIR}/_ext/1472/I2C.o.d ${OBJECTDIR}/_ext/1472/LED.o.d ${OBJECTDIR}/_ext/1472/main_V3.o.d ${OBJECTDIR}/_ext/1472/traps.o.d "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o.d" ${OBJECTDIR}/_ext/1472/eeprom.o.d ${OBJECTDIR}/_ext/1472/timers.o.d ${OBJECTDIR}/_ext/1472/ADC.o.d ${OBJECTDIR}/_ext/1472/lis331dlh.o.d ${OBJECTDIR}/_ext/1472/l3g4200d.o.d
 
 # Object Files
 OBJECTFILES=${OBJECTDIR}/_ext/1472/can_interface.o ${OBJECTDIR}/_ext/1472/can_protocol.o ${OBJECTDIR}/_ext/1472/I2C.o ${OBJECTDIR}/_ext/1472/LED.o ${OBJECTDIR}/_ext/1472/main_V3.o ${OBJECTDIR}/_ext/1472/traps.o ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o ${OBJECTDIR}/_ext/1472/eeprom.o ${OBJECTDIR}/_ext/1472/timers.o ${OBJECTDIR}/_ext/1472/ADC.o ${OBJECTDIR}/_ext/1472/lis331dlh.o ${OBJECTDIR}/_ext/1472/l3g4200d.o
+
+# Source Files
+SOURCEFILES=../can_interface.c ../can_protocol.c ../I2C.c ../LED.c ../main_V3.c ../traps.c ../AD7147 - Configuration.c ../eeprom.c ../timers.c ../ADC.c ../lis331dlh.c ../l3g4200d.c
 
 
 CFLAGS=
@@ -89,72 +95,84 @@ ${OBJECTDIR}/_ext/1472/can_interface.o: ../can_interface.c  nbproject/Makefile-$
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_interface.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_interface.o.ok ${OBJECTDIR}/_ext/1472/can_interface.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/can_interface.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/can_interface.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/can_interface.o.d" -o ${OBJECTDIR}/_ext/1472/can_interface.o ../can_interface.c    
 	
 ${OBJECTDIR}/_ext/1472/can_protocol.o: ../can_protocol.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_protocol.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_protocol.o.ok ${OBJECTDIR}/_ext/1472/can_protocol.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/can_protocol.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/can_protocol.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/can_protocol.o.d" -o ${OBJECTDIR}/_ext/1472/can_protocol.o ../can_protocol.c    
 	
 ${OBJECTDIR}/_ext/1472/I2C.o: ../I2C.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/I2C.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/I2C.o.ok ${OBJECTDIR}/_ext/1472/I2C.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/I2C.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/I2C.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/I2C.o.d" -o ${OBJECTDIR}/_ext/1472/I2C.o ../I2C.c    
 	
 ${OBJECTDIR}/_ext/1472/LED.o: ../LED.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/LED.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/LED.o.ok ${OBJECTDIR}/_ext/1472/LED.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/LED.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/LED.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/LED.o.d" -o ${OBJECTDIR}/_ext/1472/LED.o ../LED.c    
 	
 ${OBJECTDIR}/_ext/1472/main_V3.o: ../main_V3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/main_V3.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/main_V3.o.ok ${OBJECTDIR}/_ext/1472/main_V3.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/main_V3.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/main_V3.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/main_V3.o.d" -o ${OBJECTDIR}/_ext/1472/main_V3.o ../main_V3.c    
 	
 ${OBJECTDIR}/_ext/1472/traps.o: ../traps.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/traps.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/traps.o.ok ${OBJECTDIR}/_ext/1472/traps.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/traps.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/traps.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/traps.o.d" -o ${OBJECTDIR}/_ext/1472/traps.o ../traps.c    
 	
 ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o: ../AD7147\ -\ Configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o.ok ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o.err 
+	@${RM} "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o" 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o.d" -o "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o" "../AD7147 - Configuration.c"    
 	
 ${OBJECTDIR}/_ext/1472/eeprom.o: ../eeprom.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/eeprom.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/eeprom.o.ok ${OBJECTDIR}/_ext/1472/eeprom.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/eeprom.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/eeprom.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/eeprom.o.d" -o ${OBJECTDIR}/_ext/1472/eeprom.o ../eeprom.c    
 	
 ${OBJECTDIR}/_ext/1472/timers.o: ../timers.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/timers.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/timers.o.ok ${OBJECTDIR}/_ext/1472/timers.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/timers.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/timers.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/timers.o.d" -o ${OBJECTDIR}/_ext/1472/timers.o ../timers.c    
 	
 ${OBJECTDIR}/_ext/1472/ADC.o: ../ADC.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/ADC.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/ADC.o.ok ${OBJECTDIR}/_ext/1472/ADC.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/ADC.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/ADC.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/ADC.o.d" -o ${OBJECTDIR}/_ext/1472/ADC.o ../ADC.c    
 	
 ${OBJECTDIR}/_ext/1472/lis331dlh.o: ../lis331dlh.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/lis331dlh.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/lis331dlh.o.ok ${OBJECTDIR}/_ext/1472/lis331dlh.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/lis331dlh.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/lis331dlh.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/lis331dlh.o.d" -o ${OBJECTDIR}/_ext/1472/lis331dlh.o ../lis331dlh.c    
 	
 ${OBJECTDIR}/_ext/1472/l3g4200d.o: ../l3g4200d.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/l3g4200d.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/l3g4200d.o.ok ${OBJECTDIR}/_ext/1472/l3g4200d.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/l3g4200d.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/l3g4200d.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1 -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/l3g4200d.o.d" -o ${OBJECTDIR}/_ext/1472/l3g4200d.o ../l3g4200d.c    
 	
 else
@@ -162,72 +180,84 @@ ${OBJECTDIR}/_ext/1472/can_interface.o: ../can_interface.c  nbproject/Makefile-$
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_interface.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_interface.o.ok ${OBJECTDIR}/_ext/1472/can_interface.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/can_interface.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/can_interface.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/can_interface.o.d" -o ${OBJECTDIR}/_ext/1472/can_interface.o ../can_interface.c    
 	
 ${OBJECTDIR}/_ext/1472/can_protocol.o: ../can_protocol.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_protocol.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/can_protocol.o.ok ${OBJECTDIR}/_ext/1472/can_protocol.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/can_protocol.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/can_protocol.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/can_protocol.o.d" -o ${OBJECTDIR}/_ext/1472/can_protocol.o ../can_protocol.c    
 	
 ${OBJECTDIR}/_ext/1472/I2C.o: ../I2C.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/I2C.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/I2C.o.ok ${OBJECTDIR}/_ext/1472/I2C.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/I2C.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/I2C.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/I2C.o.d" -o ${OBJECTDIR}/_ext/1472/I2C.o ../I2C.c    
 	
 ${OBJECTDIR}/_ext/1472/LED.o: ../LED.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/LED.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/LED.o.ok ${OBJECTDIR}/_ext/1472/LED.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/LED.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/LED.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/LED.o.d" -o ${OBJECTDIR}/_ext/1472/LED.o ../LED.c    
 	
 ${OBJECTDIR}/_ext/1472/main_V3.o: ../main_V3.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/main_V3.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/main_V3.o.ok ${OBJECTDIR}/_ext/1472/main_V3.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/main_V3.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/main_V3.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/main_V3.o.d" -o ${OBJECTDIR}/_ext/1472/main_V3.o ../main_V3.c    
 	
 ${OBJECTDIR}/_ext/1472/traps.o: ../traps.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/traps.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/traps.o.ok ${OBJECTDIR}/_ext/1472/traps.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/traps.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/traps.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/traps.o.d" -o ${OBJECTDIR}/_ext/1472/traps.o ../traps.c    
 	
 ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o: ../AD7147\ -\ Configuration.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o.ok ${OBJECTDIR}/_ext/1472/AD7147\ -\ Configuration.o.err 
+	@${RM} "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o" 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o.d" -o "${OBJECTDIR}/_ext/1472/AD7147 - Configuration.o" "../AD7147 - Configuration.c"    
 	
 ${OBJECTDIR}/_ext/1472/eeprom.o: ../eeprom.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/eeprom.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/eeprom.o.ok ${OBJECTDIR}/_ext/1472/eeprom.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/eeprom.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/eeprom.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/eeprom.o.d" -o ${OBJECTDIR}/_ext/1472/eeprom.o ../eeprom.c    
 	
 ${OBJECTDIR}/_ext/1472/timers.o: ../timers.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/timers.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/timers.o.ok ${OBJECTDIR}/_ext/1472/timers.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/timers.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/timers.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/timers.o.d" -o ${OBJECTDIR}/_ext/1472/timers.o ../timers.c    
 	
 ${OBJECTDIR}/_ext/1472/ADC.o: ../ADC.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/ADC.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/ADC.o.ok ${OBJECTDIR}/_ext/1472/ADC.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/ADC.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/ADC.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/ADC.o.d" -o ${OBJECTDIR}/_ext/1472/ADC.o ../ADC.c    
 	
 ${OBJECTDIR}/_ext/1472/lis331dlh.o: ../lis331dlh.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/lis331dlh.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/lis331dlh.o.ok ${OBJECTDIR}/_ext/1472/lis331dlh.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/lis331dlh.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/lis331dlh.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/lis331dlh.o.d" -o ${OBJECTDIR}/_ext/1472/lis331dlh.o ../lis331dlh.c    
 	
 ${OBJECTDIR}/_ext/1472/l3g4200d.o: ../l3g4200d.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1472 
 	@${RM} ${OBJECTDIR}/_ext/1472/l3g4200d.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1472/l3g4200d.o.ok ${OBJECTDIR}/_ext/1472/l3g4200d.o.err 
+	@${RM} ${OBJECTDIR}/_ext/1472/l3g4200d.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/l3g4200d.o.d" $(SILENT) -rsi ${MP_CC_DIR}../ -c ${MP_CC} $(MP_EXTRA_CC_PRE)  -g -omf=elf -x c -c -mcpu=$(MP_PROCESSOR_OPTION) -Wall -I".." -O3 -fno-schedule-insns -fno-schedule-insns2 -MMD -MF "${OBJECTDIR}/_ext/1472/l3g4200d.o.d" -o ${OBJECTDIR}/_ext/1472/l3g4200d.o ../l3g4200d.c    
 	
 endif

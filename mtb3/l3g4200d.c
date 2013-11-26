@@ -13,26 +13,27 @@
 
 #define L3G_I2C_ADDR 0x68
 
+#define L3G_I2C_CHANNEL 0x0 //for the palms
 tL3GI2COps L3GI2COps;
 
 
 
 void L3GRegWrite(  unsigned char RegisterAddress, unsigned char DataBuffer)
 {
-	L3GI2COps.i2c_write(L3G_I2C_ADDR, RegisterAddress, DataBuffer);
+	L3GI2COps.i2c_write(L3G_I2C_CHANNEL,L3G_I2C_ADDR, RegisterAddress, DataBuffer);
 }
 
 char L3GRegRead(char reg)
 {
 	unsigned char rbuf;
-	L3GI2COps.i2c_read(L3G_I2C_ADDR,reg, &rbuf );
+	L3GI2COps.i2c_read(L3G_I2C_CHANNEL,L3G_I2C_ADDR,reg, &rbuf );
 
 	return rbuf;
 }
 
 void L3GRegBurst(char reg,char naxis, unsigned int *data )
 {
-	L3GI2COps.i2c_burst(2, L3G_I2C_ADDR,reg|0x80, naxis, data);
+	L3GI2COps.i2c_burst(L3G_I2C_CHANNEL, L3G_I2C_ADDR,reg|0x80, naxis, data);
 }
 
 

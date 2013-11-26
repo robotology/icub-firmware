@@ -91,13 +91,12 @@ void I2C_test(unsigned char Channel)
 //address including the write bit, then the register address and finally the
 //data. The function returns "1" if successfull otherwise "0".
 //--------------------------------------------------------------------------------
-unsigned char WriteByteViaI2C(unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer)
+unsigned char WriteByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer)
 {
 
     unsigned char ByteAddress;
     unsigned char AcknError;
     unsigned char DeviceAddressHeader;
-	unsigned char Channel=0;
     AcknError=1; //No error on initialisation
 
     //Add the write bit to the device address
@@ -208,11 +207,11 @@ unsigned char WriteViaI2C(unsigned char Channel,unsigned char DeviceAddress, con
 //back. The function returns "1" if successfull otherwise "0". If an error occurs,
 //Then the stop condition is sent.
 //--------------------------------------------------------------------------------
-unsigned char ReadByteViaI2C( unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer )
+unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer )
 {
-	unsigned char Channel=0;
+	
     unsigned char AcknError;
-    unsigned char SDA_number=0;
+    unsigned char SDA_number=2; //for the palm
     unsigned char DeviceAddressHeader;
 
     AcknError=1; //No error on initialisation
@@ -415,7 +414,7 @@ unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress
     unsigned char ByteAddress;
     unsigned char LowByteData, HighByteData;
     unsigned char r, AcknError;
-    unsigned char SDA_number=0;
+    unsigned char SDA_number=2;
     unsigned char DeviceAddressHeader;
 
     AcknError=1; //No error on initialisation
