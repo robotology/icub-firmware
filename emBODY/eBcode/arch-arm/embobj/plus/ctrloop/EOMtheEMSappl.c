@@ -154,10 +154,9 @@ static EOMtheEMSappl s_emsappl_singleton =
 	EO_INIT(.cfg) 
     {   
         EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
-//        EO_INIT(.hostipv4port)      12345
     },
-    EO_INIT(.timer4led)      NULL,
-    EO_INIT(.initted)        0
+    EO_INIT(.timer4led)         NULL,
+    EO_INIT(.initted)           0
 };
 
 
@@ -219,9 +218,6 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     // 5. initialise the listener
     s_eom_emsappl_thelistener_init();
     
-//     // 4b. initialise the backdoor
-//     s_eom_emsappl_backdoor_init();    
-    
     // 6. initialise the EOMtheEMSerror
     s_eom_emsappl_theemserror_init();    
 
@@ -244,8 +240,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     
     // finally ... start the state machine which enters in cfg mode    
     eo_sm_Start(s_emsappl_singleton.sm);
-    
-    
+        
         
     return(&s_emsappl_singleton);
 }
