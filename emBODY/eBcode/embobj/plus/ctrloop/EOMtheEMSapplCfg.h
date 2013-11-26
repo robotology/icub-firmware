@@ -63,7 +63,8 @@ extern "C" {
 #include "EOtheEMSapplBody.h"
 #endif
 
-
+#warning --> pensare a come rendere questo file indipendente dalla board usata (ems001 oppure ems004 oppure mc4).
+// bisogna togliere: EOtheEMSapplBody.h, rendere eom_emsapplcfg_boardid_t un semplice eOenum08_t, eom_emsapplcfg_deviceid_t, etc.
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
