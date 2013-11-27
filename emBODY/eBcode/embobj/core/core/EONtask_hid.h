@@ -34,7 +34,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOVtask.h"
+#include "EOVtask_hid.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------

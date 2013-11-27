@@ -101,7 +101,7 @@ typedef uint16_t opcprotman_dbv_t;
 typedef uint16_t opcprotman_var_t;
 
 
-typedef struct
+typedef struct              // 16 bytes
 {
     uint8_t                 sgn;    /**< contains a signature for the opc. it is teh first byte of the packet and must be opcprotman_signature  */
     uint8_t                 opc;    /**< use opcprotman_opc_t values */

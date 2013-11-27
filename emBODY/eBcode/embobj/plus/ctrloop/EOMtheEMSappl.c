@@ -57,18 +57,7 @@
 
 #include "EOMtheEMSdiscoverylistener.h"
 
-#include "EOtheLEDpulser.h"
 
-#warning --> removed EOtheEMSapplDiagnostics.h from here
-//#include "EOtheEMSapplDiagnostics.h"
-
-
-#warning TODO -> move stuff related to _TEST_SEQNUM_ to somewhere else.
-
-#ifdef _TEST_SEQNUM_
-    #include "eOtheEthLowLevelParser.h"
-    #include "eODeb_eoProtoParser.h"
-#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -89,10 +78,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define emsappl_ledred          hal_led0
-#define emsappl_ledgreen        hal_led1 
-#define emsappl_ledyellow       hal_led2
-#define emsappl_ledorange       hal_led3
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,11 +87,10 @@
 const eOemsappl_cfg_t eom_emsappl_DefaultCfg = 
 {
     EO_INIT(.emsappinfo)        NULL,
-    EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
-//    EO_INIT(.hostipv4port)      12345
+    EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 1, 200)
 };
 
-uint8_t can_out_queue_full  = 0;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,11 +117,6 @@ static void s_eom_emsappl_theemsconfigurator_init(void);
 
 static void s_eom_emsppl_theemsrunner_init(void);
 
-static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par);
-
-static void s_eom_emsappl_startBlinkLed(uint32_t counttick);
-
-static void s_eom_emsappl_InitLeds(void);
 
 EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p);
 
@@ -155,7 +134,6 @@ static EOMtheEMSappl s_emsappl_singleton =
     {   
         EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
     },
-    EO_INIT(.timer4led)         NULL,
     EO_INIT(.initted)           0
 };
 
@@ -196,10 +174,6 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 
     // do whatever is needed
     
-    // 1. init timer 4 blinking led 
-    s_eom_emsappl_InitLeds();
-    s_eom_emsappl_startBlinkLed(10);
-
     // 2. create the sm.
     s_emsappl_singleton.sm = eo_sm_New(eo_cfg_sm_EMSappl_Get());
     
@@ -227,7 +201,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     // 8. initialise the EOMtheEMSrunner,   
     s_eom_emsppl_theemsrunner_init();
 
-    // call usrdef initialise
+    // call usrdef initialise. it is the place where to start new services in init tasl 
     eom_emsappl_hid_userdef_initialise(&s_emsappl_singleton);
     
     // tell things  
@@ -520,10 +494,6 @@ static void s_eom_emsappl_thelistener_init(void)
 static void s_eom_emsappl_backdoor_init(void)
 {
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
-
-#warning --> removed eo_theEMSdgn_Initialize() from here
-    #warning TODO -> move initialisation of EOtheEMSapplDiagnostics somewhere else.
-//    eo_theEMSdgn_Initialize();
     eom_emsbackdoor_Initialise(&emscfg->backdoorcfg);
 }
 
@@ -576,54 +546,6 @@ static void s_eom_emsppl_theemsrunner_init(void)
 }
 
 
-static void s_eom_emsappl_InitLeds(void)
-{
-    hal_led_cfg_t cfg = {.dummy=0};
-    
-    hal_led_init(emsappl_ledred, &cfg);
-    hal_led_off(emsappl_ledred);
-    hal_led_init(emsappl_ledgreen, &cfg); //led green
-    hal_led_off(emsappl_ledgreen);
-    hal_led_init(emsappl_ledyellow, &cfg);
-    hal_led_off(emsappl_ledyellow);
-    hal_led_init(emsappl_ledorange, &cfg);
-    hal_led_off(emsappl_ledorange); 
-
-//     eOmledpulser_cfg_t ledpulsercfg = 
-//     {
-//         .numberofleds   = 3,
-//         .leds           = { eom_ledpulser_led_zero, eom_ledpulser_led_one, eom_ledpulser_led_two }
-//     };
-
-//     eom_ledpulser_Initialise(&ledpulsercfg);
-
-    //eom_ledpulser_Start(eom_ledpulser_GetHandle(), eom_ledpulser_led_zero, 400*1000, 10);
-}
-
-static void s_eom_emsappl_startBlinkLed(uint32_t counttick)
-{
-    osal_timer_timing_t timing;
-    osal_timer_onexpiry_t onexpiry;
-    
-    timing.startat  = OSAL_abstimeNONE;
-    timing.count    = counttick * osal_info_get_tick(); 
-    timing.mode     = osal_tmrmodeFOREVER; 
-
-    onexpiry.cbk    = s_eom_emsrunner_emsappl_toogleled;
-    onexpiry.par    = &s_emsappl_singleton;        
-
-
-    if(NULL == s_emsappl_singleton.timer4led)
-    {
-        s_emsappl_singleton.timer4led = osal_timer_new(); 
-    }
-    osal_timer_start(s_emsappl_singleton.timer4led, &timing, &onexpiry, osal_callerTSK);
-}
-
-static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par)
-{
-    hal_led_toggle(emsappl_ledorange);
-}
 
 EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p)
 {
@@ -631,106 +553,13 @@ EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl
 }
 
 
-#ifdef _TEST_SEQNUM_
-extern void my_cbk_onErrorSeqNum(eOethLowLevParser_packetInfo_t *pktInfo_ptr, uint32_t rec_seqNum, uint32_t expected_seqNum);
-extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_eoProtoParser_ropAdditionalInfo_t *ropAddInfo_ptr);
-//this variable is a function ptr.if is is not null, the isr invoked on rx pkt, will call the function ponted by this variable
-extern void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size);
-extern void EthLowLevParser_callbackInHAL(uint8_t *packet, uint32_t size);
-static void s_eom_emsappl_ethLowLevelParser_configure(void)
-{
-    
-    hal_eth_lowLevelUsePacket_ptr = EthLowLevParser_callbackInHAL;
-//     //4.1) init application parser: embObjParser
-//     const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg = 
-//     {
-//         EO_INIT(.checks)
-//         {
-//             EO_INIT(.seqNum)
-//             {
-//                 EO_INIT(.cbk_onErrSeqNum)           my_cbk_onErrorSeqNum,
-//             },
-//             
-//             EO_INIT(.nv)                            {0},
-//             
-//             EO_INIT(.invalidRopFrame)               {0}
-//         }
-//     };
-    
-    
-        //4.1) init application parser: embObjParser 
-    const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg =  
-    { 
-        EO_INIT(.checks) 
-        { 
-            EO_INIT(.seqNum) 
-            { 
-                EO_INIT(.cbk_onErrSeqNum)           my_cbk_onErrorSeqNum, 
-            }, 
-             
-            EO_INIT(.nv) 
-            { 
-                EO_INIT(.NVs2searchArray) 
-                { 
-                    EO_INIT(.head) 
-                    { 
-                        EO_INIT(.capacity)       eODeb_eoProtoParser_maxNV2find, 
-                        EO_INIT(.itemsize)       sizeof(eODeb_eoProtoParser_nvidEp_couple_t), 
-                        EO_INIT(.size)           1, 
-                    }, 
-                    EO_INIT(.data) 
-                    { 
-                        {0x14, 0x9c00} 
-                    } 
-                 
-                }, 
-                EO_INIT(.cbk_onNVfound)            my_cbk_onNVfound 
-            }, 
-             
-            EO_INIT(.invalidRopFrame)               {0} 
-        } 
-    };
 
-    
-    eODeb_eoProtoParser_Initialise(&deb_eoParserCfg);
-    
-    
-    //4.2) init low level parser: eOethLowLevParser
-/*    const eOethLowLevParser_cfg_t  ethLowLevParserCfg = 
-    {
-        EO_INIT(.conFiltersData) 
-        {
-            EO_INIT(.filtersEnable)     0,
-            EO_INIT(.filters)           {0}, //use pcap filter
-        },
-        
-        EO_INIT(.appParserData)
-        {
-            EO_INIT(.func)             eODeb_eoProtoParser_RopFrameDissect
-            EO_INIT(.arg)              eODeb_eoProtoParser_GetHandle(),
-        }
-    };
-*/
-    //currently use thelow level parser and appl paser separately
-    const eOethLowLevParser_cfg_t  ethLowLevParserCfg = {0}; 
-    eo_ethLowLevParser_Initialise(&ethLowLevParserCfg);
-
-}
-#endif
 // --------------------------------------------------------------------------------------------------------------------
 // redefinition of functions of state machine
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 {
-    
     EOaction onrx;
-    osal_timer_stop(s_emsappl_singleton.timer4led, osal_callerTSK);
-    s_eom_emsappl_startBlinkLed(1000); 
-    
-#ifdef _TEST_SEQNUM_    
-    s_eom_emsappl_ethLowLevelParser_configure();
-#endif    
-
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
@@ -744,47 +573,12 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
     eom_emsappl_hid_userdef_on_exit_CFG(&s_emsappl_singleton);
 }
 
-#ifdef _TEST_SEQNUM_
-static void s_eom_emsrunner_emsappl_toogleallled(osal_timer_t* tmr, void* par)
-{
-
-    hal_led_toggle(emsappl_ledgreen);
-    hal_led_toggle(emsappl_ledyellow);
-    
-    if(can_out_queue_full)
-    {
-        hal_led_toggle(emsappl_ledred);
-    }
-}
-#endif
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 {
     EOaction onrx;
-#ifdef   _TEST_SEQNUM_ 
-
-    osal_timer_timing_t timing;
-    osal_timer_onexpiry_t onexpiry;
-    
-    timing.startat  = OSAL_abstimeNONE;
-    timing.count    = 1000 * osal_info_get_tick(); 
-    timing.mode     = osal_tmrmodeFOREVER; 
-
-    onexpiry.cbk    = s_eom_emsrunner_emsappl_toogleallled;
-    onexpiry.par    = &s_emsappl_singleton;        
-
-
-    if(NULL == s_emsappl_singleton.timer4led)
-    {
-        s_emsappl_singleton.timer4led = osal_timer_new(); 
-    }
-    osal_timer_start(s_emsappl_singleton.timer4led, &timing, &onexpiry, osal_callerTSK);
-
-#else
-        hal_led_on(emsappl_ledred);
-
-#endif    
+   
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
@@ -795,21 +589,15 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
-{
-    hal_led_off(emsappl_ledred);
-    
+{   
     eom_emsappl_hid_userdef_on_exit_ERR(&s_emsappl_singleton);
+}
 
- }
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
     EOaction ontxdone;
     //eo_action_Clear(&ontxdone);
-
-    osal_timer_stop(s_emsappl_singleton.timer4led, osal_callerTSK);
-    s_eom_emsappl_startBlinkLed(100); 
-    
 
     eo_action_SetCallback(&ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
     // the socket does not alert anybody when it receives a pkt, but can alert the sending task

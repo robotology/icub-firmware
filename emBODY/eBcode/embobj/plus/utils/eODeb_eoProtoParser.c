@@ -76,7 +76,7 @@ static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP
 static uint8_t s_eodeb_eoProtoParser_CheckSeqnum(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr, 
                                                 uint32_t *rec_seqnum, uint32_t *expeted_seqnum);
 static uint8_t s_eodeb_eoProtoParser_isvalidropframe(uint8_t *payload);
-static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr);
+//static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr);
 
 
 
@@ -330,6 +330,7 @@ static uint8_t s_eodeb_eoProtoParser_CheckSeqnum(eODeb_eoProtoParser *p, eOethLo
 }
 
 
+#if 0
 static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr)
 {
     EOropframeHeader_t *ropframeheader;
@@ -398,6 +399,8 @@ static eOresult_t s_eodeb_eoProtoParser_DumpNV(eODeb_eoProtoParser *p, eOethLowL
 
     return(eores_OK);
 }
+
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

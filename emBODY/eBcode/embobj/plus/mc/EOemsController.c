@@ -18,8 +18,9 @@
 
 #include <string.h>
 
-#include "EOtheEMSapplBody.h"
 
+#include "EOicubCanProto_specifications.h"
+#include "EOtheEMSapplBody.h"
 
 #include "EOMtheEMSbackdoor.h"
 #include "OPCprotocolManager_Cfg.h"

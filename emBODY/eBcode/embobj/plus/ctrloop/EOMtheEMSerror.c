@@ -37,15 +37,10 @@
 
 #include "EOVtheSystem.h"
 
-//#include "EOsm.h"
 
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
 
-#if	!defined(EMSAPPL_USE_CORE)
-#include "EOtheEMSapplDiagnostics.h"
-#warning -> TODO: EOtheEMSapplDiagnosticsshould be separated from EOMtheEMSerror
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -180,6 +175,18 @@ __weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSe
 
 } 
 
+__weak extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+{
+ 
+    //#error --> see note
+//    #warning --> must contain code to handle things. see note VERY IMPORTANT
+// #if	!defined(EMSAPPL_USE_CORE)  
+//     snprintf(str, sizeof(str)-1, "EOMtheEMSerror %s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
+//     eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//     eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+// #endif    
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -223,7 +230,6 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eo_common_event_check(evt, emserror_evt_error))
     {
-        #warning ---> manage start of error....
         eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
         //eo_sm_ProcessEvent(eom_emsappl_GetStateMachine(eom_emsappl_GetHandle()), eo_sm_emsappl_EVgo2err); 
     }
@@ -234,10 +240,7 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
 {
   
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[192];
-#if	!defined(EMSAPPL_USE_CORE)  
-    char str_err[250];
-#endif
+    char str[256];
 
     EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
 
@@ -247,19 +250,16 @@ static void s_eom_emserror_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid,
         hal_trace_puts(str);
     }
     
-    if(errtype < eo_errortype_warning)
+    eom_emserror_OnError_userdefined_call(errtype, taskid, eobjstr, info);
+    
+    if(errtype <= eo_errortype_warning)
     {
         return;
     }
     
     //eov_sys_Stop(eov_sys_GetHandle());
+       
 
-#if	!defined(EMSAPPL_USE_CORE)  
-    snprintf(str_err, sizeof(str_err)-1, "EOMtheEMSerror %s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
-    eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str_err[0], sizeof(str_err));
-    eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-#endif
-     
     eom_task_PrioritySet(s_emserror_singleton.task, eom_mtask_prio_max);
     
     eom_task_SetEvent(s_emserror_singleton.task, emserror_evt_error); 

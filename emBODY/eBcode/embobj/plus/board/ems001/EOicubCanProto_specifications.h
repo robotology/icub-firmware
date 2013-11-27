@@ -27,7 +27,7 @@ extern "C" {
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/* @file       EOicubCanProtocol_specifications.h
+/* @file       EOicubCanProto_specifications.h
     @brief      This file provides interface to ICUBCANPROTOcol
     @author    valentina.gaggero@iit.it
     @date       14/02/2012

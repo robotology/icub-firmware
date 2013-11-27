@@ -52,11 +52,6 @@
 
 #include "EOaction_hid.h"
 
-#if !defined(EMSAPPL_USE_CORE)
-#include "EOappEncodersReader.h"
-#endif
-
-
 
 #include "eEcommon.h"
 #include "eEmemorymap.h"
@@ -64,6 +59,9 @@
 #include "hal_cfg.h"
 #include "osal_cfg.h"
 #include "ipal_cfg.h"
+
+// to see the EOMTHEEMSAPPLCFG_* macros
+#include "EOMtheEMSapplCfg_cfg.h"
 
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -140,14 +138,14 @@ extern const eEmoduleInfo_t eom_emsapplcfg_modinfo __attribute__((at(EENV_MEMMAP
             .size   = 0,
             .addr   = 0
         },
-        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,  
         .name           = EOMTHEEMSAPPLCFG_NAME
     },
     .protocols  =
     {
-        .udpprotversion  = { .major = 0, .minor = 1},
-        .can1protversion = { .major = 0, .minor = 1},
-        .can2protversion = { .major = 0, .minor = 1},
+        .udpprotversion  = { .major = 1, .minor = 0},
+        .can1protversion = { .major = 1, .minor = 0},
+        .can2protversion = { .major = 1, .minor = 0},
         .gtwprotversion  = { .major = 0, .minor = 0}
     },
     .extra      = {0}
@@ -219,7 +217,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .applcfg        =
     {
-        .emsappinfo             = &eom_emsapplcfg_modinfo, //&eom_emsappl_info_modinfo,
+        .emsappinfo             = &eom_emsapplcfg_modinfo, 
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4)    
     },
     .wipnetcfg      =
@@ -243,15 +241,15 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .getipaddrFROMenvironment   =   EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT,
     .errmng_haltrace_enabled    =   EOMTHEEMSAPPLCFG_HALTRACE_ENABLED,
-    .boardid                    =   (eom_emsapplcfg_boardid_t)EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
-    .hasdevice                  = 
-    {
-        EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
-    },
-    .eps                        =
-    {
-        EOMTHEEMSAPPLCFG_EBX_endpoint_mc, EOMTHEEMSAPPLCFG_EBX_endpoint_as, EOMTHEEMSAPPLCFG_EBX_endpoint_sk
-    },
+    .boardid                    =   EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
+//     .hasdevice                  = 
+//     {
+//         EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
+//     },
+//    .eps                        =
+//    {
+//        EOMTHEEMSAPPLCFG_EBX_endpoint_mc, EOMTHEEMSAPPLCFG_EBX_endpoint_as, EOMTHEEMSAPPLCFG_EBX_endpoint_sk
+//    },
     .disclistcfg    =
     {
         .taskpriority           = EOMTHEEMSAPPLCFG_LISTENER_TASK_PRIORITYof,
@@ -335,49 +333,50 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .maxnumofRXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_RX_MAXPACKETS,                // add a control that is is lower equal to inpdatagramnumber.
         .maxnumofTXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS,                // so far it can be only 0 or 1 
         .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP    
-    }
-#if !defined(EMSAPPL_USE_CORE)    
-     ,
-     .applbodycfg     =
-     {
-         .icubcanprotoimplementedversion =
-         {
-            .major                   = 1,
-            .minor                   = 1
-         },
-         .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
-         .emsControllerCfg           =
-         {
-             .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
-         },
-		 .endpoints                  =
-         {
-             .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
-             .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
-             .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
-         },
-         .configdataofMC4boards      =
-         {
-             .shiftvalues            =
-            {
-             .jointVelocityShift     =  8,
-             .jointVelocityEstimationShift = 8,
-             .jointAccelerationEstimationShift = 5
-            },
-             .bcastpolicy            =
-             {
-                 .val2bcastList      =
-                 {
-                    /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
-                    /* 1 */ ICUBCANPROTO_PER_MB_CMD_STATUS,
-                    /* 2 */ ICUBCANPROTO_PER_MB_CMD_PRINT,
-                    /* 3 */ 0
-                 }
-             }
-            
-         }
-     }
-#endif       
+    }//,
+//    .extra          = (const void*)&eom_emsapplcfg_extra
+// #if !defined(EMSAPPL_USE_CORE)    
+//      ,
+//      .applbodycfg     =
+//      {
+//          .icubcanprotoimplementedversion =
+//          {
+//             .major                   = 1,
+//             .minor                   = 1
+//          },
+//          .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
+//          .emsControllerCfg           =
+//          {
+//              .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
+//          },
+// 		 .endpoints                  =
+//          {
+//              .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
+//              .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
+//              .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
+//          },
+//          .configdataofMC4boards      =
+//          {
+//              .shiftvalues            =
+//             {
+//              .jointVelocityShift     =  8,
+//              .jointVelocityEstimationShift = 8,
+//              .jointAccelerationEstimationShift = 5
+//             },
+//              .bcastpolicy            =
+//              {
+//                  .val2bcastList      =
+//                  {
+//                     /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
+//                     /* 1 */ ICUBCANPROTO_PER_MB_CMD_STATUS,
+//                     /* 2 */ ICUBCANPROTO_PER_MB_CMD_PRINT,
+//                     /* 3 */ 0
+//                  }
+//              }
+//             
+//          }
+//      }
+// #endif       
 };
 
 
@@ -410,15 +409,15 @@ extern EOMtheEMSapplCfg* eom_emsapplcfg_GetHandle(void)
 }
 
 
-extern eObool_t eom_emsapplcfg_HasDevice(EOMtheEMSapplCfg *p, eom_emsapplcfg_deviceid_t dev)
-{
-    return(s_emsapplcfg_singleton.hasdevice[dev]);
-}
-
-extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
-{
-    return(s_emsapplcfg_singleton.eps[eptype]);
-}
+//extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, uint8_t eptype)
+//{
+//    if(eptype >= eom_emsappl_eptype_numberof)
+//    {
+//        return(0xffff);
+//    }
+//   
+//    return(s_emsapplcfg_singleton.eps[eptype]);
+//}
 
 
 

@@ -69,8 +69,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_eon_callbackman_tsk_aftercallbackorontimeout(EONtask *rt, uint32_t msg);
-
 static eOresult_t s_eon_callbackman_execute(EOVtheCallbackManager *v, eOcallback_t cbk, void *arg, eOreltime_t tout);
 
 
@@ -78,7 +76,7 @@ static eOresult_t s_eon_callbackman_execute(EOVtheCallbackManager *v, eOcallback
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EONtheCallbackManager";
+//static const char s_eobj_ownname[] = "EONtheCallbackManager";
  
 static EONtheCallbackManager s_eon_callbackmanager = 
 {
@@ -91,7 +89,7 @@ static EONtheCallbackManager s_eon_callbackmanager =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EONtheCallbackManager * eon_callbackman_Initialise(const eOmcallbackman_cfg_t *cbkmancfg) 
+extern EONtheCallbackManager * eon_callbackman_Initialise(void) 
 {
     if(NULL != s_eon_callbackmanager.tsk) 
     {
@@ -157,7 +155,10 @@ extern EONtask * eon_callbackman_GetTask(EONtheCallbackManager *p)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
+static eOresult_t s_eon_callbackman_execute(EOVtheCallbackManager *v, eOcallback_t cbk, void *arg, eOreltime_t tout)
+{
+    return(eores_OK);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

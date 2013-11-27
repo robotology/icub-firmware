@@ -17,7 +17,7 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-#include "hal_led.h"
+//#include "hal_led.h"
 
 extern const int32_t EMS_FREQUENCY_INT32;
 

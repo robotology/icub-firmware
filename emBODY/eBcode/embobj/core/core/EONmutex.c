@@ -74,7 +74,7 @@ static eOresult_t s_eon_mutex_release(void *p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EONmutex";
+//static const char s_eobj_ownname[] = "EONmutex";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -117,6 +117,7 @@ extern EONmutex* eon_mutex_New(void)
 static eOresult_t s_eon_mutex_take(void *p, eOreltime_t tout) 
 {
     EONmutex *m = (EONmutex *)p;
+    m = m;
     // we dont use m->none ...
     return(eores_OK);
 }
@@ -125,6 +126,7 @@ static eOresult_t s_eon_mutex_take(void *p, eOreltime_t tout)
 static eOresult_t s_eon_mutex_release(void *p) 
 {
     EONmutex *m = (EONmutex *)p;
+    m = m;
     // we dont use m->none ...
     return(eores_OK);
 }

@@ -32,7 +32,7 @@
 
 #include "OPCprotocolManager.h"
 #include "OPCprotocolManager_Cfg.h"
-//#include "appl-core.h"
+
 
 
 
