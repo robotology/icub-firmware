@@ -73,16 +73,15 @@ static opcprotman_var_map_t* s_opcprotman_find_var(OPCprotocolManager* p, uint16
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "OPCprotocolManager";
-static uint32_t seqencenumber = 0;
+
+static uint32_t s_opcprotman_sequencenumber = 0;
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-//this function will be declare in a configuration file, in oreder to personalize memory and callback functions of the database 
-extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p);
+
 
 extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
 {
@@ -103,6 +102,7 @@ extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
     
     
     res = opcprotman_personalize_database(p);  
+    
     if(opcprotman_OK != res)
     {
         return(NULL);
@@ -227,8 +227,8 @@ extern opcprotman_res_t opcprotman_Form(OPCprotocolManager* p, opcprotman_opc_t 
     msg->head.dbv   = p->cfg->databaseversion;
     msg->head.var   = var;
     msg->head.len   = 0; // but it shall be updated
-    seqencenumber++;
-    msg->head.seqnum = seqencenumber;
+    s_opcprotman_sequencenumber++;
+    msg->head.seqnum = s_opcprotman_sequencenumber;
     
     opcprotman_var_map_t* map = s_opcprotman_find(p, &msg->head);
     
@@ -333,19 +333,6 @@ static opcprotman_var_map_t* s_opcprotman_find(OPCprotocolManager* p, opcprotman
 
     return(s_opcprotman_find_var(p, head->var));
     
-//     uint16_t i;
-//     opcprotman_var_map_t* map = NULL;
-//     
-//     for(i=0; i<p->cfg->numberofvariables; i++)
-//     {
-//         if(head->var == p->cfg->arrayofvariablemap[i].var)
-//         {
-//             map = &p->cfg->arrayofvariablemap[i];
-//             break;
-//         }
-//     }
-//     
-//     return(map);
 }
 
 
