@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EMSAPPL_USE_CORE EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -797,11 +797,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
-            <File>
-              <FileName>OPCprotocolManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\OPCprotocolManager.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -837,6 +832,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol-cfg</GroupName>
+          <Files>
             <File>
               <FileName>OPCprotocolManager_Cfg.c</FileName>
               <FileType>1</FileType>
@@ -1401,6 +1411,36 @@
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>nee</GroupName>
+          <Files>
+            <File>
+              <FileName>EONmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheCallbackManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheTimerManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1750,7 +1790,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EMSAPPL_USE_CORE _FORCE_NETWORK_FROM_IPAL_CFG</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2161,11 +2201,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
-            <File>
-              <FileName>OPCprotocolManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\OPCprotocolManager.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2201,6 +2236,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol-cfg</GroupName>
+          <Files>
             <File>
               <FileName>OPCprotocolManager_Cfg.c</FileName>
               <FileType>1</FileType>
@@ -2565,6 +2615,36 @@
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>nee</GroupName>
+          <Files>
+            <File>
+              <FileName>EONmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheCallbackManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheTimerManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2912,9 +2992,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM EMSAPPL_USE_CORE</Define>
+              <Define>HAL_USE_ARCH_ARM EMSAPPL_USE_CORE_removed</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3325,11 +3405,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
-            <File>
-              <FileName>OPCprotocolManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\OPCprotocolManager.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -3365,6 +3440,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol-cfg</GroupName>
+          <Files>
             <File>
               <FileName>OPCprotocolManager_Cfg.c</FileName>
               <FileType>1</FileType>
@@ -3729,6 +3819,36 @@
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>nee</GroupName>
+          <Files>
+            <File>
+              <FileName>EONmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheCallbackManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheTimerManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4078,7 +4198,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EMSAPPL_USE_CORE EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -4489,11 +4609,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
-            <File>
-              <FileName>OPCprotocolManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\OPCprotocolManager.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -4529,6 +4644,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>opc-protocol-cfg</GroupName>
+          <Files>
             <File>
               <FileName>OPCprotocolManager_Cfg.c</FileName>
               <FileType>1</FileType>
@@ -4893,6 +5023,36 @@
               <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>nee</GroupName>
+          <Files>
+            <File>
+              <FileName>EONmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheCallbackManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>EONtheTimerManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
