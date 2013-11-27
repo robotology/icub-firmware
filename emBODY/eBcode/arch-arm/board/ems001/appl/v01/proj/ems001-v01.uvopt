@@ -1580,7 +1580,218 @@
   </Target>
 
   <Target>
-    <TargetName>esmappl-ems-nOffset.allOpen</TargetName>
+    <TargetName>ems001</TargetName>
+    <ToolsetNumber>0x4</ToolsetNumber>
+    <ToolsetName>ARM-ADS</ToolsetName>
+    <TargetOption>
+      <CLKADS>25000000</CLKADS>
+      <OPTTT>
+        <gFlags>1</gFlags>
+        <BeepAtEnd>1</BeepAtEnd>
+        <RunSim>1</RunSim>
+        <RunTarget>0</RunTarget>
+      </OPTTT>
+      <OPTHX>
+        <HexSelection>1</HexSelection>
+        <FlashByte>65535</FlashByte>
+        <HexRangeLowAddress>0</HexRangeLowAddress>
+        <HexRangeHighAddress>0</HexRangeHighAddress>
+        <HexOffset>0</HexOffset>
+      </OPTHX>
+      <OPTLEX>
+        <PageWidth>79</PageWidth>
+        <PageLength>66</PageLength>
+        <TabStop>8</TabStop>
+        <ListingPath>.\Lst\</ListingPath>
+      </OPTLEX>
+      <ListingPage>
+        <CreateCListing>1</CreateCListing>
+        <CreateAListing>1</CreateAListing>
+        <CreateLListing>1</CreateLListing>
+        <CreateIListing>0</CreateIListing>
+        <AsmCond>1</AsmCond>
+        <AsmSymb>1</AsmSymb>
+        <AsmXref>0</AsmXref>
+        <CCond>1</CCond>
+        <CCode>0</CCode>
+        <CListInc>0</CListInc>
+        <CSymb>0</CSymb>
+        <LinkerCodeListing>0</LinkerCodeListing>
+      </ListingPage>
+      <OPTXL>
+        <LMap>1</LMap>
+        <LComments>1</LComments>
+        <LGenerateSymbols>1</LGenerateSymbols>
+        <LLibSym>1</LLibSym>
+        <LLines>1</LLines>
+        <LLocSym>1</LLocSym>
+        <LPubSym>1</LPubSym>
+        <LXref>0</LXref>
+        <LExpSel>0</LExpSel>
+      </OPTXL>
+      <OPTFL>
+        <tvExp>1</tvExp>
+        <tvExpOptDlg>0</tvExpOptDlg>
+        <IsCurrentTarget>1</IsCurrentTarget>
+      </OPTFL>
+      <CpuCode>255</CpuCode>
+      <Books>
+        <Book>
+          <Number>0</Number>
+          <Title>7</Title>
+          <Path>DATASHTS\ST\STM32F105</Path>
+        </Book>
+        <Book>
+          <Number>1</Number>
+          <Title>Reference Manual</Title>
+          <Path>DATASHTS\ST\STM32F10xxx.PDF</Path>
+        </Book>
+      </Books>
+      <DllOpt>
+        <SimDllName>SARMCM3.DLL</SimDllName>
+        <SimDllArguments></SimDllArguments>
+        <SimDlgDllName>DARMSTM.DLL</SimDlgDllName>
+        <SimDlgDllArguments>-pSTM32F107VC</SimDlgDllArguments>
+        <TargetDllName>SARMCM3.DLL</TargetDllName>
+        <TargetDllArguments></TargetDllArguments>
+        <TargetDlgDllName>TARMSTM.DLL</TargetDlgDllName>
+        <TargetDlgDllArguments>-pSTM32F107VC</TargetDlgDllArguments>
+      </DllOpt>
+      <DebugOpt>
+        <uSim>0</uSim>
+        <uTrg>1</uTrg>
+        <sLdApp>1</sLdApp>
+        <sGomain>1</sGomain>
+        <sRbreak>1</sRbreak>
+        <sRwatch>1</sRwatch>
+        <sRmem>1</sRmem>
+        <sRfunc>1</sRfunc>
+        <sRbox>1</sRbox>
+        <tLdApp>1</tLdApp>
+        <tGomain>1</tGomain>
+        <tRbreak>1</tRbreak>
+        <tRwatch>1</tRwatch>
+        <tRmem>1</tRmem>
+        <tRfunc>0</tRfunc>
+        <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
+        <sRunDeb>0</sRunDeb>
+        <sLrtime>0</sLrtime>
+        <nTsel>9</nTsel>
+        <sDll></sDll>
+        <sDllPa></sDllPa>
+        <sDlgDll></sDlgDll>
+        <sDlgPa></sDlgPa>
+        <sIfile></sIfile>
+        <tDll></tDll>
+        <tDllPa></tDllPa>
+        <tDlgDll></tDlgDll>
+        <tDlgPa></tDlgPa>
+        <tIfile>.\STM32_TP.ini</tIfile>
+        <pMon>BIN\ULP2CM3.DLL</pMon>
+      </DebugOpt>
+      <TargetDriverDllRegistry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>ULP2CM3</Key>
+          <Name>-UP1123199 -O206 -S12 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12291 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>DLGUARM</Key>
+          <Name>(107=-1,-1,-1,-1,0)</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>DLGARARM</Key>
+          <Name>(6000=626,372,1323,788,0)</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>DLGDARM</Key>
+          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(100=-1,-1,-1,-1,0)(110=-1,-1,-1,-1,0)(111=-1,-1,-1,-1,0)(180=-1,-1,-1,-1,0)(120=-1,-1,-1,-1,0)(121=-1,-1,-1,-1,0)(122=-1,-1,-1,-1,0)(123=-1,-1,-1,-1,0)(124=-1,-1,-1,-1,0)(140=-1,-1,-1,-1,0)(240=-1,-1,-1,-1,0)(190=-1,-1,-1,-1,0)(200=-1,-1,-1,-1,0)(170=-1,-1,-1,-1,0)(130=-1,-1,-1,-1,0)(131=-1,-1,-1,-1,0)(132=-1,-1,-1,-1,0)(133=-1,-1,-1,-1,0)(160=-1,-1,-1,-1,0)(161=-1,-1,-1,-1,0)(162=-1,-1,-1,-1,0)(210=-1,-1,-1,-1,0)(211=-1,-1,-1,-1,0)(220=-1,-1,-1,-1,0)(221=-1,-1,-1,-1,0)(230=-1,-1,-1,-1,0)(234=-1,-1,-1,-1,0)(231=-1,-1,-1,-1,0)(232=-1,-1,-1,-1,0)(233=-1,-1,-1,-1,0)(150=-1,-1,-1,-1,0)(151=-1,-1,-1,-1,0)</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>DLGTARM</Key>
+          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=0,80,366,305,0)(1009=-1,-1,-1,-1,0)</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>ARMDBGFLAGS</Key>
+          <Name>-T0</Name>
+        </SetRegEntry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>UL2CM3</Key>
+          <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
+        </SetRegEntry>
+      </TargetDriverDllRegistry>
+      <Breakpoint/>
+      <WatchWindow1>
+        <Ww>
+          <count>0</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>p-&gt;cfg,0x0A</ItemText>
+        </Ww>
+      </WatchWindow1>
+      <MemoryWindow1>
+        <Mm>
+          <WinNumber>1</WinNumber>
+          <SubType>0</SubType>
+          <ItemText>0x20007f70</ItemText>
+        </Mm>
+      </MemoryWindow1>
+      <MemoryWindow2>
+        <Mm>
+          <WinNumber>2</WinNumber>
+          <SubType>0</SubType>
+          <ItemText>loc_device_def</ItemText>
+        </Mm>
+      </MemoryWindow2>
+      <MemoryWindow3>
+        <Mm>
+          <WinNumber>3</WinNumber>
+          <SubType>0</SubType>
+          <ItemText>xxx</ItemText>
+        </Mm>
+      </MemoryWindow3>
+      <DebugFlag>
+        <trace>0</trace>
+        <periodic>0</periodic>
+        <aLwin>0</aLwin>
+        <aCover>0</aCover>
+        <aSer1>0</aSer1>
+        <aSer2>0</aSer2>
+        <aPa>0</aPa>
+        <viewmode>1</viewmode>
+        <vrSel>0</vrSel>
+        <aSym>0</aSym>
+        <aTbox>0</aTbox>
+        <AscS1>0</AscS1>
+        <AscS2>0</AscS2>
+        <AscS3>0</AscS3>
+        <aSer3>0</aSer3>
+        <eProf>0</eProf>
+        <aLa>0</aLa>
+        <aPa1>0</aPa1>
+        <AscS4>0</AscS4>
+        <aSer4>1</aSer4>
+        <StkLoc>0</StkLoc>
+        <TrcWin>0</TrcWin>
+        <newCpu>0</newCpu>
+        <uProt>0</uProt>
+      </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
+      <LintExecutable></LintExecutable>
+      <LintConfigFile></LintConfigFile>
+    </TargetOption>
+  </Target>
+
+  <Target>
+    <TargetName>ems001-0offset</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -1790,217 +2001,6 @@
     </TargetOption>
   </Target>
 
-  <Target>
-    <TargetName>esmappl-ems-0offset.allOpen</TargetName>
-    <ToolsetNumber>0x4</ToolsetNumber>
-    <ToolsetName>ARM-ADS</ToolsetName>
-    <TargetOption>
-      <CLKADS>25000000</CLKADS>
-      <OPTTT>
-        <gFlags>1</gFlags>
-        <BeepAtEnd>1</BeepAtEnd>
-        <RunSim>1</RunSim>
-        <RunTarget>0</RunTarget>
-      </OPTTT>
-      <OPTHX>
-        <HexSelection>1</HexSelection>
-        <FlashByte>65535</FlashByte>
-        <HexRangeLowAddress>0</HexRangeLowAddress>
-        <HexRangeHighAddress>0</HexRangeHighAddress>
-        <HexOffset>0</HexOffset>
-      </OPTHX>
-      <OPTLEX>
-        <PageWidth>79</PageWidth>
-        <PageLength>66</PageLength>
-        <TabStop>8</TabStop>
-        <ListingPath>.\Lst\</ListingPath>
-      </OPTLEX>
-      <ListingPage>
-        <CreateCListing>1</CreateCListing>
-        <CreateAListing>1</CreateAListing>
-        <CreateLListing>1</CreateLListing>
-        <CreateIListing>0</CreateIListing>
-        <AsmCond>1</AsmCond>
-        <AsmSymb>1</AsmSymb>
-        <AsmXref>0</AsmXref>
-        <CCond>1</CCond>
-        <CCode>0</CCode>
-        <CListInc>0</CListInc>
-        <CSymb>0</CSymb>
-        <LinkerCodeListing>0</LinkerCodeListing>
-      </ListingPage>
-      <OPTXL>
-        <LMap>1</LMap>
-        <LComments>1</LComments>
-        <LGenerateSymbols>1</LGenerateSymbols>
-        <LLibSym>1</LLibSym>
-        <LLines>1</LLines>
-        <LLocSym>1</LLocSym>
-        <LPubSym>1</LPubSym>
-        <LXref>0</LXref>
-        <LExpSel>0</LExpSel>
-      </OPTXL>
-      <OPTFL>
-        <tvExp>1</tvExp>
-        <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
-      </OPTFL>
-      <CpuCode>255</CpuCode>
-      <Books>
-        <Book>
-          <Number>0</Number>
-          <Title>7</Title>
-          <Path>DATASHTS\ST\STM32F105</Path>
-        </Book>
-        <Book>
-          <Number>1</Number>
-          <Title>Reference Manual</Title>
-          <Path>DATASHTS\ST\STM32F10xxx.PDF</Path>
-        </Book>
-      </Books>
-      <DllOpt>
-        <SimDllName>SARMCM3.DLL</SimDllName>
-        <SimDllArguments></SimDllArguments>
-        <SimDlgDllName>DARMSTM.DLL</SimDlgDllName>
-        <SimDlgDllArguments>-pSTM32F107VC</SimDlgDllArguments>
-        <TargetDllName>SARMCM3.DLL</TargetDllName>
-        <TargetDllArguments></TargetDllArguments>
-        <TargetDlgDllName>TARMSTM.DLL</TargetDlgDllName>
-        <TargetDlgDllArguments>-pSTM32F107VC</TargetDlgDllArguments>
-      </DllOpt>
-      <DebugOpt>
-        <uSim>0</uSim>
-        <uTrg>1</uTrg>
-        <sLdApp>1</sLdApp>
-        <sGomain>1</sGomain>
-        <sRbreak>1</sRbreak>
-        <sRwatch>1</sRwatch>
-        <sRmem>1</sRmem>
-        <sRfunc>1</sRfunc>
-        <sRbox>1</sRbox>
-        <tLdApp>1</tLdApp>
-        <tGomain>1</tGomain>
-        <tRbreak>1</tRbreak>
-        <tRwatch>1</tRwatch>
-        <tRmem>1</tRmem>
-        <tRfunc>0</tRfunc>
-        <tRbox>1</tRbox>
-        <tRtrace>0</tRtrace>
-        <sRunDeb>0</sRunDeb>
-        <sLrtime>0</sLrtime>
-        <nTsel>9</nTsel>
-        <sDll></sDll>
-        <sDllPa></sDllPa>
-        <sDlgDll></sDlgDll>
-        <sDlgPa></sDlgPa>
-        <sIfile></sIfile>
-        <tDll></tDll>
-        <tDllPa></tDllPa>
-        <tDlgDll></tDlgDll>
-        <tDlgPa></tDlgPa>
-        <tIfile>.\STM32_TP.ini</tIfile>
-        <pMon>BIN\ULP2CM3.DLL</pMon>
-      </DebugOpt>
-      <TargetDriverDllRegistry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>ULP2CM3</Key>
-          <Name>-UP1123158 -O206 -S12 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO12291 -TC72000000 -TP8 -TDX0 -TDD0 -TDS8007 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGUARM</Key>
-          <Name>(107=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGARARM</Key>
-          <Name>(6000=626,372,1323,788,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGDARM</Key>
-          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(100=-1,-1,-1,-1,0)(110=-1,-1,-1,-1,0)(111=-1,-1,-1,-1,0)(180=-1,-1,-1,-1,0)(120=-1,-1,-1,-1,0)(121=-1,-1,-1,-1,0)(122=-1,-1,-1,-1,0)(123=-1,-1,-1,-1,0)(124=-1,-1,-1,-1,0)(140=-1,-1,-1,-1,0)(240=-1,-1,-1,-1,0)(190=-1,-1,-1,-1,0)(200=-1,-1,-1,-1,0)(170=-1,-1,-1,-1,0)(130=-1,-1,-1,-1,0)(131=-1,-1,-1,-1,0)(132=-1,-1,-1,-1,0)(133=-1,-1,-1,-1,0)(160=-1,-1,-1,-1,0)(161=-1,-1,-1,-1,0)(162=-1,-1,-1,-1,0)(210=-1,-1,-1,-1,0)(211=-1,-1,-1,-1,0)(220=-1,-1,-1,-1,0)(221=-1,-1,-1,-1,0)(230=-1,-1,-1,-1,0)(234=-1,-1,-1,-1,0)(231=-1,-1,-1,-1,0)(232=-1,-1,-1,-1,0)(233=-1,-1,-1,-1,0)(150=-1,-1,-1,-1,0)(151=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGTARM</Key>
-          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=0,80,366,305,0)(1009=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>ARMDBGFLAGS</Key>
-          <Name>-T0</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>UL2CM3</Key>
-          <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
-        </SetRegEntry>
-      </TargetDriverDllRegistry>
-      <Breakpoint/>
-      <WatchWindow1>
-        <Ww>
-          <count>0</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>p-&gt;cfg,0x0A</ItemText>
-        </Ww>
-      </WatchWindow1>
-      <MemoryWindow1>
-        <Mm>
-          <WinNumber>1</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>0x20007f70</ItemText>
-        </Mm>
-      </MemoryWindow1>
-      <MemoryWindow2>
-        <Mm>
-          <WinNumber>2</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>loc_device_def</ItemText>
-        </Mm>
-      </MemoryWindow2>
-      <MemoryWindow3>
-        <Mm>
-          <WinNumber>3</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>xxx</ItemText>
-        </Mm>
-      </MemoryWindow3>
-      <DebugFlag>
-        <trace>0</trace>
-        <periodic>0</periodic>
-        <aLwin>0</aLwin>
-        <aCover>0</aCover>
-        <aSer1>0</aSer1>
-        <aSer2>0</aSer2>
-        <aPa>0</aPa>
-        <viewmode>1</viewmode>
-        <vrSel>0</vrSel>
-        <aSym>0</aSym>
-        <aTbox>0</aTbox>
-        <AscS1>0</AscS1>
-        <AscS2>0</AscS2>
-        <AscS3>0</AscS3>
-        <aSer3>0</aSer3>
-        <eProf>0</eProf>
-        <aLa>0</aLa>
-        <aPa1>0</aPa1>
-        <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
-        <StkLoc>0</StkLoc>
-        <TrcWin>0</TrcWin>
-        <newCpu>0</newCpu>
-        <uProt>0</uProt>
-      </DebugFlag>
-      <Tracepoint>
-        <THDelay>0</THDelay>
-      </Tracepoint>
-      <LintExecutable></LintExecutable>
-      <LintConfigFile></LintConfigFile>
-    </TargetOption>
-  </Target>
-
   <Group>
     <GroupName>app_main</GroupName>
     <tvExp>1</tvExp>
@@ -2013,7 +2013,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -2026,302 +2026,30 @@
   </Group>
 
   <Group>
-    <GroupName>app-body</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>abslayer-lib</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>2</FileNumber>
-      <FileType>1</FileType>
+      <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>5</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_obj\EOappCanServicesProvider.c</PathWithFileName>
-      <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</PathWithFileName>
+      <FilenameWithoutPath>hal.ems001.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>3</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_obj\EOappEncodersReader.c</PathWithFileName>
-      <FilenameWithoutPath>EOappEncodersReader.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>4</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_obj\EOappMeasuresConverter.c</PathWithFileName>
-      <FilenameWithoutPath>EOappMeasuresConverter.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>5</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_obj\EOappTheDataBase.c</PathWithFileName>
-      <FilenameWithoutPath>EOappTheDataBase.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>6</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_obj\EOtheEMSapplBody.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheEMSapplBody.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>app-body-Cfg</GroupName>
-    <tvExp>1</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>7</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_messagesLookupTbl.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_icubCanProto_messagesLookupTbl.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>8</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>9</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>25</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>10</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>39</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgFunctions.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>11</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>12</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</PathWithFileName>
-      <FilenameWithoutPath>measuresConvFuncOveridden.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>13</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-net\eOcfg_appTheDataBase_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_appTheDataBase_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>abslayer-lib</GroupName>
-    <tvExp>1</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>14</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.cm3.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm3.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>15</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.cm3.dbg.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm3.dbg.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>16</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\hal.stm32f1.mcbstm32c.lib</PathWithFileName>
-      <FilenameWithoutPath>hal.stm32f1.mcbstm32c.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>17</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lib</PathWithFileName>
-      <FilenameWithoutPath>hal.stm32f1.ems001.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>18</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\hal.stm32f1.ems001.lwip.lib</PathWithFileName>
-      <FilenameWithoutPath>hal.stm32f1.ems001.lwip.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>19</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2330,14 +2058,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\src\hal_stm32f1_startup.s</PathWithFileName>
-      <FilenameWithoutPath>hal_stm32f1_startup.s</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</PathWithFileName>
+      <FilenameWithoutPath>hal_startup_stm32f107.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>20</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>4</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2346,14 +2074,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.open.cm3.dbg.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.open.cm3.dbg.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.cm3.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>21</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>5</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2362,14 +2090,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\osal.open.cm3.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.open.cm3.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.cm3.dbg.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>22</FileNumber>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>6</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2378,24 +2106,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\ipal.base.medium.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</PathWithFileName>
       <FilenameWithoutPath>ipal.base.medium.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>23</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\abs\lib\ipal-lwip.base.medium.lib</PathWithFileName>
-      <FilenameWithoutPath>ipal-lwip.base.medium.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2408,63 +2120,31 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>24</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\hal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>25</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>62</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\ipal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>26</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>65</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>27</FileNumber>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>7</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>8</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\hal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>hal_cfg.h</FilenameWithoutPath>
@@ -2472,8 +2152,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>28</FileNumber>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>9</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2488,24 +2168,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>29</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>30</FileNumber>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>10</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2514,15 +2178,15 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.c</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg-open.c</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>5</GroupNumber>
-      <FileNumber>31</FileNumber>
-      <FileType>5</FileType>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>11</FileNumber>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
@@ -2530,8 +2194,24 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg-open-stm32f1.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg-open-stm32f1.h</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\hal_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>hal_cfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>12</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>62</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\abslayer-cfg\ipal_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2544,7 +2224,311 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>13</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOaction.c</PathWithFileName>
+      <FilenameWithoutPath>EOaction.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>14</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOarray.c</PathWithFileName>
+      <FilenameWithoutPath>EOarray.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>15</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EoCommon.c</PathWithFileName>
+      <FilenameWithoutPath>EoCommon.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>16</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOconstarray.c</PathWithFileName>
+      <FilenameWithoutPath>EOconstarray.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>17</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOconstvector.c</PathWithFileName>
+      <FilenameWithoutPath>EOconstvector.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>18</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOdeque.c</PathWithFileName>
+      <FilenameWithoutPath>EOdeque.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>19</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOfifo.c</PathWithFileName>
+      <FilenameWithoutPath>EOfifo.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>20</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOfifoByte.c</PathWithFileName>
+      <FilenameWithoutPath>EOfifoByte.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>21</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOfifoWord.c</PathWithFileName>
+      <FilenameWithoutPath>EOfifoWord.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>22</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOlist.c</PathWithFileName>
+      <FilenameWithoutPath>EOlist.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>23</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOpacket.c</PathWithFileName>
+      <FilenameWithoutPath>EOpacket.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>24</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOsm.c</PathWithFileName>
+      <FilenameWithoutPath>EOsm.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>25</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>2</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOtheErrorManager.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheErrorManager.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>26</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheLEDpulser.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>27</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>2</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOtheMemoryPool.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheMemoryPool.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>28</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOtimer.c</PathWithFileName>
+      <FilenameWithoutPath>EOtimer.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>29</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOumlsm.c</PathWithFileName>
+      <FilenameWithoutPath>EOumlsm.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>30</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOvector.c</PathWithFileName>
+      <FilenameWithoutPath>EOvector.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>31</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOVmutex.c</PathWithFileName>
+      <FilenameWithoutPath>EOVmutex.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
       <FileNumber>32</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2554,29 +2538,29 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOaction.c</PathWithFileName>
-      <FilenameWithoutPath>EOaction.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOVtask.c</PathWithFileName>
+      <FilenameWithoutPath>EOVtask.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>4</GroupNumber>
       <FileNumber>33</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOarray.c</PathWithFileName>
-      <FilenameWithoutPath>EOarray.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOVtheCallbackManager.c</PathWithFileName>
+      <FilenameWithoutPath>EOVtheCallbackManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>4</GroupNumber>
       <FileNumber>34</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2586,13 +2570,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EoCommon.c</PathWithFileName>
-      <FilenameWithoutPath>EoCommon.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOVtheSystem.c</PathWithFileName>
+      <FilenameWithoutPath>EOVtheSystem.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>4</GroupNumber>
       <FileNumber>35</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2602,13 +2586,21 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstarray.c</PathWithFileName>
-      <FilenameWithoutPath>EOconstarray.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOVtheTimerManager.c</PathWithFileName>
+      <FilenameWithoutPath>EOVtheTimerManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-core-mee</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>5</GroupNumber>
       <FileNumber>36</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2618,13 +2610,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOconstvector.c</PathWithFileName>
-      <FilenameWithoutPath>EOconstvector.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</PathWithFileName>
+      <FilenameWithoutPath>EOMmutex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>5</GroupNumber>
       <FileNumber>37</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2634,29 +2626,29 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOdeque.c</PathWithFileName>
-      <FilenameWithoutPath>EOdeque.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtask.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>5</GroupNumber>
       <FileNumber>38</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>23</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifo.c</PathWithFileName>
-      <FilenameWithoutPath>EOfifo.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheCallbackManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>5</GroupNumber>
       <FileNumber>39</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2666,13 +2658,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoByte.c</PathWithFileName>
-      <FilenameWithoutPath>EOfifoByte.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheSystem.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>6</GroupNumber>
+      <GroupNumber>5</GroupNumber>
       <FileNumber>40</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -2682,11 +2674,19 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOfifoWord.c</PathWithFileName>
-      <FilenameWithoutPath>EOfifoWord.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheTimerManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-ipnet</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
       <FileNumber>41</FileNumber>
@@ -2698,8 +2698,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOlist.c</PathWithFileName>
-      <FilenameWithoutPath>EOlist.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheIPnet.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2714,8 +2714,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheErrorManager.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheErrorManager.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</PathWithFileName>
+      <FilenameWithoutPath>EOsocket.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2725,13 +2725,13 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtheMemoryPool.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheMemoryPool.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</PathWithFileName>
+      <FilenameWithoutPath>EOsocketDatagram.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2746,279 +2746,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOtimer.c</PathWithFileName>
-      <FilenameWithoutPath>EOtimer.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>45</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core\src\EOvector.c</PathWithFileName>
-      <FilenameWithoutPath>EOvector.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>46</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVmutex.c</PathWithFileName>
-      <FilenameWithoutPath>EOVmutex.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>47</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtask.c</PathWithFileName>
-      <FilenameWithoutPath>EOVtask.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>48</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheCallbackManager.c</PathWithFileName>
-      <FilenameWithoutPath>EOVtheCallbackManager.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>49</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheSystem.c</PathWithFileName>
-      <FilenameWithoutPath>EOVtheSystem.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>6</GroupNumber>
-      <FileNumber>50</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-vee\src\EOVtheTimerManager.c</PathWithFileName>
-      <FilenameWithoutPath>EOVtheTimerManager.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-mee</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>51</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMmutex.c</PathWithFileName>
-      <FilenameWithoutPath>EOMmutex.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>52</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtask.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtask.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>53</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheCallbackManager.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheCallbackManager.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>54</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>37</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheSystem.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheSystem.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>55</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>31</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\core-mee\src\EOMtheTimerManager.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheTimerManager.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-ipnet</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>56</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>41</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src\EOMtheIPnet.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheIPnet.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>57</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>36</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOpacket.c</PathWithFileName>
-      <FilenameWithoutPath>EOpacket.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>58</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocket.c</PathWithFileName>
-      <FilenameWithoutPath>EOsocket.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>59</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOsocketDatagram.c</PathWithFileName>
-      <FilenameWithoutPath>EOsocketDatagram.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>60</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\ipnet\src\EOVtheIPnet.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheIPnet.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3032,24 +2760,24 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>61</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>45</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\env\src\EOtheARMenvironment.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</PathWithFileName>
       <FilenameWithoutPath>EOtheARMenvironment.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>62</FileNumber>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>46</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -3058,1232 +2786,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\env\src\EOVtheEnvironment.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheEnvironment.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>63</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\body\embenv\envcom\eEcommon.c</PathWithFileName>
-      <FilenameWithoutPath>eEcommon.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>64</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\env\src\shalBASE.c</PathWithFileName>
-      <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>65</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\env\src\shalINFO.c</PathWithFileName>
-      <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>66</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\env\src\shalPART.c</PathWithFileName>
-      <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>67</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\env\src\eEsharedServices.c</PathWithFileName>
-      <FilenameWithoutPath>eEsharedServices.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-common</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>68</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOmatrix3d.c</PathWithFileName>
-      <FilenameWithoutPath>EOmatrix3d.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>69</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnv.c</PathWithFileName>
-      <FilenameWithoutPath>EOnv.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>70</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>39</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOnvsCfg.c</PathWithFileName>
-      <FilenameWithoutPath>EOnvsCfg.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>71</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOreceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOreceiver.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>72</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOrop.c</PathWithFileName>
-      <FilenameWithoutPath>EOrop.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>73</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>21</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOropframe.c</PathWithFileName>
-      <FilenameWithoutPath>EOropframe.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>74</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOstorageEEPROM.c</PathWithFileName>
-      <FilenameWithoutPath>EOstorageEEPROM.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>75</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheAgent.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheAgent.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>76</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheFormer.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheFormer.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>77</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheParser.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheParser.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>78</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOtransceiver.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>79</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>46</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtransmitter.c</PathWithFileName>
-      <FilenameWithoutPath>EOtransmitter.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>80</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtreenode.c</PathWithFileName>
-      <FilenameWithoutPath>EOtreenode.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>81</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOVstorage.c</PathWithFileName>
-      <FilenameWithoutPath>EOVstorage.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-board</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>82</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>53</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\prot\src\EOtheBOARDtransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheBOARDtransceiver.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-board</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>83</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>78</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb1.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb1.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>84</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>73</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb2.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb2.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>85</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb3.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb3.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>86</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>66</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb4.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb4.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>87</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb5.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb5.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>88</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb6.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb6.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>89</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb7.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb7.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>90</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb8.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb8.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>12</GroupNumber>
-      <FileNumber>91</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps\eOcfg_EPs_eb9.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_EPs_eb9.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-ep-mn-any</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>92</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mn.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-mn-endpoints</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>93</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mn_appl_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>94</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_appl_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mn_appl_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>95</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>28</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>14</GroupNumber>
-      <FileNumber>96</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src\eOcfg_nvsEP_mn_comm_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-mc-any</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>97</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>98</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_bodypart.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_bodypart.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>99</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_jxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>100</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_jxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>101</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>102</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>46</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_mxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>103</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_cxx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>104</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_any_con_cxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_cxxdefault.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-mc-endpoints</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>105</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerarm_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerarm_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>106</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerarm_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerarm_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>107</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerleg_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>108</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_lowerleg_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>109</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_torso_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_torso_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>110</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_torso_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_torso_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>111</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>44</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperarm_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperarm_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>112</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperarm_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperarm_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>113</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperleg_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperleg_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>16</GroupNumber>
-      <FileNumber>114</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src\eOcfg_nvsEP_mc_upperleg_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperleg_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-as-any</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>115</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>116</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_any_con_body.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_body.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>117</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_any_con_mxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>118</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_any_con_mxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxxdefault.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>119</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_any_con_sxx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>17</GroupNumber>
-      <FileNumber>120</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_any_con_sxxdefault.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxxdefault.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-as-endpoints</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>121</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_onemais_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_onemais_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>122</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_onemais_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_onemais_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>123</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_onestrain_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_onestrain_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>124</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src\eOcfg_nvsEP_as_onestrain_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_onestrain_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-sk-any</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>19</GroupNumber>
-      <FileNumber>125</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src\eOcfg_nvsEP_sk.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_sk.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-skin-endpoints</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>126</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src\eOcfg_nvsEP_sk_emsboard_con.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_sk_emsboard_con.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>127</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src\eOcfg_nvsEP_sk_emsboard_usr.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_sk_emsboard_usr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-nvs-cfg-usrcbk</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>128</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>129</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>38</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>130</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_sk_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>131</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>44</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-sm</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>22</GroupNumber>
-      <FileNumber>132</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\utils\src\EOsm.c</PathWithFileName>
-      <FilenameWithoutPath>EOsm.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -4296,24 +2800,8 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>133</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\sys\mid\lib\eventviewer.cm3.lib</PathWithFileName>
-      <FilenameWithoutPath>eventviewer.cm3.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>134</FileNumber>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>47</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4322,7 +2810,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\body\midware\eventviewer-package\eventviewer\eventviewer-src\eventviewer.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</PathWithFileName>
       <FilenameWithoutPath>eventviewer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -4330,14 +2818,14 @@
   </Group>
 
   <Group>
-    <GroupName>icub-ems</GroupName>
+    <GroupName>arm-services-embenv</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>135</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>48</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4346,46 +2834,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\eOcfg_sm_EMSappl.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_sm_EMSappl.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</PathWithFileName>
+      <FilenameWithoutPath>eEcommon.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>136</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSappl.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSappl.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>137</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>12</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSapplCfg.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSapplCfg.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>138</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>49</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4394,14 +2850,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSconfigurator.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSconfigurator.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</PathWithFileName>
+      <FilenameWithoutPath>eEsharedServices.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>139</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>50</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4410,30 +2866,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSerror.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</PathWithFileName>
+      <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>140</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>24</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSrunner.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSrunner.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>141</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>51</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4442,14 +2882,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSsocket.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSsocket.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</PathWithFileName>
+      <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>142</FileNumber>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>52</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4458,109 +2898,229 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMStransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMStransceiver.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>143</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverytransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSdiscoverytransceiver.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>144</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>5</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSdiscoverylistener.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSdiscoverylistener.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>145</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>13</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\OPCprotocolManager.c</PathWithFileName>
-      <FilenameWithoutPath>OPCprotocolManager.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>146</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>86</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoor.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSbackdoor.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>147</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>80</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOMtheEMSbackdoortransceiver.c</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSbackdoortransceiver.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalPART.c</PathWithFileName>
+      <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
   </Group>
 
   <Group>
-    <GroupName>icub-ems-cfg</GroupName>
+    <GroupName>eo-ctrloop</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>148</FileNumber>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>53</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>2</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_sm_EMSappl.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>54</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSappl.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>55</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSapplCfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>56</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSbackdoor.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>57</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>71</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSbackdoortransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>58</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSconfigurator.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>59</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSdiscoverylistener.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>60</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSdiscoverytransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>61</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>38</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>62</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSrunner.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>63</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSsocket.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>64</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMStransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-ctrloop-cfg</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>65</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>8</TopLine>
-      <CurrentLine>19</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_cfg\EOMtheEMSapplCfg_cfg.h</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSapplCfg_cfg.h</FilenameWithoutPath>
@@ -4568,60 +3128,12 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>149</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>66</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>43</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_cfg\example_overridden_appl.c</PathWithFileName>
-      <FilenameWithoutPath>example_overridden_appl.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>150</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_cfg\example_overridden_error.c</PathWithFileName>
-      <FilenameWithoutPath>example_overridden_error.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>151</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\app_cfg\example_overridden_runner.c</PathWithFileName>
-      <FilenameWithoutPath>example_overridden_runner.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>152</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
+      <ColumnNumber>4</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -4632,8 +3144,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>153</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>67</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4648,8 +3160,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>154</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>68</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4664,12 +3176,12 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>155</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>69</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>58</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -4680,12 +3192,12 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>156</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>70</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>39</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -4696,18 +3208,1354 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>25</GroupNumber>
-      <FileNumber>157</FileNumber>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>71</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>7</ColumnNumber>
+      <ColumnNumber>89</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg\OPCprotocolManager_Cfg.c</PathWithFileName>
+      <PathWithFileName>..\app_cfg\overridden_error.c</PathWithFileName>
+      <FilenameWithoutPath>overridden_error.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>opc-protocol</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>12</GroupNumber>
+      <FileNumber>72</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>32</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</PathWithFileName>
+      <FilenameWithoutPath>OPCprotocolManager.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>opc-protocol-cfg</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>73</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>53</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\robotconfig\v1\backdoor\OPCprotocolManager_Cfg.c</PathWithFileName>
       <FilenameWithoutPath>OPCprotocolManager_Cfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-comm-prot</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>74</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOmatrix3d.c</PathWithFileName>
+      <FilenameWithoutPath>EOmatrix3d.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>75</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOnv.c</PathWithFileName>
+      <FilenameWithoutPath>EOnv.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>76</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOnvsCfg.c</PathWithFileName>
+      <FilenameWithoutPath>EOnvsCfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>77</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOreceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOreceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>78</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOrop.c</PathWithFileName>
+      <FilenameWithoutPath>EOrop.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>79</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOropframe.c</PathWithFileName>
+      <FilenameWithoutPath>EOropframe.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>80</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtheAgent.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheAgent.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>81</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtheBOARDtransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheBOARDtransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>82</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtheFormer.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheFormer.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>83</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtheParser.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheParser.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>84</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtransceiver.c</PathWithFileName>
+      <FilenameWithoutPath>EOtransceiver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>85</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtransmitter.c</PathWithFileName>
+      <FilenameWithoutPath>EOtransmitter.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>86</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOtreenode.c</PathWithFileName>
+      <FilenameWithoutPath>EOtreenode.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>14</GroupNumber>
+      <FileNumber>87</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\prot\EOVstorage.c</PathWithFileName>
+      <FilenameWithoutPath>EOVstorage.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-comm-nvs-boards</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>88</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb1.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb1.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>89</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb2.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb2.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>90</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb3.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb3.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>91</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb4.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb4.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>92</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb5.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb5.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>93</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb6.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb6.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>94</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb7.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>95</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb8.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb8.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>96</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps\eOcfg_EPs_eb9.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_EPs_eb9.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-comm-nvs-ep-as</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>97</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>98</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_any_con_body.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_body.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>99</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_any_con_mxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>100</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_any_con_mxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_mxxdefault.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>101</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_any_con_sxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>102</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_any_con_sxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_any_con_sxxdefault.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>103</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_onemais_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onemais_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>104</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_onemais_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onemais_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>105</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_onestrain_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onestrain_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>106</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors\eOcfg_nvsEP_as_onestrain_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_onestrain_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-comm-nvs-ep-mc</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>107</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>108</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_bodypart.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_bodypart.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>109</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_cxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_cxx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>110</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_cxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_cxxdefault.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>111</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_jxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>112</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_jxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_jxxdefault.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>113</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_mxx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>114</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_any_con_mxxdefault.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_any_con_mxxdefault.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>115</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_lowerarm_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerarm_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>116</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_lowerarm_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerarm_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>117</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_lowerleg_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>118</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_lowerleg_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_lowerleg_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>119</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_torso_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_torso_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>120</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_torso_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_torso_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>121</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_upperarm_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperarm_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>122</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_upperarm_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperarm_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>123</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_upperleg_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperleg_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>124</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol\eOcfg_nvsEP_mc_upperleg_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_upperleg_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-comm-nvs-ep-mn</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>125</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management\eOcfg_nvsEP_mn.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mn.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>126</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management\eOcfg_nvsEP_mn_appl_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mn_appl_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>127</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management\eOcfg_nvsEP_mn_appl_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mn_appl_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>128</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management\eOcfg_nvsEP_mn_comm_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>129</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management\eOcfg_nvsEP_mn_comm_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-comm-nvs-ep-sk</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>130</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin\eOcfg_nvsEP_sk.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_sk.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>131</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin\eOcfg_nvsEP_sk_emsboard_con.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_sk_emsboard_con.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>132</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin\eOcfg_nvsEP_sk_emsboard_usr.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_sk_emsboard_usr.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>appl-services-provider</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>133</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_obj\EOappCanServicesProvider.c</PathWithFileName>
+      <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>134</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_obj\EOappEncodersReader.c</PathWithFileName>
+      <FilenameWithoutPath>EOappEncodersReader.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>135</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_obj\EOappMeasuresConverter.c</PathWithFileName>
+      <FilenameWithoutPath>EOappMeasuresConverter.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>136</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>42</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_obj\EOappTheDataBase.c</PathWithFileName>
+      <FilenameWithoutPath>EOappTheDataBase.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>137</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>49</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_obj\EOtheEMSapplBody.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheEMSapplBody.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>appl-services-provider-cfg</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>138</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_messagesLookupTbl.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_icubCanProto_messagesLookupTbl.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>139</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>140</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>141</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgFunctions.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>142</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>143</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</PathWithFileName>
+      <FilenameWithoutPath>measuresConvFuncOveridden.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>144</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_servicesProviders_cfg\icub-can-net\eOcfg_appTheDataBase_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_appTheDataBase_ebx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-nvs-cfg-usrcbk</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>145</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_usrcbk_ebx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>146</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>38</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>147</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_sk_usrcbk_ebx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>148</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>62</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_ebx.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>22</GroupNumber>
+      <FileNumber>149</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\app_nvs_cfg\rxtools.c</PathWithFileName>
+      <FilenameWithoutPath>rxtools.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -4720,17 +4568,17 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>26</GroupNumber>
-      <FileNumber>158</FileNumber>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>150</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>28</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-ems\src\EOicubCanProto.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\board\ems001\EOicubCanProto.c</PathWithFileName>
       <FilenameWithoutPath>EOicubCanProto.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -4744,24 +4592,8 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>159</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>20</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOspeedmeter.c</PathWithFileName>
-      <FilenameWithoutPath>EOspeedmeter.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>160</FileNumber>
+      <GroupNumber>24</GroupNumber>
+      <FileNumber>151</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4770,30 +4602,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOtrajectory.c</PathWithFileName>
-      <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>161</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOaxisController.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\mc\EOaxisController.c</PathWithFileName>
       <FilenameWithoutPath>EOaxisController.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>162</FileNumber>
+      <GroupNumber>24</GroupNumber>
+      <FileNumber>152</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4802,14 +4618,14 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOdecoupler.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\mc\EOdecoupler.c</PathWithFileName>
       <FilenameWithoutPath>EOdecoupler.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>163</FileNumber>
+      <GroupNumber>24</GroupNumber>
+      <FileNumber>153</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4818,24 +4634,56 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOemsController.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\mc\EOemsController.c</PathWithFileName>
       <FilenameWithoutPath>EOemsController.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>27</GroupNumber>
-      <FileNumber>164</FileNumber>
+      <GroupNumber>24</GroupNumber>
+      <FileNumber>154</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>8</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\mc\src\EOpid.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\mc\EOpid.c</PathWithFileName>
       <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>24</GroupNumber>
+      <FileNumber>155</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>2</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\mc\EOspeedmeter.c</PathWithFileName>
+      <FilenameWithoutPath>EOspeedmeter.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>24</GroupNumber>
+      <FileNumber>156</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>18</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\mc\EOtrajectory.c</PathWithFileName>
+      <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -4848,24 +4696,40 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>28</GroupNumber>
-      <FileNumber>165</FileNumber>
+      <GroupNumber>25</GroupNumber>
+      <FileNumber>157</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>41</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\utils\src\eODeb_eoProtoParser.c</PathWithFileName>
+      <PathWithFileName>..\ethlowlevelparser\usrCbk_ethLowLevParser.c</PathWithFileName>
+      <FilenameWithoutPath>usrCbk_ethLowLevParser.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>25</GroupNumber>
+      <FileNumber>158</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>2</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\utils\eODeb_eoProtoParser.c</PathWithFileName>
       <FilenameWithoutPath>eODeb_eoProtoParser.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>28</GroupNumber>
-      <FileNumber>166</FileNumber>
+      <GroupNumber>25</GroupNumber>
+      <FileNumber>159</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4874,24 +4738,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\utils\src\eOtheEthLowLevelParser.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\utils\eOtheEthLowLevelParser.c</PathWithFileName>
       <FilenameWithoutPath>eOtheEthLowLevelParser.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>28</GroupNumber>
-      <FileNumber>167</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\ethlowlevelparser\usrCbk_ethLowLevParser.c</PathWithFileName>
-      <FilenameWithoutPath>usrCbk_ethLowLevParser.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -4904,24 +4752,24 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>29</GroupNumber>
-      <FileNumber>168</FileNumber>
+      <GroupNumber>26</GroupNumber>
+      <FileNumber>160</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
+      <ColumnNumber>102</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\any-arch\sys\embobj\icub-app\src\EOtheEMSapplDiagnostics.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\embobj\plus\board\ems001\EOtheEMSapplDiagnostics.c</PathWithFileName>
       <FilenameWithoutPath>EOtheEMSapplDiagnostics.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>29</GroupNumber>
-      <FileNumber>169</FileNumber>
+      <GroupNumber>26</GroupNumber>
+      <FileNumber>161</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>

@@ -45,7 +45,7 @@
 #include "eOcfg_nvsEP_as.h"
 #include "eOcfg_nvsEP_sk.h"
 
-#include "EOMtheEMSapplCfg_hid.h" //here is define type of ems used
+#include "EOMtheEMSapplCfg_cfg.h" //here is define type of ems used
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

@@ -374,8 +374,8 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     count_ethlink_status ++;
     if(runner_countmax_check_ethlink_status == count_ethlink_status)
     {
-        uint8_t link1_isup;
-        uint8_t link2_isup;
+        //uint8_t link1_isup;
+        //uint8_t link2_isup;
 		//this func chacks if one of link change state and notify it.
 		//the pkt arrived on pc104 backdoor when one link change down->up.
         //eo_theEMSdgn_checkEthLinksStatus_quickly(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
@@ -477,7 +477,7 @@ static void s_eom_emsrunner_hid_readSkin(EOtheEMSapplBody *p)
 //    eOskin_status_t     *skstatus_ptr;
     EOarray_of_10canframes *arrayof10canframes_ptr = NULL;
     eOresult_t res;
-    uint8_t numofRXcanframe=0;
+    
 
 //uncomment this code when status and config nvvar are used.   
 //     res = eo_appTheDB_GetSkinStatusPtr(eo_appTheDB_GetHandle(), sId,  &skstatus_ptr);
@@ -494,6 +494,7 @@ static void s_eom_emsrunner_hid_readSkin(EOtheEMSapplBody *p)
     eo_array_Reset((EOarray*)arrayof10canframes_ptr);
 
 #ifdef _GET_CANQUEUE_STATISTICS_
+    uint8_t numofRXcanframe=0;
     eo_appCanSP_GetNumOfRecCanframe(eo_emsapplBody_GetCanServiceHandle(p), eOcanport2, &numofRXcanframe);
     eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport2, numofRXcanframe);
 #endif

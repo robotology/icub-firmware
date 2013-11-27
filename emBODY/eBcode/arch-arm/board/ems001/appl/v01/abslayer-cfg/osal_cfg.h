@@ -31,27 +31,15 @@
 
 // <h> Porting specifics 
 // <i> sssssssss
-//   <o> RTOS type         <0=>   IITmodified-RTXARM
-//   <i> Only IITmodified-RTXARM is now supported.
+//   <o> RTOS type         <0=>   IITmodified-RTXARM    <1=>    OOSIIT
+//   <i> Only IITmodified-RTXARM and OOSIIT are so far supported.
 #ifndef OSAL_RTOSTYPE
- #define OSAL_RTOSTYPE      0
+ #define OSAL_RTOSTYPE      1
 #endif
 
 
-//   <o> Memory model         <0=>   static allocation
-//   <i> Only static allocation is now supported.
-#ifndef OSAL_MEMMODEL
- #define OSAL_MEMMODEL      0
-#endif
-
-
-// </h>Porting specifics
-
-// <h> Embedded System 
-// <i> sssssssss
-
-//   <o> CPU family         <0=>   Cortex M3
-//   <i> Only Cortex M3 is now supported.
+//   <o> CPU family         <0=>   Cortex M3 <1=>   Cortex M4
+//   <i> Only Cortex M3 and M4 are now supported.
 #ifndef OSAL_CPUFAM
  #define OSAL_CPUFAM      0
 #endif
@@ -64,7 +52,8 @@
 #endif
 
 
-// </h>Embedded System
+
+// </h>Porting specifics
 
 
 // <h> Scheduler 
@@ -84,30 +73,6 @@
 #ifndef OSAL_TICK
  #define OSAL_TICK        1000
 #endif
-
-
-
-//   <o> Stack size for launcher task [bytes] <200-4096:8>
-//   <i> Set the stack size for launcher task.
-//   <i> Default: 128
-#ifndef OSAL_LAUNSTKSIZE
- #define OSAL_LAUNSTKSIZE     2048
-#endif
-
-//   <o> Stack size for idle task [bytes] <200-4096:8>
-//   <i> Set the stack size for idle task.
-//   <i> Default: 128
-#ifndef OSAL_IDLESTKSIZE
- #define OSAL_IDLESTKSIZE     512
-#endif
-
-//   <o> Total stack size for all the other tasks [bytes] <256-16384:8>
-//   <i> Define max. size in bytes of the global stack.
-//   <i> Default: 256  (only one task for instance)
-#ifndef OSAL_GLOBSTKSIZE
- #define OSAL_GLOBSTKSIZE    9216
-#endif
-
 
 
 // <e>Round-Robin Task switching
@@ -131,10 +96,47 @@
 // </h>Scheduler
 
 
+// <h> System resources 
+// <i> sssssssss
+
+
+//   <o> Stack size for launcher task [bytes] <200-4096:8>
+//   <i> Set the stack size for launcher task.
+//   <i> Default: 128
+#ifndef OSAL_LAUNSTKSIZE
+ #define OSAL_LAUNSTKSIZE     2048
+#endif
+
+//   <o> Stack size for idle task [bytes] <200-4096:8>
+//   <i> Set the stack size for idle task.
+//   <i> Default: 128
+#ifndef OSAL_IDLESTKSIZE
+ #define OSAL_IDLESTKSIZE     512
+#endif
+
+
+// </h>System resources
+
+
+// <h> Memory model 
+// <i> sssssssss
+
+
+//   <o> Memory model         <0=>   static allocation      <1=>   dynamic allocation    
+//   <i> with static allocation all the memory needed by OSAL objects is allocate at startup and retrieved when required.
+//   <i> with dynamic allocation the memry is retrieved just when it is needed
+#ifndef OSAL_MEMMODEL
+ #define OSAL_MEMMODEL      1
+#endif
 
 
 
-// <h> OSAL objects
+// </h>Memory model
+
+
+
+// <h> Max number of OSAL resources for static allocation mode
+// <i> This section is relevant only if the memory model is static.
 
 //   <o> Number of user tasks <0-250>
 //   <i> Maximum number of tasks that will run at the same time.
@@ -142,6 +144,14 @@
 #ifndef OSAL_TASKNUM
  #define OSAL_TASKNUM     14
 #endif
+
+//   <o> Total stack size for all the user tasks [bytes] <256-16384:8>
+//   <i> Define max. size in bytes of the global stack.
+//   <i> Default: 256  (only one task for instance)
+#ifndef OSAL_GLOBSTKSIZE
+ #define OSAL_GLOBSTKSIZE    9216
+#endif
+
 
 //   <o> Number of timers <0-250>
 //   <i> Define max number of timers.
@@ -197,14 +207,22 @@
 
 // - some controls ----------------------------------------------------------------------------------------------------
 
-#if(0 != OSAL_RTOSTYPE)
-    #error only arm-rtx modified by iit is supported so far
+#if(OSAL_RTOSTYPE > 1)
+    #error only arm-rtx modified by iit and oosiit are supported so far
+#endif
+
+#if(OSAL_RTOSTYPE == 0)
+    #if(OSAL_MEMMODEL == 1)
+        #error only oosiit supports dynamic memory model
+    #endif
+
+    #if(OSAL_MQUEUEELEMNUM < OSAL_MQUEUENUM)
+        #error more messagequeues than messages ...
+    #endif
+
 #endif
 
 
-#if(OSAL_MQUEUEELEMNUM < OSAL_MQUEUENUM)
-    #warning more messagequeues than messages ...
-#endif
 
 // - end of controls --------------------------------------------------------------------------------------------------
 

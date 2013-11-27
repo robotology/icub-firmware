@@ -74,11 +74,133 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOMtheEMSapplCfg_cfg.h"   // to see the macros
+
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
+    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
+    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
+    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
+    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
+#else
+    #error --> you must define an EBx
+#endif
+
+
+
+//encoders configuration
+#define ENC_ENA     1   /* If encoder is connected*/
+#define ENC_DISA    0   /* If encoder is NOT connected*/
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder3)  |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder2) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
+                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder1) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder2) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder3) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder4) |  \
+                                                        (ENC_DISA << eOeOappEncReader_encoder5)    \
+                                                    )
+
+#else
+    #error --> you must define an EBx
+#endif
+
+
+//ems controller configuration
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_SHOULDER
+        
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB8)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_UPPERLEG
+        
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_ANKLE
+        
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_WAIST
+
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
+
+
+#else
+    #error --> you must define an EBx
+#endif
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 
+extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default = 
+{
+    .hasdevice                      =
+    {
+        EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
+    },
+    .icubcanprotoimplementedversion =
+    {
+        .major                  = 1,
+        .minor                  = 1
+    },
+    .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
+    .emsControllerCfg           =
+    {
+        .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
+    },
+    .endpoints                  =
+    {
+        .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
+        .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
+        .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
+    },
+    .configdataofMC4boards      =
+    {
+        .shiftvalues            =
+        {
+            .jointVelocityShift     =  8,
+            .jointVelocityEstimationShift = 8,
+            .jointAccelerationEstimationShift = 5
+        },
+        .bcastpolicy            =
+        {
+            .val2bcastList      =
+            {
+            /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
+            /* 1 */ ICUBCANPROTO_PER_MB_CMD_STATUS,
+            /* 2 */ ICUBCANPROTO_PER_MB_CMD_PRINT,
+            /* 3 */ 0
+            }
+        }
+    }    
+    
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -111,7 +233,8 @@ static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-static struct EOtheEMSapplBody_hid s_applBody = 
+
+static EOtheEMSapplBody s_applBody = 
 {
     EO_INIT(.st)    eo_emsApplBody_st__NOTinited
 };
@@ -119,17 +242,19 @@ static struct EOtheEMSapplBody_hid s_applBody =
 
 static const char s_eobj_ownname[] = "EOtheEMSapplBody";
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *cfg)
+
+extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t *cfg)
 {
     eOresult_t res;
     EOtheEMSapplBody *retptr = NULL;
 
     if(NULL == cfg)
     {
-        return(retptr);
+        cfg = &eOtheEMSappBody_cfg_default;
     }
     
     retptr = &s_applBody;
@@ -164,7 +289,7 @@ extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void)
     return((s_applBody.st == eo_emsApplBody_st__inited) ? (&s_applBody) : (NULL));
 }
 
-extern const eOtheEMSappBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p)
+extern const eOtheEMSapplBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p)
 {
     if(NULL == p)
     {
@@ -172,6 +297,7 @@ extern const eOtheEMSappBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p
     }
     return(p->cfg_ptr);
 }
+
 extern EOappTheDB* eo_emsapplBody_GetDataBaseHandle(EOtheEMSapplBody *p)
 {
     if(NULL == p)
@@ -327,6 +453,17 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
 
 }
 
+
+extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
+    
+    return(p->cfg_ptr->hasdevice[dev]);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -479,7 +616,7 @@ static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
         }
     };
 
-    if(!(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_skin)))
+    if(!(eo_emsapplBody_HasDevice(p, eo_emsapplbody_deviceid_skin)))
     {
         cfg.cbkonrx[eOcanport2].fn = eo_emsapplBody_hid_canSP_cbkonrx;
         cfg.cbkonrx[eOcanport2].argoffn = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
@@ -577,7 +714,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             }
             
             msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
-            res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&emsapplCfg_ptr->applbodycfg.icubcanprotoimplementedversion);
+            res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&p->cfg_ptr->icubcanprotoimplementedversion);
             if(eores_OK != res)
             {
                 return(res);
@@ -682,15 +819,15 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
 {
     p->appRunMode = applrunMode__default;
     
-    if(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_2foc))
+    if(eo_emsapplBody_HasDevice(p, eo_emsapplbody_deviceid_2foc))
     {
         p->appRunMode = applrunMode__2foc;
         return(eores_OK);
     }
     
-    if(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_mc4))
+    if(eo_emsapplBody_HasDevice(p, eo_emsapplbody_deviceid_mc4))
     {
-        if(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_skin))
+        if(eo_emsapplBody_HasDevice(p, eo_emsapplbody_deviceid_skin))
         {
             p->appRunMode = applrunMode__skinAndMc4;
             return(eores_OK);
@@ -702,7 +839,7 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
         }
     }
     
-    if(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_skin))
+    if(eo_emsapplBody_HasDevice(p, eo_emsapplbody_deviceid_skin))
     {
         p->appRunMode = applrunMode__skinOnly;
         return(eores_OK);

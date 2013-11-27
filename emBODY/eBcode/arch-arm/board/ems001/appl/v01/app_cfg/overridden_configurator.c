@@ -102,7 +102,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     
 
 
-    if(!(eom_emsapplcfg_HasDevice(eom_emsapplcfg_GetHandle(), eom_emsappl_deviceid_skin)))
+    if(!(eo_emsapplBody_HasDevice(eo_emsapplBody_GetHandle(), eo_emsapplbody_deviceid_skin)))
     {
         numofRXcanframe = 0;
         res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);

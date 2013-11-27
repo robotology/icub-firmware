@@ -54,8 +54,8 @@ typedef enum
 
 struct EOtheEMSapplBody_hid
 {
-    const eOtheEMSappBody_cfg_t         *cfg_ptr;//tanto e' una sola la cfg!!! enon viene riutiolizzata
-    eOtheEMSapplBody_hid_states_t        st;
+    const eOtheEMSapplBody_cfg_t        *cfg_ptr;//tanto e' una sola la cfg!!! enon viene riutiolizzata
+    eOtheEMSapplBody_hid_states_t       st;
     eOmn_appl_runMode_t                 appRunMode;
 //    EOtimer                             *ledtimer;
     struct
@@ -65,7 +65,7 @@ struct EOtheEMSapplBody_hid
         EOappEncReader                  *appEncReader;
         EOemsController                 *emsController;
         EOappMeasConv                   *appMeasConv;
-    }bodyobjs;
+    } bodyobjs;
 }; 
 
 

@@ -55,15 +55,25 @@
 
 typedef struct EOtheEMSapplBody_hid  EOtheEMSapplBody;
 
+typedef enum
+{
+    eo_emsapplbody_deviceid_skin        = 0,
+    eo_emsapplbody_deviceid_mc4         = 1,
+    eo_emsapplbody_deviceid_2foc        = 2    
+} eo_emsapplbody_deviceid_t;
+
+enum {eo_emsapplbody_deviceid_numberof = 3};
+
 
 typedef struct
 {
+    eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
     eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
     uint16_t                            connectedEncodersMask;
     struct
     {
         emsBoardType_t                  emsboard_type;
-    }emsControllerCfg;
+    } emsControllerCfg;
     struct
     {
         eOnvEP_t                        mc_endpoint;  /**<  motion control endopoint managed by the application    */
@@ -88,20 +98,21 @@ typedef struct
     } configdataofMC4boards; /**<  in actual fact, all config data of mc4 boards are about joints: they should be one for each joint managed by mc4 board;
                                    anyway these data are not configured by pc104, so we use one data for any joint.    */
 
-} eOtheEMSappBody_cfg_t;
+} eOtheEMSapplBody_cfg_t;
 
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
-// empty-section
+
+extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSappBody_cfg_t *cfg);
+extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t *cfg);
 
 extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void);
 
-extern const eOtheEMSappBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
+extern const eOtheEMSapplBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
 
 extern EOappTheDB* eo_emsapplBody_GetDataBaseHandle(EOtheEMSapplBody *p);
 
@@ -118,6 +129,8 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p);
 
 extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
+
+extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev);
 
 /** @}            
     end of group eo_TheEmsAppBody

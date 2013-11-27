@@ -45,7 +45,7 @@
 
 
 //application
-#include "EOMtheEMSapplCfg_hid.h"
+#include "EOMtheEMSapplCfg_cfg.h" // to see EOMTHEEMSAPPLCFG_*
 #include "EOtheEMSapplBody.h"
 #include "EOappTheDataBase.h"
 #include "EOicubCanProto_specifications.h"

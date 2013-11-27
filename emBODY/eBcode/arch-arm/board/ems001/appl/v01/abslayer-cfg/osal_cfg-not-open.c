@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       osal_cfg-open.c
-	@brief      This file keeps internal configuration of the osal.
+/* @file       osal_cfg.c
+	@brief      This file keeps internal implementation of the osal.
 	@author     marco.accame@iit.it
     @date       11/27/2009
 **/
@@ -41,14 +41,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-
-//#if defined(USE_BRD_MCBSTM32_C)
-#include "osal_cfg-open-stm32f1.h"
-// #elif defined(USE_BRD_MCBSTM32_F400)
-//     #include "osal_cfg-open-stm32f4.h"
-// #else
-//     #error --> you must define a board
-// #endif
+#include "osal_cfg.h"
 
 static void s_osal_cfg_on_idle(void);
 
@@ -63,11 +56,10 @@ extern const osal_cfg_t osal_cfg =
     .tick                   = (osal_reltime_t)OSAL_TICK,              // uint32_t        tick;                                   
     .launcherstacksize      = OSAL_LAUNSTKSIZE,       // uint16_t        launcherstacksize;                     
     .idlestacksize          = OSAL_IDLESTKSIZE,       // uint16_t        idlestacksize;
+    .globalstacksize        = OSAL_GLOBSTKSIZE,       // uint16_t        globalstacksize;
     .roundrobin             = (osal_bool_t)OSAL_RROBIN,            // uint8_t         roundrobin;
     .roundrobintick         = OSAL_RROBINTICK,        // uint32_t        roundrobintick;
-    
     .tasknum                = OSAL_TASKNUM,           // uint8_t         tasknum;
-    .globalstacksize        = OSAL_GLOBSTKSIZE,       // uint16_t        globalstacksize;
     .timernum               = OSAL_TIMERNUM,          // uint8_t         timernum;
     .mutexnum               = OSAL_MUTEXNUM,          // uint8_t         mutexnum;
     .semaphorenum           = OSAL_SEMAPHORENUM,      // uint8_t         semaphorenum;
@@ -86,7 +78,8 @@ extern const osal_cfg_t osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfg_USERptr = &osal_cfg;
+extern const osal_cfg_t *osal_cfgMINE = &osal_cfg;
+
 
 
 

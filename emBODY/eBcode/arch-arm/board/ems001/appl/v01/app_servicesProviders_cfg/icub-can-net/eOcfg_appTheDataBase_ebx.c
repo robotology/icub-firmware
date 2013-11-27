@@ -28,7 +28,8 @@
 #include "EoCommon.h"
 
 
-#include "EOMtheEMSapplCfg_hid.h"
+#include "EOMtheEMSapplCfg_cfg.h" // to see EOMTHEEMSAPPLCFG_*
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
