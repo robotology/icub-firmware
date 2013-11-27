@@ -82,7 +82,7 @@ typedef struct OPCprotocolManager_hid OPCprotocolManager;
 
 typedef enum  
 {
-    opcprotman_OK_withreply =  1,   /**< correct result: with replay */
+    opcprotman_OK_withreply =  1,   /**< correct result: with reply */
     opcprotman_OK           =  0,   /**< correct result: generic */
     opcprotman_NOK_generic  = -1    /**< error: generic */
 } opcprotman_res_t;
@@ -123,9 +123,6 @@ typedef struct
 
 typedef struct opcprotman_var_map_T opcprotman_var_map_t;
 
-//typedef void (*opcprotman_fp_onset_t)(opcprotman_var_map_t* map, void* recdata);
-//typedef void (*opcprotman_fp_onsig_t)(opcprotman_var_map_t* map, void* recdata);
-//typedef void (*opcprotman_fp_onsay_t)(opcprotman_var_map_t* map, void* recdata);
 
 typedef void (*opcprotman_fp_onrec_t)(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
@@ -134,9 +131,6 @@ struct opcprotman_var_map_T
     uint16_t                var;
     uint16_t                size;
     void*                   ptr;
-//    opcprotman_fp_onset_t   onset;  // calls a opcprotman_var_map_t* and rx data
-//    opcprotman_fp_onsig_t   onsig;  // calls a opcprotman_var_map_t* and rx data
-//    opcprotman_fp_onsig_t   onsay;  // calls a opcprotman_var_map_t* and rx data
     opcprotman_fp_onrec_t   onrec;  // calls the opc, the opcprotman_var_map_t*, and data received in message
 };
 
@@ -153,13 +147,15 @@ typedef struct
 } opcprotman_cfg_t;
 
 
+
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+// it must be defined in an external configuration file. see examples in OPCprotocolManager_Cfg.template.c
+extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p);
 
 
 /** @fn         extern OPCprotocolManager * opcprotman_New(const opcprotman_cfg_t *cfg)
@@ -189,6 +185,7 @@ extern opcprotman_var_map_t* opcprotman_find(OPCprotocolManager* p, uint16_t var
 extern opcprotman_res_t opcprotman_personalize_var(OPCprotocolManager* p, uint16_t var, uint8_t* var_ram, opcprotman_fp_onrec_t fn);
 
 extern uint32_t opcprotman_getSeqNum(OPCprotocolManager* p, opcprotman_message_t* msg);
+
 /** @}            
     end of group doxy_opcprotman  
  **/
