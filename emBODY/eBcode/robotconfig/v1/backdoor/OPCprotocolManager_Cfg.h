@@ -39,11 +39,13 @@ extern "C" {
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
+
 #include "EoCommon.h"
 #include "OPCprotocolManager.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
+
 #define eodgn_nvidbdoor_cmds            1
 #define eodgn_nvidbdoor_errorlog        2
 #define eodgn_nvidbdoor_emsperiph       3
@@ -60,13 +62,12 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-
-
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
 extern opcprotman_cfg_t* OPCprotocolManager_Cfg_getconfig(void);
   
 
