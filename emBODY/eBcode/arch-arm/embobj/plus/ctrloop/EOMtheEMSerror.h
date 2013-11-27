@@ -42,6 +42,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOtheErrorManager.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -100,6 +101,11 @@ extern EOMtheEMSerror * eom_emserror_GetHandle(void);
 
 
 extern EOMtask * eom_emserror_GetTask(EOMtheEMSerror *p);
+
+
+// weakly defined. it adds specific actions upon error 
+
+extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
 
 
 

@@ -66,6 +66,7 @@ struct EOMtheEMSerror_hid
 extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt);
 
 
+
 #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 

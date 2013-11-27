@@ -297,10 +297,10 @@ typedef struct
 } eOdgn_motorstatusflags_t;
 
 
-    enum{eOdgn_errorlog_str_size = 250};
+enum{eOdgn_errorlog_str_size = 128};
 typedef struct
 {
-    char errorstate_str[eOdgn_errorlog_str_size]; //in string contains the reason of switch to error state.
+    char errorstate_str[eOdgn_errorlog_str_size]; // in string contains the reason of switch to error state.
 } eOdgn_errorlog_t;
 
 

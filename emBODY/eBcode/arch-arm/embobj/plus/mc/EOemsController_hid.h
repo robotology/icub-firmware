@@ -21,10 +21,11 @@ extern "C" {
 #include "EOspeedmeter.h"
 #include "EOaxisController.h"
 #include "EOdecoupler.h"
-#include "EOMtheEMSapplCfg.h"
+//#include "EOMtheEMSapplCfg.h"
     
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
+#include "EOemsController.h"
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 

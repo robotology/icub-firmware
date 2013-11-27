@@ -495,7 +495,7 @@ extern eOresult_t eo_theEMSdgn_checkEthLinkErrors(EOTheEMSdiagnostics_t* p, uint
     
     
    
-    res = hal_eth_get_errors_info(i, s_thedgn.ethError2signal, &result);
+    res = hal_eth_get_errors_info(i, (hal_eth_phy_errors_info_type_t)s_thedgn.ethError2signal, &result);
     if(res != hal_res_OK)
     {
         snprintf(str, sizeof(str)-1, "error in hal_eth_get_errors_info for phy %d", i);
