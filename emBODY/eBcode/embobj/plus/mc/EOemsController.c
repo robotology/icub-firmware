@@ -690,10 +690,11 @@ void config_2FOC(uint8_t motor)
     eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+     
+    pid.kp = 0x0B85; // 0.09
+    pid.ki = 0x028F; // 0.02
+    pid.kd = 0x0000;
     
-    pid.kp = 0x0A00;
-    pid.kd = 0;
-    pid.ki = 0; 
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
     
@@ -702,7 +703,7 @@ void config_2FOC(uint8_t motor)
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &i2t);
     
-    max_current = 0x1999;
+    max_current = 0x3332; // 0x1999;
     msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &max_current);
 }
@@ -752,8 +753,8 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     //if (mode == eomc_controlmode_cmd_position || mode == eomc_controlmode_cmd_velocity)
     {
         controlmode_2foc = eomc_controlmode_cmd_openloop;
-       
-        pid.kp = 0x0A00;
+        
+        pid.kp = 0x0B85; // 0x0A00
         pid.kd = 0x0000;
         pid.ki = 0x0000;
     }
@@ -762,9 +763,9 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     {
         controlmode_2foc = eomc_controlmode_cmd_current;
         
-        pid.kp = 0x0B85;
-        pid.kd = 0x028F;
-        pid.ki = 0x0000;
+        pid.kp = 0x0B85; // 0.09
+        pid.ki = 0x028F; // 0.02
+        pid.kd = 0x0000;
     }
     */
    
