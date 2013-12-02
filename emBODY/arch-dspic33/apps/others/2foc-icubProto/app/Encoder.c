@@ -303,12 +303,12 @@ inline void EncoderPositionDHS()
   static int encoder_dhes_state = 0;
   signed char transition = 0;
   
-  signed char rotation = 0;
+  static signed char rotation = 0;
   static int time_old = 0;
   static int time_new = 0;
   static int angle_interp = 0;
   static unsigned int UMA_stored = 0;
-  static const int SLICE = 0xFFFFU/(6*NPOLEPAIRS);
+  static const int SLICE = 2730; //0xFFFFU/(6*NPOLEPAIRS);
 
     // Read HES vaue from the uC pins of choice
 #ifdef HES_CONNECTED_TO_P2_P5
@@ -406,7 +406,7 @@ inline void EncoderPositionDHS()
 
   // combine the electrical angle information with the 
   // electrical turn count to get mechanical angle
-  UMA_stored += round * (0xFFFFU/NPOLEPAIRS);
+  UMA_stored += round * 16384; //(0xFFFFU/NPOLEPAIRS);
   
   UnalignedMecchanicalAngle = UMA_stored;
 }
