@@ -1,0 +1,1 @@
+echo hal-install.bat is to be done
