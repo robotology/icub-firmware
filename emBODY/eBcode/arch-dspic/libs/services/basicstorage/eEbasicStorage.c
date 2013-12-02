@@ -25,7 +25,7 @@
 #include "p33fxxxx.h"
 #include <libpic30.h>
 
-#include "eEmemorymap_dspic33.h"
+#include "eEmemorymap.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
