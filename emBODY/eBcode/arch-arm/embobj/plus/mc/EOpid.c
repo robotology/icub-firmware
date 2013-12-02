@@ -115,6 +115,8 @@ extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int
     o->zero_rotation_torque = (K>0.0) ? pwm_offset : -pwm_offset;
     
     //o->Kff = (K>0.0f) ? 0.16f : -0.16f;
+    
+    o->KKiIn = 0.f;
 	
     o->Imax = Imax;
     

@@ -240,9 +240,9 @@ extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pw
             if (*alarm_mask & 0x07)
             {
                 *alarm_mask |= 0x07;
-                LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-                LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
-                LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
+                //LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
+                //LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
+                //LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
             }
             break;
 
