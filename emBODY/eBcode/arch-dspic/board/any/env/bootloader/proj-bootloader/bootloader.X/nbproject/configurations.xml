@@ -13,11 +13,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="any-embenv-envcom"
-                     displayName="any-embenv-envcom"
-                     projectFiles="true">
-        <itemPath>../../../../../../any-arch/body/embenv/envcom/eEcommon.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="app" displayName="app" projectFiles="true">
         <itemPath>../../app/memory.s</itemPath>
         <itemPath>../../app/memory_manager.c</itemPath>
@@ -27,34 +22,35 @@
         <itemPath>../../app/bootloader_parser.c</itemPath>
         <itemPath>../../app/bootloader_sm.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="embenv-envcom"
-                     displayName="embenv-envcom"
-                     projectFiles="true">
-        <itemPath>../../../../../body/embenv/envcom/eEpermdata.c</itemPath>
-        <itemPath>../../../../../body/embenv/envcom/eEsharedInfo.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="embenv-envshalib"
-                     displayName="embenv-envshalib"
-                     projectFiles="true">
-        <itemPath>../../../../../body/embenv/envshalib/eEsharedStorage.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="hal" displayName="hal" projectFiles="true">
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/utils/crc16.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/utils/crc32.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_brdcfg.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_arch.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_base.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_can.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_crc.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_eeprom.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_flash.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_gpio.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_led.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_sys.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_timer.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_brdcfg.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_arch.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_base.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_can.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_crc.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_eeprom.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_flash.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_gpio.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_led.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_sys.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_timer.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc16.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc32.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal-cfg" displayName="hal-cfg" projectFiles="true">
         <itemPath>../../hal-cfg/hal_cfg.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="any-embenv-envcom"
+                     displayName="services-common"
+                     projectFiles="true">
+        <itemPath>../../../../../../libs/services/common/src/eEcommon.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="embenv-envcom"
+                     displayName="services-shared-storage"
+                     projectFiles="true">
+        <itemPath>../../../../../../libs/services/storage/shared/src/eEpermdata.c</itemPath>
+        <itemPath>../../../../../../libs/services/storage/shared/src/eEsharedInfo.c</itemPath>
+        <itemPath>../../../../../../libs/services/storage/shared/src/eEsharedStorage.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -71,6 +67,10 @@
     <Elem>../../app</Elem>
     <Elem>../</Elem>
     <Elem>../../../../../body/abslayer/hal-package/hal/hal-src</Elem>
+    <Elem>../../../../../../libs/services/sharedstorage/src</Elem>
+    <Elem>../../../../../../libs/abslayer/hal/src</Elem>
+    <Elem>../../../../../../libs/services/common/src</Elem>
+    <Elem>../../../../../../libs/services/storage/shared/src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -119,7 +119,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../../../../../porting;../../../../../../any-arch/body/embenv/envcom;../../../../../../any-arch/sys/abslayer/api;../../../../../body/embenv/envshalib;../../../../../body/abslayer/hal-package/hal/hal-src;../../../../../body/embenv/envcom;../../hal-cfg;../../app;.."/>
+                  value="../../hal-cfg;../../app;..;..\..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\..\libs\abslayer\hal\src;..\..\..\..\..\..\libs\services\common\api;..\..\..\..\..\..\libs\services\storage\shared\api;..\..\..\..\..\..\libs\services\storage\shared\src;..\..\..\cfg"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

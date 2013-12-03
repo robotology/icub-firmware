@@ -22,31 +22,31 @@
         <itemPath>../../app/bootloader_main.c</itemPath>
         <itemPath>../../app/bootloader_sm.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="embenv-envcom"
-                     displayName="embenv-envcom"
-                     projectFiles="true">
-      </logicalFolder>
-      <logicalFolder name="embenv-envshalib"
-                     displayName="embenv-envshalib"
-                     projectFiles="true">
-      </logicalFolder>
       <logicalFolder name="hal" displayName="hal" projectFiles="true">
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/utils/crc16.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/utils/crc32.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_brdcfg.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_arch.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_base.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_can.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_crc.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_eeprom.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_flash.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_gpio.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_led.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_sys.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_timer.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_brdcfg.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_arch.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_base.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_can.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_crc.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_eeprom.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_flash.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_gpio.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_led.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_sys.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_timer.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc16.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc32.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal-cfg" displayName="hal-cfg" projectFiles="true">
         <itemPath>../../hal-cfg/hal_cfg.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="embenv-envcom"
+                     displayName="services-common"
+                     projectFiles="true">
+      </logicalFolder>
+      <logicalFolder name="embenv-envshalib"
+                     displayName="services-shared-storage"
+                     projectFiles="true">
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -60,6 +60,7 @@
     <Elem>../../app</Elem>
     <Elem>../</Elem>
     <Elem>../../../../../body/abslayer/hal-package/hal/hal-src</Elem>
+    <Elem>../../../../../../libs/abslayer/hal/src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -108,7 +109,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../../../../../porting;../../../../../../any-arch/body/embenv/envcom;../../../../../../any-arch/sys/abslayer/api;../../../../../body/embenv/envshalib;../../../../../body/abslayer/hal-package/hal/hal-src;../../../../../body/embenv/envcom;../../hal-cfg;../../app;.."/>
+                  value="../../hal-cfg;../../app;..;..\..\..\cfg;..\..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\..\libs\abslayer\hal\src;..\..\..\..\..\..\libs\services\storage\shared\src;..\..\..\..\..\..\libs\services\storage\shared\api;..\..\..\..\..\..\libs\services\common\api"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

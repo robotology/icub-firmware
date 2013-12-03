@@ -38,7 +38,7 @@
 #include "hal_can.h"
 #include "can_protocol.h"
 #include "eEcommon.h"
-#include "eEmemorymap_dspic33.h"
+#include "eEmemorymap.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
