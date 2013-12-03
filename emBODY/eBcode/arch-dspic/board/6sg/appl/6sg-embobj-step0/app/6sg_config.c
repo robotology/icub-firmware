@@ -29,7 +29,7 @@
 #include <string.h>
 #include "hal_eeprom.h"
 #include "eEsharedStorage.h"
-#include "eEmemorymap_dspic33.h"
+#include "eEmemorymap.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

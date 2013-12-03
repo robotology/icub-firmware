@@ -40,7 +40,7 @@
 #include "eEsharedStorage.h"
 #include "privateData.h"
 #include "parser.h"
-#include "eEmemorymap_dspic33.h"
+#include "eEmemorymap.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -18,69 +18,71 @@
         <itemPath>../../app/eos_applembobj_info.c</itemPath>
         <itemPath>../../app/eos_applembobj_spec.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="embenv-any-envcom"
-                     displayName="embenv-any-envcom"
-                     projectFiles="true">
-        <itemPath>../../../../../../any-arch/body/embenv/envcom/eEcommon.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="embenv-dspic-envcom"
-                     displayName="embenv-envshalib "
-                     projectFiles="true">
-        <itemPath>../../../../../body/embenv/envcom/eEpermdata.c</itemPath>
-        <itemPath>../../../../../body/embenv/envcom/eEsharedInfo.c</itemPath>
-        <itemPath>../../../../../body/embenv/envshalib/eEsharedStorage.c</itemPath>
-        <itemPath>../../../../../body/embenv/envshalib/eEprivateStorage.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="eo-core" displayName="eo-core" projectFiles="true">
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOaction.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOarray.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EoCommon.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOconstarray.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOconstvector.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOdeque.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOfifo.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOfifoByte.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOfifoWord.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOlist.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOtheErrorManager.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOtheMemoryPool.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOtimer.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core/src/EOvector.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOVmutex.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOVtask.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOVtheCallbackManager.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOVtheSystem.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOVtheTimerManager.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOaction.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOarray.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOconstarray.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOconstvector.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOdeque.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOfifo.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOfifoByte.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOfifoWord.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOlist.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOtheErrorManager.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOtheMemoryPool.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOtimer.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EOvector.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/core/EoCommon.c</itemPath>
       </logicalFolder>
       <logicalFolder name="eo-core-see" displayName="eo-core-see" projectFiles="true">
-        <itemPath>../../../../../../any-arch/sys/embobj/core-see/src/EOSmutex.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-see/src/EOStheCallbackManager.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-see/src/EOStheFOOP.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-see/src/EOStheSystem.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-see/src/EOStheTimerManager.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="eo-core-vee" displayName="eo-core-vee" projectFiles="true">
-        <itemPath>../../../../../../any-arch/sys/embobj/core-vee/src/EOVmutex.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-vee/src/EOVtask.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-vee/src/EOVtheCallbackManager.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-vee/src/EOVtheSystem.c</itemPath>
-        <itemPath>../../../../../../any-arch/sys/embobj/core-vee/src/EOVtheTimerManager.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/exec/singletask/EOSmutex.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/exec/singletask/EOStheCallbackManager.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/exec/singletask/EOStheFOOP.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/exec/singletask/EOStheSystem.c</itemPath>
+        <itemPath>../../../../../../../embobj/core/exec/singletask/EOStheTimerManager.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal" displayName="hal" projectFiles="true">
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/utils/crc16.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/utils/crc32.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_brdcfg.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_arch.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_base.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_can.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_crc.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_eeprom.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_flash.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_gpio.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_led.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_sys.c</itemPath>
-        <itemPath>../../../../../body/abslayer/hal-package/hal/hal-src/hal_dspic_timer.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc16.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc32.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_brdcfg.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_arch.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_base.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_can.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_crc.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_eeprom.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_flash.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_gpio.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_led.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_sys.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_timer.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal-cfg" displayName="hal-cfg" projectFiles="true">
         <itemPath>../../hal-cfg/hal_cfg.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal-stg" displayName="hal-stg" projectFiles="true">
         <itemPath>../../hal-stg/hal_dspic_startup.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="embenv-any-envcom"
+                     displayName="services-common"
+                     projectFiles="true">
+        <itemPath>../../../../../../libs/services/common/src/eEcommon.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1"
+                     displayName="services-storage-private"
+                     projectFiles="true">
+        <itemPath>../../../../../../libs/services/storage/private/src/eEprivateStorage.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="embenv-dspic-envcom"
+                     displayName="services-storage-shared"
+                     projectFiles="true">
+        <itemPath>../../../../../../libs/services/storage/shared/src/eEpermdata.c</itemPath>
+        <itemPath>../../../../../../libs/services/storage/shared/src/eEsharedInfo.c</itemPath>
+        <itemPath>../../../../../../libs/services/storage/shared/src/eEsharedStorage.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -101,6 +103,12 @@
     <Elem>../../hal-stg</Elem>
     <Elem>../../../../../body/abslayer/hal-package/hal/hal-src</Elem>
     <Elem>../../../../../../any-arch/sys/embobj/core/src</Elem>
+    <Elem>../../../../../../libs/abslayer/hal/src</Elem>
+    <Elem>../../../../../../../embobj/core/core</Elem>
+    <Elem>../../../../../../../embobj/core/exec/singletask</Elem>
+    <Elem>../../../../../../libs/services/common/src</Elem>
+    <Elem>../../../../../../libs/services/storage/shared/src</Elem>
+    <Elem>../../../../../../libs/services/storage/private/src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -149,7 +157,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="..;../../app;../../hal-cfg;../../../../../body/embenv/envcom;../../../../../body/embenv/envshalib;../../../../../body/abslayer/hal-package/hal/hal-src;../../../../../../porting;../../../../../../any-arch/body/embenv/envcom;../../../../../../any-arch/sys/abslayer/api;../../../../../../any-arch/sys/embobj/core/api;../../../../../../any-arch/sys/embobj/core/src;../../../../../../any-arch/sys/embobj/core-vee/api;../../../../../../any-arch/sys/embobj/core-vee/src;../../../../../../any-arch/sys/embobj/core-see/api;../../../../../../any-arch/sys/embobj/core-see/src"/>
+                  value="..;../../app;../../hal-cfg;..\..\..\..\env\cfg;..\..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\..\libs\abslayer\hal\src;..\..\..\..\..\..\libs\services\common\api;..\..\..\..\..\..\libs\services\storage\shared\api;..\..\..\..\..\..\libs\services\storage\shared\src;..\..\..\..\..\..\libs\services\storage\private\api;..\..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\..\embobj\core\exec\singletask;..\..\..\..\..\..\libs\services\storage\shared\api"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

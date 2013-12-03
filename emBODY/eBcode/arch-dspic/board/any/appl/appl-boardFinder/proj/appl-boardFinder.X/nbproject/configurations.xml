@@ -4,6 +4,9 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="app" displayName="app" projectFiles="true">
+        <itemPath>../../app/app_body.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -15,11 +18,11 @@
                    projectFiles="true">
       <logicalFolder name="app" displayName="app" projectFiles="true">
         <itemPath>../../app/main.c</itemPath>
-        <itemPath>../../app/privateData.c</itemPath>
-        <itemPath>../../app/application.c</itemPath>
-        <itemPath>../../app/parser.c</itemPath>
+        <itemPath>../../app/app_body.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal" displayName="hal" projectFiles="true">
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc16.c</itemPath>
+        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc32.c</itemPath>
         <itemPath>../../../../../../libs/abslayer/hal/src/hal_brdcfg.c</itemPath>
         <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_arch.c</itemPath>
         <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_base.c</itemPath>
@@ -31,26 +34,19 @@
         <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_led.c</itemPath>
         <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_sys.c</itemPath>
         <itemPath>../../../../../../libs/abslayer/hal/src/hal_dspic_timer.c</itemPath>
-        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc16.c</itemPath>
-        <itemPath>../../../../../../libs/abslayer/hal/src/utils/crc32.c</itemPath>
       </logicalFolder>
       <logicalFolder name="hal-cfg" displayName="hal-cfg" projectFiles="true">
         <itemPath>../../hal-cfg/hal_cfg.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="hal-stg" displayName="hal-stg" projectFiles="true">
-        <itemPath>../../hal-stg/hal_dspic_startup.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="any-embenv-envcom"
+      <logicalFolder name="embenv-envshalib"
                      displayName="services-common"
                      projectFiles="true">
         <itemPath>../../../../../../libs/services/common/src/eEcommon.c</itemPath>
       </logicalFolder>
       <logicalFolder name="embenv-envcom"
-                     displayName="services-storage-shared"
+                     displayName="services-storage-basic"
                      projectFiles="true">
-        <itemPath>../../../../../../libs/services/storage/shared/src/eEpermdata.c</itemPath>
-        <itemPath>../../../../../../libs/services/storage/shared/src/eEsharedInfo.c</itemPath>
-        <itemPath>../../../../../../libs/services/storage/shared/src/eEsharedStorage.c</itemPath>
+        <itemPath>../../../../../../libs/services/storage/basic/src/eEbasicStorage.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -60,17 +56,13 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../../../../../body/embenv/envcom</Elem>
-    <Elem>../../../../../../any-arch/body/embenv/envcom</Elem>
     <Elem>../../hal-cfg</Elem>
-    <Elem>../../../../../body/embenv/envshalib</Elem>
     <Elem>../../app</Elem>
     <Elem>../</Elem>
-    <Elem>../../hal-stg</Elem>
-    <Elem>../../../../../body/abslayer/hal-package/hal/hal-src</Elem>
-    <Elem>../../../../../../libs/services/storage/shared/src</Elem>
-    <Elem>../../../../../../libs/services/common/src</Elem>
     <Elem>../../../../../../libs/abslayer/hal/src</Elem>
+    <Elem>../../../../../../libs/services/common/src</Elem>
+    <Elem>../../../../../../libs/services/storage/shared/src</Elem>
+    <Elem>../../../../../../libs/services/storage/basic/src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -119,7 +111,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../hal-cfg;../../app;..;..\..\..\..\env\cfg;..\..\..\..\..\..\libs\services\common\api;..\..\..\..\..\..\libs\services\storage\shared\api;..\..\..\..\..\..\libs\services\storage\shared\src;..\..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\..\libs\abslayer\hal\src"/>
+                  value="../../hal-cfg;../../app;..;..\..\..\..\env\cfg;..\..\..\..\..\..\libs\services\common\api;..\..\..\..\..\..\libs\services\storage\basic\api;..\..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\..\libs\abslayer\hal\src"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
@@ -140,7 +132,7 @@
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros"
-                  value="_DSPIC_;HAL_USE_ARCH_DSPIC;HAL_BOARD_6SGor2FOC;APPL_BOARD_6SGor2FOC;HAL_DONT_INLINE"/>
+                  value="_DSPIC_;HAL_USE_ARCH_DSPIC;HAL_BOARD_2FOC;HAL_DONT_INLINE"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
@@ -149,7 +141,7 @@
       <C30-AS>
         <property key="assembler-symbols" value=""/>
         <property key="expand-macros" value="false"/>
-        <property key="extra-include-directories-for-assembler" value=".."/>
+        <property key="extra-include-directories-for-assembler" value="..;"/>
         <property key="extra-include-directories-for-preprocessor" value=""/>
         <property key="false-conditionals" value="false"/>
         <property key="keep-locals" value="false"/>
@@ -184,7 +176,8 @@
         <property key="heap-size" value="4096"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
-        <property key="map-file" value="&quot;${DISTDIR}/appl-hal.X.${IMAGE_TYPE}.map&quot;"/>
+        <property key="map-file"
+                  value="&quot;${DISTDIR}/appl-boardFinder.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="oXC16ld-extra-opts" value=""/>
         <property key="oXC16ld-fill-upper" value="0"/>
         <property key="oXC16ld-force-link" value="false"/>
