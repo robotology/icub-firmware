@@ -135,10 +135,27 @@ void can_receive_additional_info();
 #define CAN_SET_BACKEMF_PARAMS      97
 #define CAN_GET_BACKEMF_PARAMS      98
 
-#define CAN_SET_MODEL_PARAMS         99
+#define CAN_SET_MODEL_PARAMS        99
 #define CAN_GET_MODEL_PARAMS        100
 
-#define NUM_OF_MESSAGES             101
+
+#define CAN_SET_CURRENT_PID       	101
+#define CAN_GET_CURRENT_PID 		102
+#define CAN_SET_CURRENT_PIDLIMITS   103
+#define CAN_GET_CURRENT_PIDLIMITS 	104
+#define CAN_SET_VELOCITY_PID        105
+#define CAN_GET_VELOCITY_PID        106
+#define CAN_SET_VELOCITY_PIDLIMITS  107
+#define CAN_GET_VELOCITY_PIDLIMITS  108
+#define CAN_SET_DESIRED_CURRENT		109
+#define CAN_GET_DESIRED_CURRENT		110
+#define CAN_SET_PERIODIC_MSG_CONTENTS   111 //this message is used only for 2foc boards
+#define CAN_SET_I2T_PARAMS			112
+#define CAN_GET_I2T_PARAMS			113
+
+
+
+#define NUM_OF_MESSAGES             114
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller
@@ -155,7 +172,7 @@ void can_receive_additional_info();
 #define CAN_BCAST_DEBUG				9
 #define CAN_BCAST_MOTOR_POSITION   10
 #define CAN_BCAST_MOTOR_SPEED      11
-
+#define CAN_BCAST_EMSTO2FOC_DESIRED_CURRENT   15 //this message is sent by ems 2 2foc. it contains 4 setpoints, one for each 2fcoc.
 #define CAN_BCAST_MAX_MSGS		   12
 
 #define MAIS_CAN_ID                 0xE 
