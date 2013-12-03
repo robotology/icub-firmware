@@ -1141,7 +1141,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredCurrent(EOicubCan
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_CURRENT;
     *((eOmeas_current_t*)(&canFrame->data[1])) = *currentVal_ptr;
     canFrame->data[3]= 0; //LSB Id
     canFrame->data[4]= 0; //MSB Id
