@@ -29,7 +29,7 @@
     @date       09/21/2011
 **/
 
-#include "eEmemorymap_dspic33.h"
+#include "eEmemorymap_dspic33boards.h"
 
 
 #endif  // include-guard
