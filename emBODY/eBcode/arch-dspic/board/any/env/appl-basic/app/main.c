@@ -122,7 +122,7 @@ int main(void)
     while(1)
     {
        	index ++; 
-		canadr = canadr;
+        canadr = canadr;
     }
     return(0);
 }

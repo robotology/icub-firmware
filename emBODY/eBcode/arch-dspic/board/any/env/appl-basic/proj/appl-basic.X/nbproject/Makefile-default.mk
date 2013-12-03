@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../../app/main.c ../../../../../body/embenv/envshalib/eEbasicStorage.c
+SOURCEFILES_QUOTED_IF_SPACED=../../app/main.c ../../../../../../libs/services/storage/basic/src/eEbasicStorage.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1445257345/main.o ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1445257345/main.o.d ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1445257345/main.o ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1445257345/main.o.d ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1445257345/main.o ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o
+OBJECTFILES=${OBJECTDIR}/_ext/1445257345/main.o ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o
 
 # Source Files
-SOURCEFILES=../../app/main.c ../../../../../body/embenv/envshalib/eEbasicStorage.c
+SOURCEFILES=../../app/main.c ../../../../../../libs/services/storage/basic/src/eEbasicStorage.c
 
 
 CFLAGS=
@@ -83,30 +83,30 @@ ${OBJECTDIR}/_ext/1445257345/main.o: ../../app/main.c  nbproject/Makefile-${CND_
 	@${MKDIR} ${OBJECTDIR}/_ext/1445257345 
 	@${RM} ${OBJECTDIR}/_ext/1445257345/main.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1445257345/main.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/main.c  -o ${OBJECTDIR}/_ext/1445257345/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/main.c  -o ${OBJECTDIR}/_ext/1445257345/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/main.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../app" -I".." -I"../../../cfg" -I"../../../../../../libs/services/common/api" -I"../../../../../../libs/services/storage/basic/api" -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o: ../../../../../body/embenv/envshalib/eEbasicStorage.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1266031256 
-	@${RM} ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../body/embenv/envshalib/eEbasicStorage.c  -o ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o: ../../../../../../libs/services/storage/basic/src/eEbasicStorage.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1000681919 
+	@${RM} ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../../libs/services/storage/basic/src/eEbasicStorage.c  -o ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -O0 -I"../../app" -I".." -I"../../../cfg" -I"../../../../../../libs/services/common/api" -I"../../../../../../libs/services/storage/basic/api" -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 else
 ${OBJECTDIR}/_ext/1445257345/main.o: ../../app/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1445257345 
 	@${RM} ${OBJECTDIR}/_ext/1445257345/main.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1445257345/main.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/main.c  -o ${OBJECTDIR}/_ext/1445257345/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/main.o.d"      -g -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/main.c  -o ${OBJECTDIR}/_ext/1445257345/main.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/main.o.d"      -g -omf=elf -O0 -I"../../app" -I".." -I"../../../cfg" -I"../../../../../../libs/services/common/api" -I"../../../../../../libs/services/storage/basic/api" -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/main.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o: ../../../../../body/embenv/envshalib/eEbasicStorage.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1266031256 
-	@${RM} ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../body/embenv/envshalib/eEbasicStorage.c  -o ${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d"      -g -omf=elf -O0 -I"../../../../../../porting" -I"../../../../../../any-arch/body/embenv/envcom" -I"../../../../../../any-arch/sys/abslayer/api" -I"../../../../../body/embenv/envshalib" -I"../../../../../body/abslayer/hal-package/hal/hal-src" -I"../../../../../body/embenv/envcom" -I"../../hal-cfg" -I"../../app" -I".." -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1266031256/eEbasicStorage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o: ../../../../../../libs/services/storage/basic/src/eEbasicStorage.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1000681919 
+	@${RM} ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../../../../../libs/services/storage/basic/src/eEbasicStorage.c  -o ${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d"      -g -omf=elf -O0 -I"../../app" -I".." -I"../../../cfg" -I"../../../../../../libs/services/common/api" -I"../../../../../../libs/services/storage/basic/api" -D_DSPIC_ -msmart-io=1 -Wall -msfr-warn=off -finline
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1000681919/eEbasicStorage.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 

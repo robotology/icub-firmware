@@ -13,21 +13,13 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="any-embenv-envcom"
-                     displayName="any-embenv-envcom"
-                     projectFiles="true">
-      </logicalFolder>
       <logicalFolder name="app" displayName="app" projectFiles="true">
         <itemPath>../../app/main.c</itemPath>
       </logicalFolder>
-      <logicalFolder name="embenv-envcom"
-                     displayName="embenv-envcom"
+      <logicalFolder name="any-embenv-envcom"
+                     displayName="services-storage-basic"
                      projectFiles="true">
-      </logicalFolder>
-      <logicalFolder name="embenv-envshalib"
-                     displayName="embenv-envshalib"
-                     projectFiles="true">
-        <itemPath>../../../../../body/embenv/envshalib/eEbasicStorage.c</itemPath>
+        <itemPath>../../../../../../libs/services/storage/basic/src/eEbasicStorage.c</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -40,6 +32,7 @@
     <Elem>../../../../../body/embenv/envshalib</Elem>
     <Elem>../../app</Elem>
     <Elem>../</Elem>
+    <Elem>../../../../../../libs/services/storage/basic/src</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -88,7 +81,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="../../../../../../porting;../../../../../../any-arch/body/embenv/envcom;../../../../../../any-arch/sys/abslayer/api;../../../../../body/embenv/envshalib;../../../../../body/abslayer/hal-package/hal/hal-src;../../../../../body/embenv/envcom;../../hal-cfg;../../app;.."/>
+                  value="../../app;..;..\..\..\cfg;..\..\..\..\..\..\libs\services\common\api;..\..\..\..\..\..\libs\services\storage\basic\api"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>
