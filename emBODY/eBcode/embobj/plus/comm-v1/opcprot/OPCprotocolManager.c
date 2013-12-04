@@ -313,6 +313,7 @@ extern uint32_t opcprotman_getSeqNum(OPCprotocolManager* p, opcprotman_message_t
 //     return(opcprotman_OK);
 // }
 // #endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
