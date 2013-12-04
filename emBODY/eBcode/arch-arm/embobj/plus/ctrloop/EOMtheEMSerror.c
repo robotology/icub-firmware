@@ -178,13 +178,6 @@ __weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSe
 __weak extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
 {
  
-    //#error --> see note
-//    #warning --> must contain code to handle things. see note VERY IMPORTANT
-// #if	!defined(EMSAPPL_USE_CORE)  
-//     snprintf(str, sizeof(str)-1, "EOMtheEMSerror %s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
-//     eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-//     eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-// #endif    
 }
 
 

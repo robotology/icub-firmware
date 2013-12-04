@@ -102,6 +102,9 @@ void usrDef_RUNRecRopframe(void);
 // default function for RX: it calls _beforedatagramreception(), _datagramreception(), _afterdatagramreception()
 extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p);
 
+// default function for RX or TX: there is a transceiver error
+extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p);
+
 // default function for RX-before-datagram-reception: it is empty.
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p);
 // default function for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.

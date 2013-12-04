@@ -35,6 +35,7 @@
 #include "EOMtask.h"
 
 #include "eventviewer.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -52,6 +53,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
 #if defined(EVIEWER_ENABLED)
 #define EVIEWER_userDef_IDbase             (ev_ID_first_usrdef+1)
 //#define EVIEWER_userDef_RUNRecRopframe     (EVIEWER_userDef_IDbase +1) see definition in EOMtheEMSrunner.c
@@ -79,6 +81,10 @@ const eOemsconfigurator_cfg_t eom_emsconfigurator_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+#if defined(EVIEWER_ENABLED)
+extern void usrDef_CFGRecRopframe(void);
+#endif
 
 extern void tskEMScfg(void *p);
 
@@ -155,10 +161,13 @@ extern EOMtask * eom_emsconfigurator_GetTask(EOMtheEMSconfigurator *p)
 }
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+#if defined(EVIEWER_ENABLED)
+extern void usrDef_CFGRecRopframe(void){}
+#endif
 
 extern void tskEMScfg(void *p)
 {
@@ -297,9 +306,6 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 
 }
 
-#if defined(EVIEWER_ENABLED)
-void usrDef_CFGRecRopframe(void){}
-#endif
 
 
 

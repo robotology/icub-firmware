@@ -94,7 +94,7 @@ typedef enum
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void tskEMScfg(void *p);
+extern void tskEMSbackdoor(void *p);
 
 static void s_eom_emsbackdoor_task_startup(EOMtask *p, uint32_t t);
 static void s_eom_emsbackdoor_task_run(EOMtask *p, uint32_t t);
@@ -177,7 +177,7 @@ extern EOMtheEMSbackdoor * eom_emsbackdoor_Initialise(const eOemsbackdoor_cfg_t 
     s_emsbackdoor_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
                                                     s_eom_emsbackdoor_task_startup, s_eom_emsbackdoor_task_run,  
                                                     (eOevent_t)0, eok_reltimeINFINITE, NULL, 
-                                                    tskEMScfg, "tskEMSbackdoor");
+                                                    tskEMSbackdoor, "tskEMSbackdoor");
  
  
  

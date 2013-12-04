@@ -222,7 +222,6 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 
 extern EOMtheEMSappl* eom_emsappl_GetHandle(void) 
 {
-    //if(NULL != s_emsappl_singleton.sm)
     if(s_emsappl_singleton.initted)
     {
         return(&s_emsappl_singleton);

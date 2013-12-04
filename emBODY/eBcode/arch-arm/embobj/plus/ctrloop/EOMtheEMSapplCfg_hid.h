@@ -37,6 +37,10 @@ extern "C" {
 
 #include "EOtheBOARDtransceiver.h"
 
+#if     defined(EO_USE_EPROT_V2)
+#include "EoProtocol.h"
+#endif
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOMtheEMSapplCfg.h"
@@ -47,89 +51,7 @@ extern "C" {
 
 // - derived #define -------------------------------------------------------------------------------------------------
 
-#if 0
 
-
-
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
-    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
-    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
-#else
-    #error --> you must define an EBx
-#endif
-
-
-
-//encoders configuration
-#define ENC_ENA     1   /* If encoder is connected*/
-#define ENC_DISA    0   /* If encoder is NOT connected*/
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
-                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
-                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |   \
-                                                        (ENC_ENA << eOeOappEncReader_encoder3)  |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
-                                                    )
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
-                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder2) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder3) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
-                                                    )
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_ENA << eOeOappEncReader_encoder0)  |   \
-                                                        (ENC_ENA << eOeOappEncReader_encoder1)  |   \
-                                                        (ENC_ENA << eOeOappEncReader_encoder2)  |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder3) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder4) |   \
-                                                        (ENC_DISA << eOeOappEncReader_encoder5)     \
-                                                    )
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0) |  \
-                                                        (ENC_DISA << eOeOappEncReader_encoder1) |  \
-                                                        (ENC_DISA << eOeOappEncReader_encoder2) |  \
-                                                        (ENC_DISA << eOeOappEncReader_encoder3) |  \
-                                                        (ENC_DISA << eOeOappEncReader_encoder4) |  \
-                                                        (ENC_DISA << eOeOappEncReader_encoder5)    \
-                                                    )
-
-#else
-    #error --> you must define an EBx
-#endif
-
-
-//ems controller configuration
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_SHOULDER
-        
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_UPPERLEG
-        
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_ANKLE
-        
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_WAIST
-
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
-
-
-#else
-    #error --> you must define an EBx
-#endif
-
-
-
-#endif
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 // empty-section
