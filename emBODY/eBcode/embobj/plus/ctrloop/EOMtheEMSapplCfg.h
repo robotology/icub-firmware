@@ -81,7 +81,6 @@ typedef const struct
     eObool_t                        getipaddrFROMenvironment;   /**< if true gets IP address from shared-services */   
     eObool_t                        errmng_haltrace_enabled;    /**< if true enable hal trace in error manager to write to debug window */
     uint8_t                         boardid;                    /**< a number from 1 to max number. use 255 for none */
-//    eOnvEP_t                        eps[eom_emsappl_eptype_numberof];
     eOemsdiscoverylistener_cfg_t    disclistcfg;                /** configuration of the discovery listener */
     eOemsbackdoor_cfg_t             backdoorcfg;                /**< configuration of the backdoor */
     eOemssocket_cfg_t               socketcfg;                  /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
@@ -89,7 +88,6 @@ typedef const struct
     eOemserror_cfg_t                errobjcfg;                  /**<   */
     eOemsconfigurator_cfg_t         cfgobjcfg;                  /**<   */
     eOemsrunner_cfg_t               runobjcfg;                  /**<   */
-//    const void*                     extra;                      /**< pointer to extra configuration. it points to eom_emsapplcfg_extra, defined externally */
 } EOMtheEMSapplCfg;        
 
 
@@ -121,13 +119,6 @@ extern EOMtheEMSapplCfg * eom_emsapplcfg_Initialise(void);
     @return     The handle to the EOMtheEMSapplCfg
  **/
 extern EOMtheEMSapplCfg * eom_emsapplcfg_GetHandle(void);
-
-
-/** @fn         extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, eom_emsapplcfg_eptype_t eptype)
-    @brief      tells the ep for a given category of endpoint.
-    @return     teh ep value or 0xffff if the ep type is not present
- **/
-//extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, uint8_t eptype); 
 
 
 /** @}            
