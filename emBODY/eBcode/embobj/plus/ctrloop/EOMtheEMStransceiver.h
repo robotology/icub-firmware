@@ -65,13 +65,21 @@ typedef struct EOMtheEMStransceiver_hid EOMtheEMStransceiver;
  **/
 typedef struct
 {
+#if     defined(EO_USE_EPROT_V2)
+    const eOnvset_DEVcfg_t*         nvsetdevcfg;
+#else
     const EOconstvector*            vectorof_endpoint_cfg;
     eOuint16_fp_uint16_t            hashfunction_ep2index;
+#endif    
     eOipv4addr_t                    hostipv4addr;
     eOipv4port_t                    hostipv4port; 
     eo_transceiver_sizes_t          sizes; 
     eOtransceiver_protection_t      transprotection;
+#if     defined(EO_USE_EPROT_V2)
+    eOnvset_protection_t            nvsetprotection;
+#else    
     eOnvscfg_protection_t           nvscfgprotection; 
+#endif    
 } eOemstransceiver_cfg_t;
 
 
@@ -89,8 +97,8 @@ typedef struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-// in here we shall place configuration of rop dimensione etc. now in defines such as EOK_BOARDTRANSCEIVER_capacityofpacket etc.
-extern const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg; // = {.hostipv4addr = EO_COMMON_IPV4ADDR(10, 0, 1, 200), .hostipv4port = 12345};
+// in here we have configuration of rop dimensione etc. 
+extern const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg; 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -119,9 +127,11 @@ extern EOMtheEMStransceiver * eom_emstransceiver_GetHandle(void);
  **/
 extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p);
 
-
+#if     defined(EO_USE_EPROT_V2)
+extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p);
+#else
 extern EOnvsCfg* eom_emstransceiver_GetNVScfg(EOMtheEMStransceiver* p);
-
+#endif
 
 extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rxpkt, uint16_t *numberofrops, eOabstime_t* txtime);
 

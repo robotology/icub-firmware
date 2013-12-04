@@ -114,9 +114,9 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emsrunner_update_dignosticsinfo_timing(void);
-static void s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid);
-static void s_eom_emsrunner_update_dignosticsinfo_txfailure(void);
+static void s_eom_emsrunner_update_diagnosticsinfo_timing(void);
+static void s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid);
+static void s_eom_emsrunner_update_diagnosticsinfo_txfailure(void);
 
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg);
 
@@ -433,7 +433,7 @@ __weak extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStran
 
 /*__weak*/ extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
 {   
-    s_eom_emsrunner_update_dignosticsinfo_timing();
+    s_eom_emsrunner_update_diagnosticsinfo_timing();
     
     p->numofrxrops = 0;
     p->numofrxpackets = 0;
@@ -631,7 +631,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
             }
             else
             {
-                s_eom_emsrunner_update_dignosticsinfo_txfailure();
+                s_eom_emsrunner_update_diagnosticsinfo_txfailure();
                 eom_emsrunner_hid_userdef_onfailedtransmission(p);
             }
         }
@@ -690,7 +690,7 @@ __weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunne
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emsrunner_update_dignosticsinfo_timing(void) 
+static void s_eom_emsrunner_update_diagnosticsinfo_timing(void) 
 {
     static uint64_t prevtime = 0;
     uint64_t currtime = osal_system_abstime_get();
@@ -799,7 +799,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX))
     {
-       s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
+       s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX); 
     }
     
@@ -835,7 +835,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {
-       s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
+       s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO);     
     }
     
@@ -899,7 +899,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX))
     {   // it is in this position so that ... it is still possible to send the EMS appl in ERROR state.
-        s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
+        s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
         eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX);
     } 
 
@@ -1193,12 +1193,12 @@ static void s_eom_emsrunner_6HALTIMERS_activate_taskrx_ultrabasic(void *arg)
     s_eom_emsrunner_6HALTIMERS_activate_task_ultrabasic(arg);    
 }
 
-static void s_eom_emsrunner_update_dignosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid)
+static void s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid)
 {
      s_eom_emsrunner_diagnosticsinfo.executionoverflows[taskid] ++;
 }
 
-static void s_eom_emsrunner_update_dignosticsinfo_txfailure(void)
+static void s_eom_emsrunner_update_diagnosticsinfo_txfailure(void)
 {
      s_eom_emsrunner_diagnosticsinfo.datagrams_failed_to_go_in_txsocket ++;
 }

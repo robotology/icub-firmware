@@ -242,14 +242,6 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     .getipaddrFROMenvironment   =   EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT,
     .errmng_haltrace_enabled    =   EOMTHEEMSAPPLCFG_HALTRACE_ENABLED,
     .boardid                    =   EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
-//     .hasdevice                  = 
-//     {
-//         EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
-//     },
-//    .eps                        =
-//    {
-//        EOMTHEEMSAPPLCFG_EBX_endpoint_mc, EOMTHEEMSAPPLCFG_EBX_endpoint_as, EOMTHEEMSAPPLCFG_EBX_endpoint_sk
-//    },
     .disclistcfg    =
     {
         .taskpriority           = EOMTHEEMSAPPLCFG_LISTENER_TASK_PRIORITYof,
@@ -284,24 +276,42 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .outdatagramsizeof          = EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF,
         .localport                  = EOMTHEEMSAPPLCFG_SOCKET_LOCALPORT, 
         .usemutex                   = eobool_true
-    },
+    },  
     .transcfg       =
     {   // the same ipv4 addr and port as in applcfg ...
+#if     defined(EO_USE_EPROT_V2) 
+        .nvsetdevcfg            = EOMTHEEMSAPPLCFG_nvsetdevcfg,
+#else   
         .vectorof_endpoint_cfg  = EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg,
         .hashfunction_ep2index  = EOMTHEEMSAPPLCFG_hashfunction_ep2index,
+#endif        
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
         .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT,
         .sizes                  =
         {
+#if     defined(EO_USE_EPROT_V2) 
+            .capacityoftxpacket             = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
+            .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, //256,
+            .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, //768,
+            .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
+            .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
+            .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS, //32
+            .maxnumberofconfreqrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFCONFREQROPS
+#else
             .capacityoftxpacket             = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
             .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, //256,
             .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, //768,
             .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
             .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
             .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32
+#endif            
         },
         .transprotection        = eo_trans_protection_none, //eo_trans_protection_enabled, //eo_trans_protection_none,
+#if     defined(EO_USE_EPROT_V2) 
+        .nvsetprotection        = eo_nvset_protection_none //eo_nvset_protection_one_per_endpoint //eo_nvset_protection_none // eo_nvset_protection_one_per_netvar eo_nvset_protection_one_per_endpoint
+#else        
         .nvscfgprotection       = eo_nvscfg_protection_none //eo_nvscfg_protection_one_per_endpoint //eo_nvscfg_protection_none // eo_nvscfg_protection_one_per_netvar eo_nvscfg_protection_one_per_endpoint
+#endif    
     },
     .errobjcfg      =
     {
@@ -333,50 +343,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .maxnumofRXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_RX_MAXPACKETS,                // add a control that is is lower equal to inpdatagramnumber.
         .maxnumofTXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS,                // so far it can be only 0 or 1 
         .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP    
-    }//,
-//    .extra          = (const void*)&eom_emsapplcfg_extra
-// #if !defined(EMSAPPL_USE_CORE)    
-//      ,
-//      .applbodycfg     =
-//      {
-//          .icubcanprotoimplementedversion =
-//          {
-//             .major                   = 1,
-//             .minor                   = 1
-//          },
-//          .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
-//          .emsControllerCfg           =
-//          {
-//              .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
-//          },
-// 		 .endpoints                  =
-//          {
-//              .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
-//              .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
-//              .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
-//          },
-//          .configdataofMC4boards      =
-//          {
-//              .shiftvalues            =
-//             {
-//              .jointVelocityShift     =  8,
-//              .jointVelocityEstimationShift = 8,
-//              .jointAccelerationEstimationShift = 5
-//             },
-//              .bcastpolicy            =
-//              {
-//                  .val2bcastList      =
-//                  {
-//                     /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
-//                     /* 1 */ ICUBCANPROTO_PER_MB_CMD_STATUS,
-//                     /* 2 */ ICUBCANPROTO_PER_MB_CMD_PRINT,
-//                     /* 3 */ 0
-//                  }
-//              }
-//             
-//          }
-//      }
-// #endif       
+    }
 };
 
 
@@ -408,16 +375,6 @@ extern EOMtheEMSapplCfg* eom_emsapplcfg_GetHandle(void)
     return(&s_emsapplcfg_singleton);
 }
 
-
-//extern eOnvEP_t eom_emsapplcfg_Get_nvEPfor(EOMtheEMSapplCfg *p, uint8_t eptype)
-//{
-//    if(eptype >= eom_emsappl_eptype_numberof)
-//    {
-//        return(0xffff);
-//    }
-//   
-//    return(s_emsapplcfg_singleton.eps[eptype]);
-//}
 
 
 

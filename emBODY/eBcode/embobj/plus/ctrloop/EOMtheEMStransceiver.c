@@ -64,10 +64,15 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+
 const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg = 
 {
+#if     defined(EO_USE_EPROT_V2)
+    EO_INIT(.nvsetdevcfg)               NULL,
+#else
     EO_INIT(.vectorof_endpoint_cfg)     NULL,
     EO_INIT(.hashfunction_ep2index)     NULL,
+#endif    
     EO_INIT(.hostipv4addr)              EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
     EO_INIT(.hostipv4port)              12345,
     EO_INIT(.sizes)
@@ -77,10 +82,18 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
         EO_INIT(.capacityofropframeregulars)        768,
         EO_INIT(.capacityofropframeoccasionals)     128,
         EO_INIT(.capacityofropframereplies)         128,
-        EO_INIT(.maxnumberofregularrops)            32        
+        EO_INIT(.maxnumberofregularrops)            32
+#if     defined(EO_USE_EPROT_V2)        
+        ,
+        EO_INIT(.maxnumberofconfreqrops)            8 
+#endif        
     },
     EO_INIT(.transprotection)           eo_trans_protection_none,
+#if     defined(EO_USE_EPROT_V2)
+    EO_INIT(.nvsetprotection)           eo_nvset_protection_none
+#else    
     EO_INIT(.nvscfgprotection)          eo_nvscfg_protection_none
+#endif    
 };
 
 
@@ -141,19 +154,27 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     
     eOboardtransceiver_cfg_t brdtransceiver_cfg;
     
+#if     defined(EO_USE_EPROT_V2)
+    brdtransceiver_cfg.nvsetdevcfg              = cfg->nvsetdevcfg;
+#else
     brdtransceiver_cfg.vectorof_endpoint_cfg    = cfg->vectorof_endpoint_cfg;
     brdtransceiver_cfg.hashfunction_ep2index    = cfg->hashfunction_ep2index;   
+#endif    
     brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
     brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port; // it is the remote port where to send packets to
     memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eo_transceiver_sizes_t));
     brdtransceiver_cfg.mutex_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New;
     brdtransceiver_cfg.transprotection          = cfg->transprotection;
-    brdtransceiver_cfg.nvscfgprotection         = cfg->nvscfgprotection;
-   
- 
+#if     defined(EO_USE_EPROT_V2)    
+    brdtransceiver_cfg.nvsetprotection          = cfg->nvsetprotection;
+    brdtransceiver_cfg.confmancfg               = NULL;
+    eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
+    s_emstransceiver_singleton.transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+#else       
+    brdtransceiver_cfg.nvscfgprotection         = cfg->nvscfgprotection;    
     //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
-
+#endif
     
     s_eom_emstransceiver_update_diagnosticsinfo();
     
@@ -188,16 +209,25 @@ extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p)
     return(s_emstransceiver_singleton.transceiver);
 }
 
+#if     defined(EO_USE_EPROT_V2)
+extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }    
+    return(eo_boardtransceiver_GetNVset(eo_boardtransceiver_GetHandle()));
+}
+#else
 extern EOnvsCfg* eom_emstransceiver_GetNVScfg(EOMtheEMStransceiver* p)
 {
     if(NULL == p)
     {
         return(NULL);
-    }
-    
+    }    
     return(eo_boardtransceiver_hid_GetNvsCfg());
 }
-
+#endif
 
 
 extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rxpkt, uint16_t *numberofrops, eOabstime_t* txtime)
@@ -226,9 +256,7 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     {
         return(eores_NOK_nullpointer);
     }
-    
-    
-    
+       
     res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops);
     if(eores_OK != res)
     {
@@ -239,7 +267,8 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     {
         *numberofrops = numofrops;
     }
-    //even if numofrops is equal to zero, i send a rop becaouse it used by pc104 like keep alive.
+    
+    //even if numofrops is equal to zero, i send a rop because it is used by pc104 to see the ems.
     res = eo_transceiver_outpacket_Get(s_emstransceiver_singleton.transceiver, txpkt);
     
     s_eom_emstransceiver_update_diagnosticsinfo();
@@ -270,6 +299,7 @@ extern eOemstransceiver_diagnosticsinfo_t* eom_emstransceiver_GetDiagnosticsInfo
     return(&s_eom_emstransceiver_diagnosticsinfo);
     
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

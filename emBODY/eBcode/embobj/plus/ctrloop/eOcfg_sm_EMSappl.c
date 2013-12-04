@@ -438,7 +438,7 @@ __weak extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
 }  
 __weak extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 {
-;
+
 }
 __weak extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 {
