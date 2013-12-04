@@ -55,6 +55,17 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+// -- all the possible enum
+
+typedef enum
+{
+    skin_sigmode_dontsignal                         = 0,
+    snsr_sigmode_signal                             = 1  
+} eOskin_sigmode_t;
+
+
+// -- all the possible data service structures
+
 typedef struct              // size is 4+10*16+0 = 164
 {
     eOarray_head_t          head;
@@ -73,11 +84,6 @@ typedef struct                  // size is: 164+4+0 = 168
 } eOskin_array_data_t;      EO_VERIFYsizeof(eOskin_array_data_t, 168);
 
 
-typedef enum
-{
-    skin_sigmode_dontsignal                         = 0,
-    snsr_sigmode_signal                             = 1  
-} eOskin_sigmode_t;
 
 typedef struct                      
 {

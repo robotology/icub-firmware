@@ -30,7 +30,7 @@ extern "C" {
 	@date       09/06/2011
 **/
 
-/** @defgroup eo_devervrffdvf Configuation of the NVs for management of the ems board
+/** @defgroup eo_motioncontrol Types used for motion control in the Ethernet boards
     Tcecece 
     
     @{		
@@ -379,6 +379,7 @@ typedef struct                  // size is 1+3+4*3 = 16
 
 typedef eOmc_calibrator32_t eOmc_calibrator_t;
 
+
 /*  This proposition is used to check if used calibrator is eOmc_calibrator32_t.
     This check is important because calibrators'params are sent to can and so conrveted. 
     If used calibrator is a different one, please modify converter object. */
@@ -413,32 +414,26 @@ typedef struct              // size is 1+3+8+0 = 12
         { 
             eOmeas_current_t       value; 
         } current;
-    } to;                                       /**< the uinion containing the value field and optional param */
+    } to;                       /**< the union containing the value field and optional param */
 } eOmc_setpoint_t;              EO_VERIFYsizeof(eOmc_setpoint_t, 12);
-
-
-
 
 
 // -- all the possible data holding structures used in a motor
 
+
+typedef struct
+{
+    uint16_t tresh;         /**< Current threshold  */
+    uint16_t time;          /**< Filter time parameter  */
+} eOmc_i2tParams_t;
+
+
+
 // -- the definition of a joint
 
 
-///** @typedef    typedef uint8_t  eOmc_jointUniqueId_t
-//    @brief      eOmc_jointUniqueId_t contains the values required to identify a joint 
-//                of robot univocally on a body part
-// **/
-//typedef uint8_t  eOmc_jointUniqueId_t;
-//
-//
-///** @typedef    typedef uint8_t  eOmc_jointBoardId_t
-//    @brief      eOmc_jointBoardId_t contains the values required to identify a joint on a board univocally.
-// **/
-//typedef uint8_t  eOmc_jointBoardId_t;
 
-
-/** @typedef    typedef uint8_t  eOmc_jointId_t
+/** @typedef    typedef uint16_t  eOmc_jointId_t
     @brief      eOmc_jointId_t contains the values required to identify a joint;
                 this type doesn't specify if it identifies a joint on a board or body part univocally,
                 unlike eOmc_jointBoardId_t and eOmc_jointUniqueId_t. 
@@ -509,7 +504,7 @@ typedef struct                  // size is:  16+12+4 = 32
 {
     eOmc_joint_status_basic_t   basic;              /**< the basic status */
     eOmc_joint_status_ofpid_t   ofpid;              /**< the pid status   */ 
-    uint8_t                     chamaleon04[4];     /**< the content of these bytes can be configured with eOmc_joint_config_t::upto04descrFORjstatuschamaleon04 to contain 0, 1, 2, 3, 4 variables */
+    uint8_t                     chamaleon04[4];     /**< these bytes are available for the application for debug purposes */
 } eOmc_joint_status_t;          EO_VERIFYsizeof(eOmc_joint_status_t, 32);
 
 
@@ -534,6 +529,7 @@ typedef struct                  // size is 16+12+1+1+1+1+0 = 32
 } eOmc_joint_commands_t;        EO_VERIFYsizeof(eOmc_joint_commands_t, 32);
 
 
+
 typedef struct                  // size is 88+32+8+32+0 = 160
 {
     eOmc_joint_config_t         jconfig;                    /**< the configuration of the joint */
@@ -548,25 +544,12 @@ typedef struct                  // size is 88+32+8+32+0 = 160
 // -- the definition of a motor
 
 
-///** @typedef    typedef uint8_t  eOmc_motorUniqueId_t
-//    @brief      eOmc_motorUniqueId_t contains the values required to identify a motor 
-//                of robot univocally on a body part
-// **/
-//typedef uint8_t  eOmc_motorUniqueId_t;
-//
-//
-///** @typedef    typedef uint8_t  eOmc_motorBoardId_t
-//    @brief      eOmc_motorBoardId_t contains the values required to identify a motor on a board.
-// **/
-//typedef uint8_t  eOmc_motorBoardId_t;
 
-
-/** @typedef    typedef uint8_t  eOmc_jointId_t
-    @brief      eOmc_jointId_t contains the values required to identify a joint;
-                this type doesn't specify if it identifies a joint on a board or body part univocally,
-                unlike eOmc_motorBoardId_t and eOmc_motorUniqueId_t. 
+/** @typedef    typedef uint16_t  eOmc_motorId_t
+    @brief      eOmc_motorId_t contains the values required to identify a motor
  **/
 typedef uint16_t  eOmc_motorId_t;
+
 
 
 /** @typedef    typedef struct eOmc_motor_config_t
@@ -601,8 +584,8 @@ typedef struct                  // size is: 4+4+2+2+0 = 12
  **/
 typedef struct                  // size is: 12+4+0 = 16
 {
-    eOmc_motor_status_basic_t   basic;               /**< the basic status of a motor */
-    uint8_t                     chamaleon04[4];         /**< its content is configured with eOmc_motor_config_t::des02FORmstatuschamal04 */
+    eOmc_motor_status_basic_t   basic;                  /**< the basic status of a motor */
+    uint8_t                     chamaleon04[4];         /**<  */
 } eOmc_motor_status_t;          EO_VERIFYsizeof(eOmc_motor_status_t, 16);
 
 
@@ -662,36 +645,6 @@ typedef struct                  // size is 8+8+8+0 = 24
 
 
 
-typedef struct
-{
-    uint16_t tresh; /**< Current threshold  */
-    uint16_t time;  /**< Filter time parameter  */
-} eOmc_i2tParams_t;
-
-// typedef struct
-// {
-    // uint8_t estimShiftJointVel;
-    // uint8_t estimShiftJointAcc;
-    // uint8_t estimShiftMotorVel;
-    // uint8_t estimShiftMotorAcc;
-// } eOmc_estimShift_t;
-
- 
-// some considerations by acemor.
-// each joint-motor needs 152+40 = 192 bytes.  
-// the left leg uses ... 192*6 joint-motor = 1152 bytes
-// the left arm uses ... 192*16 joint-motor --> 3072 bytes. .... however: if we split we had: 4*192=768 on the first and 12*192=2304 on the second
-
-// if we signal the full eOmc_joint_status_t (32) and eOmc_motor_status_t (16) -> 48 bytes we shall signal:
-// on ems with 2 jm:    -> 48*2     = 96
-// on ems with 4 jm:    -> 48*4     = 192
-// on ems with 12 jm:   -> 48*12    = 576
-// however, ... we can minimally signal only basic status: eOmc_joint_status_basic_t (16) and eOmc_motor_status_basic_t (12) -> 28
-// on ems with 2 jm:    -> 28*2     = 56
-// on ems with 4 jm:    -> 28*4     = 112
-// on ems with 12 jm:   -> 28*12    = 336
-
-
 
 
 
@@ -706,7 +659,7 @@ typedef struct
 
 
 /** @}            
-    end of group eo_devervrffdvf  
+    end of group eo_motioncontrol  
  **/
 
 #ifdef __cplusplus

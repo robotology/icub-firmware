@@ -30,7 +30,7 @@ extern "C" {
 	@date       05/15/2012
 **/
 
-/** @defgroup eo_sddevervrffdvf Management of the ems board
+/** @defgroup eo_management Management of the ems board
     Tcecece 
     
     @{		
@@ -63,6 +63,9 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+// -- all the possible enum
+
+
 /** @typedef    typedef enum eOmn_ropsigcfg_commandtype_t;
     @brief      It contains all the operations which are possible to configure the regular EOrop objects in the transceiver.   
  **/
@@ -75,6 +78,7 @@ typedef enum
     ropsigcfg_cmd_remove    = 5                 /**< it searches and removes from the reg rops all the items of the delivered array (its size must be > 0)*/
 } eOmn_ropsigcfg_commandtype_t;
 
+
 /** @typedef    typedef enum eOmn_appl_state_t;
     @brief      It contains the states of the state machine of the application.     
  **/
@@ -86,6 +90,7 @@ typedef enum
 } eOmn_appl_state_t;
 
 
+// -- all the possible data service structures
 
 /** @typedef    typedef struct eOmn_ropsigcfg_array_t;
     @brief      is an array of eOropSIGcfg_t structs used to configure the communication
@@ -107,15 +112,30 @@ typedef struct              // size is 124+1+3 = 128 bytes
     uint8_t                         filler03[3];
 } eOmn_ropsigcfg_command_t;         EO_VERIFYsizeof(eOmn_ropsigcfg_command_t, 128);
 
+/** @typedef    typedef enum eOmn_appl_runMode_t;
+    @brief      contains ems application's run mode.
+                Currently runMode is not set to ems by pc104, but application itself understands its runmode
+                depending on connected CAN boards.
+ **/
+typedef enum
+{
+    applrunMode__default       = 0,
+    applrunMode__skinOnly      = 1,
+    applrunMode__mc4Only       = 2,
+    applrunMode__skinAndMc4    = 3,
+    applrunMode__2foc          = 4
+} eOmn_appl_runMode_t;
 
 
+
+// -- the definition of a appl entity
 
 /** @typedef    typedef struct eOmn_appl_config_t;
     @brief      used to configure the application
  **/
 typedef struct                      // size is 4+4 = 8 bytes
 {
-    eOreltime_t                     cycletime;
+    eOreltime_t                     cycletime;      /**< the time to be used for the control loop expressed in microseconds */
     uint8_t                         filler04[4];
 } eOmn_appl_config_t;               EO_VERIFYsizeof(eOmn_appl_config_t, 8);
 
@@ -151,19 +171,6 @@ typedef struct                      // size is 8+8+8 = 24 bytes
 } eOmn_appl_t;                      EO_VERIFYsizeof(eOmn_appl_t, 24);
 
 
-/** @typedef    typedef enum eOmn_appl_runMode_t;
-    @brief      contains ems application's run mode.
-                Currently runMode is not set to ems by pc104, but application its self undestands its runmode
-                depending on connected CAN boards.
- **/
-typedef enum
-{
-    applrunMode__default       = 0,
-    applrunMode__skinOnly      = 1,
-    applrunMode__mc4Only       = 2,
-    applrunMode__skinAndMc4    = 3,
-    applrunMode__2foc          = 4
-} eOmn_appl_runMode_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -176,7 +183,7 @@ typedef enum
 
 
 /** @}            
-    end of group eo_sddevervrffdvf  
+    end of group eo_management  
  **/
 
 #ifdef __cplusplus

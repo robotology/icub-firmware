@@ -56,16 +56,48 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef struct eOsnsr_forcetorque_t
-    @brief      eOsnsr_forcetorque_t contains measurements of force on xyz and of torque on 3 components 
- **/
-typedef struct                  // size is: 4+2*3+2*3+0 = 16 
-{
-    uint32_t                    identifier;         /**< the identifier of the origin of measure: so far only strain */ 
-    eOmeas_force_t              force[3];           /**< the force split in x, y, and z components */
-    eOmeas_torque_t             torque[3];          /**< the torque split in three components*/
-} eOsnsr_forcetorque_t;         EO_VERIFYsizeof(eOsnsr_forcetorque_t, 16);
+// -- all the possible enum
 
+
+typedef enum
+{
+    snsr_strainmode_txcalibrateddatacontinuously          = 0,
+    snsr_strainmode_acquirebutdonttx                      = 1,
+    snsr_strainmode_txuncalibrateddatacontinuously        = 3,
+    snsr_strainmode_txalldatacontinuously                 = 4   
+} eOsnsr_strainmode_t;
+
+typedef enum
+{
+    snsr_strain_formatofvalues_fullscale            = 0,
+    snsr_strain_formatofvalues_calibrated           = 1,
+    snsr_strain_formatofvalues_uncalibrated         = 2
+} eOsnsr_strain_formatofvalues_t;
+
+typedef enum
+{
+    snsr_maismode_txdatacontinuously                    = 0,
+    snsr_maismode_acquirebutdonttx                      = 1,
+    snsr_maismode_dontacquiredonttx                     = 5  
+} eOsnsr_maismode_t;
+
+
+typedef enum
+{
+    snsr_maisresolution_08                              = 0,
+    snsr_maisresolution_16                              = 1,
+//    snsr_maisresolution_debug                           = 2       //this mode set mais board in debug mode: it sends triangulas and sqaure waves.
+} eOsnsr_maisresolution_t;
+
+
+// -- verification of enum values vs icub can protocol
+
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_txdatacontinuously == 0));
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_acquirebutdonttx == 1));
+EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_dontacquiredonttx == 5));
+
+
+// -- all the possible data service structures
 
 /** @typedef    typedef struct eOsnsr_upto15analog08vals_t
     @brief      eOsnsr_upto15analog08vals_t contains measurements of generic analog sensors with 8 bit resolution, as the default behaviour of mais 
@@ -75,7 +107,7 @@ typedef struct                  // size is: 1+1*15+0 = 16
     uint8_t                     number;             /**< the number of values */ 
     uint8_t                     value[15];          /**< the values */
 } eOsnsr_upto15analog08vals_t;  EO_VERIFYsizeof(eOsnsr_upto15analog08vals_t, 16);
-// note: a more generic type would be an EOarray. however, 4 bytes are required for teh head, thus only 12 bytes are available to fit in  
+
 
 /** @typedef    typedef struct eOsnsr_arrayofupto12bytes_t
     @brief      eOsnsr_arrayofupto12bytes_t contains measurements of generic analog sensors with 8/16/32 bit resolution and is able to contain the 12 bytes of the strain
@@ -107,23 +139,13 @@ typedef struct                  // size is: 4+36+0 = 40
 } eOsnsr_arrayofupto36bytes_t;  EO_VERIFYsizeof(eOsnsr_arrayofupto36bytes_t, 40);
 
 
-/** @typedef    typedef struct eOsnsr_aea_t
-    @brief      eOsnsr_aea_t contains measurements of the absolute encoder whcih so far is managed only by teh ems 
-    @warning    This struct must be of fixed and size and multiple of 4.
+// -- the definition of a strain entity
+
+/** @typedef    typedef uint8_t  eOsnsr_strainId_t
+    @brief      eOsnsr_strainId_t contains the values required to identify a strain sensor board in robot.
  **/
-typedef struct                  // size is: 4+0 = 4
-{
-    uint32_t                    value;            // used with ... see hal_encoder.h for bitfield formatting  
-} eOsnsr_aea_t;                 EO_VERIFYsizeof(eOsnsr_aea_t, 4);
+typedef uint16_t  eOsnsr_strainId_t;
 
-
-typedef enum
-{
-    snsr_strainmode_txcalibrateddatacontinuously          = 0,
-    snsr_strainmode_acquirebutdonttx                      = 1,
-    snsr_strainmode_txuncalibrateddatacontinuously        = 3,
-    snsr_strainmode_txalldatacontinuously                 = 4   
-} eOsnsr_strainmode_t;
 
 typedef struct                      
 {
@@ -139,12 +161,6 @@ typedef struct
     uint8_t                         filler04[4];                               
 } eOsnsr_strain_inputs_t;           EO_VERIFYsizeof(eOsnsr_strain_inputs_t, 4);
 
-typedef enum
-{
-    snsr_strain_formatofvalues_fullscale            = 0,
-    snsr_strain_formatofvalues_calibrated           = 1,
-    snsr_strain_formatofvalues_uncalibrated         = 2
-} eOsnsr_strain_formatofvalues_t;
 
 typedef struct                      // size is: 16+16+16+0 = 48                     
 {
@@ -152,6 +168,7 @@ typedef struct                      // size is: 16+16+16+0 = 48
     eOsnsr_arrayofupto12bytes_t     calibratedvalues;                       /**< the calibrated values as an array of three forces and three torques each of 2 bytes */
     eOsnsr_arrayofupto12bytes_t     uncalibratedvalues;                     /**< the uncalibrated values as an array of three forces and three torques each of 2 bytes */                  
 } eOsnsr_strain_status_t;           EO_VERIFYsizeof(eOsnsr_strain_status_t, 48);
+
 
 typedef struct                      // size is: 4+4+48+0 = 56
 {
@@ -162,24 +179,13 @@ typedef struct                      // size is: 4+4+48+0 = 56
 
 
 
-typedef enum
-{
-    snsr_maismode_txdatacontinuously                    = 0,
-    snsr_maismode_acquirebutdonttx                      = 1,
-    snsr_maismode_dontacquiredonttx                     = 5  
-} eOsnsr_maismode_t;
+// -- the definition of a mais entity
 
-EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_txdatacontinuously == 0));
-EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_acquirebutdonttx == 1));
-EO_VERIFYproposition(ismaismodeCompatiblewithicubcanproto, (snsr_maismode_dontacquiredonttx == 5));
 
-typedef enum
-{
-    snsr_maisresolution_08                              = 0,
-    snsr_maisresolution_16                              = 1,
-//    snsr_maisresolution_debug                           = 2       //this mode set mais board in debug mode: it sends triangulas and sqaure waves.
-} eOsnsr_maisresolution_t;
-
+/** @typedef    typedef uint8_t  eOsnsr_maisId_t
+    @brief      eOsnsr_maisId_t contains the values required to identify a mais sensor board in robot.
+ **/
+typedef uint16_t  eOsnsr_maisId_t;
 
 typedef struct                      
 {
@@ -196,9 +202,11 @@ typedef struct
 } eOsnsr_mais_inputs_t;             EO_VERIFYsizeof(eOsnsr_mais_inputs_t, 4);
 
 
-/*NOTE: mais board sends 2 can frame: first contains values of  channels between 0 to 6th and the second contains values of channel between 7th to 15th; they are saved in the15values.data[ch-num +1].
-in the15values.data[0]  there is the offset that indicate from wich channel the values ahve meaning. For example in case of only canframece containing values of channel between 7 to 15,
-offset has value (ch-7+1 ) = 8 and that vaules are savde from the15values.data[ch-7 +1] to the15values.data[ch-15 +1] */
+/* 
+   NOTE: mais board sends 2 can frame: the first contains values of channels between 0 to 6 (7 values) and the second contains values of channel between 7 to 14 (8 vals); 
+         they are saved the15values.data[]. 
+*/
+
 typedef struct                      // size is: 40+0 = 40                     
 {
     eOsnsr_arrayofupto36bytes_t     the15values;                        /**< the 15 values of the mais, either at 1 byte or 2 bytes resolution. */                  
@@ -211,17 +219,33 @@ typedef struct                      // size is: 4+4+40+0 = 48
     eOsnsr_mais_status_t            mstatus;
 } eOsnsr_mais_t;                    EO_VERIFYsizeof(eOsnsr_mais_t, 48);
 
-    
 
-/** @typedef    typedef uint8_t  eOsnsr_maisId_t
-    @brief      eOsnsr_maisId_t contains the values required to identify a mais sensor board in robot.
+
+
+
+// - others unused possible entities
+
+/** @typedef    typedef struct eOsnsr_aea_t
+    @brief      eOsnsr_aea_t contains measurements of the absolute encoder whcih so far is managed only by teh ems 
+    @warning    This struct must be of fixed and size and multiple of 4.
  **/
-typedef uint16_t  eOsnsr_maisId_t;
-    
-/** @typedef    typedef uint8_t  eOsnsr_strainId_t
-    @brief      eOsnsr_strainId_t contains the values required to identify a strain sensor board in robot.
+typedef struct                  // size is: 4+0 = 4
+{
+    uint32_t                    value;            // used with ... see hal_encoder.h for bitfield formatting  
+} eOsnsr_aea_t;                 EO_VERIFYsizeof(eOsnsr_aea_t, 4);
+
+
+/** @typedef    typedef struct eOsnsr_forcetorque_t
+    @brief      eOsnsr_forcetorque_t contains measurements of force on xyz and of torque on 3 components 
  **/
-typedef uint16_t  eOsnsr_strainId_t;
+typedef struct                  // size is: 4+2*3+2*3+0 = 16 
+{
+    uint32_t                    identifier;         /**< the identifier of the origin of measure: so far only strain */ 
+    eOmeas_force_t              force[3];           /**< the force split in x, y, and z components */
+    eOmeas_torque_t             torque[3];          /**< the torque split in three components*/
+} eOsnsr_forcetorque_t;         EO_VERIFYsizeof(eOsnsr_forcetorque_t, 16);
+
+
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
