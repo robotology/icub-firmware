@@ -537,7 +537,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
         case eomc_setpoint_current:
         {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT;                             
+            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_CURRENT;                             
             val_ptr =  &(setPoint->to.current.value);    
         }break;
 
