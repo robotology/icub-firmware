@@ -512,17 +512,8 @@ static void s_eom_emsappl_theemstransceiver_init(void)
 {
 
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
-    #if 1
+
     eom_emstransceiver_Initialise(&emscfg->transcfg);
-    #else
-    #warning ------> se si vuole rimuovere questa robaccia ... si deve mettere extern qualcosa nei file ebx.c
-    eOemstransceiver_cfg_t transcfg;
-    memcpy(&transcfg, &emscfg->transcfg, sizeof(eOemstransceiver_cfg_t));
-    eOnvscfg_setof_EPs_t * eps = eom_emsapplcfg_GetEPs(emscfg); 
-    transcfg.vectorof_endpoint_cfg = eps->vectorof_endpoint_cfg;
-    transcfg.hashfunction_ep2index = eps->hashfunction_ep2index;
-    eom_emstransceiver_Initialise(&transcfg);
-    #endif
 }
 
 
