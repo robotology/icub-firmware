@@ -97,7 +97,7 @@ typedef enum
 {
     eoas_maisresolution_08                              = 0,
     eoas_maisresolution_16                              = 1,
-    eoas_maisresolution_debug                           = 2       //this mode set mais board in debug mode: it sends triangular and square waves.
+    eoas_maisresolution_debug                           = 2       // this mode set mais board in debug mode: it sends triangular and square waves.
 } eOas_maisresolution_t;
 
 
@@ -144,18 +144,17 @@ typedef struct                  // size is: 4+20 = 24
 
 
 /** @typedef    typedef struct eOas_arrayofupto36bytes_t
-    @brief      eOas_arrayofupto20bytes_t contains measurements of generic analog sensors with 8/16/32 bit resolution and is able to contain the 15 halfwords of mais
+    @brief      eOas_arrayofupto36bytes_t contains measurements of generic analog sensors with 8/16/32 bit resolution and is able to contain the 15 halfwords of mais
  **/
 typedef struct                  // size is: 4+36+0 = 40 
 {
     eOarray_head_t              head;               /**< the head */ 
-    uint8_t                     data[36];           /**< the data: upto 20 U8, or 10 U16, or 5 U32 */
+    uint8_t                     data[36];           /**< the data: upto 36 U8, or 18 U16, or 9 U32 */
 } eOas_arrayofupto36bytes_t;    EO_VERIFYsizeof(eOas_arrayofupto36bytes_t, 40);
 
 
 // -- the definition of a strain entity
 
-   
 /** @typedef    typedef uint8_t  eOas_strainId_t
     @brief      eOas_strainId_t contains the values required to identify a strain sensor board in robot.
  **/
@@ -218,10 +217,8 @@ typedef struct
 
 
 /* 
-   NOTE: mais board sends 2 can frame: the first contains values of channels between 0 to 6th and the second contains values of channel between 7th to 15th; 
-         they are saved in the15values.data[ch-num +1]. in the15values.data[0] there is the offset that indicate from which channel the values have meaning. 
-         For example in case of only can-frame containing values of channel between 7 to 15, offset has value (ch-7+1 ) = 8 and that values are saved from 
-         the15values.data[ch-7 +1] to the15values.data[ch-15 +1] 
+   NOTE: mais board sends 2 can frame: the first contains values of channels between 0 to 6 (7 values) and the second contains values of channel between 7 to 14 (8 vals); 
+         they are saved the15values.data[]. 
 */
 
 typedef struct                      // size is: 40+0 = 40                     
