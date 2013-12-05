@@ -175,7 +175,8 @@ typedef enum
     eomc_setpoint_position                      = 0,
     eomc_setpoint_velocity                      = 1,
     eomc_setpoint_torque                        = 2,
-    eomc_setpoint_current                       = 3
+    eomc_setpoint_current                       = 3,
+    eomc_setpoint_positionraw                   = 4
 } eOmc_setpoint_type_t;
 
 
@@ -429,7 +430,7 @@ typedef struct              // size is 1+3+8+0 = 12
         { 
             eOmeas_current_t       value; 
         } current;
-    } to;                               /**< the uinion containing the value field and optional param */
+    } to;                       /**< the union containing the value field and optional param */
 } eOmc_setpoint_t;              //EO_VERIFYsizeof(eOmc_setpoint_t, 12);
 
 
