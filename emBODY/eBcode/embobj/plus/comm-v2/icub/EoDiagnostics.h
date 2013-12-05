@@ -51,6 +51,9 @@ extern "C" {
 #define DGN_MOTOR_FAULT_EXTERNAL        0x00000004
 #define DGN_MOTOR_FAULT_OVERCURRENT     0x00000008
 #define DGN_MOTOR_FAULT_I2TFAILURE      0x00000010
+#define DGN_MOTOR_FAULT_CANRECWARNING   0x00000020
+#define DGN_MOTOR_FAULT_CANRECERROR     0x00000040
+#define DGN_MOTOR_FAULT_CANRECHWOVERRUN 0x00000080
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -91,10 +94,47 @@ typedef struct
     eOdgn_canswstatus_t sw;
 } eOdgn_canstatus_t; //2 B
 
+typedef struct
+{
+    uint8_t min;
+    uint8_t max;
+    uint8_t dummy1;
+    uint8_t dummy2;
+} eOdgn_can_stat_info_t; // 4B
+
+typedef struct
+{
+    eOdgn_can_stat_info_t info_rx;
+    eOdgn_can_stat_info_t info_tx;
+} eOdgn_can_statistics_perPort_t; //8 B
+
+typedef struct
+{
+    eOdgn_can_statistics_perPort_t stat[2];
+} eOdgn_can_statistics_configMode_t; //16 B
+
+
+typedef struct
+{
+    eOdgn_can_statistics_perPort_t stat[2];  //2 = num can port
+} eOdgn_can_statistics_runMode_t; //16 B
+
+typedef struct
+{
+    eOdgn_can_statistics_configMode_t config_mode;
+    eOdgn_can_statistics_runMode_t    run_mode;
+} eOdgn_can_statistics_t; //32 B
+
+
+
 typedef struct 
 {
-    uint8_t linksmask;
-} eOdgn_ethstatus_t;
+    uint16_t linksmask;
+    uint8_t crcErrorCnt_overflow;
+    uint8_t crcErrorCnt_validVal;
+    uint32_t crcErrorCnt[3];
+    uint32_t i2c_error[4];
+} eOdgn_ethstatus_t; //4 B
 
 typedef struct 
 {
@@ -105,8 +145,7 @@ typedef struct
 {
     eOdgn_canstatus_t   can_dev[2];
     eOdgn_ethstatus_t   eth_dev;
-    uint8_t             dummy[5];
-} eOdgn_emsperipheralstatus_t; //8 B
+} eOdgn_emsperipheralstatus_t; //40 B
 
 typedef struct
 {
@@ -235,11 +274,21 @@ typedef struct
 } eOdgn_emsdiagnostic_emswithmc_t;  //ems with motion controller
 
 
+typedef enum
+{
+    dgn_rxCrcError  = 1,
+    dgn_rxUnicast   = 2,
+    dgn_rx64Octets  = 3,
+    dgn_txUnicast   = 4
+} eOdgn_ethCounters_type_t;
 
 
 typedef struct
 {
-    uint8_t enable; //if true than all errrors are signaled else none!
+    uint8_t enable; //if true then all errrors are signaled else none!
+    uint8_t signalExtFault; //if true external fault is signaled
+    uint8_t signalEthCounters; // 0==>disable else num in eOdgn_ethCounters_type_t
+    uint8_t signalCanStatistics;
 }eOdgn_commands_t;
 
 typedef struct
@@ -248,12 +297,29 @@ typedef struct
 } eOdgn_motorstatusflags_t;
 
 
-    enum{eOdgn_errorlog_str_size = 250};
+enum{eOdgn_errorlog_str_size = 128};
 typedef struct
 {
-    char errorstate_str[eOdgn_errorlog_str_size]; //in string contains the reason of switch to error state.
+    char errorstate_str[eOdgn_errorlog_str_size]; // in string contains the reason of switch to error state.
 } eOdgn_errorlog_t;
 
+
+
+typedef struct
+{   // time is in milli-sec
+//     uint8_t     flags;
+//     uint8_t     type;
+//     uint8_t     dummy;
+//     uint8_t     dummy2;
+    int32_t     deltaprognumber;
+    uint32_t    deltarxtime; 
+} eOdgn_rxSetPointsInfo_t;
+
+typedef struct
+{
+    eOdgn_rxSetPointsInfo_t position[4];
+    eOdgn_rxSetPointsInfo_t impedence[4];
+} eOdgn_rxCheckSetpoints_t;
 
 /** @}            
     end of group eo_cevcwervcrev5555  
