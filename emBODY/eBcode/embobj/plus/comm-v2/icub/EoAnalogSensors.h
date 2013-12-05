@@ -157,7 +157,6 @@ typedef struct                  // size is: 4+36+0 = 40
 
 // -- the definition of a strain entity
 
-   
 /** @typedef    typedef uint8_t  eOas_strainId_t
     @brief      eOas_strainId_t contains the values required to identify a strain sensor board in robot.
  **/
