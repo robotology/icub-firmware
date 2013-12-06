@@ -118,6 +118,18 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
 extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply);
 
 
+/** @fn         extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum)
+    @brief      it is called in case of error in sequence number. It can be overridden as it is weakly defined.
+                in case the __weak keywork is not supported by the compiler, the default function is removed by definining the following macro:
+                OVERRIDE_eo_receiver_callback_incaseoferror_in_sequencenumberReceived
+    @param      remipv4addr         the ip address of the received packet.
+    @param      rec_seqnum          the received sequence number.
+    @param      exp_seqnum          the expected sequence number.
+ **/
+extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum);
+
+
+
 /** @}            
     end of group eo_receiver  
  **/

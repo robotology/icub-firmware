@@ -48,7 +48,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define USE_DEBUG_EORECEIVER
+#define USE_DEBUG_EORECEIVER 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -89,8 +89,6 @@ struct EOreceiver_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-
-extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(uint64_t rec_seqnum, uint64_t expected_seqnum);
 
 
 #ifdef __cplusplus

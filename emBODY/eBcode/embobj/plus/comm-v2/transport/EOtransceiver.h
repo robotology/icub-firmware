@@ -114,14 +114,32 @@ extern const eo_transceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256
 /** @fn         extern EOtransceiver* eo_transceiver_New(uint16_t capacity)
     @brief      Creates a new frame object and allocates memory able to store @e capacity bytes. If @e capacity is
                 zero, then the object shall have external storage mode.
-    @param      capacity   The max size of the packet.
+    @param      capacity        The max size of the packet.
     @return     The pointer to the required object.
  **/
 extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg);
 
+
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime); 
 
-extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint16_t *numberofrops);
+/** @fn         extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops)
+    @brief      prepares out packet to send with one ropframe   
+    @param      p               pointer to transceiver        
+    @param      numberofrops     the number of rops contained in the out packet
+    @return     eores_OK or eores_NOK_nullpointer
+ **/
+extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops);
+
+
+/** @fn         extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt)
+    @brief      returns a pointer to the ourput packet. the packet is well formed only if eo_transceiver_outpacket_Prepare() 
+                is called before eo_transceiver_outpacket_Get().  
+    @param      p               pointer to transceiver        
+    @param      pkt             it contains pointer to outpacket
+    @return     eores_OK or eores_NOK_nullpointer
+ **/
+extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt);
+
 
 // if the variable is local then it is used the ram of the netvar. if it is remote, the ropdescr must contain data and size
 extern eOresult_t eo_transceiver_OccasionalROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdes);

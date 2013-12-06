@@ -232,11 +232,11 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
 
 
 
-extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint16_t *numberofrops)
-{
-    eOresult_t res;
+extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops)
+{  
+    eOresult_t res = eores_NOK_generic;
     
-    if((NULL == p) || (NULL == pkt))
+    if((NULL == p) || (NULL == numberofrops))
     {
         return(eores_NOK_nullpointer);
     }
@@ -244,11 +244,22 @@ extern eOresult_t eo_transceiver_Transmit(EOtransceiver *p, EOpacket **pkt, uint
     // refresh regulars ...    
     eo_transmitter_regular_rops_Refresh(p->transmitter);
     
-    
     // finally retrieve the packet from the transmitter. it will be formed by replies, regulars, occasionals.
-    res = eo_transmitter_outpacket_Get(p->transmitter, pkt, numberofrops);
+    res = eo_transmitter_outpacket_Prepare(p->transmitter, numberofrops);
+       
+    return(res);
+}
+
+
+
+extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt)
+{    
+    if(NULL == p) 
+    {
+        return(eores_NOK_nullpointer);
+    }
     
-    return(res);    
+    return(eo_transmitter_outpacket_Get(p->transmitter, pkt)); 
 }
 
 

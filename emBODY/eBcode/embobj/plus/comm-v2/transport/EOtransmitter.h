@@ -110,23 +110,39 @@ extern const eo_transmitter_cfg_t eo_transmitter_cfg_default;
  // 
 extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg);
 
-extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt, uint16_t *numberofrops); 
 
-// the rops in regular_rops stay forever unless unloaded one by one or all cleared. at each eo_transmitter_outpacket_Get() they are placed inside the
-// packet. they however need an explicit refresh of their values. 
+
+/** @fn         extern eOresult_t eo_transmitter_outpacket_Prepare(EOtransmitter *p, uint16_t *numberofrops)
+    @brief      prepares the out packet.  
+    @param      p               pointer to transceiver        
+    @param      numberofrops    contains number of rops in out packet
+    @return     eores_OK or eores_NOK_nullpointer
+ **/
+extern eOresult_t eo_transmitter_outpacket_Prepare(EOtransmitter *p, uint16_t *numberofrops);
+
+
+/** @fn         extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt)
+    @brief      returns a pointer to the out packet. it is well formed only if eo_transmitter_outpacket_Prepare() 
+                function is called before.  
+    @param      p         pointer to transceiver        
+    @param      pkt       in output will contain pointer to outpacket
+    @return     eores_OK or eores_NOK_nullpointer
+ **/
+extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt);
+
+
+
+// the rops in regular_rops stay forever unless unloaded one by one or all cleared. at each eo_transmitter_outpacket_Prepare() they are placed 
+// inside the packet. they however need an explicit refresh of their values. 
 extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc); 
 extern eOresult_t eo_transmitter_regular_rops_Unload(EOtransmitter *p, eOropdescriptor_t* ropdesc); 
 extern eOresult_t eo_transmitter_regular_rops_Clear(EOtransmitter *p); 
 extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p);
 
-// the rops in occasional_ropss are inserted with following functions, put inside the packet by function eo_transmitter_outpacket_Get()
+// the rops in occasional_rops are inserted with following functions, put inside the packet with function eo_transmitter_outpacket_Get()
 // and after that they are cleared.
 
-// obsolete ...
-//extern eOresult_t eo_transmitter_occasional_rops_Load_without_data(EOtransmitter *p, eOropdescriptor_t* ropdesc, uint8_t itisobsolete); 
-
 extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc);
-
 extern eOresult_t eo_transmitter_reply_ropframe_Load(EOtransmitter *p, EOropframe* ropframe);
 
 

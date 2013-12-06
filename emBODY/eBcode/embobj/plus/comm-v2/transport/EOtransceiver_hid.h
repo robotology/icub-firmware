@@ -46,6 +46,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+
 #define USE_DEBUG_EOTRANSCEIVER
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------

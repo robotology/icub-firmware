@@ -149,7 +149,7 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
     retptr->listofregropinfo        = (0 == cfg->maxnumberofregularrops) ? (NULL) : (eo_list_New(sizeof(eo_transm_regrop_info_t), cfg->maxnumberofregularrops, NULL, 0, NULL, NULL));
     retptr->currenttime             = 0;
     retptr->tx_seqnum               = 0;
-    retptr->confrequests            = (NULL == retptr->confmanager) ? (NULL) : (eo_vector_New(sizeof(eOropdescriptor_t), cfg->maxnumberofconfreqrops, NULL, NULL, NULL, NULL));
+    retptr->confrequests            = ((NULL == retptr->confmanager) || (0 == cfg->maxnumberofconfreqrops)) ? (NULL) : (eo_vector_New(sizeof(eOropdescriptor_t), cfg->maxnumberofconfreqrops, NULL, NULL, NULL, NULL));
 
     eo_ropframe_Load(retptr->ropframeregulars, retptr->bufferropframeregulars, eo_ropframe_sizeforZEROrops, cfg->capacityofropframeregulars);
     eo_ropframe_Clear(retptr->ropframeregulars);
@@ -467,17 +467,17 @@ extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p)
     return(eores_OK);   
 }
 
-extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt, uint16_t *numberofrops)
+
+
+
+extern eOresult_t eo_transmitter_outpacket_Prepare(EOtransmitter *p, uint16_t *numberofrops)
 {
     uint16_t remainingbytes;
-    uint16_t size;
-    uint16_t rops2tx = 0;
 
-    if((NULL == p) || (NULL == outpkt)) 
+    if(NULL == p) 
     {
         return(eores_NOK_nullpointer);
     }
-
     
     // clear the content of the ropframe to transmit which uses the same storage of the packet ...
     eo_ropframe_Clear(p->ropframereadytotx);
@@ -499,18 +499,34 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     eo_ropframe_Clear(p->ropframereplies);
     eov_mutex_Release(p->mtx_replies);
 
+
+
+    if(NULL != numberofrops)
+    {
+        // get the number of rops to tx    
+        *numberofrops = eo_ropframe_ROP_NumberOf(p->ropframereadytotx);   
+    }
+    
+    return(eores_OK); 
+}
+
+extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outpkt)
+{
+    uint16_t size;
+
+    if((NULL == p) || (NULL == outpkt)) 
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    
     // now add the age of the frame
     eo_ropframe_age_Set(p->ropframereadytotx, eov_sys_LifeTimeGet(eov_sys_GetHandle()));
-    
-    // and get the number of rops to tx    
-    rops2tx = eo_ropframe_ROP_NumberOf(p->ropframereadytotx);
-    
+        
     // add sequence number
-    if(0 != rops2tx)
-    {
-    	p->tx_seqnum++;
-    	eo_ropframe_seqnum_Set(p->ropframereadytotx, p->tx_seqnum);
-    }
+    p->tx_seqnum++;
+    eo_ropframe_seqnum_Set(p->ropframereadytotx, p->tx_seqnum);
+
     // now set the size of the packet according to what is inside the ropframe.
     eo_ropframe_Size_Get(p->ropframereadytotx, &size);
     eo_packet_Size_Set(p->txpacket, size);
@@ -529,11 +545,6 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     // finally gives back the packet
     *outpkt = p->txpacket;
 
-    // and the number of contained rops
-    if(NULL != numberofrops)
-    {
-       *numberofrops = rops2tx;
-    }
     
     // if the confirmation manager is active and there are rops which require a confirmation request ... call the on-tx function
     //if((NULL != p->confmanager) && (NULL != p->confrequests) && (0 != eo_vector_Size(p->confrequests)))
@@ -620,11 +631,23 @@ extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdes
     // put the rop inside the ropframe
     res = eo_ropframe_ROP_Add(p->ropframeoccasionals, p->roptmp, NULL, &ropsize, &remainingbytes);
     
-    // if the confirmation manager is active and a conf request is flagged on ...
-    if((NULL != p->confmanager) && (NULL != p->confrequests) && (eobool_false == eo_vector_Full(p->confrequests)))
+    // if conf request is flagged on
+    if(1 == ropdesc->control.rqstconf)
     {
-        eo_vector_PushBack(p->confrequests, ropdesc);
+        // if the confirmation manager is active
+        if((NULL != p->confmanager) && (NULL != p->confrequests))
+        { 
+            if(eobool_false == eo_vector_Full(p->confrequests))
+            {
+                eo_vector_PushBack(p->confrequests, ropdesc);
+            }
+            else
+            {
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "eo_transmitter_occasional_rops_Load() cannot process a conf-request due to overflow in vector confrequests");
+            }
+        }        
     }
+
     
     
     eov_mutex_Release(p->mtx_occasionals);

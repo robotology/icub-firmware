@@ -42,9 +42,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EoMeasures.h"
 
-#include "EoMotionControl.h" // serve?
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
