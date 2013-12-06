@@ -385,7 +385,7 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
         capacity    = 16;
         itemsize    = 1;
         size        = 16;
-        #warning acemor-> nella mais nel caso di risoluzione a 8 bit perche' la capacity di the15values e' 16 e non 15?
+        //#warning acemor-> nella mais nel caso di risoluzione a 8 bit perche' la capacity di the15values e' 16 e non 15?
         //status->the15values.head.capacity = 16;
         //status->the15values.head.itemsize = 1;
         //status->the15values.head.size = 16;
@@ -395,7 +395,7 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
         capacity    = 16;
         itemsize    = 2;
         size        = 16;
-        #warning acemor-> nella mais ho messo la capacity di the15values a 16 anche nel caso di risoluzione a 32 bit
+        //#warning acemor-> nella mais ho messo la capacity di the15values a 16 anche nel caso di risoluzione a 32 bit
         //status->the15values.head.capacity = 16;
         //status->the15values.head.itemsize = 2;
         status->the15values.head.size = 16;
