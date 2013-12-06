@@ -1161,8 +1161,8 @@
       <TopLine>114</TopLine>
       <CurrentLine>123</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.c</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg-open.c</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1209,8 +1209,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\osal_cfg-open.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg-open.h</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\osal_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1906,7 +1906,7 @@
 
   <Group>
     <GroupName>eo-ctrloop</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2106,7 +2106,7 @@
 
   <Group>
     <GroupName>eo-ctrloop-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

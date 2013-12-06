@@ -17,7 +17,7 @@
 */
 
 /* @file       osal_cfg.c
-	@brief      This file keeps internal implementation of the osal.
+	@brief      This file keeps internal configuration of the osal.
 	@author     marco.accame@iit.it
     @date       11/27/2009
 **/
