@@ -270,6 +270,7 @@ ICUBCANPROTO_PER_SB_CMD_
 #define ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECWARNING   0x20 //in data[4]   
 #define ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECERROR     0x08 //in data[4]  
 #define ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECHWOVERRUN 0x40 //in data[4]  
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef     enum             eOicubCanProto_boardType_t
@@ -308,10 +309,11 @@ typedef enum
 } eOicubCanProto_jm_indexinBoard_t;
 
 
-/** @typedef    enum{eOicubCanProto_jm_indexInBoard_max = 2};
-    @brief      this is the max numeber of joint or motor for each canBoard
+/** @typedef    enum { eOicubCanProto_jm_indexInBoard_max = 2 };
+    @brief      this is the max number of joint or motor for each canBoard
  **/
-enum{eOicubCanProto_jm_indexInBoard_max = 2};
+enum { eOicubCanProto_jm_indexInBoard_max = 2 };
+
 
 /** @typedef    typedef     uint8_t             eOicubCanProto_canBoardAddress_t
     @brief      contains can address of board. 
@@ -331,8 +333,8 @@ typedef union
     {
         uint16_t canAddr:8;                 /**< use  eOicubCanProto_canBoardAddress_t */
         uint16_t jm_indexInBoard:8;         /**< use eOicubCanProto_jm_indexinBoard_t.
-                                                if the destination is not joint or motor, this filed values 0 */
-    }s;
+                                                if the destination is not joint or motor, this field values 0 */
+    } s;
     
     uint16_t dest;
 } eOicubCanProto_msgDestination_t;
@@ -362,7 +364,7 @@ typedef enum
     eo_icubCanProto_msgCmdClass_periodicSensorBoard    = 3,
     eo_icubCanProto_msgCmdClass_skinBoard              = 4, //ATTENTION: currently it is not used by other fw. Insert here to manage skin message like other calss messages.
     eo_icubCanProto_msgCmdClass_loader                 = 7    
-}eOicubCanProto_msgCommand_class_t;
+} eOicubCanProto_msgCommand_class_t;
 
 
 /** @typedef    typedef     uint8_t             eOicubCanProto_msgCommand_t
@@ -384,9 +386,10 @@ typedef struct
     uint16_t class:8;                   /**< use  eOicubCanProto_msgCommand_class_t */
     uint16_t cmdId:8;                   /**< use  eOicubCanProto_msgCommand_cmdId_t */
 } eOicubCanProto_msgCommand_t;
+
 #define ICUBCANPROTO_MSGCOMMAND_CREATE(class, cmdId)   ((eOicubCanProto_msgCommand_t)(class<<8 | cmdId))
 
-enum {eOicubCanProto_bcastpolicy_maxsize = 4 };
+enum { eOicubCanProto_bcastpolicy_maxsize = 4 };
 
 typedef struct
 {
