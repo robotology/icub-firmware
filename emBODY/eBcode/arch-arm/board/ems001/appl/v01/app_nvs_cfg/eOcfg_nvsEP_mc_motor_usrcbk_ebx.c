@@ -109,13 +109,13 @@
 extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv)
 {
     eOmc_motor_config_t             *cfg = (eOmc_motor_config_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig, sizeof(eOmc_motor_config_t));
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config, sizeof(eOmc_motor_config_t));
 }
 
 extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv)
 {
     eOmc_motor_status_t             *cfg = (eOmc_motor_status_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mstatus, sizeof(eOmc_motor_status_t));
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.status, sizeof(eOmc_motor_status_t));
 }
 
 

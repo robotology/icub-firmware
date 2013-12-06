@@ -40,7 +40,7 @@
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoSkin.h"
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "EoBoards.h"
 #include "EOicubCanProto_specifications.h"
 #include "osal.h"
@@ -115,7 +115,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, e
 extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
 
 
-/** @fn         extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOsnsr_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
+/** @fn         extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
     @brief      send a command to a mais sensor
     @param      p               target obj
     @param      mid             mais destination of command
@@ -125,10 +125,10 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
                 eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
                 or eores_NOK_generic something else error case. //TODO: check better error!!!
  **/
-extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOsnsr_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
+extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
 
 
-/** @fn         extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOsnsr_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
+/** @fn         extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOas_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
     @brief      send a command to a strain sensor
     @param      p               target obj
     @param      mid             mais destination of command
@@ -138,7 +138,7 @@ extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOsnsr_maisId_t sId
                 eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
                 or eores_NOK_generic something else error case. //TODO: check better error!!!
  **/
-extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOsnsr_strainId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
+extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOas_strainId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr);
 
 
 

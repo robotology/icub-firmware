@@ -359,7 +359,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
 }
 
 
-extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOsnsr_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
+extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t                                  res;
     eOappTheDB_SensorCanLocation_t              canLoc;
@@ -383,7 +383,7 @@ extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOsnsr_maisId_t sId
     
 }
 
-extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOsnsr_strainId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
+extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOas_strainId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t                                  res;
     eOappTheDB_SensorCanLocation_t              canLoc;

@@ -108,13 +108,13 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
     eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jconfig, sizeof(eOmc_joint_config_t));
+    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.config, sizeof(eOmc_joint_config_t));
 }
 
 extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
 {
     eOmc_joint_status_t             *status = (eOmc_joint_status_t*)nv->loc;
-    memcpy(status, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.jstatus, sizeof(eOmc_joint_status_t));
+    memcpy(status, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.status, sizeof(eOmc_joint_status_t));
 }
 
 

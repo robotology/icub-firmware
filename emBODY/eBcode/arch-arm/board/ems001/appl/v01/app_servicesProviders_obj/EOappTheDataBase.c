@@ -63,8 +63,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
 #define db_emscanportconnected2motorboard     eOcanport1 
-#define DB_NULL_VALUE_U16                     0xFFFF
+//#define DB_NULL_VALUE_U16                     0xFFFF
+#define DB_NULL_VALUE_U08                     0xFF
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -326,7 +328,7 @@ extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOapp
 
 	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
     *mId_ptr = b_ptr->s.jm.connectedmotors[canloc_ptr->indexinboard];
-    if(*mId_ptr == DB_NULL_VALUE_U16)
+    if(*mId_ptr == DB_NULL_VALUE_U08)
     {
         return(eores_NOK_nodata);
     }
@@ -359,7 +361,7 @@ extern eOresult_t eo_appTheDB_GetJointId_ByJointCanLocation(EOappTheDB *p, eOapp
 
 
 
-extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOsnsr_maisId_t *sId_ptr)
+extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOas_maisId_t *sId_ptr)
 {
     eOappTheDB_hid_canBoardInfo_t *b_ptr;
     eOappTheDB_hid_snsrMaisInfo_t  *s_ptr;
@@ -396,7 +398,7 @@ extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, e
 
 
 
-extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOsnsr_maisId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr)
+extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOas_maisId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr)
 {
     eOappTheDB_hid_snsrMaisInfo_t		*s_ptr;
 	eOappTheDB_hid_canBoardInfo_t		*b_ptr;
@@ -421,7 +423,7 @@ extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOsnsr_maisI
 }
 
 
-extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOsnsr_strainId_t *sId_ptr)
+extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOas_strainId_t *sId_ptr)
 {
     eOappTheDB_hid_canBoardInfo_t *b_ptr;
     eOappTheDB_hid_snsrStrainInfo_t  *s_ptr;
@@ -458,7 +460,7 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p,
 
 
 
-extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOsnsr_strainId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr)
+extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strainId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr)
 {
     eOappTheDB_hid_snsrStrainInfo_t		*s_ptr;
 	eOappTheDB_hid_canBoardInfo_t		*b_ptr;
@@ -516,7 +518,7 @@ extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jI
         return(eores_NOK_nodata);
     }
 
-    *jconfig_ptr = &(p->nvsram.jointsList_ptr[jId].jconfig);
+    *jconfig_ptr = &(p->nvsram.jointsList_ptr[jId].config);
     return(eores_OK);
 }
 
@@ -534,7 +536,7 @@ extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jI
     }
 
     
-    *jstatus_ptr = &(p->nvsram.jointsList_ptr[jId].jstatus);
+    *jstatus_ptr = &(p->nvsram.jointsList_ptr[jId].status);
     return(eores_OK);
 }
 
@@ -551,7 +553,7 @@ extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jI
         return(eores_NOK_nodata);
     }
     
-    *jinputs_ptr = &(p->nvsram.jointsList_ptr[jId].jinputs);
+    *jinputs_ptr = &(p->nvsram.jointsList_ptr[jId].inputs);
     
     return(eores_OK);
 }
@@ -570,7 +572,7 @@ extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_join
     }
     
     
-    *jcmdcontrolmode_ptr = (eOmc_controlmode_t*)&(p->nvsram.jointsList_ptr[jId].jcmmnds.controlmode);
+    *jcmdcontrolmode_ptr = (eOmc_controlmode_t*)&(p->nvsram.jointsList_ptr[jId].cmmnds.controlmode);
     
     return(eores_OK);
 }
@@ -634,7 +636,7 @@ extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mI
         return(eores_NOK_nodata);
     }
     
-    *mconfig_ptr =  &(p->nvsram.motorsList_ptr[mId].mconfig);
+    *mconfig_ptr =  &(p->nvsram.motorsList_ptr[mId].config);
     
     return(eores_OK);
 }
@@ -652,13 +654,13 @@ extern eOresult_t eo_appTheDB_GetMotorStatusPtr(EOappTheDB *p, eOmc_motorId_t mI
         return(eores_NOK_nodata);
     }
     
-    *mstatus_ptr = &(p->nvsram.motorsList_ptr[mId].mstatus);
+    *mstatus_ptr = &(p->nvsram.motorsList_ptr[mId].status);
     
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOsnsr_maisId_t sId,  eOsnsr_mais_config_t **sconfig_ptr)
+extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_config_t **sconfig_ptr)
 {
 	if((NULL == p) || (NULL == sconfig_ptr))
 	{
@@ -670,13 +672,13 @@ extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOsnsr_maisId_t
         return(eores_NOK_nodata);
     }
 
-    *sconfig_ptr = &(p->nvsram.maisList_ptr[sId].mconfig);
+    *sconfig_ptr = &(p->nvsram.maisList_ptr[sId].config);
     
     return(eores_OK);
 
 }
 
-extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOsnsr_maisId_t sId,  eOsnsr_mais_status_t **sstatus_ptr)
+extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_status_t **sstatus_ptr)
 {
 	if((NULL == p) || (NULL == sstatus_ptr))
 	{
@@ -688,14 +690,14 @@ extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOsnsr_maisId_t
         return(eores_NOK_nodata);
     }
     
-    *sstatus_ptr = &(p->nvsram.maisList_ptr[sId].mstatus);
+    *sstatus_ptr = &(p->nvsram.maisList_ptr[sId].status);
     
     return(eores_OK);
 
 }
 
 
-extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOsnsr_strainId_t sId,  eOsnsr_strain_config_t **sconfig_ptr)
+extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOas_strainId_t sId,  eOas_strain_config_t **sconfig_ptr)
 {
 	if((NULL == p) || (NULL == sconfig_ptr))
 	{
@@ -707,14 +709,14 @@ extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOsnsr_strain
         return(eores_NOK_nodata);
     }
     
-    *sconfig_ptr = &(p->nvsram.strainList_ptr[sId].sconfig);
+    *sconfig_ptr = &(p->nvsram.strainList_ptr[sId].config);
     
     return(eores_OK);
 
 }
 
 
-extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOsnsr_strainId_t sId,  eOsnsr_strain_status_t **sstatus_ptr)
+extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId_t sId,  eOas_strain_status_t **sstatus_ptr)
 {
 	if((NULL == p) || (NULL == sstatus_ptr))
 	{
@@ -726,13 +728,13 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOsnsr_strain
         return(eores_NOK_nodata);
     }
     
-    *sstatus_ptr = &(p->nvsram.strainList_ptr[sId].sstatus);
+    *sstatus_ptr = &(p->nvsram.strainList_ptr[sId].status);
     
     return(eores_OK);
 
 }
 
-extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOskin_sigmode_t **sigmode_ptr)
+extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr)
 {
 	if((NULL == p) || (NULL == sigmode_ptr))
 	{
@@ -743,7 +745,7 @@ extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t s
     {
         return(eores_NOK_nodata);
     }
-    *sigmode_ptr = (eOskin_sigmode_t*)&(p->nvsram.someskin_ptr->sconfig.sigmode);
+    *sigmode_ptr = (eOsk_sigmode_t*)&(p->nvsram.skin_ptr->config.sigmode);
     
     return(eores_OK);
 
@@ -759,7 +761,7 @@ extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_sk
     {
         return(eores_NOK_nodata);
     }
-    *arrayof10canframes_ptr = &(p->nvsram.someskin_ptr->sstatus.arrayof10canframes);
+    *arrayof10canframes_ptr = &(p->nvsram.skin_ptr->status.arrayof10canframes);
     
     return(eores_OK);
 
@@ -800,7 +802,7 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
         b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
         if( (b_ptr->cfg_ptr->canLoc.emscanport == canloc_ptr->emscanport) && (b_ptr->cfg_ptr->canLoc.addr == canloc_ptr->addr) )
         {
-            *bid_ptr = (eObrd_boardId_t)i;
+            *bid_ptr = i;
             return(eores_OK);
         }
     }
@@ -921,9 +923,9 @@ static eObool_t s_appTheDB_checkConfiguaration(eOappTheDB_cfg_t *cfg)
 
 static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
 {
-    eOsizecntnr_t 					i,k;
-    eOappTheDB_cfg_canBoardInfo_t 	*b_cfg_ptr = NULL;	//pointer to configuration 
-	eOappTheDB_hid_canBoardInfo_t 	*b_ptr = NULL;		//ponter to db memory
+    eOsizecntnr_t 					i, k;
+    eOappTheDB_cfg_canBoardInfo_t 	*b_cfg_ptr = NULL;	// pointer to configuration 
+	eOappTheDB_hid_canBoardInfo_t 	*b_ptr = NULL;		// pointer to db memory
         
     //1) create canboardsList
     p->canboardsList = eo_array_New(p->cfg.canboardsList->size, sizeof(eOappTheDB_hid_canBoardInfo_t), NULL);
@@ -950,14 +952,14 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
                                                     sizeof(eOmc_motorId_t), eOicubCanProto_jm_indexInBoard_max);
             for(k=0; k<eOicubCanProto_jm_indexInBoard_max; k++)
             {
-                b_ptr->s.jm.connectedjoints[k] = DB_NULL_VALUE_U16;
-                b_ptr->s.jm.connectedmotors[k] = DB_NULL_VALUE_U16;
+                b_ptr->s.jm.connectedjoints[k] = DB_NULL_VALUE_U08;
+                b_ptr->s.jm.connectedmotors[k] = DB_NULL_VALUE_U08;
             }
         }
 //         else if((eobrd_mais == b_ptr->cfg_ptr->type) || (eobrd_skin == b_ptr->cfg_ptr->type) || (eobrd_strain == b_ptr->cfg_ptr->type))
 //         {
 //             b_ptr->s.connectedsensors =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
-//                                                     sizeof(eOsnsr_sensorId_t), 1); //currently almost only one sensor per board
+//                                                     sizeof(eOas_sensorId_t), 1); //currently almost only one sensor per board
 //         }
     }
     return(eores_OK);
@@ -1166,7 +1168,7 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
 	}
 
     // 2) create the lookup tbl
-	p->canaddressLookuptbl.capacity = maxusedcanaddr+1; //cosi' lascio l'emento 0-esimo, anche se non lo uso.    
+	p->canaddressLookuptbl.capacity = maxusedcanaddr+1; //cosi' lascio l'elemento 0-esimo, anche se non lo uso.    
     p->canaddressLookuptbl.tbl = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eObrd_boardId_t), 
 													  p->canaddressLookuptbl.capacity);
     
@@ -1194,9 +1196,9 @@ static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
     eOmc_joint_t            *jointsList_ptr  = NULL;
     eOmc_motor_t            *motorsList_ptr  = NULL;
     eOmc_controller_t       *thecontroller   = NULL;
-    eOsnsr_mais_t           *maisList_ptr    = NULL;
-    eOsnsr_strain_t         *strainList_ptr  = NULL;
-    eOskin_someskin_t       *someskin_ptr    = NULL;
+    eOas_mais_t             *maisList_ptr    = NULL;
+    eOas_strain_t           *strainList_ptr  = NULL;
+    eOsk_skin_t             *skin_ptr        = NULL;
 
     
 #if  defined(EOMTHEEMSAPPLCFG_USE_EB1)
@@ -1224,7 +1226,7 @@ static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
     
     //skin
     eo_cfg_nvsEP_sk_emsboard_t * sk_ptr = (eo_cfg_nvsEP_sk_emsboard_t *)eo_cfg_nvsEP_eb2_Get_locallyownedRAM(p->cfg.sk_endpoint);
-    someskin_ptr  = &sk_ptr->someskin;
+    skin_ptr  = &sk_ptr->skin;
   
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB3)
     //mc
@@ -1251,7 +1253,7 @@ static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
     
     //skin
     eo_cfg_nvsEP_sk_emsboard_t * sk_ptr = (eo_cfg_nvsEP_sk_emsboard_t *)eo_cfg_nvsEP_eb4_Get_locallyownedRAM(p->cfg.sk_endpoint);
-    someskin_ptr  = &sk_ptr->someskin;
+    skin_ptr  = &sk_ptr->someskin;
     
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
     //mc
@@ -1307,7 +1309,7 @@ static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
     p->nvsram.thecontroller = thecontroller;
     p->nvsram.maisList_ptr = maisList_ptr;
     p->nvsram.strainList_ptr = strainList_ptr;
-    p->nvsram.someskin_ptr = someskin_ptr;
+    p->nvsram.skin_ptr = skin_ptr;
 
 
     return(eores_OK);

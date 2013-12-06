@@ -853,8 +853,8 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
 {
     eOresult_t                  res;
-    eOsnsr_maisId_t             sId = 0; //exist only one mais per ep
-    eOsnsr_mais_config_t        *maiscfg;
+    eOas_maisId_t               sId = 0; //exist only one mais per ep
+    eOas_mais_config_t          *maiscfg;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -876,8 +876,8 @@ static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
 {
     eOresult_t                  res;
-    eOsnsr_maisId_t             sId = 0; //exist only one mais per ep
-    eOsnsr_maismode_t           mode = snsr_maismode_acquirebutdonttx;
+    eOas_maisId_t               sId = 0; //exist only one mais per ep
+    eOas_maismode_t             mode = eoas_maismode_acquirebutdonttx;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -895,8 +895,8 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 {
     eOresult_t                  res;
-    eOsnsr_strainId_t           sId = 0; //exist only one mais per ep
-    eOsnsr_strain_config_t      *straincfg;
+    eOas_strainId_t             sId = 0; //exist only one mais per ep
+    eOas_strain_config_t        *straincfg;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -924,8 +924,8 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
 {
     eOresult_t                  res;
-    eOsnsr_strainId_t           sId = 0; //exist only one mais per ep
-    eOsnsr_strainmode_t         mode = snsr_strainmode_acquirebutdonttx;
+    eOas_strainId_t           sId = 0; //exist only one mais per ep
+    eOas_strainmode_t         mode = eoas_strainmode_acquirebutdonttx;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
@@ -978,7 +978,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 //     uint8_t                             channel = 0;
 //     eOresult_t                          res;
 //     eOicubCanProto_msgDestination_t     msgdest;
-//     eOsnsr_strain_status_t              *sstatus_ptr;
+//     eOas_strain_status_t              *sstatus_ptr;
 //     eOappTheDB_sensorCanLocation_t      canLoc;
 //     eOicubCanProto_msgCommand_t         msgCmd = 
 //     {
@@ -986,9 +986,9 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 //         EO_INIT(.cmdId) 0
 //     };
 
-//     eOsnsr_strain_config_t               straincfg = 
+//     eOas_strain_config_t               straincfg = 
 //     {
-//         EO_INIT(.mode)                  snsr_strainmode_txcalibrateddatacontinuously,
+//         EO_INIT(.mode)                  eoas_strainmode_txcalibrateddatacontinuously,
 //         EO_INIT(.datarate)              1,
 //         EO_INIT(.signaloncefullscale)   eobool_true,
 //         EO_INIT(.filler01)           {0}                           
@@ -996,7 +996,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 
 //     
 //     EOappCanSP *appCanSP_ptr = p->bodyobjs.appCanSP; //eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//     eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOsnsr_strainId_t)0, &canLoc);
+//     eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOas_strainId_t)0, &canLoc);
 //     
 //     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
 //     

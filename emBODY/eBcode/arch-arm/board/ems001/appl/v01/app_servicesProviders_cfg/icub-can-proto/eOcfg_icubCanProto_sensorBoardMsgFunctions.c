@@ -36,7 +36,7 @@
 
 
 //icub api
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 //to load occasional rop
 #include "eOcfg_nvsEP_as.h" 
@@ -86,7 +86,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId, eOsnsr_arrayofupto12bytes_t  *myfullscale);
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arrayofupto12bytes_t  *myfullscale);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -124,18 +124,18 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setTxMode(EOicubCanProto* p
     
 //     switch(*maismode)
 //     {
-//         case snsr_maismode_txdatacontinuously:
+//         case eoas_maismode_txdatacontinuously:
 //         {
 //                 canFrame->data[1] = 0;
 //         }break;
 //         
-//         case snsr_maismode_acquirebutdonttx:
+//         case eoas_maismode_acquirebutdonttx:
 //         {
 //                 canFrame->data[1] = 1;
 //             
 //         }break;
 
-//         case snsr_maismode_dontacquiredonttx:
+//         case eoas_maismode_dontacquiredonttx:
 //         {
 //                 canFrame->data[1] = 2;
 //             
@@ -161,7 +161,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOsnsr_maisresolution_t *maisresolution = (eOsnsr_maisresolution_t*)val_ptr;
+    eOas_maisresolution_t *maisresolution = (eOas_maisresolution_t*)val_ptr;
     
     canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
@@ -170,18 +170,18 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProt
     canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION;
     switch(*maisresolution)
     {
-        case snsr_maisresolution_08:
+        case eoas_maisresolution_08:
         {
             canFrame->data[1] = 2;
         }break;
         
-        case snsr_maisresolution_16:
+        case eoas_maisresolution_16:
         {
             canFrame->data[1] = 0;
         }break;
 
 #ifdef _MAIS_TEST_
-        case snsr_maisresolution_debug:
+        case eoas_maisresolution_debug:
         {
             canFrame->data[1] = 1;
         }break;
@@ -198,9 +198,9 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     uint8_t                                     channel;
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_config_t                      *sconfig_ptr;
-    eOsnsr_strain_status_t                      *sstatus_ptr;
+    eOas_strainId_t                             sId;
+    eOas_strain_config_t                        *sconfig_ptr;
+    eOas_strain_status_t                        *sstatus_ptr;
     eOicubCanProto_msgDestination_t             msgdest;
     eOsmStatesEMSappl_t                         appl_st;
     eOicubCanProto_msgCommand_t                 msgCmd = 
@@ -254,11 +254,11 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
           else request full scale of next channel */
     if(5 == channel)
     {
-        eOsnsr_arrayofupto12bytes_t     myfullscale;
+        eOas_arrayofupto12bytes_t     myfullscale;
         
         
         sstatus_ptr->fullscale.head.size++;
-        memcpy(&myfullscale , &sstatus_ptr->fullscale, sizeof(eOsnsr_arrayofupto12bytes_t));
+        memcpy(&myfullscale , &sstatus_ptr->fullscale, sizeof(eOas_arrayofupto12bytes_t));
 
         //prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId, &myfullscale);
@@ -299,9 +299,9 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
 {
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_config_t                      *sconfig_ptr;
-    eOsnsr_strain_status_t                      *sstatus_ptr;
+    eOas_strainId_t                             sId;
+    eOas_strain_config_t                        *sconfig_ptr;
+    eOas_strain_status_t                        *sstatus_ptr;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -332,13 +332,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
     /* 4) set incoming force values */    
     switch(sconfig_ptr->mode)
     {
-        case snsr_strainmode_txcalibrateddatacontinuously:
-        case snsr_strainmode_txalldatacontinuously:
+        case eoas_strainmode_txcalibrateddatacontinuously:
+        case eoas_strainmode_txalldatacontinuously:
         {
             memcpy(&(sstatus_ptr->calibratedvalues.data[0]), &(frame->data[0]), 6);
         }break;
 
-        case snsr_strainmode_txuncalibrateddatacontinuously:
+        case eoas_strainmode_txuncalibrateddatacontinuously:
         {
             memcpy(&(sstatus_ptr->uncalibratedvalues.data[0]), &(frame->data[0]), 6);
         }break;
@@ -357,9 +357,9 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
 {
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_config_t                      *sconfig_ptr;
-    eOsnsr_strain_status_t                      *sstatus_ptr;
+    eOas_strainId_t                             sId;
+    eOas_strain_config_t                        *sconfig_ptr;
+    eOas_strain_status_t                        *sstatus_ptr;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -391,13 +391,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     
     switch(sconfig_ptr->mode)
     {
-        case snsr_strainmode_txcalibrateddatacontinuously:
-        case snsr_strainmode_txalldatacontinuously:
+        case eoas_strainmode_txcalibrateddatacontinuously:
+        case eoas_strainmode_txalldatacontinuously:
         {
             memcpy(&(sstatus_ptr->calibratedvalues.data[6]), &(frame->data[0]), 6);
         }break;
 
-        case snsr_strainmode_txuncalibrateddatacontinuously:
+        case eoas_strainmode_txuncalibrateddatacontinuously:
         {
             memcpy(&(sstatus_ptr->uncalibratedvalues.data[6]), &frame->data[0], 6);
         }break;
@@ -418,8 +418,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
 {
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_status_t                      *sstatus_ptr;
+    eOas_strainId_t                             sId;
+    eOas_strain_status_t                        *sstatus_ptr;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -448,8 +448,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
 {
     eOresult_t                                  res;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_strainId_t                           sId;
-    eOsnsr_strain_status_t                      *sstatus_ptr;
+    eOas_strainId_t                             sId;
+    eOas_strain_status_t                        *sstatus_ptr;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -477,9 +477,9 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOsnsr_maisId_t                             sId;
+    eOas_maisId_t                               sId;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_mais_status_t                        *sstatus_ptr;
+    eOas_mais_status_t                          *sstatus_ptr;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -496,7 +496,14 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
         return(res);
     }
 
+    // copy the canframe data values inside the array
+    #if 0
+    // not inserted juts to avoid too many changes on re-ordering of protocol v1 on date 6 dec 13, but it is the correct way to to it
+    EOarray* array = (EOarray*)&sstatus_ptr->the15values;
+    eo_array_Assign(array, 0, &(frame->data[0]), 7); // 7 bytes of frame->data starting from array position 0
+    #else
     memcpy(&(sstatus_ptr->the15values.data[0]), &(frame->data[0]), 7); 
+    #endif
 
     return(eores_OK);    
 }
@@ -505,9 +512,9 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOsnsr_maisId_t                             sId;
+    eOas_maisId_t                               sId;
     eOappTheDB_sensorCanLocation_t              canLoc;
-    eOsnsr_mais_status_t                        *sstatus_ptr;
+    eOas_mais_status_t                          *sstatus_ptr;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -523,8 +530,15 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
     {
         return(res);
     }
-
+    
+    // copy the canframe data values inside the array
+    #if 0
+    // not inserted juts to avoid too many changes on re-ordering of protocol v1 on date 6 dec 13, but it is the correct way to to it
+    EOarray* array = (EOarray*)&sstatus_ptr->the15values;
+    eo_array_Assign(array, 7, &(frame->data[0]), 8); // 8 bytes of frame->data starting from array position 8
+    #else
     memcpy(&(sstatus_ptr->the15values.data[7]), &(frame->data[0]), 8); 
+    #endif
     
     return(eores_OK);
 }
@@ -647,7 +661,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId, eOsnsr_arrayofupto12bytes_t  *myfullscale)
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arrayofupto12bytes_t  *myfullscale)
 {
     eOresult_t res;
     eOropdescriptor_t ropdesc;
@@ -669,7 +683,7 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOsnsr_strainId_t sId, eOsnsr
                                                (eOcfg_nvsEP_as_strainNumber_t)sId, 
                                                strainNVindex_sstatus__fullscale);
     ropdesc.data                    = (void*)myfullscale;
-    ropdesc.size                    = sizeof(eOsnsr_arrayofupto12bytes_t);
+    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
    
     res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
 

@@ -53,12 +53,8 @@ typedef struct
         {
             eOmc_jointId_t              *connectedjoints;
             eOmc_motorId_t              *connectedmotors;
-        }jm;
-//         eOsnsr_sensorId_t               *connectedsensors;
-    }s;
-    
-    
-//    eObrd_boardId                       bid;      Eliminato perche' non so se mi serve!!
+        } jm;
+    } s;
 } eOappTheDB_hid_canBoardInfo_t;
 
 typedef struct
@@ -92,17 +88,6 @@ typedef struct
 } eOappTheDB_hid_skinInfo_t;
 
 
-// typedef struct
-// {
-//     uint16_t                            numberofconnectedjoints;
-//     uint16_t                            numberofconnectedmotors;
-//     uint16_t                            numberofsensormais;
-//     uint16_t                            numberofsensorstrain;
-//     eOicubCanProto_canBoardAddress_t    maxusedcanaddr4motorboard;
-// } eOappTheDB_hid_generaldata_t;
-
-
-
 
 typedef struct
 {
@@ -116,30 +101,31 @@ typedef struct
     eOmc_joint_t            *jointsList_ptr;    
     eOmc_motor_t            *motorsList_ptr;
     eOmc_controller_t       *thecontroller;
-    eOsnsr_mais_t           *maisList_ptr;
-    eOsnsr_strain_t         *strainList_ptr;
-    eOskin_someskin_t       *someskin_ptr;
+    eOas_mais_t             *maisList_ptr;
+    eOas_strain_t           *strainList_ptr;
+    eOsk_skin_t             *skin_ptr;
 } eOappTheDB_hid_nvsRamRef_t;
 
 
 struct EOappTheDB_hid
 {
-    eOappTheDB_cfg_t                   cfg;
-    eOboolvalues_t                     isinitted;
-    EOarray                            *canboardsList;
-    EOarray                            *jointsList;
-    EOarray                            *motorsList;
-    EOarray                            *snsrMaisList;
-    EOarray                            *snsrStrainList;
-    EOarray                            *skinList;
+    eOappTheDB_cfg_t                    cfg;
+    eOboolvalues_t                      isinitted;
+    EOarray                             *canboardsList;
+    EOarray                             *jointsList;
+    EOarray                             *motorsList;
+    EOarray                             *snsrMaisList;
+    EOarray                             *snsrStrainList;
+    EOarray                             *skinList;
+    
 	struct
 	{
-		eOsizecntnr_t 		capacity;
-		eObrd_boardId_t		*tbl; /* gli indici partono da zero,a nche se l'inidirizzo zero sar'a' sempre usato dalla ems.*/
-	}canaddressLookuptbl;
+		eOsizecntnr_t 	    capacity;
+		eObrd_boardId_t		*tbl; // gli indici partono da zero, anche se l'indirizzo zero sara' sempre usato dalla ems
+	} canaddressLookuptbl;
 
-    eOappTheDB_hid_nvsRamRef_t nvsram;
-    eOappTheDB_hid_virtualStrainData_t virtualStrainData;
+    eOappTheDB_hid_nvsRamRef_t          nvsram;
+    eOappTheDB_hid_virtualStrainData_t  virtualStrainData;
 };
 
 

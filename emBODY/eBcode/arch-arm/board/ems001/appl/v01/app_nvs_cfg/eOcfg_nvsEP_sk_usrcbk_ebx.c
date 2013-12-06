@@ -107,7 +107,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv
     uint8_t                         i;
     eOappTheDB_SkinCanLocation_t    canLoc;
     eOsk_skinId_t                   skId = 0; //for DB the skin is unique entity
-    eOskin_sigmode_t                *sigmode = (eOskin_sigmode_t*)nv->loc;
+    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->loc;
     EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     /* NOTE: corrently any skin board starts to send can frame when it finishes its initilisation
@@ -115,7 +115,7 @@ extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv
             so here i don't send commnad to start to skin boards (because they start automatically),
             but i sent default configurations
     */
-    if(snsr_sigmode_signal == *sigmode)
+    if(eosk_sigmode_signal == *sigmode)
     {
         eOicubCanProto_msgCommand_t msgCmd = 
         {

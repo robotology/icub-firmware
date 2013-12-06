@@ -46,7 +46,7 @@ extern "C" {
 #include "EOnvsCfg.h"
 #include "eOboards.h"
 #include "eOMotionControl.h"
-#include "eOSensors.h"
+#include "EoAnalogSensors.h"
 #include "eOSkin.h"
 #include "EOicubCanProto_specifications.h"
 #include "EOappEncodersReader.h"
@@ -132,11 +132,11 @@ typedef struct
 typedef struct
 {
     EOnvsCfg                        *nvsCfg;       /**<  Network Variable configuration          */
-    eOnvEP_t                        mc_endpoint;   /**<  motion control endopoint managed by the application */
-    eOnvEP_t                        as_endpoint;   /**<  analog sensor endopoint managed by the application */
-    eOnvEP_t                        sk_endpoint;   /**<  analog sensor endopoint managed by the application */
+    eOnvEP_t                        mc_endpoint;   /**<  motion control endpoint managed by the application */
+    eOnvEP_t                        as_endpoint;   /**<  analog sensor endpoint managed by the application */
+    eOnvEP_t                        sk_endpoint;   /**<  analog sensor endpoint managed by the application */
     /* if one of endpoints is not present ==> then set endpoint to EOK_uint16dummy */
-    const EOconstvector* const      canboardsList; /**< list of CAN boars connected to ems by can */
+    const EOconstvector* const      canboardsList; /**< list of CAN boards connected to ems by can */
     const EOconstvector* const      jointsList;    /**< list of joints managed by an EMS board */
     const EOconstvector* const      motorsList;    /**< list of motors managed by an EMS board */
     const EOconstvector* const      snsrMaisList;   /**< list of sensors managed by an EMS board */
@@ -225,13 +225,13 @@ extern eOresult_t eo_appTheDB_GetMotorCanLocation(EOappTheDB *p, eOmc_motorId_t 
 
 extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eOmc_motorId_t *mId_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOsnsr_maisId_t *sId_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOas_maisId_t *sId_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOsnsr_maisId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOas_maisId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOsnsr_strainId_t *sId_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_sensorCanLocation_t *canloc_ptr, eOas_strainId_t *sId_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOsnsr_strainId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strainId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr);
 
 extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_SkinCanLocation_t *canloc_ptr);
 
@@ -255,17 +255,17 @@ extern eOresult_t eo_appTheDB_GetJointCurrentControlmode(EOappTheDB *p, eOmc_joi
 extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr);
 extern eOresult_t eo_appTheDB_GetMotorStatusPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_status_t **mstatus_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOsnsr_maisId_t sId,  eOsnsr_mais_config_t **sconfig_ptr);
-extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOsnsr_maisId_t sId,  eOsnsr_mais_status_t **sstatus_ptr);
+extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_config_t **sconfig_ptr);
+extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_status_t **sstatus_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOsnsr_strainId_t sId,  eOsnsr_strain_config_t **sconfig_ptr);
-extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOsnsr_strainId_t sId,  eOsnsr_strain_status_t **sstatus_ptr);
+extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOas_strainId_t sId,  eOas_strain_config_t **sconfig_ptr);
+extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId_t sId,  eOas_strain_status_t **sstatus_ptr);
 
 
 
-// extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOskin_config_t **skconfig_ptr);
-// extern eOresult_t eo_appTheDB_GetSkinStatusPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOskin_status_t **skstatus_ptr);
-extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOskin_sigmode_t **sigmode_ptr);
+// extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOsk_config_t **skconfig_ptr);
+// extern eOresult_t eo_appTheDB_GetSkinStatusPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOsk_status_t **skstatus_ptr);
+extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr);
 extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_skinId_t skId,  EOarray_of_10canframes **arrayof10canframes_ptr);
 
 

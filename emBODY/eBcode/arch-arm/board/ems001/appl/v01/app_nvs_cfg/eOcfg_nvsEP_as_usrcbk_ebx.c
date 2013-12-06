@@ -36,7 +36,7 @@
 #include "EOnv_hid.h"
 #include "EOarray.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "eOcfg_nvsEP_as.h"
 
 //application
@@ -76,7 +76,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status);
 
 
 
@@ -101,7 +102,7 @@
 //mais-init
 // extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv)
 // {
-//     eOsnsr_arrayofupto36bytes_t *maisArray = (eOsnsr_arrayofupto36bytes_t *)nv->loc;    
+//     eOas_arrayofupto36bytes_t *maisArray = (eOas_arrayofupto36bytes_t *)nv->loc;    
 //     maisArray->head.capacity = 
 //     capacity;
 //     uint8_t         itemsize;
@@ -112,7 +113,7 @@
 
 extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    eOsnsr_mais_status_t                *sstatus_ptr;
+    eOas_mais_status_t                  *sstatus_ptr;
     eOsmStatesEMSappl_t                 currentstate;
     eOicubCanProto_msgDestination_t     msgdest;
     eOappTheDB_sensorCanLocation_t      canLoc;
@@ -122,15 +123,15 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const E
         EO_INIT(.cmdId) 0
     };
 
-    eOsnsr_mais_config_t               *maiscfg = (eOsnsr_mais_config_t*)nv->loc;
+    eOas_mais_config_t                  *maiscfg = (eOas_mais_config_t*)nv->loc;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), (eOsnsr_maisId_t)n, &canLoc);
+    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), (eOas_maisId_t)n, &canLoc);
     
     //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
     // if yes ==> ok no problem
     // if no ==> i'll send cmd when go to RUN state
-    if(snsr_maismode_txdatacontinuously == maiscfg->mode)
+    if(eoas_maismode_txdatacontinuously == maiscfg->mode)
     {
         //only if the appl is in RUN state enable mais tx
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
@@ -149,21 +150,11 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const E
     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->resolution));
     
-    //set head of array "the15values" of status.
-    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), (eOsnsr_maisId_t)n,  &sstatus_ptr); 
+    
+    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), (eOas_maisId_t)n,  &sstatus_ptr); 
+    
 
-    if(snsr_maisresolution_08 == maiscfg->resolution)
-    {
-        sstatus_ptr->the15values.head.capacity = 16;
-        sstatus_ptr->the15values.head.itemsize = 1;
-        sstatus_ptr->the15values.head.size = 16;
-    }
-    else if(snsr_maisresolution_16 == maiscfg->resolution)
-    {
-        sstatus_ptr->the15values.head.capacity = 32;
-        sstatus_ptr->the15values.head.itemsize = 2;
-        sstatus_ptr->the15values.head.size = 32;
-    }
+    s_process_mais_resolution((eOas_maisresolution_t)maiscfg->resolution, sstatus_ptr);
 }
 
 
@@ -177,25 +168,25 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t n, c
         EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
     };
 
-    eOsnsr_maismode_t               *maismode = (eOsnsr_maismode_t*)nv->loc;
+    eOas_maismode_t                *maismode = (eOas_maismode_t*)nv->loc;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
     // if yes ==> ok no problem
     // if no ==> i'll send cmd when go to RUN state
-    if(snsr_maismode_txdatacontinuously == *maismode)
+    if(eoas_maismode_txdatacontinuously == *maismode)
     {
         //only if the appl is in RUN state enable mais tx
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
         if(eo_sm_emsappl_STrun == currentstate)
         {
-           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maismode);
+           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maismode);
         }
     }
     else
     {
-        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maismode);
+        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maismode);
     }
 }
 
@@ -213,7 +204,7 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__datarate(uint16_t 
 
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maisdatarate);
+    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maisdatarate);
 
 }
 
@@ -222,35 +213,24 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__datarate(uint16_t 
 
 extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__resolution(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
-    eOsnsr_mais_status_t                *sstatus_ptr;
+    eOas_mais_status_t              *sstatus_ptr;
     eOicubCanProto_msgCommand_t     msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION
     };
 
-    eOsnsr_maisresolution_t         *maisresolution = (uint8_t*)nv->loc;
+    eOas_maisresolution_t           *maisresolution = (uint8_t*)nv->loc;
 
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOsnsr_maisId_t)n, msgCmd, (void*)maisresolution);
+    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maisresolution);
     
-    //set head of array "the15values" of status.
-    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), (eOsnsr_maisId_t)n,  &sstatus_ptr); 
 
-    if(snsr_maisresolution_08 == *maisresolution)
-    {
-        sstatus_ptr->the15values.head.capacity = 16;
-        sstatus_ptr->the15values.head.itemsize = 1;
-        sstatus_ptr->the15values.head.size = 16;
-    }
-    else if(snsr_maisresolution_16 == *maisresolution)
-    {
-        sstatus_ptr->the15values.head.capacity = 32;
-        sstatus_ptr->the15values.head.itemsize = 2;
-        sstatus_ptr->the15values.head.size = 32;
-    }
+    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), (eOas_maisId_t)n,  &sstatus_ptr); 
 
+    s_process_mais_resolution(*maisresolution, sstatus_ptr);
+    
 }
 
 
@@ -260,7 +240,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     uint8_t                             channel = 0;
     eOresult_t                          res;
     eOicubCanProto_msgDestination_t     msgdest;
-    eOsnsr_strain_status_t              *sstatus_ptr;
+    eOas_strain_status_t                *sstatus_ptr;
     eOappTheDB_sensorCanLocation_t      canLoc;
     eOsmStatesEMSappl_t                 currentstate;
     eOicubCanProto_msgCommand_t         msgCmd = 
@@ -269,10 +249,10 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
         EO_INIT(.cmdId) 0
     };
 
-    eOsnsr_strain_config_t               *straincfg = (eOsnsr_strain_config_t*)nv->loc;
+    eOas_strain_config_t               *straincfg = (eOas_strain_config_t*)nv->loc;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOsnsr_strainId_t)xx, &canLoc);
+    eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOas_strainId_t)xx, &canLoc);
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
 
@@ -317,13 +297,13 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx
         EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
     };
 
-    eOsnsr_strainmode_t               *strainmode = (eOsnsr_strainmode_t*)nv->loc;
+    eOas_strainmode_t               *strainmode = (eOas_strainmode_t*)nv->loc;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
-    if(snsr_strainmode_acquirebutdonttx == *strainmode) 
+    if(eoas_strainmode_acquirebutdonttx == *strainmode) 
     {
-        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)strainmode);
+        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOas_strainId_t)xx, msgCmd, (void*)strainmode);
     }
     else //if pc104 configures strain mode to send data
     {
@@ -331,7 +311,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
         if(eo_sm_emsappl_STrun == currentstate)
         {
-            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)strainmode);
+            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOas_strainId_t)xx, msgCmd, (void*)strainmode);
         }
     }        
 }
@@ -348,7 +328,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_
 
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOsnsr_strainId_t)xx, msgCmd, (void*)straindatarate);
+    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOas_strainId_t)xx, msgCmd, (void*)straindatarate);
 }
 
 
@@ -356,7 +336,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullsc
 {
     uint8_t                     channel = 0;
     eOresult_t                  res;
-    eOsnsr_strain_status_t      *sstatus_ptr;
+    eOas_strain_status_t        *sstatus_ptr;
     eObool_t                    *signaloncefullscale = (eObool_t*)nv->loc;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
@@ -394,7 +374,37 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullsc
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status)
+{
+    uint8_t size = 0;
+    uint8_t itemsize = 1;
+    uint8_t capacity = 0;
+    
+    if(eoas_maisresolution_08 == resolution)
+    {
+        capacity    = 16;
+        itemsize    = 1;
+        size        = 16;
+        #warning acemor-> nella mais nel caso di risoluzione a 8 bit perche' la capacity di the15values e' 16 e non 15?
+        //status->the15values.head.capacity = 16;
+        //status->the15values.head.itemsize = 1;
+        //status->the15values.head.size = 16;
+    }
+    else if(eoas_maisresolution_16 == resolution)
+    {
+        capacity    = 16;
+        itemsize    = 2;
+        size        = 16;
+        #warning acemor-> nella mais ho messo la capacity di the15values a 16 anche nel caso di risoluzione a 32 bit
+        //status->the15values.head.capacity = 16;
+        //status->the15values.head.itemsize = 2;
+        status->the15values.head.size = 16;
+    } 
 
+    EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
+    eo_array_Resize(array, size);    
+   
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
