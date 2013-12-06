@@ -93,12 +93,12 @@ static uint16_t s_hash(uint16_t id);
 #define SMACRO_STR       _s00
 #define SMACRO_PNUM      5
 #define SMACRO_NUM       0    
-#define SMACRO_OFF      (SMACRO_NUM*sizeof(eOsnsr_strain_t))
+#define SMACRO_OFF      (SMACRO_NUM*sizeof(eOas_strain_t))
 
 #include "macros/eOcfg_nvsEP_as_any_con_sxxmacro.c"
 
 
-#define OFFSET_OF_END_OF_STRAINS    (strainOneStrain_TOTALnumber*sizeof(eOsnsr_strain_t))
+#define OFFSET_OF_END_OF_STRAINS    (strainOneStrain_TOTALnumber*sizeof(eOas_strain_t))
 
 
 // -- the 0 mais
@@ -111,7 +111,7 @@ static uint16_t s_hash(uint16_t id);
 //#define MMACRO_STR    _m00
 //#define MMACRO_PNUM    5
 //#define MMACRO_NUM    0    
-//#define MMACRO_OFF    (OFFSET_OF_END_OF_STRAINS+MMACRO_NUM*sizeof(eOsnsr_mais_t))
+//#define MMACRO_OFF    (OFFSET_OF_END_OF_STRAINS+MMACRO_NUM*sizeof(eOas_mais_t))
 //
 //#include "eOcfg_nvsEP_as_any_con_mxxmacro.c"
 

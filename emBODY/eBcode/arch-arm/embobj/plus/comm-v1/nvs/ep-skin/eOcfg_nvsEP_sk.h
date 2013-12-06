@@ -93,7 +93,7 @@ enum { skinNVindex_TOTALnumber = 2 };
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue;
+extern const eOsk_skin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

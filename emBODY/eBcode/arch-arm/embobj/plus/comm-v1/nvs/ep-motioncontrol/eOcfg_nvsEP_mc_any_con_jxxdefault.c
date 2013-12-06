@@ -74,7 +74,7 @@
 
 const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
 {
-    EO_INIT(.jconfig)             
+    EO_INIT(.config)             
     {
         EO_INIT(.pidposition)
         {
@@ -129,7 +129,7 @@ const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
         EO_INIT(.holder02FFU03)             0xe3e3,
         EO_INIT(.holder02FFU04)             0xe4e3
     },
-    EO_INIT(.jstatus)                       
+    EO_INIT(.status)                       
     {
         EO_INIT(.basic)
         {
@@ -143,8 +143,8 @@ const eOmc_joint_t eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue =
         EO_INIT(.ofpid)                     {0},
         EO_INIT(.chamaleon04)               {0} //{0xd1, 0xd2, 0xd3, 0xd4}
     },
-    EO_INIT(.jinputs)                       {0},
-    EO_INIT(.jcmmnds)                       
+    EO_INIT(.inputs)                       {0},
+    EO_INIT(.cmmnds)                       
 	{
 		EO_INIT(.calibration)               {0},
 		EO_INIT(.setpoint)                  {0},

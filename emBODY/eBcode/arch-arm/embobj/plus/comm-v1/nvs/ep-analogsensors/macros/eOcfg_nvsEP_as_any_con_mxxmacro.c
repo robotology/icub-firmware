@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "eOcfg_nvsEP_as_any_con_mxx.h"    
 #include "eOcfg_nvsEP_as_any_con_mxxdefault.h"
       
@@ -87,13 +87,13 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 #define MOFFSETof_mconfig                                               (MMACRO_OFF)
-#define MCAPACITY_mconfig                                               sizeof(eOsnsr_mais_config_t)
+#define MCAPACITY_mconfig                                               sizeof(eOas_mais_config_t)
 EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig, MMACRO_NUM),
     EO_INIT(.capacity)  MCAPACITY_mconfig,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mconfig,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.config,
     EO_INIT(.offset)    MOFFSETof_mconfig,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig)
@@ -107,7 +107,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__mode) =
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__mode, MMACRO_NUM),
     EO_INIT(.capacity)  MCAPACITY_mconfig__mode,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mconfig.mode,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.config.mode,
     EO_INIT(.offset)    MOFFSETof_mconfig__mode,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__mode)
@@ -121,7 +121,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__datarate) =
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__datarate, MMACRO_NUM),
     EO_INIT(.capacity)  MCAPACITY_mconfig__datarate,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mconfig.datarate,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.config.datarate,
     EO_INIT(.offset)    MOFFSETof_mconfig__datarate,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__datarate)
@@ -135,7 +135,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__resolution) 
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__resolution, MMACRO_NUM),
     EO_INIT(.capacity)  MCAPACITY_mconfig__resolution,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mconfig.resolution,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.config.resolution,
     EO_INIT(.offset)    MOFFSETof_mconfig__resolution,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mconfig__resolution)
@@ -155,13 +155,13 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mconfig__resolution) 
 
 
 #define MOFFSETof_mstatus                                                   (MOFFSETafter_minputs_filler04) //(MOFFSETafter_mconfig)
-#define MCAPACITY_mstatus                                                   sizeof(eOsnsr_mais_status_t)
+#define MCAPACITY_mstatus                                                   sizeof(eOas_mais_status_t)
 EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus, MMACRO_NUM),
     EO_INIT(.capacity)  MCAPACITY_mstatus,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mstatus,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.status,
     EO_INIT(.offset)    MOFFSETof_mstatus,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus)
@@ -170,13 +170,13 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus) =
 
 
 #define MOFFSETof_mstatus__the15values                                        (MOFFSETafter_minputs_filler04)
-#define MCAPACITY_mstatus__the15values                                        sizeof(eOsnsr_arrayofupto36bytes_t)
+#define MCAPACITY_mstatus__the15values                                        sizeof(eOas_arrayofupto36bytes_t)
 EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus__the15values) =
 {   
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus__the15values, MMACRO_NUM),
     EO_INIT(.capacity)  MCAPACITY_mstatus__the15values,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.mstatus.the15values,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue.status.the15values,
     EO_INIT(.offset)    MOFFSETof_mstatus__the15values,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_mxx_NVFUNTYP_mstatus__the15values)
@@ -186,8 +186,8 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_STR, _mstatus__the15values)
 
 
 // guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
-MMACRO_VERIFYSIZEOF(MMACRO_NUM, eOsnsr_mais_t, MOFFSETafter_mstatus__the15values-MMACRO_OFF);
-//MMACRO_VERIFYSIZEOF(MMACRO_NUM, eOsnsr_mais_t, 48);
+MMACRO_VERIFYSIZEOF(MMACRO_NUM, eOas_mais_t, MOFFSETafter_mstatus__the15values-MMACRO_OFF);
+//MMACRO_VERIFYSIZEOF(MMACRO_NUM, eOas_mais_t, 48);
 
 
 

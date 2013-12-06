@@ -91,7 +91,8 @@ const eo_cfg_nvsEP_mn_comm_t eo_cfg_nvsEP_mn_comm_default =
             {
                 EO_INIT(.capacity)      NUMOFROPSIGCFG,
                 EO_INIT(.itemsize)      sizeof(eOropSIGcfg_t),
-                EO_INIT(.size)          0       // it is the only field in the header that can change
+                EO_INIT(.size)          0,      // it is the only field in the header that can change
+                EO_INIT(.dummy)         0
             },
             EO_INIT(.data)              {0}     // data can also change
         },

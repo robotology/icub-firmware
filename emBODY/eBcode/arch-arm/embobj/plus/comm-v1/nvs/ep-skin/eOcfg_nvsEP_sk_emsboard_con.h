@@ -83,7 +83,7 @@ enum {varsSKemsboard_TOTALnumber = skinEMSboardNVindex_TOTALnumber };
  **/
 typedef struct                      // size is 176 = 176                
 {
-    eOskin_someskin_t               someskin;
+    eOsk_skin_t                     skin;
 } eo_cfg_nvsEP_sk_emsboard_t;       EO_VERIFYsizeof(eo_cfg_nvsEP_sk_emsboard_t, 176);
 
     

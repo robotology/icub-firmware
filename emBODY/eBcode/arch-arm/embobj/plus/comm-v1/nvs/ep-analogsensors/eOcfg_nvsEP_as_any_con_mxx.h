@@ -40,7 +40,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 
 

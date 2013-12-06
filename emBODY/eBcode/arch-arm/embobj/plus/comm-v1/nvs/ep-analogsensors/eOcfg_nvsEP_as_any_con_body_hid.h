@@ -41,7 +41,7 @@
 
 #include "EoCommon.h"
 #include "EOnv.h"
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "eOcfg_nvsEP_as_any_con_sxx.h"
 #include "eOcfg_nvsEP_as_any_con_mxx.h"
 

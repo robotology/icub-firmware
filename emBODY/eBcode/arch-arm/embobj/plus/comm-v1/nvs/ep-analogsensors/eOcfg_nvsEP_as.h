@@ -43,7 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOnv.h"
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -133,8 +133,8 @@ enum { maisNVindex_TOTALnumber = 6};
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
-extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
+extern const eOas_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
+extern const eOas_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 

@@ -40,7 +40,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
+extern const eOas_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
