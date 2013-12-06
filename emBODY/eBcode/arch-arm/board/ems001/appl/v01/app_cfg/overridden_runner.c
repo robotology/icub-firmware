@@ -553,7 +553,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBo
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT
     };	
 
 #warning VALE --> solo per test
@@ -593,7 +593,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_periodicMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT
+        EO_INIT(.cmdId) ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT
     };
 
 
@@ -724,7 +724,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__MOTION_DONE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__MOTION_DONE
     };
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
@@ -797,10 +797,10 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         
         //set command (calss + id) and send it
         msgCmd.class = eo_icubCanProto_msgCmdClass_periodicSensorBoard;
-        msgCmd.cmdId = ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR;
+        msgCmd.cmdId = ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
         
-        msgCmd.cmdId = ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR;
+        msgCmd.cmdId = ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
     }
     s_checkEthLinks();

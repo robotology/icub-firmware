@@ -247,9 +247,9 @@ extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default =
         {
             .val2bcastList      =
             {
-            /* 0 */ ICUBCANPROTO_PER_MB_CMD_POSITION,
-            /* 1 */ ICUBCANPROTO_PER_MB_CMD_STATUS,
-            /* 2 */ ICUBCANPROTO_PER_MB_CMD_PRINT,
+            /* 0 */ ICUBCANPROTO_PER_MC_CMD_POSITION,
+            /* 1 */ ICUBCANPROTO_PER_MC_CMD_STATUS,
+            /* 2 */ ICUBCANPROTO_PER_MC_CMD_PRINT,
             /* 3 */ 0
             }
         }
@@ -421,7 +421,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY
     };
 
     if(applrunMode__2foc == p->appRunMode)
@@ -477,7 +477,7 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY
     };
 
     if(applrunMode__2foc == p->appRunMode)
@@ -603,10 +603,10 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
 //     {
 //         EO_INIT(.val2bcastList)            =
 //         {
-//             /* 0 */   ICUBCANPROTO_PER_MB_CMD_POSITION,
-//             /* 1 */   ICUBCANPROTO_PER_MB_CMD_PID_VAL,
-//             /* 2 */   ICUBCANPROTO_PER_MB_CMD_PID_ERROR,
-//             /* 3 */   ICUBCANPROTO_PER_MB_CMD_VELOCITY
+//             /* 0 */   ICUBCANPROTO_PER_MC_CMD_POSITION,
+//             /* 1 */   ICUBCANPROTO_PER_MC_CMD_PID_VAL,
+//             /* 2 */   ICUBCANPROTO_PER_MC_CMD_PID_ERROR,
+//             /* 3 */   ICUBCANPROTO_PER_MC_CMD_VELOCITY
 //         }
 //     };
 
@@ -753,7 +753,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         EOMtheEMSapplCfg                    *emsapplCfg_ptr = eom_emsapplcfg_GetHandle();
         
         numofboard = eo_appTheDB_GetNumeberOfCanboards(eo_appTheDB_GetHandle());
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__GET_FIRMWARE_VERSION;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
         
         for(i=0; i<numofboard; i++)
         {
@@ -782,21 +782,21 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     
     for(i=0; i<numofjoint; i++)
     {
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
         res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, NULL);
         if(eores_OK != res)
         {
             return(res);
         }
         
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
         res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, NULL);
         if(eores_OK != res)
         {
             return(res);
         }
 
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
         res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, &controlmode);
         if(eores_OK != res)
         {
@@ -811,14 +811,14 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 //             {
 //                 return(res);
 //             }
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
+//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
 //             eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
 
             
             //get shift values from DB
             eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &shiftval_ptr);
             
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
             shift_icubCanProtValue = shiftval_ptr->jointVelocityShift;
             eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&shift_icubCanProtValue);
         
@@ -828,7 +828,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             estimshift.estimShiftJointAcc = 0;
             estimshift.estimShiftMotorVel = 0;
             estimshift.estimShiftMotorAcc = 0;
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
             eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&estimshift);
         }
     }
@@ -913,7 +913,7 @@ static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
     
@@ -936,7 +936,7 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
 
@@ -955,7 +955,7 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
     
@@ -984,7 +984,7 @@ static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
     
@@ -1055,11 +1055,11 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 //     
 //     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
 //     
-// //     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+// //     msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
 // //     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg.mode));
 //     
 
-//     msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
+//     msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
 //     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg.datarate));
 //     
 //     if(straincfg.signaloncefullscale)
@@ -1074,7 +1074,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 //         sstatus_ptr->fullscale.head.size = 0;
 //         memset(&sstatus_ptr->fullscale.data[0], 0, 12);
 //         channel = 0;
-//         msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES;
+//         msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
 //         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
 //     }
 

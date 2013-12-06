@@ -53,12 +53,12 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 /* Since inthe fist 64th messages most of them are obsolete, the table start at msg 64 and manage other such as exception*/
-#define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max          ICUBCANPROTO_POL_MB_CMD_MAXNUM -64 
-#define eo_icubCanProto_pollingMotorBoardMsg_maxNum             ICUBCANPROTO_POL_MB_CMD_MAXNUM
+#define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max          ICUBCANPROTO_POL_MC_CMD_MAXNUM -64 
+#define eo_icubCanProto_pollingMotorBoardMsg_maxNum             ICUBCANPROTO_POL_MC_CMD_MAXNUM
 
-#define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   12 //until ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED 
-#define eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max   1  //only  ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT
-#define eo_icubCanProto_periodicMotorBoardMsg_maxNum            ICUBCANPROTO_PER_MB_CMD_MAXNUM
+#define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   12 //until ICUBCANPROTO_PER_MC_CMD_MOTOR_SPEED 
+#define eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max   1  //only  ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT
+#define eo_icubCanProto_periodicMotorBoardMsg_maxNum            ICUBCANPROTO_PER_MC_CMD_MAXNUM
 
 
 
@@ -91,203 +91,203 @@ static eOresult_t s_eo_icubCanProto_periodicMotorBoardMsg_former_excFn(void *arg
 /* DECLARATION OF POLLING MOTOR BOARD PARSER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBoardMsg_parserFn_list[eo_icubCanProto_pollingMotorBoardMsg_inTbl_max] = 
 {
-    {   // 64 ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION 			
+    {   // 64 ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION 			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 65 ICUBCANPROTO_POL_MB_CMD__GET_MIN_POSITION 			
+    {   // 65 ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION 			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getMinPosition
     },
 
-    {   // 66 ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION			
+    {   // 66 ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 67 ICUBCANPROTO_POL_MB_CMD__GET_MAX_POSITION			
+    {   // 67 ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getMaxPosition
     },
 
-    {   // 68 ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY		
+    {   // 68 ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 69 ICUBCANPROTO_POL_MB_CMD__GET_MAX_VELOCITY		
+    {   // 69 ICUBCANPROTO_POL_MC_CMD__GET_MAX_VELOCITY		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getMaxVelocity
     },
 
-    {   // 70 ICUBCANPROTO_POL_MB_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
+    {   // 70 ICUBCANPROTO_POL_MC_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 71 ICUBCANPROTO_POL_MB_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
+    {   // 71 ICUBCANPROTO_POL_MC_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 72 ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT		
+    {   // 72 ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 73 ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY		
+    {   // 73 ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 74 ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT			
+    {   // 74 ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 75 ICUBCANPROTO_POL_MB_CMD__SET_OFFSET_ABS_ENCODER 			
+    {   // 75 ICUBCANPROTO_POL_MC_CMD__SET_OFFSET_ABS_ENCODER 			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 76 ICUBCANPROTO_POL_MB_CMD__GET_OFFSET_ABS_ENCODER 			
+    {   // 76 ICUBCANPROTO_POL_MC_CMD__GET_OFFSET_ABS_ENCODER 			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getOffsetAbsEncoder
     },
 
-    {   // 77 ICUBCANPROTO_POL_MB_CMD__SET_SMOOTH_PID  (obsolete)		
+    {   // 77 ICUBCANPROTO_POL_MC_CMD__SET_SMOOTH_PID  (obsolete)		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 78 ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID		
+    {   // 78 ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 79 ICUBCANPROTO_POL_MB_CMD__GET_TORQUE_PID		
+    {   // 79 ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getTorquePid
     },
 
-    {   // 80 ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS		
+    {   // 80 ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 81 ICUBCANPROTO_POL_MB_CMD__GET_TORQUE_PIDLIMITS		
+    {   // 81 ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits
     },
 
-    {   // 82  ICUBCANPROTO_POL_MB_CMD__SET_POS_PID		
+    {   // 82  ICUBCANPROTO_POL_MC_CMD__SET_POS_PID		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 83  ICUBCANPROTO_POL_MB_CMD__GET_POS_PID		
+    {   // 83  ICUBCANPROTO_POL_MC_CMD__GET_POS_PID		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getPosPid
     },
 
-    {   // 84  ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS		
+    {   // 84  ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 85  ICUBCANPROTO_POL_MB_CMD__GET_POS_PIDLIMITS	
+    {   // 85  ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits
     },
 
-    {   // 86  ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT		
+    {   // 86  ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 87  ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS		
+    {   // 87  ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 88  ICUBCANPROTO_POL_MB_CMD__GET_IMPEDANCE_PARAMS	
+    {   // 88  ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams
     },
 
-    {   // 89  ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET		
+    {   // 89  ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 90  ICUBCANPROTO_POL_MB_CMD__GET_IMPEDANCE_OFFSET	
+    {   // 90  ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset
     },
 
-    {   // 91  ICUBCANPROTO_POL_MB_CMD__GET_FIRMWARE_VERSION		
+    {   // 91  ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion
     },
     
-    {   // 92  ICUBCANPROTO_POL_MB_CMD__SET_OPTICAL_ENC_RATIO		
+    {   // 92  ICUBCANPROTO_POL_MC_CMD__SET_OPTICAL_ENC_RATIO		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 93  ICUBCANPROTO_POL_MB_CMD__SET_POS_STICTION_PARAMS		
+    {   // 93  ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 94  ICUBCANPROTO_POL_MB_CMD__GET_POS_STICTION_PARAMS		
+    {   // 94  ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 95  ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_STICTION_PARAMS		
+    {   // 95  ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 96  ICUBCANPROTO_POL_MB_CMD__GET_TORQUE_STICTION_PARAMS		
+    {   // 96  ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 97  ICUBCANPROTO_POL_MB_CMD__SET_BACKEMF_PARAMS		
+    {   // 97  ICUBCANPROTO_POL_MC_CMD__SET_BACKEMF_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 98  ICUBCANPROTO_POL_MB_CMD__GET_BACKEMF_PARAMS		
+    {   // 98  ICUBCANPROTO_POL_MC_CMD__GET_BACKEMF_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 99  ICUBCANPROTO_POL_MB_CMD__SET_MODEL_PARAMS		
+    {   // 99  ICUBCANPROTO_POL_MC_CMD__SET_MODEL_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 100  ICUBCANPROTO_POL_MB_CMD__GET_MODEL_PARAMS		
+    {   // 100  ICUBCANPROTO_POL_MC_CMD__GET_MODEL_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
     
-    {   // 101  ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID		
+    {   // 101  ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 102  ICUBCANPROTO_POL_MB_CMD__GET_CURRENT_PID		
+    {   // 102  ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PID		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getCurrentPid
     },
 
-    {   // 103  ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS		
+    {   // 103  ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 104  ICUBCANPROTO_POL_MB_CMD__GET_CURRENT_PIDLIMITS		
+    {   // 104  ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PIDLIMITS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getCurrentPidLimits
     },
 
-    {   // 105  IICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID	
+    {   // 105  IICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 106  IICUBCANPROTO_POL_MB_CMD__GET_VELOCITY_PID	
+    {   // 106  IICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PID	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getVelocityPid
     },
 
-    {   // 107  IICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS	
+    {   // 107  IICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 108  IICUBCANPROTO_POL_MB_CMD__GET_VELOCITY_PIDLIMITS	
+    {   // 108  IICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PIDLIMITS	
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 109  ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT		
+    {   // 109  ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 110  ICUBCANPROTO_POL_MB_CMD__GET_DISIRED_CURRENT		
+    {   // 110  ICUBCANPROTO_POL_MC_CMD__GET_DISIRED_CURRENT		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getDesiredCurrent
     },
 
-    {   // 111  ICUBCANPROTO_POL_MB_CMD__SET_PERIODIC_MSG_CONTENTS		
+    {   // 111  ICUBCANPROTO_POL_MC_CMD__SET_PERIODIC_MSG_CONTENTS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 112  ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS		
+    {   // 112  ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
     },
 
-    {   // 113  ICUBCANPROTO_POL_MB_CMD__GET_I2T_PARAMS		
+    {   // 113  ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS		
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getI2TParams
     }
 };        
@@ -309,203 +309,203 @@ extern const EOconstLookupTbl* const icubCanProto_pollingMotorBoardMsg_parser_LU
 /* DECLARATION OF POLLING MOTOR BOARD FORMER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingMotorBoardMsg_formerFn_list[eo_icubCanProto_pollingMotorBoardMsg_inTbl_max] = 
 {
-    {   // 64 ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION 			
+    {   // 64 ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION 			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setMinPosition
     },
 
-    {   // 65 ICUBCANPROTO_POL_MB_CMD__GET_MIN_POSITION 			
+    {   // 65 ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION 			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getMinPosition
     },
 
-    {   // 66 ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION			
+    {   // 66 ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setMaxPosition
     },
 
-    {   // 67 ICUBCANPROTO_POL_MB_CMD__GET_MAX_POSITION			
+    {   // 67 ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getMaxPosition
     },
 
-    {   // 68 ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY		
+    {   // 68 ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setMaxVelocity
     },
 
-    {   // 69 ICUBCANPROTO_POL_MB_CMD__GET_MAX_VELOCITY		
+    {   // 69 ICUBCANPROTO_POL_MC_CMD__GET_MAX_VELOCITY		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getMaxVelocity
     },
 
-    {   // 70 ICUBCANPROTO_POL_MB_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
+    {   // 70 ICUBCANPROTO_POL_MC_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 71 ICUBCANPROTO_POL_MB_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
+    {   // 71 ICUBCANPROTO_POL_MC_CMD__GET_ACTIVE_ENCODER_POSITION  (obsolete)			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 72 ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT		
+    {   // 72 ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setCurrentLimit
     },
 
-    {   // 73 ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY		
+    {   // 73 ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy
     },
 
-    {   // 74 ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT			
+    {   // 74 ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setVelShift
     },
 
-    {   // 75 ICUBCANPROTO_POL_MB_CMD__SET_OFFSET_ABS_ENCODER 			
+    {   // 75 ICUBCANPROTO_POL_MC_CMD__SET_OFFSET_ABS_ENCODER 			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setOffsetAbsEncoder
     },
 
-    {   // 76 ICUBCANPROTO_POL_MB_CMD__GET_OFFSET_ABS_ENCODER 			
+    {   // 76 ICUBCANPROTO_POL_MC_CMD__GET_OFFSET_ABS_ENCODER 			
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getOffsetAbsEncoder
     },
 
-    {   // 77 ICUBCANPROTO_POL_MB_CMD__SET_SMOOTH_PID  (obsolete)		
+    {   // 77 ICUBCANPROTO_POL_MC_CMD__SET_SMOOTH_PID  (obsolete)		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 78 ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID		
+    {   // 78 ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setTorquePid
     },
 
-    {   // 79 ICUBCANPROTO_POL_MB_CMD__GET_TORQUE_PID		
+    {   // 79 ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getTorquePid
     },
 
-    {   // 80 ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS		
+    {   // 80 ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setTorquePidLimits
     },
 
-    {   // 81 ICUBCANPROTO_POL_MB_CMD__GET_TORQUE_PIDLIMITS		
+    {   // 81 ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getTorquePidLimits
     },
 
-    {   // 82  ICUBCANPROTO_POL_MB_CMD__SET_POS_PID		
+    {   // 82  ICUBCANPROTO_POL_MC_CMD__SET_POS_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setPosPid
     },
 
-    {   // 83  ICUBCANPROTO_POL_MB_CMD__GET_POS_PID		
+    {   // 83  ICUBCANPROTO_POL_MC_CMD__GET_POS_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getPosPid
     },
 
-    {   // 84  ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS		
+    {   // 84  ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setPosPidLimits
     },
 
-    {   // 85  ICUBCANPROTO_POL_MB_CMD__GET_POS_PIDLIMITS	
+    {   // 85  ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS	
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getPosPidLimits
     },
 
-    {   // 86  ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT		
+    {   // 86  ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setVelTimeout
     },
 
-    {   // 87  ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS		
+    {   // 87  ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams
     },
 
-    {   // 88  ICUBCANPROTO_POL_MB_CMD__GET_IMPEDANCE_PARAMS	
+    {   // 88  ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS	
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getImpedanceParams
     },
 
-    {   // 89  ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET		
+    {   // 89  ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset
     },
 
-    {   // 90  ICUBCANPROTO_POL_MB_CMD__GET_IMPEDANCE_OFFSET	
+    {   // 90  ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET	
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getImpedanceOffset
     },
 
-    {   // 91  ICUBCANPROTO_POL_MB_CMD__GET_FIRMWARE_VERSION		
+    {   // 91  ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getFirmwareVersion
     },
     
-    {   // 92  ICUBCANPROTO_POL_MB_CMD__SET_OPTICAL_ENC_RATIO		
+    {   // 92  ICUBCANPROTO_POL_MC_CMD__SET_OPTICAL_ENC_RATIO		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 93  ICUBCANPROTO_POL_MB_CMD__SET_POS_STICTION_PARAMS		
+    {   // 93  ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 94  ICUBCANPROTO_POL_MB_CMD__GET_POS_STICTION_PARAMS		
+    {   // 94  ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 95  ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_STICTION_PARAMS		
+    {   // 95  ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 96  ICUBCANPROTO_POL_MB_CMD__GET_TORQUE_STICTION_PARAMS		
+    {   // 96  ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 97  ICUBCANPROTO_POL_MB_CMD__SET_BACKEMF_PARAMS		
+    {   // 97  ICUBCANPROTO_POL_MC_CMD__SET_BACKEMF_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 98  ICUBCANPROTO_POL_MB_CMD__GET_BACKEMF_PARAMS		
+    {   // 98  ICUBCANPROTO_POL_MC_CMD__GET_BACKEMF_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 99  ICUBCANPROTO_POL_MB_CMD__SET_MODEL_PARAMS		
+    {   // 99  ICUBCANPROTO_POL_MC_CMD__SET_MODEL_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 100  ICUBCANPROTO_POL_MB_CMD__GET_MODEL_PARAMS		
+    {   // 100  ICUBCANPROTO_POL_MC_CMD__GET_MODEL_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
 
-    {   // 101  ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID		
+    {   // 101  ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setCurrentPid
     },
 
-    {   // 102  ICUBCANPROTO_POL_MB_CMD__GET_CURRENT_PID		
+    {   // 102  ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getCurrentPid
     },
 
-    {   // 103  ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS		
+    {   // 103  ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setCurrentPidLimits
     },
 
-    {   // 104  ICUBCANPROTO_POL_MB_CMD__GET_CURRENT_PIDLIMITS		
+    {   // 104  ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getCurrentPidLimits
     },
 
-    {   // 105  IICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID		
+    {   // 105  IICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setVelocityPid
     },
 
-    {   // 106  ICUBCANPROTO_POL_MB_CMD__GET_VELOCITY_PID		
+    {   // 106  ICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PID		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getVelocityPid
     },
 
-    {   // 107  IICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS		
+    {   // 107  IICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setVelocityPidLimits
     },
 
-    {   // 108  ICUBCANPROTO_POL_MB_CMD__GET_VELOCITY_PIDLIMITS		
+    {   // 108  ICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PIDLIMITS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getVelocityPidLimits
     },
 
-    {   // 109  ICUBCANPROTO_POL_MB_CMD__SET_DISIRED_CURRENT		
+    {   // 109  ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setDesiredCurrent
     },
 
-    {   // 110  ICUBCANPROTO_POL_MB_CMD__GET_DISIRED_CURRENT		
+    {   // 110  ICUBCANPROTO_POL_MC_CMD__GET_DISIRED_CURRENT		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getDesiredCurrent
     },
 
-    {   // 111  ICUBCANPROTO_POL_MB_CMD__SET_PERIODIC_MSG_CONTENTS		
+    {   // 111  ICUBCANPROTO_POL_MC_CMD__SET_PERIODIC_MSG_CONTENTS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setPeriodicContents
     },
 
-    {   // 112  ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS		
+    {   // 112  ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setI2TParams
     },
 
-    {   // 113  ICUBCANPROTO_POL_MB_CMD__GET_I2T_PARAMS		
+    {   // 113  ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS		
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getI2TParams
     },
 
@@ -542,51 +542,51 @@ extern const EOconstLookupTbl* const icubCanProto_pollingMotorBoardMsg_former_LU
 /* DECLARATION OF PERIODIC MOTOR BOARD PARSER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicMotorBoardMsg_parserFn_list[eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max] = 
 {
-    {   // 0 ICUBCANPROTO_PER_MB_CMD_2FOC 			
+    {   // 0 ICUBCANPROTO_PER_MC_CMD_2FOC 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__2foc
     },
 
-    {   // 1 ICUBCANPROTO_PER_MB_CMD_POSITION 			
+    {   // 1 ICUBCANPROTO_PER_MC_CMD_POSITION 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__position
     },
 
-    {   // 2 ICUBCANPROTO_PER_MB_CMD_PID_VAL			
+    {   // 2 ICUBCANPROTO_PER_MC_CMD_PID_VAL			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__pidVal
     },
 
-    {   // 3 ICUBCANPROTO_PER_MB_CMD_STATUS			
+    {   // 3 ICUBCANPROTO_PER_MC_CMD_STATUS			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__status
     },
 
-    {   // 4 ICUBCANPROTO_PER_MB_CMD_CURRENT		
+    {   // 4 ICUBCANPROTO_PER_MC_CMD_CURRENT		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__current
     },
 
-    {   // 5 ICUBCANPROTO_PER_MB_CMD_OVERFLOW		
+    {   // 5 ICUBCANPROTO_PER_MC_CMD_OVERFLOW		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__overflow
     },
 
-    {   // 6 IICUBCANPROTO_PER_MB_CMD_PRINT		
+    {   // 6 IICUBCANPROTO_PER_MC_CMD_PRINT		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__print 
     },
 
-    {   // 7 ICUBCANPROTO_PER_MB_CMD_VELOCITY		
+    {   // 7 ICUBCANPROTO_PER_MC_CMD_VELOCITY		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__velocity
     },
 
-    {   // 8 ICUBCANPROTO_PER_MB_CMD_PID_ERROR	
+    {   // 8 ICUBCANPROTO_PER_MC_CMD_PID_ERROR	
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__pidError
     },
 
-    {   // 9 ICUBCANPROTO_PER_MB_CMD_DEBUG		
+    {   // 9 ICUBCANPROTO_PER_MC_CMD_DEBUG		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__debug
     },
     
-    {   // 10 ICUBCANPROTO_PER_MB_CMD_MOTOR_POSITION	
+    {   // 10 ICUBCANPROTO_PER_MC_CMD_MOTOR_POSITION	
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__motorPosition
     },
 
-    {   // 11 ICUBCANPROTO_PER_MB_CMD_MOTOR_SPEED		
+    {   // 11 ICUBCANPROTO_PER_MC_CMD_MOTOR_SPEED		
         EO_INIT(.parser)    eo_icubCanProto_parser_per_mb_cmd__motorSpeed
     },
     
@@ -614,7 +614,7 @@ extern const EOconstLookupTbl* const icubCanProto_periodicMotorBoardMsg_parser_L
 /* DECLARATION OF PERIODIC MOTOR BOARD FORMER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_periodicMotorBoardMsg_formerFn_list[eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max] = 
 {
-    {   // 15 ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT 			
+    {   // 15 ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT 			
         EO_INIT(.former)    eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent
     }    
 };        
@@ -666,43 +666,43 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubC
 
     switch(cmdId)
     {
-        case ICUBCANPROTO_POL_MB_CMD__NO_MESSAGE:  /* 0 */
+        case ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE:  /* 0 */
         {
             res = eo_icubCanProto_parser_test(p, frame, canPort);
         }break;
 
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_CONTROL_MODE:  /* 7 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:  /* 7 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getControlMode(p, frame, canPort);
         }break;
     
-        case ICUBCANPROTO_POL_MB_CMD__MOTION_DONE:  /* 8 */
+        case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:  /* 8 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__motionDone(p, frame, canPort);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_ADDITIONAL_INFO:  /* 12 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:  /* 12 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getAdditionalInfo(p, frame, canPort);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_DEBUG_PARAM:  /* 19 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM:  /* 19 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getDebugParam(p, frame, canPort);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_ENCODER_POSITION:  /* 20 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION:  /* 20 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getEncoderPosition(p, frame, canPort);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_DESIRED_TORQUE:  /* 45*/
+        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:  /* 45*/
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(p, frame, canPort);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_BOARD_ID:  /* 51 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID:  /* 51 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getBoardId(p, frame, canPort);
         }break;
@@ -730,113 +730,113 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
 
     switch(cmdId)
     {
-        case ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN:  /* 1 */
+        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN:  /* 1 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__controllerRun(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE:  /* 2 */
+        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE:  /* 2 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__controllerIdle(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER:  /* 4 */
+        case ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER:  /* 4 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD:  /* 5 */
+        case ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD:  /* 5 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__enablePwmPad(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD:  /* 6 */
+        case ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD:  /* 6 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__disablePwmPad(p, nv_ptr, dest, canFrame);
         }break;
 
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_CONTROL_MODE:  /* 7 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:  /* 7 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getControlMode(p, nv_ptr, dest, canFrame);
         }break;
     
-        case ICUBCANPROTO_POL_MB_CMD__MOTION_DONE:  /* 8 */
+        case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:  /* 8 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__motionDone(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE:  /* 9 */
+        case ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE:  /* 9 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setControlMode(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_ADDITIONAL_INFO:  /* 12 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:  /* 12 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getAdditionalInfo(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_ADDITIONAL_INFO:  /* 13 */
+        case ICUBCANPROTO_POL_MC_CMD__SET_ADDITIONAL_INFO:  /* 13 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setAdditionalInfo(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT:  /* 14 */
+        case ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT:  /* 14 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setSpeedEtimShift(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_DEBUG_PARAM:  /* 18 */
+        case ICUBCANPROTO_POL_MC_CMD__SET_DEBUG_PARAM:  /* 18 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setDebugParam(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_DEBUG_PARAM:  /* 19 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM:  /* 19 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getDebugParam(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_ENCODER_POSITION:  /* 20 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION:  /* 20 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getEncoderPosition(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE	:  /* 27 */
+        case ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE	:  /* 27 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__positionMove(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE:  /* 28 */
+        case ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE:  /* 28 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__velocityMove(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_ENCODER_POSITION:  /* 29 */
+        case ICUBCANPROTO_POL_MC_CMD__SET_ENCODER_POSITION:  /* 29 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setEncoderPosition(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE:  /* 44*/
+        case ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE:  /* 44*/
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_DESIRED_TORQUE:  /* 45*/
+        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:  /* 45*/
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getDesiredTorque(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__STOP_TRAJECTORY:  /* 46*/
+        case ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY:  /* 46*/
         {
             res = eo_icubCanProto_former_pol_mb_cmd__stopTrajectory(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__GET_BOARD_ID:  /* 51 */
+        case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID:  /* 51 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getBoardId(p, nv_ptr, dest, canFrame);
         }break;
 
-        case ICUBCANPROTO_POL_MB_CMD__SET_COMMAND_POSITION:  /* 62 */
+        case ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION:  /* 62 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setCmdPos(p, nv_ptr, dest, canFrame);
         }break;

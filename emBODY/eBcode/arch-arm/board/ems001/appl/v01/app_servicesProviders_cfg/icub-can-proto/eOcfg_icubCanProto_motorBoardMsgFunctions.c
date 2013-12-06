@@ -66,9 +66,9 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 #define EMS_CAN_ADDR                                    0
-#define ICUBCANPROTO_POL_MB_ID_DEFAULT                  ((ICUBCANPROTO_CLASS_POLLING_MOTORBOARD << 8) | (0x0<<4))
-#define ICUBCANPROTO_POL_MB_CREATE_ID(destBoardAddr)    ((ICUBCANPROTO_CLASS_POLLING_MOTORBOARD << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
-#define ICUBCANPROTO_PER_MB_CREATE_ID(cmdId)            ((ICUBCANPROTO_CLASS_PERIODIC_MOTORBOARD << 8) | (EMS_CAN_ADDR<<4) | (cmdId&0xF))
+#define ICUBCANPROTO_POL_MC_ID_DEFAULT                  ((ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL << 8) | (0x0<<4))
+#define ICUBCANPROTO_POL_MC_CREATE_ID(destBoardAddr)    ((ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
+#define ICUBCANPROTO_PER_MC_CREATE_ID(cmdId)            ((ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL << 8) | (EMS_CAN_ADDR<<4) | (cmdId&0xF))
 
 
 
@@ -221,11 +221,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_unexpected_cmd(EOicubCanProto* p
 
 extern eOresult_t eo_icubCanProto_former_test(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1) <<7) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1) <<7) | ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
     canFrame->data[1] = *((uint8_t*)val_ptr);
     canFrame->data[2] = *(((uint8_t*)val_ptr) +1);
     return(eores_OK);
@@ -233,21 +233,21 @@ extern eOresult_t eo_icubCanProto_former_test(EOicubCanProto* p, void *val_ptr, 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__controllerRun(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
     return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__controllerIdle(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
     return(eores_OK);
 }
 
@@ -260,13 +260,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
 {
     eOicubCanProto_calibrator_t *calib_ptr = (eOicubCanProto_calibrator_t *)val_ptr;
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
 
     /*3) set command's params */
     canFrame->data[1] = calib_ptr->type;
@@ -316,22 +316,22 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__enablePwmPad(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
     return(eores_OK);
 }
 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__disablePwmPad(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
     return(eores_OK);
 }
 
@@ -375,13 +375,13 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getControlMode(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__GET_CONTROL_MODE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE;
 
     /* this command hasn't params */
 
@@ -422,13 +422,13 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__motionDone(EOicubCanProto* 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__motionDone(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__MOTION_DONE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
 
     /* this command hasn't params */
 
@@ -441,13 +441,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setControlMode(EOicubCanPro
     eOicubCanProto_controlmode_t *controlMode_ptr = (eOicubCanProto_controlmode_t*)val_ptr;
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 2;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
 
     /* 3) set command's params */
     canFrame->data[1] = *controlMode_ptr;
@@ -478,13 +478,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setSpeedEtimShift(EOicubCan
     eOicubCanProto_estimShift_t *estimShift_ptr = (eOicubCanProto_estimShift_t*)val_ptr;
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_SPEED_ESTIM_SHIFT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
 
     /*3) set command's params */
     *((uint8_t*)(&canFrame->data[1])) = estimShift_ptr->estimShiftJointVel;
@@ -527,13 +527,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__positionMove(EOicubCanProto
     /*NOTE: here i don't check is the given setpoint is a position one. i trust to it*/
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE;
 
     /* 3) set command's params */
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = pos_setpoint_ptr->value;
@@ -549,13 +549,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__velocityMove(EOicubCanProto
     /*NOTE: here i don't check is the given setpoint is a velocity one. i trust to it*/
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE;
 
     /*3) set command's params */
     *((eOicubCanProto_velocity_t*)(&canFrame->data[1])) = vel_setpoint_ptr->value;
@@ -577,13 +577,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
     /*NOTE: here i don't check is the given setpoint is a velocity one. i trust to it*/
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
 
     /* 2 set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE;
 
     /*3) set command's params */
     *((eOicubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
@@ -603,13 +603,13 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanP
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getDesiredTorque(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__GET_DESIRED_TORQUE;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE;
 
     /* this command hasn't params */
 
@@ -620,13 +620,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getDesiredTorque(EOicubCanP
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__stopTrajectory(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__STOP_TRAJECTORY;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY;
 
     /* this command hasn't params */
 
@@ -646,11 +646,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getBoardId(EOicubCanProto* 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMinPosition(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)val_ptr);
     return(eores_OK);
 
@@ -670,11 +670,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMinPosition(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxPosition(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)val_ptr);
     return(eores_OK);
 }
@@ -695,11 +695,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMaxPosition(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxVelocity(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_MAX_VELOCITY;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     *((eOicubCanProto_velocity_t*)(&canFrame->data[1])) = *((eOicubCanProto_velocity_t*)val_ptr);
     return(eores_OK);
 }
@@ -722,11 +722,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentLimit(EOicubCanPr
     int32_t maxcurrent = *motor_currentlimit_ptr;
     /* Note: eo-protocol uses 16 bits for current, while icubcanprotocol uses 32bits */
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_LIMIT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     *((int32_t*)(&canFrame->data[1])) = maxcurrent;
     
     return(eores_OK);
@@ -736,11 +736,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentLimit(EOicubCanPr
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     uint8_t     *payload_ptr = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_BCAST_POLICY;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
     
     memcpy(&canFrame->data[1], payload_ptr, 4);
     return(eores_OK);
@@ -750,11 +750,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy(EOicubCanPro
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelShift(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
    eOicubCanProto_velocityShift_t shift = *((eOicubCanProto_velocityShift_t*)val_ptr);
-   canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+   canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
    canFrame->id_type = 0; //standard id
    canFrame->frame_type = 0; //data frame
    canFrame->size = 3;
-   canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_SHIFT;
+   canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
    *((uint16_t*)(&canFrame->data[1])) = shift;
     return(eores_OK);
 }
@@ -782,13 +782,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePid(EOicubCanProto
     eOmc_PID_t *torque_pid_ptr = (eOmc_PID_t *)val_ptr;
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = torque_pid_ptr->kp;
@@ -815,14 +815,14 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePidLimits(EOicubCa
     eOmc_PID_t *torque_pid_ptr = (eOmc_PID_t *)val_ptr;
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8; /*  Currently in messages.h there is a check on frame_len equal to 8, else frame is discard.
                             so i left size=8 even if correct size is 7 */
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = torque_pid_ptr->offset;
@@ -850,13 +850,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPid(EOicubCanProto* p
     eOmc_PID_t *pos_pid_ptr = (eOmc_PID_t *)val_ptr;
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8;
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_POS_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->kp;
@@ -884,14 +884,14 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPidLimits(EOicubCanPr
     eOmc_PID_t *pos_pid_ptr = (eOmc_PID_t *)val_ptr;
 
     /* 1) prepare base information*/
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8; /*  Currently in messages.h there is a check on frame_len equal to 8, else frame is discard.
                             so i left size=8 even if correct size is 7 */
 
     /* 2) set can command */
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
 
     /* 3) set command's params */
     *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->offset;
@@ -915,11 +915,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getPosPidLimits(EOicubCanPr
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelTimeout(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
     *((uint16_t*)(&canFrame->data[1])) = *((uint16_t*)val_ptr);
     return(eores_OK);
 }
@@ -929,13 +929,13 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams(EOicubCa
 {
     eOicubCanProto_impedance_t *imp_ptr = (eOicubCanProto_impedance_t *)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8;
     
     memset(&canFrame->data[0], 0, 8);
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
 
     //stiffnes and damping are uint16_t
     *((eOicubCanProto_stiffness_t*)(&canFrame->data[1])) = (eOicubCanProto_stiffness_t)imp_ptr->stiffness;
@@ -959,11 +959,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset(EOicubCa
 {
     eOicubCanProto_torque_t *impOffset_ptr = (eOicubCanProto_torque_t *)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
 
     *((eOicubCanProto_torque_t*)(&canFrame->data[1])) = *((eOicubCanProto_torque_t*)(impOffset_ptr));
 
@@ -1011,11 +1011,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getFirmwareVersion(EOicubCa
 {
     eOicubCanProto_protocolVersion_t *protover_ptr = (eOicubCanProto_protocolVersion_t *)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__GET_FIRMWARE_VERSION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
 
     canFrame->data[1] = protover_ptr->major;
     canFrame->data[2] = protover_ptr->minor;
@@ -1027,11 +1027,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPid(EOicubCanProt
 {
     eOmc_PID_t *cur_pid_ptr = (eOmc_PID_t*)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     *((uint16_t*)(&canFrame->data[1])) = cur_pid_ptr->kp;
     *((uint16_t*)(&canFrame->data[3])) = cur_pid_ptr->ki;
     *((uint16_t*)(&canFrame->data[5])) = cur_pid_ptr->kd;
@@ -1053,11 +1053,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPidLimits(EOicubC
 {
     eOmc_PID_t *cur_pid_ptr = (eOmc_PID_t*)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_CURRENT_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
 
     *((uint16_t*)(&canFrame->data[1])) = cur_pid_ptr->offset;
     *((uint16_t*)(&canFrame->data[3])) = cur_pid_ptr->limitonoutput;
@@ -1082,11 +1082,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPid(EOicubCanPro
 
     eOmc_PID_t *vel_pid_ptr = (eOmc_PID_t*)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PID;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
     *((uint16_t*)(&canFrame->data[1])) = vel_pid_ptr->kp;
     *((uint16_t*)(&canFrame->data[3])) = vel_pid_ptr->ki;
     *((uint16_t*)(&canFrame->data[5])) = vel_pid_ptr->kd;
@@ -1109,11 +1109,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelocityPidLimits(EOicub
 {
     eOmc_PID_t *vel_pid_ptr = (eOmc_PID_t*)val_ptr;
 
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 7;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_VELOCITY_PIDLIMITS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS;
 
     *((uint16_t*)(&canFrame->data[1])) = vel_pid_ptr->offset;
     *((uint16_t*)(&canFrame->data[3])) = vel_pid_ptr->limitonoutput;
@@ -1137,11 +1137,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getVelocityPidLimits(EOicub
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredCurrent(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     eOmeas_current_t *currentVal_ptr = (eOmeas_current_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_CURRENT;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT;
     *((eOmeas_current_t*)(&canFrame->data[1])) = *currentVal_ptr;
     canFrame->data[3]= 0; //LSB Id
     canFrame->data[4]= 0; //MSB Id
@@ -1171,11 +1171,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setI2TParams(EOicubCanProto
 {
     
     eOmc_i2tParams_t *i2tParams_ptr = (eOmc_i2tParams_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_I2T_PARAMS;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS;
     *((uint16_t*)(&canFrame->data[1])) = i2tParams_ptr->time;
     *((uint16_t*)(&canFrame->data[3])) = i2tParams_ptr->tresh;
     
@@ -1193,11 +1193,11 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getI2TParams(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCmdPos(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    canFrame->id = ICUBCANPROTO_POL_MB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MB_CMD__SET_COMMAND_POSITION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION;
     *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)nv_ptr);
     return(eores_OK);
 }
@@ -1533,7 +1533,7 @@ extern eOresult_t eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent(EO
 {
     int16_t *pwmList = (int16_t*)val_ptr;
    
-    canFrame->id = ICUBCANPROTO_PER_MB_CREATE_ID(ICUBCANPROTO_PER_MB_CMD_EMSTO2FOC_DESIRED_CURRENT);
+    canFrame->id = ICUBCANPROTO_PER_MC_CREATE_ID(ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8;
@@ -1832,12 +1832,12 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     mstatus_ptr->chamaleon04[0] = 0;
     dgn_ptr = eo_theEMSdgn_GetHandle();
     
-    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_UNDERVOLTAGE)) //undervoltage
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_UNDERVOLTAGE)) //undervoltage
     {
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_UNDERVOLTAGE;
     }
     
-    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERVOLTAGE)) //overvoltage    
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERVOLTAGE)) //overvoltage    
     {
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
     }
@@ -1845,15 +1845,15 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     
     if(eo_theEMSdgn_IsExtFault2Signal(dgn_ptr))
     {
-        if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_EXTERNAL))//external
+        if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_EXTERNAL))//external
         {
             mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
         }
     }
     
-    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MB_STATUS_FLAG_OVERCURRENT)) //over current
+    if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERCURRENT)) //over current
     {
-        if((applrunMode__2foc == runmode) && (EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MB_STATUS_FLAG_I2TFAILURE)))
+        if((applrunMode__2foc == runmode) && (EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MC_STATUS_FLAG_I2TFAILURE)))
         {
             mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_I2TFAILURE;
         }
@@ -1864,18 +1864,18 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     }
 
     
-    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECWARNING)) //can receive warning   
+    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECWARNING)) //can receive warning   
     {
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECWARNING;
     }
     
-    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECERROR)) //can receive error   
+    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECERROR)) //can receive error   
     {
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECERROR;
     }
     
     
-    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MB_STATUS_FLAG_CANRECHWOVERRUN)) //can hw over-run   
+    if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECHWOVERRUN)) //can hw over-run   
     {
         mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECHWOVERRUN;
     }

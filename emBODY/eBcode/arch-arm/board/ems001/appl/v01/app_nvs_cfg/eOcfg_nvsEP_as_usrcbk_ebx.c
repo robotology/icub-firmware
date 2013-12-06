@@ -138,16 +138,16 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const E
         if(eo_sm_emsappl_STrun == currentstate)
         {
             msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
-            msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+            msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->mode));
         }
     }
     
     
-    msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
+    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->datarate));
 
-    msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION;
+    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->resolution));
     
     
@@ -165,7 +165,7 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t n, c
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
     eOas_maismode_t                *maismode = (eOas_maismode_t*)nv->loc;
@@ -197,7 +197,7 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__datarate(uint16_t 
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
     };
 
     uint8_t               *maisdatarate = (uint8_t*)nv->loc;
@@ -217,7 +217,7 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__resolution(uint16_
     eOicubCanProto_msgCommand_t     msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION
     };
 
     eOas_maisresolution_t           *maisresolution = (uint8_t*)nv->loc;
@@ -260,11 +260,11 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
     if(eo_sm_emsappl_STrun == currentstate)
     {
-        msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+        msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));        
     }
 
-    msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
+    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
     
     if(straincfg->signaloncefullscale)
@@ -279,7 +279,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
         sstatus_ptr->fullscale.head.size = 0;
         memset(&sstatus_ptr->fullscale.data[0], 0, 12);
         channel = 0;
-        msgCmd.cmdId =  ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES;
+        msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
     }
     
@@ -294,7 +294,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_TXMODE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
     eOas_strainmode_t               *strainmode = (eOas_strainmode_t*)nv->loc;
@@ -321,7 +321,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
     };
 
     uint8_t               *straindatarate = (uint8_t*)nv->loc;
@@ -341,7 +341,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullsc
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
     };
 
     if(*signaloncefullscale)

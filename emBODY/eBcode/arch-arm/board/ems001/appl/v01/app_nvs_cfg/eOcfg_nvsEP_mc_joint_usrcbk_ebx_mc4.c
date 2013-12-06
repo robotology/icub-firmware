@@ -163,18 +163,18 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
     
     // 1) send pid position 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_POS_PID;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg->pidposition);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg->pidposition);
 
 
     // 2) send torque pid
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg->pidtorque);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg->pidtorque);
 
     // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
@@ -190,14 +190,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
         minpos_icubCanProtValue = maxpos_icubCanProtValue;
         maxpos_icubCanProtValue = pos_icubCanProtValue;
     }
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&minpos_icubCanProtValue);
  
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&maxpos_icubCanProtValue);
 
     // 5) set vel timeout
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg->velocitysetpointtimeout);
 
     // 6) set impedance
@@ -205,10 +205,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     impedence_icubCanProtValues.damping = eo_appMeasConv_impedenceDamping_I2S(appMeasConv_ptr, jxx, cfg->impedance.damping);
     impedence_icubCanProtValues.offset = eo_appMeasConv_torque_I2S(appMeasConv_ptr, jxx, cfg->impedance.offset);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues.offset);
     
     
@@ -254,10 +254,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_joi
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
 
     // send pid position 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_POS_PID;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_POS_PIDLIMITS;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 }
 
@@ -286,10 +286,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
 
     // send pid torque
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PID;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_TORQUE_PIDLIMITS;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 }
 
@@ -328,10 +328,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_joint
     impedence_icubCanProtValues.damping = eo_appMeasConv_impedenceDamping_I2S(appMeasConv_ptr, jxx, impedance_ptr->damping);
     impedence_icubCanProtValues.offset = eo_appMeasConv_torque_I2S(appMeasConv_ptr, jxx, impedance_ptr->offset);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_PARAMS;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_IMPEDANCE_OFFSET;
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues.offset);
 
 }
@@ -347,7 +347,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint(eOcfg_nvsEP
 //     eOicubCanProto_msgCommand_t              msgCmd = 
 //     {
 //         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-//         EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_MIN_POSITION
+//         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
 //     };
 
 
@@ -371,7 +371,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP
 //     eOicubCanProto_msgCommand_t              msgCmd = 
 //     {
 //         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-//         EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_MAX_POSITION
+//         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION
 //     };
 
 //     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
@@ -389,7 +389,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__SET_VEL_TIMEOUT
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
@@ -504,7 +504,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
             //reference velocity of position set point must be always >0, so here absolute func is used.
             setpoint_pos.withvelocity = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv_ptr,jxx, setPoint->to.position.withvelocity);
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__POSITION_MOVE; 
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE; 
             val_ptr =  &setpoint_pos; 
         }break;
 
@@ -520,7 +520,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
                 setpoint_vel.withacceleration = 1;
             }            
             
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__VELOCITY_MOVE;                 
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE;                 
             val_ptr =  &setpoint_vel;   
             
         }break;
@@ -531,20 +531,20 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
             
             setpoint_torque.value = eo_appMeasConv_torque_I2S(appMeasConv_ptr,jxx, setPoint->to.torque.value);
             
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_TORQUE;           
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE;           
             val_ptr =  &setpoint_torque;    
         }break;
 
         case eomc_setpoint_current:
         {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_DESIRED_CURRENT;                             
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT;                             
             val_ptr =  &(setPoint->to.current.value);    
         }break;
 
         case eomc_setpoint_positionraw:
         {    
             pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_COMMAND_POSITION; 
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
             val_ptr =  &pos; 
         }break;
         
@@ -565,7 +565,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MB_CMD__STOP_TRAJECTORY
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
@@ -691,26 +691,26 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
     if(eobool_true == enableAMPbeforeCalib)
     {
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &iCubCanProtCalibrator);
     }
     else
     {
 //        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, &iCubCanProtCalibrator);
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CALIBRATE_ENCODER;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &iCubCanProtCalibrator);
 
         #warning VALE-->devo invoiare ena_PWM e RUN?
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     }
  
@@ -759,20 +759,20 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
             //i can exit from idle only if i received set control mode position command
             return;
         }
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__ENABLE_PWM_PAD;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     
-        msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_RUN;
+        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     }
     else
     {
         if(eomc_controlmode_cmd_switch_everything_off == *controlmode_cmd_ptr)
         {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__DISABLE_PWM_PAD;
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__CONTROLLER_IDLE;
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
         }
         else
@@ -782,7 +782,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
             {
                 return;
             }
-            msgCmd.cmdId = ICUBCANPROTO_POL_MB_CMD__SET_CONTROL_MODE;
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
         }
     }

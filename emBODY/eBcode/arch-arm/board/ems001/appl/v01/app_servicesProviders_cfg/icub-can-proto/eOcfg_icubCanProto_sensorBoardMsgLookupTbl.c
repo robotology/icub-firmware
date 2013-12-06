@@ -57,19 +57,19 @@
 /* Note: currently polling sensor board messages are managed by exception functions (both parser and former)
 because they are few mesages 
 and with id not continuos. */
-#define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1   //ICUBCANPROTO_POL_SB_CMD_MAXNUM
-#define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_SB_CMD__CMD_MAXNUM
+#define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1   //ICUBCANPROTO_POL_AS_CMD_MAXNUM
+#define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_AS_CMD__CMD_MAXNUM
 
-#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM
+#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max ICUBCANPROTO_PER_AS_CMD__CMD_MAXNUM
 #define eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max 2 
-#define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_SB_CMD__CMD_MAXNUM
+#define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_AS_CMD__CMD_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_pollingSkinMsg_inTbl_max               1//ICUBCANPROTO_POL_SB_CMD_MAXNUM
+#define eo_icubCanProto_pollingSkinMsg_inTbl_max               1//ICUBCANPROTO_POL_AS_CMD_MAXNUM
 #define eo_icubCanProto_pollingSkinMsgClass_maxNum             ICUBCANPROTO_POL_SK_CMD_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_periodicSkinMsg_inTbl_max              1//ICUBCANPROTO_PER_SB_CMD_MAXNUM 
+#define eo_icubCanProto_periodicSkinMsg_inTbl_max              1//ICUBCANPROTO_PER_AS_CMD_MAXNUM 
 #define eo_icubCanProto_periodicSkinMsg_maxNum                 ICUBCANPROTO_PER_SK_CMD_MAXNUM
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ and with id not continuos. */
 /* DECLARATION OF POLLING SENSOR BOARD PARSER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingSensorBoardMsg_parserFn_list[eo_icubCanProto_pollingSensorBoardMsg_inTbl_max] = 
 {
-    {   // 0 ICUBCANPROTO_POL_SB_CMD__NONE			
+    {   // 0 ICUBCANPROTO_POL_AS_CMD__NONE			
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_sb_unexpected_cmd
     }
 };        
@@ -125,7 +125,7 @@ extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_parser_L
 /* DECLARATION OF POLLING SENSOR BOARD FORMER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingSensorBoardMsg_formerFn_list[eo_icubCanProto_pollingSensorBoardMsg_inTbl_max] = 
 {
-    {   // 0 ICUBCANPROTO_POL_SB_CMD__NONE			
+    {   // 0 ICUBCANPROTO_POL_AS_CMD__NONE			
         EO_INIT(.former)    eo_icubCanProto_former_pol_sb_unexpected_cmd
     }
 };        
@@ -152,22 +152,22 @@ extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_L
 /* DECLARATION OF PERIODIC SENSOR BOARD PARSER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensorBoardMsg_parserFn_list[eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max] = 
 {
-    {   // 8 ICUBCANPROTO_PER_SB_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE 			
+    {   // 8 ICUBCANPROTO_PER_AS_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     },
-    {   // 9 ICUBCANPROTO_PER_SB_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE 			
+    {   // 9 ICUBCANPROTO_PER_AS_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmode
     },    
-    {   // 10 ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR 			
+    {   // 10 ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
     },
-    {   // 11 ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR 			
+    {   // 11 ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__torqueVector
     },
-    {   // 12 ICUBCANPROTO_PER_SB_CMD__HES0TO6 			
+    {   // 12 ICUBCANPROTO_PER_AS_CMD__HES0TO6 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes0to6
     },
-    {   // 13 ICUBCANPROTO_PER_SB_CMD__HES7TO14
+    {   // 13 ICUBCANPROTO_PER_AS_CMD__HES7TO14
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes7to14
     }
 };        
@@ -190,10 +190,10 @@ extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_parser_
 /* DECLARATION OF PERIODIC SENSOR BOARD FORMER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_periodicSensorBoardMsg_formerFn_list[eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max] = 
 {   
-    {   // 10 ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR 			
+    {   // 10 ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR 			
         EO_INIT(.former)    eo_icubCanProto_former_per_sb_cmd__forceVector
     },
-    {   // 11 ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR 			
+    {   // 11 ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR 			
         EO_INIT(.former)    eo_icubCanProto_former_per_sb_cmd__torqueVector
     }
 };        
@@ -307,7 +307,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicub
 
     switch(cmdId)
     {
-        case ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES:
+        case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES:
         {
             res = eo_icubCanProto_parser_pol_sb_cmd__getFullScales(p, frame, canPort);
         }break;
@@ -335,26 +335,26 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicub
     switch(cmdId)
     {
 
-        case ICUBCANPROTO_POL_SB_CMD__SET_TXMODE: //0x7
+        case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE: //0x7
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setTxMode(p, val_ptr, dest, canFrame);
         }break;
 
 
-        case ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE: //0x8
+        case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE: //0x8
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(p, val_ptr, dest, canFrame);
         }break;
         
         
-        case ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION: //0x10
+        case ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION: //0x10
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setResolution(p, val_ptr, dest, canFrame);
         }break;
 
 
 
-        case ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES: //0x18
+        case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES: //0x18
         {
             res = eo_icubCanProto_former_pol_sb_cmd__getFullScales(p, val_ptr, dest, canFrame);
         }break;

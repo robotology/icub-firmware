@@ -66,10 +66,10 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 #define EMS_CAN_ADDR                                            0
-#define ICUBCANPROTO_POL_SB_ID_DEFAULT                          ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (0x0<<4))
-#define ICUBCANPROTO_POL_SB_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
-#define ICUBCANPROTO_POL_SK_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_SENSORBOARD << 8)|  (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
-#define ICUBCANPROTO_PER_SB_CREATE_ID(cmdId, addr)              ((ICUBCANPROTO_CLASS_PERIODIC_SENSORBOARD << 8) | (addr<<4) | (cmdId&0xF))
+#define ICUBCANPROTO_POL_AS_ID_DEFAULT                          ((ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR << 8) | (0x0<<4))
+#define ICUBCANPROTO_POL_AS_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
+#define ICUBCANPROTO_POL_SK_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR << 8)|  (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
+#define ICUBCANPROTO_PER_AS_CREATE_ID(cmdId, addr)              ((ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR << 8) | (addr<<4) | (cmdId&0xF))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -115,11 +115,11 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setTxMode(EOicubCanProto* p
 {
     eOenum08_t *txmode = (eOenum08_t *)val_ptr;
     
-    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_AS_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 2;
-    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_TXMODE;
+    canFrame->data[0] = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     canFrame->data[1] = *txmode;
     
 //     switch(*maismode)
@@ -149,11 +149,11 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setTxMode(EOicubCanProto* p
 extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     uint8_t *datarate = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_AS_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 2;
-    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_CANDATARATE;
+    canFrame->data[0] = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     canFrame->data[1] = *datarate;
     
     return(eores_OK);
@@ -163,11 +163,11 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProt
 {
     eOas_maisresolution_t *maisresolution = (eOas_maisresolution_t*)val_ptr;
     
-    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_AS_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 2;
-    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__SET_RESOLUTION;
+    canFrame->data[0] = ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
     switch(*maisresolution)
     {
         case eoas_maisresolution_08:
@@ -206,7 +206,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     eOicubCanProto_msgCommand_t                 msgCmd = 
     {
         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
     };
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
@@ -283,11 +283,11 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
 extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__getFullScales(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     uint8_t *channel = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_POL_SB_CREATE_ID(dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_POL_AS_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 2;
-    canFrame->data[0] = ICUBCANPROTO_POL_SB_CMD__GET_FULL_SCALES;
+    canFrame->data[0] = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
     canFrame->data[1] = *channel;
 
     return(eores_OK);
@@ -550,7 +550,7 @@ extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto*
 {
 
     uint8_t *data_ptr = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_PER_SB_CREATE_ID(ICUBCANPROTO_PER_SB_CMD__FORCE_VECTOR, dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_PER_AS_CREATE_ID(ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR, dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 6;
@@ -561,7 +561,7 @@ extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto*
 extern eOresult_t eo_icubCanProto_former_per_sb_cmd__torqueVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     uint8_t *data_ptr = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_PER_SB_CREATE_ID(ICUBCANPROTO_PER_SB_CMD__TORQUE_VECTOR, dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_PER_AS_CREATE_ID(ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR, dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 6;
