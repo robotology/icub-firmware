@@ -44,7 +44,7 @@
 #include "EOarray.h"
 #include "EOnv.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 #include "eOcfg_nvsEP_as.h"
 
@@ -102,15 +102,15 @@ enum {varsASonemais_TOTALnumber = strainOneMais_TOTALnumber*strainNVindex_TOTALn
  **/
 typedef struct                      // size is 48*1 = 48                
 {
-    eOsnsr_mais_t                   maises[1];
+    eOas_mais_t                   maises[1];
 } eo_cfg_nvsEP_as_onemais_t;        EO_VERIFYsizeof(eo_cfg_nvsEP_as_onemais_t, 48);
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 
-extern const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
-extern const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
+extern const eOas_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue;
+extern const eOas_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 

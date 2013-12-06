@@ -94,12 +94,12 @@ static uint16_t s_hash(uint16_t id);
 
 static const eOmc_controller_t s_eo_cfg_nvsEP_mc_torso_con_defaultvalue =
 {
-    EO_INIT(.cconfig)             
+    EO_INIT(.config)             
     {
         EO_INIT(.durationofctrlloop)        EOK_reltime1ms,
         EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4}
     },
-    EO_INIT(.cstatus)                      
+    EO_INIT(.status)                      
     {
         EO_INIT(.alljomoinitted)            eobool_false,
         EO_INIT(.numofjoints)               EOK_cfg_nvsEP_mc_torso_NUMofJOINTS,
@@ -108,7 +108,7 @@ static const eOmc_controller_t s_eo_cfg_nvsEP_mc_torso_con_defaultvalue =
         EO_INIT(.flagsinittedjoints)        0x0000,
         EO_INIT(.flagsinittedmotors)        0x0000   
     },
-    EO_INIT(.ccmmnds)                      
+    EO_INIT(.cmmnds)                      
     {
         EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_config,
         EO_INIT(.filler07)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}   
@@ -251,7 +251,7 @@ const eOmc_controller_t* eo_cfg_nvsEP_mc_torso_controller_defaultvalue = &s_eo_c
 EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
 {
     // joint-j00
-    // jconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jconfig,
         EO_INIT(.index)     Jindex( 0, 0),
@@ -355,7 +355,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },
 
-    // jstatus
+    // status
     {   //17
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jstatus,
         EO_INIT(.index)     Jindex( 0,17),
@@ -381,7 +381,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },  
 
-    // jinputs
+    // inputs
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jinputs,
         EO_INIT(.index)     Jindex( 0,21),
@@ -389,7 +389,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         EO_INIT(.dchildren) NULL
     },        
 
-        // jinputs
+        // inputs
         {   //22
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jinputs__externallymeasuredtorque,
             EO_INIT(.index)     Jindex( 0,22),
@@ -409,7 +409,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         }, 
     
-    // jcmmnds
+    // cmmnds
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j00_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 0,25),
@@ -448,7 +448,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
     },    
        
     // joint-j01
-    // jconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jconfig,
         EO_INIT(.index)     Jindex( 1, 0),
@@ -552,7 +552,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },
 
-    // jstatus
+    // status
     {   //17
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jstatus,
         EO_INIT(.index)     Jindex( 1,17),
@@ -578,7 +578,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },  
 
-    // jinputs
+    // inputs
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jinputs,
         EO_INIT(.index)     Jindex( 1,21),
@@ -586,7 +586,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         EO_INIT(.dchildren) NULL
     },        
 
-        // jinputs
+        // inputs
         {   //22
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jinputs__externallymeasuredtorque,
             EO_INIT(.index)     Jindex( 1,22),
@@ -606,7 +606,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         }, 
     
-    // jcmmnds
+    // cmmnds
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j01_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 1,25),
@@ -646,7 +646,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
     
 
     // joint-j02
-    // jconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jconfig,
         EO_INIT(.index)     Jindex( 2, 0),
@@ -750,7 +750,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },
 
-    // jstatus
+    // status
     {   //17
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jstatus,
         EO_INIT(.index)     Jindex( 2,17),
@@ -776,7 +776,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         },  
 
-    // jinputs
+    // inputs
     {   //21
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jinputs,
         EO_INIT(.index)     Jindex( 2,21),
@@ -784,7 +784,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         EO_INIT(.dchildren) NULL
     },        
 
-        // jinputs
+        // inputs
         {   //22
             EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jinputs__externallymeasuredtorque,
             EO_INIT(.index)     Jindex( 2,22),
@@ -804,7 +804,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.dchildren) NULL
         }, 
     
-    // jcmmnds
+    // cmmnds
     {   //25
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_j02_jcmmnds__calibration,
         EO_INIT(.index)     Jindex( 2,25),
@@ -847,7 +847,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
     // ---------- and in here come the 3 motors
     
     // motor-m00
-    // mconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_m00_mconfig,
         EO_INIT(.index)     Mindex( 0, 0),
@@ -878,7 +878,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
         },  
-    // mstatus
+    // status
     {   // 5
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_m00_mstatus,
         EO_INIT(.index)     Mindex( 0, 5),
@@ -900,7 +900,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
  
  
     // motor-m01
-    // mconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_m01_mconfig,
         EO_INIT(.index)     Mindex( 1, 0),
@@ -931,7 +931,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
         },  
-    // mstatus
+    // status
     {   // 5
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_m01_mstatus,
         EO_INIT(.index)     Mindex( 1, 5),
@@ -953,7 +953,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
  
 
     // motor-m02
-    // mconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_m02_mconfig,
         EO_INIT(.index)     Mindex( 2, 0),
@@ -984,7 +984,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
         },  
-    // mstatus
+    // status
     {   // 5
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_m02_mstatus,
         EO_INIT(.index)     Mindex( 2, 5),
@@ -1006,7 +1006,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
         
 
     // the controller
-    // cconfig
+    // config
     {   // 0
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_c00_cconfig,
         EO_INIT(.index)     Cindex( 0),
@@ -1019,7 +1019,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
         },  
-    // cstatus
+    // status
     {   // 2
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_c00_cstatus,
         EO_INIT(.index)     Cindex( 2),
@@ -1032,7 +1032,7 @@ EOtreenode eo_cfg_nvsEP_mc_torso_tree_con[] =
             EO_INIT(.nchildren) 0,
             EO_INIT(.dchildren) NULL
         },  
-    // ccmmnds    
+    // cmmnds    
     {   // 4
         EO_INIT(.data)      (void*)&eo_cfg_nvsEP_mc_torso_c00_ccmmnds__go2stateofcontroller,
         EO_INIT(.index)     Cindex( 4),

@@ -79,18 +79,18 @@ static uint16_t s_hash(uint16_t id);
 
 const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default =
 {
-    EO_INIT(.someskin)
+    EO_INIT(.skin)
     {
-        EO_INIT(.sconfig)           
+        EO_INIT(.config)           
         {
-            EO_INIT(.sigmode)       skin_sigmode_dontsignal,
+            EO_INIT(.sigmode)       eosk_sigmode_dontsignal,
             EO_INIT(.filler03)      {0xf1, 0xf2, 0xf3}
         },
-        EO_INIT(.sinputs)           
+        EO_INIT(.inputs)           
         {
             EO_INIT(.filler04)      {0xf1, 0xf2, 0xf3, 0xf4}
         },
-        EO_INIT(.sstatus)       
+        EO_INIT(.status)       
         {
             EO_INIT(.arrayof10canframes)
             {
@@ -98,7 +98,8 @@ const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default =
                 {
                     EO_INIT(.capacity)      10,
                     EO_INIT(.itemsize)      sizeof(eOutil_canframe_t),
-                    EO_INIT(.size)          0     // it is the only one in the header that can change
+                    EO_INIT(.size)          0,    // it is the only one in the header that can change
+                    EO_INIT(.dummy)         0
                 }
             },
             EO_INIT(.filler04)          {0xf1, 0xf2, 0xf3, 0xf4}         
@@ -117,7 +118,7 @@ EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sconfig__sigmode =
 {   // pos =  00
     EO_INIT(.id)        EOK_cfg_nvsEP_sk_emsboard_NVID_sconfig__sigmode,
     EO_INIT(.capacity)  CAPACITY_sconfig__sigmode,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_sk_emsboard_default.someskin.sconfig.sigmode,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_sk_emsboard_default.skin.config.sigmode,
     EO_INIT(.offset)    OFFSETof_sconfig__sigmode,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_sk_emsboard_NVFUNTYP_sconfig__sigmode),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_sk_emsboard_NVFUNTYP_sconfig__sigmode)
@@ -143,7 +144,7 @@ EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sstatus__arrayof10canframes =
 {   // pos =  01
     EO_INIT(.id)        EOK_cfg_nvsEP_sk_emsboard_NVID_sstatus__arrayof10canframes,
     EO_INIT(.capacity)  CAPACITY_sstatus__arrayof10canframes,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_sk_emsboard_default.someskin.sstatus.arrayof10canframes,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_sk_emsboard_default.skin.status.arrayof10canframes,
     EO_INIT(.offset)    OFFSETof_sstatus__arrayof10canframes,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_sk_emsboard_NVFUNTYP_sstatus__arrayof10canframes),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_sk_emsboard_NVFUNTYP_sstatus__arrayof10canframes)
@@ -160,7 +161,7 @@ EOnv_con_t eo_cfg_nvsEP_sk_emsboard_sstatus__arrayof10canframes =
 
 // guard on alignment of variables. if it doesnt compile then ... the compiler has surely inserted some holes
 
-EO_VERIFYproposition(eocfg_nvsep_sk_emsboard, ( (OFFSETafter_sstatus_filler04) == sizeof(eOskin_someskin_t) ) );
+EO_VERIFYproposition(eocfg_nvsep_sk_emsboard, ( (OFFSETafter_sstatus_filler04) == sizeof(eOsk_skin_t) ) );
 
 
 

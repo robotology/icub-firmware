@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "eOcfg_nvsEP_as_any_con_sxx.h"    
 #include "eOcfg_nvsEP_as_any_con_sxxdefault.h"
       
@@ -87,13 +87,13 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 #define SOFFSETof_sconfig                                              (SMACRO_OFF)
-#define SCAPACITY_sconfig                                              sizeof(eOsnsr_strain_config_t)
+#define SCAPACITY_sconfig                                              sizeof(eOas_strain_config_t)
 EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sconfig,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.config,
     EO_INIT(.offset)    SOFFSETof_sconfig,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig)
@@ -109,7 +109,7 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__mode) =
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__mode, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sconfig__mode,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig.mode,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.config.mode,
     EO_INIT(.offset)    SOFFSETof_sconfig__mode,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__mode)
@@ -123,7 +123,7 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__datarate) =
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__datarate, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sconfig__datarate,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig.datarate,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.config.datarate,
     EO_INIT(.offset)    SOFFSETof_sconfig__datarate,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__datarate)
@@ -137,7 +137,7 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signaloncefu
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sconfig__signaloncefullscale, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sconfig__signaloncefullscale,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sconfig.signaloncefullscale,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.config.signaloncefullscale,
     EO_INIT(.offset)    SOFFSETof_sconfig__signaloncefullscale,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sconfig__signaloncefullscale)
@@ -158,13 +158,13 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sconfig__signaloncefu
 
 
 #define SOFFSETof_sstatus                                                (SOFFSETafter_sinputs_filler04)
-#define SCAPACITY_sstatus                                                sizeof(eOsnsr_strain_status_t)
+#define SCAPACITY_sstatus                                                sizeof(eOas_strain_status_t)
 EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sstatus,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.status,
     EO_INIT(.offset)    SOFFSETof_sstatus,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus)
@@ -173,13 +173,13 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus) =
 
 
 #define SOFFSETof_sstatus__fullscale                                        (SOFFSETafter_sinputs_filler04)
-#define SCAPACITY_sstatus__fullscale                                        sizeof(eOsnsr_arrayofupto12bytes_t)
+#define SCAPACITY_sstatus__fullscale                                        sizeof(eOas_arrayofupto12bytes_t)
 EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__fullscale) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__fullscale, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sstatus__fullscale,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus.fullscale,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.status.fullscale,
     EO_INIT(.offset)    SOFFSETof_sstatus__fullscale,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__fullscale)
@@ -188,13 +188,13 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__fullscale) =
 
 
 #define SOFFSETof_sstatus__calibratedvalues                                        (SOFFSETafter_sstatus__fullscale)
-#define SCAPACITY_sstatus__calibratedvalues                                        sizeof(eOsnsr_arrayofupto12bytes_t)
+#define SCAPACITY_sstatus__calibratedvalues                                        sizeof(eOas_arrayofupto12bytes_t)
 EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__calibratedvalues) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__calibratedvalues, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sstatus__calibratedvalues,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus.calibratedvalues,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.status.calibratedvalues,
     EO_INIT(.offset)    SOFFSETof_sstatus__calibratedvalues,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__calibratedvalues)
@@ -202,13 +202,13 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__calibratedva
 #define SOFFSETafter_sstatus__calibratedvalues                                     (SOFFSETof_sstatus__calibratedvalues+SCAPACITY_sstatus__calibratedvalues)
 
 #define SOFFSETof_sstatus__uncalibratedvalues                                        (SOFFSETafter_sstatus__calibratedvalues)
-#define SCAPACITY_sstatus__uncalibratedvalues                                        sizeof(eOsnsr_arrayofupto12bytes_t)
+#define SCAPACITY_sstatus__uncalibratedvalues                                        sizeof(eOas_arrayofupto12bytes_t)
 EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__uncalibratedvalues) =
 {   
  
     EO_INIT(.id)        SMACRO_GETNVID(SMACRO_EXTERNALPREFIX_GETID, _sstatus__uncalibratedvalues, SMACRO_NUM),
     EO_INIT(.capacity)  SCAPACITY_sstatus__uncalibratedvalues,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.sstatus.uncalibratedvalues,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue.status.uncalibratedvalues,
     EO_INIT(.offset)    SOFFSETof_sstatus__uncalibratedvalues,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_as_any_con_sxx_NVFUNTYP_sstatus__uncalibratedvalues)
@@ -218,7 +218,7 @@ EOnv_con_t SMACRO_NAMEOFVARIABLE(SMACRO_PSTR, SMACRO_STR, _sstatus__uncalibrated
 
 
 // guard on alignement of variables. if it doesnt compile then ... the compiler has surely inserted some holes
-SMACRO_VERIFYSIZEOF(SMACRO_NUM, eOsnsr_strain_t, SOFFSETafter_sstatus__uncalibratedvalues-SMACRO_OFF);
+SMACRO_VERIFYSIZEOF(SMACRO_NUM, eOas_strain_t, SOFFSETafter_sstatus__uncalibratedvalues-SMACRO_OFF);
 
 
 

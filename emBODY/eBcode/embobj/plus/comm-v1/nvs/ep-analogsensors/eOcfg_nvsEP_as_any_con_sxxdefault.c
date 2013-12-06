@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -72,20 +72,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
+const eOas_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
 {
-    EO_INIT(.sconfig)
+    EO_INIT(.config)
     {
-        EO_INIT(.mode)                          snsr_strainmode_acquirebutdonttx,
+        EO_INIT(.mode)                          eoas_strainmode_acquirebutdonttx,
         EO_INIT(.datarate)                      1,    
         EO_INIT(.signaloncefullscale)           eobool_true,  
         EO_INIT(.filler01)                      {0xf1}
     },
-    EO_INIT(.sinputs)
+    EO_INIT(.inputs)
     {
         EO_INIT(.filler04)                      {0xf1, 0xf2, 0xf3, 0xf4}
     },
-    EO_INIT(.sstatus)                       
+    EO_INIT(.status)                       
     {
         EO_INIT(.fullscale)                     
         {
@@ -93,7 +93,8 @@ const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
             {
                 EO_INIT(.capacity)              6,
                 EO_INIT(.itemsize)              2,
-                EO_INIT(.size)                  0
+                EO_INIT(.size)                  0,
+                EO_INIT(.dummy)                 0
             },
             EO_INIT(.data)                      {0}
         },
@@ -103,7 +104,8 @@ const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
             {
                 EO_INIT(.capacity)              6,
                 EO_INIT(.itemsize)              2,
-                EO_INIT(.size)                  6
+                EO_INIT(.size)                  6,
+                EO_INIT(.dummy)                 0
             },
             EO_INIT(.data)                      {0}
         },
@@ -113,7 +115,8 @@ const eOsnsr_strain_t eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue =
             {
                 EO_INIT(.capacity)              6,
                 EO_INIT(.itemsize)              2,
-                EO_INIT(.size)                  6
+                EO_INIT(.size)                  6,
+                EO_INIT(.dummy)                 0
             },
             EO_INIT(.data)                      {0}
         }

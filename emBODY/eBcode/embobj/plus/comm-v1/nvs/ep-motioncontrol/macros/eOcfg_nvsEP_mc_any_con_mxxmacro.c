@@ -96,7 +96,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig) =
  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mconfig,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config,
     EO_INIT(.offset)    OFFSETof_mconfig,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig)
@@ -111,7 +111,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__pidcurrent)
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__pidcurrent, MMACRO_MNUM), 
     EO_INIT(.capacity)  CAPACITY_mconfig__pidcurrent,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig.pidcurrent,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config.pidcurrent,
     EO_INIT(.offset)    OFFSETof_mconfig__pidcurrent,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__pidcurrent)
@@ -127,7 +127,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxvelocity
     //EO_INIT(.id)        EOK_cfg_nvsEP_mc_NVID_mconfig__maxvelocityofmotor(MMACRO_MNUM),  
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__maxvelocityofmotor, MMACRO_MNUM),    
     EO_INIT(.capacity)  CAPACITY_mconfig__maxvelocityofmotor,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig.maxvelocityofmotor,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config.maxvelocityofmotor,
     EO_INIT(.offset)    OFFSETof_mconfig__maxvelocityofmotor,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxvelocityofmotor),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxvelocityofmotor)
@@ -141,7 +141,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__maxcurrento
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__maxcurrentofmotor, MMACRO_MNUM),    
     EO_INIT(.capacity)  CAPACITY_mconfig__maxcurrentofmotor,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig.maxcurrentofmotor,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config.maxcurrentofmotor,
     EO_INIT(.offset)    OFFSETof_mconfig__maxcurrentofmotor,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxcurrentofmotor),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__maxcurrentofmotor)
@@ -155,7 +155,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mconfig__des02FORmst
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mconfig__des02FORmstatuschamaleon04, MMACRO_MNUM),    
     EO_INIT(.capacity)  CAPACITY_mconfig__des02FORmstatuschamaleon04,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mconfig.des02FORmstatuschamaleon04,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config.des02FORmstatuschamaleon04,
     EO_INIT(.offset)    OFFSETof_mconfig__des02FORmstatuschamaleon04,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__des02FORmstatuschamaleon04),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mconfig__des02FORmstatuschamaleon04)
@@ -173,7 +173,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mstatus,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mstatus,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.status,
     EO_INIT(.offset)    OFFSETof_mstatus,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus)
@@ -187,7 +187,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__basic) =
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus__basic, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mstatus__basic,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mstatus.basic,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.status.basic,
     EO_INIT(.offset)    OFFSETof_mstatus__basic,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__basic),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__basic)
@@ -201,7 +201,7 @@ EOnv_con_t MMACRO_NAMEOFVARIABLE(MMACRO_PSTR, MMACRO_MSTR, _mstatus__chamaleon04
 {   
     EO_INIT(.id)        MMACRO_GETNVID(MMACRO_EXTERNALPREFIX_GETID, _mstatus__chamaleon04, MMACRO_MNUM),
     EO_INIT(.capacity)  CAPACITY_mstatus__chamaleon04,
-    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.mstatus.chamaleon04,
+    EO_INIT(.resetval)  (const void*)&eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.status.chamaleon04,
     EO_INIT(.offset)    OFFSETof_mstatus__chamaleon04,
     EO_INIT(.typ)       EO_nv_TYP(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__chamaleon04),
     EO_INIT(.fun)       EO_nv_FUN(EOK_cfg_nvsEP_mc_any_con_mxx_NVFUNTYP_mstatus__chamaleon04)

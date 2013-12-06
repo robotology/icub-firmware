@@ -73,12 +73,12 @@
 
 const eOmc_controller_t eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue =
 {
-    EO_INIT(.cconfig)             
+    EO_INIT(.config)             
     {
         EO_INIT(.durationofctrlloop)        EOK_reltime1ms,
         EO_INIT(.filler04)                  {0xf1, 0xf2, 0xf3, 0xf4}
     },
-    EO_INIT(.cstatus)                      
+    EO_INIT(.status)                      
     {
         EO_INIT(.alljomoinitted)            eobool_false,
         EO_INIT(.numofjoints)               0,
@@ -87,7 +87,7 @@ const eOmc_controller_t eo_cfg_nvsEP_mc_any_con_cxxdefault_defaultvalue =
         EO_INIT(.flagsinittedjoints)        0x0000,
         EO_INIT(.flagsinittedmotors)        0x0000   
     },
-    EO_INIT(.ccmmnds)                      
+    EO_INIT(.cmmnds)                      
     {
         EO_INIT(.go2stateofcontroller)      eomc_stateofcontroller_config,
         EO_INIT(.filler07)                  {0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7}   

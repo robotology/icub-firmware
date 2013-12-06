@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "EOnv.h"
 
 

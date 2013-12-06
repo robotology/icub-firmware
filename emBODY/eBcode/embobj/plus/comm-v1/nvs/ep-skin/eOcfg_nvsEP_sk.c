@@ -97,7 +97,7 @@ EO_VERIFYproposition(xxx, skinNVindex_TOTALnumber                           == s
 
 extern const eo_cfg_nvsEP_sk_emsboard_t eo_cfg_nvsEP_sk_emsboard_default;
 
-const eOskin_someskin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue = &eo_cfg_nvsEP_sk_emsboard_default.someskin;
+const eOsk_skin_t* eo_cfg_nvsEP_sk_someskin_defaultvalue = &eo_cfg_nvsEP_sk_emsboard_default.skin;
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -72,28 +72,29 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-const eOsnsr_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
+const eOas_mais_t eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue =
 {
-    EO_INIT(.mconfig)
+    EO_INIT(.config)
     {
-        EO_INIT(.mode)                          snsr_maismode_acquirebutdonttx,
+        EO_INIT(.mode)                          eoas_maismode_acquirebutdonttx,
         EO_INIT(.datarate)                      1,    
-        EO_INIT(.resolution)                    snsr_maisresolution_08,  
+        EO_INIT(.resolution)                    eoas_maisresolution_08,  
         EO_INIT(.filler01)                      {0xf1}
     },
-    EO_INIT(.minputs)
+    EO_INIT(.inputs)
     {
         EO_INIT(.filler04)                      {0xf1, 0xf2, 0xf3, 0xf4}
     },
-    EO_INIT(.mstatus)                       
+    EO_INIT(.status)                       
     {
         EO_INIT(.the15values)                   
         {
             EO_INIT(.head)
             {
-                EO_INIT(.capacity)              16,//if resolution is snsr_maisresolution_08
-                EO_INIT(.itemsize)              1, //1 byte if resolution is snsr_maisresolution_08
-                EO_INIT(.size)                  0
+                EO_INIT(.capacity)              16, // if resolution is eoas_maisresolution_08
+                EO_INIT(.itemsize)              1,  // 1 byte if resolution is eoas_maisresolution_08
+                EO_INIT(.size)                  0,
+                EO_INIT(.dummy)                 0
             },
             EO_INIT(.data)                      {0}
         }

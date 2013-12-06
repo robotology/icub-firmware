@@ -31,7 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 
-#include "EoSensors.h"
+#include "EoAnalogSensors.h"
 #include "eOcfg_nvsEP_as_any_con_sxx.h"
 #include "eOcfg_nvsEP_as_any_con_mxx.h"
 #include "eOcfg_nvsEP_as_any_con_sxxdefault.h"
@@ -118,8 +118,8 @@ EO_VERIFYproposition(xxx, maisNVindex_TOTALnumber                           == E
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOsnsr_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue = &eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue;
-const eOsnsr_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
+const eOas_strain_t* eo_cfg_nvsEP_as_strain_defaultvalue = &eo_cfg_nvsEP_as_any_con_sxxdefault_defaultvalue;
+const eOas_mais_t* eo_cfg_nvsEP_as_mais_defaultvalue = &eo_cfg_nvsEP_as_any_con_mxxdefault_defaultvalue;
 
 
 
