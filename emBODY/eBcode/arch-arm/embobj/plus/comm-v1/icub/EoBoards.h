@@ -42,9 +42,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EoMeasures.h"
 
-#include "EoMotionControl.h" // serve?
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -54,7 +52,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef uint16_t eObrd_boardId_t;
+typedef uint8_t eObrd_boardId_t;
 
 
 typedef enum
