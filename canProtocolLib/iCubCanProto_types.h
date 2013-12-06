@@ -80,17 +80,17 @@ typedef     uint8_t             icubCanProto_canBoardAddress_t;
 
 
 
-/** @typedef    typedef     uint8_t             eOicubCanProto_command_t
+/** @typedef    typedef     uint8_t             icubCanProto_command_t
     @brief      contains command belong to icib can protocol.
                 its values are defined in icubCanProtocol.h
  **/
-typedef     uint8_t             eOicubCanProto_msgCommand_cmdId_t;
+typedef     uint8_t             icubCanProto_msgCommand_cmdId_t;
 
 
 
-/** @typedef    typedef     uint8_t             eOicubCanProto_msgCommand_class_t
+/** @typedef    typedef     uint8_t             icubCanProto_msgCommand_class_t
     @brief      contains command belong to icib can protocol.
-                its values are defined in eOicubCanProtocol_messages.h 
+                its values are defined in icubCanProtocol_classes.h 
  **/
 typedef enum
 {
@@ -133,7 +133,7 @@ typedef int16_t             icubCanProto_force_t;
 /** @typedef    typedef int16_t icubCanProto_torque_t
     @brief      icubCanProto_torque_t contains the torque values.
  **/
-typedef int16_t             eOicubCanProto_torque_t;
+typedef int16_t             icubCanProto_torque_t;
 
 
 /** @typedef    typedef uint32_t icubCanProto_stiffness_t
@@ -162,10 +162,10 @@ typedef int16_t             icubCanProto_current_t;
  **/
 typedef enum
 {
-    eoicubCanProto_setpoint_position                      = 0,
-    eoicubCanProto_setpoint_velocity                      = 1,
-    eoicubCanProto_setpoint_torque                        = 2,
-    eoicubCanProto_setpoint_current                       = 3
+    icubCanProto_setpoint_position                      = 0,
+    icubCanProto_setpoint_velocity                      = 1,
+    icubCanProto_setpoint_torque                        = 2,
+    icubCanProto_setpoint_current                       = 3
 } icubCanProto_setpoint_type_t;
 
 /** @typedef    typedef struct icubCanProto_setpoint_position_t
@@ -173,8 +173,8 @@ typedef enum
  **/
 typedef struct
 {
-    eOicubCanProto_position_t       value; 
-    eOicubCanProto_velocity_t       withvelocity; 
+    icubCanProto_position_t       value; 
+    icubCanProto_velocity_t       withvelocity; 
 } icubCanProto_setpoint_position_t; 
 
 
