@@ -70,6 +70,8 @@
 #include "strain_config.h"
 //#include "strain_IIR_filter.h" //IIR filter not used
 
+#include "iCubCanProtocol.h"
+#include "iCubCanProto_types.h"
 
 
 
@@ -98,7 +100,7 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 _FWDT(WDT_OFF);  // WD disabled in configuration bits, so it is possible enable wd by software
 
 //_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_20);  // BOR 2.7V POR 64msec @@@ now 2.0V
+_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV20);  // BOR 2.7V POR 64msec @@@ now 2.0V
 
 
 
@@ -278,13 +280,13 @@ static void s_parse_can_msg(void)
 	
 	switch (msg->CAN_Per_Msg_Class)
 	{
-		case (CAN_MSG_CLASS_POLLING>>8):
+		case (ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR):
 		{
 			s_parse_can_pollingMsg(msg, Txdata, &datalen);
 		break;
 		}
 
-		case (CAN_MSG_CLASS_LOADER>>8):
+		case (ICUBCANPROTO_CLASS_BOOTLOADER):
 		{
 			s_parse_can_loaderMsg(msg, Txdata, &datalen);
 		break;
@@ -421,16 +423,16 @@ Ovviamente i due array devono essere salvati su memoria contigua.
 
   if (DebugCalibration==1)
   {
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_FORCE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length, 0 );
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib,length,1);
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (0x8) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataUncalib,length,2);
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (0x9) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE) ;
 	  while(!(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0))); // wiat buffer 0
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataUncalib,length,0);
   }
@@ -438,18 +440,18 @@ else
 {
   if (UseCalibration==1)
 	{
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_FORCE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length,0 );
 	  // torque data 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib, length, 1 );
 	}
   else
 	{
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_FORCE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataUncalib, length,0 );
 	  // torque data 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (CAN_CMD_TORQUE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataUncalib, length, 1 );
 	}  
 }
@@ -479,7 +481,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 
 	switch (msg->CAN_Per_Msg_PayLoad[0])
 	{
-		case CAN_CMD_SET_BOARD_ADX: // set board CAN address 
+		case ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX: // set board CAN address 
 		{     
 			if ( ( msg->CAN_Per_Msg_PayLoad[1] > 0 ) && ( msg->CAN_Per_Msg_PayLoad[1] <= 15 ))
 			{
@@ -500,7 +502,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;
 		}
 		
-		case CAN_CMD_SET_IIR: // Set IIR Filter parameters: 0x205 len 4  data 1 i MSB LSB 
+		case ICUBCANPROTO_POL_AS_CMD__SET_IIR: // Set IIR Filter parameters: 0x205 len 4  data 1 i MSB LSB 
 		{
 //IIR filter not used
 //			// Set IIR Filter parameters: 0x205 len 4  data 1 i MSB LSB 
@@ -544,13 +546,13 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}   
 		    
 	
-		case CAN_CMD_GET_MATRIX_RC: //get MATRIX
+		case ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC: //get MATRIX
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1] < 6)
 			{
 				if(msg->CAN_Per_Msg_PayLoad[2] < 6)
 				{
-					Txdata[0] = CAN_CMD_GET_MATRIX_RC; 
+					Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
 					Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
@@ -562,11 +564,11 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 			
 	
-		case CAN_CMD_GET_CH_DAC:   //get gain of DAC converter 
+		case ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC:   //get gain of DAC converter 
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1] < 6)
 			{
-				Txdata[0] = CAN_CMD_GET_CH_DAC; 
+				Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC; 
 				Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
 				Txdata[2] = strain_cfg.ee_data.EE_AN_ChannelOffset[msg->CAN_Per_Msg_PayLoad[1]] >> 8; 
 				Txdata[3] = strain_cfg.ee_data.EE_AN_ChannelOffset[msg->CAN_Per_Msg_PayLoad[1]] & 0xFF; 
@@ -576,7 +578,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 			
 	
-		case CAN_CMD_GET_CH_ADC:  //get ADC channel
+		case ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC:  //get ADC channel
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1] < 6)
 			{
@@ -584,7 +586,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
                 hal_timer_stop(hal_timerT1);
 				if(msg->CAN_Per_Msg_PayLoad[2] == 0)
 				{
-					Txdata[0] = CAN_CMD_GET_CH_ADC; 
+					Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC; 
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2];
 					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare);
@@ -594,7 +596,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 				}
 				else
 				{
-					Txdata[0] = CAN_CMD_GET_CH_ADC; 
+					Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC; 
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2];
 					
@@ -620,16 +622,16 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 		
 
-		case CAN_CMD_GET_MATRIX_G: //get matrix gain
+		case ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G: //get matrix gain
 		{
-			Txdata[0] = CAN_CMD_GET_MATRIX_G; 
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G; 
 			Txdata[1] = strain_cfg.ee_data.EE_MatrixGain; 
 			*datalen=2;           
 		break;
 		}
 		
 	
-		case CAN_CMD_SET_MATRIX_G: //set matrix gain
+		case ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_G: //set matrix gain
 	    { 
 		  strain_cfg.ee_data.EE_MatrixGain=msg->CAN_Per_Msg_PayLoad[1];
 		  eeprom_status=0;
@@ -638,12 +640,12 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 			
 
-		case CAN_CMD_GET_FULL_SCALES: 
+		case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES: 
 		{
 			// Note: EE_FullScales isn't used by strain application, but only for store datas.
 			if(msg->CAN_Per_Msg_PayLoad[1] < 6)
 			{
-				Txdata[0] = CAN_CMD_GET_FULL_SCALES; 
+				Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES; 
 				Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
 				Txdata[2] = strain_cfg.ee_data.EE_FullScales[msg->CAN_Per_Msg_PayLoad[1]] >> 8; 
 				Txdata[3] = strain_cfg.ee_data.EE_FullScales[msg->CAN_Per_Msg_PayLoad[1]] & 0xFF; 
@@ -653,7 +655,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 		
 
-		case CAN_CMD_SET_FULL_SCALES: 
+		case ICUBCANPROTO_POL_AS_CMD__SET_FULL_SCALES: 
 		{ 
 			if(msg->CAN_Per_Msg_PayLoad[1] < 6)
 			{
@@ -663,7 +665,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;  
 		}
 
-		case CAN_CMD_SET_SERIAL_NO: //set serial number
+		case ICUBCANPROTO_POL_AS_CMD__SET_SERIAL_NO: //set serial number
 		{ 
 			strain_cfg.ee_data.EE_SerialNumber[0]= msg->CAN_Per_Msg_PayLoad[1];
 			strain_cfg.ee_data.EE_SerialNumber[1]= msg->CAN_Per_Msg_PayLoad[2];
@@ -681,9 +683,9 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 		
 
-		case CAN_CMD_GET_SERIAL_NO:
+		case ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO:
 		{
-			Txdata[0] = CAN_CMD_GET_SERIAL_NO; 
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO; 
 			Txdata[1] = strain_cfg.ee_data.EE_SerialNumber[0];
 			Txdata[2] = strain_cfg.ee_data.EE_SerialNumber[1]; 
 			Txdata[3] = strain_cfg.ee_data.EE_SerialNumber[2]; 
@@ -697,18 +699,18 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 		
 
-		case CAN_CMD_GET_EEPROM_STATUS: 
+		case ICUBCANPROTO_POL_AS_CMD__GET_EEPROM_STATUS: 
 		{
-			Txdata[0] = CAN_CMD_GET_EEPROM_STATUS; 
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_EEPROM_STATUS; 
 			Txdata[1] = eeprom_status;
 
 			*datalen=2;        
 		break;
 		}
 
-		case CAN_CMD_GET_CALIB_TARE:
+		case ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE:
 		{
-			Txdata[0] = CAN_CMD_GET_CALIB_TARE; 
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE; 
 			Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];
 			Txdata[2] = strain_cfg.ee_data.EE_CalibrationTare[msg->CAN_Per_Msg_PayLoad[1]] >> 8; 
 			Txdata[3] = strain_cfg.ee_data.EE_CalibrationTare[msg->CAN_Per_Msg_PayLoad[1]] & 0xFF; 
@@ -718,7 +720,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 		
 	
-		case CAN_CMD_SET_CALIB_TARE: 
+		case ICUBCANPROTO_POL_AS_CMD__SET_CALIB_TARE: 
 		{
 			eeprom_status=0;
  
@@ -747,9 +749,9 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;  
 		}
 
-		case CAN_CMD_GET_CURR_TARE: 
+		case ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE: 
 		{
-			Txdata[0] = CAN_CMD_GET_CURR_TARE; 
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE; 
 			Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];
 			Txdata[2] = CurrentTare[msg->CAN_Per_Msg_PayLoad[1]] >> 8; 
 			Txdata[3] = CurrentTare[msg->CAN_Per_Msg_PayLoad[1]] & 0xFF; 
@@ -758,7 +760,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;
 		}
 	
-		case CAN_CMD_SET_CURR_TARE: 
+		case ICUBCANPROTO_POL_AS_CMD__SET_CURR_TARE: 
 		{ 
 			if (msg->CAN_Per_Msg_PayLoad[1]==0)
 			{
@@ -800,7 +802,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 	    }  
 		break;	
 	
-		case CAN_CMD_SET_MATRIX_RC: //set i,j value of transform. matrix:
+		case ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_RC: //set i,j value of transform. matrix:
 		{ 
 			eeprom_status=0;
 			//  set i,j value of transform. matrix:
@@ -821,7 +823,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;  
 		}		
 		
-	    case CAN_CMD_SET_CH_DAC:  //  set DAC value 0x205 len 4  data 4 ch msb lsb
+	    case ICUBCANPROTO_POL_AS_CMD__SET_CH_DAC:  //  set DAC value 0x205 len 4  data 4 ch msb lsb
 	    {	       
 			eeprom_status=0;
 			i = msg->CAN_Per_Msg_PayLoad[2]<<8 | msg->CAN_Per_Msg_PayLoad[3];
@@ -839,7 +841,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 	    break;
 		}
 		
-		case CAN_CMD_SET_TXMODE: // set continuous or on demand tx  0x205 len 2  data 7 0/1
+		case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE: // set continuous or on demand tx  0x205 len 2  data 7 0/1
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1]==0)//Transmit calibrated data continuosly
 			{ 
@@ -878,7 +880,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 	
 	
-		case CAN_CMD_MUX_NUM: //set multiplexer number
+		case ICUBCANPROTO_POL_AS_CMD__MUX_NUM: //set multiplexer number
 		{
 			muxed_chans=msg->CAN_Per_Msg_PayLoad[1];    
 			*datalen=0;	      
@@ -886,7 +888,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 		    
 
-		case CAN_CMD_SET_CANDATARATE: // set datarate for transmission in milliseconds 
+		case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE: // set datarate for transmission in milliseconds 
 				 					  // 0x205 len 2  data 8 n
 		{
 			uint16_t match_value;
@@ -910,7 +912,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 	    break;
 		}
 		    
-	    case CAN_CMD_SET_RESOLUTION: // set data resolution   
+	    case ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION: // set data resolution   
 	    							  // 0x205 len 2  data 0x10 n
 	    {
 	     	*datalen=0;
@@ -920,7 +922,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 	    break;
 
 		
-		case CAN_CMD_SAVE2EE: // Save configuration data to EE
+		case ICUBCANPROTO_POL_AS_CMD__SAVE2EE: // Save configuration data to EE
 								// 0x205 len 1  data 9 
 		{
 			eeprom_status=1;
@@ -933,7 +935,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;
 		}
 		
-		case CAN_CMD_GET_FW_VERSION:
+		case ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION:
 		{
 			if( (strain_srcCode_info_ptr->canProtocol.version == msg->CAN_Per_Msg_PayLoad[1]) &&
 			    (strain_srcCode_info_ptr->canProtocol.release == msg->CAN_Per_Msg_PayLoad[2]) )
@@ -945,8 +947,8 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
                     canProtocol_compatibility_ack = 0;
                 }
 	
-			Txdata[0] = CAN_CMD_GET_FW_VERSION;
-			Txdata[1] = BOARD_TYPE_STRAIN; 
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION;
+			Txdata[1] = icubCanProto_boardType__strain; 
 			Txdata[2] = strain_srcCode_info_ptr->fw_ExeFile.version;
 			Txdata[3] = strain_srcCode_info_ptr->fw_ExeFile.release;
 			Txdata[4] = strain_srcCode_info_ptr->fw_ExeFile.build;
@@ -958,7 +960,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}
 
 		// ==> the following commands are unused actually: <==
-	    case CAN_CMD_SELECT_ACTIVE_CH:    	// select witch channel is sampled and CANsmitted
+	    case ICUBCANPROTO_POL_AS_CMD__SELECT_ACTIVE_CH:    	// select witch channel is sampled and CANsmitted
 	   									    // 0x205 len 2  data 5 0bxx000001
 	    {
 	      if( msg->CAN_Per_Msg_PayLoad[1] & 0x1 )
@@ -995,7 +997,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}    
 
    	
-		case CAN_CMD_MUX_EN:  //enabling multiplexer
+		case ICUBCANPROTO_POL_AS_CMD__MUX_EN:  //enabling multiplexer
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1]==0)
 			{ 
@@ -1013,7 +1015,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;
 		}
 	
-		case CAN_CMD_FILTER_EN: //enabling filter
+		case ICUBCANPROTO_POL_AS_CMD__FILTER_EN: //enabling filter
 		{
             // IIR filter not used.
 //			if(msg->CAN_Per_Msg_PayLoad[1]==0)
@@ -1049,12 +1051,12 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 	
 	switch (msg->CAN_Per_Msg_PayLoad[0])
 	{
-		case CMD_BROADCAST: 
+		case ICUBCANPROTO_BL_BROADCAST: 
 		{
 			//Create ID for CAN message
-			SID = CAN_MSG_CLASS_LOADER | ( strain_cfg.ee_data.EE_CAN_BoardAddress << 4 ) | (0);
-			Txdata[0] = CMD_BROADCAST;
-			Txdata[1] = BOARD_TYPE_STRAIN; 
+			SID = ICUBCANPROTO_CLASS_BOOTLOADER  | ( strain_cfg.ee_data.EE_CAN_BoardAddress << 4 ) | (0);
+			Txdata[0] = ICUBCANPROTO_BL_BROADCAST;
+			Txdata[1] = icubCanProto_boardType__strain; 
 			Txdata[2] = strain_srcCode_info_ptr->fw_ExeFile.version;	//Firmware version number for BOOTLOADER
 			Txdata[3] = strain_srcCode_info_ptr->fw_ExeFile.release;	//Firmware build number.
 			Txdata[4] = strain_srcCode_info_ptr->fw_ExeFile.build;		//Firmware build number.
@@ -1063,13 +1065,13 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 		}
 				
 	
-		case CMD_BOARD:
+		case ICUBCANPROTO_BL_BOARD:
 		{
 			asm ("reset");	//Jump to bootlader code
 		break;
 		}
 	
-		case CMD_GET_ADDITIONAL_INFO:
+		case ICUBCANPROTO_BL_GET_ADDITIONAL_INFO:
 		{
 			SID = CAN_MSG_CLASS_LOADER | ( strain_cfg.ee_data.EE_CAN_BoardAddress << 4 ) | (0);
 			Txdata[0] = 0x0C; 
@@ -1088,7 +1090,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 		break;
 		}
 	
-		case CMD_SET_ADDITIONAL_INFO:
+		case ICUBCANPROTO_BL_SET_ADDITIONAL_INFO:
 		{
 			static uint8_t addinfo_part=0; 
 			
@@ -1115,10 +1117,10 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 		}
 				
 	
-		case CMD_ADDRESS: 
-		case CMD_DATA: 
-		case CMD_START: 
-		case CMD_END: 
+		case ICUBCANPROTO_BL_ADDRESS: 
+		case ICUBCANPROTO_BL_DATA: 
+		case ICUBCANPROTO_BL_START: 
+		case ICUBCANPROTO_BL_END: 
 		{
 			// IGNORE THESE COMMANDS
 			*datalen = -1;

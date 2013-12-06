@@ -102,6 +102,8 @@
 #include "mais_config.h"
 #include "mais_data_types.h"
 
+#include "iCubCanProtocol.h"
+#include "iCubCanProto_types.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -127,7 +129,7 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 _FWDT(WDT_OFF);     // WD disabled
 
 //_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
+_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 
 
 
@@ -397,19 +399,18 @@ static void s_parse_can_msg(void)
 
 	switch (msg->CAN_Per_Msg_Class)
 	{
-		case (CAN_MSG_CLASS_POLLING>>8):
+		case (ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR):
 		{
   			s_parse_can_pollingMsg(msg, Txdata, &datalen);
 			break;		
 		}
 		
-		case (CAN_MSG_CLASS_LOADER>>8):
+		case (ICUBCANPROTO_CLASS_BOOTLOADER):
 		{
 			s_parse_can_loaderMsg(msg, Txdata, &datalen);
 			break;
 		}
 		
-
 		default:
 		{
 			// UNKNOWN COMMAND FOR THIS CLASS
@@ -440,7 +441,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 	
 	switch (msg->CAN_Per_Msg_PayLoad[0])
 	{
-		case CAN_CMD_SET_BOARD_ADX: // set board CAN address 
+		case ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX: // set board CAN address 
 		{     
 			*datalen=0;
 			if ( ( msg->CAN_Per_Msg_PayLoad[1] > 0 ) && ( msg->CAN_Per_Msg_PayLoad[1] <= 15 ))
@@ -462,11 +463,11 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 		    
 
-		case CAN_CMD_GET_CH_ADC:  //get ADC channel
+		case ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC:  //get ADC channel
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1] < ANALOG_CHANEL_NUM)
 			{
-				Txdata[0] = CAN_CMD_GET_CH_ADC; 
+				Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC; 
 				Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
 				Txdata[2] = AN_channel_info.values[msg->CAN_Per_Msg_PayLoad[1]] >> 8; 
 				Txdata[3] = AN_channel_info.values[msg->CAN_Per_Msg_PayLoad[1]] & 0xFF; 
@@ -477,7 +478,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 	
 		
-		case CAN_CMD_SET_TXMODE: // set continuous or on demand tx  0x205 len 2  data 7 0/1
+		case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE: // set continuous or on demand tx  0x205 len 2  data 7 0/1
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1]==0)
 			{
@@ -503,7 +504,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 	
 		    
-		case CAN_CMD_SET_CANDATARATE: // set datarate for transmission in milliseconds 
+		case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE: // set datarate for transmission in milliseconds 
 			  // 0x205 len 2  data 8 n
 		{
 			mais_cfg.ee_data.CAN_MessageDataRate=msg->CAN_Per_Msg_PayLoad[1];
@@ -530,7 +531,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			break;
 		}  
 		    
-		case CAN_CMD_SET_RESOLUTION: // set data resolution   
+		case ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION: // set data resolution   
 				  					// 0x205 len 2  data 0x10 n
 		{
 		
@@ -553,7 +554,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		}  
 
 		
-		case CAN_CMD_SAVE2EE: // Save configuration data to EE
+		case ICUBCANPROTO_POL_AS_CMD__SAVE2EE: // Save configuration data to EE
 								// 0x205 len 1  data 9 
 		{
 			 mais_config_saveInEE(&mais_cfg);
@@ -565,7 +566,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			break;
 		}
 		
-		case CAN_CMD_GET_FW_VERSION:
+		case ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION:
 		{
 			if( (mais_srcCode_info_ptr->canProtocol.version == msg->CAN_Per_Msg_PayLoad[1]) &&
 			    (mais_srcCode_info_ptr->canProtocol.release == msg->CAN_Per_Msg_PayLoad[2]) )
@@ -577,8 +578,8 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
                     canProtocol_compatibility_ack = 0;
                 }
 	
-			Txdata[0] = CAN_CMD_GET_FW_VERSION;
-			Txdata[1] = BOARD_TYPE_MAIS;
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION;
+			Txdata[1] = icubCanProto_boardType__mais;
 			Txdata[2] = mais_srcCode_info_ptr->fw_ExeFile.version;
 			Txdata[3] = mais_srcCode_info_ptr->fw_ExeFile.release;
 			Txdata[4] = mais_srcCode_info_ptr->fw_ExeFile.build;
@@ -589,26 +590,26 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		break;
 		}
 
-		case CAN_CMD_SET_CURR_TARE:
-		case CAN_CMD_GET_CURR_TARE:
-		case CAN_CMD_SET_CALIB_TARE: 
-		case CAN_CMD_GET_CALIB_TARE:
-		case CAN_CMD_SET_SERIAL_NO:
-		case CAN_CMD_GET_SERIAL_NO:
-		case CAN_CMD_SET_FULL_SCALES:
-		case CAN_CMD_GET_FULL_SCALES:
-		case CAN_CMD_SET_MATRIX_G:	
-		case CAN_CMD_GET_MATRIX_G: 
-	    case CAN_CMD_SET_CH_DAC:
-		case CAN_CMD_GET_CH_DAC:   
-		case CAN_CMD_SET_MATRIX_RC:
-	    case CAN_CMD_GET_MATRIX_RC: 
-	    case CAN_CMD_MUX_EN:
-	    case CAN_CMD_MUX_NUM:
-		case CAN_CMD_SET_IIR: 
-		case CAN_CMD_CALIBRATE_OFFSET:
-	    case CAN_CMD_SELECT_ACTIVE_CH:
-	    case CAN_CMD_FILTER_EN:
+		case ICUBCANPROTO_POL_AS_CMD__SET_CURR_TARE:
+		case ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE:
+		case ICUBCANPROTO_POL_AS_CMD__SET_CALIB_TARE: 
+		case ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE:
+		case ICUBCANPROTO_POL_AS_CMD__SET_SERIAL_NO:
+		case ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO:
+		case ICUBCANPROTO_POL_AS_CMD__SET_FULL_SCALES:
+		case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES:
+		case ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_G:	
+		case ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G: 
+	    case ICUBCANPROTO_POL_AS_CMD__SET_CH_DAC:
+		case ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC:   
+		case ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_RC:
+	    case ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC: 
+	    case ICUBCANPROTO_POL_AS_CMD__MUX_EN:
+	    case ICUBCANPROTO_POL_AS_CMD__MUX_NUM:
+		case ICUBCANPROTO_POL_AS_CMD__SET_IIR: 
+		case ICUBCANPROTO_POL_AS_CMD__CALIBRATE_OFFSET:
+	    case ICUBCANPROTO_POL_AS_CMD__SELECT_ACTIVE_CH:
+	    case ICUBCANPROTO_POL_AS_CMD__FILTER_EN:
 	    {
 			  *datalen=-1;
 		      hal_error_manage(ERR_CAN_COMMAND_UNAVAILABLE);
@@ -637,12 +638,12 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 	
 	switch (msg->CAN_Per_Msg_PayLoad[0])
 	{
-		case CMD_BROADCAST: 
+		case ICUBCANPROTO_BL_BROADCAST: 
 		{
 			//Create ID for CAN message
 			SID = CAN_MSG_CLASS_LOADER | ( mais_cfg.ee_data.CAN_BoardAddress << 4 ) | (0);
-			Txdata[0] = CMD_BROADCAST;
-			Txdata[1] = BOARD_TYPE_MAIS; 
+			Txdata[0] = ICUBCANPROTO_BL_BROADCAST;
+			Txdata[1] = icubCanProto_boardType__mais; 
 			Txdata[2] = mais_srcCode_info_ptr->fw_ExeFile.version;            //Firmware version number for BOOTLOADER
 			Txdata[3] = mais_srcCode_info_ptr->fw_ExeFile.release;              //Firmware build number.
 			Txdata[4] = mais_srcCode_info_ptr->fw_ExeFile.build;              //Firmware build number.
@@ -651,16 +652,16 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 			break;
 		}
 	
-		case CMD_BOARD:
+		case ICUBCANPROTO_BL_BOARD:
 		{
 			//Jump to bootlader code
 			asm ("reset");
 			break;
 		}
 	
-		case CMD_GET_ADDITIONAL_INFO:
+		case ICUBCANPROTO_BL_GET_ADDITIONAL_INFO:
 		{
-			SID = CAN_MSG_CLASS_LOADER | ( mais_cfg.ee_data.CAN_BoardAddress << 4 ) | (0);
+			SID = (ICUBCANPROTO_CLASS_BOOTLOADER<<8) | ( mais_cfg.ee_data.CAN_BoardAddress << 4 ) | (0);
 			Txdata[0] = 0x0C; 
 			Txdata[1] = 0x00; 
 			*datalen=6;
@@ -678,7 +679,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 			break;
 		}
 	
-		case CMD_SET_ADDITIONAL_INFO:
+		case ICUBCANPROTO_BL_SET_ADDITIONAL_INFO:
 		{
 			static unsigned char addinfo_part=0;
  
@@ -706,10 +707,10 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 			break;
 		}
 	
-		case CMD_ADDRESS: 
-		case CMD_DATA: 
-		case CMD_START: 
-		case CMD_END: 
+		case ICUBCANPROTO_BL_ADDRESS: 
+		case ICUBCANPROTO_BL_DATA: 
+		case ICUBCANPROTO_BL_START: 
+		case ICUBCANPROTO_BL_END: 
 		{
 			// IGNORE THESE COMMANDS
 			*datalen = -1;
@@ -751,10 +752,10 @@ static void s_test(void)
 		msg2[7]=0;
 	}
 	
-	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES0TO6) ;
+	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES0TO6) ;
 	hal_can_put_immediately(hal_can_portCAN1,SID, msg1, 8, 0 );
 			
-	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES7TO14) ;		
+	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES7TO14) ;		
 	hal_can_put_immediately(hal_can_portCAN1, SID, msg2, 8, 1 );
 
 }
@@ -798,10 +799,10 @@ static void s_timer2_callback(void)
 			HESData2[6] = AN_channel_info.values[13] >>4;  
 			HESData2[7] = AN_channel_info.values[14] >>4;
 		
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES0TO6) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES0TO6) ;
 			hal_can_put_immediately(hal_can_portCAN1,SID, HESData1, 7, 0 );
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES7TO14) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES7TO14) ;
 			
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData2, 8, 1 );
 		}
@@ -815,16 +816,16 @@ static void s_timer2_callback(void)
 			memcpy(HESData3,&AN_channel_info.values[8],8);
 			memcpy(HESData4,&AN_channel_info.values[12],6);
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES0TO3) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES0TO3) ;
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData1, 8, 0 );	  
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES4TO7) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES4TO7) ;
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData2, 8, 1 );
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES8TO11) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES8TO11) ;
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData3, 8, 2 );	  
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (CAN_CMD_HES12TO14) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES12TO14) ;
 			while( !(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0)) );
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData4, 8, 0 );
 		

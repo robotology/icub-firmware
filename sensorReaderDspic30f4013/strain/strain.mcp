@@ -8,7 +8,7 @@ dir_src=
 dir_bin=.\output
 dir_tmp=.\output
 dir_sin=
-dir_inc=..\common\source_code\include;..\common\API\common;..\common\API\strain;.\source_code\include
+dir_inc=..\..\canProtocolLib;..\common\source_code\include;..\common\API\common;..\common\API\strain;.\source_code\include
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]

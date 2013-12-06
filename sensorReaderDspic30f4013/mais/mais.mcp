@@ -8,7 +8,7 @@ dir_src=
 dir_bin=.\output
 dir_tmp=.\output
 dir_sin=
-dir_inc=..\common\source_code\include;..\common\API\mais;..\common\API\common;.\source_code\include
+dir_inc=..\common\source_code\include;..\common\API\mais;..\common\API\common;..\..\canProtocolLib;.\source_code\include
 dir_lib=
 dir_lkr=
 [CAT_FILTERS]
