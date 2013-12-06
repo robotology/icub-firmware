@@ -348,8 +348,58 @@ extern void * eo_vector_At(EOvector * vector, eOsizecntnr_t pos)
     return((void*) start);         
 }
 
+extern void eo_vector_Assign(EOvector * vector, eOsizecntnr_t pos, void *items, eOsizecntnr_t nitems)
+{
+    // here we require uint8_t to access item_array_data because we work with bytes.
+    uint8_t *start = NULL;
+    uint8_t *p = items;
+        
+    if((NULL == vector) || (NULL == items) || (0 == nitems)) 
+    {    
+        // invalid data
+        return;    
+    }
+    
+    if((pos+nitems-1) >= vector->capacity) 
+    { 
+        // beyond the capacity of the vector
+        return;
+    }
+ 
+    
+    if((pos+nitems-1) >= vector->size)
+    {
+        eo_vector_Resize(vector, pos+nitems); 
+    }
+    
+    // now fill from pos-th position until (pos+nitems-1)-th position w/ objects pointed by items
+    
+    
+    start = (uint8_t*) (vector->item_array_data);
+    // cast to uint32_t to tell the reader that index of array start[] can be bigger than max eOsizecntnr_t
+    start = &start[(uint32_t)pos * vector->item_size]; 
+    p = (uint8_t*) items;
+    
+    uint16_t i;
+    for(i=0; i<nitems; i++)
+    {
+        if(NULL != vector->item_copy_fn) 
+        {
+            vector->item_copy_fn(start, p);
+        }
+        else
+        {
+            memcpy(start, p, vector->item_size);
+        } 
+        
+        start += vector->item_size;
+        p += vector->item_size;
+    }
+    
+    return;     
+}
 
-extern void eo_vector_Assign(EOvector * vector, void *p, eOsizecntnr_t pos) 
+extern void eo_vector_AssignOne(EOvector * vector, eOsizecntnr_t pos, void *p) 
 {
     // here we require uint8_t to access item_array_data because we work with bytes.
     uint8_t *start = NULL;

@@ -166,23 +166,26 @@ extern void eo_vector_Clear(EOvector * vector);
 extern void * eo_vector_At(EOvector * vector, eOsizecntnr_t pos);
 
 
-/** @fn         extern void eo_vector_Assign(EOvector * vector, void *p, eOsizecntnr_t pos)
+/** @fn         extern void eo_vector_AssignOne(EOvector * vector, eOsizecntnr_t pos, void *p)
     @brief      Assigns the item pointed by @e p to the position @e pos. If pos > size, then the
                 function shall resize the EOvector. A call with pos > capacity shall do nothing.
     @param      vector          Pointer to the EOvector object.
-    @par        p               Item to be assigned 
-    @par       pos             Position where to assign.
+    @param      p               Item to be assigned 
+    @param      pos             Position where to assign.
     @warning    If called with @e pos higher than the capacity of the EOvector, the function shall do nothing
 
  **/
-extern void eo_vector_Assign(EOvector * vector, void *p, eOsizecntnr_t pos);
+extern void eo_vector_AssignOne(EOvector * vector, eOsizecntnr_t pos, void *p);
+
+
+extern void eo_vector_Assign(EOvector * vector, eOsizecntnr_t pos, void *items, eOsizecntnr_t nitems);
 
 
 /** @fn         extern void eo_vector_Resize(EOvector * vector, eOsizecntnr_t size)
     @brief      Resize the vector and calls proper constructor or destructors for teh item. 
                 A call with pos > capacity shall do nothing. 
     @param      vector          Pointer to the EOvector object.
-    @par        size            The new size 
+    @param      size            The new size 
  **/
 extern void eo_vector_Resize(EOvector * vector, eOsizecntnr_t size);
 
