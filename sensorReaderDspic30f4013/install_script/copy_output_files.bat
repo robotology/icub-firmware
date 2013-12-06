@@ -19,7 +19,7 @@ set MY_BOARD=mais
 ECHO selected board is %MY_BOARD%
 goto cpy_build
 
-:2blldc_board
+:strain
 set MY_BOARD=strain
 ECHO %MY_BOARD%
 goto cpy_build
