@@ -94,12 +94,12 @@ typedef     uint8_t             icubCanProto_msgCommand_cmdId_t;
  **/
 typedef enum
 {
-    icubCanProto_msgCmdClass_pollingMotorBoard      = ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL,
-    icubCanProto_msgCmdClass_periodicMotorBoard     = ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL,
-    icubCanProto_msgCmdClass_pollingSensorBoard     = ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR,
-    icubCanProto_msgCmdClass_periodicSensorBoard    = ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR,
-    icubCanProto_msgCmdClass_skinBoard              = 4, //ATTENTION: currently it is not used by other fw. Insert here to manage skin message like other calss messages.
-    icubCanProto_msgCmdClass_loader                 = ICUBCANPROTO_CLASS_BOOTLOADER    
+    icubCanProto_msgCmdClass_pollingMotorControl      = ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL,
+    icubCanProto_msgCmdClass_periodicMotorControl     = ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL,
+    icubCanProto_msgCmdClass_pollingAnalogSensor      = ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR,
+    icubCanProto_msgCmdClass_periodicAnalogSensor     = ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR,
+    icubCanProto_msgCmdClass_skinBoard                = 4, //ATTENTION: currently it is not used by other fw. Insert here to manage skin message like other calss messages.
+    icubCanProto_msgCmdClass_bootLoader               = ICUBCANPROTO_CLASS_BOOTLOADER    
 }icubCanProto_msgCommand_class_t;
 
 
