@@ -74,7 +74,7 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 ////    gulp_update_request = 1;
 ////  } 
 ////
-////    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
+////    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 ////	
 ////	ECANSend(txid, 8, &candata);
 //
@@ -137,7 +137,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
     gulp_update_request = 1;
   } 
 
-    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
+    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 	
 	ECANSend(txid, 8, &candata);
 #endif
@@ -187,7 +187,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
 //
 //    if(txlen>0)
 //    {
-//        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
+//        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 //        ECANSend(txid, 8, &txpayload);
 //    }
 //
@@ -257,7 +257,7 @@ static void s_CanIcubProtoTrasmitter_praparePeriodicMsg(tCanData *candata_ptr, u
 {
     memcpy(&candata_ptr->b[0], &Gulp.B[0], 8);
     *len_ptr = 8;
-    *txid_ptr = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
+    *txid_ptr = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 }
 
 extern void CanIcubProtoTrasmitter_SendStatusMsg()
@@ -276,7 +276,7 @@ extern void CanIcubProtoTrasmitter_SendStatusMsg()
     candata.b[5] = (SysError.I2TFailure << 5);
     candata.b[6] = SysStatus.b[3];
     
-    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_STATUS);
+    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
     len = 7;
 	
 	ECANSend(txid, len, &candata);

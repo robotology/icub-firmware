@@ -676,7 +676,7 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
     
     switch(permsg_type)
     {
-        case ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT:
+        case ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT:
         {
             if((canprotoparser_bid*2) > rxlen)
             {
