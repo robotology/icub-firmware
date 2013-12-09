@@ -67,14 +67,14 @@ typedef struct
     {
         struct 
         {
-            eOicubCanProto_msgCommand_cmdId_t   cmdId;
+            icubCanProto_msgCommand_cmdId_t     cmdId;
             eOcanframe_t                        *frame;
             eOcanport_t                         canPort;        
         }p_arg;
         
         struct
         {
-            eOicubCanProto_msgCommand_cmdId_t   cmdId;
+            icubCanProto_msgCommand_cmdId_t     cmdId;
             eOicubCanProto_msgDestination_t     dest;
             void                                *value;                              
             eOcanframe_t                        *frame;      
@@ -121,7 +121,7 @@ typedef struct
 {
     const EOconstLookupTbl           *const parserTbl;
     const EOconstLookupTbl           *const formerTbl;
-    eOicubCanProto_msgCommand_cmdId_t (*eo_icubCanProto_getCmdId_fromFrame) (eOcanframe_t *canFrame);
+    icubCanProto_msgCommand_cmdId_t  (*eo_icubCanProto_getCmdId_fromFrame) (eOcanframe_t *canFrame);
 } eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t;
 
 
@@ -133,7 +133,7 @@ EO_extern_inline eOboolvalues_t eo_icubCanProto_hid_LUTbl_indexIsInTbl(const EOc
 
 EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excParse(EOicubCanProto* p,
                                                               const EOconstLookupTbl *tbl, // lookup table
-                                                              eOicubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func
+                                                              icubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func
                                                               eOcanframe_t *frame,                          //frame to parser
                                                               eOcanport_t canPortRX)                        //port where was received
 {
@@ -158,7 +158,7 @@ EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excParse(EOicubCanProto* p
                                                              
 EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excForm(EOicubCanProto* p,
                                                              const EOconstLookupTbl *tbl, // lookup table
-                                                             eOicubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func 
+                                                             icubCanProto_msgCommand_cmdId_t cmdId,                     //command used to select parser func 
                                                              void *value,                                       //value to set in frame
                                                              eOicubCanProto_msgDestination_t dest,                  //axis of joint
                                                              eOcanframe_t *frame)                          //output frame
@@ -182,14 +182,14 @@ EO_extern_inline eOresult_t eo_icubCanProto_hid_LUTbl_excForm(EOicubCanProto* p,
 }
 
 
-EO_extern_inline eOicubCanProto_msgCommand_class_t eo_icubCanProto_hid_getMsgClassFromFrameId(uint32_t frame_id)
+EO_extern_inline icubCanProto_msgCommand_class_t eo_icubCanProto_hid_getMsgClassFromFrameId(uint32_t frame_id)
 {
-    return((eOicubCanProto_msgCommand_class_t)((frame_id & 0x700) >> 8));
+    return((icubCanProto_msgCommand_class_t)((frame_id & 0x700) >> 8));
 }
 
-EO_extern_inline eOicubCanProto_canBoardAddress_t eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(uint32_t frame_id)
+EO_extern_inline icubCanProto_canBoardAddress_t eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(uint32_t frame_id)
 {
-    return((eOicubCanProto_canBoardAddress_t)((frame_id & 0x0F0) >> 4));
+    return((icubCanProto_canBoardAddress_t)((frame_id & 0x0F0) >> 4));
 }
 
 EO_extern_inline eOicubCanProto_jm_indexinBoard_t eo_icubCanProto_hid_getjmIndexInBOardFromFrame(eOcanframe_t *frame)

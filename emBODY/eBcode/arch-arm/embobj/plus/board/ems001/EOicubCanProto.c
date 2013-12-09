@@ -67,14 +67,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
-                                                                                    eOicubCanProto_msgCommand_class_t msgclass,
+static icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
+                                                                                    icubCanProto_msgCommand_class_t msgclass,
                                                                                     eOcanframe_t *frame );
 static const EOconstLookupTbl* s_eo_icubCanProto_LUTbl_GetParserTbl(EOicubCanProto* p,
-                                                                    eOicubCanProto_msgCommand_class_t msgclass);
+                                                                    icubCanProto_msgCommand_class_t msgclass);
 
 static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanProto* p,
-                                                                     eOicubCanProto_msgCommand_class_t msgclass);
+                                                                     icubCanProto_msgCommand_class_t msgclass);
 
 static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
@@ -134,7 +134,7 @@ extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
         return(eores_NOK_nullpointer);
     }
     
-    tbl = s_eo_icubCanProto_LUTbl_GetFormerTbl(p, (eOicubCanProto_msgCommand_class_t)(command.class));
+    tbl = s_eo_icubCanProto_LUTbl_GetFormerTbl(p, (icubCanProto_msgCommand_class_t)(command.class));
 
     if(NULL == tbl)
     {
@@ -162,7 +162,7 @@ extern eOresult_t eo_icubCanProto_ParseSkinCanFrame(EOicubCanProto* p, eOcanfram
         return(eores_NOK_nullpointer);
     }
 
-    tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, eo_icubCanProto_msgCmdClass_skinBoard);
+    tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, icubCanProto_msgCmdClass_skinBoard);
 
     if(NULL == tbl)
     {
@@ -188,8 +188,8 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 {
     const EOconstLookupTbl                             *tbl;
     eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
-    eOicubCanProto_msgCommand_cmdId_t                   cmdId;
-    eOicubCanProto_msgCommand_class_t                   msgClass;
+    icubCanProto_msgCommand_cmdId_t                     cmdId;
+    icubCanProto_msgCommand_class_t                     msgClass;
     eOappTheDB_SkinCanLocation_t                        canLoc;
     eOresult_t                                          res;
     
@@ -203,7 +203,7 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
         
     if((eores_OK == res) && (canPortRX == canLoc.emscanport))
     {
-        msgClass = eo_icubCanProto_msgCmdClass_skinBoard;
+        msgClass = icubCanProto_msgCmdClass_skinBoard;
     }
     else
     {
@@ -234,8 +234,8 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 
 
 
-static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
-                                                                                    eOicubCanProto_msgCommand_class_t msgclass,
+static icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFrame(EOicubCanProto* p,
+                                                                                    icubCanProto_msgCommand_class_t msgclass,
                                                                                     eOcanframe_t *frame )
 {
     eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t* itemsList;
@@ -248,7 +248,7 @@ static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_LUTbl_GetCmdIdFromFra
 
 
 static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetParserTbl(EOicubCanProto* p,
-                                                                     eOicubCanProto_msgCommand_class_t msgclass)
+                                                                     icubCanProto_msgCommand_class_t msgclass)
 {
     eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t* itemsList;
 
@@ -265,7 +265,7 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetParserTbl(EOicubCanPr
 }
 
 static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanProto* p,
-                                                                     eOicubCanProto_msgCommand_class_t msgclass)
+                                                                     icubCanProto_msgCommand_class_t msgclass)
 {
     eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t* itemsList;
 
