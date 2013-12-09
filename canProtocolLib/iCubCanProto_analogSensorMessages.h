@@ -79,21 +79,19 @@ extern "C" {
 #define ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX     0x32 // Set board CAN address
 
 
-//since CUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX hasn't continuous number it will manged by exception function and
-//not by lookup bable
 #define ICUBCANPROTO_POL_AS_CMD__CMD_MAXNUM                 ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION +1
 
 /***************************************************************************/
 // command messages of class ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR 
 /***************************************************************************/
-#define ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR                       0xA // Transmit Torque values t1 t1 t2 t2 t3 t3
-#define ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR                      0xB // Transmit Force  values f1 f1 f2 f2 f3 f3
-#define ICUBCANPROTO_PER_AS_CMD__HES0TO6                            0xC //hall effect sensors from 0  to 6  *8bits
-#define ICUBCANPROTO_PER_AS_CMD__HES7TO14                           0xD //hall effect sensors from 7  to 14  *8bits
-#define ICUBCANPROTO_PER_AS_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE      0x8 // used by strain to transmit Force uncalib data when is enabled DebugMode (ICUBCANPROTO_POL_AS_CMD__SET_TXMODE with payload[1]=4)
-#define ICUBCANPROTO_PER_AS_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE     0x9 // used by strain to transmit Force uncalib data when is enabled DebugMode (ICUBCANPROTO_POL_AS_CMD__SET_TXMODE with payload[1]=4)
+#define ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR                       0xA // Transmit Torque values t1 t1 t2 t2 t3 t3
+#define ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR                      0xB // Transmit Force  values f1 f1 f2 f2 f3 f3
+#define ICUBCANPROTO_PER_AS_MSG__HES0TO6                            0xC //hall effect sensors from 0  to 6  *8bits
+#define ICUBCANPROTO_PER_AS_MSG__HES7TO14                           0xD //hall effect sensors from 7  to 14  *8bits
+#define ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE      0x8 // used by strain to transmit Force uncalib data when is enabled DebugMode (ICUBCANPROTO_POL_AS_CMD__SET_TXMODE with payload[1]=4)
+#define ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE     0x9 // used by strain to transmit Force uncalib data when is enabled DebugMode (ICUBCANPROTO_POL_AS_CMD__SET_TXMODE with payload[1]=4)
 
-#define ICUBCANPROTO_PER_AS_CMD__CMD_MAXNUM         6
+#define ICUBCANPROTO_PER_AS_MSG_MAXNUM                              6
 
 
 

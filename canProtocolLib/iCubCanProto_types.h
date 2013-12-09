@@ -44,7 +44,15 @@ extern "C" {
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+// error flags in motor board status message (ICUBCANPROTO_PER_MC_MSG__STATUS)
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_UNDERVOLTAGE    0x01
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERVOLTAGE     0x02
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_EXTERNAL        0x04
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERCURRENT     0x08
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_I2TFAILURE      0x20//in data[5]
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECWARNING   0x20 //in data[4]   
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECERROR     0x08 //in data[4]  
+#define ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECHWOVERRUN 0x40 //in data[4]
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -346,7 +354,6 @@ typedef enum
     icubCanProto_controlmode_calib_abs_and_incremental  = 0x41,
     icubCanProto_controlmode_openloop                   = 0x50
 } icubCanProto_controlmode_t;
-
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

@@ -47,26 +47,6 @@ extern "C" {
 // - public #define  --------------------------------------------------------------------------------------------------
 
 /***************************************************************************/
-// command messages of class ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL
-/***************************************************************************/
-#define ICUBCANPROTO_PER_MC_CMD_2FOC                        0
-#define ICUBCANPROTO_PER_MC_CMD_POSITION                    1
-#define ICUBCANPROTO_PER_MC_CMD_PID_VAL                     2
-#define ICUBCANPROTO_PER_MC_CMD_STATUS                      3
-#define ICUBCANPROTO_PER_MC_CMD_CURRENT                     4
-#define ICUBCANPROTO_PER_MC_CMD_OVERFLOW                    5
-#define ICUBCANPROTO_PER_MC_CMD_PRINT                       6
-#define ICUBCANPROTO_PER_MC_CMD_VELOCITY                    7
-#define ICUBCANPROTO_PER_MC_CMD_PID_ERROR                   8
-#define ICUBCANPROTO_PER_MC_CMD_DEBUG                       9
-#define ICUBCANPROTO_PER_MC_CMD_MOTOR_POSITION              10
-#define ICUBCANPROTO_PER_MC_CMD_MOTOR_SPEED                 11
-#define ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT   15
-
-#define ICUBCANPROTO_PER_MC_CMD_MAXNUM                      ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT + 1
-
-
-/***************************************************************************/
 // command messages of class ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL
 /***************************************************************************/
 #define ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE                     0
@@ -175,21 +155,29 @@ extern "C" {
 #define ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS                 112
 #define ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS                 113
 
-#define ICUBCANPROTO_POL_MC_CMD_MAXNUM                     ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS + 1 
+#define ICUBCANPROTO_POL_MC_CMD_MAXNUM                          ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS + 1 
 
 
 
-/*****************************************************************************/
-// error flags in motor board status message (ICUBCANPROTO_PER_MC_CMD_STATUS)
-/*****************************************************************************/
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_UNDERVOLTAGE    0x01
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERVOLTAGE     0x02
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_EXTERNAL        0x04
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERCURRENT     0x08
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_I2TFAILURE      0x20//in data[5]
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECWARNING   0x20 //in data[4]   
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECERROR     0x08 //in data[4]  
-#define ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECHWOVERRUN 0x40 //in data[4]  
+/***************************************************************************/
+// messages of class ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL
+/***************************************************************************/
+#define ICUBCANPROTO_PER_MC_MSG__2FOC                        0
+#define ICUBCANPROTO_PER_MC_MSG__POSITION                    1
+#define ICUBCANPROTO_PER_MC_MSG__PID_VAL                     2
+#define ICUBCANPROTO_PER_MC_MSG__STATUS                      3
+#define ICUBCANPROTO_PER_MC_MSG__CURRENT                     4
+#define ICUBCANPROTO_PER_MC_MSG__OVERFLOW                    5
+#define ICUBCANPROTO_PER_MC_MSG__PRINT                       6
+#define ICUBCANPROTO_PER_MC_MSG__VELOCITY                    7
+#define ICUBCANPROTO_PER_MC_MSG__PID_ERROR                   8
+#define ICUBCANPROTO_PER_MC_MSG__DEBUG                       9
+#define ICUBCANPROTO_PER_MC_MSG__MOTOR_POSITION              10
+#define ICUBCANPROTO_PER_MC_MSG__MOTOR_SPEED                 11
+#define ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT   15
+
+#define ICUBCANPROTO_PER_MC_MSG_MAXNUM                       ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT + 1
+
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
