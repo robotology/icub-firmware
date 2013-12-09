@@ -3,17 +3,22 @@
 
 #include "controller.h"
 
-#define CAN_ID_JNT_STRAIN_11		11
-#define CAN_ID_JNT_STRAIN_12		12
-#define CAN_ID_6AX_STRAIN_13		13
-#define CAN_ID_6AX_STRAIN_14 		14
+#define CAN_ID_STRAIN_01		01
+#define CAN_ID_STRAIN_02		02
+#define CAN_ID_STRAIN_03		03
+#define CAN_ID_STRAIN_04		04
+#define CAN_ID_STRAIN_05		05
+#define CAN_ID_STRAIN_06 		06
+#define CAN_ID_STRAIN_07		07
+#define CAN_ID_STRAIN_08		08
+#define CAN_ID_STRAIN_09		09
+#define CAN_ID_STRAIN_10 		10
+#define CAN_ID_STRAIN_11		11
+#define CAN_ID_STRAIN_12		12
+#define CAN_ID_STRAIN_13		13
+#define CAN_ID_STRAIN_14 		14
 
-#define WDT_JNT_STRAIN_11		0
-#define WDT_JNT_STRAIN_12		1
-#define WDT_6AX_STRAIN_13		2
-#define WDT_6AX_STRAIN_14 		3
-#define WDT_6AX_STRAIN_01 		4
-#define STRAIN_MAX              5
+#define STRAIN_MAX             15
 
 extern byte  _selected_strain_id[JN];
 extern byte  _selected_strain_chan[JN];

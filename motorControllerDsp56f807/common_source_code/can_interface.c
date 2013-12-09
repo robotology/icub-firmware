@@ -229,30 +229,26 @@ byte can_interface (void)
     VERSION == 0x0219 || VERSION == 0x0250 || VERSION == 0x0251 || VERSION == 0x0252 || VERSION == 0x0254 || VERSION == 0x0257 
 			if (_canmsg.CAN_ID_class == CLASS_PERIODIC_SENS)
 			{
-				if 		(_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_11)  { strain_num=WDT_JNT_STRAIN_11; }
-				else if (_canmsg.CAN_ID_src==CAN_ID_JNT_STRAIN_12)  { strain_num=WDT_JNT_STRAIN_12; }
-				else if (_canmsg.CAN_ID_src==CAN_ID_6AX_STRAIN_13)  { strain_num=WDT_6AX_STRAIN_13; }
-				else if (_canmsg.CAN_ID_src==CAN_ID_6AX_STRAIN_14)  { strain_num=WDT_6AX_STRAIN_14;	}
-				else if (_canmsg.CAN_ID_src==0x01)		            { strain_num=WDT_6AX_STRAIN_01; } //ankle sensor, do nothing
-				else    										 
-				{
-					can_printf("ERR: UNKNOWN STRAIN!");
-					strain_num=0;
-				}
-
 				switch(_canmsg.CAN_ID_dst)
 				{
 				
 					case 0xa:
+					strain_num=_canmsg.CAN_ID_src;
 					_strain[strain_num][0] = (Int16)(BYTE_W(_canmsg.CAN_data[0],_canmsg.CAN_data[1])-(UInt16)0x8000);
 					_strain[strain_num][1] = (Int16)(BYTE_W(_canmsg.CAN_data[2],_canmsg.CAN_data[3])-(UInt16)0x8000);
 					_strain[strain_num][2] = (Int16)(BYTE_W(_canmsg.CAN_data[4],_canmsg.CAN_data[5])-(UInt16)0x8000);
 					break;
 					
 					case 0xb:
+					strain_num=_canmsg.CAN_ID_src;
 					_strain[strain_num][3] = (Int16)(BYTE_W(_canmsg.CAN_data[0],_canmsg.CAN_data[1])-(UInt16)0x8000);
 					_strain[strain_num][4] = (Int16)(BYTE_W(_canmsg.CAN_data[2],_canmsg.CAN_data[3])-(UInt16)0x8000);
 					_strain[strain_num][5] = (Int16)(BYTE_W(_canmsg.CAN_data[4],_canmsg.CAN_data[5])-(UInt16)0x8000);
+					break;
+					
+					default:
+					strain_num=0;
+					can_printf("ERR: UNKNOWN STRAIN MSG!");
 					break;
 				}
 				
@@ -683,12 +679,12 @@ void can_send_broadcast(void)
 		if(FAULT_ABS0 == 0)
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_2BLLDC)) 
-		#ifdef USE_ABS_SSI
-		if(FAULT_ABS0 == 0 && FAULT_ABS1 == 0)
-			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-		#endif
+			#ifdef USE_ABS_SSI
+			if(FAULT_ABS0 == 0 && FAULT_ABS1 == 0)
+				CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+			#endif        	
 #else
-			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 #endif
 	
 	}
