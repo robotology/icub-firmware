@@ -8,7 +8,7 @@ dir_src=
 dir_bin=.\output
 dir_tmp=.\tmp
 dir_sin=..\app
-dir_inc=..\..\..\..\any\env\cfg;..\app;..\app-added;..\..\..\..\..\libs\services\storage\basic\api
+dir_inc=..\..\..\..\..\..\..\..\canProtocolLib;..\..\..\..\any\env\cfg;..\app;..\app-added;..\..\..\..\..\libs\services\storage\basic\api
 dir_lib=C:\Program Files\Microchip\MPLAB C30\lib
 dir_lkr=
 [CAT_FILTERS]
