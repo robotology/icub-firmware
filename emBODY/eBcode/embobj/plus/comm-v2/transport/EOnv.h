@@ -137,6 +137,8 @@ extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv);
 
 extern eOnvBRD_t eo_nv_GetBRD(const EOnv *nv);
 
+extern eObool_t eo_nv_IsCached(const EOnv *nv);
+
 extern eOnvID32_t eo_nv_GetID32(const EOnv *nv);
 
 extern eOnvEP8_t eo_nv_GetEP8(const EOnv *nv);

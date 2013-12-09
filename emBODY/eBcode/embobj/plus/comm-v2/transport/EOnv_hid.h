@@ -51,8 +51,11 @@ extern "C" {
 
 
 
-typedef     void        (*eOvoid_fp_cnvp_t)                             (const EOnv*);
-typedef     void        (*eOvoid_fp_cnvp_cropdesp_t)                    (const EOnv*, const eOropdescriptor_t*);
+typedef void (*eOvoid_fp_cnvp_t)                            (const EOnv*);
+typedef void (*eOvoid_fp_cnvp_cropdesp_t)                   (const EOnv*, const eOropdescriptor_t*);
+
+typedef eOresult_t (*eOres_fp_cnvp_t)                       (const EOnv*);
+typedef eOresult_t (*eOres_fp_cnvp_cropdesp_t)              (const EOnv*, const eOropdescriptor_t*);
 
 
 typedef const struct EOnv_rom_T         // 16 bytes on arm 
@@ -71,7 +74,8 @@ struct EOnv_hid                    // 24 bytes ... multiple of 8
 {
     eOipv4addr_t                    ip;         // ip address of the device owning the nv. if equal to eok_ipv4addr_localhost, then the nv is owned by the device.
     eOnvBRD_t                       brd;        // brd number. it is a short of the ip address.
-    uint8_t                         filler3[3];
+    eObool_t                        cached;     // if eobool_true then the variabale contains values which resides on a another entity (e.g., a can board) 
+    uint8_t                         filler2[2];
     eOnvID32_t                      id32;
     EOnv_rom_t*                     rom;        // pointer to the constant part common to every device which uses this nv
     void*                           ram;        // the ram which keeps the LOCAL value of nv 
@@ -90,7 +94,7 @@ struct EOnv_hid                    // 24 bytes ... multiple of 8
 //extern EOnv * eo_nv_hid_New(uint8_t fun, uint8_t typ, uint32_t otherthingsmaybe);
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx);
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eObool_t cached, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx);
 
 extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest);
 

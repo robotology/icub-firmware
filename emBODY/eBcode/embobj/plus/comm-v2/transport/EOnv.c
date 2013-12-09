@@ -123,6 +123,7 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
     
     nv->ip          = eo_nv_IPdummy;
     nv->brd         = eo_nv_BRDdummy;
+    nv->cached      = eobool_false;
     nv->id32        = eo_nv_ID32dummy;
     nv->rom         = NULL;       
     nv->ram         = NULL;  
@@ -283,6 +284,15 @@ extern eOnvBRD_t eo_nv_GetBRD(const EOnv *nv)
     return(nv->brd);    
 }
 
+extern eObool_t eo_nv_IsCached(const EOnv *nv)
+{
+    if(NULL == nv)
+    {
+        return(eobool_false);
+    }
+    return(nv->cached);    
+}
+
 
 extern eOnvRWmode_t eo_nv_GetRWmode(const EOnv *nv)
 {
@@ -305,10 +315,11 @@ extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eObool_t cached, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
 {
     nv->ip          = ip;
     nv->brd         = brd;
+    nv->cached      = cached;
     nv->id32        = id32;
     nv->rom         = rom;
     nv->ram         = ram; 

@@ -88,7 +88,8 @@ typedef struct
     eOuint32_fp_uint8_uint8_uint32_t    getid;              /*< a function which returns the full ID given: (brd, ep, prognumber)  */
     eOuint32_fp_uint8_uint32_t          getprognumber;      /*< a function which returns a progressive number given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getrom;             /*< a function which returns the .rom part of the NV given: (brd, id) */
-    eOvoidp_fp_uint8_uint32_t           getram;    
+    eOvoidp_fp_uint8_uint32_t           getram; 
+    eObool_fp_uint8_uint32_t            isvarcached;        /*< a function which tells if the var is cached given: (brd, id) */    
 } eOnvset_protocol_Interface_t;
 
 

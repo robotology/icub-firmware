@@ -290,6 +290,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
             uint8_t brd =  (*theDevice)->boardnum;
             eOnvID32_t id32 = EOK_uint32dummy;     
             uint32_t prog = 0;
+            eObool_t cached = eobool_false;
 
             for(k=0; k<nvars; k++)
             {
@@ -306,7 +307,10 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                 if(EOK_uint32dummy == id32)
                 {
                     continue;
-                }                    
+                }
+
+                // - 0+. cached?
+                cached = (*theEndpoint)->epcfg.protif->isvarcached(brd, id32);               
                 // - 1. the rom
                 rom = (EOnv_rom_t*) (*theEndpoint)->epcfg.protif->getrom(brd, id32);
                 // - 2. the ram
@@ -318,6 +322,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                 eo_nv_hid_Load(     &thenv,
                                     ip, //(*theDevice)->ipaddress,
                                     brd,
+                                    cached,
                                     id32,
                                     rom,
                                     ram,
@@ -445,7 +450,9 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
         return(eores_NOK_generic);       
     }
     
-    // - retrieve from the device and endpoint what is required to form the netvar: con, ram, mtx, etc.    
+    // - retrieve from the device and endpoint what is required to form the netvar: con, ram, mtx, etc.   
+    // - 0+. cached?
+    eObool_t cached = theEndpoint->epcfg.protif->isvarcached(brd, id32);     
     // - 1. the rom
     EOnv_rom_t* rom = (EOnv_rom_t*) theEndpoint->epcfg.protif->getrom(brd, id32);
     // - 2. the ram
@@ -467,7 +474,8 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
     eo_nv_hid_Load(     thenv,
                         ip, //(*theDevice)->ipaddress,
                         brd,
-                        id32, 
+                        id32,
+                        cached,    
                         rom,
                         ram,
                         mtx2use

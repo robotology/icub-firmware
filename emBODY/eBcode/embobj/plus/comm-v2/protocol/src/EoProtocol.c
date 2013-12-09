@@ -92,7 +92,7 @@ static eOprotBRD_t s_eoprot_localboard = 255;
 
 extern const uint8_t* eoprot_board_numberofeachentity[eoprot_boards_maxnumberof][eoprot_endpoints_numberof] = { NULL };
 extern void* eoprot_board_ramofeachendpoint[eoprot_boards_maxnumberof][eoprot_endpoints_numberof] = { NULL };
-
+extern eObool_fp_uint32_t eoprot_board_isvarcached_fns[eoprot_boards_maxnumberof] = { NULL };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -107,7 +107,8 @@ const eOprot_nvset_Interface_t eoprot_eonvset_Interface =
     EO_INIT(.getid)                 eoprot_prognum2id,            
     EO_INIT(.getprognumber)         eoprot_id2prognum,     
     EO_INIT(.getrom)                s_eoprot_eonvrom_get,             
-    EO_INIT(.getram)                eoprot_variable_ramof_get                      
+    EO_INIT(.getram)                eoprot_variable_ramof_get,
+    EO_INIT(.isvarcached)           eoprot_variable_is_cached    
 };
 
 
@@ -209,6 +210,27 @@ extern eOresult_t eoprot_config_endpoint_entities(eOprotBRD_t brd, eOprotEndpoin
     eoprot_board_numberofeachentity[brd][epi] = numberofentities;    
         
     return(res);
+}
+
+extern eOresult_t eoprot_config_cached_variables(eOprotBRD_t brd, eObool_fp_uint32_t isvarcached_fn)
+{
+    eOresult_t res = eores_OK;
+    
+    if(eoprot_board_localboard == brd)
+    {
+        brd = s_eoprot_localboard;
+    } 
+    
+    if((brd >= eoprot_boards_maxnumberof) || (NULL == isvarcached_fn))
+    {
+        return(eores_NOK_generic);
+    }
+       
+            
+    eoprot_board_isvarcached_fns[brd] = isvarcached_fn;    
+
+    
+    return(res);        
 }
 
 extern uint16_t eoprot_endpoint_sizeof_get(eOprotBRD_t brd, eOprotEndpoint_t ep)
@@ -334,6 +356,31 @@ extern uint16_t eoprot_variable_sizeof_get(eOprotBRD_t brd, eOprotID32_t id)
     
     
     return(size);
+}
+
+extern eObool_t eoprot_variable_is_cached(eOprotBRD_t brd, eOprotID32_t id)
+{
+    eObool_t res = eobool_false;
+    eObool_fp_uint32_t fptr = NULL;
+
+    if(eoprot_board_localboard == brd)
+    {
+        brd = s_eoprot_localboard;
+    }  
+    
+    if(brd >= eoprot_boards_maxnumberof)
+    {
+        return(res);
+    }
+
+    fptr = eoprot_board_isvarcached_fns[brd];
+    
+    if(NULL != fptr)
+    {
+        res = fptr(id);
+    }
+    
+    return(res);
 }
 
 
