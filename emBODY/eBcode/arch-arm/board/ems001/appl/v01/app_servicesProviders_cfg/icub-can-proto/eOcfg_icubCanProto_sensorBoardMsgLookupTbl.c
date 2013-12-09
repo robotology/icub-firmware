@@ -58,11 +58,11 @@
 because they are few mesages 
 and with id not continuos. */
 #define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1   //ICUBCANPROTO_POL_AS_CMD_MAXNUM
-#define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_AS_CMD__CMD_MAXNUM
+#define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_AS_CMD_MAXNUM
 
-#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max ICUBCANPROTO_PER_AS_CMD__CMD_MAXNUM
+#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max ICUBCANPROTO_PER_AS_MSG_MAXNUM
 #define eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max 2 
-#define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_AS_CMD__CMD_MAXNUM
+#define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_AS_MSG_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
 #define eo_icubCanProto_pollingSkinMsg_inTbl_max               1//ICUBCANPROTO_POL_AS_CMD_MAXNUM

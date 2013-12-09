@@ -550,7 +550,7 @@ extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto*
 {
 
     uint8_t *data_ptr = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_PER_AS_CREATE_ID(ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR, dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_PER_AS_CREATE_ID(ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR, dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 6;
@@ -561,7 +561,7 @@ extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto*
 extern eOresult_t eo_icubCanProto_former_per_sb_cmd__torqueVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     uint8_t *data_ptr = (uint8_t*)val_ptr;
-    canFrame->id = ICUBCANPROTO_PER_AS_CREATE_ID(ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR, dest.s.canAddr);
+    canFrame->id = ICUBCANPROTO_PER_AS_CREATE_ID(ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR, dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 6;

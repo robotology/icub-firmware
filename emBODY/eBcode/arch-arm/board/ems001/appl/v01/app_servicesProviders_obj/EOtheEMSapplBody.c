@@ -247,9 +247,9 @@ extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default =
         {
             .val2bcastList      =
             {
-            /* 0 */ ICUBCANPROTO_PER_MC_CMD_POSITION,
-            /* 1 */ ICUBCANPROTO_PER_MC_CMD_STATUS,
-            /* 2 */ ICUBCANPROTO_PER_MC_CMD_PRINT,
+            /* 0 */ ICUBCANPROTO_PER_MC_MSG__POSITION,
+            /* 1 */ ICUBCANPROTO_PER_MC_MSG__STATUS,
+            /* 2 */ ICUBCANPROTO_PER_MC_MSG__PRINT,
             /* 3 */ 0
             }
         }

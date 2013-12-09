@@ -1533,7 +1533,7 @@ extern eOresult_t eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent(EO
 {
     int16_t *pwmList = (int16_t*)val_ptr;
    
-    canFrame->id = ICUBCANPROTO_PER_MC_CREATE_ID(ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT);
+    canFrame->id = ICUBCANPROTO_PER_MC_CREATE_ID(ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 8;

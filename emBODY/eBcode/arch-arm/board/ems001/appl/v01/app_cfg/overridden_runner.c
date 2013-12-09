@@ -593,7 +593,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_periodicMotorControl,
-        EO_INIT(.cmdId) ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT
+        EO_INIT(.cmdId) ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
     };
 
 
@@ -797,10 +797,10 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         
         //set command (calss + id) and send it
         msgCmd.class = icubCanProto_msgCmdClass_periodicAnalogSensor;
-        msgCmd.cmdId = ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR;
+        msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
         
-        msgCmd.cmdId = ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR;
+        msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
     }
     s_checkEthLinks();
