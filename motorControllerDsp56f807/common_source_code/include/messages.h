@@ -1125,6 +1125,14 @@
 			_set_vel[axis] = BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
 			if (_set_vel[axis] < 1) \
 				_set_vel[axis] = 1; \
+			/* stiction compensation (XOR condition on PID sign) */ \
+			if (_ended[axis]) \
+			{ \
+			   if ( (_set_point[axis]>_position[axis]) == (_kp[axis]>0)) \
+		  		  _kstc[axis] = _kstp[axis]; \
+			   else \
+				  _kstc[axis] = _kstn[axis]; \
+			} \
 			/* _set_vel needs to be checked */ \
 			_set_acc[axis] = 0; \
 			init_trajectory (axis, _desired[axis], _set_point[axis], _set_vel[axis]); \

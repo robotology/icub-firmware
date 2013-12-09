@@ -138,7 +138,7 @@ Int16  _ko[JN] = INIT_ARRAY (0);				// offset
 Int16  _kr[JN] = INIT_ARRAY (3);				// scale factor (negative power of two) 
 Int16  _kstp[JN] = INIT_ARRAY (0);              // stiction compensation: positive val
 Int16  _kstn[JN] = INIT_ARRAY (0);              // stiction compensation: negative val
-
+Int16  _kstc[JN] = INIT_ARRAY (0);              // stiction compensation: current  val 
 
 // TORQUE PID
 Int16  _strain_val[JN] = INIT_ARRAY (0);
@@ -414,6 +414,19 @@ Int32 compute_pwm(byte j)
 		PWMoutput = compute_pid2(j);
 		PWMoutput = PWMoutput + _ko[j];
 		_pd[j] = _pd[j] + _ko[j];
+		
+		#if (CURRENT_BOARD_TYPE == BOARD_TYPE_4DC) 
+		//stiction compensation for 4dc motros
+			PWMoutput = PWMoutput + _kstc[j];
+			_pd[j] = _pd[j] + _kstc[j];
+			if (_ended[j])
+			{
+				if (_kstc[j]> 0 ) _kstc[j]--;
+				if (_kstc[j]< 0 ) _kstc[j]++;
+			}
+		#endif
+		
+		
 	break;
 	case MODE_OPENLOOP:
 		PWMoutput = _ko[j];
@@ -515,7 +528,7 @@ Int32 compute_pid_impedance(byte j)
 	else
 	{
 		_error_position[j] = extract_l(ImpInputError);
-	}		
+	}
 	
 	/* Proportional part (stiffness) */
 	_desired_torque[j] = -(Int32) _ks_imp[j] * (Int32)(_error_position[j]);

@@ -178,7 +178,7 @@ extern Int16  _ko[JN] ;					// offset
 extern Int16  _kr[JN] ;					// scale factor (negative power of two) 
 extern Int16  _kstp[JN] ;               // stiction compensation: positive val
 extern Int16  _kstn[JN] ;               // stiction compensation: negative val
-
+extern Int16  _kstc[JN] ;               // stiction compensation: current  val 
 
 // TORQUE PID
 extern Int16  _strain_val[JN];
