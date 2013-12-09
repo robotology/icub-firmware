@@ -79,7 +79,7 @@ extern "C" {
 #define ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX     0x32 // Set board CAN address
 
 
-#define ICUBCANPROTO_POL_AS_CMD__CMD_MAXNUM                 ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION +1
+#define ICUBCANPROTO_POL_AS_CMD_MAXNUM                 ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION +1
 
 /***************************************************************************/
 // command messages of class ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR 
