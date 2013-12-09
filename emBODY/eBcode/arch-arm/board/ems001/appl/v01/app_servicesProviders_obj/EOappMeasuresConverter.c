@@ -212,7 +212,7 @@ extern eOresult_t eo_appMeasConv_SetJntEncoderConversionOffset(EOappMeasConv *p,
 }
 
 
-__weak extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_position_t e_pos)
+__weak extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_position_t e_pos)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -228,7 +228,7 @@ __weak extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p,
     return((eOmeas_position_t)e_pos);
 }
 
-__weak extern eOicubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
+__weak extern icubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -242,10 +242,10 @@ __weak extern eOicubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeas
     }
 #endif
      
-    return((eOicubCanProto_position_t)i_pos);
+    return((icubCanProto_position_t)i_pos);
 }
 
-__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel)
+__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -262,7 +262,7 @@ __weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p,
     return((eOmeas_velocity_t)e_vel);
 }
 
-__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_velocity_t e_vel)
+__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -279,7 +279,7 @@ __weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv
 }
 
 
-__weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+__weak extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -293,11 +293,11 @@ __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeas
     }
 #endif
 
-    return((eOicubCanProto_velocity_t)i_vel);
+    return((icubCanProto_velocity_t)i_vel);
 }
 
 
-__weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+__weak extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
 
 #ifdef _APPMEASCONV_SAFE_
@@ -312,9 +312,9 @@ __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOapp
     }
 #endif
     
-    return((eOicubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+    return((icubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
 }
-// __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+// __weak extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 // {
 // #ifdef _APPMEASCONV_SAFE_
 //     if(NULL == p)
@@ -328,11 +328,11 @@ __weak extern eOicubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOapp
 //     }
 // #endif
 
-//     return((eOicubCanProto_velocity_t)i_vel);
+//     return((icubCanProto_velocity_t)i_vel);
 // }
 
 
-__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)
+__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
 {
 #ifdef _APPMEASCONV_SAFE_    
     if(NULL == p)
@@ -350,7 +350,7 @@ __weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeas
 }
 
 
-__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_acceleration_t e_acc)
+__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
 {
 #ifdef _APPMEASCONV_SAFE_    
     if(NULL == p)
@@ -367,7 +367,7 @@ __weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOapp
     return((eOmeas_acceleration_t)e_acc);
 
 }
-__weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+__weak extern icubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -381,10 +381,10 @@ __weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(E
     }
 #endif
      
-    return((eOicubCanProto_acceleration_t)i_acc);
+    return((icubCanProto_acceleration_t)i_acc);
 }
 
-__weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+__weak extern icubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -398,10 +398,10 @@ __weak extern eOicubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_a
     }
 #endif
      
-    return((eOicubCanProto_acceleration_t)i_acc);
+    return((icubCanProto_acceleration_t)i_acc);
 
 }
-__weak extern eOicubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
+__weak extern icubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -416,11 +416,11 @@ __weak extern eOicubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(E
 #endif
 
      
-    return((eOicubCanProto_stiffness_t)i_stiff);
+    return((icubCanProto_stiffness_t)i_stiff);
 }
 
 
-__weak extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_stiffness_t s_stiff)
+__weak extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -438,7 +438,7 @@ __weak extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeas
 }
 
 
-__weak extern eOicubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
+__weak extern icubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -452,10 +452,10 @@ __weak extern eOicubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOapp
     }
 #endif
 
-    return((eOicubCanProto_damping_t)i_damping);
+    return((icubCanProto_damping_t)i_damping);
 }
 
-__weak extern eOmeas_damping_t eo_appMeasConv_impedenceDamping_S2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_damping_t s_damping)
+__weak extern eOmeas_damping_t eo_appMeasConv_impedenceDamping_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_damping_t s_damping)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -473,7 +473,7 @@ __weak extern eOmeas_damping_t eo_appMeasConv_impedenceDamping_S2I(EOappMeasConv
 }
 
 
-__weak extern eOicubCanProto_torque_t eo_appMeasConv_torque_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
+__weak extern icubCanProto_torque_t eo_appMeasConv_torque_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)
@@ -487,11 +487,11 @@ __weak extern eOicubCanProto_torque_t eo_appMeasConv_torque_I2S(EOappMeasConv *p
     }
 #endif
     
-    return((eOicubCanProto_torque_t)i_torque);
+    return((icubCanProto_torque_t)i_torque);
 }
 
 
-__weak extern eOmeas_torque_t eo_appMeasConv_torque_S2I(EOappMeasConv *p, eOmc_jointId_t jId, eOicubCanProto_torque_t s_torque)
+__weak extern eOmeas_torque_t eo_appMeasConv_torque_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
 {
 #ifdef _APPMEASCONV_SAFE_
     if(NULL == p)

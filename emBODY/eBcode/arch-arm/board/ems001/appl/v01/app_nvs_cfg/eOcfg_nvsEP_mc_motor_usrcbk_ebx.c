@@ -126,13 +126,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mx
 {
     eOresult_t                              res;
     eObrd_types_t                           boardType;
-    eOicubCanProto_velocity_t               vel_icubCanProtValue;
+    icubCanProto_velocity_t                 vel_icubCanProtValue;
     eOmc_motor_config_t                     *cfg_ptr = (eOmc_motor_config_t*)nv->loc;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -179,7 +179,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__pidcurrent(eOcfg_nvsEP_mc_moto
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -207,10 +207,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__pidcurrent(eOcfg_nvsEP_mc_moto
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxvelocityofmotor(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOmeas_velocity_t                       *vel_ptr = (eOmeas_velocity_t*)nv->loc;
-    eOicubCanProto_velocity_t               vel_icubCanProtValue;
+    icubCanProto_velocity_t                 vel_icubCanProtValue;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY
     };
 
@@ -230,7 +230,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(eOcfg_nvsEP_
     eOmeas_current_t                        *curr_ptr = (eOmeas_current_t*)nv->loc;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT
     };
 

@@ -552,7 +552,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBo
     eOresult_t 				    res = eores_OK;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT
     };	
 
@@ -592,7 +592,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
     eOicubCanProto_msgDestination_t         dest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_periodicMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_periodicMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT
     };
 
@@ -723,7 +723,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__MOTION_DONE
     };
     
@@ -796,7 +796,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); //virtual ft sensor has address 12
         
         //set command (calss + id) and send it
-        msgCmd.class = eo_icubCanProto_msgCmdClass_periodicSensorBoard;
+        msgCmd.class = icubCanProto_msgCmdClass_periodicAnalogSensor;
         msgCmd.cmdId = ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
         

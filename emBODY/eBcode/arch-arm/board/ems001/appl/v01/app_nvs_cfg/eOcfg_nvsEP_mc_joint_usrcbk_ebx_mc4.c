@@ -81,7 +81,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOicubCanProto_controlmode_t *icubcanProto_controlmode);
+static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, icubCanProto_controlmode_t *icubcanProto_controlmode);
 
 
 
@@ -125,12 +125,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     eOmc_joint_config_t                     *cfg = (eOmc_joint_config_t*)nv->loc;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_joint_status_t                     *jstatus_ptr = NULL;
-    eOicubCanProto_position_t               pos_icubCanProtValue, minpos_icubCanProtValue, maxpos_icubCanProtValue;
-    eOicubCanProto_impedance_t              impedence_icubCanProtValues;
+    icubCanProto_position_t                 pos_icubCanProtValue, minpos_icubCanProtValue, maxpos_icubCanProtValue;
+    icubCanProto_impedance_t                impedence_icubCanProtValues;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -238,7 +238,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_joi
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -270,7 +270,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -300,13 +300,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_joint
 {
     eOresult_t                              res;
     eObrd_types_t                           boardType;
-    eOicubCanProto_impedance_t              impedence_icubCanProtValues;
+    icubCanProto_impedance_t                impedence_icubCanProtValues;
     eOmc_impedance_t                        *impedance_ptr = (eOmc_impedance_t*)nv->loc;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -343,10 +343,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint(eOcfg_nvsEP
         So i ca not use this function
     */
 //     eOmeas_position_t                       *pos_ptr = (eOmeas_position_t*)nv->loc;
-//     eOicubCanProto_position_t                pos_icubCanProtValue;
+//     icubCanProto_position_t                pos_icubCanProtValue;
 //     eOicubCanProto_msgCommand_t              msgCmd = 
 //     {
-//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+//         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
 //         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
 //     };
 
@@ -367,10 +367,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP
     */
 
 //     eOmeas_position_t                       *pos_ptr = (eOmeas_position_t*)nv->loc;
-//     eOicubCanProto_position_t                pos_icubCanProtValue;
+//     icubCanProto_position_t                pos_icubCanProtValue;
 //     eOicubCanProto_msgCommand_t              msgCmd = 
 //     {
-//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+//         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
 //         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION
 //     };
 
@@ -388,7 +388,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_
     eOmeas_time_t                           *time_ptr = (eOmeas_time_t*)nv->loc;
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT
     };
 
@@ -459,11 +459,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
     void                                    *val_ptr = NULL;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOmc_joint_config_t                     *jconfig_ptr;
-    eOicubCanProto_position_t               pos;
+    icubCanProto_position_t                 pos;
 
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -499,7 +499,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
     {
         case eomc_setpoint_position:
         {
-            eOicubCanProto_setpoint_position_t  setpoint_pos;
+            icubCanProto_setpoint_position_t  setpoint_pos;
             
             setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, setPoint->to.position.value);
             //reference velocity of position set point must be always >0, so here absolute func is used.
@@ -510,7 +510,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
         case eomc_setpoint_velocity:
         {
-            eOicubCanProto_setpoint_velocity_t  setpoint_vel;
+            icubCanProto_setpoint_velocity_t  setpoint_vel;
             
             setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E_abs(appMeasConv_ptr, jxx, setPoint->to.velocity.withacceleration);           
             setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, setPoint->to.velocity.value);
@@ -527,7 +527,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
         case eomc_setpoint_torque:
         {
-            eOicubCanProto_setpoint_torque_t setpoint_torque;
+            icubCanProto_setpoint_torque_t setpoint_torque;
             
             setpoint_torque.value = eo_appMeasConv_torque_I2S(appMeasConv_ptr,jxx, setPoint->to.torque.value);
             
@@ -564,7 +564,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_
     eObool_t                                *cmd = (eObool_t*)nv->loc;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY
     };
 
@@ -581,14 +581,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 {
     eOresult_t                              res;
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->loc;
-    eOicubCanProto_calibrator_t             iCubCanProtCalibrator;
+    icubCanProto_calibrator_t               iCubCanProtCalibrator;
     eOboolvalues_t                          enableAMPbeforeCalib = eobool_false;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -620,7 +620,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
     //prepare calibration data to send
     /*Note: currently calibration params are raw, so they doesn't need to be converted in icub can proto measures;
     but i prepare code for future: when calibration param used new measure unit.*/
-    iCubCanProtCalibrator.type = (eOicubCanProto_calibration_type_t)calibrator->type;
+    iCubCanProtCalibrator.type = (icubCanProto_calibration_type_t)calibrator->type;
     switch(calibrator->type)
     {
         case eomc_calibration_type0_hard_stops:
@@ -633,13 +633,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
             
         case eomc_calibration_type1_abs_sens_analog:
         {
-//             eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.position);
+//             icubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.position);
 //             /*sice pos param is a word of 16 bits i must check min and max*/
 //             if((pos < INT16_MIN)||(pos>INT16_MAX))
 //             {
 //                 return;
 //             }
-//             iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
+//             iCubCanProtCalibrator.params.type1.position = (icubCanProto_position4calib_t)pos; 
 //             iCubCanProtCalibrator.params.type1.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.velocity);
              iCubCanProtCalibrator.params.type1.position = calibrator->params.type1.position; 
              iCubCanProtCalibrator.params.type1.velocity =  calibrator->params.type1.velocity;
@@ -656,13 +656,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
         case eomc_calibration_type3_abs_sens_digital:
         {
-//              eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
+//              icubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.position);
 //             /*sice pos param is a word of 16 bits i must check min and max*/
 //             if((pos < INT16_MIN)||(pos>INT16_MAX))
 //             {
 //                 return;
 //             }
-//             iCubCanProtCalibrator.params.type1.position = (eOicubCanProto_position4calib_t)pos; 
+//             iCubCanProtCalibrator.params.type1.position = (icubCanProto_position4calib_t)pos; 
 //             iCubCanProtCalibrator.params.type3.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type3.velocity);           
             iCubCanProtCalibrator.params.type1.position = calibrator->params.type3.position; 
             iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type3.velocity;            
@@ -672,14 +672,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 
         case eomc_calibration_type4_abs_and_incremental:
         {
-//             eOicubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.position);
+//             icubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.position);
 //             //here position is in int16_t ==> so i must verify if pos is out of int16_t range
 //             if((pos > INT16_MAX) || (pos < INT16_MIN))
 //             {
 //                 return;
 //                 #warning VALE --> how to manage this error???
 //             }
-//             iCubCanProtCalibrator.params.type4.position = (eOicubCanProto_position4calib_t)pos; 
+//             iCubCanProtCalibrator.params.type4.position = (icubCanProto_position4calib_t)pos; 
 //            iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type4.velocity);            
             iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
             iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
@@ -723,11 +723,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOmc_controlmode_command_t              *controlmode_cmd_ptr = (eOmc_controlmode_command_t*)nv->loc;
-    eOicubCanProto_controlmode_t            icubcanProto_controlmode;
+    icubCanProto_controlmode_t              icubcanProto_controlmode;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -792,10 +792,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
 extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
 {
     eOmeas_torque_t *torquevalue_ptr = (eOmeas_torque_t*)nv->loc;
-    eOicubCanProto_torque_t icub_torque;
+    icubCanProto_torque_t icub_torque;
     
 //     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-//     eOicubCanProto_torque_t icub_torque =  eo_appMeasConv_torque_I2S(appMeasConv_ptr, jxx, *torquevalue_ptr);
+//     icubCanProto_torque_t icub_torque =  eo_appMeasConv_torque_I2S(appMeasConv_ptr, jxx, *torquevalue_ptr);
 
     icub_torque = *torquevalue_ptr +0x8000;
     eo_appTheDB_SetVirtualStrainValue(eo_appTheDB_GetHandle(), jxx, icub_torque);
@@ -812,37 +812,37 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg
 // --------------------------------------------------------------------------------------------------------------------
 
 static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, 
-                                                                      eOicubCanProto_controlmode_t *icubcanProto_controlmode)
+                                                                      icubCanProto_controlmode_t *icubcanProto_controlmode)
 {
     switch(eomc_controlmode)
     {
         case eomc_controlmode_cmd_position:
         {
-            *icubcanProto_controlmode = eo_icubCanProto_controlmode_position;
+            *icubcanProto_controlmode = icubCanProto_controlmode_position;
         }break;
         case eomc_controlmode_cmd_velocity:
         {
-            *icubcanProto_controlmode = eo_icubCanProto_controlmode_velocity;
+            *icubcanProto_controlmode = icubCanProto_controlmode_velocity;
         }break;
         case eomc_controlmode_cmd_torque:
         {
-            *icubcanProto_controlmode = eo_icubCanProto_controlmode_torque;
+            *icubcanProto_controlmode = icubCanProto_controlmode_torque;
         }break;
         case eomc_controlmode_cmd_impedance_pos:
         {
-            *icubcanProto_controlmode = eo_icubCanProto_controlmode_impedance_pos;
+            *icubcanProto_controlmode = icubCanProto_controlmode_impedance_pos;
         }break;
         case eomc_controlmode_cmd_impedance_vel:
         {
-             *icubcanProto_controlmode = eo_icubCanProto_controlmode_impedance_vel;
+             *icubcanProto_controlmode = icubCanProto_controlmode_impedance_vel;
         }break;
         case eomc_controlmode_cmd_current:
         {
-            *icubcanProto_controlmode = eo_icubCanProto_controlmode_current;
+            *icubcanProto_controlmode = icubCanProto_controlmode_current;
         }
         case eomc_controlmode_cmd_openloop:
         {
-            *icubcanProto_controlmode = eo_icubCanProto_controlmode_openloop;
+            *icubcanProto_controlmode = icubCanProto_controlmode_openloop;
         }break;
         case eomc_controlmode_cmd_switch_everything_off:
         {

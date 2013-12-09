@@ -750,7 +750,7 @@ extern eOresult_t eo_appCanSP_ConfigMotor(EOappCanSP *p, eOmc_motorId_t mId, eOm
     eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
     eo_icubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 
@@ -914,7 +914,7 @@ extern eOresult_t eo_appCanSP_SendSetPoint(EOappCanSP *p, eOmc_jointId_t jId, eO
     void *val_ptr = NULL;
     eo_icubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 

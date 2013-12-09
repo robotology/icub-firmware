@@ -71,8 +71,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, eOcanframe_t *frame, eOcanport_t canPort);
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdID, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, eOcanframe_t *frame, eOcanport_t canPort);
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdID, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 
 
 static eOresult_t s_eo_icubCanProto_pollingMotorBoardMsg_parser_excFn(void *arg);
@@ -659,7 +659,7 @@ extern const EOconstLookupTbl* const icubCanProto_periodicMotorBoardMsg_former_L
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, 
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, 
                                                                          eOcanframe_t *frame, eOcanport_t canPort)
 {                                                                      
     eOresult_t res;
@@ -721,7 +721,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubC
 
 
 
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, 
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, 
                                                                             void *nv_ptr,
                                                                             eOicubCanProto_msgDestination_t dest,
                                                                             eOcanframe_t *canFrame)

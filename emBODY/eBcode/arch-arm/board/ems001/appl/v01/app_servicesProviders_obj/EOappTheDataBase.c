@@ -1149,7 +1149,7 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
 {
     eOsizecntnr_t 		     		 	i;
 // 	eObrd_boardId_t						maxusedcanaddr = 0;
-    eOicubCanProto_canBoardAddress_t 	maxusedcanaddr = 0, addr;
+    icubCanProto_canBoardAddress_t 	    maxusedcanaddr = 0, addr;
 
     //1) get max used can address (it will be in range [1,E]. 0 is ems can port address and F is bradcast address)
 	eOappTheDB_cfg_canBoardInfo_t *b_cfg_ptr = (eOappTheDB_cfg_canBoardInfo_t*)(p->cfg.canboardsList->item_array_data);
@@ -1253,7 +1253,7 @@ static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p)
     
     //skin
     eo_cfg_nvsEP_sk_emsboard_t * sk_ptr = (eo_cfg_nvsEP_sk_emsboard_t *)eo_cfg_nvsEP_eb4_Get_locallyownedRAM(p->cfg.sk_endpoint);
-    skin_ptr  = &sk_ptr->someskin;
+    skin_ptr  = &sk_ptr->skin;
     
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
     //mc

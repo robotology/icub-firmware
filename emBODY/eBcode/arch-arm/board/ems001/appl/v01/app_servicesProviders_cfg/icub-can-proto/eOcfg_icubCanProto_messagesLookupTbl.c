@@ -70,9 +70,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass(eOcanframe_t *frame);
-static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPollingClass(eOcanframe_t *frame);
-static eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofSkinClass(eOcanframe_t *frame);
+static icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass(eOcanframe_t *frame);
+static icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPollingClass(eOcanframe_t *frame);
+static icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofSkinClass(eOcanframe_t *frame);
 
 static eOresult_t s_eo_icubCanProto_msgClasses_excFn(void *arg);
 
@@ -170,27 +170,27 @@ extern const EOconstLookupTbl* const icubCanProto_msgClasses_lookupTbl__ptr = &s
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-EO_static_inline eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass(eOcanframe_t *frame)
+EO_static_inline icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass(eOcanframe_t *frame)
 {
-    return((eOicubCanProto_msgCommand_cmdId_t)(frame->id & 0x00F));    
+    return((icubCanProto_msgCommand_cmdId_t)(frame->id & 0x00F));    
 
 }
 
 
 
-EO_static_inline eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPollingClass(eOcanframe_t *frame)
+EO_static_inline icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofPollingClass(eOcanframe_t *frame)
 {
     if(frame->size == 0)
     {
         return(0xFF);
     }
     
-    return((eOicubCanProto_msgCommand_cmdId_t)(frame->data[0]&0x7F));
+    return((icubCanProto_msgCommand_cmdId_t)(frame->data[0]&0x7F));
 }
 
 
 
-EO_static_inline eOicubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofSkinClass(eOcanframe_t *frame)
+EO_static_inline icubCanProto_msgCommand_cmdId_t s_eo_icubCanProto_getCmdId_fromFrame_ofSkinClass(eOcanframe_t *frame)
 {
     return(0); //use only this command to acees to skin's functions       
 }

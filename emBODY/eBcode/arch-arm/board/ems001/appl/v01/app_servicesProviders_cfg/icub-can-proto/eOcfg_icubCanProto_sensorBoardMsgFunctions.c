@@ -205,7 +205,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     eOsmStatesEMSappl_t                         appl_st;
     eOicubCanProto_msgCommand_t                 msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
     };
     

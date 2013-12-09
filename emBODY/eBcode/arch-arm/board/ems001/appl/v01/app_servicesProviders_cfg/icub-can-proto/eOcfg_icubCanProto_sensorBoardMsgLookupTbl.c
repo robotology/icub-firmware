@@ -81,9 +81,9 @@ and with id not continuos. */
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, eOcanframe_t *frame, eOcanport_t canPort);
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdID, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
-static eOresult_t s_eo_icubCanProto_exceptionMsgperiodicSensorBoard_parser(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, eOcanframe_t *frame, eOcanport_t canPort);
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, eOcanframe_t *frame, eOcanport_t canPort);
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdID, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
+static eOresult_t s_eo_icubCanProto_exceptionMsgperiodicSensorBoard_parser(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, eOcanframe_t *frame, eOcanport_t canPort);
 
 static eOresult_t s_eo_icubCanProto_pollingSensorBoardMsg_parser_excFn(void *arg);
 static eOresult_t s_eo_icubCanProto_pollingSensorBoardMsg_former_excFn(void *arg);
@@ -300,7 +300,7 @@ extern const EOconstLookupTbl* const icubCanProto_periodicSkinMsg_parser_LUTbl__
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, 
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, 
                                                                           eOcanframe_t *frame, eOcanport_t canPort)
 {                                                                      
     eOresult_t res = eores_OK;
@@ -325,7 +325,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicub
 
 
 
-static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, 
+static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, 
                                                                             void *val_ptr,
                                                                             eOicubCanProto_msgDestination_t dest,
                                                                             eOcanframe_t *canFrame)
@@ -370,7 +370,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicub
 }
 
 
-static eOresult_t s_eo_icubCanProto_exceptionMsgperiodicSensorBoard_parser(EOicubCanProto *p, eOicubCanProto_msgCommand_cmdId_t cmdId, 
+static eOresult_t s_eo_icubCanProto_exceptionMsgperiodicSensorBoard_parser(EOicubCanProto *p, icubCanProto_msgCommand_cmdId_t cmdId, 
                                                                           eOcanframe_t *frame, eOcanport_t canPort)
 {                                                                      
     eOresult_t res;

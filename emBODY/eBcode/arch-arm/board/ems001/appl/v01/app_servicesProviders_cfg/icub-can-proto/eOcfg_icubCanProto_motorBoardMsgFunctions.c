@@ -86,7 +86,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p,
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
-static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(eOicubCanProto_controlmode_t icubcanProto_controlmode, eOmc_controlmode_t *eomc_controlmode);
+static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode, eOmc_controlmode_t *eomc_controlmode);
 static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode);
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -258,7 +258,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__toggleVerbose(EOicubCanProt
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_calibrator_t *calib_ptr = (eOicubCanProto_calibrator_t *)val_ptr;
+    icubCanProto_calibrator_t *calib_ptr = (icubCanProto_calibrator_t *)val_ptr;
     /* 1) prepare base information*/
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
@@ -274,21 +274,21 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
 
     switch(calib_ptr->type)
     {
-        case eo_icubCanProto_calibration_type0_hard_stops:
+        case icubCanProto_calibration_type0_hard_stops:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type0.pwmlimit;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type0.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
         }break;
 
-        case eo_icubCanProto_calibration_type1_abs_sens_analog:
+        case icubCanProto_calibration_type1_abs_sens_analog:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type1.position;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type1.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
         }break;
 
-        case eo_icubCanProto_calibration_type2_hard_stops_diff:
+        case icubCanProto_calibration_type2_hard_stops_diff:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type2.pwmlimit;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type2.velocity;
@@ -296,14 +296,14 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
         }break;
 
 
-        case eo_icubCanProto_calibration_type3_abs_sens_digital:
+        case icubCanProto_calibration_type3_abs_sens_digital:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type3.position;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type3.velocity;
             *((uint16_t*)(&canFrame->data[6])) = calib_ptr->params.type3.offset;        
         }break;
 
-        case eo_icubCanProto_calibration_type4_abs_and_incremental:
+        case icubCanProto_calibration_type4_abs_and_incremental:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type4.position;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type4.velocity;
@@ -438,7 +438,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__motionDone(EOicubCanProto* 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setControlMode(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_controlmode_t *controlMode_ptr = (eOicubCanProto_controlmode_t*)val_ptr;
+    icubCanProto_controlmode_t *controlMode_ptr = (icubCanProto_controlmode_t*)val_ptr;
 
     /* 1) prepare base information*/
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
@@ -523,7 +523,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getEncoderPosition(EOicubCa
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__positionMove(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_setpoint_position_t *pos_setpoint_ptr = (eOicubCanProto_setpoint_position_t *)val_ptr;
+    icubCanProto_setpoint_position_t *pos_setpoint_ptr = (icubCanProto_setpoint_position_t *)val_ptr;
     /*NOTE: here i don't check is the given setpoint is a position one. i trust to it*/
 
     /* 1) prepare base information*/
@@ -536,8 +536,8 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__positionMove(EOicubCanProto
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE;
 
     /* 3) set command's params */
-    *((eOicubCanProto_position_t*)(&canFrame->data[1])) = pos_setpoint_ptr->value;
-    *((eOicubCanProto_velocity_t*)(&canFrame->data[5])) = pos_setpoint_ptr->withvelocity;
+    *((icubCanProto_position_t*)(&canFrame->data[1])) = pos_setpoint_ptr->value;
+    *((icubCanProto_velocity_t*)(&canFrame->data[5])) = pos_setpoint_ptr->withvelocity;
 
     return(eores_OK);
 }
@@ -545,7 +545,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__positionMove(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__velocityMove(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_setpoint_velocity_t *vel_setpoint_ptr = (eOicubCanProto_setpoint_velocity_t *)val_ptr;
+    icubCanProto_setpoint_velocity_t *vel_setpoint_ptr = (icubCanProto_setpoint_velocity_t *)val_ptr;
     /*NOTE: here i don't check is the given setpoint is a velocity one. i trust to it*/
 
     /* 1) prepare base information*/
@@ -558,8 +558,8 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__velocityMove(EOicubCanProto
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE;
 
     /*3) set command's params */
-    *((eOicubCanProto_velocity_t*)(&canFrame->data[1])) = vel_setpoint_ptr->value;
-    *((eOicubCanProto_acceleration_t*)(&canFrame->data[3])) = vel_setpoint_ptr->withacceleration;
+    *((icubCanProto_velocity_t*)(&canFrame->data[1])) = vel_setpoint_ptr->value;
+    *((icubCanProto_acceleration_t*)(&canFrame->data[3])) = vel_setpoint_ptr->withacceleration;
 
     return(eores_OK);
 }
@@ -573,7 +573,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setEncoderPosition(EOicubCa
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_setpoint_torque_t *torque_setpoint_ptr = (eOicubCanProto_setpoint_torque_t *)val_ptr;
+    icubCanProto_setpoint_torque_t *torque_setpoint_ptr = (icubCanProto_setpoint_torque_t *)val_ptr;
     /*NOTE: here i don't check is the given setpoint is a velocity one. i trust to it*/
 
     /* 1) prepare base information*/
@@ -586,7 +586,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE;
 
     /*3) set command's params */
-    *((eOicubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
+    *((icubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
 
     /* Note: the firware and icubcanproto expect torque value on 32bit. 
        Currently icubInterface and new eo-proto use 16 bits for torque */
@@ -651,7 +651,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMinPosition(EOicubCanPro
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
-    *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)val_ptr);
+    *((icubCanProto_position_t*)(&canFrame->data[1])) = *((icubCanProto_position_t*)val_ptr);
     return(eores_OK);
 
 
@@ -675,7 +675,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxPosition(EOicubCanPro
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
-    *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)val_ptr);
+    *((icubCanProto_position_t*)(&canFrame->data[1])) = *((icubCanProto_position_t*)val_ptr);
     return(eores_OK);
 }
 
@@ -700,7 +700,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxVelocity(EOicubCanPro
     canFrame->frame_type = 0; //data frame
     canFrame->size = 3;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
-    *((eOicubCanProto_velocity_t*)(&canFrame->data[1])) = *((eOicubCanProto_velocity_t*)val_ptr);
+    *((icubCanProto_velocity_t*)(&canFrame->data[1])) = *((icubCanProto_velocity_t*)val_ptr);
     return(eores_OK);
 }
 
@@ -749,7 +749,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBcastPolicy(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelShift(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-   eOicubCanProto_velocityShift_t shift = *((eOicubCanProto_velocityShift_t*)val_ptr);
+   icubCanProto_velocityShift_t shift = *((icubCanProto_velocityShift_t*)val_ptr);
    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
    canFrame->id_type = 0; //standard id
    canFrame->frame_type = 0; //data frame
@@ -927,7 +927,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setVelTimeout(EOicubCanProt
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_impedance_t *imp_ptr = (eOicubCanProto_impedance_t *)val_ptr;
+    icubCanProto_impedance_t *imp_ptr = (icubCanProto_impedance_t *)val_ptr;
 
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
@@ -938,8 +938,8 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams(EOicubCa
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
 
     //stiffnes and damping are uint16_t
-    *((eOicubCanProto_stiffness_t*)(&canFrame->data[1])) = (eOicubCanProto_stiffness_t)imp_ptr->stiffness;
-    *((eOicubCanProto_damping_t*)(&canFrame->data[3])) = (eOicubCanProto_damping_t)imp_ptr->damping;
+    *((icubCanProto_stiffness_t*)(&canFrame->data[1])) = (icubCanProto_stiffness_t)imp_ptr->stiffness;
+    *((icubCanProto_damping_t*)(&canFrame->data[3])) = (icubCanProto_damping_t)imp_ptr->damping;
 
     return(eores_OK);
 }
@@ -957,7 +957,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceParams(EOicubCa
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOicubCanProto_torque_t *impOffset_ptr = (eOicubCanProto_torque_t *)val_ptr;
+    icubCanProto_torque_t *impOffset_ptr = (icubCanProto_torque_t *)val_ptr;
 
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
@@ -965,7 +965,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset(EOicubCa
     canFrame->size = 3;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
 
-    *((eOicubCanProto_torque_t*)(&canFrame->data[1])) = *((eOicubCanProto_torque_t*)(impOffset_ptr));
+    *((icubCanProto_torque_t*)(&canFrame->data[1])) = *((icubCanProto_torque_t*)(impOffset_ptr));
 
     return(eores_OK);
 }
@@ -1198,7 +1198,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCmdPos(EOicubCanProto* p
     canFrame->frame_type = 0; //data frame
     canFrame->size = 5;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION;
-    *((eOicubCanProto_position_t*)(&canFrame->data[1])) = *((eOicubCanProto_position_t*)nv_ptr);
+    *((icubCanProto_position_t*)(&canFrame->data[1])) = *((icubCanProto_position_t*)nv_ptr);
     return(eores_OK);
 }
 
@@ -1343,7 +1343,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     if(applrunMode__2foc == runmode)
     {
         //in this case one can addr =>one motor!!
-        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
+        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1],
                                                                             &eomc_controlmode);
         eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
         //l'aggiornamento delle nv del giunto sara' fatto nel DO.
@@ -1369,7 +1369,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
 
     
         //set control mode status
-        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[1],
+        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1],
                                                                              &eomc_controlmode);
 
         jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
@@ -1406,7 +1406,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
 
     
         //set control mode status
-        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((eOicubCanProto_controlmode_t) frame->data[3],
+        s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[3],
                                                                              &eomc_controlmode);
 
         jstatus_ptr->basic.controlmodestatus = eomc_controlmode;
@@ -1561,7 +1561,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
 	EOappMeasConv                           *appMeasConv_ptr = NULL;
-	eOicubCanProto_position_t               pos_icubCanProtValue;
+	icubCanProto_position_t                 pos_icubCanProtValue;
     eOmc_joint_status_t                     *jstatus_ptr;
 
     
@@ -1582,11 +1582,11 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
     
     if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinboard)
 	{
-        pos_icubCanProtValue = *((eOicubCanProto_position_t*)&(frame->data[0])); 
+        pos_icubCanProtValue = *((icubCanProto_position_t*)&(frame->data[0])); 
     }
     else
     {
-        pos_icubCanProtValue = *((eOicubCanProto_position_t*)&(frame->data[4])); 
+        pos_icubCanProtValue = *((icubCanProto_position_t*)&(frame->data[4])); 
     }
 
     jstatus_ptr->basic.position = eo_appMeasConv_jntPosition_E2I(appMeasConv_ptr, jId, pos_icubCanProtValue); 
@@ -1675,8 +1675,8 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
     eOmc_jointId_t   		                jId;
     eOmc_joint_status_t                     *jstatus_ptr;
 	EOappMeasConv                           *appMeasConv_ptr = NULL;
-	eOicubCanProto_velocity_t               vel_icubCanProtValue;
-    eOicubCanProto_acceleration_t           acc_icubCanProtValue;
+	icubCanProto_velocity_t                 vel_icubCanProtValue;
+    icubCanProto_acceleration_t             acc_icubCanProtValue;
     
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &jId);
     if(eores_OK != res)
@@ -1696,13 +1696,13 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
     //get measures from can frame
     if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinboard)
 	{
-        vel_icubCanProtValue = *((eOicubCanProto_velocity_t*)&(frame->data[0]));
-        acc_icubCanProtValue = *((eOicubCanProto_velocity_t*)&(frame->data[2]));
+        vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[0]));
+        acc_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[2]));
     }
     else
     {
-        vel_icubCanProtValue = *((eOicubCanProto_velocity_t*)&(frame->data[4]));
-        acc_icubCanProtValue = *((eOicubCanProto_velocity_t*)&(frame->data[6]));
+        vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[4]));
+        acc_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[6]));
     }
     
     //convert measure for icub world and set values in jstatus (nv mem)
@@ -1762,50 +1762,50 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* 
 }
 
 
-static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(eOicubCanProto_controlmode_t icubcanProto_controlmode,
+static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode,
                                                                                       eOmc_controlmode_t *eomc_controlmode)
 {
     switch(icubcanProto_controlmode)
     {
-        case eo_icubCanProto_controlmode_idle:
+        case icubCanProto_controlmode_idle:
         {
             *eomc_controlmode = eomc_controlmode_idle;
         }break;
 
-        case eo_icubCanProto_controlmode_position:
+        case icubCanProto_controlmode_position:
         {
             *eomc_controlmode = eomc_controlmode_position;
         }break;
 
-        case eo_icubCanProto_controlmode_velocity:
+        case icubCanProto_controlmode_velocity:
         {
             *eomc_controlmode = eomc_controlmode_velocity;
         }break;
-        case eo_icubCanProto_controlmode_torque:
+        case icubCanProto_controlmode_torque:
         {
             *eomc_controlmode = eomc_controlmode_torque;
         }break;
 
-        case eo_icubCanProto_controlmode_impedance_pos:
+        case icubCanProto_controlmode_impedance_pos:
         {
             *eomc_controlmode = eomc_controlmode_impedance_pos;
         }break;
 
-        case eo_icubCanProto_controlmode_impedance_vel:
+        case icubCanProto_controlmode_impedance_vel:
         {
             *eomc_controlmode = eomc_controlmode_impedance_vel;
         }break;
 
-        case  eo_icubCanProto_controlmode_calib_abs_pos_sens:
-        case  eo_icubCanProto_controlmode_calib_hard_stops:
-        case  eo_icubCanProto_controlmode_handle_hard_stops:
-        case  eo_icubCanProto_controlmode_margin_reached:
-        case  eo_icubCanProto_controlmode_calib_abs_and_incremental:
+        case  icubCanProto_controlmode_calib_abs_pos_sens:
+        case  icubCanProto_controlmode_calib_hard_stops:
+        case  icubCanProto_controlmode_handle_hard_stops:
+        case  icubCanProto_controlmode_margin_reached:
+        case  icubCanProto_controlmode_calib_abs_and_incremental:
         {
             *eomc_controlmode = eomc_controlmode_calib;
         }break;
         
-        case eo_icubCanProto_controlmode_openloop:
+        case icubCanProto_controlmode_openloop:
         {
             *eomc_controlmode = eomc_controlmode_openloop;
         }break;

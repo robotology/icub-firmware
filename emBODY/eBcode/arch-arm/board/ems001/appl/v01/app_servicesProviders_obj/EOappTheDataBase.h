@@ -64,7 +64,7 @@ typedef struct
 typedef struct
 {
     eOcanport_t                             emscanport;
-    eOicubCanProto_canBoardAddress_t        addr;
+    icubCanProto_canBoardAddress_t          addr;
 } eOappTheDB_canBoardCanLocation_t;
 
 typedef eOappTheDB_canBoardCanLocation_t    eOappTheDB_sensorCanLocation_t;
@@ -170,7 +170,7 @@ typedef struct
 typedef struct
 {
     eOcanport_t                             emscanport;
-    eOicubCanProto_canBoardAddress_t        addr;
+    icubCanProto_canBoardAddress_t        addr;
     eOicubCanProto_jm_indexinBoard_t        indexinboard;
 } eOappTheDB_jointOrMotorCanLocation_t;
 
@@ -203,7 +203,7 @@ extern EOappTheDB* eo_appTheDB_GetHandle(void);
 
 //extern eOresult_t eo_appTheDB_SetjointsShiftValues(EOappTheDB *p, eOappTheDB_jointShiftValues_t *shiftval_ptr);
 
-//extern eOresult_t eo_appTheDB_SetJointsBcastpolicyPtr(EOappTheDB *p, eOicubCanProto_bcastpolicy_t *bcast_ptr);
+//extern eOresult_t eo_appTheDB_SetJointsBcastpolicyPtr(EOappTheDB *p, icubCanProto_bcastpolicy_t *bcast_ptr);
 
 extern uint16_t eo_appTheDB_GetNumeberOfConnectedJoints(EOappTheDB *p);
 

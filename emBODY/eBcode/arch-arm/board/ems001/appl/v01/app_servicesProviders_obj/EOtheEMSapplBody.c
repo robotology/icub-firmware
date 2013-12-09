@@ -420,7 +420,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY
     };
 
@@ -476,7 +476,7 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
     
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY
     };
 
@@ -738,11 +738,11 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
 //    eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_estimShift_t             estimshift;
-    eOicubCanProto_velocityShift_t          shift_icubCanProtValue;
+    icubCanProto_velocityShift_t            shift_icubCanProtValue;
     eOappTheDB_cfg_canBoardInfo_t           *cfg_canbrd_ptr;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
 #warning aggiungi getfw version per strain e mais
@@ -841,7 +841,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         eOappTheDB_jointOrMotorCanLocation_t    canLoc; //here I don't use eOappTheDB_SkinCanLocation_t because i need jmindexId filed to set triangle id
         eOappTheDB_SkinCanLocation_t            skincanLoc;
 
-        msgCmd.class =  eo_icubCanProto_msgCmdClass_skinBoard; //currently this class not exist and it is remaped on sensor class
+        msgCmd.class =  icubCanProto_msgCmdClass_skinBoard; //currently this class not exist and it is remaped on sensor class
         msgCmd.cmdId =  ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
 
 
@@ -912,7 +912,7 @@ static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
     eOas_mais_config_t          *maiscfg;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
@@ -935,7 +935,7 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
     eOas_maismode_t             mode = eoas_maismode_acquirebutdonttx;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
@@ -954,7 +954,7 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
     eOas_strain_config_t        *straincfg;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
@@ -983,7 +983,7 @@ static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
     eOas_strainmode_t         mode = eoas_strainmode_acquirebutdonttx;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
@@ -1037,7 +1037,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 //     eOappTheDB_sensorCanLocation_t      canLoc;
 //     eOicubCanProto_msgCommand_t         msgCmd = 
 //     {
-//         EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingSensorBoard,
+//         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
 //         EO_INIT(.cmdId) 0
 //     };
 

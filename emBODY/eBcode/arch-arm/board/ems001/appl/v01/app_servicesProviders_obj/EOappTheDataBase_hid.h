@@ -136,7 +136,7 @@ struct EOappTheDB_hid
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-EO_extern_inline eObrd_boardId_t eo_appTheDB_hid_GetBoardIdWithAddress(EOappTheDB *p, eOicubCanProto_canBoardAddress_t addr)
+EO_extern_inline eObrd_boardId_t eo_appTheDB_hid_GetBoardIdWithAddress(EOappTheDB *p, icubCanProto_canBoardAddress_t addr)
 {
     return(p->canaddressLookuptbl.tbl[addr]);
 }
