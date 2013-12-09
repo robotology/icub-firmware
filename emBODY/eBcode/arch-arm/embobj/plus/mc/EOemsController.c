@@ -675,7 +675,7 @@ void config_2FOC(uint8_t motor)
 {
     eOmc_PID_t pid;
     eOmc_i2tParams_t i2t;
-    eOicubCanProto_current_t max_current;
+    icubCanProto_current_t max_current;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
@@ -683,7 +683,7 @@ void config_2FOC(uint8_t motor)
     
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
     
@@ -716,7 +716,7 @@ void set_2FOC_idle(uint8_t motor)
     
     eOicubCanProto_msgCommand_t msgCmd =
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
     
@@ -742,7 +742,7 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     
     eOicubCanProto_msgCommand_t msgCmd = 
     {
-        EO_INIT(.class) eo_icubCanProto_msgCmdClass_pollingMotorBoard,
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
     
