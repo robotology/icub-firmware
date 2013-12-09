@@ -77,6 +77,8 @@ EO_VERIFYproposition(eoprot_b02_gasdfe, eoprot_boards_maxnumberof > eoprot_b02_b
 
 static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep);
 
+static eObool_t s_eoprot_b02_isvariablecached(eOnvID32_t id);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -185,6 +187,8 @@ extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
     eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_analogsensors, eoprot_b02_as_entities_numberofeach);
     eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_skin, eoprot_b02_sk_entities_numberofeach);
     
+    eoprot_config_cached_variables(eoprot_b02_boardnumber, s_eoprot_b02_isvariablecached);
+    
     if(eobool_true == islocal)
     {
         eoprot_config_board_local(eoprot_b02_boardnumber);
@@ -220,7 +224,12 @@ static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep)
 }
 
 
-
+static eObool_t s_eoprot_b02_isvariablecached(eOnvID32_t id)
+{
+    // in here, if a variable is cached (the joints in the ems 2 board in the lower arm, for instance) ..
+    // the function must return eobool_true for that id
+    return(eobool_false);   // no variable is cached
+}
 
 
 
