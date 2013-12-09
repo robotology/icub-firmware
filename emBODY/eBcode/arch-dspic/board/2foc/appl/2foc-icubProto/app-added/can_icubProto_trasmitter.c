@@ -24,7 +24,6 @@
 #include "can_icubProto_trasmitter.h"
 #include "system.h"
 #include "faults.h"
-#include "can_icubProto_messages.h"
 
 //CAN_PERIOD_PHASE is used to be sure that all foc don't send status msg in the same time
 #define CAN_PERIOD_PHASE (canprototransmitter_bid)*2
@@ -75,7 +74,7 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 ////    gulp_update_request = 1;
 ////  } 
 ////
-////    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_2FOC);
+////    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
 ////	
 ////	ECANSend(txid, 8, &candata);
 //
@@ -105,7 +104,7 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 //
 //    len = 7;
 //
-//    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
+//    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
 //	
 //	ECANSend(txid, len, &candata);
 //  }
@@ -138,7 +137,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
     gulp_update_request = 1;
   } 
 
-    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_2FOC);
+    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
 	
 	ECANSend(txid, 8, &candata);
 #endif
@@ -188,7 +187,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
 //
 //    if(txlen>0)
 //    {
-//        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_2FOC);
+//        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
 //        ECANSend(txid, 8, &txpayload);
 //    }
 //
@@ -209,7 +208,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt(void)
 //        candata.b[6] = SysStatus.b[3];
 //
 //    
-//        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
+//        txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
 //    	
 //    	ECANSend(txid, 7, &candata);
 //    }
@@ -258,7 +257,7 @@ static void s_CanIcubProtoTrasmitter_praparePeriodicMsg(tCanData *candata_ptr, u
 {
     memcpy(&candata_ptr->b[0], &Gulp.B[0], 8);
     *len_ptr = 8;
-    *txid_ptr = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_2FOC);
+    *txid_ptr = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_2FOC);
 }
 
 extern void CanIcubProtoTrasmitter_SendStatusMsg()
@@ -277,7 +276,7 @@ extern void CanIcubProtoTrasmitter_SendStatusMsg()
     candata.b[5] = (SysError.I2TFailure << 5);
     candata.b[6] = SysStatus.b[3];
     
-    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, canprototransmitter_bid, ICUBPROTO_PERIODICCMD_STATUS);
+    txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_CMD_STATUS);
     len = 7;
 	
 	ECANSend(txid, len, &candata);

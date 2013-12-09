@@ -21,7 +21,9 @@
 #define MIN(a,b) ((a>b)?b:a)
 
 #include "ecan.h"
-
+#include "stdint.h"
+#include "iCubCanProto_types.h"
+#include "iCubCanProtocol.h"
 
 #define CAN_PROTO_TX_CMDVALUE_UNUSED 0x00FFFF00
 

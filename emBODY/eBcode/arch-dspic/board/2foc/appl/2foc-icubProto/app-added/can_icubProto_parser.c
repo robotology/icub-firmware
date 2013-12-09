@@ -30,7 +30,6 @@
 #include "DSP.h"
 #include "can_icubProto_parser.h"
 #include "can_icubProto_trasmitter.h"
-#include "can_icubProto_messages.h"
 #include "EmuROM.h"
 #include "can_icubProto.h"
 #include "faults.h"
@@ -99,17 +98,17 @@ void CanIcubProtoParserParse(unsigned long rxid, unsigned char rxlen, tCanData *
   
     switch(msg_class)
     {
-        case ICUBPROTO_CLASS_POLLING_MOTORBOARD:
+        case ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL:
         {
             command_ok = s_canIcubProtoParser_parse_pollingMsg(rxpayload, rxlen, &txpayload, &txlen);
         }break;
         
-        case ICUBPROTO_CLASS_PERIODIC_MOTORBOARD:
+        case ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL:
         {
             command_ok = s_canIcubProtoParser_parse_periodicMsg(permsg_type, rxpayload, rxlen, &txpayload, &txlen);
         }break;
         
-        case ICUBPROTO_CLASS_CANLOADER:
+        case ICUBCANPROTO_CLASS_BOOTLOADER:
         {
             command_ok = s_canIcubProtoParser_parse_canLoaderMsg(rxpayload, rxlen, &txpayload, &txlen);
         }break;
@@ -150,7 +149,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     *txlen = 0x0; 
     switch(cmd)
     {
-        case ICUBPROTO_POLLINGCMD_CONTROLLER_RUN: // DS402 Operation Enable 
+        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN: // DS402 Operation Enable 
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -177,7 +176,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             DS402_Controlword.Flags.EnableOperation = 1;       
         }break;
         
-        case ICUBPROTO_POLLINGCMD_DISABLE_PWM_PAD: // DS402 Operation Disable
+        case ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD: // DS402 Operation Disable
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -202,7 +201,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             //DS402_Controlword.Flags.EnableOperation = 0;
         }break;
     
-        case ICUBPROTO_POLLINGCMD_ENABLE_PWM_PAD: // DS402 Switch On 
+        case ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD: // DS402 Switch On 
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -228,7 +227,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             DS402_Controlword.Flags.SwitchOn = 1;
         }break;
         
-        case ICUBPROTO_POLLINGCMD_CONTROLLER_IDLE: // DS402 Shutdown
+        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE: // DS402 Shutdown
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -250,7 +249,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             DS402_Controlword.Flags.EnableVoltage = 0;   
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_CONTROL_MODE:
+        case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -274,7 +273,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         }break;
 
-        case ICUBPROTO_POLLINGCMD_SET_CONTROL_MODE:
+        case ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE:
         {
             if(2 != rxlen)
             {   // incorrect number of parameters
@@ -298,31 +297,31 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
             switch(rxpayload->b[1])
             {           
-                case ICUBPROTO_CONTROLMODE_CURRENT:
+                case icubCanProto_controlmode_current:
                 {
                     SysStatus.TorqueControl = 1;
 					current_open_loop=0;
                 }break;
-                case ICUBPROTO_CONTROLMODE_VELOCITY:
+                case icubCanProto_controlmode_velocity:
                 {
                     SysStatus.SpeedControl = 1;
                 }break;
                 
-                case ICUBPROTO_CONTROLMODE_IDLE:
+                case icubCanProto_controlmode_idle:
                 {
                     // go to Switched On state
                     DS402_Controlword.Flags.EnableOperation = 0;
                 }break;
 
-                case ICUBPROTO_CONTROLMODE_POSITION:
+                case icubCanProto_controlmode_position:
 				{
 				}break;
-                case ICUBPROTO_CONTROLMODE_OPENLOOP:
+                case icubCanProto_controlmode_openloop:
 				{
 					SysStatus.TorqueControl = 1;
 					current_open_loop=1;
 				}break;	
-                case ICUBPROTO_CONTROLMODE_TORQUE:
+                case icubCanProto_controlmode_torque:
                 {
                    s_controlMode_setDefault();
                 }break;
@@ -335,7 +334,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         }break;
 
-        case ICUBPROTO_POLLINGCMD_WRITE_FLASH_MEM:
+        case ICUBCANPROTO_POL_MC_CMD__WRITE_FLASH_MEM:
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -355,27 +354,27 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             EepromSave();
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_ADDITIONAL_INFO:
+        case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:
         {
             ;   //todo
         }break;
 
-        case ICUBPROTO_POLLINGCMD_SET_ADDITIONAL_INFO:
+        case ICUBCANPROTO_POL_MC_CMD__SET_ADDITIONAL_INFO:
         {
             ;   //todo
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_DESIRED_VELOCITY: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_VELOCITY: 
         {
             ;  //todo 
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_DESIRED_VELOCITY: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_VELOCITY: 
         {
             ;  //todo 
         }break;
 
-        case ICUBPROTO_POLLINGCMD_SET_ENCODER_POSITION: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_ENCODER_POSITION: 
         {
             
 		// setta l'offset di fasatura 
@@ -383,7 +382,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         }break;
         
         
-        case ICUBPROTO_POLLINGCMD_GET_BOARD_ID: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID: 
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -397,7 +396,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             txpayload->b[1] = canprotoparser_bid;
         }break;
 
-        case ICUBPROTO_POLLINGCMD_SET_BOARD_ID: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_BOARD_ID: 
         {
 //            *txlen=0x1;
 //             txpayload->b[0] = CAN_PROTO_ERROR_COMMAND_NOT_INPLEMENTED;
@@ -427,18 +426,18 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 //            CanIcubProtoSetFilters(canprotoparser_bid);
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_MAX_VELOCITY: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY: 
         {
             ; //aspetta maggia
 			//
         }break;
 
-        case ICUBPROTO_POLLINGCMD_GET_MAX_VELOCITY: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_MAX_VELOCITY: 
         {
             ; //aspetta maggia
         }break;
 
-        case ICUBPROTO_POLLINGCMD_SET_CURRENT_LIMIT: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT: 
         {
          
 			
@@ -455,12 +454,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
  
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_FIRMWARE_VERSION: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION: 
         {
             ; //todo da leggere dalla partizione giusta della eeprom
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_CURRENT_PID: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID: 
         {
             SFRAC16 pp, pi, pd, pm; //pm non viene passato dal comando 
 
@@ -480,7 +479,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 	    ControllerSetCurrentQPIDParm(pp,pi,pd,pm);
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_CURRENT_PID: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PID: 
         {
             signed int p, i, d, m; 
             if(1 != rxlen)
@@ -499,7 +498,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             *txlen = 0x7;   
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_VELOCITY_PID: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID: 
         {
             SFRAC16 pp, pi, pd, pm; //pm non viene passato dal comando 
             
@@ -517,7 +516,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             ControllerSetWPIDParm(pp,pi,pd,pm);
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_VELOCITY_PID: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PID: 
         {
             signed int p, i, d, m;
 
@@ -536,7 +535,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             *txlen = 0x7;
         }break;
                 
-        case ICUBPROTO_POLLINGCMD_SET_DESIRED_CURRENT: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT: 
         {
 			SFRAC16 IqRef;
             if(5 != rxlen)
@@ -574,7 +573,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 #endif    
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_DESIRED_CURRENT: 
+        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_CURRENT: 
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -590,7 +589,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             memcpy(&txpayload->b[3], &CtrlReferences.qIdRef, 2);    
         }break;
 
-        case ICUBPROTO_POLLINGCMD_SET_PERIODIC_MSG_CONTENTS: 
+        case ICUBCANPROTO_POL_MC_CMD__SET_PERIODIC_MSG_CONTENTS: 
         {
             if(5 != rxlen)
             {   // incorrect number of parameters
@@ -628,7 +627,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
         }break;
         
-        case ICUBPROTO_POLLINGCMD_SET_I2T_PARAMS:
+        case ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS:
         {
             if(5 != rxlen)
             {   // incorrect number of parameters
@@ -642,7 +641,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
              I2Tdata.IThreshold = (rxpayload->b[4] <<8 | rxpayload->b[3]);
         }break;
         
-        case ICUBPROTO_POLLINGCMD_GET_I2T_PARAMS:
+        case ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS:
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -677,7 +676,7 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
     
     switch(permsg_type)
     {
-        case ICUBPROTO_PERIODICCMD_EMSTO2FOC_DESIRED_CURRENT:
+        case ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT:
         {
             if((canprotoparser_bid*2) > rxlen)
             {
@@ -718,7 +717,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
 	
 	switch (cmd)
     {
-        case CMD_BROADCAST: 
+        case ICUBCANPROTO_BL_BROADCAST: 
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
@@ -732,7 +731,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
 
             *txlen = 5;
             txpayload->b[0] = cmd;
-            txpayload->b[1] = BOARD_TYPE_2FOC; 
+            txpayload->b[1] = icubCanProto_boardType__2foc; 
             txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
             txpayload->b[3] = 0;  //TODO   //Firmware build number.
             txpayload->b[4] = 6;  //TODO   //Firmware build number. 
@@ -740,17 +739,17 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
         } break;
                 
     
-        case CMD_BOARD:
+        case ICUBCANPROTO_BL_BOARD:
         {
             asm ("reset");    // Jump to bootloader code      
         } break;
     
-        case CMD_GET_ADDITIONAL_INFO:
+        case ICUBCANPROTO_BL_GET_ADDITIONAL_INFO:
         {
             ;
         } break;
     
-        case CMD_SET_ADDITIONAL_INFO:
+        case ICUBCANPROTO_BL_SET_ADDITIONAL_INFO:
         {
             ;
         } break;
