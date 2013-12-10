@@ -56,8 +56,8 @@
 #define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max          ICUBCANPROTO_POL_MC_CMD_MAXNUM -64 
 #define eo_icubCanProto_pollingMotorBoardMsg_maxNum             ICUBCANPROTO_POL_MC_CMD_MAXNUM
 
-#define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   12 //until ICUBCANPROTO_PER_MC_CMD_MOTOR_SPEED 
-#define eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max   1  //only  ICUBCANPROTO_PER_MC_CMD_EMSTO2FOC_DESIRED_CURRENT
+#define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   12 //until ICUBCANPROTO_PER_MC_MSG__MOTOR_SPEED 
+#define eo_icubCanProto_periodicMotorBoardMsg_inFormerTbl_max   1  //only  ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
 #define eo_icubCanProto_periodicMotorBoardMsg_maxNum            ICUBCANPROTO_PER_MC_CMD_MAXNUM
 
 
