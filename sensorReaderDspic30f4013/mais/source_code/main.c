@@ -752,10 +752,10 @@ static void s_test(void)
 		msg2[7]=0;
 	}
 	
-	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES0TO6) ;
+	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES0TO6) ;
 	hal_can_put_immediately(hal_can_portCAN1,SID, msg1, 8, 0 );
 			
-	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES7TO14) ;		
+	SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES7TO14) ;		
 	hal_can_put_immediately(hal_can_portCAN1, SID, msg2, 8, 1 );
 
 }
@@ -799,10 +799,10 @@ static void s_timer2_callback(void)
 			HESData2[6] = AN_channel_info.values[13] >>4;  
 			HESData2[7] = AN_channel_info.values[14] >>4;
 		
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES0TO6) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES0TO6) ;
 			hal_can_put_immediately(hal_can_portCAN1,SID, HESData1, 7, 0 );
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES7TO14) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES7TO14) ;
 			
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData2, 8, 1 );
 		}
@@ -816,16 +816,16 @@ static void s_timer2_callback(void)
 			memcpy(HESData3,&AN_channel_info.values[8],8);
 			memcpy(HESData4,&AN_channel_info.values[12],6);
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES0TO3) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES0TO3) ;
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData1, 8, 0 );	  
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES4TO7) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES4TO7) ;
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData2, 8, 1 );
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES8TO11) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES8TO11) ;
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData3, 8, 2 );	  
 			
-			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__HES12TO14) ;
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES12TO14) ;
 			while( !(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0)) );
 			hal_can_put_immediately(hal_can_portCAN1, SID, HESData4, 8, 0 );
 		
