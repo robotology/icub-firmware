@@ -98,25 +98,25 @@ extern "C" {
 //the following msg are deprecated!!!
 
 // hall effect sensors from 0 to 3*16bits
-#define ICUBCANPROTO_PER_AS_CMD__HES0TO3           0xC // 010 SOURCE DEST 0xC h0 h0 h1 h1 h2 h2 h3 h3
+#define ICUBCANPROTO_PER_AS_MSG__HES0TO3           0xC // 010 SOURCE DEST 0xC h0 h0 h1 h1 h2 h2 h3 h3
 // hall effect sensors from 4 to 7*16bits
-#define ICUBCANPROTO_PER_AS_CMD__HES4TO7           0xD // 010 SOURCE DEST 0xC h4 h4 h5 h5 h6 h6 h7 h7
+#define ICUBCANPROTO_PER_AS_MSG__HES4TO7           0xD // 010 SOURCE DEST 0xC h4 h4 h5 h5 h6 h6 h7 h7
 // hall effect sensors from 8 to 11*16bits
-#define ICUBCANPROTO_PER_AS_CMD__HES8TO11          0xE // 010 SOURCE DEST 0xC h8 h8 h9 h9 h10 h10 h11 h11
+#define ICUBCANPROTO_PER_AS_MSG__HES8TO11          0xE // 010 SOURCE DEST 0xC h8 h8 h9 h9 h10 h10 h11 h11
 // hall effect sensors from 12 to 14*16bits
-#define ICUBCANPROTO_PER_AS_CMD__HES12TO14         0xF // 010 SOURCE DEST 0xC h12 h12 h13 h13 h14 h14 h15 h15
+#define ICUBCANPROTO_PER_AS_MSG__HES12TO14         0xF // 010 SOURCE DEST 0xC h12 h12 h13 h13 h14 h14 h15 h15
 
 // hall effect sensors from 0 to 7*8bits
-#define ICUBCANPROTO_PER_AS_CMD__HES0TO6           0xC // 010 SOURCE DEST 0xC h0 h1 h2 h3 h4 h5 h6 
+#define ICUBCANPROTO_PER_AS_MSG__HES0TO6           0xC // 010 SOURCE DEST 0xC h0 h1 h2 h3 h4 h5 h6 
 // hall effect sensors from 8 to 14*8bits
-#define ICUBCANPROTO_PER_AS_CMD__HES7TO14          0xD // 010 SOURCE DEST 0xD h7 h8 h9 h10 h11 h12 h13 h14 
+#define ICUBCANPROTO_PER_AS_MSG__HES7TO14          0xD // 010 SOURCE DEST 0xD h7 h8 h9 h10 h11 h12 h13 h14 
 
 // hall effect sensors from 0 to 4*12bits
-#define ICUBCANPROTO_PER_AS_CMD__HES0TO4           0xC // 010 SOURCE DEST 0xC h0 h1 h2 h3 h4 
+#define ICUBCANPROTO_PER_AS_MSG__HES0TO4           0xC // 010 SOURCE DEST 0xC h0 h1 h2 h3 h4 
 // hall effect sensors from 5 to 9*12bits
-#define ICUBCANPROTO_PER_AS_CMD__HES5TO9           0xD // 010 SOURCE DEST 0xD h5 h6 h7 h8 h9 
+#define ICUBCANPROTO_PER_AS_MSG__HES5TO9           0xD // 010 SOURCE DEST 0xD h5 h6 h7 h8 h9 
 // hall effect sensors from 10 to 14*12bits
-#define ICUBCANPROTO_PER_AS_CMD__HES10TO14          0xE // 010 SOURCE DEST 0xD h10 h11 h12 h13 h14 
+#define ICUBCANPROTO_PER_AS_MSG__HES10TO14          0xE // 010 SOURCE DEST 0xD h10 h11 h12 h13 h14 
 
 
 
