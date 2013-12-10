@@ -734,7 +734,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
             txpayload->b[1] = icubCanProto_boardType__2foc; 
             txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
             txpayload->b[3] = 0;  //TODO   //Firmware build number.
-            txpayload->b[4] = 6;  //TODO   //Firmware build number. 
+            txpayload->b[4] = 7;  //TODO   //Firmware build number. 
             #warning solita incoerenza tra versioni di fw sensori ed motori            
         } break;
                 
