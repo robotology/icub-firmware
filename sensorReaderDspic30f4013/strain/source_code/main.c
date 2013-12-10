@@ -423,16 +423,16 @@ Ovviamente i due array devono essere salvati su memoria contigua.
 
   if (DebugCalibration==1)
   {
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length, 0 );
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib,length,1);
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataUncalib,length,2);
 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE) ;
 	  while(!(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0))); // wiat buffer 0
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataUncalib,length,0);
   }
@@ -440,18 +440,18 @@ else
 {
   if (UseCalibration==1)
 	{
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length,0 );
 	  // torque data 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib, length, 1 );
 	}
   else
 	{
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataUncalib, length,0 );
 	  // torque data 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR) ;
+	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
 	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataUncalib, length, 1 );
 	}  
 }
