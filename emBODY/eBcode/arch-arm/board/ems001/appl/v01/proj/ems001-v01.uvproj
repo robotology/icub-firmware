@@ -136,7 +136,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -1455,7 +1454,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -2774,7 +2772,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -4133,7 +4130,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -5492,7 +5488,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -6811,7 +6806,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -8130,7 +8124,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
@@ -8344,7 +8337,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;.;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-proto;..\app_servicesProviders_cfg\icub-can-net;..\..\..\env\cfg;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v1\icub;..\..\..\..\..\..\embobj\plus\comm-v1\prot;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\board-eps;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-analogsensors;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-motioncontrol;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-management;..\..\..\..\..\..\embobj\plus\comm-v1\nvs\ep-skin;.;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\app_nvs_cfg;..\app_servicesProviders_obj;..\app_servicesProviders_cfg\icub-can-proto;..\app_servicesProviders_cfg\icub-can-net;..\..\..\env\cfg;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\..\canProtocolLib</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -9467,7 +9460,6 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>9</TargetSelection>
