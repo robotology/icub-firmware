@@ -69,7 +69,7 @@ typedef struct
     eOuint16_fp_uint16_t            hashfunction_ep2index;
     eOipv4addr_t                    remoteboardipv4addr;
     eOipv4port_t                    remoteboardipv4port;
-    eo_transceiver_sizes_t          sizes;       
+    eOtransceiver_sizes_t           sizes;       
     eov_mutex_fn_mutexderived_new   mutex_fn_new;    
     eOtransceiver_protection_t      transprotection;
     eOnvscfg_protection_t           nvscfgprotection; 
