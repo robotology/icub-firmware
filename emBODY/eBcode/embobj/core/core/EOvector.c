@@ -353,6 +353,7 @@ extern void eo_vector_Assign(EOvector * vector, eOsizecntnr_t pos, void *items, 
     // here we require uint8_t to access item_array_data because we work with bytes.
     uint8_t *start = NULL;
     uint8_t *p = items;
+    uint16_t i;
         
     if((NULL == vector) || (NULL == items) || (0 == nitems)) 
     {    
@@ -380,7 +381,6 @@ extern void eo_vector_Assign(EOvector * vector, eOsizecntnr_t pos, void *items, 
     start = &start[(uint32_t)pos * vector->item_size]; 
     p = (uint8_t*) items;
     
-    uint16_t i;
     for(i=0; i<nitems; i++)
     {
         if(NULL != vector->item_copy_fn) 
