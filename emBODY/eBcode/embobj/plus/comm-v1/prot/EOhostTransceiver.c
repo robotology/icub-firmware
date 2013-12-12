@@ -110,7 +110,7 @@ const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default =
 extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t *cfg) 
 {
     EOhostTransceiver* retptr = NULL;
-    eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
+    eOtransceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
 
 
     if(NULL == cfg)
