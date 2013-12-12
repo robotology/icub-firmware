@@ -82,15 +82,19 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
         EO_INIT(.capacityofropframeregulars)        768,
         EO_INIT(.capacityofropframeoccasionals)     128,
         EO_INIT(.capacityofropframereplies)         128,
-        EO_INIT(.maxnumberofregularrops)            32
-#if     defined(EO_USE_EPROT_V2)        
-        ,
-        EO_INIT(.maxnumberofconfreqrops)            8 
-#endif        
+        EO_INIT(.maxnumberofregularrops)            32     
     },
     EO_INIT(.transprotection)           eo_trans_protection_none,
 #if     defined(EO_USE_EPROT_V2)
-    EO_INIT(.nvsetprotection)           eo_nvset_protection_none
+    EO_INIT(.nvsetprotection)           eo_nvset_protection_none,
+    EO_INIT(.proxycfg)
+    {
+		EO_INIT(.mode)            					eoproxy_mode_enabled,
+        EO_INIT(.capacityoflistofropdes)            8,
+        EO_INIT(.replyroptimeout)                   10*1000,
+        EO_INIT(.mutex_fn_new)                      NULL,
+        EO_INIT(.transceiver)                       NULL
+    }
 #else    
     EO_INIT(.nvscfgprotection)          eo_nvscfg_protection_none
 #endif    
@@ -162,12 +166,12 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
 #endif    
     brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
     brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port; // it is the remote port where to send packets to
-    memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eo_transceiver_sizes_t));
+    memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eOtransceiver_sizes_t));
     brdtransceiver_cfg.mutex_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New;
     brdtransceiver_cfg.transprotection          = cfg->transprotection;
 #if     defined(EO_USE_EPROT_V2)    
     brdtransceiver_cfg.nvsetprotection          = cfg->nvsetprotection;
-    brdtransceiver_cfg.confmancfg               = NULL;
+    brdtransceiver_cfg.proxycfg                 = (eOproxy_cfg_t*)&cfg->proxycfg;
     eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
 #else       

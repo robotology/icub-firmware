@@ -43,7 +43,9 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
-
+#if     defined(EO_USE_EPROT_V2)
+#include "EOproxy.h"
+#endif
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -73,10 +75,11 @@ typedef struct
 #endif    
     eOipv4addr_t                    hostipv4addr;
     eOipv4port_t                    hostipv4port; 
-    eo_transceiver_sizes_t          sizes; 
+    eOtransceiver_sizes_t           sizes; 
     eOtransceiver_protection_t      transprotection;
 #if     defined(EO_USE_EPROT_V2)
     eOnvset_protection_t            nvsetprotection;
+    eOproxy_cfg_t                   proxycfg;
 #else    
     eOnvscfg_protection_t           nvscfgprotection; 
 #endif    

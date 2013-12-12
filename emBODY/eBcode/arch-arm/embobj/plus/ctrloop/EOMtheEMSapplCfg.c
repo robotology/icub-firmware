@@ -295,8 +295,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
             .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, //768,
             .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
             .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
-            .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS, //32
-            .maxnumberofconfreqrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFCONFREQROPS
+            .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32
 #else
             .capacityoftxpacket             = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
             .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, //256,
@@ -308,7 +307,15 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         },
         .transprotection        = eo_trans_protection_none, //eo_trans_protection_enabled, //eo_trans_protection_none,
 #if     defined(EO_USE_EPROT_V2) 
-        .nvsetprotection        = eo_nvset_protection_none //eo_nvset_protection_one_per_endpoint //eo_nvset_protection_none // eo_nvset_protection_one_per_netvar eo_nvset_protection_one_per_endpoint
+        .nvsetprotection        = eo_nvset_protection_none,//eo_nvset_protection_one_per_endpoint //eo_nvset_protection_none // eo_nvset_protection_one_per_netvar eo_nvset_protection_one_per_endpoint
+        .proxycfg          =
+        {
+            .mode                   = (eOproxymode_t)EOMTHEEMSAPPLCFG_PROXY_MODE,
+            .capacityoflistofropdes = EOMTHEEMSAPPLCFG_PROXY_MAXNUMOFREPLYROPS,
+            .replyroptimeout        = EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC*1000,
+            .mutex_fn_new           = NULL,
+            .transceiver            = NULL
+        }                   
 #else        
         .nvscfgprotection       = eo_nvscfg_protection_none //eo_nvscfg_protection_one_per_endpoint //eo_nvscfg_protection_none // eo_nvscfg_protection_one_per_netvar eo_nvscfg_protection_one_per_endpoint
 #endif    
