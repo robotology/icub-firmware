@@ -65,7 +65,7 @@ typedef struct
  
 struct EOtransceiver_hid 
 {
-    eo_transceiver_cfg_t        cfg;
+    eOtransceiver_cfg_t         cfg;
     EOreceiver*                 receiver;
     EOtransmitter*              transmitter;   
 #if defined(USE_DEBUG_EOTRANSCEIVER)    

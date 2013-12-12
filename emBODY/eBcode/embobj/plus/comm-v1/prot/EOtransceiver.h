@@ -79,7 +79,7 @@ typedef struct
     uint16_t        capacityofropframeoccasionals;
     uint16_t        capacityofropframereplies;
     uint16_t        maxnumberofregularrops;
-} eo_transceiver_sizes_t; 
+} eOtransceiver_sizes_t; 
 
 
 typedef struct
@@ -95,7 +95,7 @@ typedef struct
     EOnvsCfg*                       nvscfg;         // later on we could split it into a locnvscfg and a remnvscfg
     eov_mutex_fn_mutexderived_new   mutex_fn_new;
     eOtransceiver_protection_t      protection;
-} eo_transceiver_cfg_t;
+} eOtransceiver_cfg_t;
 
 
 // typedef struct      // 12 bytes           
@@ -120,7 +120,7 @@ typedef struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_transceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256, 128, 128, 16, EO_COMMON_IPV4ADDR_LOCALHOST, 10001, NULL, NULL};
+extern const eOtransceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256, 128, 128, 16, EO_COMMON_IPV4ADDR_LOCALHOST, 10001, NULL, NULL};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -136,7 +136,7 @@ extern const eo_transceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256
  
  // gestisce 1 solo indirizzo ip di destinazione in modo da avere 1 solo EOpacket in uscita.
  // 
-extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg);
+extern EOtransceiver* eo_transceiver_New(const eOtransceiver_cfg_t *cfg);
 
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime); 
 

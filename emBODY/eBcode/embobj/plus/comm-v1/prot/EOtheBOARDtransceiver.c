@@ -107,7 +107,7 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
  
 extern EOtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg) 
 {
-    eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
+    eOtransceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
     
     if(NULL != s_eo_theboardtrans.transceiver)
     {

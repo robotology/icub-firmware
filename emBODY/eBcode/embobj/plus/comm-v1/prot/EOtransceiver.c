@@ -77,7 +77,7 @@
 
 //static const char s_eobj_ownname[] = "EOtransceiver";
 
-const eo_transceiver_cfg_t eo_transceiver_cfg_default = 
+const eOtransceiver_cfg_t eo_transceiver_cfg_default = 
 {
     EO_INIT(.capacityoftxpacket)            512, 
     EO_INIT(.capacityofrop)                 128, 
@@ -101,7 +101,7 @@ const eo_transceiver_cfg_t eo_transceiver_cfg_default =
 
 
  
-extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
+extern EOtransceiver* eo_transceiver_New(const eOtransceiver_cfg_t *cfg)
 {
     EOtransceiver *retptr = NULL;  
     eo_receiver_cfg_t rec_cfg;
@@ -139,7 +139,7 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtransceiver), 1);
     
     
-    memcpy(&retptr->cfg, cfg, sizeof(eo_transceiver_cfg_t)); 
+    memcpy(&retptr->cfg, cfg, sizeof(eOtransceiver_cfg_t)); 
     
     retptr->receiver = eo_receiver_New(&rec_cfg);
     
