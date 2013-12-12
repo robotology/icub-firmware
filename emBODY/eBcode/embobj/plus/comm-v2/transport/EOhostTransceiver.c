@@ -91,8 +91,7 @@ const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default =
         EO_INIT(.capacityofropframeregulars)        EOK_HOSTTRANSCEIVER_capacityofropframeregulars,
         EO_INIT(.capacityofropframeoccasionals)     EOK_HOSTTRANSCEIVER_capacityofropframeoccasionals,
         EO_INIT(.capacityofropframereplies)         EOK_HOSTTRANSCEIVER_capacityofropframereplies,
-        EO_INIT(.maxnumberofregularrops)            EOK_HOSTTRANSCEIVER_maxnumberofregularrops,
-        EO_INIT(.maxnumberofconfreqrops)            EOK_HOSTTRANSCEIVER_maxnumberofconfreqrops        
+        EO_INIT(.maxnumberofregularrops)            EOK_HOSTTRANSCEIVER_maxnumberofregularrops       
     },    
     EO_INIT(.mutex_fn_new)              NULL,
     EO_INIT(.transprotection)           eo_trans_protection_none,
@@ -110,7 +109,7 @@ const eOhosttransceiver_cfg_t eo_hosttransceiver_cfg_default =
 extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t *cfg) 
 {
     EOhostTransceiver* retptr = NULL;
-    eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
+    eOtransceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
 
     if(NULL == cfg)
     {
@@ -129,19 +128,20 @@ extern EOhostTransceiver * eo_hosttransceiver_New(const eOhosttransceiver_cfg_t 
     retptr->nvset = s_eo_hosttransceiver_nvset_get(cfg);
     
 
-    txrxcfg.capacityoftxpacket              = cfg->sizes.capacityoftxpacket;
-    txrxcfg.capacityofrop                   = cfg->sizes.capacityofrop;
-    txrxcfg.capacityofropframeregulars      = cfg->sizes.capacityofropframeregulars;
-    txrxcfg.capacityofropframeoccasionals   = cfg->sizes.capacityofropframeoccasionals;
-    txrxcfg.capacityofropframereplies       = cfg->sizes.capacityofropframereplies;
-    txrxcfg.maxnumberofregularrops          = cfg->sizes.maxnumberofregularrops;
-    txrxcfg.maxnumberofconfreqrops          = cfg->sizes.maxnumberofconfreqrops;
-    txrxcfg.remipv4addr                     = cfg->remoteboardipv4addr;
-    txrxcfg.remipv4port                     = cfg->remoteboardipv4port;
-    txrxcfg.nvset                           = retptr->nvset;
-    txrxcfg.mutex_fn_new                    = cfg->mutex_fn_new;
-    txrxcfg.protection                      = cfg->transprotection;
-    txrxcfg.confmancfg                      = cfg->confmancfg;
+    txrxcfg.sizes.capacityoftxpacket            = cfg->sizes.capacityoftxpacket;
+    txrxcfg.sizes.capacityofrop                 = cfg->sizes.capacityofrop;
+    txrxcfg.sizes.capacityofropframeregulars    = cfg->sizes.capacityofropframeregulars;
+    txrxcfg.sizes.capacityofropframeoccasionals = cfg->sizes.capacityofropframeoccasionals;
+    txrxcfg.sizes.capacityofropframereplies     = cfg->sizes.capacityofropframereplies;
+    txrxcfg.sizes.maxnumberofregularrops        = cfg->sizes.maxnumberofregularrops;
+    txrxcfg.remipv4addr                         = cfg->remoteboardipv4addr;
+    txrxcfg.remipv4port                         = cfg->remoteboardipv4port;
+    txrxcfg.nvset                               = retptr->nvset; 
+    txrxcfg.confmancfg                          = cfg->confmancfg;
+    txrxcfg.proxycfg                            = NULL; // the host does not have a proxy
+    txrxcfg.mutex_fn_new                        = cfg->mutex_fn_new;
+    txrxcfg.protection                          = cfg->transprotection;
+
     
     
     retptr->transceiver = eo_transceiver_New(&txrxcfg);

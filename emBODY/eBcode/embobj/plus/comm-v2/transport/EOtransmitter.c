@@ -90,6 +90,8 @@ static void s_eo_transmitter_list_updaterop_in_ropframe(void *item, void *param)
 
 static void s_eo_transmitter_list_shiftdownropinfo(void *item, void *param);
 
+static eOresult_t s_eo_transmitter_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc, EOropframe* intoropframe, EOVmutexDerived *mtx);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -97,21 +99,22 @@ static void s_eo_transmitter_list_shiftdownropinfo(void *item, void *param);
 
 static const char s_eobj_ownname[] = "EOtransmitter";
 
-const eo_transmitter_cfg_t eo_transmitter_cfg_default = 
+const eOtransmitter_cfg_t eo_transmitter_cfg_default = 
 {
-    EO_INIT(.capacityoftxpacket)            512, 
-    EO_INIT(.capacityofropframeregulars)    256, 
-    EO_INIT(.capacityofropframeoccasionals) 256,
-    EO_INIT(.capacityofropframereplies)     256,
-    EO_INIT(.capacityofrop)                 128, 
-    EO_INIT(.maxnumberofregularrops)        16,
-    EO_INIT(.maxnumberofconfreqrops)        16,
-    EO_INIT(.nvset)                         NULL,
-    EO_INIT(.confmanager)                   NULL,
+    EO_INIT(.sizes)
+    {
+        EO_INIT(.capacityoftxpacket)            512, 
+        EO_INIT(.capacityofropframeregulars)    256, 
+        EO_INIT(.capacityofropframeoccasionals) 256,
+        EO_INIT(.capacityofropframereplies)     256,
+        EO_INIT(.capacityofrop)                 128, 
+        EO_INIT(.maxnumberofregularrops)        16
+    },
     EO_INIT(.ipv4addr)                      EO_COMMON_IPV4ADDR_LOCALHOST,
     EO_INIT(.ipv4port)                      10001,
     EO_INIT(.protection)                    eo_transmitter_protection_none,
-    EO_INIT(.mutex_fn_new)                  NULL
+    EO_INIT(.mutex_fn_new)                  NULL,
+    EO_INIT(.agent)                         NULL
 };
 
 
@@ -120,7 +123,7 @@ const eo_transmitter_cfg_t eo_transmitter_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 
  
-extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
+extern EOtransmitter* eo_transmitter_New(const eOtransmitter_cfg_t *cfg)
 {
     EOtransmitter *retptr = NULL;   
 
@@ -129,33 +132,34 @@ extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg)
         cfg = &eo_transmitter_cfg_default;
     }
     
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != cfg->agent), s_eobj_ownname, "cfg->agent is NULL");
+    
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtransmitter), 1);
     
-    retptr->txpacket                = eo_packet_New(cfg->capacityoftxpacket);
+    retptr->txpacket                = eo_packet_New(cfg->sizes.capacityoftxpacket);
     retptr->ropframereadytotx       = eo_ropframe_New();
     retptr->ropframeregulars        = eo_ropframe_New();
     retptr->ropframeoccasionals     = eo_ropframe_New();
     retptr->ropframereplies         = eo_ropframe_New();
-    retptr->roptmp                  = eo_rop_New(cfg->capacityofrop);
-    retptr->nvset                   = cfg->nvset;
-    retptr->theagent                = eo_agent_Initialise();
-    retptr->confmanager             = cfg->confmanager;
+    retptr->roptmp                  = eo_rop_New(cfg->sizes.capacityofrop);
+    retptr->agent                   = cfg->agent;
+    retptr->nvset                   = eo_agent_GetNVset(cfg->agent);
+    retptr->confmanager             = eo_agent_GetConfirmationManager(cfg->agent);
     retptr->ipv4addr                = cfg->ipv4addr;
     retptr->ipv4port                = cfg->ipv4port;
-    retptr->bufferropframeregulars  = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframeregulars, 1);
-    retptr->bufferropframeoccasionals = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframeoccasionals, 1);
-    retptr->bufferropframereplies   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereplies, 1);
-    retptr->listofregropinfo        = (0 == cfg->maxnumberofregularrops) ? (NULL) : (eo_list_New(sizeof(eo_transm_regrop_info_t), cfg->maxnumberofregularrops, NULL, 0, NULL, NULL));
+    retptr->bufferropframeregulars  = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->sizes.capacityofropframeregulars, 1);
+    retptr->bufferropframeoccasionals = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->sizes.capacityofropframeoccasionals, 1);
+    retptr->bufferropframereplies   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->sizes.capacityofropframereplies, 1);
+    retptr->listofregropinfo        = (0 == cfg->sizes.maxnumberofregularrops) ? (NULL) : (eo_list_New(sizeof(eo_transm_regrop_info_t), cfg->sizes.maxnumberofregularrops, NULL, 0, NULL, NULL));
     retptr->currenttime             = 0;
     retptr->tx_seqnum               = 0;
-    retptr->confrequests            = ((NULL == retptr->confmanager) || (0 == cfg->maxnumberofconfreqrops)) ? (NULL) : (eo_vector_New(sizeof(eOropdescriptor_t), cfg->maxnumberofconfreqrops, NULL, NULL, NULL, NULL));
 
-    eo_ropframe_Load(retptr->ropframeregulars, retptr->bufferropframeregulars, eo_ropframe_sizeforZEROrops, cfg->capacityofropframeregulars);
+    eo_ropframe_Load(retptr->ropframeregulars, retptr->bufferropframeregulars, eo_ropframe_sizeforZEROrops, cfg->sizes.capacityofropframeregulars);
     eo_ropframe_Clear(retptr->ropframeregulars);
-    eo_ropframe_Load(retptr->ropframeoccasionals, retptr->bufferropframeoccasionals, eo_ropframe_sizeforZEROrops, cfg->capacityofropframeoccasionals);
+    eo_ropframe_Load(retptr->ropframeoccasionals, retptr->bufferropframeoccasionals, eo_ropframe_sizeforZEROrops, cfg->sizes.capacityofropframeoccasionals);
     eo_ropframe_Clear(retptr->ropframeoccasionals);
-    eo_ropframe_Load(retptr->ropframereplies, retptr->bufferropframereplies, eo_ropframe_sizeforZEROrops, cfg->capacityofropframereplies);
+    eo_ropframe_Load(retptr->ropframereplies, retptr->bufferropframereplies, eo_ropframe_sizeforZEROrops, cfg->sizes.capacityofropframereplies);
     eo_ropframe_Clear(retptr->ropframereplies);
 
 
@@ -262,7 +266,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     ropdescriptor.control.confinfo  = eo_ropconf_none;  // VERY IMPORTANT: the regulars cannot be a ack/nack
     ropdescriptor.control.version   = EOK_ROP_VERSION_0;
     
-    nvownership = eo_rop_hid_GetOwnership(ropdescriptor.ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
+    nvownership = eo_rop_get_ownership(ropdescriptor.ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
       
     res = eo_nvset_NV_Get(  (p->nvset),  
                             (eo_nv_ownership_local == nvownership) ? (eok_ipv4addr_localhost) : (p->ipv4addr), 
@@ -280,7 +284,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     ropdescriptor.size = eo_nv_Size(&nv);    
     
     // now we have the nv. we set its value in local ram
-    if(eobool_true == eo_rop_hid_OPChasData(ropdescriptor.ropcode))
+    if(eobool_true == eo_rop_ropcode_has_data(ropdescriptor.ropcode))
     {  
         if(eo_nv_ownership_local == nvownership)
         {   // if the nv is local, then take data from nv, thus no need to write the data field of the nv using ropdescriptor.data.
@@ -304,7 +308,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     }
 
        
-    res = eo_agent_OutROPprepare(p->theagent, &nv, &ropdescriptor, p->roptmp, &usedbytes);   
+    res = eo_agent_OutROPprepare(p->agent, &nv, &ropdescriptor, p->roptmp, &usedbytes);   
     
     // if we cannot prepare the rop ... we quit
     if(eores_OK != res)
@@ -313,7 +317,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
         return(res);
     }
     // extract the reference to the associated netvar
-    tmpnvptr = eo_rop_hid_NV_Get(p->roptmp);
+    tmpnvptr = eo_rop_GetNV(p->roptmp);
     
 
     // 2. put the rop inside the ropframe
@@ -329,7 +333,7 @@ extern eOresult_t eo_transmitter_regular_rops_Load(EOtransmitter *p, eOropdescri
     // 3. prepare a regropinfo variable to be put inside the list    
     
     regropinfo.ropcode                  = ropdescriptor.ropcode;    
-    regropinfo.hasdata2update           = eo_rop_hid_DataField_is_Present(&(p->roptmp->stream.head)); 
+    regropinfo.hasdata2update           = eo_rop_datafield_is_present(&(p->roptmp->stream.head)); 
     regropinfo.ropstarthere             = ropstarthere;
     regropinfo.ropsize                  = ropsize;
     regropinfo.timeoffsetinsiderop      = (0 == p->roptmp->stream.head.ctrl.plustime) ? (EOK_uint16dummy) : (ropsize - 8); //if we have time, then it is in teh last 8 bytes
@@ -545,117 +549,27 @@ extern eOresult_t eo_transmitter_outpacket_Get(EOtransmitter *p, EOpacket **outp
     // finally gives back the packet
     *outpkt = p->txpacket;
 
-    
-    // if the confirmation manager is active and there are rops which require a confirmation request ... call the on-tx function
-    //if((NULL != p->confmanager) && (NULL != p->confrequests) && (0 != eo_vector_Size(p->confrequests)))
-    if(0 != eo_vector_Size(p->confrequests))
+
+    // if the confirmation manager is active .. call it
+    if(NULL != p->confmanager)
     {
-        uint16_t size = eo_vector_Size(p->confrequests);
-        uint16_t i=0;
-        for(i=0; i<size; i++)
-        {
-            eOropdescriptor_t *ropdes = (eOropdescriptor_t*) eo_vector_At(p->confrequests, i);
-            eo_confman_Confirmation_Requested(p->confmanager, p->ipv4addr, ropdes);            
-        }       
-        eo_vector_Clear(p->confrequests);   // remove the conf requests
+        eo_confman_ConfirmationRequests_Process(p->confmanager, p->ipv4addr);
     }
-    
+        
     return(eores_OK);   
 }
 
 
- 
 extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc)
-{
-    eOnvOwnership_t nvownership;
-    eOresult_t res;
-    uint16_t usedbytes;
-    uint16_t ropsize;
-    uint16_t remainingbytes;   
-    EOnv nv;
-    
-    if((NULL == p) || (NULL == ropdesc)) 
-    {
-        return(eores_NOK_nullpointer);
-    }  
-     
-    
-    nvownership = eo_rop_hid_GetOwnership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
-      
-    res = eo_nvset_NV_Get(  (p->nvset),  
-                            (eo_nv_ownership_local == nvownership) ? (eok_ipv4addr_localhost) : (p->ipv4addr), 
-                            ropdesc->id32,
-                            &nv
-                            );   
-
-    // if the nvset does not have the pair (ip, id) then we return an error because we cannot form the rop
-    if(eores_OK != res)
-    {
-        return(eores_NOK_generic);
-    } 
-
-    // force size to be coherent with the nv. the size is always used, even if there is no data to transmit
-    ropdesc->size = eo_nv_Size(&nv);    
-    
-    // now we have the nv. we set its value in local ram
-    if(eobool_true == eo_rop_hid_OPChasData(ropdesc->ropcode))
-    {  
-        if(eo_nv_ownership_local == nvownership)
-        {   // if the nv is local, then take data from nv, thus no need to write the data field of the nv using ropdesc->data.
-            ropdesc->data = NULL;   // set ropdesc->data to NULL to force eo_agent_OutROPfromNV() to get data from EOnv
-        }
-        else
-        {   // if the nv is remote, then the data must be passed inside ropdesc->data
-            if(NULL == ropdesc->data)
-            {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "eo_transmitter_occasional_rops_Load() cannot have a NULL ropdes->data with remote ownership");
-            }          
-        }
-    }
-    else
-    {   // dont need to send data
-        ropdesc->data = NULL;
-    }
-
-
-    eov_mutex_Take(p->mtx_occasionals, eok_reltimeINFINITE);
-       
-    res = eo_agent_OutROPprepare(p->theagent, &nv, ropdesc, p->roptmp, &usedbytes);    
-    
-    if(eores_OK != res)
-    {
-        eov_mutex_Release(p->mtx_occasionals);
-        return(res);
-    }
-
-    // put the rop inside the ropframe
-    res = eo_ropframe_ROP_Add(p->ropframeoccasionals, p->roptmp, NULL, &ropsize, &remainingbytes);
-    
-    // if conf request is flagged on
-    if(1 == ropdesc->control.rqstconf)
-    {
-        // if the confirmation manager is active
-        if((NULL != p->confmanager) && (NULL != p->confrequests))
-        { 
-            if(eobool_false == eo_vector_Full(p->confrequests))
-            {
-                eo_vector_PushBack(p->confrequests, ropdesc);
-            }
-            else
-            {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "eo_transmitter_occasional_rops_Load() cannot process a conf-request due to overflow in vector confrequests");
-            }
-        }        
-    }
-
-    
-    
-    eov_mutex_Release(p->mtx_occasionals);
-   
-    
-    return(res);   
+{   // we dont care about p->ropframeoccasionals being invalid because all controls are inside s_eo_transmitter_rops_Load().
+    return(s_eo_transmitter_rops_Load(p, ropdesc, p->ropframeoccasionals, p->mtx_occasionals));
 }
- 
+
+extern eOresult_t eo_transmitter_reply_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc)
+{   // we dont care about p->ropframereplies being invalid because all controls are inside s_eo_transmitter_rops_Load().
+    return(s_eo_transmitter_rops_Load(p, ropdesc, p->ropframereplies, p->mtx_replies));
+}
+
 
 extern eOresult_t eo_transmitter_reply_ropframe_Load(EOtransmitter *p, EOropframe* ropframe)
 {
@@ -756,6 +670,89 @@ static void s_eo_transmitter_list_shiftdownropinfo(void *item, void *param)
     // for each element after: modify its content so that ropstarthere is decremented by theone2beremoved.ropsize
 
     after->ropstarthere -= theone2beremoved->ropsize;
+}
+
+
+static eOresult_t s_eo_transmitter_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc, EOropframe* intoropframe, EOVmutexDerived* mtx)
+{
+    eOnvOwnership_t nvownership;
+    eOresult_t res;
+    uint16_t usedbytes;
+    uint16_t ropsize;
+    uint16_t remainingbytes;   
+    EOnv nv;
+    
+    if((NULL == p) || (NULL == ropdesc)) 
+    {
+        return(eores_NOK_nullpointer);
+    }  
+     
+    
+    nvownership = eo_rop_get_ownership(ropdesc->ropcode, eo_ropconf_none, eo_rop_dir_outgoing);
+      
+    res = eo_nvset_NV_Get(  (p->nvset),  
+                            (eo_nv_ownership_local == nvownership) ? (eok_ipv4addr_localhost) : (p->ipv4addr), 
+                            ropdesc->id32,
+                            &nv
+                            );   
+
+    // if the nvset does not have the pair (ip, id) then we return an error because we cannot form the rop
+    if(eores_OK != res)
+    {
+        return(eores_NOK_generic);
+    } 
+
+    // force size to be coherent with the nv. the size is always used, even if there is no data to transmit
+    ropdesc->size = eo_nv_Size(&nv);    
+    
+    // now we have the nv. we set its value in local ram
+    if(eobool_true == eo_rop_ropcode_has_data(ropdesc->ropcode))
+    {  
+        if(eo_nv_ownership_local == nvownership)
+        {   // if the nv is local, then take data from nv, thus no need to write the data field of the nv using ropdesc->data.
+            ropdesc->data = NULL;   // set ropdesc->data to NULL to force eo_agent_OutROPfromNV() to get data from EOnv
+        }
+        else
+        {   // if the nv is remote, then the data must be passed inside ropdesc->data
+            if(NULL == ropdesc->data)
+            {
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "s_eo_transmitter_rops_Load() cannot have a NULL ropdes->data with remote ownership");
+            }          
+        }
+    }
+    else
+    {   // dont need to send data
+        ropdesc->data = NULL;
+    }
+
+
+    eov_mutex_Take(mtx, eok_reltimeINFINITE);
+       
+    res = eo_agent_OutROPprepare(p->agent, &nv, ropdesc, p->roptmp, &usedbytes);    
+    
+    if(eores_OK != res)
+    {
+        eov_mutex_Release(mtx);
+        return(res);
+    }
+
+    // put the rop inside the ropframe
+    res = eo_ropframe_ROP_Add(intoropframe, p->roptmp, NULL, &ropsize, &remainingbytes);
+    
+    
+    eov_mutex_Release(mtx);
+    
+ 
+    // if conf request is flagged on
+    if((1 == ropdesc->control.rqstconf) && ((NULL != p->confmanager)))
+    {
+        if(eores_OK != eo_confman_ConfirmationRequest_Insert(p->confmanager, ropdesc))
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "s_eo_transmitter_rops_Load() cannot process a conf-request");
+        }
+    }
+  
+    return(res);   
 }
 
 

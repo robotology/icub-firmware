@@ -38,7 +38,7 @@ extern "C" {
 #include "EOropframe.h"
 #include "EOrop.h"
 #include "EOnvSet.h"
-#include "EOtheAgent.h"
+#include "EOagent.h"
 #include "EOlist.h"
 #include "EOVmutex.h"
 #include "EOnv_hid.h"
@@ -88,8 +88,8 @@ struct EOtransmitter_hid
     EOropframe*                 ropframeoccasionals;    
     EOropframe*                 ropframereplies;
     EOrop*                      roptmp;
+    EOagent*                    agent;
     EOnvSet*                    nvset;
-    EOtheAgent*                 theagent;
     EOconfirmationManager*      confmanager;
     eOipv4addr_t                ipv4addr;
     eOipv4port_t                ipv4port;
@@ -102,7 +102,6 @@ struct EOtransmitter_hid
     EOVmutexDerived*            mtx_regulars;
     EOVmutexDerived*            mtx_occasionals;
     uint64_t                    tx_seqnum;
-    EOvector*                   confrequests;
 #if defined(USE_DEBUG_EOTRANSMITTER)    
     EOtransmitterDEBUG_t        DEBUG;
 #endif    

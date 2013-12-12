@@ -45,6 +45,8 @@ extern "C" {
 #include "EOpacket.h"
 #include "EOnvSet.h"
 #include "EOconfirmationManager.h"
+#include "EOproxy.h"
+#include "EOagent.h"
 
 
 
@@ -64,35 +66,39 @@ extern "C" {
 typedef struct EOreceiver_hid EOreceiver;
 
 
-
 typedef struct
 {
     uint16_t                capacityofropframereply; // or of packetreply in case we want to use a apcket whcih also has ipaddr and port  
     uint16_t                capacityofropinput;
-    uint16_t                capacityofropreply;
-    EOnvSet*                nvset;
-    EOconfirmationManager*  confmanager;
-} eo_receiver_cfg_t;
+    uint16_t                capacityofropreply;    
+} eOreceiver_sizes_t;
+
+
+typedef struct
+{
+    eOreceiver_sizes_t      sizes;
+    EOagent*                agent;
+} eOreceiver_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_receiver_cfg_t eo_receiver_cfg_default; //= {256, 128, 128, NULL, NULL};
+extern const eOreceiver_cfg_t eo_receiver_cfg_default; //= {256, 128, 128, NULL};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
+/** @fn         extern EOreceiver* eo_receiver_New(const eOreceiver_cfg_t *cfg)
     @brief      Creates a new receiver.
     @param      cfg   the configuration. If NULL, the default is used.
     @return     The pointer to the required object.
  **/
-extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg);
+extern EOreceiver* eo_receiver_New(const eOreceiver_cfg_t *cfg);
 
 
-/** @fn         extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *nvset, eObool_t *thereisareply)
+/** @fn         extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, eObool_t *thereisareply)
     @brief      Accepts the reference to a received packet from a given remote host, uses a given NVs configuration, and process
                 the ropframe contained inside the packet (if valid). For each ROP it searches the NV(endpoint, id) if local operation
                 or the NV(remoteip, endpoint, id) if remote operation and if found it processes it.
@@ -105,7 +111,7 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg);
     @return     eores_OK only if the packet is valid and contains a valid ropframe, even if empty. eores_NOK_nullpointer or
                 eores_NOK_generic in case of errors.
  **/
-extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *nvset, uint16_t *numberofrops, eObool_t *thereisareply, eOabstime_t *transmittedtime);
+extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, uint16_t *numberofrops, eObool_t *thereisareply, eOabstime_t *transmittedtime);
 
 
 /** @fn         extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply, eOipv4addr_t *ipv4addr, eOipv4port_t *ipv4port)

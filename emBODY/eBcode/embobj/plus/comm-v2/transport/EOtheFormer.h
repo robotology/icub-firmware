@@ -84,16 +84,24 @@ extern EOtheFormer * eo_former_Initialise(void);
 extern EOtheFormer * eo_former_GetHandle(void);
 
 
-extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop);
+/** @fn         extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop)
+    @brief      computes the size of the stream that will come out of rop.
+    @param      p               The former.
+    @param      rop             The ROP to send
+    @return     the size of the stream
+ **/
+//extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop);
 
-/** @fn         extern eOresult_t eo_former_GetStream(EOtheFormer *p, EOrop *rop_in, uint8_t *data, uint16_t size, EOrop *reply, uint8_t *replyneeded)
+/** @fn         extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize)
     @brief      Builds the packet in stream form.
     @param      p               The former.
     @param      rop             The ROP to send
+    @param      streamcapacity  The capacity of the streamdata array (its allocated size)
+    @param      streamdata      The stream data coming from the rop
+    @param      streamsize      The stream size coming from the rop
     @return     Normally eores_OK, eores_NOK_generic upon failure.
  **/
-
-extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize);//, eOipv4addr_t *ipaddr);
+extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize);
 
 
 

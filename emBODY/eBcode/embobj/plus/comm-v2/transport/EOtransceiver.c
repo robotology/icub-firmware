@@ -50,13 +50,14 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
-
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,19 +78,22 @@
 
 //static const char s_eobj_ownname[] = "EOtransceiver";
 
-const eo_transceiver_cfg_t eo_transceiver_cfg_default = 
+const eOtransceiver_cfg_t eo_transceiver_cfg_default = 
 {
-    EO_INIT(.capacityoftxpacket)            512, 
-    EO_INIT(.capacityofrop)                 128, 
-    EO_INIT(.capacityofropframeregulars)    256,
-    EO_INIT(.capacityofropframeoccasionals) 128,
-    EO_INIT(.capacityofropframereplies)     128, 
-    EO_INIT(.maxnumberofregularrops)        16,
-    EO_INIT(.maxnumberofconfreqrops)        16,
+    EO_INIT(.sizes)
+    {
+        EO_INIT(.capacityoftxpacket)            512, 
+        EO_INIT(.capacityofrop)                 128, 
+        EO_INIT(.capacityofropframeregulars)    256,
+        EO_INIT(.capacityofropframeoccasionals) 128,
+        EO_INIT(.capacityofropframereplies)     128, 
+        EO_INIT(.maxnumberofregularrops)        16
+    },    
     EO_INIT(.remipv4addr)                   EO_COMMON_IPV4ADDR_LOCALHOST,
     EO_INIT(.remipv4port)                   10001,
     EO_INIT(.nvset)                         NULL,
     EO_INIT(.confmancfg)                    NULL,
+    EO_INIT(.proxycfg)                      NULL,
     EO_INIT(.mutex_fn_new)                  NULL,
     EO_INIT(.protection)                    eo_trans_protection_none
 };
@@ -104,11 +108,11 @@ const eo_transceiver_cfg_t eo_transceiver_cfg_default =
 
 
  
-extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
+extern EOtransceiver* eo_transceiver_New(const eOtransceiver_cfg_t *cfg)
 {
     EOtransceiver *retptr = NULL;  
-    eo_receiver_cfg_t rec_cfg;
-    eo_transmitter_cfg_t tra_cfg;
+    eOreceiver_cfg_t rec_cfg;
+    eOtransmitter_cfg_t tra_cfg;
 
 
     if(NULL == cfg)
@@ -120,51 +124,77 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtransceiver), 1);
     
-    //  save the config
+    // save the config
     
-    memcpy(&retptr->cfg, cfg, sizeof(eo_transceiver_cfg_t)); 
+    memcpy(&retptr->cfg, cfg, sizeof(eOtransceiver_cfg_t)); 
     
     
     // create the conf manager  
     
-    if(NULL != cfg->confmancfg)
+    if((NULL != cfg->confmancfg) && (eoconfman_mode_disabled != cfg->confmancfg->mode))
     {
-        retptr->confmanager = eo_confman_New(cfg->confmancfg);
+        eOconfman_cfg_t confmancfg;
+        memcpy(&confmancfg, cfg->confmancfg, sizeof(eOconfman_cfg_t));
+        confmancfg.mutex_fn_new = (eo_trans_protection_enabled == cfg->protection) ? (cfg->mutex_fn_new) : (NULL);
+        retptr->confmanager = eo_confman_New(&confmancfg);
     }
     else
     {
         retptr->confmanager = NULL;
     }
-   
+    
+    
+    // create the proxy
+    
+    if((NULL != cfg->proxycfg) && (eoproxy_mode_disabled != cfg->proxycfg->mode))
+    {
+        eOproxy_cfg_t proxycfg;
+        memcpy(&proxycfg, cfg->proxycfg, sizeof(eOproxy_cfg_t));
+        proxycfg.mutex_fn_new   = (eo_trans_protection_enabled == cfg->protection) ? (cfg->mutex_fn_new) : (NULL);
+        proxycfg.transceiver    = retptr;        
+        retptr->proxy           = eo_proxy_New(&proxycfg);        
+    }        
+    else
+    {
+        retptr->proxy = NULL;
+    }
+
+
+    // create the agent
+    
+    eOagent_cfg_t agentcfg;
+    agentcfg.nvset      = cfg->nvset;
+    agentcfg.proxy      = retptr->proxy;
+    agentcfg.confman    = retptr->confmanager;
+    
+    retptr->agent = eo_agent_New(&agentcfg);               
+ 
     
     // create the receiver
     
-    memcpy(&rec_cfg, &eo_receiver_cfg_default, sizeof(eo_receiver_cfg_t));
-    rec_cfg.capacityofropframereply         = cfg->capacityofropframereplies;
-    rec_cfg.capacityofropinput              = cfg->capacityofrop;
-    rec_cfg.capacityofropreply              = cfg->capacityofrop;
-    rec_cfg.nvset                           = cfg->nvset;
-    rec_cfg.confmanager                     = retptr->confmanager;
+    memcpy(&rec_cfg, &eo_receiver_cfg_default, sizeof(eOreceiver_cfg_t));
+    rec_cfg.sizes.capacityofropframereply   = cfg->sizes.capacityofropframereplies;
+    rec_cfg.sizes.capacityofropinput        = cfg->sizes.capacityofrop;
+    rec_cfg.sizes.capacityofropreply        = cfg->sizes.capacityofrop;
+    rec_cfg.agent                           = retptr->agent;
 
     retptr->receiver = eo_receiver_New(&rec_cfg);
 
     
     // create the transmitter
     
-    memcpy(&tra_cfg, &eo_transmitter_cfg_default, sizeof(eo_transmitter_cfg_t));
-    tra_cfg.capacityoftxpacket              = cfg->capacityoftxpacket;
-    tra_cfg.capacityofropframeregulars      = cfg->capacityofropframeregulars;
-    tra_cfg.capacityofropframeoccasionals   = cfg->capacityofropframeoccasionals;
-    tra_cfg.capacityofropframereplies       = cfg->capacityofropframereplies;
-    tra_cfg.capacityofrop                   = cfg->capacityofrop;
-    tra_cfg.maxnumberofregularrops          = cfg->maxnumberofregularrops;
-    tra_cfg.maxnumberofconfreqrops          = cfg->maxnumberofconfreqrops;
-    tra_cfg.ipv4addr                        = cfg->remipv4addr;     // it is the address of the remote host: we filter incoming packet with this address and sends packets only to it
-    tra_cfg.ipv4port                        = cfg->remipv4port;     // it is the remote port where to send packets
-    tra_cfg.nvset                           = cfg->nvset;
-    tra_cfg.confmanager                     = retptr->confmanager;
-    tra_cfg.mutex_fn_new                    = cfg->mutex_fn_new;
-    tra_cfg.protection                      = (eo_trans_protection_none == cfg->protection) ? (eo_transmitter_protection_none) : (eo_transmitter_protection_total);
+    memcpy(&tra_cfg, &eo_transmitter_cfg_default, sizeof(eOtransmitter_cfg_t));
+    tra_cfg.sizes.capacityoftxpacket            = cfg->sizes.capacityoftxpacket;
+    tra_cfg.sizes.capacityofropframeregulars    = cfg->sizes.capacityofropframeregulars;
+    tra_cfg.sizes.capacityofropframeoccasionals = cfg->sizes.capacityofropframeoccasionals;
+    tra_cfg.sizes.capacityofropframereplies     = cfg->sizes.capacityofropframereplies;
+    tra_cfg.sizes.capacityofrop                 = cfg->sizes.capacityofrop;
+    tra_cfg.sizes.maxnumberofregularrops        = cfg->sizes.maxnumberofregularrops;
+    tra_cfg.ipv4addr                            = cfg->remipv4addr;     // it is the address of the remote host: we filter incoming packet with this address and sends packets only to it
+    tra_cfg.ipv4port                            = cfg->remipv4port;     // it is the remote port where to send packets
+    tra_cfg.agent                               = retptr->agent;
+    tra_cfg.mutex_fn_new                        = cfg->mutex_fn_new;
+    tra_cfg.protection                          = (eo_trans_protection_none == cfg->protection) ? (eo_transmitter_protection_none) : (eo_transmitter_protection_total);
     
     retptr->transmitter = eo_transmitter_New(&tra_cfg);
     
@@ -176,6 +206,17 @@ extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg)
 #endif
     
     return(retptr);
+}
+
+
+extern EOnvSet * eo_transceiver_GetNVset(EOtransceiver *p)
+{    
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+         
+    return(p->cfg.nvset);
 }
 
 
@@ -198,7 +239,7 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
         return(eores_NOK_generic);
     }
     
-    if(eores_OK != (res = eo_receiver_Process(p->receiver, pkt, p->cfg.nvset, numberofrops, &thereisareply, txtime)))
+    if(eores_OK != (res = eo_receiver_Process(p->receiver, pkt, numberofrops, &thereisareply, txtime)))
     {
         return(res);
     }  
@@ -212,7 +253,7 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
         res = eo_receiver_GetReply(p->receiver, &ropframereply);
         
         // i will transmit back a reply to the remote host at address p->cfg.remipv4addr and port p->cfg.remipv4port  ...
-        // which are the ones also assigned to the p->transmitter at its creation.
+        // which are the ones assigned to the p->transmitter at its creation.
         
         res = eo_transmitter_reply_ropframe_Load(p->transmitter, ropframereply);      
         
@@ -246,6 +287,11 @@ extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *n
     
     // finally retrieve the packet from the transmitter. it will be formed by replies, regulars, occasionals.
     res = eo_transmitter_outpacket_Prepare(p->transmitter, numberofrops);
+    
+    // we also need to tick the proxy to remove timed-out replies enqueued by EOreceiver and not yet
+    // inserted in EOtransmitter with eo_transceiver_ReplyROP_Load() called by eo_proxy_ReplyROP_Load()
+    // if p->proxy is NULL the following call does not harm
+    eo_proxy_Tick(p->proxy);
        
     return(res);
 }
@@ -341,6 +387,31 @@ extern eOresult_t eo_transceiver_OccasionalROP_Load(EOtransceiver *p, eOropdescr
 
 }    
 
+
+extern eOresult_t eo_transceiver_ReplyROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc)
+{
+    eOresult_t res;
+    
+    if((NULL == p) || (NULL == ropdesc))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+
+    res = eo_transmitter_reply_rops_Load(p->transmitter, ropdesc);
+ 
+#if defined(USE_DEBUG_EOTRANSCEIVER)  
+    {   // DEBUG    
+        if(eores_OK != res)
+        {
+            p->DEBUG.cannotloadropinreplies ++;
+        }
+    }   
+#endif
+    
+    return(res);
+
+}    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

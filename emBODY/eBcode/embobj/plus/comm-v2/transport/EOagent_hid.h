@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -17,56 +17,51 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCONFIRMATIONMANAGER_HID_H_
-#define _EOCONFIRMATIONMANAGER_HID_H_
+#ifndef _EOAGENT_HID_H_
+#define _EOAGENT_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* @file       EOconfirmationManager_hid.h
-    @brief      This header file implements hidden interface to ... object.
+/* @file       EOagent_hid.h
+    @brief      This header file implements hidden interface to the EOagent singleton.
     @author     marco.accame@iit.it
-    @date       02/05/2013
+    @date       09/03/2010
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOvector.h"
-#include "EOVmutex.h"
-    
+
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOconfirmationManager.h"
+#include "EOagent.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
+// empty-section
+
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
-
-/** @struct     EOconfirmationManager_hid
+/** @struct     EOagent_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
  
-struct EOconfirmationManager_hid 
+struct EOagent_hid 
 {
-    eOconfman_cfg_t     config;
-    EOvector*           confrequests;
-    EOVmutexDerived*    mtx;
+    eOagent_cfg_t   config;
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-
-
+// empty-section
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
@@ -75,6 +70,9 @@ struct EOconfirmationManager_hid
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
 
 
 

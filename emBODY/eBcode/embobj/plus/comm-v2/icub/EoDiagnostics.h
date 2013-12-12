@@ -213,7 +213,7 @@ typedef struct
     uint32_t    txropframeistoobigforthepacket;
     uint32_t    cannotloadropinregulars;
     uint32_t    cannotloadropinoccasionals;
-    uint32_t    dummy;
+    uint32_t    cannotloadropinreplies;
 } eOdgn_embObjtransceiver_t;  // 32 B
 
 typedef struct

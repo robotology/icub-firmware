@@ -17,56 +17,57 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCONFIRMATIONMANAGER_HID_H_
-#define _EOCONFIRMATIONMANAGER_HID_H_
+#ifndef _EOPROXY_HID_H_
+#define _EOPROXY_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* @file       EOconfirmationManager_hid.h
-    @brief      This header file implements hidden interface to ... object.
+/* @file       EOProxy_hid.h
+    @brief      This header file implements hidden interface to a EOproxy .
     @author     marco.accame@iit.it
-    @date       02/05/2013
+    @date       12/10/2013
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOvector.h"
+#include "EOlist.h"
 #include "EOVmutex.h"
-    
+#include "EOtransceiver.h"
+
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "EOconfirmationManager.h"
+#include "EOproxy.h"
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
+// empty-section
+
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
-
-/** @struct     EOconfirmationManager_hid
+/** @struct     EOproxy_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
  
-struct EOconfirmationManager_hid 
+struct EOproxy_hid 
 {
-    eOconfman_cfg_t     config;
-    EOvector*           confrequests;
-    EOVmutexDerived*    mtx;
+    eOproxy_cfg_t       config;
+    EOtransceiver*      transceiver;
+    EOlist*             listofropdes;
+    EOVmutexDerived*    mtx;           
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-
-
+// empty-section
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
@@ -75,6 +76,9 @@ struct EOconfirmationManager_hid
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
 
 
 

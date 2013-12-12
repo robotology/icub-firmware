@@ -41,16 +41,12 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
+#include "EOproxy.h"
+#include "EOnvSet.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-//#define EOK_BOARDTRANSCEIVER_capacityofpacket                   640
-//#define EOK_BOARDTRANSCEIVER_capacityofrop                      192
-//#define EOK_BOARDTRANSCEIVER_capacityofropframeregulars         384
-//#define EOK_BOARDTRANSCEIVER_capacityofropframeoccasionals      128
-//#define EOK_BOARDTRANSCEIVER_capacityofropframereplies          128 
-//#define EOK_BOARDTRANSCEIVER_maxnumberofregularrops             16 
+// empty-section
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -60,11 +56,11 @@ typedef struct
     const eOnvset_DEVcfg_t*         nvsetdevcfg;          
     eOipv4addr_t                    remotehostipv4addr;
     eOipv4port_t                    remotehostipv4port;
-    eo_transceiver_sizes_t          sizes; 
+    eOtransceiver_sizes_t           sizes; 
     eov_mutex_fn_mutexderived_new   mutex_fn_new;    
     eOtransceiver_protection_t      transprotection;
     eOnvset_protection_t            nvsetprotection;
-    eOconfman_cfg_t*                confmancfg;
+    eOproxy_cfg_t*                  proxycfg;
 } eOboardtransceiver_cfg_t;
 
 

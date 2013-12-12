@@ -44,6 +44,7 @@ extern "C" {
 #include "EOropframe.h"
 #include "EOpacket.h"
 #include "EOnvSet.h"
+#include "EOagent.h"
 #include "EOVmutex.h"
 #include "EOconfirmationManager.h"
 
@@ -71,28 +72,33 @@ typedef enum
     eo_transmitter_protection_total     = 1
 } eOtransmitter_protection_t;
 
+
+typedef struct   
+{
+    uint16_t        capacityoftxpacket; 
+    uint16_t        capacityofrop;    
+    uint16_t        capacityofropframeregulars; 
+    uint16_t        capacityofropframeoccasionals;
+    uint16_t        capacityofropframereplies;
+    uint16_t        maxnumberofregularrops;
+} eOtransmitter_sizes_t; 
+
+
 typedef struct
 {
-    uint16_t                        capacityoftxpacket;  
-    uint16_t                        capacityofropframeregulars; 
-    uint16_t                        capacityofropframeoccasionals;
-    uint16_t                        capacityofropframereplies;
-    uint16_t                        capacityofrop;
-    uint16_t                        maxnumberofregularrops;
-    uint16_t                        maxnumberofconfreqrops;
-    EOnvSet*                        nvset;
-    EOconfirmationManager*          confmanager;
+    eOtransmitter_sizes_t           sizes;
     eOipv4addr_t                    ipv4addr;
     eOipv4port_t                    ipv4port;    
     eOtransmitter_protection_t      protection;  
-    eov_mutex_fn_mutexderived_new   mutex_fn_new;        
-} eo_transmitter_cfg_t;
+    eov_mutex_fn_mutexderived_new   mutex_fn_new;   
+    EOagent*                        agent;    
+} eOtransmitter_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_transmitter_cfg_t eo_transmitter_cfg_default; 
+extern const eOtransmitter_cfg_t eo_transmitter_cfg_default; 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -108,7 +114,7 @@ extern const eo_transmitter_cfg_t eo_transmitter_cfg_default;
  
  // gestisce 1 solo indirizzo ip di destinazione in modo da avere 1 solo EOpacket in uscita.
  // 
-extern EOtransmitter* eo_transmitter_New(const eo_transmitter_cfg_t *cfg);
+extern EOtransmitter* eo_transmitter_New(const eOtransmitter_cfg_t *cfg);
 
 
 
@@ -143,6 +149,7 @@ extern eOresult_t eo_transmitter_regular_rops_Refresh(EOtransmitter *p);
 // and after that they are cleared.
 
 extern eOresult_t eo_transmitter_occasional_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc);
+extern eOresult_t eo_transmitter_reply_rops_Load(EOtransmitter *p, eOropdescriptor_t* ropdesc);
 extern eOresult_t eo_transmitter_reply_ropframe_Load(EOtransmitter *p, EOropframe* ropframe);
 
 

@@ -38,8 +38,9 @@ extern "C" {
 #include "EOropframe.h"
 #include "EOrop.h"
 #include "EOnvSet.h"
-#include "EOtheAgent.h"
+#include "EOagent.h"
 #include "EOconfirmationManager.h"
+#include "EOproxy.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -68,14 +69,11 @@ typedef struct
  
 struct EOreceiver_hid 
 {
-    //EOpacket*                   rxpacket;
     EOropframe*                 ropframeinput;
     EOropframe*                 ropframereply;    
     EOrop*                      ropinput;
     EOrop*                      ropreply;
-    EOnvSet*                    nvset;
-    EOtheAgent*                 theagent;
-    EOconfirmationManager*      confmanager;
+    EOagent*                    agent;
     eOipv4addr_t                ipv4addr;
     eOipv4port_t                ipv4port;
     uint8_t*                    bufferropframereply;

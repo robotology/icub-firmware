@@ -81,7 +81,6 @@ typedef enum
 } eOnvOwnership_t; 
 
 
-
 typedef enum
 {
     eo_nv_strg_volatile     = 0,
@@ -137,7 +136,7 @@ extern eOipv4addr_t eo_nv_GetIP(const EOnv *nv);
 
 extern eOnvBRD_t eo_nv_GetBRD(const EOnv *nv);
 
-extern eObool_t eo_nv_IsCached(const EOnv *nv);
+extern eObool_t eo_nv_IsProxied(const EOnv *nv);
 
 extern eOnvID32_t eo_nv_GetID32(const EOnv *nv);
 

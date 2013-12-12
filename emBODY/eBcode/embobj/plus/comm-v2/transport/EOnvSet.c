@@ -290,7 +290,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
             uint8_t brd =  (*theDevice)->boardnum;
             eOnvID32_t id32 = EOK_uint32dummy;     
             uint32_t prog = 0;
-            eObool_t cached = eobool_false;
+            eObool_t proxied = eobool_false;
 
             for(k=0; k<nvars; k++)
             {
@@ -309,8 +309,8 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                     continue;
                 }
 
-                // - 0+. cached?
-                cached = (*theEndpoint)->epcfg.protif->isvarcached(brd, id32);               
+                // - 0+. proxied?
+                proxied = (*theEndpoint)->epcfg.protif->isvarproxied(brd, id32);               
                 // - 1. the rom
                 rom = (EOnv_rom_t*) (*theEndpoint)->epcfg.protif->getrom(brd, id32);
                 // - 2. the ram
@@ -322,7 +322,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                 eo_nv_hid_Load(     &thenv,
                                     ip, //(*theDevice)->ipaddress,
                                     brd,
-                                    cached,
+                                    proxied,
                                     id32,
                                     rom,
                                     ram,
@@ -451,8 +451,8 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
     }
     
     // - retrieve from the device and endpoint what is required to form the netvar: con, ram, mtx, etc.   
-    // - 0+. cached?
-    eObool_t cached = theEndpoint->epcfg.protif->isvarcached(brd, id32);     
+    // - 0+. proxied?
+    eObool_t proxied = theEndpoint->epcfg.protif->isvarproxied(brd, id32);     
     // - 1. the rom
     EOnv_rom_t* rom = (EOnv_rom_t*) theEndpoint->epcfg.protif->getrom(brd, id32);
     // - 2. the ram
@@ -475,7 +475,7 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
                         ip, //(*theDevice)->ipaddress,
                         brd,
                         id32,
-                        cached,    
+                        proxied,    
                         rom,
                         ram,
                         mtx2use

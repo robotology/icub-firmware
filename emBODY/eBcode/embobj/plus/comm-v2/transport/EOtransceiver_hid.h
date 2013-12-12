@@ -34,6 +34,8 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOconfirmationManager.h"
+#include "EOproxy.h"
 #include "EOreceiver.h"
 #include "EOtransmitter.h"
 #include "EOVmutex.h"
@@ -56,26 +58,26 @@ typedef struct
     uint32_t    failuresinloadofreplyropframe;
     uint32_t    cannotloadropinregulars;
     uint32_t    cannotloadropinoccasionals;
+    uint32_t    cannotloadropinreplies;
 } EOtransceiverDEBUG_t;
+
 
 /** @struct     EOtransceiver_hid
     @brief      Hidden definition. Implements private data used only internally by the 
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
- **/  
- 
+ **/   
 struct EOtransceiver_hid 
 {
-    eo_transceiver_cfg_t        cfg;
+    eOtransceiver_cfg_t         cfg;
     EOconfirmationManager*      confmanager;
+    EOproxy*                    proxy;
+    EOagent*                    agent;
     EOreceiver*                 receiver;
     EOtransmitter*              transmitter;   
 #if defined(USE_DEBUG_EOTRANSCEIVER)    
     EOtransceiverDEBUG_t        DEBUG;
 #endif    
-    //EOVmutexDerived*            mtx_tx_replies;
-    //EOVmutexDerived*            mtx_tx_regulars;
-    //EOVmutexDerived*            mtx_tx_occasionals;
 }; 
 
 

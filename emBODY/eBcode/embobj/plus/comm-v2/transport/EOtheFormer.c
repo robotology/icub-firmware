@@ -106,61 +106,29 @@ extern EOtheFormer * eo_former_GetHandle(void)
 }
 
 
-extern uint16_t eo_former_GetSizeOfStream(EOtheFormer *p, const EOrop *rop)
-{   // this function requires the access to hidden types of EOrop
-    uint16_t size = sizeof(eOrophead_t);
-//    eOropcode_t ropcode = eo_rop_ropcode_Get((EOrop *)rop);
 
-    if((NULL == p) || (NULL == rop))
-    {    
-        return(0);
-    }
-		
-    if(eobool_false == eo_rop_hid_is_valid((EOrop *)rop))
-    {
-        return(0);      
-    }
-
-    if(eobool_true == eo_rop_hid_DataField_is_Present(&rop->stream.head))
-    {
-         size += eo_rop_hid_DataField_EffectiveSize(rop->stream.head.dsiz);
-    }
-
-    if(1 == rop->stream.head.ctrl.plussign)
-    {
-        size += 4;
-    }
-
-    if(1 == rop->stream.head.ctrl.plustime)
-    {
-        size+= 8;
-    }
-
-    return(size);
-}
-
-extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize) //, eOipv4addr_t *ipaddr)
+extern eOresult_t eo_former_GetStream(EOtheFormer *p, const EOrop *rop, const uint16_t streamcapacity, uint8_t *streamdata, uint16_t *streamsize)
 {   // this function requires the access to hidden types of EOrop
     uint16_t dataeffectivesize = 0;
     uint8_t  signsize = 0;
     uint8_t  timesize = 0;
 
-    if((NULL == p) || (NULL == rop) || (NULL == streamdata) || (NULL == streamsize))// || (NULL == ipaddr))
+    if((NULL == p) || (NULL == rop) || (NULL == streamdata) || (NULL == streamsize))
     {    
         return(eores_NOK_nullpointer);
     }
 
     // we assume that the rop is legal as it was formed by the EOtheAgent or extracted from a stream by EOtheParser
     // thus we dont check too much.
-    if(eobool_false == eo_rop_hid_ropcode_is_valid(rop->stream.head.ropc))
+    if(eobool_false == eo_rop_ropcode_is_valid(rop->stream.head.ropc))
     {
         return(eores_NOK_generic); 
     }
 
 
-    if(eobool_true == eo_rop_hid_DataField_is_Present(&rop->stream.head))
+    if(eobool_true == eo_rop_datafield_is_present(&rop->stream.head))
     {
-        dataeffectivesize = eo_rop_hid_DataField_EffectiveSize(rop->stream.head.dsiz);
+        dataeffectivesize = eo_rop_datafield_effective_size(rop->stream.head.dsiz);
     }
 
     if(1 == rop->stream.head.ctrl.plussign)

@@ -406,14 +406,14 @@ extern eOresult_t eo_ropframe_ROP_Add(EOropframe *p, const EOrop *rop, uint16_t*
     }
      
     // verify that the rop is valid
-    if(eobool_false == eo_rop_hid_is_valid((EOrop*)rop))
+    if(eobool_false == eo_rop_IsValid((EOrop*)rop))
     {
         return(eores_NOK_generic);
     }
     
     // verify that we have bytes enough to convert the rop to stream 
     
-    streamsize = eo_former_GetSizeOfStream(eo_former_GetHandle(), rop);
+    streamsize = eo_rop_GetSize((EOrop*)rop);
     // remaining can be also negative. for example when capacity is eo_ropframe_sizeforZEROrops+1 (thus only one byte for rops) and the target rop requires 8 bytes.
     // we have eo_ropframe_sizeforZEROrops+1 - eo_ropframe_sizeforZEROrops - 8 = -7 ...
     remaining = p->capacity - eo_ropframe_sizeforZEROrops - s_eo_ropframe_sizeofrops_get(p);

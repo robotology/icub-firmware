@@ -81,7 +81,7 @@
 
 static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 static eOresult_t s_eo_nv_Set(const EOnv *nv, const void *dat, void *dst, eOnvUpdate_t upd);
-
+static void s_eo_nv_UpdateROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 
 
 EO_static_inline uint16_t s_eo_nv_get_size2(const EOnv *nv)
@@ -123,7 +123,7 @@ extern eOresult_t eo_nv_Clear(EOnv *nv)
     
     nv->ip          = eo_nv_IPdummy;
     nv->brd         = eo_nv_BRDdummy;
-    nv->cached      = eobool_false;
+    nv->proxied     = eobool_false;
     nv->id32        = eo_nv_ID32dummy;
     nv->rom         = NULL;       
     nv->ram         = NULL;  
@@ -284,13 +284,13 @@ extern eOnvBRD_t eo_nv_GetBRD(const EOnv *nv)
     return(nv->brd);    
 }
 
-extern eObool_t eo_nv_IsCached(const EOnv *nv)
+extern eObool_t eo_nv_IsProxied(const EOnv *nv)
 {
     if(NULL == nv)
     {
         return(eobool_false);
     }
-    return(nv->cached);    
+    return(nv->proxied);    
 }
 
 
@@ -315,11 +315,11 @@ extern eOnvOwnership_t eo_nv_GetOwnership(const EOnv *nv)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eObool_t cached, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eObool_t proxied, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx)
 {
     nv->ip          = ip;
     nv->brd         = brd;
-    nv->cached      = cached;
+    nv->proxied     = proxied;
     nv->id32        = id32;
     nv->rom         = rom;
     nv->ram         = ram; 
@@ -369,7 +369,17 @@ extern eObool_t eo_nv_hid_isUpdateable(const EOnv *nv)
     }
 } 
 
+extern eOresult_t eo_nv_hid_UpdateROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes)
+{
+    if(NULL == nv)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    s_eo_nv_UpdateROP(nv, upd, ropdes);
 
+    return(eores_OK);    
+}
 
 extern eOresult_t eo_nv_hid_ResetROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes)
 {
@@ -429,10 +439,19 @@ static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOn
 {
     uint16_t size = s_eo_nv_get_size2(nv);
 
+    // copy data
     eov_mutex_Take(nv->mtx, eok_reltimeINFINITE);
     memcpy(dst, dat, size);
     eov_mutex_Release(nv->mtx);
 
+    // call the update function if necessary
+    s_eo_nv_UpdateROP(nv, upd, ropdes);
+
+    return(eores_OK);
+}
+
+static void s_eo_nv_UpdateROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes)
+{
     // call the update function if necessary
     if(eo_nv_upd_dontdo != upd)
     {
@@ -447,7 +466,6 @@ static eOresult_t s_eo_nv_SetROP(const EOnv *nv, const void *dat, void *dst, eOn
         }
     }
 
-    return(eores_OK);
 }
 
 

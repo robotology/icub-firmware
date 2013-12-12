@@ -155,19 +155,19 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
 
     // check validity of ropc 
     
-    if(eobool_false == eo_rop_hid_ropcode_is_valid(rophead->ropc))
+    if(eobool_false == eo_rop_ropcode_is_valid(rophead->ropc))
     {
         *result = eo_parser_res_nok_ropisillegal;
         *consumedbytes = streamsize;
         return(eores_NOK_generic);
     }
-    
+     
     // if the ropc requires data, the field datsize must be present
     
     // some ropcodes also have a data field
-    if(eobool_true == eo_rop_hid_DataField_is_Required(rophead))
+    if(eobool_true == eo_rop_datafield_is_required(rophead))
     {
-        if(eobool_true == eo_rop_hid_DataField_is_Present(rophead))
+        if(eobool_true == eo_rop_datafield_is_present(rophead))
         {
             ropdata = (uint8_t*)(&streamdata[sizeof(eOrophead_t)]);            
         }
@@ -189,7 +189,7 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
     if(NULL != ropdata)
     {        
         // we compute the effective size of data as the next multiple of four of dsiz
-        dataeffectivesize = eo_rop_hid_DataField_EffectiveSize(rophead->dsiz);
+        dataeffectivesize = eo_rop_datafield_effective_size(rophead->dsiz);
         
         // we make a first verification of size whcih at least tell us if the roptail is inside the stream
         if(streamsize < (sizeof(eOrophead_t) + dataeffectivesize))
@@ -283,7 +283,7 @@ extern eOresult_t eo_parser_GetROP(EOtheParser *p, const uint8_t *streamdata, co
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 

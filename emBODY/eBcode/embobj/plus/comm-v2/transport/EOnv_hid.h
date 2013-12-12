@@ -74,7 +74,7 @@ struct EOnv_hid                    // 24 bytes ... multiple of 8
 {
     eOipv4addr_t                    ip;         // ip address of the device owning the nv. if equal to eok_ipv4addr_localhost, then the nv is owned by the device.
     eOnvBRD_t                       brd;        // brd number. it is a short of the ip address.
-    eObool_t                        cached;     // if eobool_true then the variabale contains values which resides on a another entity (e.g., a can board) 
+    eObool_t                        proxied;    // if eobool_true then the variable contains values which resides on a another entity (e.g., a can board) 
     uint8_t                         filler2[2];
     eOnvID32_t                      id32;
     EOnv_rom_t*                     rom;        // pointer to the constant part common to every device which uses this nv
@@ -102,7 +102,7 @@ extern eObool_t eo_nv_hid_isWritable(const EOnv *netvar);
 extern eObool_t eo_nv_hid_isLocal(const EOnv *netvar);
 extern eObool_t eo_nv_hid_isUpdateable(const EOnv *netvar);
 
-
+extern eOresult_t eo_nv_hid_UpdateROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 extern eOresult_t eo_nv_hid_ResetROP(const EOnv *nv, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 extern eOresult_t eo_nv_hid_SetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t *ropdes);
 extern eOresult_t eo_nv_hid_remoteSetROP(const EOnv *nv, const void *dat, eOnvUpdate_t upd, const eOropdescriptor_t* ropdes);

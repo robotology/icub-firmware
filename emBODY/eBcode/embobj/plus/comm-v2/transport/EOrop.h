@@ -112,8 +112,6 @@ typedef enum
 typedef struct      // 04 bytes
 {
     eOnvID32_t      id32;
-//     eObool_t        plustime;
-//     uint8_t         filler[3];
 } eOropSIGcfg_t;    EO_VERIFYsizeof(eOropSIGcfg_t, 4);
 
 
@@ -129,8 +127,30 @@ typedef struct      // 24 bytes
 } eOropdescriptor_t;        //EO_VERIFYsizeof(eOropdescriptor_t, 24); 
 
 
+/** @typedef struct eOrophead_t
+    @brief      contains representation of the binary rop, which is formed by: 
+                head (8B) + data (4nB, optional) + sign (4B, optional) + time (8B, optional)
+ **/
+typedef struct
+{
+    eOropctrl_t     ctrl;
+    eOropcode_t     ropc;
+    uint16_t        dsiz;
+    eOnvID32_t      id32;
+} eOrophead_t;      EO_VERIFYsizeof(eOrophead_t, 8);
+
+
+
+
 // the minimum size is just an header (e.g., the ask command)
-enum { eo_rop_minimumsize = 8 };
+enum { eo_rop_minimumsize = sizeof(eOrophead_t) };
+
+
+typedef enum
+{
+    eo_rop_dir_received     = 0,
+    eo_rop_dir_outgoing     = 1
+} eOropDirection;
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -156,16 +176,12 @@ extern EOrop* eo_rop_New(uint16_t capacity);
 extern eOresult_t eo_rop_Reset(EOrop *p);
 
 
-/** @fn         extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop)
-    @brief      Operates on a EOrop and executes whatever is specified by the ROP. If needed it also prepares a 
-                ROP to send back to the sender. If a reply ROP is needed then the ropcode field shall be a valid one
-                and different from eo_ropcode_none
-    @param      p           The input ROP
-    @param      replyrop    Pointer to a ROP to be sent back to the sender of @e p. If a reply is needed this shall contain
-                            the ROP to use, otherwise a resetted EOrop.
-    @return     Always success unless any argument is NULL.
+/** @fn         extern uint16_t eo_rop_GetSize(EOrop *p)
+    @brief      computes the size of the stream that will come out of rop.
+    @param      rop             The ROP 
+    @return     the size of the stream
  **/
-extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop);
+extern uint16_t eo_rop_GetSize(EOrop *p);
 
 
 /** @fn         extern eOropcode_t eo_rop_GetROPCode(EOrop *p)
@@ -175,14 +191,47 @@ extern eOresult_t eo_rop_Process(EOrop *p, EOrop *replyrop);
  **/
 extern eOropcode_t eo_rop_GetROPcode(EOrop *p);
 
+
+/** @fn         extern uint8_t* eo_rop_GetROPdata(EOrop *p)
+    @brief      Returns the ROP data.
+    @param      p           The EOrop object 
+    @return     The data if the object is valid, or NULL if invalid
+ **/
 extern uint8_t* eo_rop_GetROPdata(EOrop *p);
 
-extern uint16_t eo_rop_ComputeSize(eOropctrl_t ropctrl, eOropcode_t ropc, uint16_t sizeofdata);
 
-extern eOropcode_t eo_rop_ropcode_Get(EOrop *p);
+extern EOnv* eo_rop_GetNV(EOrop *p);
 
-extern eOropconfinfo_t eo_rop_ropconfinfo_Get(EOrop *p);
 
+extern eOropconfinfo_t eo_rop_GetROPconfinfo(EOrop *p);
+
+
+extern eObool_t eo_rop_IsValid(EOrop *p);
+
+
+/** @fn         extern uint16_t eo_rop_compute_size(eOropctrl_t ropctrl, eOropcode_t ropc, uint16_t sizeofdata)
+    @brief      Computes the size of the ROP.
+    @param      ropctrl     The rop control field 
+    @param      ropc        The rop code
+    @param      sizeofdata  The size of data 
+    @return     The size of ROP
+ **/
+extern uint16_t eo_rop_compute_size(eOropctrl_t ropctrl, eOropcode_t ropc, uint16_t sizeofdata);
+
+
+// used when the rop is already built or when we already have a valid head from a stream
+extern eObool_t eo_rop_datafield_is_present(const eOrophead_t *head);
+
+// used when it is necessary to build a rop to transmit and the dsiz field is not yet assigned
+extern eObool_t eo_rop_datafield_is_required(const eOrophead_t *head);
+
+extern uint16_t eo_rop_datafield_effective_size(uint16_t ropdatasize);
+
+extern eObool_t eo_rop_ropcode_is_valid(uint8_t bytewithropcode);
+
+extern eObool_t eo_rop_ropcode_has_data(eOropcode_t ropc);
+
+extern eOnvOwnership_t eo_rop_get_ownership(eOropcode_t ropc, eOropconfinfo_t confinfo, eOropDirection direction);
 
 
 /** @}            

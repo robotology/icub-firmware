@@ -204,7 +204,7 @@ typedef struct
     eOuint32_fp_uint8_uint32_t          getprognumber;      /*< a function which returns a progressive number given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getrom;             /*< a function which returns the .rom part of the NV given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getram;             /*< a function which returns the .ram part of the NV given: (brd, id) */  
-    eObool_fp_uint8_uint32_t            isvarcached;
+    eObool_fp_uint8_uint32_t            isvarproxied;
 } eOprot_nvset_Interface_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -290,7 +290,7 @@ extern eOresult_t eoprot_config_board_local(eOprotBRD_t brd);
 extern eOresult_t eoprot_config_endpoint_entities(eOprotBRD_t brd, eOprotEndpoint_t ep, const uint8_t* numberofentities);
 
 
-extern eOresult_t eoprot_config_cached_variables(eOprotBRD_t brd, eObool_fp_uint32_t isvarcached_fn);
+extern eOresult_t eoprot_config_proxied_variables(eOprotBRD_t brd, eObool_fp_uint32_t isvarproxied_fn);
 
 
 
@@ -335,7 +335,7 @@ extern void* eoprot_variable_ramof_get(eOprotBRD_t brd, eOprotID32_t id);
  **/
 extern uint16_t eoprot_variable_sizeof_get(eOprotBRD_t brd, eOprotID32_t id);
 
-extern eObool_t eoprot_variable_is_cached(eOprotBRD_t brd, eOprotID32_t id);
+extern eObool_t eoprot_variable_is_proxied(eOprotBRD_t brd, eOprotID32_t id);
 
 
 /** @fn         extern void* eoprot_entity_ramof_get(eOprotBRD_t brd, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index)

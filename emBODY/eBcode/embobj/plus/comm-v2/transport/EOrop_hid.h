@@ -45,45 +45,14 @@ extern "C" {
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-
-
-
-
-
-
-typedef struct
-{
-    eOropctrl_t     ctrl;
-    eOropcode_t     ropc;
-    uint16_t        dsiz;
-    eOnvID32_t      id32;
-} eOrophead_t;      EO_VERIFYsizeof(eOrophead_t, 8);
-
-
-EO_VERIFYproposition(eo_rop_minimumsize_verify, (eo_rop_minimumsize == sizeof(eOrophead_t)));
-
-
-typedef enum
-{
-    eo_rop_dir_received     = 0,
-    eo_rop_dir_outgoing     = 1
-} eOropDirection;
+// empty-section
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-
-
-typedef struct
-{   // temporary data used for various purposes, mainly for computing the netvar
-    EOnvSet*            nvset;                  // the used nvset
-    eOnvOwnership_t     nvownership;            // the ownership of the netvar with respect to the user of the rop
-} EOrop_tmpdata_t;
-
-
-/* @struct     EOrop_stream_t
-    @brief      contains representation of the binary rop, whichi is formed by: 
+/* @typedef struct eOropstream_t
+    @brief      contains representation of the binary rop, which is formed by: 
                 head (8B) + data (4nB, optional) + sign (4B, optional) + time (8B, optional)
  **/
 typedef struct
@@ -94,7 +63,7 @@ typedef struct
     uint64_t            time;    
     uint16_t		    capacity;
     uint16_t	        dummy;			
-} EOrop_stream_t;
+} eOropstream_t;
 
 
 /* @struct     EOrop_hid
@@ -102,75 +71,18 @@ typedef struct
  **/
 struct EOrop_hid 
 {
-    EOrop_stream_t      stream;                     // contains the representation of the binary rop. it is created by parser or use by rop
-    EOnv                netvar;                     // it is used by the agent in reception phase but also in transmission phase. it
-    eOropdescriptor_t   ropdes;                     // contains a description of the rop used by the callback funtions of the netvar
+    eOropstream_t       stream;                     // contains the representation of the binary rop. it is created by parser
+    EOnv                netvar;                     // it is used by the agent in reception phase but also in transmission phase. 
+    eOropdescriptor_t   ropdes;                     // contains a description of the rop
 };    
 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern EOnv* eo_rop_hid_NV_Get(EOrop *p);
-
-extern eOnvOwnership_t eo_rop_hid_GetOwnership(eOropcode_t ropc, eOropconfinfo_t confinfo, eOropDirection direction);
-
-extern eObool_t eo_rop_hid_DataField_is_Present(const eOrophead_t *head);
-
-extern eObool_t eo_rop_hid_DataField_is_Required(const eOrophead_t *head);
-
-extern eObool_t eo_rop_hid_OPChasData(eOropcode_t ropc);
-
-extern void	eo_rop_hid_fill_ropdes(eOropdescriptor_t* ropdes, EOrop_stream_t* stream, uint16_t size, uint8_t* data);
-
-// - declaration of extern inline hidden functions --------------------------------------------------------------------
-
-EO_extern_inline uint16_t eo_rop_hid_DataField_EffectiveSize(uint16_t ropdatasize)
-{
-    return(((ropdatasize + 3) >> 2) << 2);
-}
-
-EO_extern_inline eObool_t eo_rop_hid_ropcode_is_valid(uint8_t bytewithropcode)
-{
-    if((bytewithropcode >= (uint8_t)eo_ropcodevalues_numberof) || (bytewithropcode == (uint8_t)eo_ropcode_none))
-    {
-        return(eobool_false);
-    }
-    
-    return(eobool_true);
-}
 
 
-EO_extern_inline eObool_t eo_rop_hid_is_valid(EOrop *p)
-{
-    // verify ropcode
-    if(eobool_false == eo_rop_hid_ropcode_is_valid(p->stream.head.ropc))
-    {
-        return(eobool_false);
-    }
-    
-    eObool_t datasizeispresent = eo_rop_hid_DataField_is_Present(&p->stream.head);
-    eObool_t datafieldisrequired = eo_rop_hid_DataField_is_Required(&p->stream.head);
-    
-    // verify datafield
-    if(eobool_true == datafieldisrequired)
-    {
-        if(eobool_false == datasizeispresent)
-        {
-            return(eobool_false);
-        }
-    }
-    else
-    {
-        if(eobool_true == datasizeispresent)
-        {
-            return(eobool_false);
-        }        
-    }
-    
-    return(eobool_true);
-}
-
+extern void	eo_rop_hid_fill_ropdes(eOropdescriptor_t* ropdes, eOropstream_t* stream, uint16_t size, uint8_t* data);
 
 
 

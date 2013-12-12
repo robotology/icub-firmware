@@ -17,31 +17,32 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCONFIRMATIONMANAGER_H_
-#define _EOCONFIRMATIONMANAGER_H_
+#ifndef _EOPROXY_H_
+#define _EOPROXY_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** @file       EOconfirmationManager.h
-    @brief      This header file implements public interface to ....
+/** @file       EOproxy.h
+    @brief      This header file implements public interface to the parser singleton used for communication protocol
     @author     marco.accame@iit.it
-    @date       02/05/2013
+    @date       12/10/2013
 **/
 
-/** @defgroup eo_confman Object EOconfirmationManager
-    The EOconfirmationManager object is used as ...
-         
+/** @defgroup eo_proxy Object EOproxy
+    The EOproxy is an object used to forward requests to a different device, typically on CAN.
+      
     @{        
  **/
-
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
 #include "EOrop.h"
+#include "EOVmutex.h"
+
 
 
 
@@ -52,64 +53,57 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
-/** @typedef    typedef struct EOconfirmationManager_hid EOconfirmationManager
-    @brief      EOconfirmationManager is an opaque struct. It is used to implement data abstraction for the datagram 
+/** @typedef    typedef struct EOProxy_hid EOproxy
+    @brief      EOproxy is an opaque struct. It is used to implement data abstraction for the proxy  
                 object so that the user cannot see its private fields and he/she is forced to manipulate the
                 object only with the proper public functions. 
  **/  
-typedef struct EOconfirmationManager_hid EOconfirmationManager;
-
+typedef struct EOproxy_hid EOproxy;
 
 typedef enum 
 {
-    eoconfman_mode_disabled     = 0,
-    eoconfman_mode_enabled      = 1   
-} eOconfmanmode_t;
+    eoproxy_mode_disabled   = 0,
+    eoproxy_mode_enabled    = 1   
+} eOproxymode_t;
 
 typedef struct
 {
-    eOconfmanmode_t                 mode;
-    uint16_t                        maxnumberofconfreqrops;
+    eOproxymode_t                   mode;
+    uint16_t                        capacityoflistofropdes;
+    eOreltime_t                     replyroptimeout;            // no timeout if EOK_uint64dummy 
     eov_mutex_fn_mutexderived_new   mutex_fn_new;
-    void (*on_rop_conf_requested)(eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes);
-    void (*on_rop_conf_received)(eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes);
-} eOconfman_cfg_t;
- 
+    void*                           transceiver; // points to a EOtransceiver
+} eOproxy_cfg_t;
+
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-extern const eOconfman_cfg_t eOconfman_cfg_default; 
+// empty-section
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOconfirmationManager* eo_confman_New(const eOconfman_cfg_t *cfg)
-    @brief      Creates a new EOconfirmationManager object
-    @param      cfg     The cfg.
-    @return     The pointer to the required object.
+ 
+/** @fn         extern EOproxy* eo_proxy_New(const eOproxy_cfg_t *cfg)
+    @brief      creates a EOproxy. 
+    @param      cfg         the configuration.
+    @return     A valid and not-NULL pointer to the EOproxy object. NULL only if cfg->mode is eoproxy_mode_disabled
  **/
+extern EOproxy* eo_proxy_New(const eOproxy_cfg_t *cfg);
 
-extern EOconfirmationManager* eo_confman_New(const eOconfman_cfg_t *cfg);
+extern eOresult_t eo_proxy_ROP_Forward(EOproxy *p, EOrop* rop, EOrop* ropout);
 
-extern eOresult_t eo_confman_ConfirmationRequest_Insert(EOconfirmationManager *p, eOropdescriptor_t* ropdesc);
+extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, void *data);
 
-extern eOresult_t eo_confman_ConfirmationRequests_Process(EOconfirmationManager *p, eOipv4addr_t toipaddr);
-
-          
-extern eOresult_t eo_confman_Confirmation_Requested(EOconfirmationManager *p, eOipv4addr_t toipaddr, eOropdescriptor_t* ropdes);
-
-extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, eOipv4addr_t fromipaddr, eOropdescriptor_t* ropdes);
-
-                                                   
+extern eOresult_t eo_proxy_Tick(EOproxy *p);
 
 
 
 
 
 /** @}            
-    end of group eo_confman  
+    end of group eo_proxy  
  **/
 
 #ifdef __cplusplus
@@ -120,4 +114,6 @@ extern eOresult_t eo_confman_Confirmation_Received(EOconfirmationManager *p, eOi
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
 

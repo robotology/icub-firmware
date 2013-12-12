@@ -95,7 +95,7 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
     EO_INIT(.mutex_fn_new)              NULL,
     EO_INIT(.transprotection)           eo_trans_protection_none,
     EO_INIT(.nvsetprotection)           eo_nvset_protection_none,
-    EO_INIT(.confmancfg)                NULL
+    EO_INIT(.proxycfg)                  NULL 
 };
 
 
@@ -108,7 +108,7 @@ const eOboardtransceiver_cfg_t eo_boardtransceiver_cfg_default =
  
 extern EOtheBOARDtransceiver * eo_boardtransceiver_Initialise(const eOboardtransceiver_cfg_t *cfg) 
 {
-    eo_transceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
+    eOtransceiver_cfg_t txrxcfg = eo_transceiver_cfg_default;
     
     if(NULL != s_eo_theboardtrans.transceiver)
     {
@@ -139,18 +139,19 @@ extern EOtheBOARDtransceiver * eo_boardtransceiver_Initialise(const eOboardtrans
     s_eo_theboardtrans.boardnumber = cfg->nvsetdevcfg->boardnum;
     
 
-    txrxcfg.capacityoftxpacket              = cfg->sizes.capacityoftxpacket;
-    txrxcfg.capacityofrop                   = cfg->sizes.capacityofrop;
-    txrxcfg.capacityofropframeregulars      = cfg->sizes.capacityofropframeregulars;
-    txrxcfg.capacityofropframeoccasionals   = cfg->sizes.capacityofropframeoccasionals;
-    txrxcfg.capacityofropframereplies       = cfg->sizes.capacityofropframereplies;
-    txrxcfg.maxnumberofregularrops          = cfg->sizes.maxnumberofregularrops;
-    txrxcfg.remipv4addr                     = cfg->remotehostipv4addr;
-    txrxcfg.remipv4port                     = cfg->remotehostipv4port;
-    txrxcfg.nvset                           = s_eo_theboardtrans.nvset;
-    txrxcfg.confmancfg                      = cfg->confmancfg;
-    txrxcfg.mutex_fn_new                    = cfg->mutex_fn_new;
-    txrxcfg.protection                      = cfg->transprotection;
+    txrxcfg.sizes.capacityoftxpacket            = cfg->sizes.capacityoftxpacket;
+    txrxcfg.sizes.capacityofrop                 = cfg->sizes.capacityofrop;
+    txrxcfg.sizes.capacityofropframeregulars    = cfg->sizes.capacityofropframeregulars;
+    txrxcfg.sizes.capacityofropframeoccasionals = cfg->sizes.capacityofropframeoccasionals;
+    txrxcfg.sizes.capacityofropframereplies     = cfg->sizes.capacityofropframereplies;
+    txrxcfg.sizes.maxnumberofregularrops        = cfg->sizes.maxnumberofregularrops;
+    txrxcfg.remipv4addr                         = cfg->remotehostipv4addr;
+    txrxcfg.remipv4port                         = cfg->remotehostipv4port;
+    txrxcfg.nvset                               = s_eo_theboardtrans.nvset;
+    txrxcfg.confmancfg                          = NULL; // it does not have a confirmation manager cfg->confmancfg;
+    txrxcfg.proxycfg                            = cfg->proxycfg;
+    txrxcfg.mutex_fn_new                        = cfg->mutex_fn_new;
+    txrxcfg.protection                          = cfg->transprotection;
     
     s_eo_theboardtrans.transceiver = eo_transceiver_New(&txrxcfg);
     

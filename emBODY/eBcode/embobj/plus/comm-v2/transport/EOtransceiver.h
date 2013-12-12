@@ -44,6 +44,7 @@ extern "C" {
 #include "EOpacket.h"
 #include "EOnvSet.h"
 #include "EOconfirmationManager.h"
+#include "EOproxy.h"
 #include "EOrop.h"
 #include "EOVmutex.h"
 
@@ -80,45 +81,40 @@ typedef struct
     uint16_t        capacityofropframeoccasionals;
     uint16_t        capacityofropframereplies;
     uint16_t        maxnumberofregularrops;
-    uint16_t        maxnumberofconfreqrops;
-} eo_transceiver_sizes_t; 
+} eOtransceiver_sizes_t; 
 
 
 typedef struct
 {
-    uint16_t                        capacityoftxpacket; 
-    uint16_t                        capacityofrop;    
-    uint16_t                        capacityofropframeregulars; 
-    uint16_t                        capacityofropframeoccasionals;
-    uint16_t                        capacityofropframereplies;
-    uint16_t                        maxnumberofregularrops;
-    uint16_t                        maxnumberofconfreqrops;
+    eOtransceiver_sizes_t           sizes;
     eOipv4addr_t                    remipv4addr;           
     eOipv4port_t                    remipv4port;    
     EOnvSet*                        nvset; 
     eOconfman_cfg_t*                confmancfg;
+    eOproxy_cfg_t*                  proxycfg;
     eov_mutex_fn_mutexderived_new   mutex_fn_new;
     eOtransceiver_protection_t      protection;
-} eo_transceiver_cfg_t;
+} eOtransceiver_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eo_transceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256, 128, 128, 16, EO_COMMON_IPV4ADDR_LOCALHOST, 10001, NULL, NULL};
+extern const eOtransceiver_cfg_t eo_transceiver_cfg_default; //= {512, 128, 256, 128, 128, 16, EO_COMMON_IPV4ADDR_LOCALHOST, 10001, NULL, NULL};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOtransceiver* eo_transceiver_New(uint16_t capacity)
-    @brief      Creates a new frame object and allocates memory able to store @e capacity bytes. If @e capacity is
-                zero, then the object shall have external storage mode.
-    @param      capacity        The max size of the packet.
+/** @fn         extern EOtransceiver* eo_transceiver_New(eOtransceiver_cfg_t 8cfg)
+    @brief      Creates a new transceiver
+    @param      cfg        the configuration.
     @return     The pointer to the required object.
  **/
-extern EOtransceiver* eo_transceiver_New(const eo_transceiver_cfg_t *cfg);
+extern EOtransceiver* eo_transceiver_New(const eOtransceiver_cfg_t *cfg);
 
+
+extern EOnvSet * eo_transceiver_GetNVset(EOtransceiver *p);
 
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime); 
 
@@ -143,7 +139,7 @@ extern eOresult_t eo_transceiver_outpacket_Get(EOtransceiver *p, EOpacket **pkt)
 
 // if the variable is local then it is used the ram of the netvar. if it is remote, the ropdescr must contain data and size
 extern eOresult_t eo_transceiver_OccasionalROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdes);
-
+extern eOresult_t eo_transceiver_ReplyROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdesc);
 
 extern eOresult_t eo_transceiver_RegularROPs_Clear(EOtransceiver *p);
 extern eOresult_t eo_transceiver_RegularROP_Load(EOtransceiver *p, eOropdescriptor_t *ropdes); 

@@ -75,13 +75,15 @@
 
 //static const char s_eobj_ownname[] = "EOreceiver";
 
-const eo_receiver_cfg_t eo_receiver_cfg_default = 
+const eOreceiver_cfg_t eo_receiver_cfg_default = 
 {
-    EO_INIT(.capacityofropframereply)   256, 
-    EO_INIT(.capacityofropinput)        128, 
-    EO_INIT(.capacityofropreply)        128, 
-    EO_INIT(.nvset)                     NULL,
-    EO_INIT(.confmanager)               NULL
+    EO_INIT(.sizes)
+    {
+        EO_INIT(.capacityofropframereply)   256, 
+        EO_INIT(.capacityofropinput)        128, 
+        EO_INIT(.capacityofropreply)        128
+    }, 
+    EO_INIT(.agent)                     NULL
 };
 
 
@@ -92,7 +94,7 @@ const eo_receiver_cfg_t eo_receiver_cfg_default =
 
 
  
-extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
+extern EOreceiver* eo_receiver_New(const eOreceiver_cfg_t *cfg)
 {
     EOreceiver *retptr = NULL;   
 
@@ -106,14 +108,12 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     
     retptr->ropframeinput       = eo_ropframe_New();
     retptr->ropframereply       = eo_ropframe_New();
-    retptr->ropinput            = eo_rop_New(cfg->capacityofropinput);
-    retptr->ropreply            = eo_rop_New(cfg->capacityofropreply);
-    retptr->nvset               = cfg->nvset;
-    retptr->theagent            = eo_agent_Initialise();
-    retptr->confmanager         = cfg->confmanager;
+    retptr->ropinput            = eo_rop_New(cfg->sizes.capacityofropinput);
+    retptr->ropreply            = eo_rop_New(cfg->sizes.capacityofropreply);
+    retptr->agent               = cfg->agent;
     retptr->ipv4addr            = 0;
     retptr->ipv4port            = 0;
-    retptr->bufferropframereply = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->capacityofropframereply, 1);
+    retptr->bufferropframereply = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, cfg->sizes.capacityofropframereply, 1);
     retptr->rx_seqnum           = eok_uint64dummy;
     // now we need to allocate the buffer for the ropframereply
 
@@ -121,14 +121,14 @@ extern EOreceiver* eo_receiver_New(const eo_receiver_cfg_t *cfg)
     memset(&retptr->DEBUG, 0, sizeof(EOreceiverDEBUG_t));
 #endif  
     
-    eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, eo_ropframe_sizeforZEROrops, cfg->capacityofropframereply);
+    eo_ropframe_Load(retptr->ropframereply, retptr->bufferropframereply, eo_ropframe_sizeforZEROrops, cfg->sizes.capacityofropframereply);
     eo_ropframe_Clear(retptr->ropframereply);
     
     return(retptr);
 }
 
 
-extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *nvset, uint16_t *numberofrops, eObool_t *thereisareply, eOabstime_t *transmittedtime)
+extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, uint16_t *numberofrops, eObool_t *thereisareply, eOabstime_t *transmittedtime)
 {
     uint16_t rxremainingbytes = 0;
     uint16_t txremainingbytes = 0;
@@ -138,7 +138,6 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
     uint16_t nrops;
     uint16_t i;
     eOresult_t res;
-    EOnvSet *nvset2use = NULL;
     eOipv4addr_t remipv4addr;
     eOipv4port_t remipv4port;
     uint64_t rec_seqnum;
@@ -150,12 +149,6 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
         return(eores_NOK_nullpointer);
     }
     
-    nvset2use = (NULL != nvset) ? nvset : p->nvset;
-    
-    if(NULL == nvset2use)
-    {
-        return(eores_NOK_nullpointer);
-    }
     
     // clear the ropframereply w/ eo_ropframe_Clear(). the clear operation also makes it safe to manipulate p->ropframereplay with *_quickversion
     
@@ -233,9 +226,8 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
             
             numofprocessedrops++;
 
-            // - use the agent w/ eo_agent_InpROPprocess() and retrieve the ropreply. 
-            //   we need to tell the agent what nvs database we are using and from where the rop is coming             
-            eo_agent_InpROPprocess(p->theagent, p->ropinput, nvset2use, p->confmanager, remipv4addr, p->ropreply);
+            // - use the agent w/ eo_agent_InpROPprocess() and retrieve the ropreply.      
+            eo_agent_InpROPprocess(p->agent, p->ropinput, remipv4addr, p->ropreply);
             
             // - if ropreply is ok w/ eo_rop_GetROPcode() then add it to ropframereply w/ eo_ropframe_ROP_Add()           
             if(eo_ropcode_none != eo_rop_GetROPcode(p->ropreply))
@@ -283,12 +275,14 @@ extern eOresult_t eo_receiver_Process(EOreceiver *p, EOpacket *packet, EOnvSet *
     return(eores_OK);   
 }
 
+
 #if !defined(OVERRIDE_eo_receiver_callback_incaseoferror_in_sequencenumberReceived)
 __weak extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum)
 {
 
 }
 #endif
+
 
 extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply)
 {
@@ -298,8 +292,6 @@ extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply
     }
     
     if(0 == eo_ropframe_ROP_NumberOf(p->ropframereply))
-    // dont use the quickversion because it may be that ropframereply is dummy
-//    if(0 == eo_ropframe_ROP_NumberOf_quickversion(p->ropframereply))
     {
         *ropframereply  = p->ropframereply;
         return(eores_NOK_generic);
@@ -315,7 +307,7 @@ extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 
@@ -323,7 +315,7 @@ extern eOresult_t eo_receiver_GetReply(EOreceiver *p, EOropframe **ropframereply
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
