@@ -94,7 +94,7 @@ struct EOnv_hid                    // 24 bytes ... multiple of 8
 //extern EOnv * eo_nv_hid_New(uint8_t fun, uint8_t typ, uint32_t otherthingsmaybe);
 
 
-extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eObool_t cached, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx);
+extern eOresult_t eo_nv_hid_Load(EOnv *nv, eOipv4addr_t ip, eOnvBRD_t brd, eObool_t proxied, eOnvID32_t id32, EOnv_rom_t* rom, void* ram, EOVmutexDerived* mtx);
 
 extern void eo_nv_hid_Fast_LocalMemoryGet(EOnv *nv, void* dest);
 

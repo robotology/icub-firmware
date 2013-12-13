@@ -92,10 +92,42 @@ typedef struct
  **/
 extern EOproxy* eo_proxy_New(const eOproxy_cfg_t *cfg);
 
+
+/** @fn         extern eOresult_t eo_proxy_ROP_Forward(EOproxy *p, EOrop* rop, EOrop* ropout)
+    @brief      asks the proxy to forward a rop. that is done by calling the update() function of the
+                relevant netvar. if the rop is of kind ask<>, then the ropdescriptor and the netvar are stored
+                inside an internal list and are assigned a timeout. if within the timeout the reply arrives, the user
+                calls eo_proxy_ReplyROP_Load() and the say<> is automatically loaded in the transceiver.
+    @param      p           the object.
+    @param      rop         the rop to forward.
+    @param      ropout      the possible rop to send back (a nak for instance or a ack).
+    @return     eores_NOK_nullpointer if any argument is NULL, eores_NOK_generic if the netvar canot be proxied,
+                or eores_OK on success.    
+ **/
 extern eOresult_t eo_proxy_ROP_Forward(EOproxy *p, EOrop* rop, EOrop* ropout);
 
-extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, void *data);
 
+
+/** @fn         extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, uint32_t signature, void *data)
+    @brief      tells the proxy that a reply has arrived. the ropdescriptor to use is searched inside the object using 
+                two keys: the id32 and the signature. If signature has value EOK_uint32dummy then it is not used.
+    @param      p           the object.
+    @param      id32        the id of the variable.
+    @param      signature   the signature of the rop. if EOK_uint32dummy the signature is not used for teh search 
+    @param      data        the data to be inserted inside the reply rop 
+    @return     eores_NOK_nullpointer if any argument is NULL, eores_NOK_generic if the netvar canot be proxied,
+                or eores_OK on success.    
+ **/
+extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, uint32_t signature, void *data);
+
+
+/** @fn         extern eOresult_t eo_proxy_Tick(EOproxy *p)
+    @brief      it must be called now and then to update the internal list of rop-descriptors waiting to be sent back.
+                it internally retrieves the current time and removes ropdescriptors which has passed beyond timeout.
+    @param      p           the object.
+    @return     eores_NOK_nullpointer if any argument is NULL, eores_NOK_generic if the netvar canot be proxied,
+                or eores_OK on success.    
+ **/
 extern eOresult_t eo_proxy_Tick(EOproxy *p);
 
 

@@ -219,6 +219,16 @@ extern EOnvSet * eo_transceiver_GetNVset(EOtransceiver *p)
     return(p->cfg.nvset);
 }
 
+extern EOproxy * eo_transceiver_GetProxy(EOtransceiver *p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+         
+    return(p->proxy);    
+}
+
 
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime)
 {
@@ -231,6 +241,11 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
     {
         return(eores_NOK_nullpointer);
     }
+    
+    // we tick the proxy to remove timed-out replies enqueued by EOreceiver and not yet
+    // inserted in EOtransmitter with eo_transceiver_ReplyROP_Load() called by eo_proxy_ReplyROP_Load()
+    // if p->proxy is NULL the following call does not harm
+    eo_proxy_Tick(p->proxy);
     
     // remember: we process a packet only if the source ipaddress is the same as in p->cfg.remipv4addr. the source port can be any.
     eo_packet_Addressing_Get(pkt, &remaddr, &remport);

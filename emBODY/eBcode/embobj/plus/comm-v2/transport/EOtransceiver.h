@@ -116,6 +116,8 @@ extern EOtransceiver* eo_transceiver_New(const eOtransceiver_cfg_t *cfg);
 
 extern EOnvSet * eo_transceiver_GetNVset(EOtransceiver *p);
 
+extern EOproxy * eo_transceiver_GetProxy(EOtransceiver *p);
+
 extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16_t *numberofrops, eOabstime_t* txtime); 
 
 /** @fn         extern eOresult_t eo_transceiver_outpacket_Prepare(EOtransceiver *p, uint16_t *numberofrops)

@@ -79,6 +79,12 @@ typedef struct              // 24+24=48
     EOnv                    nv;
 } eo_proxy_ropdes_plus_t;
 
+typedef struct
+{
+    uint32_t    id32;
+    uint32_t    sign;
+} eo_proxy_search_key_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -194,10 +200,14 @@ extern eOresult_t eo_proxy_ROP_Forward(EOproxy *p, EOrop* rop, EOrop* ropout)
     return(res);
 }
 
-extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, void *data)
+extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, uint32_t signature, void *data)
 {
     eOresult_t res = eores_NOK_generic;
     
+    eo_proxy_search_key_t skey;
+    skey.id32 = id32;
+    skey.sign = signature;
+        
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -205,7 +215,7 @@ extern eOresult_t eo_proxy_ReplyROP_Load(EOproxy *p, eOnvID32_t id32, void *data
         
     eov_mutex_Take(p->mtx, eok_reltimeINFINITE);
     
-    EOlistIter* li = eo_list_Find(p->listofropdes, s_matching_rule_id32, &id32);
+    EOlistIter* li = eo_list_Find(p->listofropdes, s_matching_rule_id32, &skey);
 
     if(NULL == li)
     {   // there is no entry with id32 in the list ... i dont load any reply rop
@@ -239,7 +249,7 @@ extern eOresult_t eo_proxy_Tick(EOproxy *p)
         return(eores_NOK_nullpointer);
     }
     
-    eOreltime_t timenow = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    eOabstime_t timenow = eov_sys_LifeTimeGet(eov_sys_GetHandle());
     
     eov_mutex_Take(p->mtx, eok_reltimeINFINITE);
     
@@ -314,12 +324,13 @@ static eOresult_t s_eo_proxy_forward_ask(EOproxy *p, EOrop *rop, EOrop *ropout)
     eOropdescriptor_t* ropdes = &rop->ropdes;
     eOresult_t res = eores_NOK_generic;
     eo_proxy_ropdes_plus_t ropdesplus;
+    eOabstime_t timenow = eov_sys_LifeTimeGet(eov_sys_GetHandle());;
      
     eov_mutex_Take(p->mtx, eok_reltimeINFINITE);
     
     if(eobool_true != eo_list_Full(p->listofropdes))
     {   // we can process the ask        
-        res = eo_nv_hid_UpdateROP(nv, eo_nv_upd_always, ropdes);       
+        res = eores_OK;       
     }
     else
     {
@@ -364,7 +375,7 @@ static eOresult_t s_eo_proxy_forward_ask(EOproxy *p, EOrop *rop, EOrop *ropout)
     ropdesplus.ropdes.time              =  p->config.replyroptimeout;
     if(EOK_uint64dummy != p->config.replyroptimeout)
     {
-        ropdesplus.ropdes.time += eov_sys_LifeTimeGet(eov_sys_GetHandle());
+        ropdesplus.ropdes.time += timenow;
     }   
 
     // we copy the nv
@@ -374,7 +385,11 @@ static eOresult_t s_eo_proxy_forward_ask(EOproxy *p, EOrop *rop, EOrop *ropout)
     // since the timeouts  are all equal, i just append the item at the end of the list
     eo_list_PushBack(p->listofropdes, &ropdesplus);
      
-    eov_mutex_Release(p->mtx);    
+    eov_mutex_Release(p->mtx); 
+
+    // now we update the nv. it is in here so that inside the callback we can send the reply
+    res = eo_nv_hid_UpdateROP(nv, eo_nv_upd_always, ropdes);
+    
     return(res);
 }
 
@@ -382,9 +397,10 @@ static eOresult_t s_eo_proxy_forward_ask(EOproxy *p, EOrop *rop, EOrop *ropout)
 static eOresult_t s_matching_rule_id32(void *item, void *param)
 {
     eo_proxy_ropdes_plus_t *inside = (eo_proxy_ropdes_plus_t*)item;
-    eOnvID32_t *id32ptr = (eOnvID32_t*)param;
+    eo_proxy_search_key_t *skeyptr = (eo_proxy_search_key_t*)param;
+    uint32_t insidesignature = (EOK_uint32dummy == skeyptr->sign) ? (EOK_uint32dummy) : (inside->ropdes.signature);
 
-    if(inside->ropdes.id32 == *id32ptr)
+    if((inside->ropdes.id32 == skeyptr->id32) && (insidesignature == skeyptr->sign))
     {
         return(eores_OK);
     }
