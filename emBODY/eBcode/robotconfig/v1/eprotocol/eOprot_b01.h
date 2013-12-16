@@ -85,12 +85,12 @@ enum { eoprot_b01_mc_joints_numberof = 4, eoprot_b01_mc_motors_numberof = 4, eop
 /** @typedef    typedef struct eOprot_b01_motioncontrol_t;
     @brief      It is the container of joints, motors, controllers in the motion control endpoint of board eb1.
  **/
-typedef struct                  // 152*4+40*4+24 = 792              
+typedef struct                  // 152*4+40*4+16 = 784              
 {
     eOmc_joint_t                joints[eoprot_b01_mc_joints_numberof]; 
     eOmc_motor_t                motors[eoprot_b01_mc_motors_numberof];
     eOmc_controller_t           thecontroller;
-} eOprot_b01_motioncontrol_t;   //EO_VERIFYsizeof(eOprot_b01_motioncontrol_t, 792);      
+} eOprot_b01_motioncontrol_t;   EO_VERIFYsizeof(eOprot_b01_motioncontrol_t, 784);      
 
 
 

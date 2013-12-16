@@ -17,23 +17,23 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOPROT_B02_H_
-#define _EOPROT_B02_H_
+#ifndef _EOPROT_B07_H_
+#define _EOPROT_B07_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/** @file       eOprot_b02.h          
-	@brief      This header file contains protocol personalisation for board eb2 (left arm, lower) and its interface
+/** @file       eOprot_b07.h          
+	@brief      This header file contains protocol personalisation for board eb6 (left leg, lower) and its interface
                 towards EOnvset.
 	@author     marco.accame@iit.it
 	@date       06/06/2013
 **/
 
-/** @defgroup doxy_eOprot_b02 Configuration of protocol for board eb2 (left lower arm)
-    It contains protocol personalisation for board eb2 (left arm, lower) and its interface towards EOnvset 
+/** @defgroup doxy_eOprot_b07 Configuration of protocol for board eb7 (left lower leg)
+    It contains protocol personalisation for board eb7 (left leg, lower) and its interface towards EOnvset 
     
     @{		
  **/
@@ -49,7 +49,6 @@ extern "C" {
 #include "EoProtocolAS.h"
 #include "EoProtocolMC.h"
 #include "EoProtocolMN.h"
-#include "EoProtocolSK.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -57,102 +56,86 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-enum { eoprot_b02_boardnumber = 1 }; 
+enum { eoprot_b07_boardnumber = 6 }; 
 
 
-enum { eoprot_b02_endpoints_numberof = 4 };
+enum { eoprot_b07_endpoints_numberof = 3 };
 
 
 // - management
 
-enum { eoprot_b02_mn_comms_numberof = 1, eoprot_b02_mn_appls_numberof = 1 };
+enum { eoprot_b07_mn_comms_numberof = 1, eoprot_b07_mn_appls_numberof = 1 };
 
 
-/** @typedef    typedef struct eOprot_b02_management_t;
-    @brief      It is the container of entities comm and app in the management endpoint of board b02.
+/** @typedef    typedef struct eOprot_b07_management_t;
+    @brief      It is the container of entities comm and app in the management endpoint of board b07.
  **/
 typedef struct                  // 124+24+0 = 128              
 {
     eOmn_comm_t                 communication; 
     eOmn_appl_t                 application;
-} eOprot_b02_management_t;      //EO_VERIFYsizeof(eOprot_b02_management_t, 128); 
+} eOprot_b07_management_t;      //EO_VERIFYsizeof(eOprot_b07_management_t, 128); 
 
 
 // - motion control
 
-enum { eoprot_b02_mc_joints_numberof = 12, eoprot_b02_mc_motors_numberof = 12, eoprot_b02_mc_controllers_numberof = 1 };
+enum { eoprot_b07_mc_joints_numberof = 2, eoprot_b07_mc_motors_numberof = 2, eoprot_b07_mc_controllers_numberof = 1 };
 
  
-/** @typedef    typedef struct eOprot_b02_motioncontrol_t;
+/** @typedef    typedef struct eOprot_b07_motioncontrol_t;
     @brief      It is the container of joints, motors, controllers in the motion control endpoint of board eb1.
  **/
-typedef struct                  // 152*12+40*12+16 = 2320            
+typedef struct                  // 152*2+40*2+16 = 400              
 {
-    eOmc_joint_t                joints[eoprot_b02_mc_joints_numberof]; 
-    eOmc_motor_t                motors[eoprot_b02_mc_motors_numberof];
+    eOmc_joint_t                joints[eoprot_b07_mc_joints_numberof]; 
+    eOmc_motor_t                motors[eoprot_b07_mc_motors_numberof];
     eOmc_controller_t           thecontroller;
-} eOprot_b02_motioncontrol_t;   //EO_VERIFYsizeof(eOprot_b02_motioncontrol_t, 2320);      
+} eOprot_b07_motioncontrol_t;   //EO_VERIFYsizeof(eOprot_b07_motioncontrol_t, 400);      
 
 
 
 // - analog sensors
 
-enum { eoprot_b02_as_strains_numberof = 0, eoprot_b02_as_maises_numberof = 1, eoprot_b02_as_extorque_numberof = 12 };
+enum { eoprot_b07_as_strains_numberof = 0, eoprot_b07_as_maises_numberof = 0, eoprot_b07_as_extorque_numberof = 2 };
          
 
-/** @typedef    typedef struct eOprot_b02_analogsensors_t;
-    @brief      It is the container of strain, mais in the analog sensors endpoint of board eb1.
+/** @typedef    typedef struct eOprot_b07_analogsensors_t;
+    @brief      It is the container of strain, mais in the analog sensors endpoint.
  **/
-typedef struct                  // 48+12*8+0 = 144             
+typedef struct                  // 2*8+0 = 16              
 {
-    eOas_mais_t                 mais; 
-    eOas_extorque_t             extorque[eoprot_b02_as_extorque_numberof];
-} eOprot_b02_analogsensors_t;   //EO_VERIFYsizeof(eOprot_b02_analogsensors_t, 144); 
-
-
-// - skin
-
-enum { eoprot_b02_sk_skins_numberof = 1 };
-            
-
-/** @typedef    typedef struct eOprot_b02_skin_t;
-    @brief      It is the container of skins in the skin endpoint of board eb2.
- **/
-typedef struct                  // 176+0 = 176              
-{
-    eOsk_skin_t                 skin; 
-} eOprot_b02_skin_t;            //EO_VERIFYsizeof(eOprot_b02_skin_t, 176); 
+    eOas_extorque_t             extorque[eoprot_b07_as_extorque_numberof];
+} eOprot_b07_analogsensors_t;   //EO_VERIFYsizeof(eOprot_b07_analogsensors_t, 16); 
 
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 // the configuration for the EOnvset object for protocol management
-extern const eOnvset_DEVcfg_t eoprot_b02_nvsetDEVcfg;
+extern const eOnvset_DEVcfg_t eoprot_b07_nvsetDEVcfg;
 
-extern const uint8_t eoprot_b02_mn_entities_numberofeach[]; // = { eoprot_b02_mn_comms_numberof, eoprot_b02_mn_appls_numberof };
-extern const uint8_t eoprot_b02_mc_entities_numberofeach[]; // = { eoprot_b02_mc_joints_numberof, eoprot_b02_mc_motors_numberof, eoprot_b02_mc_controllers_numberof };
-extern const uint8_t eoprot_b02_as_entities_numberofeach[]; // = { eoprot_b02_as_strains_numberof, eoprot_b02_as_maises_numberof, eoprot_b02_as_extorque_numberof };
-extern const uint8_t eoprot_b02_sk_entities_numberofeach[]; // = { eoprot_b02_sk_skins_numberof };
+extern const uint8_t eoprot_b07_mn_entities_numberofeach[]; // = { eoprot_b07_mn_comms_numberof, eoprot_b07_mn_appls_numberof };
+extern const uint8_t eoprot_b07_mc_entities_numberofeach[]; // = { eoprot_b07_mc_joints_numberof, eoprot_b07_mc_motors_numberof, eoprot_b07_mc_controllers_numberof };
+extern const uint8_t eoprot_b07_as_entities_numberofeach[]; // = { eoprot_b07_as_strains_numberof, eoprot_b07_as_maises_numberof, eoprot_b07_as_extorque_numberof };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
+/** @fn         extern eOresult_t eoprot_b07_Initialise(eObool_t islocal)
     @brief      Initialises the endpoints of this board by loading the number of 
                 entities for each of them in the related endpoint file. As a result of that, 
                 the functions which require a brd argument will return the correct value if called 
-                with brd = eoprot_b01_boardnumber.
+                with brd = eoprot_b07_boardnumber.
                 This function is called by the EOnvset because the eOnvset_DEVcfg_t contains a 
                 pointer to it.  However, it is made public so that it can be called independently 
                 from the use of EOnvset.
     @return     eores_OK if successful or eores_NOK_generic upon failure.
  **/
-extern eOresult_t eoprot_b02_Initialise(eObool_t islocal);
+extern eOresult_t eoprot_b07_Initialise(eObool_t islocal);
 
 
 
 /** @}            
-    end of group doxy_eOprot_b02  
+    end of group doxy_eOprot_b07  
  **/
 
 #ifdef __cplusplus

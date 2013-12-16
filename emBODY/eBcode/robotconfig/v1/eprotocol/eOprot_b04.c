@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOprot_b02.c
+/* @file       eOprot_b04.c
     @brief      This file keeps ...
     @author     marco.accame@iit.it
     @date       06/06/2013
@@ -48,7 +48,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOprot_b02.h"
+#include "eOprot_b04.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-EO_VERIFYproposition(eoprot_b02_gasdfe, eoprot_boards_maxnumberof > eoprot_b02_boardnumber);
+EO_VERIFYproposition(eoprot_b04_gasdfe, eoprot_boards_maxnumberof > eoprot_b04_boardnumber);
 
 
 
@@ -75,9 +75,9 @@ EO_VERIFYproposition(eoprot_b02_gasdfe, eoprot_boards_maxnumberof > eoprot_b02_b
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep);
+static uint16_t s_eoprot_b04_ep2index(eOnvEP8_t ep);
 
-static eObool_t s_eoprot_b02_isvariableproxied(eOnvID32_t id);
+static eObool_t s_eoprot_b04_isvariableproxied(eOnvID32_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,12 +85,12 @@ static eObool_t s_eoprot_b02_isvariableproxied(eOnvID32_t id);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
+static const eOnvset_EPcfg_t s_eoprot_b04_theEPcfgs[] =
 {  
     {   // management
         EO_INIT(.endpoint)                          eoprot_endpoint_management,
         EO_INIT(.dummy)                             0,
-        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_management_t),
+        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b04_management_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_mn,
         EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface        
     },        
@@ -98,7 +98,7 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
     {   // motion-control         
         EO_INIT(.endpoint)                          eoprot_endpoint_motioncontrol,
         EO_INIT(.dummy)                             0,
-        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_motioncontrol_t),
+        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b04_motioncontrol_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_mc,
         EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface        
     },
@@ -106,7 +106,7 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
     {   // analog-sensors         
         EO_INIT(.endpoint)                          eoprot_endpoint_analogsensors,
         EO_INIT(.dummy)                             0,
-        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_analogsensors_t),
+        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b04_analogsensors_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_as,
         EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface        
     },
@@ -114,20 +114,20 @@ static const eOnvset_EPcfg_t s_eoprot_b02_theEPcfgs[] =
     {   // skin         
         EO_INIT(.endpoint)                          eoprot_endpoint_skin,
         EO_INIT(.dummy)                             0,
-        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b02_skin_t),
+        EO_INIT(.epram_sizeof)                      sizeof(eOprot_b04_skin_t),
         EO_INIT(.fptr_ram_initialise)               eoprot_fun_INITIALISE_sk,
         EO_INIT(.protif)                            (eOnvset_protocol_Interface_t*)&eoprot_eonvset_Interface             
     }     
     
-};  EO_VERIFYsizeof(s_eoprot_b02_theEPcfgs, sizeof(eOnvset_EPcfg_t)*(eoprot_b02_endpoints_numberof));
+};  EO_VERIFYsizeof(s_eoprot_b04_theEPcfgs, sizeof(eOnvset_EPcfg_t)*(eoprot_b04_endpoints_numberof));
 
 
 
-static const EOconstvector s_eoprot_b02_constvectofEPcfg = 
+static const EOconstvector s_eoprot_b04_constvectofEPcfg = 
 {
-    EO_INIT(.size)                  sizeof(s_eoprot_b02_theEPcfgs)/sizeof(const eOnvset_EPcfg_t),
+    EO_INIT(.size)                  sizeof(s_eoprot_b04_theEPcfgs)/sizeof(const eOnvset_EPcfg_t),
     EO_INIT(.item_size)             sizeof(eOnvset_EPcfg_t),
-    EO_INIT(.item_array_data)       s_eoprot_b02_theEPcfgs
+    EO_INIT(.item_array_data)       s_eoprot_b04_theEPcfgs
 };
 
 
@@ -136,40 +136,40 @@ static const EOconstvector s_eoprot_b02_constvectofEPcfg =
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOnvset_DEVcfg_t eoprot_b02_nvsetDEVcfg =
+const eOnvset_DEVcfg_t eoprot_b04_nvsetDEVcfg =
 {
-    EO_INIT(.boardnum)                  eoprot_b02_boardnumber,
+    EO_INIT(.boardnum)                  eoprot_b04_boardnumber,
     EO_INIT(.dummy)                     {0, 0, 0},
-    EO_INIT(.fptr_device_initialise)    eoprot_b02_Initialise,     
-    EO_INIT(.vectorof_epcfg)            &s_eoprot_b02_constvectofEPcfg,
-    EO_INIT(.fptr_ep2indexofepcfg)      s_eoprot_b02_ep2index
+    EO_INIT(.fptr_device_initialise)    eoprot_b04_Initialise,     
+    EO_INIT(.vectorof_epcfg)            &s_eoprot_b04_constvectofEPcfg,
+    EO_INIT(.fptr_ep2indexofepcfg)      s_eoprot_b04_ep2index
 };
 
 
 
-const uint8_t eoprot_b02_mn_entities_numberofeach[eomn_entities_numberof] = 
+const uint8_t eoprot_b04_mn_entities_numberofeach[eomn_entities_numberof] = 
 { 
-    eoprot_b02_mn_comms_numberof, 
-    eoprot_b02_mn_appls_numberof
+    eoprot_b04_mn_comms_numberof, 
+    eoprot_b04_mn_appls_numberof
 };
 
-const uint8_t eoprot_b02_mc_entities_numberofeach[eomc_entities_numberof] = 
+const uint8_t eoprot_b04_mc_entities_numberofeach[eomc_entities_numberof] = 
 { 
-    eoprot_b02_mc_joints_numberof, 
-    eoprot_b02_mc_motors_numberof, 
-    eoprot_b02_mc_controllers_numberof
+    eoprot_b04_mc_joints_numberof, 
+    eoprot_b04_mc_motors_numberof, 
+    eoprot_b04_mc_controllers_numberof
 };
 
-const uint8_t eoprot_b02_as_entities_numberofeach[eoas_entities_numberof] = 
+const uint8_t eoprot_b04_as_entities_numberofeach[eoas_entities_numberof] = 
 { 
-    eoprot_b02_as_strains_numberof, 
-    eoprot_b02_as_maises_numberof,
-    eoprot_b02_as_extorque_numberof
+    eoprot_b04_as_strains_numberof, 
+    eoprot_b04_as_maises_numberof,
+    eoprot_b04_as_extorque_numberof
 };
 
-const uint8_t eoprot_b02_sk_entities_numberofeach[eosk_entities_numberof] = 
+const uint8_t eoprot_b04_sk_entities_numberofeach[eosk_entities_numberof] = 
 { 
-    eoprot_b02_sk_skins_numberof
+    eoprot_b04_sk_skins_numberof
 };
 
 
@@ -178,20 +178,20 @@ const uint8_t eoprot_b02_sk_entities_numberofeach[eosk_entities_numberof] =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
+extern eOresult_t eoprot_b04_Initialise(eObool_t islocal)
 {
     // must initialise the mc, the mn, the ...
     
-    eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_management, eoprot_b02_mn_entities_numberofeach);
-    eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_motioncontrol, eoprot_b02_mc_entities_numberofeach);
-    eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_analogsensors, eoprot_b02_as_entities_numberofeach);
-    eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_skin, eoprot_b02_sk_entities_numberofeach);
+    eoprot_config_endpoint_entities(eoprot_b04_boardnumber, eoprot_endpoint_management, eoprot_b04_mn_entities_numberofeach);
+    eoprot_config_endpoint_entities(eoprot_b04_boardnumber, eoprot_endpoint_motioncontrol, eoprot_b04_mc_entities_numberofeach);
+    eoprot_config_endpoint_entities(eoprot_b04_boardnumber, eoprot_endpoint_analogsensors, eoprot_b04_as_entities_numberofeach);
+    eoprot_config_endpoint_entities(eoprot_b04_boardnumber, eoprot_endpoint_skin, eoprot_b04_sk_entities_numberofeach);
     
-    eoprot_config_proxied_variables(eoprot_b02_boardnumber, s_eoprot_b02_isvariableproxied);
+    eoprot_config_proxied_variables(eoprot_b04_boardnumber, s_eoprot_b04_isvariableproxied);
     
     if(eobool_true == islocal)
     {
-        eoprot_config_board_local(eoprot_b02_boardnumber);
+        eoprot_config_board_local(eoprot_b04_boardnumber);
     }
     
     return(eores_OK);
@@ -209,14 +209,14 @@ extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-EO_VERIFYproposition(s_eoprot_b02_mn_val, 0 == eoprot_endpoint_management);
-EO_VERIFYproposition(s_eoprot_b02_mc_val, 1 == eoprot_endpoint_motioncontrol);
-EO_VERIFYproposition(s_eoprot_b02_as_val, 2 == eoprot_endpoint_analogsensors);
-EO_VERIFYproposition(s_eoprot_b02_sk_val, 3 == eoprot_endpoint_skin);
+EO_VERIFYproposition(s_eoprot_b04_mn_val, 0 == eoprot_endpoint_management);
+EO_VERIFYproposition(s_eoprot_b04_mc_val, 1 == eoprot_endpoint_motioncontrol);
+EO_VERIFYproposition(s_eoprot_b04_as_val, 2 == eoprot_endpoint_analogsensors);
+EO_VERIFYproposition(s_eoprot_b04_sk_val, 3 == eoprot_endpoint_skin);
 
-static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep)
+static uint16_t s_eoprot_b04_ep2index(eOnvEP8_t ep)
 {    
-    if(ep < eoprot_b02_endpoints_numberof)
+    if(ep < eoprot_b04_endpoints_numberof)
     {
         return(ep);
     }
@@ -224,7 +224,7 @@ static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep)
 }
 
 
-static eObool_t s_eoprot_b02_isvariableproxied(eOnvID32_t id)
+static eObool_t s_eoprot_b04_isvariableproxied(eOnvID32_t id)
 {    
     eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
     if(eoprot_endpoint_motioncontrol == ep)
