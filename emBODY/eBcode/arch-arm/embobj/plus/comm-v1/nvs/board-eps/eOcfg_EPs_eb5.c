@@ -126,7 +126,7 @@ static const eOnvscfg_EP_t s_eo_cfg_EPs_vectorof_eb5_data[] =
         EO_INIT(.endpoint_data_retrieve)            s_eocfg_eps_ebx_ram_retrieve
     },      
 
-    {   // mc-leftleg-lower
+    {   // mc-torso
         EO_INIT(.endpoint)                          endpoint_mc_torso,
         EO_INIT(.sizeof_endpoint_data)              sizeof(eo_cfg_nvsEP_mc_torso_t),
         EO_INIT(.hashfunction_id2index)             eo_cfg_nvsEP_mc_torso_hashfunction_id2index,
