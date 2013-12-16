@@ -104,8 +104,8 @@ const eOprot_nvset_Interface_t eoprot_eonvset_Interface =
     EO_INIT(.loadram)               eoprot_config_endpoint_ram,
     EO_INIT(.getvarsnumberof)       s_eoprot_endpoint_numberofvariables_get,       
     EO_INIT(.isidsupported)         eoprot_id_isvalid,     
-    EO_INIT(.getid)                 eoprot_prognum2id,            
-    EO_INIT(.getprognumber)         eoprot_id2prognum,     
+    EO_INIT(.epgetid)               eoprot_endpoint_prognum2id,            
+    EO_INIT(.epgetprognumber)       eoprot_endpoint_id2prognum,     
     EO_INIT(.getrom)                s_eoprot_eonvrom_get,             
     EO_INIT(.getram)                eoprot_variable_ramof_get,
     EO_INIT(.isvarproxied)          eoprot_variable_is_proxied    
@@ -500,7 +500,7 @@ extern eObool_t eoprot_id_isvalid(eOprotBRD_t brd, eOnvID32_t id)
 }
 
 
-extern eOprotID32_t eoprot_prognum2id(eOprotBRD_t brd, eOprotEndpoint_t ep, eOprotProgNumber_t prog)
+extern eOprotID32_t eoprot_endpoint_prognum2id(eOprotBRD_t brd, eOprotEndpoint_t ep, eOprotProgNumber_t prog)
 {
     eOprotTag_t tag = 0xff;
     eOprotIndex_t index = 0xff;
@@ -540,7 +540,7 @@ extern eOprotID32_t eoprot_prognum2id(eOprotBRD_t brd, eOprotEndpoint_t ep, eOpr
 }
 
 
-extern eOprotProgNumber_t eoprot_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
+extern eOprotProgNumber_t eoprot_endpoint_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
 {
     eOprotProgNumber_t prog = 0;
     
@@ -571,12 +571,23 @@ extern eOprotProgNumber_t eoprot_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
     {   // we add all the tags in the entities below
         prog += (eoprot_ep_tags_numberof[epi][i] * eoprot_board_numberofeachentity[brd][epi][i]);
     }
-    // then we add only the tags of the entities equal to the current one + the progessive number of the tag
+    // then we add only the tags of the entities equal to the current one + the progressive number of the tag
     prog += (index*eoprot_ep_tags_numberof[epi][entity] + s_eoprot_rom_get_prognum(id));
 
     return(prog);
 }    
 
+#warning --> IF NEEDED, WRITE FUNCTIONS WHICH CONVERT FROM ID32 to PROG and vice-versa
+extern eOprotID32_t eoprot_prognum2id(eOprotBRD_t brd, eOprotProgNumber_t prog)
+{
+    return(EOK_uint32dummy);   
+}
+
+
+extern eOprotProgNumber_t eoprot_id2prognum(eOprotBRD_t brd, eOprotID32_t id)
+{
+    return(EOK_uint32dummy);
+}    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

@@ -85,8 +85,8 @@ typedef struct
     eOres_fp_uint8_uint8_voidp_uint16_t loadram;            /*< a function which loads the ram of the endpoint given: (brd, ep, ram, sizeof) */
     eOuint16_fp_uint8_uint8_t           getvarsnumberof;    /*< a function which returns the total number of variables given: (brd, ep) */
     eObool_fp_uint8_uint32_t            isidsupported;      /*< a function which tells if the id is supported given: (brd, id) */
-    eOuint32_fp_uint8_uint8_uint32_t    getid;              /*< a function which returns the full ID given: (brd, ep, prognumber)  */
-    eOuint32_fp_uint8_uint32_t          getprognumber;      /*< a function which returns a progressive number given: (brd, id) */
+    eOuint32_fp_uint8_uint8_uint32_t    epgetid;              /*< a function which returns the full ID given: (brd, ep, prognumber)  */
+    eOuint32_fp_uint8_uint32_t          epgetprognumber;      /*< a function which returns a progressive number given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getrom;             /*< a function which returns the .rom part of the NV given: (brd, id) */
     eOvoidp_fp_uint8_uint32_t           getram; 
     eObool_fp_uint8_uint32_t            isvarproxied;       /*< a function which tells if the var is proxied given: (brd, id) */    

@@ -106,7 +106,7 @@ struct EOnvSet_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern eOnvPROGnum_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32);
+extern eOnvPROGnum_t eo_nvset_hid_EPprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32);
 
 
 

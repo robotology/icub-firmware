@@ -303,7 +303,7 @@ extern eOresult_t eo_nvset_NVSinitialise(EOnvSet* p)
                 
                 prog = k;
                 // - 0. the id32 
-                id32 = (*theEndpoint)->epcfg.protif->getid(brd, ep08, prog);    
+                id32 = (*theEndpoint)->epcfg.protif->epgetid(brd, ep08, prog);    
                 if(EOK_uint32dummy == id32)
                 {
                     continue;
@@ -491,7 +491,7 @@ extern eOresult_t eo_nvset_NV_Get(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32, 
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOnvPROGnum_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32)
+extern eOnvPROGnum_t eo_nvset_hid_EPprogressivenumber(EOnvSet* p, eOipv4addr_t ip, eOnvID32_t id32)
 {
     eOnvset_dev_t* theDevice = NULL;
     eOnvset_ep_t* theEndpoint = NULL;
@@ -509,12 +509,12 @@ extern eOnvPROGnum_t eo_nvset_hid_NVprogressivenumber(EOnvSet* p, eOipv4addr_t i
         return(EOK_uint32dummy);
     }
     
-    if(NULL == theEndpoint->epcfg.protif->getprognumber)
+    if(NULL == theEndpoint->epcfg.protif->epgetprognumber)
     {
         return(EOK_uint32dummy);
     }
     
-    return(theEndpoint->epcfg.protif->getprognumber(theDevice->boardnum, id32));
+    return(theEndpoint->epcfg.protif->epgetprognumber(theDevice->boardnum, id32));
 }
 
 extern uint16_t eo_nvset_hid_ip2index(EOnvSet* p, eOipv4addr_t ip)
@@ -568,7 +568,7 @@ static EOVmutexDerived* s_eo_nvset_get_nvmutex(EOnvSet* p, eOnvset_dev_t* thedev
             case eo_nvset_protection_one_per_netvar:
             {
                 //#warning .... i think of void* as a uint32_t*
-                uint32_t nvprognumber = theendpoint->epcfg.protif->getprognumber(thedevice->boardnum, id32);
+                uint32_t nvprognumber = theendpoint->epcfg.protif->epgetprognumber(thedevice->boardnum, id32);
                 uint32_t** addr = eo_vector_At(theendpoint->themtxofthenvs, nvprognumber);
                 mtx2use = (EOVmutexDerived*) (*addr);
             } break;  
