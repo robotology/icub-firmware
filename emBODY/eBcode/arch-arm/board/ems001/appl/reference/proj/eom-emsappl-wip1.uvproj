@@ -518,11 +518,6 @@
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
-              <FileName>EONtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
-            </File>
-            <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
@@ -863,6 +858,11 @@
           <GroupName>eo-comm-v2-transport</GroupName>
           <Files>
             <File>
+              <FileName>EOagent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+            </File>
+            <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
@@ -883,6 +883,11 @@
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
+              <FileName>EOproxy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+            </File>
+            <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
@@ -896,11 +901,6 @@
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheAgent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
@@ -941,6 +941,41 @@
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b03.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b05.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b06.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b08.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b09.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1007,11 +1042,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtocolEPmc_fun_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\EoProtocolEPmc_fun_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>nee</GroupName>
           <Files>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
@@ -1512,11 +1557,6 @@
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
-              <FileName>EONtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
-            </File>
-            <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
@@ -1857,6 +1897,11 @@
           <GroupName>eo-comm-v2-transport</GroupName>
           <Files>
             <File>
+              <FileName>EOagent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+            </File>
+            <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
@@ -1877,6 +1922,11 @@
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
+              <FileName>EOproxy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+            </File>
+            <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
@@ -1890,11 +1940,6 @@
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheAgent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
@@ -1935,6 +1980,41 @@
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b03.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b05.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b06.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b08.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b09.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2001,11 +2081,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtocolEPmc_fun_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\EoProtocolEPmc_fun_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>nee</GroupName>
           <Files>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
@@ -2506,11 +2596,6 @@
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
-              <FileName>EONtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
-            </File>
-            <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
@@ -2851,6 +2936,11 @@
           <GroupName>eo-comm-v2-transport</GroupName>
           <Files>
             <File>
+              <FileName>EOagent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+            </File>
+            <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
@@ -2871,6 +2961,11 @@
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
+              <FileName>EOproxy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+            </File>
+            <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
@@ -2884,11 +2979,6 @@
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheAgent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
@@ -2929,6 +3019,41 @@
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b03.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b05.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b06.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b08.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b09.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2995,11 +3120,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtocolEPmc_fun_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\EoProtocolEPmc_fun_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>nee</GroupName>
           <Files>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
@@ -3500,11 +3635,6 @@
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
-              <FileName>EONtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
-            </File>
-            <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
@@ -3845,6 +3975,11 @@
           <GroupName>eo-comm-v2-transport</GroupName>
           <Files>
             <File>
+              <FileName>EOagent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+            </File>
+            <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
@@ -3865,6 +4000,11 @@
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
+              <FileName>EOproxy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+            </File>
+            <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
@@ -3878,11 +4018,6 @@
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheAgent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheAgent.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
@@ -3923,6 +4058,41 @@
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b03.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b05.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b06.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b08.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b09.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3989,11 +4159,21 @@
               <FileType>1</FileType>
               <FilePath>..\app_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtocolEPmc_fun_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app_cfg\EoProtocolEPmc_fun_overridden.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>nee</GroupName>
           <Files>
+            <File>
+              <FileName>EONtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+            </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
