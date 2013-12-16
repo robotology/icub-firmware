@@ -84,7 +84,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const uint16_t eoprot_ep_board_numberofthem = eoprot_boards_maxnumberof;
+extern const uint8_t eoprot_ep_board_numberofthem = eoprot_boards_maxnumberof;
 
 extern const uint8_t eoprot_ep_entities_numberof[] =
 {   // very important: use order of eOprot_endpoint_t: pos 0 is eoprot_endpoint_management etc.

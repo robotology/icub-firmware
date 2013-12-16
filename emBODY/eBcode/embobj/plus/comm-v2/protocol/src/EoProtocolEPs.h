@@ -54,7 +54,7 @@
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const uint16_t eoprot_ep_board_numberofthem;
+extern const uint8_t eoprot_ep_board_numberofthem;
 extern const uint8_t eoprot_ep_entities_numberof[eoprot_endpoints_numberof];
 extern const EOnv_rom_t * const * eoprot_ep_folded_descriptors[eoprot_endpoints_numberof];
 extern const uint16_t* eoprot_ep_entities_sizeof[eoprot_endpoints_numberof]; 
