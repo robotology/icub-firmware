@@ -148,6 +148,9 @@ extern eOresult_t eo_transceiver_RegularROP_Load(EOtransceiver *p, eOropdescript
 extern eOresult_t eo_transceiver_RegularROP_Unload(EOtransceiver *p, eOropdescriptor_t *ropdes); 
 
 
+extern eOresult_t eo_transceiver_LoadReplyInProxy(EOtransceiver *p, eOnvID32_t id32, void* data);
+
+
 
 /** @}            
     end of group eo_transceiver  

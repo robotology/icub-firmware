@@ -428,6 +428,19 @@ extern eOresult_t eo_transceiver_ReplyROP_Load(EOtransceiver *p, eOropdescriptor
 
 }    
 
+
+extern eOresult_t eo_transceiver_LoadReplyInProxy(EOtransceiver *p, eOnvID32_t id32, void* data)
+{   
+    if((NULL == p) || (NULL == data))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    // if proxy is NULL eo_proxy function returns eores_NOK_nullpointer 
+    return(eo_proxy_ReplyROP_Load(eo_transceiver_GetProxy(p), id32, EOK_uint32dummy, data));
+}    
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
