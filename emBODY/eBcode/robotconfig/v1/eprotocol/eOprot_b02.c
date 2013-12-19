@@ -77,7 +77,6 @@ EO_VERIFYproposition(eoprot_b02_gasdfe, eoprot_boards_maxnumberof > eoprot_b02_b
 
 static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep);
 
-static eObool_t s_eoprot_b02_isvariableproxied(eOnvID32_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -187,7 +186,7 @@ extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
     eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_analogsensors, eoprot_b02_as_entities_numberofeach);
     eoprot_config_endpoint_entities(eoprot_b02_boardnumber, eoprot_endpoint_skin, eoprot_b02_sk_entities_numberofeach);
     
-    eoprot_config_proxied_variables(eoprot_b02_boardnumber, s_eoprot_b02_isvariableproxied);
+    eoprot_config_proxied_variables(eoprot_b02_boardnumber, eoprot_b02_isvariableproxied);
     
     if(eobool_true == islocal)
     {
@@ -197,6 +196,25 @@ extern eOresult_t eoprot_b02_Initialise(eObool_t islocal)
     return(eores_OK);
 }
 
+extern eObool_t eoprot_b02_isvariableproxied(eOnvID32_t id)
+{    
+    eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
+    if(eoprot_endpoint_motioncontrol == ep)
+    {
+        eOprotEntity_t ent = eoprot_ID2entity(id);
+        if((eoprot_entity_mc_joint == ent) || (eoprot_entity_mc_motor == ent))
+        {   // only joints and motors are proxied. all of them
+            return(eobool_true);
+        }        
+    }
+    else if(eoprot_endpoint_analogsensors == ep)
+    {   // what about the mais?
+        return(eobool_false);
+    }
+    
+    // all other variables are not proxied
+    return(eobool_false);    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -223,26 +241,6 @@ static uint16_t s_eoprot_b02_ep2index(eOnvEP8_t ep)
     return(EOK_uint16dummy);
 }
 
-
-static eObool_t s_eoprot_b02_isvariableproxied(eOnvID32_t id)
-{    
-    eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
-    if(eoprot_endpoint_motioncontrol == ep)
-    {
-        eOprotEntity_t ent = eoprot_ID2entity(id);
-        if((eoprot_entity_mc_joint == ent) || (eoprot_entity_mc_motor == ent))
-        {   // only joints and motors are proxied. all of them
-            return(eobool_true);
-        }        
-    }
-    else if(eoprot_endpoint_analogsensors == ep)
-    {   // what about the mais?
-        return(eobool_false);
-    }
-    
-    // all other variables are not proxied
-    return(eobool_false);    
-}
 
 
 

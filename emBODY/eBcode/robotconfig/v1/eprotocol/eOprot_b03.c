@@ -76,7 +76,6 @@ EO_VERIFYproposition(eoprot_b03_gasdfe, eoprot_boards_maxnumberof > eoprot_b03_b
 
 static uint16_t s_eoprot_b03_ep2index(eOnvEP8_t ep);
 
-static eObool_t s_eoprot_b03_isvariableproxied(eOnvID32_t id);
 
 
 
@@ -173,7 +172,7 @@ extern eOresult_t eoprot_b03_Initialise(eObool_t islocal)
     eoprot_config_endpoint_entities(eoprot_b03_boardnumber, eoprot_endpoint_motioncontrol, eoprot_b03_mc_entities_numberofeach);
     eoprot_config_endpoint_entities(eoprot_b03_boardnumber, eoprot_endpoint_analogsensors, eoprot_b03_as_entities_numberofeach);
     
-    eoprot_config_proxied_variables(eoprot_b03_boardnumber, s_eoprot_b03_isvariableproxied);
+    eoprot_config_proxied_variables(eoprot_b03_boardnumber, eoprot_b03_isvariableproxied);
     
     
     if(eobool_true == islocal)
@@ -184,6 +183,12 @@ extern eOresult_t eoprot_b03_Initialise(eObool_t islocal)
     return(eores_OK);
 }
 
+extern eObool_t eoprot_b03_isvariableproxied(eOnvID32_t id)
+{
+    // in here, if a variable is proxied (the joints in the ems 2 board in the lower arm, for instance) ..
+    // the function must return eobool_true for that id
+    return(eobool_false);   // no variable is proxied
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -211,12 +216,6 @@ static uint16_t s_eoprot_b03_ep2index(eOnvEP8_t ep)
 }
 
 
-static eObool_t s_eoprot_b03_isvariableproxied(eOnvID32_t id)
-{
-    // in here, if a variable is proxied (the joints in the ems 2 board in the lower arm, for instance) ..
-    // the function must return eobool_true for that id
-    return(eobool_false);   // no variable is proxied
-}
 
 
 

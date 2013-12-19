@@ -134,6 +134,14 @@ extern const uint8_t eoprot_b08_as_entities_numberofeach[]; // = { eoprot_b08_as
 extern eOresult_t eoprot_b08_Initialise(eObool_t islocal);
 
 
+/** @fn         extern eObool_t eoprot_b08_isvariableproxied(eOnvID32_t id)
+    @brief      Tells if a variable is proxied.
+                This function is called by the EOnvset because the eOnvset_DEVcfg_t contains a 
+                pointer to it.  However, it is made public so that it can be called independently 
+                from the use of EOnvset.
+    @return     eobool_true if the variable described by ID is proxied, eobool_false if it is fully local.
+ **/
+extern eObool_t eoprot_b08_isvariableproxied(eOnvID32_t id);
 
 /** @}            
     end of group doxy_eOprot_b08  
