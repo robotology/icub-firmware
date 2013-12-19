@@ -87,14 +87,19 @@
 extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     if((eobool_true == eo_nv_IsProxied(nv)) && (eo_ropcode_ask == rd->ropcode))
-    {
-        EOtransceiver *brdtr = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
-        EOproxy* proxy = eo_transceiver_GetProxy(brdtr);
-        
+    {        
         uint8_t data[32] = {0, 1, 2, 3};
-        uint32_t signature = EOK_uint32dummy;
-    //rd->signature
+        
+        EOtransceiver *brdtr = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+        
+// either the first or the second mode are ok
+#if 1  
+        eo_transceiver_LoadReplyInProxy(brdtr, rd->id32, data);
+#else        
+        EOproxy* proxy = eo_transceiver_GetProxy(brdtr);
+        uint32_t signature = EOK_uint32dummy; //or ... rd->signature
         eo_proxy_ReplyROP_Load(proxy, rd->id32, signature, data);
+#endif        
     }
 }
 
