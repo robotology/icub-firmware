@@ -621,13 +621,28 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
 // 	canFrame->data[7]=0;
 
     
-    canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
-	canFrame->data[2]=0x01;  //==> invia ogni 40 milli
-	canFrame->data[3]=0x03;
-	canFrame->data[4]=0;
-	canFrame->data[5]=0x20;
-	canFrame->data[6]=0;
-	canFrame->data[7]=35;
+    
+   
+    if(0xE == dest.s.canAddr)
+    {
+        canFrame->data[1]=0x4E; 
+        canFrame->data[2]=0x02;  
+        canFrame->data[3]=0xEF;
+        canFrame->data[4]=0x00;
+        canFrame->data[5]=0xFF;
+        canFrame->data[6]=0xFF;
+        canFrame->data[7]=0x00;        
+    }
+    else
+    {
+        canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
+        canFrame->data[2]=0x01;  //==> invia ogni 40 milli
+        canFrame->data[3]=0x03;
+        canFrame->data[4]=0;
+        canFrame->data[5]=0x20;
+        canFrame->data[6]=0;
+        canFrame->data[7]=35;
+    }
 
     return(eores_OK);
 }
