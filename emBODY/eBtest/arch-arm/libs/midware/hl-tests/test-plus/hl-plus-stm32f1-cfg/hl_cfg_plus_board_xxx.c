@@ -460,6 +460,34 @@ extern const hl_can_mapping_t hl_can_mapping =
 
 
 
+#if     defined(HL_USE_UTIL_TIMER)
+
+#include "hl_timer.h"
+
+#if     defined(HL_USE_BRD_MCBSTM32)
+
+extern const hl_timer_mapping_t hl_timer_mapping =
+{
+    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4)
+};
+#elif   defined(HL_USE_BRD_MCBSTM32_C)
+
+
+extern const hl_timer_mapping_t hl_timer_mapping =
+{
+    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
+};
+
+#elif   defined(HL_USE_BRD_EMS001)
+
+extern const hl_timer_mapping_t hl_timer_mapping =
+{
+    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
+};
+
+#endif
+
+#endif//defined(HL_USE_UTIL_TIMER)
     
 
 // --------------------------------------------------------------------------------------------------------------------

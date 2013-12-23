@@ -33,6 +33,7 @@
 #include "hl_sys.h"
 
 #include "hl_i2c.h"
+#include "hl_timer.h"
 
 #include "hl_chip_xx_eeprom.h"
 #include "hl_chip_st_l3g4200d.h"
@@ -85,6 +86,8 @@ static void test_timer(uint16_t microsecs);
 
 static void test_mems_init(void);
 static void test_mems_get(void);
+
+static void s_on_timer_expiry(void* p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -214,6 +217,15 @@ static void test_eeprom(void)
         .wp_val         = hl_gpio_valUNDEF,
         .wp_gpio        = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }           
     }; 
+#elif   defined(HL_USE_BRD_EMS004)
+    const hl_chip_xx_eeprom_cfg_t eepromcfg = 
+    {
+        .chip           = hl_chip_xx_eeprom_chip_atmel_at24c512b, 
+        .i2cid          = hl_i2c1,
+        .hwaddra2a1a0   = 0,
+        .wp_val         = hl_gpio_valSET,
+        .wp_gpio        = { .port = hl_gpio_portB, .pin = hl_gpio_pin10 }           
+    };     
 #else
     #error -> define an eeprom cfg
 #endif    
@@ -291,6 +303,27 @@ static void test_mems_get(void)
 
 static void test_timer(uint16_t microsecs)
 {
+#if     defined(HL_USE_UTIL_TIMER)
+    
+    hl_timer_cfg_t tmrcfg = 
+    {
+        .countdown  = microsecs,
+        .mode       = hl_timer_mode_periodic,
+        .priority   = hl_irqpriority10,
+        .callback   = s_on_timer_expiry,
+        .arg        = NULL,
+        .advcfg     = NULL
+    };
+    
+    hl_reltime_t err;
+    
+    hl_timer_t timerID = hl_timer8; //hl_timer4;
+    
+    hl_timer_init(timerID, &tmrcfg, &err);
+    err =  err;    
+    hl_timer_start(timerID);
+    
+#else    
     // the timer 4 uses the fast bus as its reference clock.
     // thus ...
     
@@ -331,43 +364,48 @@ static void test_timer(uint16_t microsecs)
 
     // enable isr
     TIM_ITConfig( TIM4, TIM_IT_Update, ENABLE );
+#endif    
 }
 
 
-
-void TIM4_IRQHandler(void)
+static void s_on_timer_expiry(void* p)
 {
     static volatile uint32_t delta = 0;
     static volatile uint32_t prev = 0;
     static volatile uint32_t val = 0;
 
+    delta = systickserv_numofticks - prev;
+    prev = systickserv_numofticks;
+
+    delta = delta;
+    
+    //val = (0 == val) ? (1) : (0);
+    val ++;
+    
+    if(50 == val)
+    {
+        board_led_on(board_led_3);
+    }
+    else if(100 == val)
+    {
+        board_led_off(board_led_3);
+        val = 0;
+    }        
+}
+
+#if     !defined(HL_USE_UTIL_TIMER)
+void TIM4_IRQHandler(void)
+{
 
     if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
     {
-
         TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-
-        delta = systickserv_numofticks - prev;
-        prev = systickserv_numofticks;
-
-        delta = delta;
         
-        //val = (0 == val) ? (1) : (0);
-        val ++;
-        
-        if(50 == val)
-        {
-            board_led_on(board_led_3);
-        }
-        else if(100 == val)
-        {
-            board_led_off(board_led_3);
-            val = 0;
-        }
+        s_on_timer-expiry(NULL);
     }
 
 }
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -666,6 +666,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_can.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -701,7 +706,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>ems001</TargetName>
+      <TargetName>ems004</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1042,9 +1047,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_EMS001</Define>
+              <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_EMS004</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips;..\hl-plus-cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\chips;..\hl-plus-stm32f4-cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1359,6 +1364,11 @@
               <FileName>hl_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\plus\src\utils\hl_timer.c</FilePath>
             </File>
           </Files>
         </Group>

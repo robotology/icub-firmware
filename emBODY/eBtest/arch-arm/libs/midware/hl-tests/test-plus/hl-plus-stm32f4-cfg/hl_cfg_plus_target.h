@@ -36,7 +36,7 @@
     
 #elif   defined(HL_USE_BRD_EMS004)    
 
-    #define HL_USE_MPU_NAME_STM32F407xx
+    #define HL_USE_MPU_NAME_STM32F407IG
 
 #else
     #error ERR: cannot define MPU_NAME

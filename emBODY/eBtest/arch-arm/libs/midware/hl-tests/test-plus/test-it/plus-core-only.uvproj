@@ -444,7 +444,7 @@
             <File>
               <FileName>hl_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\hl-plus-cfg\hl_startup_stm32f107.s</FilePath>
+              <FilePath>..\hl-plus-cfg-core\hl_startup_stm32f107.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -484,7 +484,7 @@
             <File>
               <FileName>hl_startup_stm32f103.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\hl-plus-cfg\hl_startup_stm32f103.s</FilePath>
+              <FilePath>..\hl-plus-cfg-core\hl_startup_stm32f103.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1098,12 +1098,12 @@
             <File>
               <FileName>hl_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\hl-plus-cfg\hl_startup_stm32f107.s</FilePath>
+              <FilePath>..\hl-plus-cfg-core\hl_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>hl_startup_stm32f103.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\hl-plus-cfg\hl_startup_stm32f103.s</FilePath>
+              <FilePath>..\hl-plus-cfg-core\hl_startup_stm32f103.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1752,12 +1752,12 @@
             <File>
               <FileName>hl_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\hl-plus-cfg\hl_startup_stm32f107.s</FilePath>
+              <FilePath>..\hl-plus-cfg-core\hl_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>hl_startup_stm32f103.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\hl-plus-cfg\hl_startup_stm32f103.s</FilePath>
+              <FilePath>..\hl-plus-cfg-core\hl_startup_stm32f103.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>

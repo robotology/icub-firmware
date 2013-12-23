@@ -63,6 +63,8 @@
 #define HL_USE_UTIL_BITS
 #define HL_USE_UTIL_FIFO
 #define HL_USE_UTIL_I2C
+#define HL_USE_UTIL_TIMER
+//#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER04
 
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
@@ -81,6 +83,8 @@
 #define HL_USE_UTIL_BITS
 #define HL_USE_UTIL_FIFO
 #define HL_USE_UTIL_I2C
+#define HL_USE_UTIL_TIMER
+//#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER04
 
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
@@ -102,6 +106,8 @@
 #define HL_USE_UTIL_ETH
 #define HL_USE_UTIL_ETHTRANS
 #define HL_USE_UTIL_CAN
+#define HL_USE_UTIL_TIMER
+//#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER04
 
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
