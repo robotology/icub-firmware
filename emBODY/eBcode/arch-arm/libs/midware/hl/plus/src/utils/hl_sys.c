@@ -233,10 +233,10 @@ extern void hl_sys_irqn_enable(hl_irqn_t irqn)
      NVIC_EnableIRQ((IRQn_Type)irqn);    
 }  
 
-extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_interrupt_priority_t prio) 
+extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_irqpriority_t prio) 
 {
 #if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)     
-    if(hl_int_priorityNONE == prio)
+    if(hl_irqpriorityNONE == prio)
     {
         return;
     }
@@ -245,9 +245,9 @@ extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_interrupt_priority_t pri
     NVIC_SetPriority((IRQn_Type)irqn, prio);    
 } 
 
-extern hl_interrupt_priority_t hl_sys_irqn_priority_get(hl_irqn_t irqn) 
+extern hl_irqpriority_t hl_sys_irqn_priority_get(hl_irqn_t irqn) 
 {
-    return((hl_interrupt_priority_t)NVIC_GetPriority((IRQn_Type)irqn));    
+    return((hl_irqpriority_t)NVIC_GetPriority((IRQn_Type)irqn));    
 }
 
 

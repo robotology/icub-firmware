@@ -186,6 +186,7 @@ typedef uint8_t (*hl_uint8_fp_void_t) (void);
  **/
 typedef void (*hl_callback_t) (void* p);
 
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

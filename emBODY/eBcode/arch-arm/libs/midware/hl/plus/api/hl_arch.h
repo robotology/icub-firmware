@@ -235,6 +235,23 @@ extern const hl_can_advcfg_t hl_can_advcfg_default; // =
 // -- can section: end
 
 
+// -- timer section: begin
+// --
+
+#include "hl_timer.h"
+
+struct hl_timer_advcfg_opaque_t
+{   // the same as TIM_TimeBaseInitTypeDef
+    uint16_t    TIM_Prescaler; 
+    uint16_t    TIM_CounterMode;    
+    uint16_t    TIM_Period;                
+    uint16_t    TIM_ClockDivision;           
+    uint8_t     TIM_RepetitionCounter;         
+};
+
+
+// --
+// -- timer section: end
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

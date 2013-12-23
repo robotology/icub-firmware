@@ -145,7 +145,7 @@ uint32_t CRC_CalcBlockCRC_networkorder(uint32_t pBuffer[], uint32_t BufferLength
 {
   uint32_t index = 0;
 
-#warning --> acemor of iit says: the standard crc32 works on bytes with network order but the stm32 hw uses little endian mode
+//#warning --> acemor of iit says: the standard crc32 works on bytes with network order but the stm32 hw uses little endian mode
 
   for(index = 0; index < BufferLength; index++)
   {

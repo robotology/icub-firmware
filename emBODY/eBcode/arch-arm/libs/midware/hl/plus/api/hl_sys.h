@@ -52,30 +52,30 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum hl_interrupt_priority_t;
+/** @typedef    typedef enum hl_irqpriority_t;
     @brief      keeps the possible values for interrupt priorities (0 is highest)
 
  **/
 typedef enum
 {
-    hl_int_priorityNONE     = hl_NA08,
-    hl_int_priority00       = 0,
-    hl_int_priority01       = 1,
-    hl_int_priority02       = 2,
-    hl_int_priority03       = 3,
-    hl_int_priority04       = 4,
-    hl_int_priority05       = 5,
-    hl_int_priority06       = 6,
-    hl_int_priority07       = 7,
-    hl_int_priority08       = 8,
-    hl_int_priority09       = 9,
-    hl_int_priority10       = 10,
-    hl_int_priority11       = 11,
-    hl_int_priority12       = 12,
-    hl_int_priority13       = 13,
-    hl_int_priority14       = 14,
-    hl_int_priority15       = 15
-} hl_interrupt_priority_t;  
+    hl_irqpriorityNONE      = hl_NA08,
+    hl_irqpriority00        = 0,
+    hl_irqpriority01        = 1,
+    hl_irqpriority02        = 2,
+    hl_irqpriority03        = 3,
+    hl_irqpriority04        = 4,
+    hl_irqpriority05        = 5,
+    hl_irqpriority06        = 6,
+    hl_irqpriority07        = 7,
+    hl_irqpriority08        = 8,
+    hl_irqpriority09        = 9,
+    hl_irqpriority10        = 10,
+    hl_irqpriority11        = 11,
+    hl_irqpriority12        = 12,
+    hl_irqpriority13        = 13,
+    hl_irqpriority14        = 14,
+    hl_irqpriority15        = 15
+} hl_irqpriority_t;  
 
 
 /** @typedef    typedef int32_t hl_irqn_t
@@ -161,19 +161,25 @@ extern void hl_sys_irqn_disable(hl_irqn_t irqn);
 
 /** @fn         extern void hl_sys_irqn_enable(hl_irqn_t irqn)
     @brief      Enable a selected IRQ in the system.
-    @param      irqn        The irq number to operate on.  Use an enum value in IRQn_Type
-                            or hl_cpu_arc_xxx_irqn_t
+    @param      irqn        The irq number to operate on.  
  **/
 extern void hl_sys_irqn_enable(hl_irqn_t irqn);
 
 
-/** @fn         extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_interrupt_priority_t prio)
+/** @fn         extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hlirqpriority_t prio)
     @brief      Sets a priority to the selected IRQ in the system.
-    @param      irqn        The irq number to operate on.  Use an enum value in IRQn_Type
-                            or hl_cpu_arc_xxx_irqn_t
+    @param      irqn        The irq number to operate on.  
     @param      prio        The target priority
  **/
-extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_interrupt_priority_t prio); 
+extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_irqpriority_t prio); 
+
+
+/** @fn         extern hl_irqpriority_t hl_sys_irqn_priority_get(hl_irqn_t irqn)
+    @brief      Gets the priority of the selected IRQ in the system.
+    @param      irqn        The irq number to operate on.  
+    @return     the priority    
+ **/
+extern hl_irqpriority_t hl_sys_irqn_priority_get(hl_irqn_t irqn);
 
 
 /** @fn         extern int hl_sys_itm_puts(const char* str)

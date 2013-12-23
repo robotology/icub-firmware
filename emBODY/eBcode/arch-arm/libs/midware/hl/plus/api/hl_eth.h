@@ -155,7 +155,7 @@ typedef struct
 {
     hl_eth_macaddress_t             macaddress;                 /**< the mac address */
     hl_eth_behaviour_t              behaviour;                  /**< the tx-rx behaviour */
-    hl_interrupt_priority_t         priority;                   /**< keeps priority of teh ISR */
+    hl_irqpriority_t                priority;                   /**< keeps priority of the ISR */
     uint8_t                         capacityoftxfifoofframes;   /**< the number of eth frames buffered in dma transmission */
     uint8_t                         capacityofrxfifoofframes;   /**< the number of eth frames buffered in dma reception */
 } hl_eth_cfg_t;

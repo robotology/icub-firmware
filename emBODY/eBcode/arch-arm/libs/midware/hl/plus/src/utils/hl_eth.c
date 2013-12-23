@@ -477,7 +477,7 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     uint8_t capacityofrxfifoofframes = cfg->capacityofrxfifoofframes;
 
 
-    if((NULL == cfg) || (hl_int_priorityNONE == cfg->priority) || (0 == cfg->macaddress) )
+    if((NULL == cfg) || (hl_irqpriorityNONE == cfg->priority) || (0 == cfg->macaddress) )
     {
         hl_sys_on_error(hl_error_incorrectparameter, "hl_eth_init() ... ");
     }
