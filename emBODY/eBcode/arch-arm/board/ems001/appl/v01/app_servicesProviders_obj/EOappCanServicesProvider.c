@@ -1148,6 +1148,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
 {
     eOresult_t          res;
     eOcanframe_t        canFrame;
+    osal_result_t       osal_res;
 #ifdef _GET_CANQUEUE_STATISTICS_
     uint8_t             numofoutframe=0;
 #endif
@@ -1176,16 +1177,19 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
                 p->waittxdata[emscanport].numoftxframe2send = 1;
                 hal_sys_irqn_enable(irqn);
 
-                osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, /*osal_reltimeINFINITE*/eoappCanSP_onEvtMode_timeoutSendFrame);
+                osal_res = osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, /*osal_reltimeINFINITE*/eoappCanSP_onEvtMode_timeoutSendFrame);
                 
                 //if i'm here i just wake up
                 hal_sys_irqn_disable(irqn);
                 p->waittxdata[emscanport].waitenable = eobool_false;
                 hal_sys_irqn_enable(irqn);
-                res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
-                if(eores_OK != res)
+                if(osal_res_OK == osal_res)
                 {
-                   eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "error in hal_can_put!"); 
+                    res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+                    if(eores_OK != res)
+                    {
+                       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "error in hal_can_put!(NOK_busy)"); 
+                    }
                 }
             }
             else
