@@ -131,7 +131,7 @@ typedef enum
 
 
 /** @typedef    typedef struct oosiit_advtmr_timing_t
-    @brief      keeps timing configuration of advanced timers.
+    @brief      keeps timing configuration of advanced timers. time is in in system ticks.
  **/
 typedef struct
 {
@@ -411,14 +411,14 @@ extern uint64_t oosiit_nanotime_get(void);
 
 /** @fn         extern void oosiit_dly_wait(uint32_t delay)
     @brief      Pauses the calling task for a specified interval
-    @param      delay      the delay.
+    @param      delay      the delay in system ticks.
  **/
 extern void oosiit_dly_wait(uint32_t delay);
 
 
 /** @fn         extern void oosiit_itv_set(uint32_t period)
     @brief      Sets up the calling task for periodic wake-up 
-    @param      period      the period.
+    @param      period      the period in system ticks.
  **/
 extern void oosiit_itv_set(uint32_t period);
 
@@ -466,7 +466,7 @@ extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** messa
     @brief      puts the pointer to a message inside the mailbox.
     @param      mailbox         the mailbox.                                                 
     @param      message         the message
-    @param      timeout         the timeout
+    @param      timeout         the timeout in system ticks
     @return     oosiit_res_OK upon success, oosiit_res_TMO if timeout failure 
  **/ 
 extern oosiit_result_t oosiit_mbx_send(oosiit_objptr_t mailbox, void* message, uint32_t timeout); // osiit_
@@ -508,7 +508,7 @@ extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp);
     @brief      It forces the caller task to wait for the event flags specified by @e waitflags in the mode specified by @e waitmode
                 with timeout specified by @e timeout.
     @param      waitflags       the mask of the event flags to be waited.
-    @param      timeout         the timeout.
+    @param      timeout         the timeout in system ticks.
     @param      waitmode        if oosiit_evt_wait_mode_any, the function waits until any of the flags becomes available; 
                                 else if oosiit_evt_wait_mode_all, it waits until all the flags become available
     @return     oosiit_res_TMO if the function exits for timeout. oosiit_res_EVT if the condition specified by @e waitflag and @e waitmode
@@ -580,7 +580,7 @@ extern oosiit_result_t oosiit_sem_send(oosiit_objptr_t sem);
 /** @fn         extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout)
     @brief      It removes a token from the semaphore with a given timeout.
     @param      sem             The handler to the semaphore
-    @param      timeout         maximum wait time.
+    @param      timeout         maximum wait time in system ticks.
     @return     oosiit_res_OK upon immediate success, oosiit_res_SEM upon success after some wait time, oosiit_res_TMO if timeout failure,
                 finally oosiit_res_NOK if called from an ISR or if the semaphore is invalid
  **/ 
@@ -611,7 +611,7 @@ extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex);
 /** @fn         extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
     @brief      It takes a mutex with priority inheritance.
     @param      mutex           the handle to the mutex
-    @param      timeout         maximum wait time.
+    @param      timeout         maximum wait time. in system ticks
     @return     oosiit_res_OK upon immediate success, oosiit_res_MUT upon success after some wait time, oosiit_res_TMO if timeout failure. 
                 oosiit_res_NOK on invalid mutex or if the function is called from inside an ISR.
  **/
