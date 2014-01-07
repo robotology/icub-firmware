@@ -1,0 +1,12 @@
+
+here is what the .docx documents deal of.
+
+- embobj 
+  tells what is the embOBJ library of objects for embedded environments.
+
+- ethernet-protocol-implementation
+  describes the protocol used for command exchange between EMS and robotInterface. 
+
+- embobj-ethernet-protocol-implementations
+  describes implementation under embOBJ of the ethernet protocol.
+
