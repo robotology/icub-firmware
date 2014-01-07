@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-#include "brd_mcbstm32x.h"
+#include "board.h"
 
 #include "cmsis_stm32f4.h"
 
