@@ -49,7 +49,7 @@ extern void oosiit_sys_error(oosiit_error_code_t errorcode)
 {
     volatile static uint32_t err = 0;
 
-    for(;;)
+    //for(;;)
     {
         err = errorcode;
         err = err;
@@ -75,7 +75,7 @@ extern void oosiit_ext_free(void* m)
 // - ...  
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(USE_BRD_MCBSTM32_F400)
+#if defined(HL_USE_BRD_MCBSTM32_F400)
     #undef OOSIIT_CLOCK
     #define OOSIIT_CLOCK 168000000
 #endif
@@ -106,7 +106,7 @@ extern const oosiit_cfg_t *oosiit_cfg_USERptr = &oosiit_cfg_USER;
 
 
 
-#include "oosiit_storage.c"
+
 
 
 
