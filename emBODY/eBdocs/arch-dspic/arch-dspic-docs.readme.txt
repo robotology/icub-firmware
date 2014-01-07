@@ -1,0 +1,16 @@
+
+here is what the .docx documents deal of.
+
+- dspic-system-behaviour-applications 
+  tells what the DSPIC does when it bootstraps, which processes it executes (bootloader, application),
+  which libraries are used to access permanent storage. it also describes how the bootloader and the updatebootloader
+  behave. finally it tells how the final application can be developed (with embOBJs as for the 6SG or with minimal
+  intervention as for the 2FOC).  
+
+- dspic-01-memory-mapping
+  briefly tells how is the memory maps for boards with dspic33.
+
+- dspic-02-possible-applications
+  briefly tells how oen can develop the application for dspic33 under the eBODY environment. 
+
+  
