@@ -106,7 +106,6 @@ extern const oosiit_cfg_t *oosiit_cfg_USERptr = &oosiit_cfg_USER;
 
 
 
-#include "oosiit_storage.c"
 
 
 
