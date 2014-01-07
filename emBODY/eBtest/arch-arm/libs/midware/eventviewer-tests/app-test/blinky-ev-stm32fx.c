@@ -22,7 +22,24 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#include "brd_mcbstm32x.h"  
+// include the cmsis api file which is relevant to the used mpu
+#if     defined(HL_USE_BRD_MCBSTM32)
+    #include "cmsis_stm32f1.h"
+#elif   defined(HL_USE_BRD_MCBSTM32_C)
+    #include "cmsis_stm32f1.h"
+#elif   defined(HL_USE_BRD_EMS001)
+    #include "cmsis_stm32f1.h"
+#elif   defined(HL_USE_BRD_MCBSTM32_F200)
+    #include "cmsis_stm32f2.h"
+#elif   defined(HL_USE_BRD_MCBSTM32_F400)   
+    #include "cmsis_stm32f4.h" 
+#else
+    #error --> define a MCBSTM32 board
+#endif
+
+
+#include "board.h"  
+
 #include "systickservices.h" 
 
 #include "stdint.h"
@@ -104,20 +121,20 @@ int main(void)
     // apart from some specific actions: systick, userdef1 and userdef2
     eventviewer_switch_to(ev_ID_idle);
     
-    brd_mcbstm32x_led_init();
+    board_led_init();
     
     systickserv_start_systick(1000, myonsystick);
     
     for(;;)
     {
         prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
-        brd_mcbstm32x_led_on(brd_mcbstm32x_led_0);
+        board_led_on(board_led_0);
         eventviewer_switch_to(prev);
         
         systickserv_wait_for(500*1000);
         
         prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
-        brd_mcbstm32x_led_off(brd_mcbstm32x_led_0);
+        board_led_off(board_led_0);
         eventviewer_switch_to(prev);
         
         systickserv_wait_for(500*1000);
