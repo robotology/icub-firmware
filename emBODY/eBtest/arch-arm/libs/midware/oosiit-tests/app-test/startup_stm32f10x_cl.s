@@ -1,9 +1,9 @@
-;******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
+;******************** (C) COPYRIGHT 2011 STMicroelectronics ********************
 ;* File Name          : startup_stm32f10x_cl.s
 ;* Author             : MCD Application Team
-;* Version            : V3.2.0
-;* Date               : 03/01/2010
-;* Description        : STM32F10x Connectivity line devices vector table for RVMDK 
+;* Version            : V3.5.0
+;* Date               : 11-March-2011
+;* Description        : STM32F10x Connectivity line devices vector table for MDK-ARM 
 ;*                      toolchain. 
 ;*                      This module performs:
 ;*                      - Set the initial SP
@@ -31,6 +31,8 @@
 ; </h>
 
 Stack_Size      EQU     0x00002000
+				EXPORT  Stack_Size
+; IIT-EXT: exported the Stack_Size				
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
@@ -42,6 +44,8 @@ __initial_sp
 ; </h>
 
 Heap_Size       EQU     0x00009000
+				EXPORT  Heap_Size
+; IIT-EXT: exported the Heap_Size
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
@@ -365,4 +369,4 @@ __user_initial_stackheap
 
                  END
 
-;******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE*****
+;******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE*****

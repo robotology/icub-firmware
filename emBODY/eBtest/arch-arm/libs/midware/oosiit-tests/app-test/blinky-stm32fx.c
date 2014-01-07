@@ -21,9 +21,27 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+// include the cmsis api file which is relevant to the used mpu
+#if     defined(HL_USE_BRD_MCBSTM32)
+    #include "cmsis_stm32f1.h"
+#elif   defined(HL_USE_BRD_MCBSTM32_C)
+    #include "cmsis_stm32f1.h"
+#elif   defined(HL_USE_BRD_EMS001)
+    #include "cmsis_stm32f1.h"
+#elif   defined(HL_USE_BRD_MCBSTM32_F200)
+    #include "cmsis_stm32f2.h"
+#elif   defined(HL_USE_BRD_MCBSTM32_F400)   
+    #include "cmsis_stm32f4.h" 
+#else
+    #error --> define a MCBSTM32 board
+#endif
+
+
+#include "board.h"  
+
 #include "oosiit.h"
 
-#include "brd_mcbstm32x.h"      
+  
 
 #include "stdint.h"
 #include "stdlib.h"
@@ -136,7 +154,7 @@ int main(void)
     //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     
     // init the leds
-    brd_mcbstm32x_led_init();
+    board_led_init();
     
     oosiit_memory_getsize(oosiit_cfg_USERptr, &ram32num, &ram64num);
 
@@ -254,9 +272,9 @@ extern void tsk_evtbased(void* p)
         oosiit_evt_wait(s_event_trigger, OOSIIT_NOTIMEOUT, oosiit_evt_wait_mode_all); 
         sig = oosiit_evt_get();
         sig = sig;
-        brd_mcbstm32x_led_on(brd_mcbstm32x_led_0);
+        board_led_on(board_led_0);
         oosiit_dly_wait(50); 
-        brd_mcbstm32x_led_off(brd_mcbstm32x_led_0);
+        board_led_off(board_led_0);
 
         avail = oosiit_mbx_available(s_mailbox1);
         if(avail > 0)
@@ -288,10 +306,10 @@ extern void tsk_msgbased(void* p)
             number = number;
         }
         
-        brd_mcbstm32x_led_on(brd_mcbstm32x_led_1);
+        board_led_on(board_led_1);
         oosiit_dly_wait((number+1)*50); 
 //        oosiit_dly_wait(50); 
-        brd_mcbstm32x_led_off(brd_mcbstm32x_led_1);        
+        board_led_off(board_led_1);        
  
     }
 
@@ -410,28 +428,30 @@ static void s_stay(void* p)
     for(;;)
     {
         oosiit_itv_wait();
-        
-        if(NULL != mut)
-        {
-            oosiit_mut_delete(mut);
-            //oosiit_mut_wait(mut, 0);
-            mut = NULL;
-            mut = oosiit_mut_create();
+        if(oosiit_memmode_dynamic == oosiit_cfg_USERptr->memorymode)
+        {   // we can keep on creating mutexes only if we have dynamic mode ...
             if(NULL != mut)
-                oosiit_mut_wait(mut, 0);
-        }
-        else
-        {
-            xxx++;
+            {
+                oosiit_mut_delete(mut);
+                //oosiit_mut_wait(mut, 0);
+                mut = NULL;
+                mut = oosiit_mut_create();
+                if(NULL != mut)
+                    oosiit_mut_wait(mut, 0);
+            }
+            else
+            {
+                xxx++;
+            }
         }
  
         if(0 == (++count % 2)) 
         {
-            brd_mcbstm32x_led_off(brd_mcbstm32x_led_7);
+            board_led_off(board_led_7);
         }
         else
         {
-            brd_mcbstm32x_led_on(brd_mcbstm32x_led_7);
+            board_led_on(board_led_7);
         }
         
     }
