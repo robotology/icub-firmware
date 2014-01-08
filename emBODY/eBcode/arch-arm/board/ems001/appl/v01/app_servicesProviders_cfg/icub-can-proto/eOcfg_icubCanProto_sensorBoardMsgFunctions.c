@@ -502,6 +502,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
     EOarray* array = (EOarray*)&sstatus_ptr->the15values;
     eo_array_Assign(array, 0, &(frame->data[0]), 7); // 7 bytes of frame->data starting from array position 0
     #else
+    sstatus_ptr->the15values.head.size = 15;
     memcpy(&(sstatus_ptr->the15values.data[0]), &(frame->data[0]), 7); 
     #endif
 
@@ -537,6 +538,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
     EOarray* array = (EOarray*)&sstatus_ptr->the15values;
     eo_array_Assign(array, 7, &(frame->data[0]), 8); // 8 bytes of frame->data starting from array position 8
     #else
+    sstatus_ptr->the15values.head.size = 15;
     memcpy(&(sstatus_ptr->the15values.data[7]), &(frame->data[0]), 8); 
     #endif
     
