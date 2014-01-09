@@ -745,7 +745,9 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
-#warning aggiungi getfw version per strain e mais
+    //note: can protocol version check is done only for motor control
+    
+    
     // 1) config can board if mc4 boars are connected to this ems 
     if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
