@@ -28,17 +28,14 @@
 
 #include "EOVtheSystem.h"
 #include "EOMtask.h"
-#include "EOpacket.h"
-#include "EOsocketDatagram.h"
-#include "EOMmutex.h"
 #include "EOaction_hid.h"
 #include "EOtheErrorManager.h"
 
 #include "osal.h"
 #include "hal.h"
-#include "ipal.h"
 
 #include "stdlib.h"
+#include "stdio.h"
 
 
 
@@ -47,7 +44,6 @@
 #include "EOtimer.h"
 #include "EOaction.h"
 #include "EOMtheCallbackmanager.h"
-#include "EOMtheIPnet.h"
 
 #include "EOtheLEDpulser.h"
 
@@ -70,16 +66,16 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void task_udpserver(void *p);
-
+extern void task_eventdriven(void *p);
+extern void task_periodic(void *p);
+extern void task_messagedriven(void *p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define USE_RECEIVER_ECHOER
-
+//#define MINIMAL_BEHAVIOUR
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -93,72 +89,43 @@ extern void task_udpserver(void *p);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_udpserver_startup(EOMtask *p, uint32_t t);
-
-static void s_udpserver_run(EOMtask *p, uint32_t t);
-
 static void s_specialise_blink(void *param);
 
-
-
-static void s_eom_applbasic_specialise_transceiver_init(void);
-
-#if defined(USE_RECEIVER_ECHOER)
-static void s_eom_applbasic_specialise_echoer_receive(EOpacket* rxpkt);
-#else
-static void s_eom_applbasic_specialise_asimm_receive(EOpacket* rxpkt);
-#endif
-
-static void s_eom_applbasic_specialise_ipnet_start(void);
-
-static void s_eom_applbasic_specialise_updserver_start(void);
-
-static void s_eom_applbasic_specialise_onpktreceived_set( void (*cbk)(EOpacket*) );
+static void s_eom_applbasic_specialise_tasks_start(void);
 
 static void s_eom_applbasic_specialise_leds(void);
 
-static void s_eom_applbasic_specialise_transmit(EOpacket *txpkt);
+static void s_periodic_startup(EOMtask *p, uint32_t t);
+static void s_periodic_run(EOMtask *p, uint32_t t);
 
-static eObool_t s_eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr);
+static void s_eventdriven_startup(EOMtask *p, uint32_t t);
+static void s_eventdriven_run(EOMtask *p, uint32_t t);
 
+//static void s_messagedriven_startup(EOMtask *p, uint32_t t);
+static void s_messagedriven_run(EOMtask *p, uint32_t t);
 
-void getfromEOsocket(void)
-{
-
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOpacket* s_mytxpkt = NULL;
 
 static EOtimer*     s_timer_blink = NULL;
 static EOaction*    s_action_blink = NULL;
 
 
-//static osal_semaphore_t*        s_sem_tx_pkt        = NULL;
+static EOMtask* s_task_periodic = NULL;
+static EOMtask* s_task_eventdriven = NULL;
+static EOMtask*  s_task_messagedriven = NULL;
 
-static EOsocketDatagram*        s_skt_rops          = NULL;
-static EOpacket*                s_rxpkt             = NULL;
-static EOpacket*                s_txpkt             = NULL;
-static EOMtask*                 s_task_udpserver    = NULL;
+static const eOevent_t s_event_from_task_periodic  = 0x00000004;
+static const eOmessage_t s_message_from_task_eventbased  = 0x00000001;
 
-
-static void (*s_eom_applbasic_specialise_on_ropframe_received)(EOpacket*) = NULL;
-
-
-
-//static const eOevent_t s_event_tx_into_skt_rops         = 0x00000001;
-//static const eOevent_t s_event_connect_to_host          = 0x00000002;
-static const eOevent_t s_event_from_skt_rops            = 0x00000004;
-
-static const eOipv4port_t s_server_port                 = 33333; 
-
-static volatile eObool_t s_host_connected               = eobool_false;
-
-static eOipv4addr_t s_host_ipaddress                    = 0;
-
+#if     defined(MINIMAL_BEHAVIOUR)
+static const char s_eobj_ownname[] = "EOMapplBASICminimal";
+#else
+static const char s_eobj_ownname[] = "EOMapplBASIC";
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -173,7 +140,6 @@ static eOipv4addr_t s_host_ipaddress                    = 0;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const ipal_cfg_t    ipal_cfg;
 
 extern void eom_applbasic_specialise_system(void)
 {
@@ -181,41 +147,48 @@ extern void eom_applbasic_specialise_system(void)
     // -- service 1:    init the leds.
     //                  led0, led1, led2 with the LEDpulser. led3, led4, and led5 manually
     //                  led0 will blink forever at 1Hz
-    //                  led1 will pulse 5 times at 5Hz at pkt reception
-    //                  led2 will pulse 10 times at 10Hz at pkt transmission
-    //                  led3, led4, and led5 will rotate every 500 msec
+    //                  led1 will pulse 10 times at 20Hz inside periodic task
+    //                  led2 will pulse 5 times at 10Hz inside teh event-driven task
+    //                  led3, led4, and led5 will ...
     
     s_eom_applbasic_specialise_leds();
     
     
-    // -- service 2:    starts the ipnet.
-    //                  it has two internal tasks: one periodic and the other one triggered by network events or tx requests
-    
-    s_eom_applbasic_specialise_ipnet_start();
+    // -- service 2:    starts two tasks: one periodic andm one event-driven. 
+    //                  the periodic pulses led1, prints with the errormanager and wakes up the event-driven
+    //                  the event driven pulses led2 and prints with the error manager.
 
-
-    // -- service 3:    starts an event-driven task-upd-server. 
-    //                  it which starts the listening socket and manages reception of packets.
-
-    s_eom_applbasic_specialise_updserver_start();  
+    s_eom_applbasic_specialise_tasks_start();  
 
 }
 
 
-
-static void s_eom_applbasic_specialise_onpktreceived_set( void (*cbk)(EOpacket*)  )
-{
-    s_eom_applbasic_specialise_on_ropframe_received = cbk;
-}
 
 static void s_eom_applbasic_specialise_leds(void)
 {
+    
+#if     defined(MINIMAL_BEHAVIOUR)
+
+    // init all leds
+    hal_led_init(hal_led0, NULL);
+    hal_led_init(hal_led1, NULL);
+    hal_led_init(hal_led2, NULL);
+    hal_led_init(hal_led3, NULL);
+    hal_led_init(hal_led4, NULL);
+    hal_led_init(hal_led5, NULL);
+    hal_led_init(hal_led6, NULL);
+    hal_led_init(hal_led7, NULL);
+
+#else    
    
-    // init the ledpulser with leds 0 and 1
+    // init the ledpulser with leds 0 and 1 and 2 and 3
     
     eOledpulser_cfg_t ledpulsercfg = 
     {
-        .led_enable_mask    = (1 << eo_ledpulser_led_zero) | (1 << eo_ledpulser_led_one) | (1 << eo_ledpulser_led_two),
+        .led_enable_mask    = (1 << eo_ledpulser_led_zero) | 
+                              (1 << eo_ledpulser_led_one)  | 
+                              (1 << eo_ledpulser_led_two)  |
+                              (1 << eo_ledpulser_led_three),
         .led_init           = (eOint8_fp_uint8_cvoidp_t)hal_led_init,
         .led_on             = (eOint8_fp_uint8_t)hal_led_on,
         .led_off            = (eOint8_fp_uint8_t)hal_led_off,
@@ -226,19 +199,18 @@ static void s_eom_applbasic_specialise_leds(void)
     eo_ledpulser_Initialise(&ledpulsercfg);  
         
     // start a pulse on led0: infinite with 1 Hz period
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, 1*1000*1000, 0);
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, 1*eok_reltime1sec, 0);
     
-    // led1 will be driven by the receiver 
-    // led2 will be driven by teh transmitter
+    // led1 will be driven by the periodic task 
+    // led2 will be driven by teh event driven task
            
     // init the other leds
-    hal_led_init(hal_led3, NULL);
     hal_led_init(hal_led4, NULL);
     hal_led_init(hal_led5, NULL);
     hal_led_init(hal_led6, NULL);
     hal_led_init(hal_led7, NULL);
     
-    // use leds 3, 4, 5 with a single timer expirying every 500 ms
+    // use leds 4, 5 with a single timer expirying every 2 sec
     
     s_timer_blink = eo_timer_New();
     s_action_blink = eo_action_New();
@@ -247,77 +219,42 @@ static void s_eom_applbasic_specialise_leds(void)
                           eom_callbackman_GetTask(eom_callbackman_GetHandle())
                          );
     
-    eo_timer_Start(s_timer_blink, eok_abstimeNOW, 500*1000, eo_tmrmode_FOREVER, s_action_blink);    
-        
-}
-
-
-static void s_eom_applbasic_specialise_transmit(EOpacket *txpkt)
-{
-
-   // copy the pkt pointer
-    s_txpkt = txpkt;
-
-    eo_packet_Addressing_Set(s_txpkt, s_host_ipaddress, s_server_port);
-
-    eo_socketdtg_Put(s_skt_rops, s_txpkt);
-
-}
-
-
-static eObool_t s_eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr)
-{
-    if((eobool_false == s_host_connected) || (remotehostaddr != s_host_ipaddress))
-    {
-        // attempt connection for 1 second. no more. 
-        if(eores_OK == eo_socketdtg_Connect(s_skt_rops, remotehostaddr, eok_reltime1sec))
-        {
-            s_host_ipaddress = remotehostaddr;
-            s_host_connected = eobool_true;
-        }
-        else
-        {
-            s_host_connected = eobool_false;
-            //printf("not connecetd after %d ms. i shall try again at next reception\n\r", eok_reltime1sec/1000);
-        }
-    }
-
-    return(s_host_connected);
-}
-
-
-static void s_eom_applbasic_specialise_ipnet_start(void)
-{
-    const ipal_cfg_t* used_ipal_cfg = &ipal_cfg;
+    eo_timer_Start(s_timer_blink, eok_abstimeNOW, 2*eok_reltime1sec, eo_tmrmode_FOREVER, s_action_blink);    
     
-    const eOmipnet_cfg_dtgskt_t used_dtgskt_cfg = 
-    {   
-        .numberofsockets            = 2,        // max 2 sockets in IPnet 
-        .maxdatagramenqueuedintx    = 2         // max 2 datagrams in tx queue of IPnet
-    };
- 
-
-    eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,     // the properties of the two tasks of IPnet
-                         used_ipal_cfg,             // the ipal config
-                         NULL,                      // the ip/mac addresses. if NULL ... they are taken from ipal_cfg
-                         &used_dtgskt_cfg           // the datagrams   
-                         );
-
+#endif        
 }
 
 
-static void s_eom_applbasic_specialise_updserver_start(void)
+
+static void s_eom_applbasic_specialise_tasks_start(void)
 {
-    s_host_connected = eobool_false;
 
-    // the function s_udpserver_startup() is executed only one and ... starts a listening socket
-    // which will send and event to the task if a new packet arrives.
-    // the function s_udpserver_run() is triggered when an event arrives from the attached socket
-     s_task_udpserver = eom_task_New(eom_mtask_EventDriven, 100, 2*1024, s_udpserver_startup, s_udpserver_run,  6, 
-                                    eok_reltimeINFINITE, NULL, 
-                                    task_udpserver, "udpserver");
+    s_task_periodic = eom_task_New(     eom_mtask_Periodic,                 // the type of task: periodic
+                                        101,                                // its priority. higher is more priority
+                                        2*1024,                             // its dedicated stack size
+                                        s_periodic_startup,                 // function executed only once at startup
+                                        s_periodic_run,                     // functione executed periodically  
+                                        EOK_uint32dummy,                    // not relevant for periodic tasks
+                                        5*eok_reltime1sec+33*eok_reltime1ms,// the period
+                                        NULL,                               // some memory associated to the task: nothing in our application
+                                        task_periodic, "periodicdriven"     // used by microvision
+                                        );
 
-    s_task_udpserver = s_task_udpserver;
+    s_task_periodic = s_task_periodic;
+    
+    
+    s_task_eventdriven = eom_task_New(  eom_mtask_EventDriven,              // the type of task: event driven
+                                        100, 
+                                        2*1024, 
+                                        s_eventdriven_startup,              // function executed only once at startup
+                                        s_eventdriven_run,  
+                                        EOK_uint32dummy,                    // not relevant for eventdriven tasks
+                                        eok_reltimeINFINITE,                // the timeout on waiting for an event
+                                        NULL, 
+                                        task_eventdriven, "eventdriven"
+                                        );
+
+    s_task_eventdriven = s_task_eventdriven;    
 
 }  
 
@@ -328,12 +265,23 @@ static void s_eom_applbasic_specialise_updserver_start(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void task_udpserver(void *p)
+extern void task_periodic(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start(p);
 } 
 
+extern void task_eventdriven(void *p)
+{
+    // do here whatever you like before startup() is executed and then forever()
+    eom_task_Start(p);
+} 
+
+extern void task_messagedriven(void *p)
+{
+    // do here whatever you like before startup() is executed and then forever()
+    eom_task_Start(p);
+} 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -343,152 +291,103 @@ extern void task_udpserver(void *p)
 
 
 
-static void s_udpserver_startup(EOMtask *p, uint32_t t)
+static void s_periodic_startup(EOMtask *p, uint32_t t)
 {
-    EOaction_strg s_fullaction_stg;
-    EOaction* s_fullaction = (EOaction*)s_fullaction_stg;
-
-
-    // init the rx packet 
-    s_rxpkt = eo_packet_New(512);  
-    
- 
-
-    // initialise the socket 
-    s_skt_rops = eo_socketdtg_New(  2, 512, eom_mutex_New(), // input queue
-                                    2, 512, eom_mutex_New()  // output queue
-                                 );
-
-    // set the rx action on socket to be a message s_message_from_skt_rops to this task object
-    eo_action_SetEvent(s_fullaction, s_event_from_skt_rops, p);
-    eo_socketdtg_Open(s_skt_rops, s_server_port, eo_sktdir_TXRX, eobool_false, NULL, s_fullaction, NULL);
-    
-    // init the transceiver
-    s_eom_applbasic_specialise_transceiver_init();
-
-    //eventviewer_load(ev_ID_first_usrdef+0, getfromEOsocket);
-        
+       
 }
 
-static void s_udpserver_run(EOMtask *p, uint32_t t)
+static void s_periodic_run(EOMtask *p, uint32_t t)
+{   
+    static uint32_t num = 0;
+    char str[64];
+    
+    snprintf(str, sizeof(str), "periodic task executed %d times", ++num);
+    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+
+#if     defined(MINIMAL_BEHAVIOUR)
+    hal_led_toggle(hal_led1);
+#else    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_one, 50*eok_reltime1ms, 10);
+#endif
+        
+    eom_task_SetEvent(s_task_eventdriven, s_event_from_task_periodic);
+}
+
+
+static void s_eventdriven_startup(EOMtask *p, uint32_t t)
 {
+    // tasks can be created also inside other tasks after that the init task has expired
+    
+    s_task_messagedriven = eom_task_New(eom_mtask_MessageDriven,          // the type of task: message driven
+                                        99, 
+                                        2*1024, 
+                                        NULL,                               // function executed only once at startup: YES IT CAN BE NULL
+                                        s_messagedriven_run,  
+                                        4,                                  // size of internal receiving message queue
+                                        eok_reltimeINFINITE,                // the timeout on waiting for a message
+                                        NULL, 
+                                        task_messagedriven, "messagedriven"
+                                        );
 
-    eOresult_t res;
-    uint16_t numberof = 0;
+    s_task_messagedriven = s_task_messagedriven;      
+       
+}
 
+static void s_eventdriven_run(EOMtask *p, uint32_t t)
+{
     // the event that we have received
     eOevent_t evt = (eOevent_t)t;
 
-    if(eobool_true == eo_common_event_check(evt, s_event_from_skt_rops))
+    if(eobool_true == eo_common_event_check(evt, s_event_from_task_periodic))
     {
-        //evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef+0);
-        // retrieve the pkt.
-        res = eo_socketdtg_Get(s_skt_rops, s_rxpkt, eok_reltimeINFINITE);
-
-        //eventviewer_switch_to(prev);
+#if     defined(MINIMAL_BEHAVIOUR)
+        hal_led_toggle(hal_led2);
+#else         
+        eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_two,  100*eok_reltime1ms, 5);
+#endif
+        static uint32_t num = 0;
+        char str[64];
         
-        eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_one, 200*1000, 5);
-
-        // call a function for it
-        if((eores_OK == res) && (NULL != s_eom_applbasic_specialise_on_ropframe_received))
-        {
-            s_eom_applbasic_specialise_on_ropframe_received(s_rxpkt);
-        }
-
-        // if any other pkt in socket then send event again
-        res = eo_socketdtg_Received_NumberOf(s_skt_rops, &numberof);
-        if((0 != numberof) && (eores_OK == res))
-        {
-            eom_task_SetEvent(p, s_event_from_skt_rops);
-        }
+        snprintf(str, sizeof(str), "event-driven task executed %d times", ++num);
+        eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+        
+        // now send a message to task message driven
+        eom_task_SendMessage(s_task_messagedriven, s_message_from_task_eventbased, eok_reltimeINFINITE);
     }
-
+    
 }
 
+
+
+static void s_messagedriven_run(EOMtask *p, uint32_t t)
+{
+    // the message that we have received
+    eOmessage_t msg = (eOmessage_t)t;
+
+    if(s_message_from_task_eventbased == msg)
+    {
+#if     defined(MINIMAL_BEHAVIOUR)
+        hal_led_toggle(hal_led3);
+#else         
+        eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three,  50*eok_reltime1ms, 10);
+#endif
+        static uint32_t num = 0;
+        char str[64];
+        
+        snprintf(str, sizeof(str), "message-driven task executed %d times", ++num);
+        eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+    }
+    
+}
 
 
 static void s_specialise_blink(void *param)
 {
-    static uint8_t pos = 0;
-    
-    switch(pos)
-    {
-        case 0: hal_led_toggle(hal_led3); break;
-        case 1: hal_led_toggle(hal_led4); break;
-        case 2: hal_led_toggle(hal_led5); break;
-    }
-    
-    pos = (pos+1)%3;
+    hal_led_toggle(hal_led4); 
+    hal_led_toggle(hal_led5); 
 }
 
 
-
-static void s_eom_applbasic_specialise_transceiver_init(void)
-{
-    
-    // init transceiver
-    s_mytxpkt = eo_packet_New(512);
-
-    eo_packet_Size_Set(s_mytxpkt, 512);
-        
-    // impose that on rx pkt the task udp calls ...
-
-#if defined(USE_RECEIVER_ECHOER)    
-    s_eom_applbasic_specialise_onpktreceived_set(s_eom_applbasic_specialise_echoer_receive);
-#else    
-    s_eom_applbasic_specialise_onpktreceived_set(s_eom_applbasic_specialise_asimm_receive);    
-#endif
-    
-}
-
-
-#if defined(USE_RECEIVER_ECHOER)
-static void s_eom_applbasic_specialise_echoer_receive(EOpacket* rxpkt)
-{
-    eOipv4addr_t remaddr;
-    eOipv4port_t remport;
-
-    eo_packet_Addressing_Get(rxpkt, &remaddr, &remport);
-
-    // at first attempt to connect.
-
-    if(eobool_false == s_eom_applbasic_specialise_connect(remaddr))
-    {
-        return;
-    }
-
-
-    // then send back teh very same pkt
-
-    s_eom_applbasic_specialise_transmit(rxpkt);
-    
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_two, 100*1000, 10);
-
-}
-#else
-static void s_eom_applbasic_specialise_asimm_receive(EOpacket* rxpkt)
-{
-    eOipv4addr_t remaddr;
-    eOipv4port_t remport;
-
-    eo_packet_Addressing_Get(rxpkt, &remaddr, &remport);
-
-    // at first attempt to connect.
-
-    if(eobool_false == s_eom_applbasic_specialise_connect(remaddr))
-    {
-        return;
-    }
-
-
-    // then send back the full pkt
-
-    s_eom_applbasic_specialise_transmit(s_mytxpkt);
-    
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_two, 100*1000, 10);
-
-}
-#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

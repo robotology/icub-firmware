@@ -41,8 +41,6 @@
 #include "EOMtheSystem.h"
 #include "EOtheMemoryPool.h"
 #include "EOtheErrormanager.h"
-//#include "EOMtheApplication.h"
-
 
 
 // keeps specialisation proper to the board function

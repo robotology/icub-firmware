@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\cfg;..\app_extra;..\app_basic;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\..\cfg;..\app_extra;..\app_basic;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -444,11 +444,6 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
-            <File>
-              <FileName>ipal.base.medium.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -460,11 +455,6 @@
               <FilePath>..\abslayer-cfg\hal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>ipal_cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
-            </File>
-            <File>
               <FileName>osal_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
@@ -473,11 +463,6 @@
               <FileName>hal_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg\hal_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>ipal_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
               <FileName>osal_cfg.h</FileName>
@@ -663,31 +648,6 @@
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-ipnet</GroupName>
-          <Files>
-            <File>
-              <FileName>EOMtheIPnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOsocket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOsocketDatagram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheIPnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1141,11 +1101,6 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
-            <File>
-              <FileName>ipal.base.medium.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1157,11 +1112,6 @@
               <FilePath>..\abslayer-cfg\hal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>ipal_cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\abslayer-cfg\ipal_cfg.c</FilePath>
-            </File>
-            <File>
               <FileName>osal_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg.c</FilePath>
@@ -1170,11 +1120,6 @@
               <FileName>hal_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg\hal_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>ipal_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\abslayer-cfg\ipal_cfg.h</FilePath>
             </File>
             <File>
               <FileName>osal_cfg.h</FileName>
@@ -1360,31 +1305,6 @@
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-ipnet</GroupName>
-          <Files>
-            <File>
-              <FileName>EOMtheIPnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOsocket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOsocketDatagram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheIPnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
