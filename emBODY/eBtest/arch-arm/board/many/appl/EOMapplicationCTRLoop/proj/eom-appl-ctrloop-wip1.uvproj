@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>emsappl-mcbstm32c-zerooffset</TargetName>
+      <TargetName>ctrloop-v2-mcbstm32c-zerooffset</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -152,7 +152,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\STM32_TP.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -334,8 +334,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\robotconfig\v1\eprotocol</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems001like</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,9 +392,9 @@
           <GroupName>app_main</GroupName>
           <Files>
             <File>
-              <FileName>eom_emsappl_main.c</FileName>
+              <FileName>eom_appl_ctrloop_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_appl_ctrloop_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -404,7 +404,7 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -427,45 +427,22 @@
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
-            <File>
-              <FileName>osal.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -510,117 +487,117 @@
             <File>
               <FileName>EOpacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOpacket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOpacket.c</FilePath>
             </File>
             <File>
               <FileName>EOsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOaction.c</FilePath>
             </File>
             <File>
               <FileName>EOarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOarray.c</FilePath>
             </File>
             <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EoCommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EoCommon.c</FilePath>
             </File>
             <File>
               <FileName>EOconstarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstarray.c</FilePath>
             </File>
             <File>
               <FileName>EOconstvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstvector.c</FilePath>
             </File>
             <File>
               <FileName>EOdeque.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOdeque.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOdeque.c</FilePath>
             </File>
             <File>
               <FileName>EOfifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifo.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifo.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoByte.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoByte.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoByte.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoWord.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoWord.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoWord.c</FilePath>
             </File>
             <File>
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOlist.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOlist.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheErrorManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheErrorManager.c</FilePath>
             </File>
             <File>
               <FileName>EOtheLEDpulser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheLEDpulser.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMemoryPool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheMemoryPool.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheMemoryPool.c</FilePath>
             </File>
             <File>
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtimer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtimer.c</FilePath>
             </File>
             <File>
               <FileName>EOumlsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOumlsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOumlsm.c</FilePath>
             </File>
             <File>
               <FileName>EOvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOvector.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOVtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtask.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -630,27 +607,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -660,22 +637,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -685,12 +662,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -700,7 +677,7 @@
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -710,27 +687,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -740,62 +717,62 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -840,7 +817,7 @@
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -860,72 +837,72 @@
             <File>
               <FileName>EOagent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
             </File>
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
               <FileName>EOproxy.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -935,47 +912,47 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b03.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b04.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b05.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b08.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -985,52 +962,52 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1055,34 +1032,34 @@
             <File>
               <FileName>EONtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtask.c</FilePath>
             </File>
             <File>
               <FileName>EONmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONmutex.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>emsappl-mcbstm32c-normoffset</TargetName>
+      <TargetName>ctrloop-v2-mcbstm32c-normoffset</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1227,7 +1204,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\STM32_TP.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -1423,9 +1400,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>HAL_USE_ARCH_ARM EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_main;..\app_cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems001like</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1467,9 +1444,9 @@
           <GroupName>app_main</GroupName>
           <Files>
             <File>
-              <FileName>eom_emsappl_main.c</FileName>
+              <FileName>eom_appl_ctrloop_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_appl_ctrloop_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1479,32 +1456,45 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
-            <File>
-              <FileName>osal.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1549,117 +1539,117 @@
             <File>
               <FileName>EOpacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOpacket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOpacket.c</FilePath>
             </File>
             <File>
               <FileName>EOsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOaction.c</FilePath>
             </File>
             <File>
               <FileName>EOarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOarray.c</FilePath>
             </File>
             <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EoCommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EoCommon.c</FilePath>
             </File>
             <File>
               <FileName>EOconstarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstarray.c</FilePath>
             </File>
             <File>
               <FileName>EOconstvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstvector.c</FilePath>
             </File>
             <File>
               <FileName>EOdeque.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOdeque.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOdeque.c</FilePath>
             </File>
             <File>
               <FileName>EOfifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifo.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifo.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoByte.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoByte.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoByte.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoWord.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoWord.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoWord.c</FilePath>
             </File>
             <File>
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOlist.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOlist.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheErrorManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheErrorManager.c</FilePath>
             </File>
             <File>
               <FileName>EOtheLEDpulser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheLEDpulser.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMemoryPool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheMemoryPool.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheMemoryPool.c</FilePath>
             </File>
             <File>
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtimer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtimer.c</FilePath>
             </File>
             <File>
               <FileName>EOumlsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOumlsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOumlsm.c</FilePath>
             </File>
             <File>
               <FileName>EOvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOvector.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOVtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtask.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1669,27 +1659,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1699,22 +1689,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1724,12 +1714,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1739,7 +1729,7 @@
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1749,27 +1739,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1779,62 +1769,62 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1879,7 +1869,7 @@
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1899,72 +1889,72 @@
             <File>
               <FileName>EOagent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
             </File>
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
               <FileName>EOproxy.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1974,47 +1964,47 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b03.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b04.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b05.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b08.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2024,52 +2014,52 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2094,34 +2084,34 @@
             <File>
               <FileName>EONtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtask.c</FilePath>
             </File>
             <File>
               <FileName>EONmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONmutex.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>emsappl-ems001brd-normoffset</TargetName>
+      <TargetName>ctrloop-v2-ems001brd-normoffset</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -2266,7 +2256,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\STM32_TP.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -2462,9 +2452,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_main;..\app_cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems001like</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2506,9 +2496,9 @@
           <GroupName>app_main</GroupName>
           <Files>
             <File>
-              <FileName>eom_emsappl_main.c</FileName>
+              <FileName>eom_appl_ctrloop_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_appl_ctrloop_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2518,32 +2508,27 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
-            <File>
-              <FileName>osal.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2588,117 +2573,117 @@
             <File>
               <FileName>EOpacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOpacket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOpacket.c</FilePath>
             </File>
             <File>
               <FileName>EOsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOaction.c</FilePath>
             </File>
             <File>
               <FileName>EOarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOarray.c</FilePath>
             </File>
             <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EoCommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EoCommon.c</FilePath>
             </File>
             <File>
               <FileName>EOconstarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstarray.c</FilePath>
             </File>
             <File>
               <FileName>EOconstvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstvector.c</FilePath>
             </File>
             <File>
               <FileName>EOdeque.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOdeque.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOdeque.c</FilePath>
             </File>
             <File>
               <FileName>EOfifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifo.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifo.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoByte.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoByte.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoByte.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoWord.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoWord.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoWord.c</FilePath>
             </File>
             <File>
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOlist.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOlist.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheErrorManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheErrorManager.c</FilePath>
             </File>
             <File>
               <FileName>EOtheLEDpulser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheLEDpulser.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMemoryPool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheMemoryPool.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheMemoryPool.c</FilePath>
             </File>
             <File>
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtimer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtimer.c</FilePath>
             </File>
             <File>
               <FileName>EOumlsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOumlsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOumlsm.c</FilePath>
             </File>
             <File>
               <FileName>EOvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOvector.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOVtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtask.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2708,27 +2693,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2738,22 +2723,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2763,12 +2748,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2778,7 +2763,7 @@
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2788,27 +2773,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2818,62 +2803,62 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2918,7 +2903,7 @@
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2938,72 +2923,72 @@
             <File>
               <FileName>EOagent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
             </File>
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
               <FileName>EOproxy.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3013,47 +2998,47 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b03.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b04.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b05.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b08.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3063,52 +3048,52 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3133,34 +3118,34 @@
             <File>
               <FileName>EONtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtask.c</FilePath>
             </File>
             <File>
               <FileName>EONmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONmutex.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>emsappl-ems001brd-zerooffset</TargetName>
+      <TargetName>ctrloop-v2-ems001brd-zerooffset</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -3305,7 +3290,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\STM32_TP.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -3501,9 +3486,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
+              <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems001like</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3545,9 +3530,9 @@
           <GroupName>app_main</GroupName>
           <Files>
             <File>
-              <FileName>eom_emsappl_main.c</FileName>
+              <FileName>eom_appl_ctrloop_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app_main\eom_emsappl_main.c</FilePath>
+              <FilePath>..\app_main\eom_appl_ctrloop_main.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3557,32 +3542,45 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
-            <File>
-              <FileName>osal.cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -3627,117 +3625,117 @@
             <File>
               <FileName>EOpacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOpacket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOpacket.c</FilePath>
             </File>
             <File>
               <FileName>EOsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOaction.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOaction.c</FilePath>
             </File>
             <File>
               <FileName>EOarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOarray.c</FilePath>
             </File>
             <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EoCommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EoCommon.c</FilePath>
             </File>
             <File>
               <FileName>EOconstarray.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstarray.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstarray.c</FilePath>
             </File>
             <File>
               <FileName>EOconstvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOconstvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOconstvector.c</FilePath>
             </File>
             <File>
               <FileName>EOdeque.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOdeque.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOdeque.c</FilePath>
             </File>
             <File>
               <FileName>EOfifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifo.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifo.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoByte.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoByte.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoByte.c</FilePath>
             </File>
             <File>
               <FileName>EOfifoWord.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOfifoWord.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOfifoWord.c</FilePath>
             </File>
             <File>
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOlist.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOlist.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheErrorManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheErrorManager.c</FilePath>
             </File>
             <File>
               <FileName>EOtheLEDpulser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheLEDpulser.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMemoryPool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheMemoryPool.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtheMemoryPool.c</FilePath>
             </File>
             <File>
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtimer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOtimer.c</FilePath>
             </File>
             <File>
               <FileName>EOumlsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOumlsm.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOumlsm.c</FilePath>
             </File>
             <File>
               <FileName>EOvector.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOvector.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOvector.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOVtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtask.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EOVtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EOVtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3747,27 +3745,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3777,22 +3775,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3802,12 +3800,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3817,7 +3815,7 @@
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3827,27 +3825,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3857,62 +3855,62 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3957,7 +3955,7 @@
             <File>
               <FileName>OPCprotocolManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3977,72 +3975,72 @@
             <File>
               <FileName>EOagent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOagent.c</FilePath>
             </File>
             <File>
               <FileName>EOconfirmationManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOconfirmationManager.c</FilePath>
             </File>
             <File>
               <FileName>EOhostTransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOhostTransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOnv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnv.c</FilePath>
             </File>
             <File>
               <FileName>EOnvSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOnvSet.c</FilePath>
             </File>
             <File>
               <FileName>EOproxy.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOproxy.c</FilePath>
             </File>
             <File>
               <FileName>EOreceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOreceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOrop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOrop.c</FilePath>
             </File>
             <File>
               <FileName>EOropframe.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOropframe.c</FilePath>
             </File>
             <File>
               <FileName>EOtheBOARDtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheBOARDtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtheFormer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheFormer.c</FilePath>
             </File>
             <File>
               <FileName>EOtheParser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtheParser.c</FilePath>
             </File>
             <File>
               <FileName>EOtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOtransmitter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4052,47 +4050,47 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b03.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b04.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b05.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b08.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4102,52 +4100,52 @@
             <File>
               <FileName>EoProtocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolAS_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolEPs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMC_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolMN_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4172,27 +4170,27 @@
             <File>
               <FileName>EONtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EONtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EONtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONtask.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONtask.c</FilePath>
             </File>
             <File>
               <FileName>EONmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\core\core\EONmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\core\EONmutex.c</FilePath>
             </File>
           </Files>
         </Group>
