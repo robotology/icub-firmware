@@ -825,7 +825,7 @@ extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
         return(osal_res_NOK_generic);
     } 
     
-    *id = 0;
+    *id = oosiit_tsk_get_id(tsk->rtostsk);
 
     return(osal_res_OK);
 }
