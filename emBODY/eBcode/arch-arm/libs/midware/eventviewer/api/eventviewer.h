@@ -77,8 +77,8 @@ typedef enum
 typedef enum
 {
     ev_ID_idle              = 1,        /**< the idle ID: use this as initial ID and when there is no relevant activity */
-    ev_ID_first_usrdef      = 2,        /**< use this and successive 61 IDs for user-defined activities */
-    ev_ID_first_ostask      = 64,       /**< use this and successive 63 IDs for os tasks */
+    ev_ID_first_ostask      = 2,        /**< use this and successive 93 IDs for os tasks */
+    ev_ID_first_usrdef      = 96,       /**< use this and successive 31 IDs for for user-defined activities */
     ev_ID_pendsv            = 128,      /**< use this for pendsv */
     ev_ID_systick           = 129,      /**< use this for systick */
     ev_ID_svc               = 130,      /**< use this for svc */
