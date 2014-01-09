@@ -243,6 +243,7 @@ static void s_eom_thecreation(void)
     char str[128];
     // we are in osal, now
 
+
     // start the services offered by embobj: timer manager and callback manager
 
     eom_timerman_Initialise(s_eom_system.tmrmancfg);
@@ -263,7 +264,10 @@ static void s_eom_thecreation(void)
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
     
     // run user defined initialisation ...
-    s_eom_system.user_init_fn();
+    if(NULL != s_eom_system.user_init_fn)
+    {
+        s_eom_system.user_init_fn();
+    }
     
     snprintf(str, sizeof(str)-1, "quitting the init task");
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
