@@ -115,7 +115,6 @@ int main(void)
     eventviewer_load(ev_ID_systick, SysTick_Handler);  
     eventviewer_load(ev_ID_first_usrdef+1, userdef1); 
     eventviewer_load(ev_ID_first_usrdef+2, userdef2);
-    //eventviewer_load(ev_ID_first_usrdef+3, userdef3);
     
     // the eventviewer shall stay most of time in idle
     // apart from some specific actions: systick, userdef1 and userdef2
@@ -138,10 +137,7 @@ int main(void)
         eventviewer_switch_to(prev);
         
         systickserv_wait_for(500*1000);
-    }
-
-    
-    
+    }    
 }
 
 
