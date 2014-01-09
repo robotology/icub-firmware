@@ -97,9 +97,6 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t);
 
 static void s_udpserver_run(EOMtask *p, uint32_t t);
 
-static void s_specialise_blink(void *param);
-
-
 
 static void s_eom_applipnet_specialise_transceiver_init(void);
 
@@ -133,11 +130,6 @@ void getfromEOsocket(void)
 
 static EOpacket* s_mytxpkt = NULL;
 
-static EOtimer*     s_timer_blink = NULL;
-static EOaction*    s_action_blink = NULL;
-
-
-//static osal_semaphore_t*        s_sem_tx_pkt        = NULL;
 
 static EOsocketDatagram*        s_skt_rops          = NULL;
 static EOpacket*                s_rxpkt             = NULL;
@@ -148,9 +140,6 @@ static EOMtask*                 s_task_udpserver    = NULL;
 static void (*s_eom_applipnet_specialise_on_ropframe_received)(EOpacket*) = NULL;
 
 
-
-//static const eOevent_t s_event_tx_into_skt_rops         = 0x00000001;
-//static const eOevent_t s_event_connect_to_host          = 0x00000002;
 static const eOevent_t s_event_from_skt_rops            = 0x00000004;
 
 static const eOipv4port_t s_server_port                 = 33333; 
@@ -183,7 +172,6 @@ extern void eom_applipnet_specialise_system(void)
     //                  led0 will blink forever at 1Hz
     //                  led1 will pulse 5 times at 5Hz at pkt reception
     //                  led2 will pulse 10 times at 10Hz at pkt transmission
-    //                  led3, led4, and led5 will rotate every 500 msec
     
     s_eom_applipnet_specialise_leds();
     
@@ -211,7 +199,7 @@ static void s_eom_applipnet_specialise_onpktreceived_set( void (*cbk)(EOpacket*)
 static void s_eom_applipnet_specialise_leds(void)
 {
    
-    // init the ledpulser with leds 0 and 1
+    // init the ledpulser with leds 0 and 1 and 2
     
     eOledpulser_cfg_t ledpulsercfg = 
     {
@@ -237,18 +225,7 @@ static void s_eom_applipnet_specialise_leds(void)
     hal_led_init(hal_led5, NULL);
     hal_led_init(hal_led6, NULL);
     hal_led_init(hal_led7, NULL);
-    
-    // use leds 3, 4, 5 with a single timer expirying every 500 ms
-    
-    s_timer_blink = eo_timer_New();
-    s_action_blink = eo_action_New();
-    eo_action_SetCallback(s_action_blink, 
-                          s_specialise_blink, NULL,
-                          eom_callbackman_GetTask(eom_callbackman_GetHandle())
-                         );
-    
-    eo_timer_Start(s_timer_blink, eok_abstimeNOW, 500*1000, eo_tmrmode_FOREVER, s_action_blink);    
-        
+               
 }
 
 
@@ -370,9 +347,9 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t)
         
 }
 
+
 static void s_udpserver_run(EOMtask *p, uint32_t t)
 {
-
     eOresult_t res;
     uint16_t numberof = 0;
 
@@ -404,23 +381,6 @@ static void s_udpserver_run(EOMtask *p, uint32_t t)
     }
 
 }
-
-
-
-static void s_specialise_blink(void *param)
-{
-    static uint8_t pos = 0;
-    
-    switch(pos)
-    {
-        case 0: hal_led_toggle(hal_led3); break;
-        case 1: hal_led_toggle(hal_led4); break;
-        case 2: hal_led_toggle(hal_led5); break;
-    }
-    
-    pos = (pos+1)%3;
-}
-
 
 
 static void s_eom_applipnet_specialise_transceiver_init(void)
