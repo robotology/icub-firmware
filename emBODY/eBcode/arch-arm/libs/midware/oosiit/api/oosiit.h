@@ -373,6 +373,13 @@ extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
 extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp);
 
 
+/** @fn         extern uint8_t oosiit_tsk_get_id(oosiit_tskptr_t tp)
+    @brief      allows retrieving the internal id of the task.
+    @param      tp       the descriptor of the task
+    @return     if successful the id, otherwise it returns 0. 
+ **/
+extern uint8_t oosiit_tsk_get_id(oosiit_tskptr_t tp);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // time functions
 

@@ -2361,24 +2361,28 @@ extern void rt_iit_dbg_init(void)
 extern void rt_iit_dbg_task_notify(void* ptcb, BOOL create)
 {
     P_TCB p_tcb = (P_TCB) ptcb;
+    evEntityId_t id = 0;
     if(0 == oosiit_dbg_initted)
     {
         return;
     }
     
+    id = ev_ID_first_ostask+p_tcb->task_id-1;
+
+    
     if(1 == create)
     {
-        eventviewer_load(ev_ID_first_ostask+p_tcb->task_id, p_tcb->ptask);
+        eventviewer_load(id, p_tcb->ptask);
     }
     else
     {
-        eventviewer_unload(ev_ID_first_ostask+p_tcb->task_id, p_tcb->ptask);
+        eventviewer_unload(id, p_tcb->ptask);
     }
 }
 
 extern void rt_iit_dbg_task_switch(U32 task_id)
 {
-    U8 id = (255==task_id) ? (ev_ID_idle) : (ev_ID_first_ostask+(U8)task_id);
+    U8 id = (255==task_id) ? (ev_ID_idle) : (ev_ID_first_ostask+(U8)task_id-1);
     
     if((0 == oosiit_dbg_initted) || (os_tsk.new == os_tsk.run))
     {

@@ -1358,7 +1358,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>__CORTEX_M3 NDBG_MSG OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>.\api;.\src\cmsis-rtx-modified\cm;.\src\others</IncludePath>
+              <IncludePath>.\api;.\src\cmsis-rtx-modified\cm;.\src\others;..\..\midware\eventviewer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3454,7 +3454,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>__CORTEX_M4 __FPU_PRESENT OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>.\api;.\src\cmsis-rtx-modified\cm;.\src\others;..\..\..\..\sys\mid; ..\..\..\..\sys\mid\inc</IncludePath>
+              <IncludePath>.\api;.\src\cmsis-rtx-modified\cm;.\src\others;..\..\..\..\sys\mid;..\..\..\..\sys\mid\inc;..\..\midware\eventviewer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

@@ -31,9 +31,9 @@
 #include "stdlib.h"
 #include "string.h"
 
-#if defined(OOSIIT_DBG_ENABLE)
+//#if defined(OOSIIT_DBG_ENABLE)
 #include "api/eventviewer.h"
-#endif
+//#endif
 
 #include "oosiit_svc.h"
 
@@ -683,6 +683,21 @@ extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
     {   // call svc
         return(__svc_oosiit_tsk_get_extdata(tp));
     }        
+}
+
+extern uint8_t oosiit_tsk_get_id(oosiit_tskptr_t tp)
+{
+    if(oosiit_res_NOK == s_oosiit_tsk_valid(tp))
+    {
+        return(0);
+    } 
+
+    P_TCB task_context = (P_TCB)tp;
+    if(255 == task_context->task_id)
+    {
+        return(ev_ID_idle);
+    }
+    return(task_context->task_id+ev_ID_first_ostask-1);  
 }
 
 
