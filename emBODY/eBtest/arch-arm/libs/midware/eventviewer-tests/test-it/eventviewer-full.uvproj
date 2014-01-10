@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>STM32F10X_CL HL_USE_BRD_MCBSTM32_C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\lowlevel\hl-core-tests\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,14 +392,9 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
-            </File>
-            <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -440,6 +435,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -504,12 +504,12 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
             <File>
               <FileName>systickservices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\systickservices.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\systickservices.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -869,7 +869,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>STM32F40_41xxx HL_USE_BRD_MCBSTM32_F400 __CORTEX_M4  __FPU_PRESENT</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\lowlevel\hl-core-tests\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -911,9 +911,14 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
+              <FileName>system_stm32f4xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -954,11 +959,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1023,12 +1023,12 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
             <File>
               <FileName>systickservices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\systickservices.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\systickservices.c</FilePath>
             </File>
           </Files>
         </Group>
