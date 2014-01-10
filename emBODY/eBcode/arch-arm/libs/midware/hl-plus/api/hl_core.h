@@ -41,15 +41,15 @@
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
-    #include "../../core/stm32f1/api/stm32f1.h"
+    #include "../../../lowlevel/hl-core/stm32f1/api/stm32f1.h"
     
 #elif   defined(HL_USE_MPU_ARCH_STM32F2)
 
-    #include "../../core/stm32f2/api/stm32f2.h"
+    #include "../../../lowlevel/hl-core/stm32f2/api/stm32f2.h"
 
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
 
-    #include "../../core/stm32f4/api/stm32f4.h"
+    #include "../../../lowlevel/hl-core/stm32f4/api/stm32f4.h"
     
 #else
     #error HL: specify a HL_USE_MPU_ARCH_*

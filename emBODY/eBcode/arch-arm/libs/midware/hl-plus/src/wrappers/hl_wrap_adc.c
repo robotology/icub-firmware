@@ -29,21 +29,17 @@
 #endif
 
 
-#include "hl_cfg_plus_modules.h"
-
-#if     defined(HL_USE_CORE_STM32)
-
 
 #include "hl_cfg_plus_modules.h"
 
 #if     defined(HL_USE_CORE_STM32)
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-    #include "../../../core/stm32f1/src/stm32f10x_adc.c"
+    #include "../../../../lowlevel/hl-core/stm32f1/src/stm32f10x_adc.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F2)
-    #include "../../../core/stm32f4/src/stm32f2xx_adc.c"
+    #include "../../../../lowlevel/hl-core/stm32f4/src/stm32f2xx_adc.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    #include "../../../core/stm32f4/src/stm32f4xx_adc.c"
+    #include "../../../../lowlevel/hl-core/stm32f4/src/stm32f4xx_adc.c"
 #else
     #error HL-PLUS: specify a HL_USE_MPU_ARCH_*
 #endif
@@ -51,7 +47,6 @@
 
 #endif//defined(HL_USE_CORE_STM32)
 
-#endif//defined(HL_USE_CORE_STM32)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

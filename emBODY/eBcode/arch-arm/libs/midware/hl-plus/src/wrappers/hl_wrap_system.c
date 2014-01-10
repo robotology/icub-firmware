@@ -35,11 +35,11 @@
 
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-    #include "../../../core/cmsis/src/system_stm32f10x.c"
+    #include "../../../../lowlevel/hl-core/cmsis/src/system_stm32f10x.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F2)
-    #include "../../../core/cmsis/src/system_stm32f2xx.c"
+    #include "../../../../lowlevel/hl-core/cmsis/src/system_stm32f2xx.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    #include "../../../core/cmsis/src/system_stm32f4xx.c"
+    #include "../../../../lowlevel/hl-core/cmsis/src/system_stm32f4xx.c"
 #else
     #error HL-PLUS: specify a HL_USE_MPU_ARCH_*
 #endif

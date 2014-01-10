@@ -35,11 +35,11 @@
 
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-    #include "../../../core/stm32f1/src/stm32f10x_wwdg.c"
+    #include "../../../../lowlevel/hl-core/stm32f1/src/stm32f10x_wwdg.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F2)
-    #include "../../../core/stm32f4/src/stm32f2xx_wwdg.c"
+    #include "../../../../lowlevel/hl-core/stm32f4/src/stm32f2xx_wwdg.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    #include "../../../core/stm32f4/src/stm32f4xx_wwdg.c"
+    #include "../../../../lowlevel/hl-core/stm32f4/src/stm32f4xx_wwdg.c"
 #else
     #error HL-PLUS: specify a HL_USE_MPU_ARCH_*
 #endif

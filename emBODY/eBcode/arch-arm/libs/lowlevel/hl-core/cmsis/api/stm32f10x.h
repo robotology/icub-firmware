@@ -57,7 +57,7 @@
 //IIT-EXT
 #if defined(HL_CFG_PLUS_TARGET_BY_FILE)
     #include "hl_cfg_plus_target.h"
-    #include "../../../plus/api/hl_mpu2cmsis.h"
+    #include "../../../../midware/hl-plus/api/hl_mpu2cmsis.h"
     #if !defined(__STM32F10x_H__PRINT_ONLY_ONCE)
         #define __STM32F10x_H__PRINT_ONLY_ONCE
         //#warning HL-WARN: using configuration file: hl_cfg_cmsis_stm32fx.h

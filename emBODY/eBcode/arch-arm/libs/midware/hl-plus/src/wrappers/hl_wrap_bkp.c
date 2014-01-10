@@ -35,12 +35,12 @@
 
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-    #include "../../../core/stm32f1/src/stm32f10x_bkp.c"
+    #include "../../../../lowlevel/hl-core/stm32f1/src/stm32f10x_bkp.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F2)
-    //#include "../../../core/stm32f4/src/stm32f2xx_bkp.c"
+    //#include "../../../../lowlevel/hl-core/stm32f4/src/stm32f2xx_bkp.c"
     #warning HL: stm32f2xx_bkp.c is not used
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    //#include "../../../core/stm32f4/src/stm32f4xx_bkp.c"
+    //#include "../../../../lowlevel/hl-core/stm32f4/src/stm32f4xx_bkp.c"
     //#warning HL: stm32f4xx_bkp.c is not used
 #else
     #error HL-PLUS: specify a HL_USE_MPU_ARCH_*

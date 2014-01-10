@@ -35,12 +35,12 @@
 
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
-    //#include "../../../core/stm32f1/src/stm32f10x_syscfg.c"
+    //#include "../../../../lowlevel/hl-core/stm32f1/src/stm32f10x_syscfg.c"
     //#warning HL: stm32f10x_syscfg.c is not used
 #elif   defined(HL_USE_MPU_ARCH_STM32F2)
-    #include "../../../core/stm32f4/src/stm32f2xx_syscfg.c"
+    #include "../../../../lowlevel/hl-core/stm32f4/src/stm32f2xx_syscfg.c"
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    #include "../../../core/stm32f4/src/stm32f4xx_syscfg.c"
+    #include "../../../../lowlevel/hl-core/stm32f4/src/stm32f4xx_syscfg.c"
 #else
     #error HL-PLUS: specify a HL_USE_MPU_ARCH_*
 #endif
