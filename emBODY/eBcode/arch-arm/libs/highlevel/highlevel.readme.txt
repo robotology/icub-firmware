@@ -2,3 +2,5 @@
 It shall contain:
 - abstraction layer
 - services
+
+embobj will stay out of arch-arm as it is transversal
