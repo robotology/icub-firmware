@@ -1,4 +1,7 @@
 
+README FIRST: abslayer and services shall be moved under highlevel
+
+
 It contains source code for libraries used in boards built with MPUs with ARM architecture (ARM-CM3 and ARM-CM4).
 It also contains projects for the libraries. 
 
