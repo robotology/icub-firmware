@@ -1,0 +1,4 @@
+
+It shall contain:
+- abstraction layer
+- services
