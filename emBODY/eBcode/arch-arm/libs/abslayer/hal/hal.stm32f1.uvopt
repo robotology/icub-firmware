@@ -283,7 +283,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>1</tvExp>
+        <tvExp>0</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -766,12 +766,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>24</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>4</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\cmsis\src\system_stm32f10x.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</PathWithFileName>
       <FilenameWithoutPath>system_stm32f10x.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -779,7 +779,7 @@
   </Group>
 
   <Group>
-    <GroupName>hl-stm32f1</GroupName>
+    <GroupName>hl-core-stm32f1</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -795,7 +795,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x__misc.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x__misc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x__misc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -811,7 +811,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_adc.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_adc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_adc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -827,7 +827,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_bkp.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_bkp.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_bkp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -843,7 +843,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_can.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_can.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_can.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -859,7 +859,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_cec.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_cec.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_cec.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -875,7 +875,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_crc.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_crc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_crc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -891,7 +891,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_dac.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_dac.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_dac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -907,7 +907,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_dbgmcu.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_dbgmcu.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_dbgmcu.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -923,7 +923,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_dma.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_dma.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_dma.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -939,7 +939,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_exti.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_exti.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_exti.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -955,7 +955,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_flash.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_flash.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -971,7 +971,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_fsmc.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_fsmc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_fsmc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -987,7 +987,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_gpio.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_gpio.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1003,7 +1003,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_i2c.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_i2c.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_i2c.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1019,7 +1019,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_iwdg.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_iwdg.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_iwdg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1035,7 +1035,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_pwr.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_pwr.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_pwr.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1051,7 +1051,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_rcc.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_rcc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_rcc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1067,7 +1067,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_rtc.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_rtc.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_rtc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1083,7 +1083,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_sdio.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_sdio.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_sdio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1099,7 +1099,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_spi.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_spi.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_spi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1115,7 +1115,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_tim.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_tim.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_tim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1131,7 +1131,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_usart.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_usart.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1147,7 +1147,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\midware\hl\core\stm32f1\src\stm32f10x_wwdg.c</PathWithFileName>
+      <PathWithFileName>..\..\lowlevel\hl-core\stm32f1\src\stm32f10x_wwdg.c</PathWithFileName>
       <FilenameWithoutPath>stm32f10x_wwdg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1182,10 +1182,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>6</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>626</TopLine>
+      <CurrentLine>652</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\src\stm32f1\hal_stm32_base.c</PathWithFileName>
       <FilenameWithoutPath>hal_stm32_base.c</FilenameWithoutPath>
@@ -1556,7 +1556,7 @@
 
   <Group>
     <GroupName>hal-utils</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1600,7 +1600,7 @@
       <Focus>0</Focus>
       <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
+      <TopLine>3</TopLine>
       <CurrentLine>17</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\src\utils\hl_i2c.c</PathWithFileName>
