@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>STM32F10X_MD HL_USE_BRD_MCBSTM32_C __CORTEX_M3  OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\lowlevel\hl-core-tests\app-test\cmsis</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -444,7 +444,7 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -452,14 +452,9 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
-            </File>
-            <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -500,6 +495,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1127,7 +1127,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HL_USE_BRD_MCBSTM32_C __CORTEX_M3  STM32F10X_CL OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\lowlevel\hl-core-tests\app-test\cmsis</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1221,7 +1221,7 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1229,14 +1229,9 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
-            </File>
-            <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1277,6 +1272,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1904,7 +1904,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HL_USE_BRD_MCBSTM32_C __CORTEX_M3  STM32F10X_CL OOSIIT_DBG_ENABLE_ALL OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\lowlevel\hl-core-tests\app-test\cmsis</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1998,7 +1998,7 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2006,14 +2006,9 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
-            </File>
-            <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2054,6 +2049,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2681,7 +2681,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>STM32F40_41xxx HL_USE_BRD_MCBSTM32_F400 __CORTEX_M4  __FPU_PRESENT OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\lowlevel\hl-core-tests\app-test\cmsis</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2775,7 +2775,7 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2783,9 +2783,14 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
+              <FileName>system_stm32f4xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2826,11 +2831,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3458,7 +3458,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>STM32F40_41xxx HL_USE_BRD_MCBSTM32_F400 __CORTEX_M4  __FPU_PRESENT OOSIIT_USE_TIMEGET_UNDER_SVC OOSIIT_DBG_ENABLE_ALL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\api;..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\hl-tests\test-core\app-test\cmsis;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\oosiit\src\others;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\lowlevel\hl-core-tests\app-test\cmsis</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3552,7 +3552,7 @@
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hl-tests\test-core\app-test\cmsis\board.c</FilePath>
+              <FilePath>..\..\..\lowlevel\hl-core-tests\app-test\cmsis\board.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3560,9 +3560,14 @@
           <GroupName>cmsis</GroupName>
           <Files>
             <File>
+              <FileName>system_stm32f4xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f10x.c</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3603,11 +3608,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl\core\cmsis\src\system_stm32f4xx.c</FilePath>
             </File>
           </Files>
         </Group>
