@@ -4,15 +4,15 @@ It is possible to use HL at various levels. The core/cmsis is the lowest level a
 - CMSIS
   Allows to use CMSIS and access to the registers of the chosen MPUs. 
   To use CMSIS it is necessary to chose an MPU by defining the relevant macro in the project. Then, one must copy from 
-  core/cmsis/cfg the relevant startup_xxxx.s file, and change it according the needs and include in the project. 
-  Finally one must include the relevant file core/cmsis/src/system_xxxx.c.
+  hl-core/cmsis/cfg the relevant startup_xxxx.s file, and change it according the needs and include in the project. 
+  Finally one must include the relevant file hl-core/cmsis/src/system_xxxx.c.
   
   The CMSIS files are coming from original ARM / ST distribution. They however have some changes, all marked with IIT-EXT tag.
   1. Some functions are defined as __weak, so that one can override them: SystemInit() and SystemCoreClockUpdate().
   2. In startup_xxx.s files the variables Stack_Size and Heap_Size have been exported to make them visible by other .c files.
-  3. It is forced inclusion of core/cmsis/api files with the purpose to prevent the compiler to use old files with the same name
+  3. It is forced inclusion of hl-core/cmsis/api files with the purpose to prevent the compiler to use old files with the same name
      which it finds in its system include folders.
-  4. It is added some code under #ifdef which makes it easier for the hl/plus part to configure cmsis. 
+  4. It is added some code under #ifdef which makes it easier for the hl-plus library (see midware folder) to configure cmsis. 
      The code is activated only if macro HL_CFG_PLUS_TARGET_BY_FILE is defined. If not defined, the code is the same as the 
      original distribution
      
