@@ -317,7 +317,7 @@ static void test_timer(uint16_t microsecs)
     
     hl_reltime_t err;
     
-    hl_timer_t timerID = hl_timer8; //hl_timer4;
+    hl_timer_t timerID = hl_timer4; //hl_timer8;
     
     hl_timer_init(timerID, &tmrcfg, &err);
     err =  err;    
