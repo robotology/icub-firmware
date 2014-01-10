@@ -12,7 +12,7 @@ here is what the .docx documents deal of.
   to measure time of execution of some code parts.
 
 - arm-applications
-  tells which applications can be developed using the eBODY framework. The simplest is the main() located at zero offset or
+  tells which applications can be developed using the emBODY framework. The simplest is the main() located at zero offset or
   even located at a non-zero offset and executed with a jump. Others are: the main() with the use of hl library (core or plus);
   the use of multitasking with oosiit / osal; the use of the embOBJ's core application; the use of embOBJ's control loop application.
 
