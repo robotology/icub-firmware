@@ -37,16 +37,16 @@
 
 #if   defined(HAL_USE_CPU_NAM_STM32F107)
     // we need to adapt the stm32f1.h and cmsis_stm32f1.h for a stm32f107 by defining the macro STM32F10X_CL
-    #define STM32F10X_CL
-	#include "stm32f10x.h"
+    //#define STM32F10X_CL
+	//#include "stm32f10x.h"
     #include "stm32f1.h"
     #include "cmsis_stm32f1.h"
     
 #elif defined(HAL_USE_CPU_NAM_STM32F407)
     // we need to adapt the stm32f4.h and cmsis_stm32f4.h for a stm32f407 by defining the macro STM32F4XX
     // we also need: __CORTEX_M4  __FPU_PRESENT
-    #define STM32F4XX 
-    #define __CORTEX_M4  
+    //#define STM32F4XX 
+    //#define __CORTEX_M4  
 //    #define __FPU_PRESENT
 
 	#include "stm32f4.h"

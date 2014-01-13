@@ -30,7 +30,7 @@
 #undef IPAL_MODE_FULL
 #define IPAL_MODE_BASE
 
-#include "sys/abs/api/ipal.h"  
+#include "ipal.h"  
 
 
 #include "hal.h"

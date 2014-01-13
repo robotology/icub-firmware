@@ -232,7 +232,7 @@
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
-            <Im2Chk>0</Im2Chk>
+            <Im2Chk>1</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -348,9 +348,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_MCBSTM32F400 STM32F40_41xxx __CORTEX_M4</Define>
+              <Define>HAL_BOARD_MCBSTM32F400 HL_USE_BRD_MCBSTM32_F400 HL_CFG_PLUS_TARGET_BY_FILE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\periphs;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api</IncludePath>
+              <IncludePath>..\..\hal\hal-api;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\periphs;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\app-test\stm32f4;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -424,87 +424,172 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hl-core</GroupName>
+          <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>stm32f4xx__misc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx__misc.c</FilePath>
+              <FileName>hl_cfg_plus_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app-test\stm32f4\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.c</FileName>
+              <FileName>hl_cfg_plus_target.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app-test\stm32f4\hl_cfg_plus_target.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hl-plus-wrappers</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_wrap_adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_adc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_adc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_can.c</FileName>
+              <FileName>hl_wrap_bkp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_can.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_bkp.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_crc.c</FileName>
+              <FileName>hl_wrap_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_crc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_can.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp.c</FileName>
+              <FileName>hl_wrap_cec.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cec.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp_aes.c</FileName>
+              <FileName>hl_wrap_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp_aes.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_crc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp_des.c</FileName>
+              <FileName>hl_wrap_cryp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp_des.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp_tdes.c</FileName>
+              <FileName>hl_wrap_cryp_aes.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp_tdes.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp_aes.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dac.c</FileName>
+              <FileName>hl_wrap_cryp_des.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dac.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp_des.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dbgmcu.c</FileName>
+              <FileName>hl_wrap_cryp_tdes.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dbgmcu.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp_tdes.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dcmi.c</FileName>
+              <FileName>hl_wrap_dac.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dcmi.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dac.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dma.c</FileName>
+              <FileName>hl_wrap_dbgmcu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dma.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dbgmcu.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dma2d.c</FileName>
+              <FileName>hl_wrap_dcmi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dma2d.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dcmi.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_exti.c</FileName>
+              <FileName>hl_wrap_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_exti.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dma.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_flash.c</FileName>
+              <FileName>hl_wrap_exti.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_flash.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_exti.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_fmc.c</FileName>
+              <FileName>hl_wrap_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_fmc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_fsmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_fsmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_hash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_hash.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_hash_md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_hash_md5.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_hash_sha1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_hash_sha1.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_syscfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_wrap_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_system.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -547,99 +632,19 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stm32f4xx_fsmc.c</FileName>
+              <FileName>hl_wrap_tim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_fsmc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_tim.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileName>hl_wrap_usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_gpio.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_usart.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_hash.c</FileName>
+              <FileName>hl_wrap_wwdg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_hash.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hash_md5.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_hash_md5.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hash_sha1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_hash_sha1.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_iwdg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_iwdg.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_ltdc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_ltdc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_pwr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_pwr.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_rcc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_rcc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_rng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_rng.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_sai.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_sai.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_syscfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_syscfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_wwdg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_wwdg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_wwdg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1338,182 +1343,187 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>hl-core</GroupName>
+          <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>stm32f4xx__misc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx__misc.c</FilePath>
+              <FileName>hl_cfg_plus_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app-test\stm32f4\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_adc.c</FileName>
+              <FileName>hl_cfg_plus_target.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app-test\stm32f4\hl_cfg_plus_target.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hl-plus-wrappers</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_wrap_adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_adc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_adc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_can.c</FileName>
+              <FileName>hl_wrap_bkp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_can.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_bkp.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_crc.c</FileName>
+              <FileName>hl_wrap_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_crc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_can.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp.c</FileName>
+              <FileName>hl_wrap_cec.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cec.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp_aes.c</FileName>
+              <FileName>hl_wrap_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp_aes.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_crc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp_des.c</FileName>
+              <FileName>hl_wrap_cryp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp_des.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_cryp_tdes.c</FileName>
+              <FileName>hl_wrap_cryp_aes.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_cryp_tdes.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp_aes.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dac.c</FileName>
+              <FileName>hl_wrap_cryp_des.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dac.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp_des.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dbgmcu.c</FileName>
+              <FileName>hl_wrap_cryp_tdes.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dbgmcu.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_cryp_tdes.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dcmi.c</FileName>
+              <FileName>hl_wrap_dac.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dcmi.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dac.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dma.c</FileName>
+              <FileName>hl_wrap_dbgmcu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dma.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dbgmcu.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_dma2d.c</FileName>
+              <FileName>hl_wrap_dcmi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_dma2d.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dcmi.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_exti.c</FileName>
+              <FileName>hl_wrap_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_exti.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_dma.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_flash.c</FileName>
+              <FileName>hl_wrap_exti.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_flash.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_exti.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_fmc.c</FileName>
+              <FileName>hl_wrap_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_fmc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_flash.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_fsmc.c</FileName>
+              <FileName>hl_wrap_fsmc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_fsmc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_fsmc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileName>hl_wrap_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_gpio.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_hash.c</FileName>
+              <FileName>hl_wrap_hash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_hash.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_hash.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_hash_md5.c</FileName>
+              <FileName>hl_wrap_hash_md5.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_hash_md5.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_hash_md5.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_hash_sha1.c</FileName>
+              <FileName>hl_wrap_hash_sha1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_hash_sha1.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_hash_sha1.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_i2c.c</FileName>
+              <FileName>hl_wrap_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_i2c.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_iwdg.c</FileName>
+              <FileName>hl_wrap_iwdg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_iwdg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_iwdg.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_ltdc.c</FileName>
+              <FileName>hl_wrap_misc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_ltdc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_misc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_pwr.c</FileName>
+              <FileName>hl_wrap_pwr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_pwr.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_pwr.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_rcc.c</FileName>
+              <FileName>hl_wrap_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_rcc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_rcc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_rng.c</FileName>
+              <FileName>hl_wrap_rtc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_rng.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_rtc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_rtc.c</FileName>
+              <FileName>hl_wrap_sdio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_rtc.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_sdio.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_sai.c</FileName>
+              <FileName>hl_wrap_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_sai.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_spi.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_sdio.c</FileName>
+              <FileName>hl_wrap_syscfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_sdio.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_syscfg.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_spi.c</FileName>
+              <FileName>hl_wrap_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_spi.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_system.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileName>hl_wrap_tim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_syscfg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_tim.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_tim.c</FileName>
+              <FileName>hl_wrap_usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_tim.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_usart.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_usart.c</FileName>
+              <FileName>hl_wrap_wwdg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_wwdg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\src\stm32f4xx_wwdg.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_wwdg.c</FilePath>
             </File>
           </Files>
         </Group>

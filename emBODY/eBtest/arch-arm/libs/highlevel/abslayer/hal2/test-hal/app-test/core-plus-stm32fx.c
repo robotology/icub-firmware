@@ -110,8 +110,8 @@
 //#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
 #endif
 
-#undef EXECUTE_TEST_PERIPH_ETH
-//#define EXECUTE_TEST_PERIPH_ETH
+//#undef EXECUTE_TEST_PERIPH_ETH
+#define EXECUTE_TEST_PERIPH_ETH
 
 
 #ifdef EXECUTE_TEST_PERIPH_ETH
@@ -1258,7 +1258,7 @@ static void test_periph_can(void)
 
 
 #if     defined(EXECUTE_TEST_PERIPH_ETH)    
-#include "../../../../../sys/abs/api/ipal.h"
+#include "ipal.h"
 static uint8_t s_blink_ipal_led3 = 0;
 static uint8_t s_blink_ipal_led4 = 0;
 static uint8_t s_reply_udp_msg = 0;

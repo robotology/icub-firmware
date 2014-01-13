@@ -64,7 +64,7 @@
 #undef     HAL_USE_PERIPH_CAN
 #undef     HAL_USE_PERIPH_CRC
 #undef     HAL_USE_PERIPH_DMA
-#undef     HAL_USE_PERIPH_ETH
+#define     HAL_USE_PERIPH_ETH
 #define     HAL_USE_PERIPH_GPIO
 #define     HAL_USE_PERIPH_I2C
 #undef     HAL_USE_PERIPH_SPI
@@ -80,7 +80,7 @@
 #define     HAL_USE_DEVICE_EEPROM
 //#define HAL_USE_DEVICE_EEPROM_dummy
 #undef  HAL_USE_DEVICE_ENCODER
-#undef     HAL_USE_DEVICE_ETHTRANSCEIVER
+#define     HAL_USE_DEVICE_ETHTRANSCEIVER
 #undef  HAL_USE_DEVICE_GYROSCOPE
 #define     HAL_USE_DEVICE_LED
 #undef     HAL_USE_DEVICE_MUX
@@ -89,7 +89,7 @@
 
 
 // -- chips: define what you need to use
-#undef     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
+#define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
 #undef     HAL_USE_CHIP_ST_L3G4200D
 #undef     HAL_USE_CHIP_ST_LIS3DH
 #undef  HAL_USE_CHIP_MICREL_KS8893

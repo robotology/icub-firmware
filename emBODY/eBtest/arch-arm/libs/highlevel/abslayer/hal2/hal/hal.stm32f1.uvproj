@@ -348,9 +348,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_MCBSTM32C</Define>
+              <Define>HAL_BOARD_MCBSTM32C STM32F10X_CL</Define>
               <Undefine></Undefine>
-              <IncludePath>..\hal\hal-api;..\..\..\..\sys\mid\api;..\..\..\..\sys\mid\inc;..\hal\hal-src\core;..\hal\hal-src\brdcfg;..\hal\hal-src\extra\chips;..\hal\hal-src\extra\devices;..\hal\hal-src\extra\extbrds;..\hal\hal-src\extra\periphs;..\hal\hal-src\extra\utilities;..\..\..\..\..\arch-armcmx</IncludePath>
+              <IncludePath>..\hal\hal-api;..\hal\hal-src\core;..\hal\hal-src\brdcfg;..\hal\hal-src\extra\chips;..\hal\hal-src\extra\devices;..\hal\hal-src\extra\extbrds;..\hal\hal-src\extra\periphs;..\hal\hal-src\extra\utilities;..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -389,12 +389,127 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>hal-middleware-library</GroupName>
+          <GroupName>hl-stm32</GroupName>
           <Files>
             <File>
-              <FileName>stm32f1.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
+              <FileName>stm32f10x__misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x__misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_bkp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_bkp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_cec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_cec.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_dbgmcu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_dbgmcu.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_fsmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_fsmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_wwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_wwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1023,12 +1138,127 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>hal-middleware-library</GroupName>
+          <GroupName>hl-stm32</GroupName>
           <Files>
             <File>
-              <FileName>stm32f1.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\sys\mid\lib\stm32f1.lib</FilePath>
+              <FileName>stm32f10x__misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x__misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_bkp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_bkp.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_cec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_cec.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_dbgmcu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_dbgmcu.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_fsmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_fsmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_wwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\src\stm32f10x_wwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\src\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
