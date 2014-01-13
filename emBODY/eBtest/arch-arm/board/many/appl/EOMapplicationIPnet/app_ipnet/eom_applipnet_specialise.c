@@ -78,7 +78,9 @@ extern void task_udpserver(void *p);
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+// if not echoer, then it is a-symmetric
 #define USE_RECEIVER_ECHOER
+//#define DONT_PULSE_LEDS
 
 
 
@@ -148,6 +150,8 @@ static volatile eObool_t s_host_connected               = eobool_false;
 
 static eOipv4addr_t s_host_ipaddress                    = 0;
 
+static const uint32_t s_max_packet_size                     = 512;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -212,10 +216,11 @@ static void s_eom_applipnet_specialise_leds(void)
     
     // each active led will have at timer. we can set it on, off, pulse. 
     eo_ledpulser_Initialise(&ledpulsercfg);  
-        
+
+#if !defined(DONT_PULSE_LEDS)    
     // start a pulse on led0: infinite with 1 Hz period
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, 1*1000*1000, 0);
-    
+#endif    
     // led1 will be driven by the receiver 
     // led2 will be driven by teh transmitter
            
@@ -327,13 +332,13 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t)
 
 
     // init the rx packet 
-    s_rxpkt = eo_packet_New(512);  
+    s_rxpkt = eo_packet_New(s_max_packet_size);  
     
  
 
     // initialise the socket 
-    s_skt_rops = eo_socketdtg_New(  2, 512, eom_mutex_New(), // input queue
-                                    2, 512, eom_mutex_New()  // output queue
+    s_skt_rops = eo_socketdtg_New(  2, s_max_packet_size, eom_mutex_New(), // input queue
+                                    2, s_max_packet_size, eom_mutex_New()  // output queue
                                  );
 
     // set the rx action on socket to be a message s_message_from_skt_rops to this task object
@@ -363,9 +368,9 @@ static void s_udpserver_run(EOMtask *p, uint32_t t)
         res = eo_socketdtg_Get(s_skt_rops, s_rxpkt, eok_reltimeINFINITE);
 
         //eventviewer_switch_to(prev);
-        
+#if !defined(DONT_PULSE_LEDS)   
         eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_one, 200*1000, 5);
-
+#endif
         // call a function for it
         if((eores_OK == res) && (NULL != s_eom_applipnet_specialise_on_ropframe_received))
         {
@@ -387,9 +392,9 @@ static void s_eom_applipnet_specialise_transceiver_init(void)
 {
     
     // init transceiver
-    s_mytxpkt = eo_packet_New(512);
+    s_mytxpkt = eo_packet_New(s_max_packet_size);
 
-    eo_packet_Size_Set(s_mytxpkt, 512);
+    eo_packet_Size_Set(s_mytxpkt, s_max_packet_size);
         
     // impose that on rx pkt the task udp calls ...
 
@@ -422,8 +427,9 @@ static void s_eom_applipnet_specialise_echoer_receive(EOpacket* rxpkt)
 
     s_eom_applipnet_specialise_transmit(rxpkt);
     
+#if !defined(DONT_PULSE_LEDS)       
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_two, 100*1000, 10);
-
+#endif
 }
 #else
 static void s_eom_applipnet_specialise_asimm_receive(EOpacket* rxpkt)
@@ -444,9 +450,10 @@ static void s_eom_applipnet_specialise_asimm_receive(EOpacket* rxpkt)
     // then send back the full pkt
 
     s_eom_applipnet_specialise_transmit(s_mytxpkt);
-    
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_two, 100*1000, 10);
 
+#if !defined(DONT_PULSE_LEDS)       
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_two, 100*1000, 10);
+#endif
 }
 #endif
 
