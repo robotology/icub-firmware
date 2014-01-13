@@ -937,7 +937,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F10X_CL HL_USE_BRD_EMS001</Define>
+              <Define>STM32F10X_CL HL_USE_BRD_MCBSTM32C</Define>
               <Undefine></Undefine>
               <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f1\api</IncludePath>
             </VariousControls>
