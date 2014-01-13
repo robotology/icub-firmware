@@ -191,7 +191,7 @@ __weak extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(cons
 #if !defined(OVERRIDE_eoprot_fun_INIT_mc_joint_cmmnds_calibration)
 __weak extern void eoprot_fun_INIT_mc_joint_cmmnds_calibration(const EOnv* nv) {}
 #endif
-#if !defined(OVERRIDE_eoprot_fun_UPDT_mc_joint_cmmnds_calibration_UDPT)
+#if !defined(OVERRIDE_eoprot_fun_UPDT_mc_joint_cmmnds_calibration)
 __weak extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd) {}
 #endif
 

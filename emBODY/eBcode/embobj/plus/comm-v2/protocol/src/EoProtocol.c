@@ -701,8 +701,13 @@ static eObool_t s_eoprot_entity_tag_is_valid(uint8_t epi, eOprotEntity_t entity,
 // returns the offset of the variable with a given tag from the start of the entity
 static uint16_t s_eoprot_rom_entity_offset_of_tag(uint8_t epi, uint8_t ent, eOprotTag_t tag)
 {
+    uint32_t i, tag_aux=0;
     const uint32_t *entityrom = eoprot_ep_entities_defval[epi][ent];
-    uint32_t tmp = ((uint32_t) eoprot_ep_folded_descriptors[epi][tag]->resetval) - ((uint32_t) entityrom);
+    for(i=0; i<ent; i++)
+    {
+        tag_aux +=eoprot_ep_tags_numberof[epi][i];
+    }
+    uint32_t tmp = ((uint32_t) eoprot_ep_folded_descriptors[epi][tag_aux+tag]->resetval) - ((uint32_t) entityrom);
     return((uint16_t)tmp); 
 }
 
