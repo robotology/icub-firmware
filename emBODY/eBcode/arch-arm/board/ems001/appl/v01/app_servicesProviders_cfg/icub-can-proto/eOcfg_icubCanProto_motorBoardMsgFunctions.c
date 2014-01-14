@@ -1853,16 +1853,13 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERCURRENT)) //over current
     {
-        if((applrunMode__2foc == runmode) && (EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MC_STATUS_FLAG_I2TFAILURE)))
-        {
-            mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_I2TFAILURE;
-        }
-        else
-        {
-            mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERCURRENT;
-        }
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERCURRENT;
     }
-
+    
+    if(EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MC_STATUS_FLAG_I2TFAILURE))
+    {
+        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_I2TFAILURE;
+    }
     
     if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECWARNING)) //can receive warning   
     {
