@@ -580,7 +580,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             
             if (big_error_flag)
             {
-                if (OUT_OF_RANGE(o->err,1820/*10 deg*/))
+                if (OUT_OF_RANGE(o->err,1820)) // 10 deg
                 {
                     *big_error_flag = eobool_true;
                 }                
