@@ -40,8 +40,9 @@
 
 #define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
-#define SAFE_MAX_CURRENT 2500
-#define NOMINAL_CURRENT  6500
+#define SAFE_MAX_CURRENT  2500
+#define NOMINAL_CURRENT  10000
+
 #define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
