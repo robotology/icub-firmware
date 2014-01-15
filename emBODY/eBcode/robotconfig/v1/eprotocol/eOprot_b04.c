@@ -198,22 +198,26 @@ extern eOresult_t eoprot_b04_Initialise(eObool_t islocal)
 
 extern eObool_t eoprot_b04_isvariableproxied(eOnvID32_t id)
 {    
-    eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
-    if(eoprot_endpoint_motioncontrol == ep)
-    {
-        eOprotEntity_t ent = eoprot_ID2entity(id);
-        if((eoprot_entity_mc_joint == ent) || (eoprot_entity_mc_motor == ent))
-        {   // only joints and motors are proxied. all of them
-            return(eobool_true);
-        }        
-    }
-    else if(eoprot_endpoint_analogsensors == ep)
-    {   // what about the mais?
-        return(eobool_false);
-    }
+//     eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
+//     if(eoprot_endpoint_motioncontrol == ep)
+//     {
+//         eOprotEntity_t ent = eoprot_ID2entity(id);
+//         if((eoprot_entity_mc_joint == ent) || (eoprot_entity_mc_motor == ent))
+//         {   // only joints and motors are proxied. all of them
+//             return(eobool_true);
+//         }        
+//     }
+//     else if(eoprot_endpoint_analogsensors == ep)
+//     {   // what about the mais?
+//         return(eobool_false);
+//     }
+//     
+//     // all other variables are not proxied
+//     return(eobool_false);    
     
-    // all other variables are not proxied
-    return(eobool_false);    
+    
+    //vale: i commented all because currently we don't use proxied variables
+     return(eobool_false); 
 }
 
 // --------------------------------------------------------------------------------------------------------------------
