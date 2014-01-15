@@ -38,10 +38,6 @@
 #include "EOnv_hid.h"
 
 #include "EOMotionControl.h"
-#include "eOcfg_nvsEP_mc.h"
-
-#include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
-#include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
 
 
 //application
@@ -112,6 +108,9 @@
 #endif
 
 
+
+    
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,27 +124,30 @@
 /* TAG_ALE*/
 
 //joint-init
-extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+                    
+extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
 {
-    eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.config, sizeof(eOmc_joint_config_t));
+    eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->ram;
+    memcpy(cfg, &joint_default_value.config, sizeof(eOmc_joint_config_t));
 }
 
-extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
 {
-    eOmc_joint_status_t             *cfg = (eOmc_joint_status_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.status, sizeof(eOmc_joint_status_t));
+    eOmc_joint_status_t             *cfg = (eOmc_joint_status_t*)nv->ram;
+    memcpy(cfg, &joint_default_value.status, sizeof(eOmc_joint_status_t));
 }
 
 
 //joint-update
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+            
+extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t              res;
+    eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     float                   rescaler_pos;
     float                   rescaler_trq;
     eOmc_joint_status_t     *jstatus_ptr = NULL;
-    eOmc_joint_config_t     *cfg = (eOmc_joint_config_t*)nv->loc;
+    eOmc_joint_config_t     *cfg = (eOmc_joint_config_t*)nv->ram;
 
     //currently no joint config param must be sent to 2foc board. (for us called 1foc :) )
     //(currently no pid velocity is sent to 2foc)
@@ -175,10 +177,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     // 3) set velocity pid:    to be implemented
    
     // 4) set min position    
-    eo_emsController_SetPosMin(jxx, cfg->minpositionofjoint);
+    eo_emsController_SetPosMin(jxx, cfg->limitsofjoint.min);
         
     // 5) set max position
-    eo_emsController_SetPosMax(jxx, cfg->maxpositionofjoint);
+    eo_emsController_SetPosMax(jxx, cfg->limitsofjoint.max);
 
     // 6) set vel timeout        
     eo_emsController_SetVelTimeout(jxx, cfg->velocitysetpointtimeout);
@@ -205,9 +207,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->loc;
+    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->ram;
+    eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
 	
     eo_emsController_SetPosPid(jxx, pid_ptr->kp,//*rescaler, 
@@ -218,9 +221,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_joi
 	                                pid_ptr->offset);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->loc;
+    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->ram;
+    eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
 
     eo_emsController_SetTrqPid(jxx, pid_ptr->kp*rescaler, 
@@ -231,9 +235,9 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
 	                                pid_ptr->offset);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    
+   eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32); 
 #if defined(VERIFY_ROP_SETIMPEDANCE)   
     
     if(jxx < MAXJ)
@@ -270,28 +274,26 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_joint
 #endif  
 
 
-    eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->loc;   
+    eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->ram;   
     eo_emsController_SetImpedance(jxx, cfg->stiffness, cfg->damping, cfg->offset);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_position_t       *pos_ptr = (eOmeas_position_t*)nv->loc;
+    eOmc_jointId_t                 jxx = eoprot_ID2index(rd->id32);
+    eOmeas_position_limits_t       *limit_ptr = (eOmeas_position_limits_t*)nv->ram;
 
-    eo_emsController_SetPosMin(jxx, *pos_ptr);
-}
-
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eOmeas_position_t   *pos_ptr = (eOmeas_position_t*)nv->loc;
-
-    eo_emsController_SetPosMax(jxx, *pos_ptr);
+    eo_emsController_SetPosMin(jxx, limit_ptr->min);
+    eo_emsController_SetPosMax(jxx, limit_ptr->max);
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+
+
+extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_time_t                           *time_ptr = (eOmeas_time_t*)nv->loc;
+    eOmeas_time_t                           *time_ptr = (eOmeas_time_t*)nv->ram;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
 
     eo_emsController_SetVelTimeout(jxx, *time_ptr);
 }
@@ -299,11 +301,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_
 
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_mc_jointNumber_t jxx,  const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     /*NOTE: this function is equal to mc4 fucntion.*/
     eOresult_t              res;
     eOmc_joint_status_t     *jstatus_ptr;
+    eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     
     res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
     if(eores_OK != res)
@@ -311,7 +314,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_
         return;
     }
 
-    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->loc))
+    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->ram))
     {
         jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
     }
@@ -325,10 +328,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_
 // //extern uint8_t callback_of_setpoint(int32_t data, uint8_t joint);
 // extern uint8_t callback_of_setpointV2(int32_t data, uint8_t joint);
 // extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint);
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->loc;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
     eOmc_joint_config_t                     *jconfig_ptr;
     eOmc_joint_status_t                     *jstatus_ptr;
 
@@ -472,16 +476,18 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
     }
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eo_emsController_Stop(jxx);
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->loc;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_openloop;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -520,9 +526,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
                                       calibrator->params.type3.offset);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_controlmode_command_t *controlmode_ptr = (eOmc_controlmode_command_t*)nv->loc;
+    eOmc_controlmode_command_t *controlmode_ptr = (eOmc_controlmode_command_t*)nv->ram;
+    eOmc_jointId_t             jxx = eoprot_ID2index(rd->id32);
     
     /*
     eOresult_t                              res;
@@ -592,9 +599,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
 
 
 // __ALE__
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->loc);
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->ram);
 }
 
 

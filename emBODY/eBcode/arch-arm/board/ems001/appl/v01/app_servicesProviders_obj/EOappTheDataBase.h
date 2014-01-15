@@ -43,7 +43,7 @@ extern "C" {
 #include "eOcommon.h"
 #include "EOconstvector.h"
 #include "EOnv.h"
-#include "EOnvsCfg.h"
+//#include "EOnvsCfg.h"
 #include "eOboards.h"
 #include "eOMotionControl.h"
 #include "EoAnalogSensors.h"
@@ -131,10 +131,10 @@ typedef struct
 
 typedef struct
 {
-    EOnvsCfg                        *nvsCfg;       /**<  Network Variable configuration          */
-    eOnvEP_t                        mc_endpoint;   /**<  motion control endpoint managed by the application */
-    eOnvEP_t                        as_endpoint;   /**<  analog sensor endpoint managed by the application */
-    eOnvEP_t                        sk_endpoint;   /**<  analog sensor endpoint managed by the application */
+    //EOnvsCfg                        *nvsCfg;       /**<  Network Variable configuration          */
+//     eOnvEP8_t                        mc_endpoint;   /**<  motion control endpoint managed by the application */
+//     eOnvEP8_t                        as_endpoint;   /**<  analog sensor endpoint managed by the application */
+//     eOnvEP8_t                        sk_endpoint;   /**<  analog sensor endpoint managed by the application */
     /* if one of endpoints is not present ==> then set endpoint to EOK_uint16dummy */
     const EOconstvector* const      canboardsList; /**< list of CAN boards connected to ems by can */
     const EOconstvector* const      jointsList;    /**< list of joints managed by an EMS board */
@@ -243,16 +243,16 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
 
 extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_config_t **jconfig_ptr);
 extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_status_t **jstatus_ptr);
-extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_inputs_t **jinputs_ptr);
-extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_controlmode_t **jcmdcontrolmode_ptr);
+//extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_inputs_t **jinputs_ptr);
+//extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_controlmode_t **jcmdcontrolmode_ptr);
 extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t **shiftval_ptr);
 extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOicubCanProto_bcastpolicy_t **bcast_ptr);
-extern eOresult_t eo_appTheDB_SetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t curr_mode);
-extern eOresult_t eo_appTheDB_GetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t *curr_mode_ptr);
+// extern eOresult_t eo_appTheDB_SetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t curr_mode);
+// extern eOresult_t eo_appTheDB_GetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t *curr_mode_ptr);
 
 
 
-extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr);
+//extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr);
 extern eOresult_t eo_appTheDB_GetMotorStatusPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_status_t **mstatus_ptr);
 
 extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_config_t **sconfig_ptr);

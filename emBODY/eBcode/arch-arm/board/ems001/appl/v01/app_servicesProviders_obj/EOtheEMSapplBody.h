@@ -74,13 +74,13 @@ typedef struct
     {
         emsBoardType_t                  emsboard_type;
     } emsControllerCfg;
-    struct
-    {
-        eOnvEP_t                        mc_endpoint;  /**<  motion control endopoint managed by the application    */
-        eOnvEP_t                        as_endpoint;  /**<  analog sensor endopoint managed by the application    */
-        eOnvEP_t                        sk_endpoint;  /**<  skin endopoint managed by the application    */
+//     struct
+//     {
+//         eOnvEP8_t                        mc_endpoint;  /**<  motion control endopoint managed by the application    */
+//         eOnvEP8_t                        as_endpoint;  /**<  analog sensor endopoint managed by the application    */
+//         eOnvEP8_t                        sk_endpoint;  /**<  skin endopoint managed by the application    */
 
-    } endpoints;
+//     } endpoints;
     
     struct
     {

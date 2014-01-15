@@ -37,10 +37,12 @@
 
 //icub api
 #include "EoAnalogSensors.h"
+#include "EoProtocol.h"
+#include "EoProtocolAS.h"
 
 //to load occasional rop
-#include "eOcfg_nvsEP_as.h" 
 #include "EOMtheEMStransceiver.h"
+#include "EOtransceiver.h"
 
 //to send evt to configurator task
 #include "EOMtask.h"
@@ -48,6 +50,8 @@
 #include "EOMtheEMSappl.h"
 
 #include "EOtheEMSapplDiagnostics.h"
+
+#include "EOtransceiver.h"
 
 //#include "hal_debugPin.h"
 // --------------------------------------------------------------------------------------------------------------------
@@ -691,18 +695,15 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arr
         return(eores_NOK_generic);
     }
 
+    memset(&ropdesc, 0, sizeof(eOropdescriptor_t));
 
-    ropdesc.configuration           = eok_ropconfiguration_basic;
-    ropdesc.configuration.plustime  = 0;
     ropdesc.ropcode                 = eo_ropcode_sig;
-    ropdesc.ep                      = bodycfg->endpoints.as_endpoint;
-    ropdesc.id                      = eo_cfg_nvsEP_as_strain_NVID_Get((eOcfg_nvsEP_as_endpoint_t)bodycfg->endpoints.as_endpoint, 
-                                               (eOcfg_nvsEP_as_strainNumber_t)sId, 
-                                               strainNVindex_sstatus__fullscale);
-    ropdesc.data                    = (void*)myfullscale;
     ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
+    ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, sId, eoprot_tag_as_strain_status_fullscale); 
+    ropdesc.data                    = (void*)myfullscale;
+
    
-    res = eo_transceiver_rop_occasional_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
+    res = eo_transceiver_OccasionalROP_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
 
     if(eores_OK != res)
     {

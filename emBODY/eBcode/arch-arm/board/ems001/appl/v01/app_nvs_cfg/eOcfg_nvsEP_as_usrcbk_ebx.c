@@ -37,7 +37,7 @@
 #include "EOarray.h"
 
 #include "EoAnalogSensors.h"
-#include "eOcfg_nvsEP_as.h"
+//#include "eOcfg_nvsEP_as.h"
 
 //application
 #include "EOMtheEMSappl.h"
@@ -45,6 +45,7 @@
 #include "EOicubCanProto_specifications.h"
 
 //#include "EOappTheNVmapRef.h"
+#include "EoProtocol.h"
 
 
 
@@ -102,7 +103,7 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
 //mais-init
 // extern void eo_cfg_nvsEP_as_onemais_usr_hid_INIT_Mxx_mstatus__the15values(uint16_t xx, const EOnv* nv)
 // {
-//     eOas_arrayofupto36bytes_t *maisArray = (eOas_arrayofupto36bytes_t *)nv->loc;    
+//     eOas_arrayofupto36bytes_t *maisArray = (eOas_arrayofupto36bytes_t *)nv->ram;    
 //     maisArray->head.capacity = 
 //     capacity;
 //     uint8_t         itemsize;
@@ -111,22 +112,38 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
 
 //mais-update
 
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+
+extern void eoprot_fun_INIT_as_mais_config(const EOnv* nv)
+{
+// eOas_mais_config_t                  *maiscfg = (eOas_mais_config_t*)nv->ram;
+//     
+// memset(maiscfg, 0xab, sizeof(eOas_mais_config_t));  
+}
+extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
+{
+    eOas_mais_status_t *status_ptr = (eOas_mais_status_t *)nv->ram;
+    status_ptr->the15values.head.itemsize = 1;
+    status_ptr->the15values.head.size = 16;
+    status_ptr->the15values.head.capacity = 36;
+
+}
+extern void eoprot_fun_UPDT_as_mais_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_mais_status_t                  *sstatus_ptr;
     eOsmStatesEMSappl_t                 currentstate;
     eOicubCanProto_msgDestination_t     msgdest;
     eOappTheDB_sensorCanLocation_t      canLoc;
+    eOas_maisId_t                       maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) 0
     };
 
-    eOas_mais_config_t                  *maiscfg = (eOas_mais_config_t*)nv->loc;
+    eOas_mais_config_t                  *maiscfg = (eOas_mais_config_t*)nv->ram;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), (eOas_maisId_t)n, &canLoc);
+    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), maisId, &canLoc);
     
     //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
     // if yes ==> ok no problem
@@ -151,24 +168,24 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig(uint16_t n, const E
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->resolution));
     
     
-    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), (eOas_maisId_t)n,  &sstatus_ptr); 
+    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), maisId,  &sstatus_ptr); 
     
 
     s_process_mais_resolution((eOas_maisresolution_t)maiscfg->resolution, sstatus_ptr);
 }
 
 
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_as_mais_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOsmStatesEMSappl_t           currentstate;
-    
-    eOicubCanProto_msgCommand_t    msgCmd = 
+    eOas_maisId_t                 maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
+    eOicubCanProto_msgCommand_t   msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
-    eOas_maismode_t                *maismode = (eOas_maismode_t*)nv->loc;
+    eOas_maismode_t                *maismode = (eOas_maismode_t*)nv->ram;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
@@ -181,61 +198,83 @@ extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__mode(uint16_t n, c
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
         if(eo_sm_emsappl_STrun == currentstate)
         {
-           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maismode);
+           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maismode);
         }
     }
     else
     {
-        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maismode);
+        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maismode);
     }
 }
 
 
-
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__datarate(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_INIT_as_mais_config_datarate(const EOnv* nv)
 {
+uint8_t               *maisdatarate = (uint8_t*)nv->ram;
+    
+*maisdatarate = 0xCC;
+}
+extern void eoprot_fun_UPDT_as_mais_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_maisId_t                  maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
     };
 
-    uint8_t               *maisdatarate = (uint8_t*)nv->loc;
+    uint8_t               *maisdatarate = (uint8_t*)nv->ram;
 
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maisdatarate);
+    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisdatarate);
 
 }
 
 
 
 
-extern void eo_cfg_nvsEP_as_onemais_usr_hid_UPDT_Mxx_mconfig__resolution(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_mais_status_t              *sstatus_ptr;
+    eOas_maisId_t                   maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t     msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION
     };
 
-    eOas_maisresolution_t           *maisresolution = (uint8_t*)nv->loc;
+    eOas_maisresolution_t           *maisresolution = (eOas_maisresolution_t*)nv->ram;
 
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, (eOas_maisId_t)n, msgCmd, (void*)maisresolution);
+    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisresolution);
     
 
-    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), (eOas_maisId_t)n,  &sstatus_ptr); 
+    eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), maisId,  &sstatus_ptr); 
 
     s_process_mais_resolution(*maisresolution, sstatus_ptr);
     
 }
 
+extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
+{
+    eOas_strain_status_t *status_ptr = (eOas_strain_status_t *)nv->ram;
+    
+    status_ptr->fullscale.head.capacity = 6;
+    status_ptr->fullscale.head.itemsize = 2;
+    status_ptr->fullscale.head.size     = 0;
+    
+    status_ptr->calibratedvalues.head.capacity = 6;
+    status_ptr->calibratedvalues.head.itemsize = 2;
+    status_ptr->calibratedvalues.head.size     = 6;
+    
+    status_ptr->uncalibratedvalues.head.capacity = 6;
+    status_ptr->uncalibratedvalues.head.itemsize = 2;
+    status_ptr->uncalibratedvalues.head.size     = 6;
+}
 
-
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint8_t                             channel = 0;
     eOresult_t                          res;
@@ -243,16 +282,17 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     eOas_strain_status_t                *sstatus_ptr;
     eOappTheDB_sensorCanLocation_t      canLoc;
     eOsmStatesEMSappl_t                 currentstate;
+    eOas_strainId_t                     strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t         msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) 0
     };
 
-    eOas_strain_config_t               *straincfg = (eOas_strain_config_t*)nv->loc;
+    eOas_strain_config_t               *straincfg = (eOas_strain_config_t*)nv->ram;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), (eOas_strainId_t)xx, &canLoc);
+    eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), strainId, &canLoc);
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
 
@@ -270,7 +310,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     if(straincfg->signaloncefullscale)
     {
         //clear array in strainstatus
-        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), xx,  &sstatus_ptr);
+        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), strainId,  &sstatus_ptr);
         if(eores_OK != res)
         {
             return;
@@ -287,23 +327,23 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig(uint16_t xx, cons
     (see eOcfg_nvsEP_as_any_con_sxxdefault.c) */
 }
 
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOsmStatesEMSappl_t            currentstate;
-    
+    eOas_strainId_t                strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
     };
 
-    eOas_strainmode_t               *strainmode = (eOas_strainmode_t*)nv->loc;
+    eOas_strainmode_t               *strainmode = (eOas_strainmode_t*)nv->ram;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
     if(eoas_strainmode_acquirebutdonttx == *strainmode) 
     {
-        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOas_strainId_t)xx, msgCmd, (void*)strainmode);
+        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)strainmode);
     }
     else //if pc104 configures strain mode to send data
     {
@@ -311,33 +351,35 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__mode(uint16_t xx
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
         if(eo_sm_emsappl_STrun == currentstate)
         {
-            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOas_strainId_t)xx, msgCmd, (void*)strainmode);
+            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)strainmode);
         }
     }        
 }
 
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__datarate(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_as_strain_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOas_strainId_t                strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
     };
 
-    uint8_t               *straindatarate = (uint8_t*)nv->loc;
+    uint8_t               *straindatarate = (uint8_t*)nv->ram;
 
 	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, (eOas_strainId_t)xx, msgCmd, (void*)straindatarate);
+    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)straindatarate);
 }
 
 
-extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullscale(uint16_t xx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint8_t                     channel = 0;
     eOresult_t                  res;
     eOas_strain_status_t        *sstatus_ptr;
-    eObool_t                    *signaloncefullscale = (eObool_t*)nv->loc;
+    eObool_t                    *signaloncefullscale = (eObool_t*)nv->ram;
+    eOas_strainId_t             strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
@@ -349,7 +391,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullsc
         EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
         
         //clear array in strainstatus
-        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), xx,  &sstatus_ptr);
+        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), strainId,  &sstatus_ptr);
         if(eores_OK != res)
         {
             return;
@@ -358,7 +400,7 @@ extern void eo_cfg_nvsEP_as_onestrain_usr_hid_UPDT_Sxx_sconfig__signaloncefullsc
         sstatus_ptr->fullscale.head.size = 0;
         memset(&sstatus_ptr->fullscale.data[0], 0, 12);
         channel = 0;
-        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, xx, msgCmd, &channel);
+        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, &channel);
     }
 
 }

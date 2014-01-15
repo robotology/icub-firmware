@@ -48,9 +48,7 @@
 #include "eOicubCanProto_specifications.h"
 
 //nv-cfg
-#include "eOcfg_nvsEP_mc.h"
-#include "eOcfg_nvsEP_sk.h" 
-#include "eOcfg_nvsEP_as.h" 
+
 
 //application
 #include "EOMtheEMSapplCfg.h"
@@ -84,7 +82,6 @@
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
         
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB2)
-        #include "eOcfg_nvsEP_sk.h"
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftlowerarm       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftlowerarm 
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_leftlowerarm 
@@ -95,7 +92,6 @@
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
 
 #elif     defined(EOMTHEEMSAPPLCFG_USE_EB4)
-        #include "eOcfg_nvsEP_sk.h"
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightlowerarm       
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightlowerarm 
         #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_rightlowerarm 
@@ -229,12 +225,12 @@ extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default =
     {
         .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
     },
-    .endpoints                  =
-    {
-        .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
-        .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
-        .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
-    },
+//     .endpoints                  =
+//     {
+//         .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
+//         .as_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_as,
+//         .sk_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_sk,
+//     },
     .configdataofMC4boards      =
     {
         .shiftvalues            =
@@ -581,10 +577,10 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
     
     eOappTheDB_cfg_t cfg = 
     {
-        EO_INIT(.nvsCfg)            eo_boardtransceiver_hid_GetNvsCfg(),
-        EO_INIT(.mc_endpoint)       p->cfg_ptr->endpoints.mc_endpoint,                 
-        EO_INIT(.as_endpoint)       p->cfg_ptr->endpoints.as_endpoint,   
-        EO_INIT(.sk_endpoint)       p->cfg_ptr->endpoints.sk_endpoint,   
+        //EO_INIT(.nvsCfg)            eo_boardtransceiver_hid_GetNvsCfg(),
+//         EO_INIT(.mc_endpoint)       p->cfg_ptr->endpoints.mc_endpoint,                 
+//         EO_INIT(.as_endpoint)       p->cfg_ptr->endpoints.as_endpoint,   
+//         EO_INIT(.sk_endpoint)       p->cfg_ptr->endpoints.sk_endpoint,   
         EO_INIT(.canboardsList)     eo_cfg_appDB_constvec_boards__ptr,
         EO_INIT(.jointsList)        eo_cfg_appDB_constvec_joints__ptr,
         EO_INIT(.motorsList)        eo_cfg_appDB_constvec_motors__ptr,

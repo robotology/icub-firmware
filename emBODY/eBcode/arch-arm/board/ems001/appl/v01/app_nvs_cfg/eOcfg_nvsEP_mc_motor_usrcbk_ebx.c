@@ -38,10 +38,8 @@
 #include "EOnv_hid.h"
 
 #include "EOMotionControl.h"
-#include "eOcfg_nvsEP_mc.h"
+#include "EoProtocol.h"
 
-#include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
-#include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
 
 
 //application
@@ -86,7 +84,27 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+const eOmc_motor_t motor_default_dvalue =
+{
+    EO_INIT(.config)             
+    {
+        EO_INIT(.pidcurrent)
+        {
+            EO_INIT(.kp)                    0,
+            EO_INIT(.ki)                    0,
+            EO_INIT(.kd)                    0,
+            EO_INIT(.limitonintegral)       0,
+            EO_INIT(.limitonoutput)         0,
+            EO_INIT(.scale)                 0,
+            EO_INIT(.offset)                0,
+            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        },
+        EO_INIT(.maxvelocityofmotor)        0,
+        EO_INIT(.maxcurrentofmotor)         0,
+        EO_INIT(.filler02)                  {0}
+    },
+    EO_INIT(.status)                       {0}
+}; 
 
 
 
@@ -106,28 +124,29 @@
 /********************************************************************************************************************************/
 //motor init
 //joint-init
-extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv)
+extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mconfig(const EOnv* nv)
 {
-    eOmc_motor_config_t             *cfg = (eOmc_motor_config_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.config, sizeof(eOmc_motor_config_t));
+    eOmc_motor_config_t             *cfg = (eOmc_motor_config_t*)nv->ram;
+    memcpy(cfg, &motor_default_dvalue.config, sizeof(eOmc_motor_config_t));
 }
 
-extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv)
+extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(const EOnv* nv)
 {
-    eOmc_motor_status_t             *cfg = (eOmc_motor_status_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_mxxdefault_defaultvalue.status, sizeof(eOmc_motor_status_t));
+    eOmc_motor_status_t             *cfg = (eOmc_motor_status_t*)nv->ram;
+    memcpy(cfg, &motor_default_dvalue.status, sizeof(eOmc_motor_status_t));
 }
 
 
 
 
 // motor-update
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
+    eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
     eObrd_types_t                           boardType;
     icubCanProto_velocity_t                 vel_icubCanProtValue;
-    eOmc_motor_config_t                     *cfg_ptr = (eOmc_motor_config_t*)nv->loc;
+    eOmc_motor_config_t                     *cfg_ptr = (eOmc_motor_config_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
@@ -171,10 +190,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig(eOcfg_nvsEP_mc_motorNumber_t mx
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__pidcurrent(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->loc;
+    eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
+    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t            msgCmd = 
@@ -204,11 +224,12 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__pidcurrent(eOcfg_nvsEP_mc_moto
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxvelocityofmotor(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_velocity_t                       *vel_ptr = (eOmeas_velocity_t*)nv->loc;
+    eOmeas_velocity_t                       *vel_ptr = (eOmeas_velocity_t*)nv->ram;
+    eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
     icubCanProto_velocity_t                 vel_icubCanProtValue;
-    eOicubCanProto_msgCommand_t            msgCmd = 
+    eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY
@@ -225,10 +246,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxvelocityofmotor(eOcfg_nvsEP
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Mxx_mconfig__maxcurrentofmotor(eOcfg_nvsEP_mc_motorNumber_t mxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_current_t                        *curr_ptr = (eOmeas_current_t*)nv->loc;
-    eOicubCanProto_msgCommand_t            msgCmd = 
+    eOmeas_current_t                        *curr_ptr = (eOmeas_current_t*)nv->ram;
+    eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
+    eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT

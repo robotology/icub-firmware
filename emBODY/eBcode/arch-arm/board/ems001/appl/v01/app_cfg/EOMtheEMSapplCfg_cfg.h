@@ -52,7 +52,7 @@ extern "C" {
 //  <o> ID of the EMS board     <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     9
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
 
 
       
@@ -68,20 +68,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          34
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          35
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2014
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2013
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        01
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        1
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          14
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          15
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
 //  </h>build date
 
 // </h>Info 
@@ -572,6 +572,40 @@ extern "C" {
 //  </h>format
 
 //  </h>protocol
+
+
+
+
+//  <h> proxy
+//  <i> the proxy redirectes all ROPs related to variables effectively owned by another device (e.g., over CAN)
+//  <i> and manages replies in the following way: 
+//  <i> - ack/nak: are managed in relation to the IP board. The ROP with conf request flagged is acked/naked as soon is decoded.
+//  <i> - say:     the ask<> is forwarded, info about the reply are stored inside a list and the say<> is sent oly when the 
+//  <i>            data from the proxied device arrives. if the timeout expires, the reply is not sent anymore. 
+
+//  <o> mode     <0=> DISABLED    <1=> ENABLED
+
+#define EOMTHEEMSAPPLCFG_PROXY_MODE     1
+
+//  <h> reply container
+//  <i> it contains the details of the received ask<>: id32, plus-time, plus-signature, etc. 
+//  <i> the details are stored in a list of a given capacity for up to a given timeout
+
+//  <o> capacity of the reply container                     <0-32>
+//  <i> default: 16
+//  <i> it is the max number of reply information that can be stored
+#define EOMTHEEMSAPPLCFG_PROXY_MAXNUMOFREPLYROPS 16
+
+//  <o> maximum time a reply can be contained (in ms)       <0-100000>
+//  <i> default: 10. 
+//  <i> it is the max time a reply can be stored in the container before the say<> is considered lost
+#define EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC     10000
+
+//  </h> reply container
+
+//  </h> proxy
+
+
 
 
 //  </h>Transceiver configuration

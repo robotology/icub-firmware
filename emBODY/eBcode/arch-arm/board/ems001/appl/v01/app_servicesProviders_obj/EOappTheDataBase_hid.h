@@ -34,9 +34,7 @@ extern "C" {
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "eOcfg_nvsEP_mc.h"
-#include "eOcfg_nvsEP_as.h"
-#include "eOcfg_nvsEP_sk.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 #include "EOappTheDataBase.h"
@@ -124,7 +122,7 @@ struct EOappTheDB_hid
 		eObrd_boardId_t		*tbl; // gli indici partono da zero, anche se l'indirizzo zero sara' sempre usato dalla ems
 	} canaddressLookuptbl;
 
-    eOappTheDB_hid_nvsRamRef_t          nvsram;
+    //eOappTheDB_hid_nvsRamRef_t          nvsram;
     eOappTheDB_hid_virtualStrainData_t  virtualStrainData;
 };
 

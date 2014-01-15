@@ -39,10 +39,6 @@
 //#include "EOtheErrorManager.h"
 
 #include "EOMotionControl.h"
-#include "eOcfg_nvsEP_mc.h"
-
-#include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
-#include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
 
 
 //application
@@ -105,29 +101,30 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
 /* TAG_ALE*/
 
 //joint-init
-extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
 {
-    eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->loc;
-    memcpy(cfg, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.config, sizeof(eOmc_joint_config_t));
+    eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->ram;
+    memcpy(cfg, &joint_default_value.config, sizeof(eOmc_joint_config_t));
 }
 
-extern void eo_cfg_nvsEP_mc_hid_INIT_Jxx_jstatus(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv)
+extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
 {
-    eOmc_joint_status_t             *status = (eOmc_joint_status_t*)nv->loc;
-    memcpy(status, &eo_cfg_nvsEP_mc_any_con_jxxdefault_defaultvalue.status, sizeof(eOmc_joint_status_t));
+    eOmc_joint_status_t             *status = (eOmc_joint_status_t*)nv->ram;
+    memcpy(status, &joint_default_value.status, sizeof(eOmc_joint_status_t));
 }
 
 
 //joint-update
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;    
-    eOmc_joint_config_t                     *cfg = (eOmc_joint_config_t*)nv->loc;
+    eOmc_joint_config_t                     *cfg = (eOmc_joint_config_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_joint_status_t                     *jstatus_ptr = NULL;
     icubCanProto_position_t                 pos_icubCanProtValue, minpos_icubCanProtValue, maxpos_icubCanProtValue;
     icubCanProto_impedance_t                impedence_icubCanProtValues;
     eOicubCanProto_msgDestination_t         msgdest;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
@@ -180,8 +177,8 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
     // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
 
     // 4) set limits
-    minpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, cfg->minpositionofjoint);
-    maxpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, cfg->maxpositionofjoint);
+    minpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, cfg->limitsofjoint.min);
+    maxpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, cfg->limitsofjoint.max);
     
     if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
     {
@@ -230,13 +227,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig(eOcfg_nvsEP_mc_jointNumber_t jx
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->loc;
+    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
-    eOicubCanProto_msgCommand_t            msgCmd = 
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
@@ -261,13 +259,14 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidposition(eOcfg_nvsEP_mc_joi
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
     eObrd_types_t                           boardType;
-    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->loc;
+    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
@@ -296,14 +295,15 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__pidtorque(eOcfg_nvsEP_mc_joint
 
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
     eObrd_types_t                           boardType;
     icubCanProto_impedance_t                impedence_icubCanProtValues;
-    eOmc_impedance_t                        *impedance_ptr = (eOmc_impedance_t*)nv->loc;
+    eOmc_impedance_t                        *impedance_ptr = (eOmc_impedance_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOicubCanProto_msgCommand_t    msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
@@ -336,56 +336,57 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__impedance(eOcfg_nvsEP_mc_joint
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__minpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    /*
-        If min position > max position i must swap min and max
-        So i ca not use this function
-    */
-//     eOmeas_position_t                       *pos_ptr = (eOmeas_position_t*)nv->loc;
-//     icubCanProto_position_t                pos_icubCanProtValue;
-//     eOicubCanProto_msgCommand_t              msgCmd = 
-//     {
-//         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-//         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
-//     };
 
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOresult_t                              res;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOicubCanProto_msgDestination_t         msgdest;
+    icubCanProto_position_t                 pos_icubCanProtValue, minpos_icubCanProtValue, maxpos_icubCanProtValue;
+    eOmeas_position_limits_t                *limits_ptr = nv->ram;
+    
+    eOicubCanProto_msgCommand_t             msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
+        EO_INIT(.cmdId) 0
+    };
+    
+    
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    
+    /*Since icub can proto uses encoder tack like position unit, i need of the converter: from icub to encoder*/
+    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle()); 
 
-//     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-//     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-
-//     pos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, *pos_ptr);
-//     eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, (void*)&pos_icubCanProtValue);   
+    res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jxx,  &canLoc, NULL);
+    if(eores_OK != res)
+    {
+        return;
+    }
+    
+   
+    minpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, limits_ptr->min);
+    maxpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, limits_ptr->max);
+    
+    if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
+    {
+        //swap min and max
+        pos_icubCanProtValue = minpos_icubCanProtValue;
+        minpos_icubCanProtValue = maxpos_icubCanProtValue;
+        maxpos_icubCanProtValue = pos_icubCanProtValue;
+    }
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&minpos_icubCanProtValue);
+ 
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&maxpos_icubCanProtValue);
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__maxpositionofjoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+
+extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    /*
-        If min position > max position i must swap min and max
-        So i ca not use this function
-    */
-
-//     eOmeas_position_t                       *pos_ptr = (eOmeas_position_t*)nv->loc;
-//     icubCanProto_position_t                pos_icubCanProtValue;
-//     eOicubCanProto_msgCommand_t              msgCmd = 
-//     {
-//         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-//         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION
-//     };
-
-//     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-//     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-
-//     pos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv_ptr, jxx, *pos_ptr);
-//     eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, (void*)&pos_icubCanProtValue);   
-}
-
-
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
-{
-    eOmeas_time_t                           *time_ptr = (eOmeas_time_t*)nv->loc;
+    eOmeas_time_t                          *time_ptr = (eOmeas_time_t*)nv->ram;
+    eOmc_jointId_t                         jxx = eoprot_ID2index(rd->id32);
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
@@ -397,9 +398,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__velocitysetpointtimeout(eOcfg_
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_mc_jointNumber_t jxx,  const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t              res;
+    eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     eOmc_joint_status_t     *jstatus_ptr;
     
     res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
@@ -408,7 +410,7 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_
         return;
     }
 
-    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->loc))
+    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->ram))
     {
         jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
     }
@@ -418,10 +420,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__motionmonitormode(eOcfg_nvsEP_
     }
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;    
-    eOutil_emulfloat32_t                    *encfactor = (eOutil_emulfloat32_t*)nv->loc;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOutil_emulfloat32_t                    *encfactor = (eOutil_emulfloat32_t*)nv->ram;
 
 
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle()); 
@@ -434,10 +437,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionfactor(eOcfg_
     }
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;    
-    eOutil_emulfloat32_t                    *encoffset = (eOutil_emulfloat32_t*)nv->loc;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOutil_emulfloat32_t                    *encoffset = (eOutil_emulfloat32_t*)nv->ram;
 
 
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle()); 
@@ -450,16 +454,17 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jconfig__encoderconversionoffset(eOcfg_
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
  //   char str[96];
     
     eOresult_t                              res;
-    eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->loc;
+    eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
     void                                    *val_ptr = NULL;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOmc_joint_config_t                     *jconfig_ptr;
     icubCanProto_position_t                 pos;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
 
     eOicubCanProto_msgCommand_t            msgCmd = 
     {
@@ -559,9 +564,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__setpoint(eOcfg_nvsEP_mc_jointN
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eObool_t                                *cmd = (eObool_t*)nv->loc;
+    eObool_t                                *cmd = (eObool_t*)nv->ram;
+    eOmc_jointId_t                         jxx = eoprot_ID2index(rd->id32);
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
@@ -577,10 +583,11 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__stoptrajectory(eOcfg_nvsEP_mc_
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->loc;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
     icubCanProto_calibrator_t               iCubCanProtCalibrator;
     eOboolvalues_t                          enableAMPbeforeCalib = eobool_false;
     eOmc_joint_status_t                     *jstatus_ptr;
@@ -717,12 +724,13 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__calibration(eOcfg_nvsEP_mc_joi
 }
 
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOmc_joint_status_t                     *jstatus_ptr;
-    eOmc_controlmode_command_t              *controlmode_cmd_ptr = (eOmc_controlmode_command_t*)nv->loc;
+    eOmc_controlmode_command_t              *controlmode_cmd_ptr = (eOmc_controlmode_command_t*)nv->ram;
     icubCanProto_controlmode_t              icubcanProto_controlmode;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
@@ -789,9 +797,10 @@ extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jcmmnds__controlmode(eOcfg_nvsEP_mc_joi
 
 }
 
-extern void eo_cfg_nvsEP_mc_hid_UPDT_Jxx_jinputs__externallymeasuredtorque(eOcfg_nvsEP_mc_jointNumber_t jxx, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_torque_t *torquevalue_ptr = (eOmeas_torque_t*)nv->loc;
+    eOmeas_torque_t *torquevalue_ptr = (eOmeas_torque_t*)nv->ram;
+    eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     icubCanProto_torque_t icub_torque;
     
 //     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());

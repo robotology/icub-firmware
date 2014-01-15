@@ -1829,17 +1829,17 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
         return(res);
     }
     
-    mstatus_ptr->chamaleon04[0] = 0;
+    mstatus_ptr->filler04[0] = 0;
     dgn_ptr = eo_theEMSdgn_GetHandle();
     
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_UNDERVOLTAGE)) //undervoltage
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_UNDERVOLTAGE;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_UNDERVOLTAGE;
     }
     
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERVOLTAGE)) //overvoltage    
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_OVERVOLTAGE;
     }
     
     
@@ -1847,40 +1847,41 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     {
         if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_EXTERNAL))//external
         {
-            mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
+            mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_EXTERNAL;
         }
     }
     
     if(EO_COMMON_CHECK_FLAG(flag0, ICUBCANPROTO_PER_MC_STATUS_FLAG_OVERCURRENT)) //over current
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_OVERCURRENT;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_OVERCURRENT;
     }
     
     if(EO_COMMON_CHECK_FLAG(flag5, ICUBCANPROTO_PER_MC_STATUS_FLAG_I2TFAILURE))
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_I2TFAILURE;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_I2TFAILURE;
     }
+
     
     if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECWARNING)) //can receive warning   
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECWARNING;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_CANRECWARNING;
     }
     
     if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECERROR)) //can receive error   
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECERROR;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_CANRECERROR;
     }
     
     
     if(EO_COMMON_CHECK_FLAG(flag4, ICUBCANPROTO_PER_MC_STATUS_FLAG_CANRECHWOVERRUN)) //can hw over-run   
     {
-        mstatus_ptr->chamaleon04[0] |= DGN_MOTOR_FAULT_CANRECHWOVERRUN;
+        mstatus_ptr->filler04[0] |= DGN_MOTOR_FAULT_CANRECHWOVERRUN;
     }
         
     
-    if(0 != mstatus_ptr->chamaleon04[0])
+    if(0 != mstatus_ptr->filler04[0])
     {
-        eo_theEMSdgn_UpdateMotorStFlags(dgn_ptr, mId, mstatus_ptr->chamaleon04[0]);
+        eo_theEMSdgn_UpdateMotorStFlags(dgn_ptr, mId, mstatus_ptr->filler04[0]);
         eo_theEMSdgn_Signalerror(dgn_ptr, eodgn_nvidbdoor_motorstatus , 0);
         eo_theEMSdgn_ClearMotorStFlags(dgn_ptr);
     }

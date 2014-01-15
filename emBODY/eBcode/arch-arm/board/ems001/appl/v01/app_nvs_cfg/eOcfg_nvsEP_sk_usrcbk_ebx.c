@@ -37,7 +37,7 @@
 #include "EOnv_hid.h"
 
 #include "EOSkin.h"
-#include "eOcfg_nvsEP_sk.h"
+//#include "eOcfg_nvsEP_sk.h"
 
 //application
 #include "EOtheEMSapplBody.h"
@@ -99,15 +99,31 @@
 
 //sk-init
 
+extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
+{
+    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->ram;
+    
+    *sigmode = eosk_sigmode_signal;
+}
 
+
+extern void eoprot_fun_INIT_sk_skin_status_arrayof10canframes(const EOnv* nv)
+{
+    EOarray_of_10canframes *array_ptr = (EOarray_of_10canframes *)nv->ram;
+    
+    array_ptr->head.capacity = 10;       
+    array_ptr->head.itemsize = sizeof(eOutil_canframe_t);
+    array_ptr->head.size = 0;   
+
+}
 //sk-update
-extern void eo_cfg_nvsEP_sk_hid_UPDT_sconfig__sigmode(uint16_t n, const EOnv* nv, const eOabstime_t time, const uint32_t sign)
+extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                      res;
     uint8_t                         i;
     eOappTheDB_SkinCanLocation_t    canLoc;
     eOsk_skinId_t                   skId = 0; //for DB the skin is unique entity
-    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->loc;
+    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->ram;
     EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     /* NOTE: corrently any skin board starts to send can frame when it finishes its initilisation

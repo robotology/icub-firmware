@@ -38,10 +38,10 @@
 #include "EOnv_hid.h"
 
 #include "EOMotionControl.h"
-#include "eOcfg_nvsEP_mc.h"
+//#include "eOcfg_nvsEP_mc.h"
 
-#include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
-#include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
+// #include "eOcfg_nvsEP_mc_any_con_jxxdefault.h"
+// #include "eOcfg_nvsEP_mc_any_con_mxxdefault.h"
 
 
 //application
@@ -87,7 +87,87 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+const eOmc_joint_t joint_default_value =
+{
+    EO_INIT(.config)             
+    {
+        EO_INIT(.pidposition)
+        {
+            EO_INIT(.kp)                    0,
+            EO_INIT(.ki)                    0,
+            EO_INIT(.kd)                    0,
+            EO_INIT(.limitonintegral)       0,
+            EO_INIT(.limitonoutput)         0,
+            EO_INIT(.scale)                 0,
+            EO_INIT(.offset)                0,
+            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        },
+        EO_INIT(.pidvelocity)
+        {
+            EO_INIT(.kp)                    0,
+            EO_INIT(.ki)                    0,
+            EO_INIT(.kd)                    0,
+            EO_INIT(.limitonintegral)       0,
+            EO_INIT(.limitonoutput)         0,
+            EO_INIT(.scale)                 0,
+            EO_INIT(.offset)                0,
+            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        },
+        EO_INIT(.pidtorque)
+        {
+            EO_INIT(.kp)                    0,
+            EO_INIT(.ki)                    0,
+            EO_INIT(.kd)                    0,
+            EO_INIT(.limitonintegral)       0,
+            EO_INIT(.limitonoutput)         0,
+            EO_INIT(.scale)                 0,
+            EO_INIT(.offset)                0,
+            EO_INIT(.filler03)              {0xf1, 0xf2, 0xf3}
+        }, 
+        EO_INIT(.limitsofjoint)
+        {
+            EO_INIT(.min)                   0,
+            EO_INIT(.max)                   0
+        },
+        EO_INIT(.impedance)
+        {
+            EO_INIT(.stiffness)             0,
+            EO_INIT(.damping)               0,
+            EO_INIT(.offset)                0,
+            EO_INIT(.filler02)              {0xf1, 0xf2}           
+        },        
+        
+        EO_INIT(.velocitysetpointtimeout)   0,
+       
+        EO_INIT(.motionmonitormode)         eomc_motionmonitormode_dontmonitor,
+        EO_INIT(.filler01)                 0xe0,
+        EO_INIT(.encoderconversionfactor)   EOUTIL_EMULFLOAT32_ONE,
+        EO_INIT(.encoderconversionoffset)   EOUTIL_EMULFLOAT32_ZERO,
+    },
+    EO_INIT(.status)                       
+    {
+        EO_INIT(.basic)
+        {
+            EO_INIT(.position)              0,
+            EO_INIT(.velocity)              0,       
+            EO_INIT(.acceleration)          0,     
+            EO_INIT(.torque)                0,
+            EO_INIT(.motionmonitorstatus)   eomc_motionmonitorstatus_notmonitored,
+            EO_INIT(.controlmodestatus)      eomc_controlmode_idle,
+        },
+        EO_INIT(.ofpid)                     {0},
+        EO_INIT(.chamaleon04)               {0} //{0xd1, 0xd2, 0xd3, 0xd4}
+    },
+    EO_INIT(.inputs)                       {0},
+    EO_INIT(.cmmnds)                       
+	{
+		EO_INIT(.calibration)               {0},
+		EO_INIT(.setpoint)                  {0},
+		EO_INIT(.stoptrajectory)            0,
+		EO_INIT(.controlmode)				eomc_controlmode_cmd_switch_everything_off,
+        EO_INIT(.filler02)                  {0}
+	}
+}; 
 
 
 

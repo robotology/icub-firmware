@@ -33,7 +33,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 //abstlayaer
 #include "eOcommon.h"
-#include "eOcfg_nvsEP_mc.h"
+
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
