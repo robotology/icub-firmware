@@ -1,5 +1,0 @@
-
-This is a simple application which can be used to debug the hal 
-by inclusion of the source code of teh library.
-
-This application runs on mcbstm32c board only.

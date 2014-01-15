@@ -1,4 +1,0 @@
-
-from revision 16798
-removed _FORCE_NETWORK_FROM_IPAL_CFG
-optimisation +O3 speed
