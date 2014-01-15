@@ -1,0 +1,6 @@
+ems application with ethernet protocol version 1 is composed by
+
+
+    *   iCub\firmware\emBODY\eBcode\arch-arm\board\ems001\appl\v01             at svn revision 28000 14th January 2014
+    *   iCub\firmware\emBODY\eBcode\embobj                                     at svn revision 28001 14th January 2014
+    *   iCub\firmware\emBODY\eBcode\arch-arm\libs                              at svn revision 27971 10th January 2014
