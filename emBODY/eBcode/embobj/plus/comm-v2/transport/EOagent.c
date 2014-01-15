@@ -274,7 +274,7 @@ extern eOresult_t eo_agent_OutROPprepare(EOagent* p, EOnv* nv, eOropdescriptor_t
     }
     else
     {
-        rop->stream.head.dsiz = eo_nv_Size(nv);
+        rop->stream.head.dsiz = 0;
     }
     
     // assign sign

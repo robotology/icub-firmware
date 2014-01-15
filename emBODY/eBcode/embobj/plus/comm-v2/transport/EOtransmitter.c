@@ -723,6 +723,7 @@ static eOresult_t s_eo_transmitter_rops_Load(EOtransmitter *p, eOropdescriptor_t
     else
     {   // dont need to send data
         ropdesc->data = NULL;
+        ropdesc->size = 0;
     }
 
 
