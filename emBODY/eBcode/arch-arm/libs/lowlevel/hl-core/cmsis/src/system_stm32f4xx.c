@@ -252,27 +252,44 @@
 /******************************************************************************/
 
 /************************* PLL Parameters *************************************/
+// IIT-EXT: ... put the PLL_M, PLL_N, PLL_P, PLL_Q under #if !defined() to avoid redefinition
 /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */
+#if     !defined(PLL_M)
 #define PLL_M      25
+#endif//!defined(PLL_M)
+#if     !defined(PLL_Q)
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
 #define PLL_Q      7
+#endif//!defined(PLL_Q)
 
 #if defined (STM32F40_41xxx)
+#if     !defined(PLL_N)
 #define PLL_N      336
+#endif//!defined(PLL_N)
 /* SYSCLK = PLL_VCO / PLL_P */
+#if     !defined(PLL_P)
 #define PLL_P      2
+#endif//!defined(PLL_P)
 #endif /* STM32F40_41xxx */
 
 #if defined (STM32F427_437xx) || defined (STM32F429_439xx)
+#if     !defined(PLL_N)
 #define PLL_N      360
+#endif//!defined(PLL_N)
 /* SYSCLK = PLL_VCO / PLL_P */
+#if     !defined(PLL_P)
 #define PLL_P      2
+#endif//!defined(PLL_P)
 #endif /* STM32F427_437x || STM32F429_439xx */
 
 #if defined (STM32F401xx)
+#if     !defined(PLL_N)
 #define PLL_N      336
+#endif//!defined(PLL_N)
 /* SYSCLK = PLL_VCO / PLL_P */
+#if     !defined(PLL_P)
 #define PLL_P      4
+#endif//!defined(PLL_P)
 #endif /* STM32F401xx */
 
 /******************************************************************************/

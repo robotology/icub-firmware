@@ -143,8 +143,10 @@
    */
 #define HSE_STARTUP_TIMEOUT   ((uint16_t)0x0500) /*!< Time out for HSE start up */
 
+// IIT-EXT: protected HSI_VALUE vs multiple definitions
+#if !defined  (HSI_VALUE)  
 #define HSI_VALUE    ((uint32_t)8000000) /*!< Value of the Internal oscillator in Hz*/
-
+#endif
 /**
  * @brief STM32F10x Standard Peripheral Library version number
    */
