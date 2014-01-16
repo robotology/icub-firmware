@@ -33,34 +33,29 @@
 #if     defined(HL_USE_BRD_MCBSTM32)
  
     #define HL_USE_MPU_NAME_STM32F103RB
-//    #define HL_USE_MPU_ARCH_STM32F1
-    
-//    #define HL_TARGET_MPU_NAME  HL_MPU_NAME_STM32F103RB
-//    #define HL_TARGET_MPU_ARCH  HL_MPU_ARCH_STM32F1
     
 #elif   defined(HL_USE_BRD_MCBSTM32_C)
 
     #define HL_USE_MPU_NAME_STM32F107VC
-//    #define HL_USE_MPU_ARCH_STM32F1  
     
-//    #define HL_TARGET_MPU_NAME  HL_MPU_NAME_STM32F107VC
-//    #define HL_TARGET_MPU_ARCH  HL_MPU_ARCH_STM32F1    
-    
+    #define HL_CFG_MPUSPEED_INTclockspeed    ((uint32_t) 8000000)
+    #define HL_CFG_MPUSPEED_EXTclockspeed    ((uint32_t)25000000)    
+
 #elif   defined(HL_USE_BRD_EMS001)    
 
-    #define HL_USE_MPU_NAME_STM32F107VC
-//    #define HL_USE_MPU_ARCH_STM32F1
-    
-//    #define HL_TARGET_MPU_NAME  HL_MPU_NAME_STM32F107VC
-//    #define HL_TARGET_MPU_ARCH  HL_MPU_ARCH_STM32F1      
+    #define HL_USE_MPU_NAME_STM32F107VC   
 
 #else
     #error ERR: cannot define MPU_NAME
 #endif
 
 
+// MPU ARCH:
 #include "hl_mpu2arch.h"
 
+
+// MPU SPEED CFG:
+#include "hl_mpuspeed.h"
 
 #endif  // include-guard
 

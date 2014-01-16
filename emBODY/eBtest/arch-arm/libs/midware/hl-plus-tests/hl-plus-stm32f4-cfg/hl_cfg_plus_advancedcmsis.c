@@ -38,6 +38,16 @@
 // }
 
 
+#if     defined(HL_USE_BRD_EMS004)
+
+// need to use a different SystemInit() because we dont have the normal clock as in mcbstm32f400 
+
+//#include "ems004_sys.c"
+
+
+#endif//defined(HL_USE_BRD_EMS004)
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

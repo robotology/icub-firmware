@@ -43,6 +43,8 @@
 #include "board.h"  
 #include "systickservices.h" 
 
+#include "eventviewer.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,7 +78,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void myonsystick(void);
+extern void myonsystick(void);
 
 static void test_i2c(void);
 
@@ -88,6 +90,11 @@ static void test_mems_init(void);
 static void test_mems_get(void);
 
 static void s_on_timer_expiry(void* p);
+
+void idle(void) {}
+extern void onsystick(void) {}
+void userdef1(void) {}
+static void brd_eventviewer_init(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -111,14 +118,16 @@ int main(void)
 {
     
     SystemCoreClockUpdate();
+    
+    brd_eventviewer_init();
  
     board_led_init();
     
-    test_i2c();
+    //test_i2c();
     
-    test_eeprom();
+    //test_eeprom();
     
-    test_mems_init();
+    //test_mems_init();
     
     
     systickserv_start_systick(1000, myonsystick);
@@ -138,7 +147,7 @@ int main(void)
         //systickserv_wait_for(500*1000);
         hl_sys_delay(500*1000);
         
-        test_mems_get();
+        //test_mems_get();
     }
 
     
@@ -160,9 +169,10 @@ int main(void)
 
 
 
-static void myonsystick(void)
-{
-
+extern void myonsystick(void)
+{   
+    evEntityId_t prev = eventviewer_switch_to(ev_ID_systick);
+    eventviewer_switch_to(prev);
 }
 
 
@@ -180,7 +190,12 @@ static void test_i2c(void)
     
     r = hl_i2c_ping(hl_i2c1, devaddr);
     
-    r = r;    
+    r = r;  
+
+    if(hl_res_OK != r)
+    {
+        hl_sys_itm_puts("hl_i2c_ping() failure");
+    }        
     
 }
 
@@ -229,7 +244,7 @@ static void test_eeprom(void)
 #else
     #error -> define an eeprom cfg
 #endif    
-    hl_result_t r = hl_res_NOK_generic;
+    volatile hl_result_t r = hl_res_NOK_generic;
     
     r = hl_chip_xx_eeprom_init(&eepromcfg);
     
@@ -252,6 +267,49 @@ static void test_eeprom(void)
     memset(buffer, 0, sizeof(buffer));
     
     r = hl_chip_xx_eeprom_read(address, size, buffer, &readbytes);
+    
+    
+    {
+        int i;
+        #define BYTES_TO_VERIFY 808
+        #define ADDRESS_TO_TEST 0x1800
+        static uint8_t data[1024] = {0}; //{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+        for(i=0; i<sizeof(data); i++)
+        {
+            data[i] = (uint8_t)i;
+        }
+
+        static uint8_t tmp[1024] = {0};
+            
+
+        r = hl_chip_xx_eeprom_write(ADDRESS_TO_TEST, BYTES_TO_VERIFY, data, &writtenbytes);
+        r =  r;
+        
+        memset(tmp, 0, sizeof(tmp));
+        
+        r = hl_chip_xx_eeprom_read(ADDRESS_TO_TEST, BYTES_TO_VERIFY, tmp, &readbytes);
+        r =  r;
+        
+        if(0 != memcmp(tmp, data, BYTES_TO_VERIFY))
+        {
+            for(i=0; i<BYTES_TO_VERIFY; i++)
+            {
+                if(tmp[i] != data[i])
+                {
+                    r = r;
+                }
+            }
+            // test has failed
+            for(;;);
+        }
+        else
+        {
+            //for(;;);
+        }        
+        
+        
+        
+    }
     
 
     r = r;    
@@ -373,6 +431,8 @@ static void s_on_timer_expiry(void* p)
     static volatile uint32_t delta = 0;
     static volatile uint32_t prev = 0;
     static volatile uint32_t val = 0;
+    
+    evEntityId_t previd = eventviewer_switch_to(ev_ID_first_usrdef+1);
 
     delta = systickserv_numofticks - prev;
     prev = systickserv_numofticks;
@@ -390,7 +450,9 @@ static void s_on_timer_expiry(void* p)
     {
         board_led_off(board_led_3);
         val = 0;
-    }        
+    }  
+
+    eventviewer_switch_to(previd);     
 }
 
 #if     !defined(HL_USE_UTIL_TIMER)
@@ -407,6 +469,25 @@ void TIM4_IRQHandler(void)
 }
 #endif
 
+
+    
+static void brd_eventviewer_init(void)
+{
+    
+    //evEntityId_t prev;
+
+    eventviewer_init();
+    eventviewer_load(ev_ID_idle, idle);  
+    eventviewer_load(ev_ID_systick, onsystick);  
+    eventviewer_load(ev_ID_first_usrdef+1, userdef1); 
+    
+    // the eventviewer shall stay most of time in idle
+    // apart from some specific actions: systick, userdef1 and userdef2
+    eventviewer_switch_to(ev_ID_idle);
+    
+
+}
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_MCBSTM32</Define>
               <Undefine></Undefine>
-              <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils</IncludePath>
+              <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -743,6 +743,16 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>eviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -939,7 +949,7 @@
             <GenPPlst>1</GenPPlst>
             <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
-            <mOS>0</mOS>
+            <mOS>1</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
             <hadIROM>1</hadIROM>
@@ -1089,7 +1099,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_MCBSTM32_C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils</IncludePath>
+              <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1482,6 +1492,16 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>eviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -1678,7 +1698,7 @@
             <GenPPlst>1</GenPPlst>
             <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
-            <mOS>0</mOS>
+            <mOS>1</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
             <hadIROM>1</hadIROM>
@@ -1828,7 +1848,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_EMS001</Define>
               <Undefine></Undefine>
-              <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils</IncludePath>
+              <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2218,6 +2238,16 @@
               <FileName>hl_chip_xx_ethphy.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eviewer</GroupName>
+          <Files>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
         </Group>

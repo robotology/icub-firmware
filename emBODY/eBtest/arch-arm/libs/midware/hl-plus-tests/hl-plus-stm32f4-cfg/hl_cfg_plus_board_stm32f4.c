@@ -168,7 +168,7 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
                     .port   = hl_gpio_portB, 
                     .pin    = hl_gpio_pin8
                 },
-                .af32       = xxx          
+                .af32       = hl_NA32          
             }, 
             .sda = 
             {
@@ -177,7 +177,7 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
                     .port   = hl_gpio_portB, 
                     .pin    = hl_gpio_pin9
                 },
-                .af32       = xxx          
+                .af32       = hl_NA32          
             } 
         }, 
         {   // hl_i2c2 
@@ -298,6 +298,7 @@ extern const hl_eth_mapping_t hl_eth_mapping =
 
 #elif   defined(HL_USE_BRD_EMS004)
 
+#warning ems004 has different eth settings respect to mcbstm32f400
 extern const hl_eth_mapping_t hl_eth_mapping =
 {
     .supported          = hl_true,
@@ -309,7 +310,7 @@ extern const hl_eth_mapping_t hl_eth_mapping =
             .ETH_RMII_REF_CLK   =            
             {   
                 .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin1 }, 
-                .af32   = GPIO_AF_ETH xxx
+                .af32   = GPIO_AF_ETH
             },  
             .ETH_RMII_TX_EN     =            
             {   
@@ -329,17 +330,17 @@ extern const hl_eth_mapping_t hl_eth_mapping =
             .ETH_RMII_CRS_DV    =            
             {   
                 .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin8 }, 
-                .af32   = GPIO_Remap_ETH
+                .af32   = GPIO_AF_ETH
             },
             .ETH_RMII_RXD0      =            
             {   
                 .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin9 }, 
-                .af32   = GPIO_Remap_ETH
+                .af32   = GPIO_AF_ETH
             },
             .ETH_RMII_RXD1      =            
             {   
                 .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin10 }, 
-                .af32   = GPIO_Remap_ETH
+                .af32   = GPIO_AF_ETH
             } 
         },
         .gpio_smi       =
@@ -447,6 +448,7 @@ extern const hl_can_mapping_t hl_can_mapping =
 
 #elif   defined(HL_USE_BRD_EMS004)
 
+#warning --> see can settings in ems004
 
 extern const hl_can_mapping_t hl_can_mapping =
 {
@@ -470,7 +472,7 @@ extern const hl_can_mapping_t hl_can_mapping =
                     .port   = hl_gpio_portD, 
                     .pin    = hl_gpio_pin1
                 },
-                .af32       = GPIO_AF_CAN1  xxx        
+                .af32       = GPIO_AF_CAN1         
             } 
         }, 
         {   // hl_can2 
@@ -490,7 +492,7 @@ extern const hl_can_mapping_t hl_can_mapping =
                     .port   = hl_gpio_portB, 
                     .pin    = hl_gpio_pin6
                 },
-                .af32       = GPIO_AF_CAN2 xxx          
+                .af32       = GPIO_AF_CAN2          
             } 
         }   
     } 
