@@ -64,3 +64,9 @@ from a library of available ones.
    The file hl_cfg_plus_advancedcmsis.c may contain redefinitions of those functions which are weakly defined in
    hl/core/cmsis/src/system_xxx.c and included in PLUS by means of hl_wrap_system.c. The functions are:
    SystemInit() and SystemCoreClockUpdate().
+   An alternative which is simpler but less powerful is to simply redefine some macros used by CMSIS files:
+   HSI_VALUE, HSE_VALUE and for stm32f4 also PLL_M, PLL_N, PLL_P and PLL_Q. By redefining them in the proper way 
+   it is possible to customise the MPU speed.
+   It is possible to redefine the above macros by operating inside hl_cfg_plus_target.h and defining the values of:
+   HL_CFG_MPUSPEED_INTclockspeed, HL_CFG_MPUSPEED_EXTclockspeed, HL_CFG_MPUSPEED_STM32F4_PLL_m, HL_CFG_MPUSPEED_STM32F4_PLL_n,
+   HL_CFG_MPUSPEED_STM32F4_PLL_p, HL_CFG_MPUSPEED_STM32F4_PLL_q. Then inclusion of hl_mpuspeed.h must follow.  
