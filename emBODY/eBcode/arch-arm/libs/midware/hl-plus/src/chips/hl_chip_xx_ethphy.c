@@ -293,7 +293,7 @@ static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cf
     uint16_t regv;
     uint32_t tout;
     
-    #warning --> chi initialissa lo smi? chi ne ha bisogno? 
+    #warning --> chi inizializza lo smi? chi ne ha bisogno? 
     // 1. initialises smi
     hl_eth_smi_init();
     
