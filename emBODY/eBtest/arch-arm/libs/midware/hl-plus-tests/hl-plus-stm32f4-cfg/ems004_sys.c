@@ -62,8 +62,8 @@ static const hl_cpu_hid_brdcfg_t cpu_brdcfg =
     {
         .keepinternalclockatstartup     = hl_false,      // false is the preferred mode
         .refclock                       = hl_cpu_refclock_pll_on_external_xtl,  
-        .intclockspeed                  = HL_INTclockspeed,
-        .extclockspeed                  = HL_EXTclockspeed,
+        .intclockspeed                  = HSI_VALUE,
+        .extclockspeed                  = HSE_VALUE,
         .pllcfg                         =
         {   // pllfreq = n*(source/m), speedcpu = pllfreq/p, 48mhz = pllfreq/q
             .m                  =  25, 
