@@ -503,6 +503,9 @@ static void SetSysClock(void)
 /******************************************************************************/
   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
   
+  //IIT-EXT: added enable of hse bypass    
+//  RCC->CR |= ((uint32_t)RCC_CR_HSEBYP);
+  
   /* Enable HSE */
   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
  
