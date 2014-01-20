@@ -76,7 +76,23 @@ static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size);
 
 void upd_core_init(void)
 {
-    hal_gpio_init(hal_gpio_portE, hal_gpio_pin13, hal_gpio_dirOUT, hal_gpio_speed_low); 
+#if		!defined(HAL_USE_VERSION_2)
+	hal_gpio_init(hal_gpio_portE, hal_gpio_pin13, hal_gpio_dirOUT, hal_gpio_speed_low);
+#else
+    const  hal_gpio_t gpio = 
+    {
+        .port   = hal_gpio_portE,
+        .pin    = hal_gpio_pin13   
+    };
+    
+    const hal_gpio_cfg_t gpiocfg =
+    {
+        .dir = hal_gpio_dirOUT,
+        .speed = hal_gpio_speed_low,
+        .altcfg = NULL
+    };
+    hal_gpio_init(gpio, &gpiocfg);
+#endif
 }
 
 #define PROGRAM_LOADER   0x55

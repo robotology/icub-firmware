@@ -28,10 +28,21 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "hal.h"
-#include "hal_arch.h"
+
+#if		defined(HAL_IS_VERSION_2)
+
 #include "hal_switch.h"
 
+#include "hal_uniqueid.h"
+#include "hal_eeprom.h"
+#include "hal_led.h"
 
+#else	// must be version 1
+	
+#include "hal_arch.h"
+#define hal_uniqueid_id64bit_get hal_arch_arm_uniqueid64_get
+
+#endif
 
 #include "string.h"
 #include "stdlib.h"
@@ -134,14 +145,14 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
             .version    = 
             { 
                 .major = 2, 
-                .minor = 2
+                .minor = 3
             },  
             .builddate  = 
             {
-                .year  = 2013,
-                .month = 11,
-                .day   = 25,
-                .hour  = 13,
+                .year  = 2014,
+                .month = 1,
+                .day   = 13,
+                .hour  = 18,
                 .min   = 0
             }
         },
@@ -267,6 +278,100 @@ static eEboardInfo_t s_loader_boardinfo =
     .uniqueid       = 0,
     .extra          = {0}
 };
+
+#elif defined(BOARD_EMS004)
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = 0x11,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2011,
+                .month = 11,
+                .day   = 3,
+                .hour  = 18,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "ems004"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
+
+#elif defined(BOARD_MCBSTM32F400)
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = 0x11,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2010,
+                .month = 1,
+                .day   = 1,
+                .hour  = 0,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "mcbstm32f400"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
 #endif
 
 
@@ -383,7 +488,7 @@ static void s_loader_shared_services_init(void)
     }    
     
     // impose boardinfo
-    s_loader_boardinfo.uniqueid = hal_arch_arm_uniqueid64_get();
+    s_loader_boardinfo.uniqueid = hal_uniqueid_id64bit_get();
     
     if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(&s_loader_boardinfo))
     {
@@ -611,11 +716,7 @@ void systickhandler(void)
 }
 
 static void s_loader_HW_init(void)
-{
-    extern const hal_cfg_t *hal_cfgMINE;
-    uint32_t size04aligned;
-    uint32_t *data32aligned = NULL;
-
+{     
     if(1 == hw_initted)
     {
         return;
@@ -624,6 +725,22 @@ static void s_loader_HW_init(void)
     {
         hw_initted = 1;
     }
+
+#if		defined(HAL_IS_VERSION_2)
+
+    extern const hal_core_cfg_t* hal_coreCFGptr;
+
+    hal_core_init(hal_coreCFGptr);
+    
+    hal_core_start();
+
+	hal_uniqueid_init(NULL);
+
+#else	// it must be hal version 1
+
+    extern const hal_cfg_t *hal_cfgMINE;
+    uint32_t size04aligned;
+    uint32_t *data32aligned = NULL;
 
     hal_base_memory_getsize(hal_cfgMINE, &size04aligned); 
 
@@ -635,6 +752,8 @@ static void s_loader_HW_init(void)
     hal_base_initialise(hal_cfgMINE, data32aligned);
 
     hal_sys_systeminit();
+
+#endif
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL); 
 
@@ -651,7 +770,7 @@ static void s_loader_HW_init(void)
 #endif    
     
 
-#if defined(BOARD_EMS001)
+#if defined(BOARD_EMS001) || defined(BOARD_EMS004)
     if(hal_false == hal_switch_initted_is())
     {
         hal_switch_init(NULL);
