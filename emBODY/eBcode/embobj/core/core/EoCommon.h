@@ -594,12 +594,12 @@ EO_extern_inline eObool_t eo_common_event_check(eOevent_t event, eOevent_t mask)
 
 EO_extern_inline eOq17_14_t eo_common_float_to_Q17_14(float f_num)
 {
-    return((eOq17_14_t)(f_num * 16384.0) ); //note: 16384.0 = 2^14
+    return((eOq17_14_t)(f_num * 16384.0f) ); //note: 16384.0 = 2^14
 }
 
 EO_extern_inline float eo_common_Q17_14_to_float(eOq17_14_t q_num)
 {
-    return((float)(q_num / 16384.0) ); //note: 16384.0 = 2^14
+    return((float)(q_num / 16384.0f) ); //note: 16384.0 = 2^14
 }
 
 EO_extern_inline eOresult_t eo_common_Q17_14_mult(eOq17_14_t q_num1, eOq17_14_t q_num2, eOq17_14_t *q_res)
