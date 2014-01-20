@@ -75,10 +75,10 @@
 //#undef  EXECUTE_TEST_SYS_DELAY
 #define EXECUTE_TEST_SYS_DELAY
 
-// #undef EXECUTE_TEST_PERIPH_I2C
+#undef EXECUTE_TEST_PERIPH_I2C
 #define EXECUTE_TEST_PERIPH_I2C
 
-//#undef  EXECUTE_TEST_DEVICE_EEPROM
+#undef  EXECUTE_TEST_DEVICE_EEPROM
 #define EXECUTE_TEST_DEVICE_EEPROM
 
 
@@ -88,8 +88,8 @@
 #undef  EXECUTE_TEST_PERIPH_WATCHDOG
 //#define EXECUTE_TEST_PERIPH_WATCHDOG
 
-//#undef EXECUTE_TEST_PERIPH_UNIQUEID
-#define EXECUTE_TEST_PERIPH_UNIQUEID
+#undef EXECUTE_TEST_PERIPH_UNIQUEID
+//#define EXECUTE_TEST_PERIPH_UNIQUEID
 
 
 #undef EXECUTE_TEST_PERIPH_CAN
@@ -110,8 +110,8 @@
 //#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
 #endif
 
-//#undef EXECUTE_TEST_PERIPH_ETH
-#define EXECUTE_TEST_PERIPH_ETH
+#undef EXECUTE_TEST_PERIPH_ETH
+//#define EXECUTE_TEST_PERIPH_ETH
 
 
 #ifdef EXECUTE_TEST_PERIPH_ETH
@@ -279,7 +279,7 @@ static const hal_gpio_val_t user_notpushed_value =
 
 int main(void) 
 {
-    extern const hal_core_cfg_t*     hal_coreCFGptr;
+    extern const hal_cfg_t*     hal_coreCFGptr;
     hal_result_t res = hal_res_OK;
     
    
@@ -787,40 +787,53 @@ static void test_device_eeprom(void)
 #if     defined(HAL_USE_DEVICE_EEPROM) || defined(HAL_USE_DEVICE_EEPROM_dummy)
     
     test_is_beginning("eeprom");
+    int i;
+    // 808 a partire da 0x1800
+    #define BYTES_TO_VERIFY 32
+    #define ADDRESS_TO_TEST 0x0
+    static uint8_t data[1024] = {0}; //{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+    for(i=0; i<sizeof(data); i++)
+    {
+        data[i] = (uint8_t)i;
+    }
+
+    static uint8_t tmp[1024] = {0};
     
-    #define BYTES_TO_VERIFY 12
-    static uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
-    
-    static uint8_t tmp[512] = {0};
-    
-    hal_result_t res;
+    volatile hal_result_t res;
     
     //hal_i2c4hal_init(hal_i2c_port1, NULL);
 
-    res = hal_eeprom_init(hal_eeprom2_i2c_01, NULL);
+    res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom2_i2c_01, 258, BYTES_TO_VERIFY, tmp);
+    res = hal_eeprom_read(hal_eeprom_i2c_01, ADDRESS_TO_TEST, BYTES_TO_VERIFY, tmp);
     res =  res;  
     
 //    return;   
     
-    res = hal_eeprom_erase(hal_eeprom2_i2c_01, 0, 512);
+    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 0x2000);
     res =  res;
     
-    res = hal_eeprom_read(hal_eeprom2_i2c_01, 258, BYTES_TO_VERIFY, tmp);
+    res = hal_eeprom_read(hal_eeprom_i2c_01, ADDRESS_TO_TEST, BYTES_TO_VERIFY, tmp);
     res =  res;    
     
-    res = hal_eeprom_write(hal_eeprom2_i2c_01, 256, BYTES_TO_VERIFY, data);
+    res = hal_eeprom_write(hal_eeprom_i2c_01, ADDRESS_TO_TEST, BYTES_TO_VERIFY, data);
     res =  res;
     
     memset(tmp, 0, sizeof(tmp));
     
-    res = hal_eeprom_read(hal_eeprom2_i2c_01, 256, BYTES_TO_VERIFY+4, tmp);
+    res = hal_eeprom_read(hal_eeprom_i2c_01, ADDRESS_TO_TEST, BYTES_TO_VERIFY, tmp);
     res =  res;
     
     if(0 != memcmp(tmp, data, BYTES_TO_VERIFY))
     {
+        for(i=0; i<BYTES_TO_VERIFY; i++)
+        {
+            if(tmp[i] != data[i])
+            {
+                res = res;
+            }
+        }
         // test has failed
         test_has_failed("eeprom");
     }

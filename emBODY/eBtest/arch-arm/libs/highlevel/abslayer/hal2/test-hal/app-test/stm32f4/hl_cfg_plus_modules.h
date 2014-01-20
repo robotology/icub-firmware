@@ -47,6 +47,11 @@
 
 #define HL_USE_CORE_STM32
 
+#define HL_USE_UTIL_GPIO
+#define HL_USE_UTIL_BITS
+#define HL_USE_UTIL_FIFO
+#define HL_USE_UTIL_I2C
+
 // HL_BEH_* contain behaviours to be applied to every module
 
 //#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK

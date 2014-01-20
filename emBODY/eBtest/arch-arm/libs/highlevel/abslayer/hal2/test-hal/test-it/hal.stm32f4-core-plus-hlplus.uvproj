@@ -429,12 +429,22 @@
             <File>
               <FileName>hl_cfg_plus_modules.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app-test\stm32f4\hl_cfg_plus_modules.h</FilePath>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app-test\stm32f4\hl_cfg_plus_target.h</FilePath>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -923,6 +933,61 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>hl-plus-utils</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_bits.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_bits.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_ethtrans.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_ethtrans.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_timer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -994,7 +1059,7 @@
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\hal.stm32f2.mcbstm32f200.lib .\hal-lib\hal.stm32f2.mcbstm32f200.lib</UserProg1Name>
+            <UserProg1Name></UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1267,9 +1332,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_EMS004</Define>
+              <Define>HAL_BOARD_EMS004 HL_USE_BRD_EMS004 HL_CFG_PLUS_TARGET_BY_FILE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\sys\mid\api;..\..\..\..\..\sys\mid\inc;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\periphs;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\arch-armcmx</IncludePath>
+              <IncludePath>..\..\hal\hal-api;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\periphs;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\app-test\stm32f4;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1348,12 +1413,22 @@
             <File>
               <FileName>hl_cfg_plus_modules.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app-test\stm32f4\hl_cfg_plus_modules.h</FilePath>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app-test\stm32f4\hl_cfg_plus_target.h</FilePath>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1509,6 +1584,46 @@
               <FileName>hl_wrap_system.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\wrappers\hl_wrap_system.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>hl_wrap_tim.c</FileName>
@@ -1799,6 +1914,61 @@
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hl-plus-utils</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_bits.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_bits.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_eth.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_ethtrans.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_ethtrans.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_timer.c</FilePath>
             </File>
           </Files>
         </Group>
