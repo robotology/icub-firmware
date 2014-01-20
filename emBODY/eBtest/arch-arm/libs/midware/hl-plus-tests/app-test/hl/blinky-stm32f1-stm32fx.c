@@ -116,16 +116,21 @@ static void brd_eventviewer_init(void);
 
 int main(void) 
 {
+    RCC_ClocksTypeDef rcc_clockS;
+        
+    RCC_GetClocksFreq(&rcc_clockS);
     
     SystemCoreClockUpdate();
+    
+    RCC_GetClocksFreq(&rcc_clockS);
     
     brd_eventviewer_init();
  
     board_led_init();
     
-    //test_i2c();
+    test_i2c();
     
-    //test_eeprom();
+    test_eeprom();
     
     //test_mems_init();
     
@@ -239,7 +244,7 @@ static void test_eeprom(void)
         .i2cid          = hl_i2c1,
         .hwaddra2a1a0   = 0,
         .wp_val         = hl_gpio_valSET,
-        .wp_gpio        = { .port = hl_gpio_portB, .pin = hl_gpio_pin10 }           
+        .wp_gpio        = { .port = hl_gpio_portD, .pin = hl_gpio_pin10 }           
     };     
 #else
     #error -> define an eeprom cfg
