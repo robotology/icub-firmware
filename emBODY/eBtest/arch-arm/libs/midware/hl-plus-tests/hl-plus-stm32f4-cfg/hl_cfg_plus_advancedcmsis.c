@@ -42,7 +42,7 @@
 
 // need to use a different SystemInit() because we dont have the normal clock as in mcbstm32f400 
 
-//#include "ems004_sys.c"
+#include "ems004_sys.c"
 
 
 #endif//defined(HL_USE_BRD_EMS004)
