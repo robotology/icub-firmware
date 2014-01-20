@@ -101,8 +101,6 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
                                          const eOmtimerman_cfg_t *tmrmancfg,
                                          const eOmcallbackman_cfg_t *cbkmancfg)
 {
-    uint32_t ram04size = 0;
-    uint32_t *ram04data = NULL;
     uint32_t ram08size = 0;
     uint64_t *ram08data = NULL;
 
@@ -138,6 +136,9 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
     s_eom_system.cbkmancfg  = cbkmancfg;
 
 
+#if     !defined(HAL_USE_VERSION_2)
+    uint32_t ram04size = 0;
+    uint32_t *ram04data = NULL;
     // initialise hal
     hal_base_memory_getsize(syscfg->halcfg, &ram04size);
     
@@ -153,7 +154,17 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
     {
         hal_sys_vectortable_relocate(syscfg->codespaceoffset);
     }
+#else   // must be HAL_USE_VERSION_2    
 
+    hal_core_init(syscfg->halcfg);
+    hal_core_start();
+
+    if(0 != syscfg->codespaceoffset)
+    {
+        hal_sys_vectortable_relocate(syscfg->codespaceoffset);
+    }    
+    
+#endif  //HAL_USE_VERSION_2
 
 //    // initialise fsal
 //    if(NULL != syscfg->fsalcfg)
@@ -210,8 +221,11 @@ extern uint32_t eom_sys_GetHeapSize(EOMtheSystem *p)
     {
         return(0);
     }
-    
-    return(s_eom_system.halcfg->sys_heapsize);
+#if     !defined(HAL_USE_VERSION_2)
+	return(s_eom_system.halcfg->sys_heapsize);
+#else    
+    return(s_eom_system.halcfg->syscfg.heapsize);
+#endif
 }
 
 
