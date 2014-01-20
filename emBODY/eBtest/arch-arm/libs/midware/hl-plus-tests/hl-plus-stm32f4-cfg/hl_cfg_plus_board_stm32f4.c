@@ -168,7 +168,7 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
                     .port   = hl_gpio_portB, 
                     .pin    = hl_gpio_pin8
                 },
-                .af32       = hl_NA32          
+                .af32       = GPIO_AF_I2C1          
             }, 
             .sda = 
             {
@@ -177,7 +177,7 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
                     .port   = hl_gpio_portB, 
                     .pin    = hl_gpio_pin9
                 },
-                .af32       = hl_NA32          
+                .af32       = GPIO_AF_I2C1          
             } 
         }, 
         {   // hl_i2c2 
