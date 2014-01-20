@@ -57,9 +57,9 @@
  **/ 
 typedef enum  
 { 
-    hal_eeprom1_emulatedflash   = 0,    /**< the eeprom is emulated in internal flash */
-    hal_eeprom2_i2c_01          = 1,    /**< the eeprom is on I2C. the used I2C port and address are internally defined in the board config file */
-    hal_eeprom3_i2c_02          = 2     /**< one more eeprom on I2C. the used I2C port and address are internally defined in the board config file */
+    hal_eeprom_emulatedflash    = 0,    /**< the eeprom is emulated in internal flash */
+    hal_eeprom_i2c_01           = 1,    /**< the eeprom is on I2C. the used I2C port and address are internally defined in the board config file */
+    hal_eeprom_i2c_02           = 2     /**< one more eeprom on I2C. the used I2C port and address are internally defined in the board config file */
 } hal_eeprom_t;
 
 enum { hal_eeproms_number = 3 };

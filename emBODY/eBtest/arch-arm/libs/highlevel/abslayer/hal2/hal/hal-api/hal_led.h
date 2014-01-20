@@ -57,14 +57,14 @@
  **/ 
 typedef enum  
 { 
-    hal_led1 = 0,         
-    hal_led2 = 1,
-	hal_led3 = 2,
-    hal_led4 = 3,         
-    hal_led5 = 4,
-	hal_led6 = 5,
-    hal_led7 = 6,         
-    hal_led8 = 7
+    hal_led0 = 0,
+    hal_led1 = 1,         
+    hal_led2 = 2,
+	hal_led3 = 3,
+    hal_led4 = 4,         
+    hal_led5 = 5,
+	hal_led6 = 6,
+    hal_led7 = 7
 } hal_led_t;
 
 enum { hal_leds_number = 8 };

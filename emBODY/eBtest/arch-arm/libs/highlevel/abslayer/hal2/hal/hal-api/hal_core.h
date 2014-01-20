@@ -65,6 +65,8 @@ typedef struct
     hal_sys_cfg_t       syscfg;     /**< the configuration of the sys module */
 } hal_core_cfg_t;
 
+typedef hal_core_cfg_t hal_cfg_t;
+
 
 /** @typedef    typedef enum hal_core_status_t 
     @brief      contains the status of the core part of HAL. 
