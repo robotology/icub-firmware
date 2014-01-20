@@ -28,14 +28,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "hal.h"
+#include "hal_switch.h"
+#include "hal_eeprom.h"
+#include "hal_led.h"
 
 #if		defined(HAL_IS_VERSION_2)
 
-#include "hal_switch.h"
-
 #include "hal_uniqueid.h"
-#include "hal_eeprom.h"
-#include "hal_led.h"
 
 #else	// must be version 1
 	
