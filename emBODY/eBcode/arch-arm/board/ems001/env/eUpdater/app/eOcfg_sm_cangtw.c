@@ -165,7 +165,9 @@ static void s_can_get(hal_can_port_t port);
 static void s_send_blmsg(EOsm *s);
 static void s_smcfg_can_clean(hal_can_port_t port);
 
+#if     defined(_DEBUG_MODE_PRINTCAN_)
 static void s_print_canframe(uint32_t progr, uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame);
+#endif
 
 static eOresult_t s_valid_canid_class(uint32_t id);
 
@@ -474,13 +476,13 @@ static const eOreltime_t time4txgap2  			=   25*1000;
 #define BOOTLOADER_BROADCAST_ADDRESS    0x70f 
 
 
-#define PAYLOAD_CMD_BOARD_LEN           0x02    // Data length (in byte) for BOARD command
-#define CMD_BOARD                       0x00
-static const uint8_t s_blcanBOARDmsg[PAYLOAD_CMD_BOARD_LEN] = 
-{
-    CMD_BOARD, 
-    0,              // update-eeprom
-};
+// #define PAYLOAD_CMD_BOARD_LEN           0x02    // Data length (in byte) for BOARD command
+// #define CMD_BOARD                       0x00
+// static const uint8_t s_blcanBOARDmsg[PAYLOAD_CMD_BOARD_LEN] = 
+// {
+//     CMD_BOARD, 
+//     0,              // update-eeprom
+// };
 
 #define PAYLOAD_CMD_BROADCAST_LEN       0x01    // Data length (in byte) for BROADCAST command
 #define CMD_BROADCAST                   0xff
@@ -947,6 +949,7 @@ static void s_smcfg_can_clean(hal_can_port_t port)
     hal_trace_puts(str); 
 }
 
+#if     defined(_DEBUG_MODE_PRINTCAN_)
 static void s_print_canframe(uint32_t progr, uint8_t tx, hal_can_port_t port, hal_can_frame_t* frame)
 {
     char str[128]; 
@@ -975,6 +978,7 @@ static void s_print_canframe(uint32_t progr, uint8_t tx, hal_can_port_t port, ha
     hal_trace_puts(str); 
     
 }
+#endif
 
 #define PASS_ALL
 static eOresult_t s_valid_canid_class(uint32_t id)
