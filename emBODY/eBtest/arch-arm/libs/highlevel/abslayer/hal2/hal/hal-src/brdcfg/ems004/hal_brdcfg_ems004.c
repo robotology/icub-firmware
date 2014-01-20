@@ -535,7 +535,7 @@
     
     static const hal_gpio_map_t hal_brdcfg_device_eeprom__gpiomapof_wp  = 
     {    
-        .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin10 }, 
+        .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin10 }, 
         .config = { .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_high,       .altcfg = NULL }
     };
 
@@ -580,7 +580,7 @@
 
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig =
     {
-        .supported_mask     =  (0 << hal_eeprom1_emulatedflash) | (1 << hal_eeprom2_i2c_01) | (0 << hal_eeprom3_i2c_02),
+        .supported_mask     =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
         .devcfg             =
         {            
             {   // hal_eeprom1_emulatedflash 

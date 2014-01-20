@@ -175,7 +175,7 @@
 #ifdef  HAL_USE_PERIPH_CAN
     extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig =
     {
-        .supported_mask     = (1 << hal_can1) | (1 << hal_can2),
+        .supported_mask     = (0 << hal_can1) | (0 << hal_can2),
         .gpio_rx            =
         {
             {   // hal_can1 
@@ -553,7 +553,7 @@
 
     extern const hal_device_eeprom_hid_brdcfg_t hal_brdcfg_device_eeprom__theconfig =
     {
-        .supported_mask     =  (0 << hal_eeprom1_emulatedflash) | (1 << hal_eeprom2_i2c_01) | (0 << hal_eeprom3_i2c_02),
+        .supported_mask     =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
         .devcfg             =
         {            
             {   // hal_eeprom1_emulatedflash 

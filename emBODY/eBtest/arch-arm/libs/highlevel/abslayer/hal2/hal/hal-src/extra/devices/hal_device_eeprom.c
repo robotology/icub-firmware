@@ -135,6 +135,11 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg
     {
         return(hal_res_NOK_unsupported);
     }
+    
+    if(hal_true == s_hal_device_eeprom_initted_is(id))
+    {
+        return(hal_res_OK);
+    }
 
     if(NULL == cfg)
     {
@@ -147,7 +152,7 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg
 
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             if((0 == cfg->flashpagesize) || (NULL == cfg->flashpagebuffer))
             {
@@ -160,7 +165,7 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg
             res = hal_res_OK;
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             res = hal_i2c_init(devcfg->i2cbased.i2cid, NULL);   // i use default configuration
             if(hal_res_OK != res)
@@ -236,12 +241,12 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t id, uint32_t addr, uint32_t si
     
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             res = s_hal_device_eeprom_eraseflash(addr, size);
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             num8 = size / factor;
             rem8 = size % factor;
@@ -304,12 +309,12 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t id, uint32_t addr, uint32_t si
     
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             res = s_hal_device_eeprom_writeflash(addr, size, data);
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             res = devcfg->i2cbased.chipif.write(addr, size, (uint8_t*)data, NULL);
         } break;
@@ -355,12 +360,12 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t id, uint32_t addr, uint32_t siz
     
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             res = hal_flash_read(addr, size, data);
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             res = devcfg->i2cbased.chipif.read(addr, size, (uint8_t*)data, NULL);
         } break;
@@ -386,12 +391,12 @@ extern uint32_t hal_eeprom_get_baseaddress(hal_eeprom_t id)
 
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             val = devcfg->flashemul.baseaddress;;
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             val = devcfg->i2cbased.baseaddress;
         } break;
@@ -414,12 +419,12 @@ extern uint32_t hal_eeprom_get_totalsize(hal_eeprom_t id)
 
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             val = devcfg->flashemul.totalsize;
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             val = devcfg->i2cbased.totalsize;
         } break;
@@ -443,13 +448,13 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t id, uint32_t addr)
 
     switch(id)
     {
-        case hal_eeprom1_emulatedflash:
+        case hal_eeprom_emulatedflash:
         {
             base = devcfg->flashemul.baseaddress;
             size = devcfg->flashemul.totalsize;
         } break;
 
-        case hal_eeprom2_i2c_01:
+        case hal_eeprom_i2c_01:
         {
             base = devcfg->i2cbased.baseaddress;
             size = devcfg->i2cbased.totalsize;

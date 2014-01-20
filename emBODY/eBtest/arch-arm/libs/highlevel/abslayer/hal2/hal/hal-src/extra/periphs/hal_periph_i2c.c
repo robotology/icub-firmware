@@ -44,6 +44,8 @@
 #include "hal_utility_bits.h" 
 
 
+#include "hl_i2c.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -61,6 +63,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+#define USE_HL_I2C_IN_HAL2
 
 #define HAL_i2c_id2index(p)           ((uint8_t)(p))
 
@@ -591,7 +595,7 @@ static hal_result_t s_hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg)
         s_hal_i2c_status_set(id, hal_false, 0);      
     }           
     
-
+#if !defined(USE_HL_I2C_IN_HAL2)
     // acemor: very important info.
     // init the scl and sda gpio before calling hw_init. 
     // because if the i2c is already initted and it detects sda or scl low it sets
@@ -599,7 +603,9 @@ static hal_result_t s_hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg)
     s_hal_i2c_hw_gpio_init(id);
     s_hal_i2c_hw_init(id);
     s_hal_i2c_hw_enable(id, cfg);
-        
+#else    
+    hl_i2c_init(id, NULL);
+#endif        
     
     s_hal_i2c_initted_set(id);
     
@@ -1073,6 +1079,14 @@ static hal_result_t s_hal_i2c_transaction_rx(hal_i2c_t id,  hal_i2c_devaddr_t de
 
 static hal_result_t s_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
+#if defined(USE_HL_I2C_IN_HAL2)
+    hl_result_t r;    
+    hl_i2c_regaddr_t ra;
+    ra.numofbytes = regaddr.numofbytes;
+    memcpy(&ra, &regaddr, sizeof(hl_i2c_regaddr_t));
+    r = hl_i2c_read((hl_i2c_t) id, devaddr, ra, data, size);
+    return((hal_result_t)r);    
+#else
 #if 0
     uint8_t addr[3] = {0};
 
@@ -1222,6 +1236,7 @@ static hal_result_t s_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_
 
 
     return(hal_res_OK);
+#endif  
 #endif    
 }
 
@@ -1288,6 +1303,14 @@ static void s_hal_i2c_read_bytes(I2C_TypeDef* I2Cx, uint8_t* data, uint16_t size
 
 static hal_result_t s_hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
+#if defined(USE_HL_I2C_IN_HAL2)
+    hl_result_t r;    
+    hl_i2c_regaddr_t ra;
+    ra.numofbytes = regaddr.numofbytes;
+    memcpy(&ra, &regaddr, sizeof(hl_i2c_regaddr_t));
+    r = hl_i2c_write((hl_i2c_t) id, devaddr, ra, data, size);
+    return((hal_result_t)r);    
+#else    
 #if 0
     uint8_t addr[3] = {0};
     hal_i2c_transaction_begin(id, devaddr);
@@ -1413,6 +1436,7 @@ static hal_result_t s_hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal
     //s_stm32i2c_i2c_waitdevicestandbystate(id, devaddr);
     
     return(hal_res_OK);
+#endif
 #endif
 }
 

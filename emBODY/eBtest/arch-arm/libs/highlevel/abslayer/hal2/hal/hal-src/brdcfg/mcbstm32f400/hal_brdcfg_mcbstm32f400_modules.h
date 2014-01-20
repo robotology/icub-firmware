@@ -61,7 +61,7 @@
 #define     HAL_USE_UTILITY_FIFO
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
-#undef     HAL_USE_PERIPH_CAN
+#define     HAL_USE_PERIPH_CAN
 #undef     HAL_USE_PERIPH_CRC
 #undef     HAL_USE_PERIPH_DMA
 #define     HAL_USE_PERIPH_ETH
@@ -75,7 +75,7 @@
 
 // -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
 #undef  HAL_USE_DEVICE_ACCELEROMETER
-#undef     HAL_USE_DEVICE_CANTRANSCEIVER
+#define     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
 #define     HAL_USE_DEVICE_EEPROM
 //#define HAL_USE_DEVICE_EEPROM_dummy

@@ -1184,6 +1184,7 @@ static void s_hal_can_hw_gpio_init(hal_can_t id)
 
     hal_gpio_altcfg_t hal_can_canx_rx_altcfg;
     hal_gpio_altcfg_t hal_can_canx_tx_altcfg;
+    hal_gpio_cfg_t config;
     
     // prepare the altcfg for rx and tx pins
     memcpy(&hal_can_canx_rx_altcfg, &s_hal_can_canx_rx_altcfg, sizeof(hal_gpio_altcfg_t));
@@ -1192,8 +1193,17 @@ static void s_hal_can_hw_gpio_init(hal_can_t id)
     hal_can_canx_rx_altcfg.afmode = hal_can_canx_tx_altcfg.afmode = afmode;
     
     // configure rx and tx pins
-    hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_id2index(id)], &hal_can_canx_rx_altcfg);    
-    hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_id2index(id)], &hal_can_canx_tx_altcfg);
+    //hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_id2index(id)], &hal_can_canx_rx_altcfg);    
+    //hal_gpio_configure(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_id2index(id)], &hal_can_canx_tx_altcfg);
+    
+    // configure rx and tx pins
+    memcpy(&config, &hal_brdcfg_can__theconfig.gpio_rx[HAL_can_id2index(id)].config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = &hal_can_canx_rx_altcfg;
+    hal_gpio_init(hal_brdcfg_can__theconfig.gpio_rx[HAL_can_id2index(id)].gpio, &config);
+    
+    memcpy(&config, &hal_brdcfg_can__theconfig.gpio_tx[HAL_can_id2index(id)].config, sizeof(hal_gpio_cfg_t));
+    config.altcfg = &hal_can_canx_tx_altcfg;
+    hal_gpio_init(hal_brdcfg_can__theconfig.gpio_tx[HAL_can_id2index(id)].gpio, &config);
 
 #endif
     
