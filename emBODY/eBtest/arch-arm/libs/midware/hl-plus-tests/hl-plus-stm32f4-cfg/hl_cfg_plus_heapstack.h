@@ -37,7 +37,7 @@
 // <h> stack configuration
 //   <o> stack size (in bytes) <0x0-0xFFFFFFFF:8>
 // </h>
-#define HL_PLUS_SIZEOF_STACK        0x00000800
+#define HL_PLUS_SIZEOF_STACK        0x00001000
 
 
 #endif  // include-guard

@@ -84,7 +84,9 @@ static void test_i2c(void);
 
 static void test_eeprom(void);
 
-static void test_timer(uint16_t microsecs);
+static void test_delay(void);
+
+static void test_timer(uint32_t microsecs);
 
 static void test_mems_init(void);
 static void test_mems_get(void);
@@ -94,7 +96,11 @@ static void s_on_timer_expiry(void* p);
 void idle(void) {}
 extern void onsystick(void) {}
 void userdef1(void) {}
+void userdef2(void) {}
+    
+//#define ENABLE_EVIEWER
 static void brd_eventviewer_init(void);
+static evEntityId_t brd_eventviewer_switch(evEntityId_t ev);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -128,24 +134,30 @@ int main(void)
  
     board_led_init();
     
-    test_i2c();
+    test_delay();
     
-    test_eeprom();
+//    test_i2c();
+    
+//    test_eeprom();
     
     //test_mems_init();
     
     
     systickserv_start_systick(1000, myonsystick);
     
-    
+        
     test_timer(10*1000);    // 10 millisecs
     
     for(;;)
     {
+        evEntityId_t previd;
+        
         board_led_on(board_led_0);
         
+        previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);
         //systickserv_wait_for(500*1000);
         hl_sys_delay(500*1000);
+        brd_eventviewer_switch(previd);
         
         board_led_off(board_led_0);
         
@@ -153,6 +165,7 @@ int main(void)
         hl_sys_delay(500*1000);
         
         //test_mems_get();
+
     }
 
     
@@ -176,8 +189,8 @@ int main(void)
 
 extern void myonsystick(void)
 {   
-    evEntityId_t prev = eventviewer_switch_to(ev_ID_systick);
-    eventviewer_switch_to(prev);
+    evEntityId_t prev = brd_eventviewer_switch(ev_ID_systick);
+    brd_eventviewer_switch(prev);
 }
 
 
@@ -363,8 +376,47 @@ static void test_mems_get(void)
     
 }
 
+static void test_delay(void)
+{
+    // delays are 1usec, 10usec, 100usec, 1msec, 10msec, 100msec, 1sec.
+    evEntityId_t previd;
+    
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(1);
+    brd_eventviewer_switch(previd);
 
-static void test_timer(uint16_t microsecs)
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(1);
+    brd_eventviewer_switch(previd);
+    
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(10);
+    brd_eventviewer_switch(previd);   
+
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(100);
+    brd_eventviewer_switch(previd);    
+    
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(1000);
+    brd_eventviewer_switch(previd);    
+    
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(10*1000);
+    brd_eventviewer_switch(previd);    
+    
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(100*1000);
+    brd_eventviewer_switch(previd);  
+
+    previd = brd_eventviewer_switch(ev_ID_first_usrdef+2);    
+    hl_sys_delay(1000*1000);
+    brd_eventviewer_switch(previd); 
+    
+}
+
+
+static void test_timer(uint32_t microsecs)
 {
 #if     defined(HL_USE_UTIL_TIMER)
     
@@ -437,7 +489,7 @@ static void s_on_timer_expiry(void* p)
     static volatile uint32_t prev = 0;
     static volatile uint32_t val = 0;
     
-    evEntityId_t previd = eventviewer_switch_to(ev_ID_first_usrdef+1);
+    evEntityId_t previd = brd_eventviewer_switch(ev_ID_first_usrdef+1);
 
     delta = systickserv_numofticks - prev;
     prev = systickserv_numofticks;
@@ -457,7 +509,7 @@ static void s_on_timer_expiry(void* p)
         val = 0;
     }  
 
-    eventviewer_switch_to(previd);     
+    brd_eventviewer_switch(previd);     
 }
 
 #if     !defined(HL_USE_UTIL_TIMER)
@@ -478,19 +530,32 @@ void TIM4_IRQHandler(void)
     
 static void brd_eventviewer_init(void)
 {
-    
-    //evEntityId_t prev;
+#if defined(ENABLE_EVIEWER)    
 
     eventviewer_init();
     eventviewer_load(ev_ID_idle, idle);  
     eventviewer_load(ev_ID_systick, onsystick);  
     eventviewer_load(ev_ID_first_usrdef+1, userdef1); 
+    eventviewer_load(ev_ID_first_usrdef+2, userdef2);
     
     // the eventviewer shall stay most of time in idle
     // apart from some specific actions: systick, userdef1 and userdef2
     eventviewer_switch_to(ev_ID_idle);
     
+#endif    
+}
 
+static evEntityId_t brd_eventviewer_switch(evEntityId_t ev)
+{   
+    evEntityId_t prev = ev_ID_idle;
+    
+#if defined(ENABLE_EVIEWER)
+    
+    prev = eventviewer_switch_to(ev);
+
+#endif    
+    
+    return(prev);   
 }
     
 // --------------------------------------------------------------------------------------------------------------------
