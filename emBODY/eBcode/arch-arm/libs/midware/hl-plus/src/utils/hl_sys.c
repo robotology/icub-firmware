@@ -81,7 +81,7 @@ extern uint32_t SystemCoreClock;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_hl_sys_howmanyARMv7ops(void);
+//static uint8_t s_hl_sys_howmanyARMv7ops(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,22 +113,16 @@ __asm static int s_hl_sys_asm_getheapsize (void) {
         BX      LR
 }
 
-__asm static void s_hl_sys_asm_someARMv7ops(uint32_t numberof) 
-{   // it takes 3+p cycles: 1+1+1+p, p = 1, 2, or 3. where p is what is needed to fill the pipeline
-    // cm3: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0337i/index.html
-    ALIGN
-loop
-    CBZ     r0, exit
-    SUB     r0,#1
-    B       loop
-exit
-    BX      LR     
-
-    ALIGN
+// it should use 4 cycles per iteration: subs 1, and bne 3. however, we have 1.25 gain of cortex, and access to flash whcih may slows it.
+__asm static void s_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
+{
+   align
+dowaitloop
+   subs r0,r0,#1
+   bne dowaitloop
+   bx lr 
+   align    
 }
-
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -188,15 +182,31 @@ extern hl_result_t hl_sys_delay(hl_reltime_t reltime)
         {
             return(hl_res_NOK_generic);
         }
-        // to occupy a millisec i execute an operation for a number of times which depends on: SystemCoreClock and 1.25 dmips/mhz, 
-        //s_hl_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
-        s_hl_sys_numofops1sec = ((SystemCoreClock)) / s_hl_sys_howmanyARMv7ops();
+        // to occupy a millisec i execute an operation for a number of times which depends on: 
+        // SystemCoreClock, cortex gain(1.25 dmips/mhz), flash access, etc.
+        // to overcome all this i just consider SystemCoreClock w/out 1.25 gain and i measures
+        // extra gain with on a simple assembly function which should take 4 cycles per iteration (?).      
+        //s_hl_sys_numofops1sec = (5*(SystemCoreClock)) / 4; 
+        s_hl_sys_numofops1sec = (1*(SystemCoreClock)) / 1;
+       
+#if     defined(HL_USE_MPU_NAME_STM32F103RB)
+        s_hl_sys_numofops1sec /= 6;             // 2 wait states, prefetching enabled.      
+#elif   defined(HL_USE_MPU_NAME_STM32F107VC)
+        s_hl_sys_numofops1sec /= 6;             // 2 wait states, prefetching enabled.        
+#elif   defined(HL_USE_MPU_NAME_STM32F407IG)
+        s_hl_sys_numofops1sec /= 3;             // 5 wait states, art technology enabled    
+#else //defined(HL_USE_MPU_NAME_*)
+    #error ERROR --> choose a HL_USE_MPU_NAME_*
+#endif         
     }
     
+    
     volatile uint64_t num = s_hl_sys_numofops1sec * reltime;
-    num /= 1000000;    
-    s_hl_sys_asm_someARMv7ops((uint32_t)num);
-
+    num /= 1000000; 
+//    num -= 40; //we may remove some cycles to compensates for previous instructions, but ... we dont do it.   
+//__disable_irq();    
+    s_hl_sys_asm_xnumARMv7ops((uint32_t)num);
+//__enable_irq();
     return(hl_res_OK);
 }
 
@@ -295,17 +305,18 @@ __weak extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errorm
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_hl_sys_howmanyARMv7ops(void)
-{
-#if     defined(HL_USE_MPU_ARCH_STM32F1)
-    //return(3+3);
-    return(3+3+3);      // number seems to be rather empirical. can anybody help me finding a rule?
-#elif   defined(HL_USE_MPU_ARCH_STM32F4)
-    return(3+1);
-#else //defined(HL_USE_MPU_ARCH_*)
-    #error ERROR --> choose a HL_USE_MPU_ARCH_*
-#endif  
-}
+// static uint8_t s_hl_sys_howmanyARMv7ops(void)
+// {
+// #if     defined(HL_USE_MPU_ARCH_STM32F1)
+//     //return(3+3);
+//     return(3+3+3);      // number seems to be rather empirical. can anybody help me finding a rule?
+// #elif   defined(HL_USE_MPU_ARCH_STM32F4)
+//     //return(3+1);
+//     return 3;
+// #else //defined(HL_USE_MPU_ARCH_*)
+//     #error ERROR --> choose a HL_USE_MPU_ARCH_*
+// #endif  
+// }
 
 
 #endif//defined(HL_USE_UTIL_SYS)
