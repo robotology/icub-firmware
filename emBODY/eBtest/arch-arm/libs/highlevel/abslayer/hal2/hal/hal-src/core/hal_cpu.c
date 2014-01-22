@@ -815,9 +815,9 @@ static void s_hal_cpu_set_sys_clock(void)
         }
     }
    
-    // --- configure flash prefetch, instruction cache, data cache and wait state 
-    
-    FLASH->ACR = FLASH_ACR_ICEN | FLASH_ACR_DCEN | FLASH_ACR_LATENCY_5WS;
+
+    /* Configure Flash prefetch, Instruction cache, Data cache and wait state */
+    FLASH->ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN |FLASH_ACR_DCEN |FLASH_ACR_LATENCY_5WS;
     
     
     // --- configure the system source clock
