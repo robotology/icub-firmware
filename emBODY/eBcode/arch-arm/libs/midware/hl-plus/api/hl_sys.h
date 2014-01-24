@@ -190,6 +190,15 @@ extern hl_irqpriority_t hl_sys_irqn_priority_get(hl_irqn_t irqn);
 extern int hl_sys_itm_puts(const char* str);
 
 
+/** @fn         extern void hl_sys_on_warning(const char * warningmsg)
+    @brief      It is called by HL when a runtime warning is issued, but it can be called by a HL user as well. 
+                The function is weakly defined so that the default implementation can be overridden by the user. 
+                The default implementation simply prints erromsg to ITM and returns.
+    @param      warningmsg      The warning message.
+ **/
+extern void hl_sys_on_warning(const char * warningmsg);
+
+
 /** @fn         extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errormsg)
     @brief      It is called by HL when an internal error occurs, but it can be called by a HL user as well. 
                 The function is weakly defined so that the default implementation can be overridden by the user. 

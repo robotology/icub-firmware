@@ -59,7 +59,7 @@ typedef enum
 { 
     hl_chip_xx_ethphy_chip_ti_dp83848       = 0,    /**< capacity 8kbytes; page size 4 bytes; i2c speeds: 400khz. it is also wireless, but we don't care. */
     hl_chip_xx_ethphy_chip_st_802rt1a       = 1,
-    hl_chip_xx_ethphy_chip_autodetect      = 15,   /**< it detects the chip */
+    hl_chip_xx_ethphy_chip_autodetect       = 15,   /**< it detects the chip */
     hl_chip_xx_ethphy_chip_none             = 255   /**< just no device ... yet. */
 } hl_chip_xx_ethphy_chip_t;
 
