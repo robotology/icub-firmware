@@ -309,7 +309,7 @@ extern const hl_eth_mapping_t hl_eth_mapping =
             .ETH_RMII_REF_CLK   =            
             {   
                 .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin1 }, 
-                .af32   = GPIO_AF_ETH xxx
+                .af32   = GPIO_AF_ETH
             },  
             .ETH_RMII_TX_EN     =            
             {   
@@ -328,18 +328,18 @@ extern const hl_eth_mapping_t hl_eth_mapping =
             },
             .ETH_RMII_CRS_DV    =            
             {   
-                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin8 }, 
-                .af32   = GPIO_Remap_ETH
+                .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin7 }, 
+                .af32   = GPIO_AF_ETH
             },
             .ETH_RMII_RXD0      =            
             {   
-                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin9 }, 
-                .af32   = GPIO_Remap_ETH
+                .gpio   = { .port = hl_gpio_portC,     .pin = hl_gpio_pin4 }, 
+                .af32   = GPIO_AF_ETH
             },
             .ETH_RMII_RXD1      =            
             {   
-                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin10 }, 
-                .af32   = GPIO_Remap_ETH
+                .gpio   = { .port = hl_gpio_portC,     .pin = hl_gpio_pin5 }, 
+                .af32   = GPIO_AF_ETH
             } 
         },
         .gpio_smi       =
@@ -370,19 +370,116 @@ extern const hl_eth_mapping_t hl_eth_mapping =
 
 #include "hl_ethtrans.h"
 
+
 #if defined(HL_USE_BRD_MCBSTM32_F400)
+
+#include "hl_chip_xx_ethphy.h"
 
 extern const hl_ethtrans_mapping_t hl_ethtrans_mapping = 
 {
     .supported  = hl_true
 };
+
+// must redefine the ethtrans functions to use ... HL_USE_CHIP_XX_ETHPHY
+extern hl_result_t hl_ethtrans_chip_init(const hl_ethtrans_cfg_t *cfg)
+{  
+    return(hl_chip_xx_ethphy_init(NULL));
+}
+
+
+extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
+{
+    return(hl_chip_xx_ethphy_configure(targetphymode, usedphymode));
+}
 
 #elif defined(HL_USE_BRD_EMS004)
 
+#include "hl_chip_micrel_ks8893.h"
+
+
 extern const hl_ethtrans_mapping_t hl_ethtrans_mapping = 
 {
     .supported  = hl_true
 };
+
+
+static void s_hal_brdcfg_device_switch__mco2_init(void)
+{
+    // --- mco2: PC9
+    
+    #define SLR100MHZ               0x000C0000
+    #define SLR050MHZ               0x00080000
+    // configure pc9 af, push pull, 50mhz
+    // enable system configuration controller clock
+    RCC->APB2ENR    |= (1 << 14);  
+    // clocks port port c
+    RCC->AHB1ENR    |= 0x00000004;
+
+    GPIOC->MODER    &= ~0x000C0000;              // reset pc9
+    GPIOC->MODER    |=  0x00080000;              // alternate function
+    GPIOC->OTYPER   &= ~0x00000200;              // output push-pull (reset state)  
+    GPIOC->OSPEEDR  |=  SLR100MHZ;               // slew rate as 100MHz pin (0x000C0000) or 50mhz (0x00080000)
+    GPIOC->PUPDR    &= ~0x000C0000;              // no pull up, pull down
+
+    GPIOC->AFR[1]   &= ~0x000000F0;
+    GPIOC->AFR[1]   |=  0x00000000;              // AF0 (system) 
+}
+
+
+
+static void s_hal_brdcfg_device_switch__mco_initialise(void)
+{    
+#define HAL_SWITCH_USE_HSE  
+#undef  HAL_SWITCH_USE_PLLI2S    
+    
+    s_hal_brdcfg_device_switch__mco2_init();
+
+#if     defined(HAL_SWITCH_USE_PLLI2S)    
+    RCC_PLLI2SCmd(DISABLE);
+    RCC_PLLI2SConfig(200, 2); // 50mhz: 1mhz*200/2 = 100.  then we divide by 2 again
+    RCC_PLLI2SCmd(ENABLE);
+    // wait until it is ready
+    while(RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
+    // connect mco2 with plli2s divided by 2
+    RCC_MCO2Config(RCC_MCO2Source_PLLI2SCLK, RCC_MCO2Div_2);
+#elif   defined(HAL_SWITCH_USE_HSE)
+ 
+    // connect mco2 with hse divided by 1
+    RCC_MCO2Config(RCC_MCO2Source_HSE, RCC_MCO2Div_1);
+#endif    
+    
+    
+    //hal_eth_hid_rmii_refclock_init();
+}
+
+
+static hl_result_t s_hal_brdcfg_device_switch__extclock_init(void)
+{
+    s_hal_brdcfg_device_switch__mco_initialise();  
+    return(hl_res_OK);    
+}
+
+
+extern const hl_chip_micrel_ks8893_cfg_t ems004_micrel_ks8893_config = 
+{
+    .i2cid              = hl_i2c1,
+    .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
+    .resetval           = hl_gpio_valRESET,
+    .extclockinit       = s_hal_brdcfg_device_switch__extclock_init    
+};
+
+
+// must redefine the ethtrans functions to use ... HL_USE_CHIP_XX_ETHPHY
+extern hl_result_t hl_ethtrans_chip_init(const hl_ethtrans_cfg_t *cfg)
+{  
+    return(hl_chip_micrel_ks8893_init(&ems004_micrel_ks8893_config));
+}
+
+
+extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
+{
+    return(hl_chip_micrel_ks8893_configure(targetphymode, usedphymode));
+}
 
 #endif//defined(HL_USE_BRD_EMS004)
 
@@ -470,7 +567,7 @@ extern const hl_can_mapping_t hl_can_mapping =
                     .port   = hl_gpio_portD, 
                     .pin    = hl_gpio_pin1
                 },
-                .af32       = GPIO_AF_CAN1  xxx        
+                .af32       = GPIO_AF_CAN1          
             } 
         }, 
         {   // hl_can2 
@@ -490,7 +587,7 @@ extern const hl_can_mapping_t hl_can_mapping =
                     .port   = hl_gpio_portB, 
                     .pin    = hl_gpio_pin6
                 },
-                .af32       = GPIO_AF_CAN2 xxx          
+                .af32       = GPIO_AF_CAN2          
             } 
         }   
     } 
