@@ -44,7 +44,9 @@
 #include "hal_brdcfg.h"
 #include "hal_flash.h"
 
-extern uint32_t SystemCoreClock;
+//extern uint32_t SystemCoreClock;
+
+#include "hl_sys.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -197,49 +199,50 @@ extern uint32_t hal_sys_heap_get_totalsize(void)
 }
 
 
-uint8_t hal_sys_howmanyARMv7ops(void)
-{
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-    return(3+3);
-    //return(3+3+3);      // number seems to be rather empirical. can anybody help me finding a rule?
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
-    return(3+1);
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif  
-}
-__asm void hal_sys_someARMv7ops(uint32_t numberof) 
-{   // it takes 3+p cycles: 1+1+1+p, p = 1, 2, or 3. where p is what is needed to fill the pipeline
-    // cm3: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0337i/index.html
-    ALIGN
-loop
-    CBZ     r0, exit
-    SUB     r0,#1
-    B       loop
-exit
-    BX      LR     
+// uint8_t hal_sys_howmanyARMv7ops(void)
+// {
+// #if     defined(HAL_USE_CPU_FAM_STM32F1)
+//     return(3+3);
+//     //return(3+3+3);      // number seems to be rather empirical. can anybody help me finding a rule?
+// #elif   defined(HAL_USE_CPU_FAM_STM32F4)
+//     return(3+1);
+// #else //defined(HAL_USE_CPU_FAM_*)
+//     #error ERR --> choose a HAL_USE_CPU_FAM_*
+// #endif  
+// }
+// __asm void hal_sys_someARMv7ops(uint32_t numberof) 
+// {   // it takes 3+p cycles: 1+1+1+p, p = 1, 2, or 3. where p is what is needed to fill the pipeline
+//     // cm3: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0337i/index.html
+//     ALIGN
+// loop
+//     CBZ     r0, exit
+//     SUB     r0,#1
+//     B       loop
+// exit
+//     BX      LR     
 
-    ALIGN
-}
+//     ALIGN
+// }
 
 
 extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
 {
-    static uint32_t s_hal_sys_numofops1usec = 0;
-    if(0 == s_hal_sys_numofops1usec)
-    {
-        if(0 == SystemCoreClock)
-        {
-            return(hal_res_NOK_generic);
-        }
-        // to occupy a microsec i execute an operation for a number of times which depends on: SystemCoreCloc and 1.25 dmips/mhz, 
-        //s_hal_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
-        s_hal_sys_numofops1usec = (SystemCoreClock/1000000) / hal_sys_howmanyARMv7ops();
-    }
-        
-    hal_sys_someARMv7ops(s_hal_sys_numofops1usec * reltime);
+//     static uint32_t s_hal_sys_numofops1usec = 0;
+//     if(0 == s_hal_sys_numofops1usec)
+//     {
+//         if(0 == SystemCoreClock)
+//         {
+//             return(hal_res_NOK_generic);
+//         }
+//         // to occupy a microsec i execute an operation for a number of times which depends on: SystemCoreCloc and 1.25 dmips/mhz, 
+//         //s_hal_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
+//         s_hal_sys_numofops1usec = (SystemCoreClock/1000000) / hal_sys_howmanyARMv7ops();
+//     }
+//         
+//     hal_sys_someARMv7ops(s_hal_sys_numofops1usec * reltime);
 
-    return(hal_res_OK);
+//     return(hal_res_OK);
+    return((hal_result_t)hl_sys_delay(reltime));
 }
 
 
