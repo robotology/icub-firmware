@@ -533,9 +533,10 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     // but which we retrieve
     // in case of a phy accessed through the smi, this function must set the mode and the speed and return the result
     // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
-
-    hl_ethtrans_config(hl_ethtrans_phymode_auto, &usedphymode);
     
+    // hl_ethtrans_phymode_fullduplex100mbps or hl_ethtrans_phymode_auto
+    hl_ethtrans_config(hl_ethtrans_phymode_fullduplex100mbps, &usedphymode);
+    #warning --> using hl_ethtrans_phymode_fullduplex100mbps
     
     if(hl_ethtrans_phymode_none == usedphymode)
     {
