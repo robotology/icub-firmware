@@ -66,11 +66,9 @@
 
 #define HL_can_id2index(p)              ((uint8_t)((p)))
 
-#define HL_can_port2peripheral(p)      ( ( hl_can1 == (p) ) ? (CAN1) : (CAN2) )
+#define HL_can_port2peripheral(p)       ( ( hl_can1 == (p) ) ? (CAN1) : (CAN2) )
 
 
-
-#warning WIP --> in HAL2 it does not trigger the rx handler... WE MUST FIX IT ...
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -324,36 +322,36 @@ static void s_hl_can_hw_clock_init(hl_can_t id)
 
 
 
-#if 0
-#if     defined(HL_USE_MPU_ARCH_STM32F1)
-    // the clock APB1 is 36mhz, half the max frequency of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14) 
-    // the clock APB2 operates at full speed of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14)
-    // can is on APB1, aka the slow bus
-    // we give a total of HL_CAN_TQ_TOTAL = 9 time quanta for the duration of a can bit. 
-    // we split the 9 time quanta in 5+1+3 = HL_CAN_TQ_BS1+1+HL_CAN_TQ_BS2
-    // we allow to stretch the bit duration in order to re-synch by maximum HL_CAN_TQ_SJW = 3 time quanta 
-    //#define HL_CAN_CLK	  		      (hl_brdcfg_cpu__theconfig.speeds.slowbus)
-    #define HL_CAN_CLK                  (SystemCoreClock/2)
-    #define HL_CAN_TQ_TOTAL             9
-    #define HL_CAN_TQ_SJW               CAN_SJW_3tq
-    #define HL_CAN_TQ_BS1               CAN_BS1_5tq
-    #define HL_CAN_TQ_BS2               CAN_BS2_3tq
-#elif    defined(HL_USE_MPU_ARCH_STM32F4)
-    // the clock APB1 is 42mhz, a fourth the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
-    // the clock APB2 is 84mhz, a half the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
-    // can is on APB1, aka the slow bus
-    // we give a total of HL_CAN_TQ_TOTAL = 7 time quanta for the duration of a can bit. 
-    // we split the 7 time quanta in 4+1+2 = HL_CAN_TQ_BS1+1+HL_CAN_TQ_BS2
-    // we allow to stretch the bit duration in order to re-synch by maximum HL_CAN_TQ_SJW = 3 time quanta     
-    //#define HL_CAN_CLK                  (hl_brdcfg_cpu__theconfig.speeds.slowbus)
-    #define HL_CAN_TQ_TOTAL             7
-    #define HL_CAN_TQ_SJW               CAN_SJW_3tq
-    #define HL_CAN_TQ_BS1               CAN_BS1_4tq
-    #define HL_CAN_TQ_BS2               CAN_BS2_2tq    
-#else //defined(HL_USE_CPU_ARCH_*)
-    #error ERR --> choose a HL_USE_CPU_ARCH_*
-#endif 
-#endif
+// #if 0
+// #if     defined(HL_USE_MPU_ARCH_STM32F1)
+//     // the clock APB1 is 36mhz, half the max frequency of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14) 
+//     // the clock APB2 operates at full speed of 72 mhz. (see page 49/1096 of stm32f1x reference manual Doc ID 13902 Rev 14)
+//     // can is on APB1, aka the slow bus
+//     // we give a total of HL_CAN_TQ_TOTAL = 9 time quanta for the duration of a can bit. 
+//     // we split the 9 time quanta in 5+1+3 = HL_CAN_TQ_BS1+1+HL_CAN_TQ_BS2
+//     // we allow to stretch the bit duration in order to re-synch by maximum HL_CAN_TQ_SJW = 3 time quanta 
+//     //#define HL_CAN_CLK	  		      (hl_brdcfg_cpu__theconfig.speeds.slowbus)
+//     #define HL_CAN_CLK                  (SystemCoreClock/2)
+//     #define HL_CAN_TQ_TOTAL             9
+//     #define HL_CAN_TQ_SJW               CAN_SJW_3tq
+//     #define HL_CAN_TQ_BS1               CAN_BS1_5tq
+//     #define HL_CAN_TQ_BS2               CAN_BS2_3tq
+// #elif    defined(HL_USE_MPU_ARCH_STM32F4)
+//     // the clock APB1 is 42mhz, a fourth the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
+//     // the clock APB2 is 84mhz, a half the max frequency of 168 mhz. (see page 23/180 of stm32f4x datasheet Doc ID 022152 Rev 3)
+//     // can is on APB1, aka the slow bus
+//     // we give a total of HL_CAN_TQ_TOTAL = 7 time quanta for the duration of a can bit. 
+//     // we split the 7 time quanta in 4+1+2 = HL_CAN_TQ_BS1+1+HL_CAN_TQ_BS2
+//     // we allow to stretch the bit duration in order to re-synch by maximum HL_CAN_TQ_SJW = 3 time quanta     
+//     //#define HL_CAN_CLK                  (hl_brdcfg_cpu__theconfig.speeds.slowbus)
+//     #define HL_CAN_TQ_TOTAL             7
+//     #define HL_CAN_TQ_SJW               CAN_SJW_3tq
+//     #define HL_CAN_TQ_BS1               CAN_BS1_4tq
+//     #define HL_CAN_TQ_BS2               CAN_BS2_2tq    
+// #else //defined(HL_USE_CPU_ARCH_*)
+//     #error ERR --> choose a HL_USE_CPU_ARCH_*
+// #endif 
+// #endif
 
 
 static const hl_can_bitsampling_t* s_hl_can_get_bitsampling(uint32_t canclock)
@@ -496,17 +494,12 @@ static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
 		return(hl_res_NOK_generic);
 	}
     
-    // we do just a basic init to the filters
+    // we do just a basic init to the filters. we use only one filter in bank0 which is ok for both CAN1 (master) and CAN2 (slave)
 
-	// TODO: rendere configurabile i filtri
-    // #warning VALE->filter doesn't work!!!
-    // acemor on 19-oct-2012: FILTERNUM_CAN2 era 14 che e' un valore non valido ...
-    //                        quindi lascio i filtri 0->6 per il can1 ed i filtri 7->13 per il can2
-    #define FILTERNUM_CAN1                              0
-    #define FILTERNUM_CAN2                              7
+    // we dont assign any bank which is specific of only can2, thus both can1 and can start from bank0
+    CAN_SlaveStartBank(28);
 
-    // NOTE VALE: in order to receive msg, i had to init filter for receive all.
-	// CAN filter init
+    // now we initialise bank0 to pass everything to fifo0. yes, we use only fifo0.
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
 	CAN_FilterInitStructure.CAN_FilterMode              = CAN_FilterMode_IdMask;
 	CAN_FilterInitStructure.CAN_FilterScale             = CAN_FilterScale_32bit;
@@ -514,9 +507,9 @@ static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
 	CAN_FilterInitStructure.CAN_FilterIdLow             = 0x0000;
 	CAN_FilterInitStructure.CAN_FilterMaskIdHigh        = 0x0000;
 	CAN_FilterInitStructure.CAN_FilterMaskIdLow         = 0x0000;
-	CAN_FilterInitStructure.CAN_FilterFIFOAssignment    = 0;
+	CAN_FilterInitStructure.CAN_FilterFIFOAssignment    = CAN_Filter_FIFO0;
 	CAN_FilterInitStructure.CAN_FilterActivation        = ENABLE;
-    CAN_FilterInitStructure.CAN_FilterNumber            = (hl_can1 == id) ? (FILTERNUM_CAN1) : (FILTERNUM_CAN2);
+    CAN_FilterInitStructure.CAN_FilterNumber            = 0;
 
     CAN_FilterInit(&CAN_FilterInitStructure);
    
@@ -578,7 +571,7 @@ static void s_hl_can_fill_gpio_init_altf(hl_can_t id, hl_gpio_init_t* rxinit, hl
 #endif 
     };
 
-   // at first we copy the default configuration of pin rx and tx
+    // at first we copy the default configuration of pin rx and tx
     
     memcpy(rxinit, &s_hl_can_rx_gpio_init, sizeof(hl_gpio_init_t));   
     memcpy(txinit, &s_hl_can_tx_gpio_init, sizeof(hl_gpio_init_t));
