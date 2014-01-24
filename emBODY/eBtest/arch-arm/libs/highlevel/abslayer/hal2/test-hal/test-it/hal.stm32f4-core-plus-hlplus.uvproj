@@ -832,9 +832,9 @@
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.c</FileName>
+              <FileName>hal_periph_eth.hl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.hl.c</FilePath>
             </File>
             <File>
               <FileName>hal_periph_gpio.c</FileName>
@@ -988,10 +988,40 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>hl-plus-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_lis3x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_lis3x.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>ems004</TargetName>
+      <TargetName>ems004v1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1816,9 +1846,9 @@
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.c</FileName>
+              <FileName>hal_periph_eth.hl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.hl.c</FilePath>
             </File>
             <File>
               <FileName>hal_periph_gpio.c</FileName>
@@ -1969,6 +1999,36 @@
               <FileName>hl_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_timer.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hl-plus-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_lis3x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_lis3x.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
           </Files>
         </Group>
