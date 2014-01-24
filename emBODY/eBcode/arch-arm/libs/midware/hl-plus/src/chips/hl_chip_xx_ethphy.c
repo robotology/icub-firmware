@@ -205,7 +205,8 @@ extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t targetphymo
         if(NULL != usedphymode)
         {
             *usedphymode = hl_ethtrans_phymode_none;
-        }   
+        }  
+        hl_sys_on_error(hl_error_unsupportedbehaviour, "hl_chip_xx_ethphy_configure() does not support hl_ethtrans_phymode_auto");        
         return(hl_res_NOK_generic);        
     }
     
