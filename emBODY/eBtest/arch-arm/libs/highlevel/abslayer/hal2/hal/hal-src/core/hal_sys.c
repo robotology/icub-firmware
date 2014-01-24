@@ -478,22 +478,11 @@ extern hal_result_t hal_sys_hid_systeminit(void)
     // the redefined function just configures the internal clock and does not use any prescaling for internal buses.
     
     // hence, ... we need to configure a proper clock and update the system core clock 
-    
-    hal_cpu_clocks_set();
-    
-//     if(hal_true == hal_brdcfg_sys__theconfig.clockcfg.keepinternalclockatstartup)
-//     {
-//         s_hal_sys_set_sys_clock(hal_cpu_maxspeed_get());
-//         s_hal_sys_system_core_clock_update();
-//     }
-//     else
-//     {
-//         s_hal_sys_system_core_clock_update();
-//     }
+  
 
-
-//     hal_brdcfg_sys__clock_config();
-//     hal_brdcfg_sys__gpio_default_init();
+#warning --> dont use hal_cpu_clocks_set()  
+//    hal_cpu_clocks_set();
+    
 
     // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
     // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
