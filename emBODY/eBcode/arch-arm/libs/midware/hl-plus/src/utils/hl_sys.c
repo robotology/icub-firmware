@@ -284,6 +284,12 @@ extern int hl_sys_itm_puts(const char* str)
 }
 
 
+__weak extern void hl_sys_on_warning(const char * warningmsg)
+{
+    hl_sys_itm_puts(warningmsg);
+    for(;;);
+}
+
 __weak extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errormsg)
 {
     errorcode = errorcode;
