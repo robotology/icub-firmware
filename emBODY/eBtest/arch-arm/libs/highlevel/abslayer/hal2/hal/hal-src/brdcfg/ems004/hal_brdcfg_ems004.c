@@ -803,7 +803,21 @@
     
 
 #ifdef HAL_USE_DEVICE_SWITCH
-    extern const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg;
+    
+#include "hl_chip_micrel_ks8893.h"
+    
+extern const hl_chip_micrel_ks8893_cfg_t ems004_micrel_ks8893_config;  // defined in ... hl somewhere
+    
+static hal_result_t chip_micrel_ks8893_init(void *cfg)
+{  
+    return((hal_result_t)hl_chip_micrel_ks8893_init((const hl_chip_micrel_ks8893_cfg_t *)cfg));
+}
+
+static hal_result_t chip_micrel_ks8893_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t* usedphymode)
+{
+    return((hal_result_t)hl_chip_micrel_ks8893_configure((hl_ethtrans_phymode_t)targetphymode, (hl_ethtrans_phymode_t*)usedphymode));
+}
+
     extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig =
     {
         .supported      = hal_true,
@@ -812,12 +826,13 @@
             .targetphymode  = HAL_ETH_PHYMODE_THEONE2USE,
             .chipif         =
             {
-                .init       = (hal_res_fp_voidp_t)hal_chip_micrel_ks8893_init,
-                .initpar    = (void*)&s_micrel_ks8893_cfg,
-                .config     = hal_chip_micrel_ks8893_configure,          
+                .init       = chip_micrel_ks8893_init,
+                .initpar    = (void*)&ems004_micrel_ks8893_config,
+                .config     = chip_micrel_ks8893_configure,          
             }
         }
     };
+
 #endif//HAL_USE_DEVICE_SWITCH
         
     
