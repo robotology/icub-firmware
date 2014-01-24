@@ -645,11 +645,6 @@
               <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
-              <FileName>EOMtheApplication.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheApplication.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
@@ -1340,11 +1335,6 @@
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheApplication.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask\EOMtheApplication.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
