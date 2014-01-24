@@ -93,7 +93,7 @@
 
 
 #undef EXECUTE_TEST_PERIPH_CAN
-//#define EXECUTE_TEST_PERIPH_CAN
+#define EXECUTE_TEST_PERIPH_CAN
 
 #define haLcAn1    hal_can1
 #define haLcAn2    hal_can2
@@ -109,6 +109,9 @@
 #define EXECUTE_TEST_PERIPH_CAN_TX1_RX2
 //#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
 #endif
+
+#undef EXECUTE_TEST_DEVICE_SWITCH
+//#define EXECUTE_TEST_DEVICE_SWITCH
 
 #undef EXECUTE_TEST_PERIPH_ETH
 //#define EXECUTE_TEST_PERIPH_ETH
@@ -197,6 +200,11 @@ static void test_periph_can(void);
 #if     defined(EXECUTE_TEST_PERIPH_ETH)    
 static void test_periph_eth(void);
 #endif//defined(EXECUTE_TEST_PERIPH_ETH)   
+
+
+#if     defined(EXECUTE_TEST_DEVICE_SWITCH)    
+static void test_device_switch(void);
+#endif//defined(EXECUTE_TEST_DEVICE_SWITCH)   
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -356,6 +364,11 @@ int main(void)
 #endif//defined(EXECUTE_TEST_PERIPH_CAN)
      
 
+// it also contains a forever loop. you cannot ping it. just use the two ports
+
+#if     defined(EXECUTE_TEST_DEVICE_SWITCH)    
+    test_device_switch();
+#endif//defined(EXECUTE_TEST_DEVICE_SWITCH)   
 
 // keep it last, as it contains a forever loop
 
@@ -1082,7 +1095,7 @@ static void can_transmit_burst(hal_can_frame_t* frametx, uint8_t burstlen, uint3
     frametx->data[0] = cnt & 0xff;    
     frametx->data[1] = accumulate;
     
-    hal_can_put(haLcAn1, frametx, hal_can_send_normprio_later); //hal_can_send_normprio_now);  
+    hal_can_put(haLcAn1, frametx, hal_can_send_normprio_later); //hal_can_send_normprio_now);  or hal_can_send_normprio_later
 
     
     if(burstlen == ++accumulate)
@@ -1150,19 +1163,22 @@ static void can_process_reception(hal_can_t canid, uint32_t count)
         
         rxnumber = msgformat->sequencenumber;
         
-        if(haLcAn1 == canid)
+        if(hal_res_OK == res)
         {
-                snprintf(msg, sizeof(msg)-1, "can: received a can pkt from haLcAn1 of size %d and w/ sequencenumber = %d", 
-                                              rxframe.size, rxnumber);
-                hal_trace_puts(msg);          
-        }
-        else if(haLcAn2 == canid)
-        {
-            if(0 == (rxnumber % 100))
+            if(haLcAn1 == canid)
             {
-                snprintf(msg, sizeof(msg)-1, "can: received a can pkt from haLcAn2 of size %d and w/ sequencenumber = %d", 
-                                              rxframe.size, rxnumber);
-                hal_trace_puts(msg);           
+                    snprintf(msg, sizeof(msg)-1, "can: received a can pkt from haLcAn1 of size %d and w/ sequencenumber = %d", 
+                                                  rxframe.size, rxnumber);
+                    hal_trace_puts(msg);          
+            }
+            else if(haLcAn2 == canid)
+            {
+                if(0 == (rxnumber % 100))
+                {
+                    snprintf(msg, sizeof(msg)-1, "can: received a can pkt from haLcAn2 of size %d and w/ sequencenumber = %d", 
+                                                  rxframe.size, rxnumber);
+                    hal_trace_puts(msg);           
+                }
             }
         }
     } while((remaining > 0) && (hal_res_OK == res));
@@ -1191,8 +1207,6 @@ static void test_periph_can(void)
 
 
     
-       
-    
 #if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)  
     // init can 2
     memcpy(&canxconfig, &canconfigbase, sizeof(hal_can_cfg_t));
@@ -1203,7 +1217,8 @@ static void test_periph_can(void)
     hal_can_init(haLcAn2, &canxconfig);
     hal_can_enable(haLcAn2);
     //hal_can_put(haLcAn2, &canframetx, hal_can_send_normprio_now);
-#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2) 
+#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)          
+    
     
     // init can 1 
     memcpy(&canxconfig, &canconfigbase, sizeof(hal_can_cfg_t));
@@ -1212,7 +1227,10 @@ static void test_periph_can(void)
     canxconfig.callback_on_rx   = test_periph_can1_on_rx;
     canxconfig.arg_cb_rx        = (void*)haLcAn1;
     hal_can_init(haLcAn1, &canxconfig);
-    hal_can_enable(haLcAn1);    
+    hal_can_enable(haLcAn1);   
+
+
+ 
     
     
 // #if     !defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
@@ -1268,6 +1286,25 @@ static void test_periph_can(void)
 }
 
 #endif//defined(EXECUTE_TEST_PERIPH_CAN)
+
+
+#if     defined(EXECUTE_TEST_DEVICE_SWITCH)   
+
+#include "hal_switch.h"
+
+static void test_device_switch(void)
+{
+    hal_eth_phymode_t usedphymode = hal_eth_phymode_none;
+    
+    hal_switch_init(NULL);
+    hal_switch_configure(hal_eth_phymode_fullduplex100mbps, &usedphymode);
+    
+    test_message(" ----------- TEST SWITCH successful if you can use the two ports as a pass-through ----------- ");
+    
+    //for(;;);
+}
+
+#endif//defined(EXECUTE_TEST_DEVICE_SWITCH)   
 
 
 #if     defined(EXECUTE_TEST_PERIPH_ETH)    
