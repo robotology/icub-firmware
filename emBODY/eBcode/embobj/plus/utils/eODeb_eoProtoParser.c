@@ -72,7 +72,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr);
-static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP_t ep, eOnvID_t nvid);
+static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOprotID32_t id32);
 static uint8_t s_eodeb_eoProtoParser_CheckSeqnum(eODeb_eoProtoParser *p, eOethLowLevParser_packetInfo_t *pktInfo_ptr, 
                                                 uint32_t *rec_seqnum, uint32_t *expeted_seqnum);
 static uint8_t s_eodeb_eoProtoParser_isvalidropframe(uint8_t *payload);
@@ -230,15 +230,14 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
 			timesize = 8;
 		}
 
-		if(s_eodeb_eoProtoParser_NVisrequired(p, ropheader->endp, ropheader->nvid))
+		if(s_eodeb_eoProtoParser_NVisrequired(p, ropheader->id32))
 		{
 
 			//prepare rop additional info
-			ropAddInfo.desc.configuration.plussign = ropheader->ctrl.plussign;
-			ropAddInfo.desc.configuration.plustime = ropheader->ctrl.plustime;
+			ropAddInfo.desc.control.plussign = ropheader->ctrl.plussign;
+			ropAddInfo.desc.control.plustime = ropheader->ctrl.plustime;
 			ropAddInfo.desc.ropcode = ropheader->ropc;
-			ropAddInfo.desc.ep = ropheader->endp;
-			ropAddInfo.desc.id = ropheader->nvid;
+			ropAddInfo.desc.id32 = ropheader->id32;
 			ropAddInfo.desc.data = &rop_ptr[ROP_HEADER_SIZE];
 			ropAddInfo.desc.size = ropheader->dsiz;
 			ropAddInfo.desc.signature = EOK_uint32dummy;
@@ -257,31 +256,20 @@ static eOresult_t s_eodeb_eoProtoParser_CheckNV(eODeb_eoProtoParser *p, eOethLow
     return(eores_OK);
 }
 
-static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOnvEP_t ep, eOnvID_t nvid)
+static uint8_t s_eodeb_eoProtoParser_NVisrequired(eODeb_eoProtoParser *p, eOprotID32_t id32)
 {
     uint8_t i, max;
-    eODeb_eoProtoParser_nvidEp_couple_t *couple;
+    eODeb_eoProtoParser_nv_identify_t *id;
     
     max = p->cfg.checks.nv.NVs2searchArray.head.size;
     
     for(i=0; i<max; i++)
     {
-        couple  = (eODeb_eoProtoParser_nvidEp_couple_t *)eo_array_At((EOarray*)&p->cfg.checks.nv.NVs2searchArray, i);
-        if(couple->ep == ALL_EP)
+        id  = (eODeb_eoProtoParser_nv_identify_t *)eo_array_At((EOarray*)&p->cfg.checks.nv.NVs2searchArray, i);
+        if(id->id32 == id32)
         {
-        	if(couple->id == nvid)
-			{
-				return(1);
-			}
+            return(1);
         }
-        else
-        {
-            if((couple->id == nvid)&&(couple->ep == ep))
-            {
-            	return(1);
-            }
-        }
-
     }
     return(0);
 }

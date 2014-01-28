@@ -42,7 +42,8 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOarray.h"
-#include "EOrop.h"
+//#include "EOrop.h"
+#include "EoProtocol.h"
 #include "eOtheEthLowLevelParser.h"
 
 
@@ -85,16 +86,19 @@ typedef struct
 /* the couple nvid and ep identifies one nvid univocally*/
 typedef struct
 {
-    eOnvEP_t        ep;
-    eOnvID_t        id;
-} eODeb_eoProtoParser_nvidEp_couple_t;
+    eOprotID32_t               id32;
+//     eOprotEndpoint_t        ep;
+//     eOprotEntity_t          entity;
+//     eOprotIndex_t           index;
+//     eOprotTag_t             tag;
+} eODeb_eoProtoParser_nv_identify_t;
 
 
 /* thi struct is the list of couple <ep, nvid>.*/
 typedef struct
 {
     eOarray_head_t                          head;
-    eODeb_eoProtoParser_nvidEp_couple_t    data[eODeb_eoProtoParser_maxNV2find];
+    eODeb_eoProtoParser_nv_identify_t    data[eODeb_eoProtoParser_maxNV2find];
 } eODeb_eoProtoParser_NVsArray_t;
 
 /*this struct contains a list of nvs to search in ropframe and the callback to invoke when one of them is found. */
