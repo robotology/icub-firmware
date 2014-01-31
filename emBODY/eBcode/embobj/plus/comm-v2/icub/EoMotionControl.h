@@ -74,11 +74,17 @@ enum { eomc_entities_numberof = 3 };
 
 
 /** @warning    DO NOT CHANGE these values, as they are given by iCub protocol.
+                It is important to use negative values instead of their representation in hexadecimal: in this way compiler 
+                defines eOmc_controlmode_command_t and eOmc_controlmode_t like int8_t and not like uint8_t.
+                In this way fields, that contain values of eOmc_controlmode_t,  are compatible with their declared type (eOenum08_t).
+                In the following structures, fields of enumeration type have type eOenum08_t (int8_t), instead of the specific enum type like eOmc_controlmode_t,
+                in order to force the structure to a specific size, because this structure are transported in Ethernet protocol,
+                so fixed size is basic for parsing and forming messages.
  **/
 enum {  eomc_ctrlmval_idle          = 0x00, eomc_ctrlmval_position      = 0x01, eomc_ctrlmval_velocity      = 0x02, 
         eomc_ctrlmval_torque        = 0x03, eomc_ctrlmval_impedance_pos = 0x04, eomc_ctrlmval_impedance_vel = 0x05, 
         eomc_ctrlmval_current       = 0x06, eomc_ctrlmval_velocity_pos  = 0x07,
-        eomc_ctrlmval_openloop      = 0x50, eomc_ctrlmval_everything_off= 0xf0, eomc_ctrlmval_calib         = 0xfe
+        eomc_ctrlmval_openloop      = 0x50, eomc_ctrlmval_everything_off= -16/*0xf0*/, eomc_ctrlmval_calib         = -2/*0xfe*/
      };
 
 
