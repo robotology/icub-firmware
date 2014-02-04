@@ -201,7 +201,7 @@ extern void myonsystick(void)
 
 static void test_i2c(void)
 {  
-#if     defined(HL_USE_UTIL_I2C)    
+#if     defined(HL_USE_UTIL_I2C) | defined(HL_USE_UTIL_EMS4RC_I2C)  
     
     const hl_i2c_devaddr_t devaddri2c1 = 0xA0;
     
