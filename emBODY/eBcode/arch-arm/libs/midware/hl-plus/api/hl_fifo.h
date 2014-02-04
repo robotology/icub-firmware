@@ -203,6 +203,29 @@ extern uint8_t hl_fifo_size(hl_fifo_t *fifo);
 extern hl_bool_t hl_fifo_full(hl_fifo_t *fifo);
 
 
+// other fifo functions for a specific item size.
+
+extern uint8_t * hl_fifo_front01(hl_fifo_t *fifo);
+extern hl_result_t hl_fifo_get01(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
+extern hl_result_t hl_fifo_put01(hl_fifo_t *fifo, uint8_t *data);
+
+extern uint8_t * hl_fifo_front02(hl_fifo_t *fifo);
+extern hl_result_t hl_fifo_get02(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
+extern hl_result_t hl_fifo_put02(hl_fifo_t *fifo, uint8_t *data);
+
+extern uint8_t * hl_fifo_front04(hl_fifo_t *fifo);
+extern hl_result_t hl_fifo_get04(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
+extern hl_result_t hl_fifo_put04(hl_fifo_t *fifo, uint8_t *data);
+
+extern uint8_t * hl_fifo_front08(hl_fifo_t *fifo);
+extern hl_result_t hl_fifo_get08(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
+extern hl_result_t hl_fifo_put08(hl_fifo_t *fifo, uint8_t *data);
+
+extern uint8_t * hl_fifo_front16(hl_fifo_t *fifo);
+extern hl_result_t hl_fifo_get16(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining);
+extern hl_result_t hl_fifo_put16(hl_fifo_t *fifo, uint8_t *data);
+
+
 
 
 /** @}            
