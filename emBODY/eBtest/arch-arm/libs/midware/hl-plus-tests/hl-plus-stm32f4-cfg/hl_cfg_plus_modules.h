@@ -76,7 +76,8 @@
 #define HL_USE_CHIP_ST_L3G4200D
 #define HL_USE_CHIP_ST_LIS3X
 
-#elif   defined(HL_USE_BRD_EMS004) 
+
+#elif   defined(HL_USE_BRD_EMS4RD) 
 
 
 // HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
@@ -89,6 +90,7 @@
 #define HL_USE_UTIL_ETH
 #define HL_USE_UTIL_ETHTRANS
 #define HL_USE_UTIL_CAN
+#define HL_USE_UTIL_CAN_COMM
 
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
@@ -96,7 +98,7 @@
 #define HL_USE_CHIP_XX_EEPROM
 #define HL_USE_CHIP_ST_L3G4200D
 #define HL_USE_CHIP_ST_LIS3X
-#define HL_USE_CHIP_MICREL_KS8893
+//#define HL_USE_CHIP_MICREL_KS8893
 #define HL_USE_CHIP_XX_ETHPHY
 #define HL_USE_UTIL_TIMER
 
