@@ -196,6 +196,9 @@ extern Int16  _kstp_torque[JN] ;            // stiction compensation: positive v
 extern Int16  _kstn_torque[JN] ;            // stiction compensation: negative val
 extern Int16  _kff_torque[JN] ;             // feedforward gain
 
+// OPENLOOP
+extern Int16  _ko_openloop[JN] ;	        // offset 
+
 // SPEED PID (iKart)
 extern Int16  _error_speed[JN];	            // actual feedback error 
 extern Int16  _error_speed_old[JN];         // error at t-1

@@ -155,6 +155,9 @@ Int16  _kstp_torque[JN] = INIT_ARRAY (0);       // stiction compensation: positi
 Int16  _kstn_torque[JN] = INIT_ARRAY (0);       // stiction compensation: negative val
 Int16  _kff_torque[JN] = INIT_ARRAY (0);        // feedforward gain
 
+// OPENLOOP
+Int16  _ko_openloop[JN] = INIT_ARRAY (0);		// offset 
+
 // SPEED PID (iKart)
 Int16  _error_speed[JN] = INIT_ARRAY (0);	    // actual feedback error 
 Int16  _error_speed_old[JN] = INIT_ARRAY (0);   // error at t-1
@@ -329,8 +332,9 @@ Int32 compute_pwm(byte j)
 		_pd[j] = 0;
 	break;
 	case MODE_OPENLOOP:
-		PWMoutput = _ko[j];
-		_pd[j] = 0;
+		//PWMoutput = _ko[j];
+		//_pd[j] = 0;
+		PWMoutput = _ko_openloop[j];
 	break;
 	
 #elif VERSION == 0x0215 
@@ -395,7 +399,8 @@ Int32 compute_pwm(byte j)
 		_pd[j] = _pd[j] + _ko[j];
 	break;
 	case MODE_OPENLOOP:
-		PWMoutput = _ko[j];
+		//PWMoutput = _ko[j];
+		PWMoutput = _ko_openloop[j];
 		#ifdef IDENTIF 
 		if (sine_ampl!=0)
 		{
@@ -429,7 +434,8 @@ Int32 compute_pwm(byte j)
 		
 	break;
 	case MODE_OPENLOOP:
-		PWMoutput = _ko[j];
+		//PWMoutput = _ko[j];
+		PWMoutput = _ko_openloop[j];
 		#ifdef IDENTIF 
 		if (sine_ampl!=0)
 		{
