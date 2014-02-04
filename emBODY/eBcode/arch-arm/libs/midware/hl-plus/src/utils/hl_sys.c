@@ -151,66 +151,80 @@ __weak extern void hl_sys_heap_delete(void* p)
     free(p);
 }
 
-#if 0
-extern hl_result_t hl_sys_delay(hl_reltime_t reltime)
-{
-    static uint32_t s_hl_sys_numofops1usec = 0;
-    if(0 == s_hl_sys_numofops1usec)
-    {
-        if(0 == SystemCoreClock)
-        {
-            return(hl_res_NOK_generic);
-        }
-        // to occupy a microsec i execute an operation for a number of times which depends on: SystemCoreCloc and 1.25 dmips/mhz, 
-        //s_hl_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
-        s_hl_sys_numofops1usec = (SystemCoreClock/1000000) / s_hl_sys_howmanyARMv7ops();
-
-    }
-        
-    s_hl_sys_asm_someARMv7ops(s_hl_sys_numofops1usec * reltime);
-
-    return(hl_res_OK);
-}
-#else
 
 extern hl_result_t hl_sys_delay(hl_reltime_t reltime)
 {
-    static uint64_t s_hl_sys_numofops1sec = 0;
-    if(0 == s_hl_sys_numofops1sec)
+    static uint64_t s_hl_sys_numofops1sec = HSI_VALUE;
+    static uint32_t s_hl_sys_used_systemcoreclock = 0;
+    if(s_hl_sys_used_systemcoreclock != SystemCoreClock)
     {
-        if(0 == SystemCoreClock)
-        {
-            return(hl_res_NOK_generic);
-        }
+
         // to occupy a millisec i execute an operation for a number of times which depends on: 
         // SystemCoreClock, cortex gain(1.25 dmips/mhz), flash access, etc.
         // to overcome all this i just consider SystemCoreClock w/out 1.25 gain and i measures
         // extra gain with on a simple assembly function which should take 4 cycles per iteration (?).      
         //s_hl_sys_numofops1sec = (5*(SystemCoreClock)) / 4; 
-        s_hl_sys_numofops1sec = (1*(SystemCoreClock)) / 1;
+        s_hl_sys_used_systemcoreclock = SystemCoreClock;
+        s_hl_sys_numofops1sec = SystemCoreClock;
+        
        
 #if     defined(HL_USE_MPU_NAME_STM32F103RB)
-        s_hl_sys_numofops1sec /= 6;             // 2 wait states, prefetching enabled.      
+        s_hl_sys_numofops1sec /= 3;  
+        // ok, but flah may be slower than cpu speed. lets see what latency is used. (prefetching seems not affect exec speed)       
+        uint32_t flash_latency = FLASH->ACR & FLASH_ACR_LATENCY; 
+        if(FLASH_ACR_LATENCY_0 == flash_latency)
+        {
+            // no loss of speed
+        }
+        else if(FLASH_ACR_LATENCY_1 == flash_latency)
+        {
+            s_hl_sys_numofops1sec *= 3;
+            s_hl_sys_numofops1sec /= 4;
+        }
+        else if(FLASH_ACR_LATENCY_2 == flash_latency)
+        {   // 2 wait states: cpu too fast for flash.
+            s_hl_sys_numofops1sec /= 2;
+        }
 #elif   defined(HL_USE_MPU_NAME_STM32F107VC)
-        s_hl_sys_numofops1sec /= 6;             // 2 wait states, prefetching enabled.        
+        s_hl_sys_numofops1sec /= 3;  
+        // ok, but flah may be slower than cpu speed. lets see what latency is used. (prefetching seems not affect exec speed)       
+        uint32_t flash_latency = FLASH->ACR & FLASH_ACR_LATENCY; 
+        if(FLASH_ACR_LATENCY_0 == flash_latency)
+        {
+            // no loss of speed
+        }
+        else if(FLASH_ACR_LATENCY_1 == flash_latency)
+        {
+            s_hl_sys_numofops1sec *= 3;
+            s_hl_sys_numofops1sec /= 4;
+        }
+        else if(FLASH_ACR_LATENCY_2 == flash_latency)
+        {   // 2 wait states: cpu too fast for flash.
+            s_hl_sys_numofops1sec /= 2;
+        }
 #elif   defined(HL_USE_MPU_NAME_STM32F407IG)
-        s_hl_sys_numofops1sec /= 3;             // 5 wait states, art technology enabled    
+        s_hl_sys_numofops1sec /= 3;             
+        // with art technology enabled the flash is seen as fast as the cpu. wow.     
 #else //defined(HL_USE_MPU_NAME_*)
     #error ERROR --> choose a HL_USE_MPU_NAME_*
-#endif         
+#endif 
+
+        // at this point i normalise the variable to keep not the nymber of operations for 1 sec,
+        // but for 1024*1024 microsec. by doing so, later on i shift by 20 instead of using a division. 
+        s_hl_sys_numofops1sec <<= 20;
+        s_hl_sys_numofops1sec /= 1000000;
     }
     
     
     volatile uint64_t num = s_hl_sys_numofops1sec * reltime;
-    num /= 1000000; 
-//    num -= 40; //we may remove some cycles to compensates for previous instructions, but ... we dont do it.   
-//__disable_irq();    
+    num >>= 20; 
+    //num -= offset; //we may remove some cycles to compensates for previous instructions, but ... we dont do it. it depends on c compiler optimisation 
+    
     s_hl_sys_asm_xnumARMv7ops((uint32_t)num);
-//__enable_irq();
+    
     return(hl_res_OK);
 }
 
-#endif
 
 
 extern hl_result_t hl_sys_systemreset(void) 
@@ -287,7 +301,7 @@ extern int hl_sys_itm_puts(const char* str)
 __weak extern void hl_sys_on_warning(const char * warningmsg)
 {
     hl_sys_itm_puts(warningmsg);
-    for(;;);
+    //for(;;);
 }
 
 __weak extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errormsg)
