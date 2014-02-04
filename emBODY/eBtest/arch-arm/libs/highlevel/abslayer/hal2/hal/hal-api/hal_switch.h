@@ -87,7 +87,7 @@ extern const hal_switch_cfg_t hal_switch_cfg_default;   // = { .dummy = 0};
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg);
 
 
-extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode);
+extern hal_result_t hal_switch_configure(hal_eth_phymode_t *usedmiiphymode);
 
 
 /** @fn			extern hal_bool_t hal_switch_initted_is(void)

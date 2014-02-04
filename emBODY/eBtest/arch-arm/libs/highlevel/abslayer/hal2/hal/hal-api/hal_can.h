@@ -183,16 +183,16 @@ typedef struct
                 uint8_t  rxqueueisfull:1; /**< if its value is 1 then the rx hw buffer is full. */
                 uint8_t  dummy3b:3;
                 
-            }hw_status; //3 bytes NOTE: this information are set by hardware and propagate to application layer by an interrupt
+            } hw_status; //3 bytes NOTE: this information are set by hardware and propagate to application layer by an interrupt
             
             struct
             {
                 uint8_t txqueueisfull:1; 
                 uint8_t rxqueueisfull:1;
-            }sw_status; //1 bytes NOTE: this information are set by software when try to put a new frame in sw output queue and it is full (txqueueisfull =1)
+            } sw_status; //1 bytes NOTE: this information are set by software when try to put a new frame in sw output queue and it is full (txqueueisfull =1)
                         // or when the can receive a new frame and sw input queue is full (rxqueueisfull = 1).  en sw interrupt is generated.??!! 
-        }s;
-    }u;
+        } s;
+    } u;
 } hal_can_status_t;
 
  

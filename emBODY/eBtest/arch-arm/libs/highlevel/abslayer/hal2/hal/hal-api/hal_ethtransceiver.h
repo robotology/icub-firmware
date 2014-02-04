@@ -86,7 +86,7 @@ extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .
 extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg);
 
 
-extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode);
+extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t *usedmiiphymode);
 
 
 /** @fn			extern hal_bool_t hal_ethtransceiver_initted_is(void)

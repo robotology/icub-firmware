@@ -65,36 +65,60 @@ typedef enum
     hal_gpio_portG,
     hal_gpio_portH,
     hal_gpio_portI,
+    hal_gpio_portJ,
+    hal_gpio_portK,
+    hal_gpio_portL,
     hal_gpio_portNONE = hal_NA08    /**< use when no port can be specified. it does not count in hal_gpio_ports_number */
 } hal_gpio_port_t;
 
-enum { hal_gpio_ports_number = 9 };
+enum { hal_gpio_ports_number = 12 };
 
     
 /** @typedef    typedef enum hal_gpio_pin_t 
     @brief      hal_gpio_pin_t contains all possible pins that a silicon GPIO can have. It it correct make the id start
                 from 0 rather than 1, as usual in HAL, because silicon vendors make it start from 0.
  **/    
+// typedef enum 
+// {
+//     hal_gpio_pin0 = 0,
+//     hal_gpio_pin1,
+//     hal_gpio_pin2,
+//     hal_gpio_pin3,
+//     hal_gpio_pin4,
+//     hal_gpio_pin5,
+//     hal_gpio_pin6,
+//     hal_gpio_pin7,
+//     hal_gpio_pin8,
+//     hal_gpio_pin9,
+//     hal_gpio_pin10,  
+//     hal_gpio_pin11,
+//     hal_gpio_pin12,
+//     hal_gpio_pin13,
+//     hal_gpio_pin14,
+//     hal_gpio_pin15,
+//     hal_gpio_pinNONE = hal_NA08     /**< use when no pin can be specified. it does not count in hal_gpio_pinss_number */   
+// } hal_gpio_pin_t;   
+
 typedef enum 
 {
-    hal_gpio_pin0 = 0,
-    hal_gpio_pin1,
-    hal_gpio_pin2,
-    hal_gpio_pin3,
-    hal_gpio_pin4,
-    hal_gpio_pin5,
-    hal_gpio_pin6,
-    hal_gpio_pin7,
-    hal_gpio_pin8,
-    hal_gpio_pin9,
-    hal_gpio_pin10,  
-    hal_gpio_pin11,
-    hal_gpio_pin12,
-    hal_gpio_pin13,
-    hal_gpio_pin14,
-    hal_gpio_pin15,
-    hal_gpio_pinNONE = hal_NA08     /**< use when no pin can be specified. it does not count in hal_gpio_pinss_number */   
-} hal_gpio_pin_t;   
+    hal_gpio_pin0       = 0x0001 << 0,
+    hal_gpio_pin1       = 0x0001 << 1,
+    hal_gpio_pin2       = 0x0001 << 2,
+    hal_gpio_pin3       = 0x0001 << 3,
+    hal_gpio_pin4       = 0x0001 << 4,
+    hal_gpio_pin5       = 0x0001 << 5,
+    hal_gpio_pin6       = 0x0001 << 6,
+    hal_gpio_pin7       = 0x0001 << 7,
+    hal_gpio_pin8       = 0x0001 << 8,
+    hal_gpio_pin9       = 0x0001 << 9,
+    hal_gpio_pin10      = 0x0001 << 10,  
+    hal_gpio_pin11      = 0x0001 << 11,
+    hal_gpio_pin12      = 0x0001 << 12,
+    hal_gpio_pin13      = 0x0001 << 13,
+    hal_gpio_pin14      = 0x0001 << 14,
+    hal_gpio_pin15      = 0x0001 << 15,
+    hal_gpio_pinNONE    = 0x0000     /**< use when no pin can be specified. it does not count in hal_gpio_pinss_number */   
+} hal_gpio_pin_t; 
 
 enum { hal_gpio_pins_number = 16 };
 
@@ -174,13 +198,19 @@ typedef struct
     @brief      hal_gpio_map_t contains the mapping of gpio with dir and speed and it config.
                 It is used in mapping a peripheral into a given gpio
  **/
+// typedef struct 
+// {
+//     hal_gpio_t          gpio;
+//     hal_gpio_cfg_t      config;
+// } hal_gpio_map_t;
+
+
 typedef struct 
 {
     hal_gpio_t          gpio;
-    hal_gpio_cfg_t      config;
-} hal_gpio_map_t;
+    uint32_t            af32;
+} hal_gpio_maP_t;
 
- 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const hal_gpio_cfg_t hal_gpio_cfg_default; // = {.dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low};
@@ -219,17 +249,17 @@ extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val);
 extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio);
 
 
-/** @fn         extern void hal_gpio_quickest_setval(hal_gpio_t gpio hal_gpio_val_t val)
-    @brief      Sets the value of the given pin in the given port in the quickest possible mode. To pursue speed,
-                all safety checks which are available in hal_gpio_setval are here removed. Thus, pay particular
-                attention to manipulate gpios already initted as output. And never and never use hal_gpio_portNONE
-                or hal_gpio_pinNONE otherwise a SW crash is inevitable. needless to say don't ever use hal_gpio_valNONE. 
-                On STM32F107 @ 72MHz, the execution time is around 1 usec vs. about 1.7 usec of hal_gpio_setval().
-                On STM32F407 @ 168MHz, the execution time is around 0.2 usec vs. about 0.4 usec of hal_gpio_setval().
-    @param      gpio            The gpio. 
-    @param      value           The target value.
- **/
-extern void hal_gpio_quickest_setval(hal_gpio_t gpio, hal_gpio_val_t val);
+// /** @fn         extern void hal_gpio_quickest_setval(hal_gpio_t gpio hal_gpio_val_t val)
+//     @brief      Sets the value of the given pin in the given port in the quickest possible mode. To pursue speed,
+//                 all safety checks which are available in hal_gpio_setval are here removed. Thus, pay particular
+//                 attention to manipulate gpios already initted as output. And never and never use hal_gpio_portNONE
+//                 or hal_gpio_pinNONE otherwise a SW crash is inevitable. needless to say don't ever use hal_gpio_valNONE. 
+//                 On STM32F107 @ 72MHz, the execution time is around 1 usec vs. about 1.7 usec of hal_gpio_setval().
+//                 On STM32F407 @ 168MHz, the execution time is around 0.2 usec vs. about 0.4 usec of hal_gpio_setval().
+//     @param      gpio            The gpio. 
+//     @param      value           The target value.
+//  **/
+// extern void hal_gpio_quickest_setval(hal_gpio_t gpio, hal_gpio_val_t val);
 
 
 

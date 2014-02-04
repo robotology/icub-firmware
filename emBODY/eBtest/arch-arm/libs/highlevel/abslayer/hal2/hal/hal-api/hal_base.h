@@ -180,6 +180,9 @@ typedef hal_result_t (*hal_res_fp_voidp_t) (void* p);
  **/
 typedef void (*hal_void_fp_void_t) (void);
 
+typedef void* (*hal_voidp_fp_uint32_t) (uint32_t);
+
+typedef void (*hal_void_fp_voidp_t) (void*);
 
 /** @typedef    typedef uint8_t (*hal_uint8_fp_void_t) (void)
     @brief      hal_uint8_fp_void_t is a pointer to a function which returns uint8_t and has a void argument.
@@ -242,6 +245,8 @@ typedef struct
         If not redefined (thus this value is NULL) it does nothing.  It is necessary to redefine only if the HAL is used 
         in a multitasking execution environment (with an RTOS) */ 
     void            (*osal_system_scheduling_restart)(void);
+    void*           (*ext_heap_new)(uint32_t size);
+    void            (*ext_heap_delete)(void* mem);
 } hal_extfn_cfg_t;
 
 
@@ -300,6 +305,9 @@ extern void hal_base_osal_scheduling_restart(void);
 extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
 
+extern void * hal_base_heap_new(uint32_t size);
+
+extern void hal_base_heap_delete(void* mem);
 
 
 
