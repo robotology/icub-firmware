@@ -49,10 +49,15 @@
 
 typedef struct
 {
+    hal_gpio_maP_t          sck;        /**<  */
+    hal_gpio_maP_t          miso;       /**<  */
+    hal_gpio_maP_t          mosi;       /**<  */
+} hal_spi_gpiomap_t;
+
+typedef struct
+{
     uint8_t             supported_mask;                     /**< bit in position hal_spix must be 1 if portx is supported */
-    hal_gpio_map_t      gpio_sck[hal_spis_number];          /**< in position hal_spix there is mapping of gpio used for sck pin */
-    hal_gpio_map_t      gpio_miso[hal_spis_number];         /**< in position hal_spix there is mapping of gpio used for miso pin */
-    hal_gpio_map_t      gpio_mosi[hal_spis_number];         /**< in position hal_spix there is mapping of gpio used for mosi pin */
+    hal_spi_gpiomap_t   gpiomap[hal_spis_number];
 } hal_spi_hid_brdcfg_t;
 
 

@@ -98,14 +98,38 @@ inline extern hal_boolval_t hal_utility_bits_halfword_bitcheck(uint16_t hword, u
     }
 }
 
+
+inline extern hal_boolval_t hal_utility_bits_halfword_maskcheck(uint16_t hword, uint16_t mask)
+{
+    if(hword & mask)
+    {
+        return(hal_true);
+    }
+    else
+    {
+        return(hal_false);
+    }
+}
+
 inline extern void hal_utility_bits_halfword_bitset(uint16_t* hword, uint8_t bit)
 {
     (*hword) |= (1<<bit);    
 }
 
+inline extern void hal_utility_bits_halfword_maskset(uint16_t* hword, uint16_t mask)
+{
+    (*hword) |= (mask);    
+}
+
+
 inline extern void hal_utility_bits_halfword_bitclear(uint16_t* hword, uint8_t bit)
 {
     (*hword) &= (~(1<<bit));    
+}
+
+inline extern void hal_utility_bits_halfword_maskclear(uint16_t* hword, uint16_t mask)
+{
+    (*hword) &= (~(mask));    
 }
 
 inline extern void hal_tools_bitmanip_halfword_bittoggle(uint16_t* hword, uint8_t bit)

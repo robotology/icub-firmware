@@ -181,7 +181,7 @@ extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
+extern hal_result_t hal_switch_configure(hal_eth_phymode_t *usedmiiphymode)
 {
     //hal_result_t res = hal_res_NOK_generic;
 
@@ -204,7 +204,7 @@ extern hal_result_t hal_switch_configure(hal_eth_phymode_t targetphymode, hal_et
     }    
 
     
-    hal_brdcfg_device_switch__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
+    hal_brdcfg_device_switch__theconfig.devcfg.chipif.config(usedmiiphymode);
 
     s_hal_device_switch_started_set();
 

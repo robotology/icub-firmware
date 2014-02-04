@@ -47,12 +47,16 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    hal_gpio_maP_t      rx;         /**< gpio map used for rx pin */
+    hal_gpio_maP_t      tx;         /**< gpio map used for tx pin */ 
+} hal_can_gpiomap_t;
 
 typedef struct
 {
     uint8_t             supported_mask;             /**< bit in position hal_can_portx must be 1 if portx is supported */
-    hal_gpio_map_t      gpio_rx[hal_cans_number];   /**< in position hal_can_portx there is mapping of gpio used for canx rx pin */
-    hal_gpio_map_t      gpio_tx[hal_cans_number];   /**< in position hal_can_portx there is mapping of gpio used for canx tx pin */
+    hal_can_gpiomap_t   gpiomap[hal_cans_number];
 } hal_can_hid_brdcfg_t;
 
 

@@ -44,14 +44,14 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_device_ethtransceiver_hid_fn_config_t) (hal_eth_phymode_t targetphymode, hal_eth_phymode_t* usedphymode);
-typedef hal_result_t (*al_device_ethtransceiver_hid_fn_getphymode_t) (hal_eth_phymode_t* usedphymode);
+typedef hal_result_t (*hal_device_ethtransceiver_hid_fn_config_t) (hal_eth_phymode_t* usedphymode);
+typedef hal_result_t (*hal_device_ethtransceiver_hid_fn_getphymode_t) (hal_eth_phymode_t* usedphymode);
 typedef struct
 {   // used inside the public functions of hal_device_ethtransceiver to communicate to the chip, but defined inside brdcfg
     hal_res_fp_voidp_t                              init;
     void*                                           initpar;
     hal_device_ethtransceiver_hid_fn_config_t       config;
-    al_device_ethtransceiver_hid_fn_getphymode_t    getphymode;
+    hal_device_ethtransceiver_hid_fn_getphymode_t   getphymode;
 } hal_device_ethtransceiver_hid_chip_interface_t;
 
 

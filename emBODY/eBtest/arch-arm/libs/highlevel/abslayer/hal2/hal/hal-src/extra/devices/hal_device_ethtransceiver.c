@@ -41,6 +41,8 @@
 
 #include "hal_utility_bits.h"
 
+#include "hl_ethtrans.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -72,7 +74,9 @@ const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default =
     .dummy = 0 
 };
 
+extern const hl_ethtrans_mapping_t* hl_ethtrans_map = NULL;
 
+extern void* hl_ethtrans_chip_init_param = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -108,7 +112,8 @@ static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtrans
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static hl_ethtrans_mapping_t s_hl_ethtrans_mapping = { .supported = hl_true };
 
 
 
@@ -160,10 +165,10 @@ extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
 }
 
 
-extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, hal_eth_phymode_t *usedphymode)
+extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t *usedmiiphymode)
 {
 //    hal_result_t res = hal_res_NOK_generic;
-
+    hl_ethtrans_phymode_t usedmiiphmo;
 
     if(hal_true != s_hal_device_ethtransceiver_supported_is())
     {
@@ -179,13 +184,15 @@ extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t targetphymode, h
 
     if(hal_true == s_hal_device_ethtransceiver_started_is(hal_ethtransceiver1))
     {
-        hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode(usedphymode);
+        hl_ethtrans_chip_getmiiphymode(&usedmiiphmo);
+        *usedmiiphymode = (hal_eth_phymode_t)usedmiiphmo;
         return(hal_res_OK);
     }    
  
-    targetphymode = (hal_eth_phymode_auto == targetphymode) ? (hal_brdcfg_device_ethtransceiver__theconfig.devcfg.targetphymode) : (targetphymode);
+    //targetphymode = (hal_eth_phymode_auto == targetphymode) ? (hal_brdcfg_device_ethtransceiver__theconfig.devcfg.targetphymode) : (targetphymode);
  
-    hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
+    hl_ethtrans_chip_config(&usedmiiphmo);
+    *usedmiiphymode = (hal_eth_phymode_t)usedmiiphmo;
 
     s_hal_device_ethtransceiver_started_set(hal_ethtransceiver1);
 
@@ -218,6 +225,20 @@ extern hal_result_t hal_device_ethtransceiver_hid_static_memory_init(void)
 {
     memset(&s_hal_device_ethtransceiver_theinternals, 0, sizeof(s_hal_device_ethtransceiver_theinternals));
     return(hal_res_OK);
+}
+
+extern hl_result_t hl_ethtrans_chip_init(void *param)
+{
+    hal_result_t res = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init(param);
+    return((hl_result_t)res);
+}
+    
+extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode)
+{
+    hal_eth_phymode_t usedmiiphmo;
+    hal_result_t res = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config(&usedmiiphmo);
+    *usedmiiphymode = (hl_ethtrans_phymode_t)usedmiiphmo;
+    return((hl_result_t)res);
 }
 
 
@@ -256,14 +277,23 @@ static void s_hal_device_ethtransceiver_started_set(hal_ethtransceiver_t id)
 
 static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg)
 {
-    if((NULL != hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init)   && 
-       (NULL != hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config) &&
-        (NULL != hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode) )
+    if((NULL == hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init)         || 
+       (NULL == hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config)       ||
+       (NULL == hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode) 
+      )
     {
-        return(hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init(hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.initpar));
+        return(hal_res_NOK_generic);        
     }
 
-    return(hal_res_NOK_generic);    
+    // init the hl transceiver ..
+    s_hl_ethtrans_mapping.supported = hal_brdcfg_device_ethtransceiver__theconfig.supported;
+    hl_ethtrans_map = &s_hl_ethtrans_mapping;
+    hl_ethtrans_chip_init_param = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.initpar;
+    //hl_result_t r = hl_ethtrans_chip_init(hl_ethtrans_chip_init_param);
+    hl_result_t r = hl_ethtrans_init(NULL);
+    
+    return((hal_result_t)r);
+   
 }
 
 

@@ -78,7 +78,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static const hal_gpio_cfg_t s_hal_led_gpio_config = 
+{
+    .dir    = hal_gpio_dirOUT,
+    .speed  = hal_gpio_speed_low,
+    .altcfg = NULL
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -104,7 +110,7 @@ static uint16_t s_hal_device_led_initted = 0;
 
 extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 {
-    const hal_gpio_map_t *gm = NULL;
+    const hal_gpio_maP_t *gm = NULL;
     hal_result_t res = hal_res_NOK_generic;
 
     if(hal_false == s_hal_device_led_supported_is(id))
@@ -112,9 +118,9 @@ extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
         return(hal_res_NOK_generic);
     }
      
-    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
     
-    res = hal_gpio_init(gm->gpio, &gm->config);
+    res = hal_gpio_init(gm->gpio, &s_hal_led_gpio_config);
     
     if(hal_res_OK != res)
     {
@@ -130,7 +136,7 @@ extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 
 extern hal_result_t hal_led_on(hal_led_t id)
 {
-    const hal_gpio_map_t *gm = NULL;
+    const hal_gpio_maP_t *gm = NULL;
     
     if(hal_false == s_hal_device_led_initted_is(id))
     {
@@ -138,7 +144,7 @@ extern hal_result_t hal_led_on(hal_led_t id)
     }
 
     // do something 
-    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
     
     return(hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_on));
 }
@@ -147,7 +153,7 @@ extern hal_result_t hal_led_on(hal_led_t id)
 
 extern hal_result_t hal_led_off(hal_led_t id)
 {
-    const hal_gpio_map_t *gm = NULL;
+    const hal_gpio_maP_t *gm = NULL;
     
     if(hal_false == s_hal_device_led_initted_is(id))
     {
@@ -155,7 +161,7 @@ extern hal_result_t hal_led_off(hal_led_t id)
     }
 
     // do something 
-    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
     
     return(hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_off));
 }
@@ -164,7 +170,7 @@ extern hal_result_t hal_led_off(hal_led_t id)
 
 extern hal_result_t hal_led_toggle(hal_led_t id)
 {
-    const hal_gpio_map_t *gm = NULL;
+    const hal_gpio_maP_t *gm = NULL;
     hal_gpio_val_t val = hal_gpio_valNONE;
     
     if(hal_false == s_hal_device_led_initted_is(id))
@@ -173,7 +179,7 @@ extern hal_result_t hal_led_toggle(hal_led_t id)
     }
 
     // do something 
-    gm = &hal_brdcfg_device_led__theconfig.gpiomaps[HAL_device_led_id2index(id)];
+    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
     
     val = hal_gpio_getval(gm->gpio);
     

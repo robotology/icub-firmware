@@ -49,10 +49,16 @@
 
 typedef struct
 {
-    uint8_t                 supported_mask;
-    hal_gpio_map_t          gpio_sel0[hal_muxes_number];    /**<  */
-    hal_gpio_map_t          gpio_sel1[hal_muxes_number];    /**<  */
-    hal_gpio_map_t          gpio_enable[hal_muxes_number];    /**<  */
+    hal_gpio_maP_t          gpio_sel0;    /**<  */
+    hal_gpio_maP_t          gpio_sel1;    /**<  */
+    hal_gpio_maP_t          gpio_enable;    /**<  */
+} hal_device_mux_gpiomap_t;
+
+
+typedef struct
+{
+    uint8_t                     supported_mask;
+    hal_device_mux_gpiomap_t    gpiomap[hal_muxes_number];
 } hal_device_mux_hid_brdcfg_t;
 
 

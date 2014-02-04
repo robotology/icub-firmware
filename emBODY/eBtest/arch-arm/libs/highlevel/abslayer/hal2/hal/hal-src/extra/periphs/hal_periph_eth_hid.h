@@ -53,13 +53,13 @@ typedef enum
 
 typedef struct
 {   // RMII: Reduced Media Independent Interface   
-    hal_gpio_map_t      ETH_RMII_REF_CLK;           /**< mapping of gpio used for ETH_RMII_REF_CLK pin */
-    hal_gpio_map_t      ETH_RMII_TX_EN;             /**< mapping of gpio used for ETH_RMII_TX_EN pin */
-    hal_gpio_map_t      ETH_RMII_TXD0;              /**< mapping of gpio used for ETH_RMII_TXD0 pin */
-    hal_gpio_map_t      ETH_RMII_TXD1;              /**< mapping of gpio used for ETH_RMII_TXD1 pin */
-    hal_gpio_map_t      ETH_RMII_CRS_DV;            /**< mapping of gpio used for ETH_RMII_CRS_DV pin */
-    hal_gpio_map_t      ETH_RMII_RXD0;              /**< mapping of gpio used for ETH_RMII_RXD0 pin */
-    hal_gpio_map_t      ETH_RMII_RXD1;              /**< mapping of gpio used for ETH_RMII_RXD1 pin */
+    hal_gpio_maP_t      ETH_RMII_REF_CLK;           /**< mapping of gpio used for ETH_RMII_REF_CLK pin */
+    hal_gpio_maP_t      ETH_RMII_TX_EN;             /**< mapping of gpio used for ETH_RMII_TX_EN pin */
+    hal_gpio_maP_t      ETH_RMII_TXD0;              /**< mapping of gpio used for ETH_RMII_TXD0 pin */
+    hal_gpio_maP_t      ETH_RMII_TXD1;              /**< mapping of gpio used for ETH_RMII_TXD1 pin */
+    hal_gpio_maP_t      ETH_RMII_CRS_DV;            /**< mapping of gpio used for ETH_RMII_CRS_DV pin */
+    hal_gpio_maP_t      ETH_RMII_RXD0;              /**< mapping of gpio used for ETH_RMII_RXD0 pin */
+    hal_gpio_maP_t      ETH_RMII_RXD1;              /**< mapping of gpio used for ETH_RMII_RXD1 pin */
 } hal_eth_hid_gpio_rmii_t;
 
 typedef struct
@@ -75,16 +75,22 @@ typedef union
 
 typedef struct
 {   // SMI: Serial Management Interface
-    hal_gpio_map_t      ETH_MDC;                    /**< mapping of gpio used for ETH_MDC pin */
-    hal_gpio_map_t      ETH_MDIO;                   /**< mapping of gpio used for ETH_MDIO pin */
+    hal_gpio_maP_t      ETH_MDC;                    /**< mapping of gpio used for ETH_MDC pin */
+    hal_gpio_maP_t      ETH_MDIO;                   /**< mapping of gpio used for ETH_MDIO pin */
 } hal_eth_hid_gpio_smi_t;
 
 typedef struct
 {
-    hal_bool_t                  supported;          /**< hal_true if supported */
     hal_eth_hid_mif_t           mif;                /**< always rmii  */
     hal_eth_hid_gpio_mif_t      gpio_mif;    
     hal_eth_hid_gpio_smi_t      gpio_smi;
+} hal_eth_gpiomap_t;
+
+
+typedef struct
+{
+    hal_bool_t          supported;      /**< hal_true if supported */
+    hal_eth_gpiomap_t   gpiomap;        /**< the gpio mapping */
 } hal_eth_hid_brdcfg_t;
 
 
@@ -101,17 +107,17 @@ extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support;
 
 extern hal_result_t hal_eth_hid_static_memory_init(void);
 
-extern void hal_eth_hid_rmii_prepare(void);
-extern void hal_eth_hid_rmii_refclock_init(void);
-extern void hal_eth_hid_rmii_tx_init(void);
-extern void hal_eth_hid_rmii_rx_init(void);
+// extern void hal_eth_hid_rmii_prepare(void);
+// extern void hal_eth_hid_rmii_refclock_init(void);
+// extern void hal_eth_hid_rmii_tx_init(void);
+// extern void hal_eth_hid_rmii_rx_init(void);
 
-extern void hal_eth_hid_microcontrollerclockoutput_init(void);
+//extern void hal_eth_hid_microcontrollerclockoutput_init(void);
 
 
-extern void hal_eth_hid_smi_init(void);
-extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
-extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
+// extern void hal_eth_hid_smi_init(void);
+// extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
+// extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
 
 #endif  // include guard

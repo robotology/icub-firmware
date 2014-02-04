@@ -48,12 +48,16 @@
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
+typedef struct
+{
+    hal_gpio_maP_t      scl;       /**< gpio map used for scl pin */
+    hal_gpio_maP_t      sda;       /**< gpio map used for sda pin */ 
+} hal_i2c_gpiomap_t;
 
 typedef struct
 {
     uint8_t             supported_mask;                     /**< bit in position hal_can_portx must be 1 if portx is supported */
-    hal_gpio_map_t      gpio_scl[hal_i2cs_number];          /**< in position hal_i2cx there is mapping of gpio used for its scl pin */
-    hal_gpio_map_t      gpio_sda[hal_i2cs_number];          /**< in position hal_i2cx there is mapping of gpio used for its sda pin */
+    hal_i2c_gpiomap_t   gpiomap[hal_i2cs_number];           /**< in position hal_i2cx there is mapping of gpio used for it */
 } hal_i2c_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------

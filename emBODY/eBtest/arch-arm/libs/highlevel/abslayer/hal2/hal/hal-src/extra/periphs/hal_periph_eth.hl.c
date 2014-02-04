@@ -86,6 +86,8 @@ extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support =
     .fn_inside_eth_isr  = NULL
 };
 
+// it must be defined in order to use hl_eth.
+extern const hl_eth_mapping_t* hl_eth_map = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -170,7 +172,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     }
 
     #warning WIP --> make ipal use a cfg w/ capacityoftxfifoofframes and capacityofrxfifoofframes
-    uint8_t capacityoftxfifoofframes = 1;   // cfg->capacityoftxfifoofframes
+    uint8_t capacityoftxfifoofframes = 2;   // cfg->capacityoftxfifoofframes
     uint8_t capacityofrxfifoofframes = 2;   // cfg->capacityofrxfifoofframes
     
     memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
@@ -178,14 +180,28 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     intitem->config.capacityofrxfifoofframes = capacityofrxfifoofframes;
     
     memcpy(&intitem->onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));    
+
+#warning --> for mcbstm32f400 i removed teh init of the transceiver in here SEE IF WE CAN KEEP IT >>>>>>>>>>   
+    // initialise the eth transceiver.
+    if(hal_res_OK != hal_ethtransceiver_init(NULL))
+    {
+        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_ethtransceiver_init() failed");
+    }
     
     intitem->hl_eth_config.macaddress                = intitem->config.macaddress;
     intitem->hl_eth_config.behaviour                 = hl_eth_beh_dmatxrx;
     intitem->hl_eth_config.priority                  = (hl_irqpriority_t)intitem->config.priority;
     intitem->hl_eth_config.capacityoftxfifoofframes  = intitem->config.capacityoftxfifoofframes;
     intitem->hl_eth_config.capacityofrxfifoofframes  = intitem->config.capacityofrxfifoofframes;
+
+    // we must initialise hl_can_map w/ suited values. 
+    // we have built hal_brdcfg_eth__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_eth_mapping_t) == sizeof(hal_eth_hid_brdcfg_t));       
+    hl_eth_map = (hl_eth_mapping_t*)&hal_brdcfg_eth__theconfig;
     
     hl_result_t r = hl_eth_init(&intitem->hl_eth_config);
+    
+    s_hal_eth_initted_set(id);
  
     return((hal_result_t)r);
 }
@@ -274,27 +290,27 @@ static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
 
 
 
-extern void hal_eth_hid_smi_init(void)
-{
-    hl_eth_smi_init();
-}
+// extern void hal_eth_hid_smi_init(void)
+// {
+//     hl_eth_smi_init();
+// }
 
-extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
-{
-    return(hl_eth_smi_read(PHYaddr, REGaddr));
-}
+// extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
+// {
+//     return(hl_eth_smi_read(PHYaddr, REGaddr));
+// }
 
-// writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
-extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
-{
-    hl_eth_smi_write(PHYaddr, REGaddr, value);
-}
+// // writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
+// extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
+// {
+//     hl_eth_smi_write(PHYaddr, REGaddr, value);
+// }
 
 
-extern void hal_eth_hid_rmii_refclock_init(void)
-{   // used by mac but also by external phy or switch    
-    hl_eth_rmii_refclock_init();
-}
+// extern void hal_eth_hid_rmii_refclock_init(void)
+// {   // used by mac but also by external phy or switch    
+//     hl_eth_rmii_refclock_init();
+// }
 
 
 //extern void hal_eth_hid_rmii_prepare(void)

@@ -25,10 +25,10 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#warning WIP --> fix extbrd_keil so thta it uses spi correctly
+
 
 #ifdef  HAL_USE_EXTBRD_KEIL_MCBQVGA
-
+#warning WIP --> fix extbrd_keil so thta it uses spi correctly
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------

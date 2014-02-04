@@ -96,15 +96,21 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_mux_supported_is(hal_mux_t id);
-static void s_hal_device_mux_initted_set(hal_mux_t id);
-static hal_boolval_t s_hal_device_mux_initted_is(hal_mux_t id);
+static hal_boolval_t s_hal_mux_supported_is(hal_mux_t id);
+static void s_hal_mux_initted_set(hal_mux_t id);
+static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static const hal_gpio_cfg_t s_hal_mux_gpio_config = 
+{
+    .dir    = hal_gpio_dirOUT,
+    .speed  = hal_gpio_speed_max,
+    .altcfg = NULL
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -129,7 +135,7 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
 {
     hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)];
 
-    if(hal_false == s_hal_device_mux_supported_is(id))
+    if(hal_false == s_hal_mux_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -153,26 +159,26 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
     
     memcpy(&intitem->config, cfg, sizeof(hal_mux_cfg_t));   
     
-    memcpy(&intitem->enable, &hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_id2index(id)].gpio, sizeof(hal_gpio_t));
-    memcpy(&intitem->sel0, &hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_id2index(id)].gpio, sizeof(hal_gpio_t));
-    memcpy(&intitem->sel1, &hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_id2index(id)].gpio, sizeof(hal_gpio_t));
+    memcpy(&intitem->enable, &hal_brdcfg_device_mux__theconfig.gpiomap[HAL_device_mux_id2index(id)].gpio_enable.gpio, sizeof(hal_gpio_t));
+    memcpy(&intitem->sel0,   &hal_brdcfg_device_mux__theconfig.gpiomap[HAL_device_mux_id2index(id)].gpio_sel0.gpio, sizeof(hal_gpio_t));
+    memcpy(&intitem->sel1,   &hal_brdcfg_device_mux__theconfig.gpiomap[HAL_device_mux_id2index(id)].gpio_sel1.gpio, sizeof(hal_gpio_t));
 
     
     
-    hal_gpio_init(intitem->enable, &hal_brdcfg_device_mux__theconfig.gpio_enable[HAL_device_mux_id2index(id)].config);
+    hal_gpio_init(intitem->enable, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
     
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
     
-    hal_gpio_init(intitem->sel0, &hal_brdcfg_device_mux__theconfig.gpio_sel0[HAL_device_mux_id2index(id)].config);
+    hal_gpio_init(intitem->sel0, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->sel0, hal_gpio_valHIGH);
     
-    hal_gpio_init(intitem->sel1, &hal_brdcfg_device_mux__theconfig.gpio_sel1[HAL_device_mux_id2index(id)].config);
+    hal_gpio_init(intitem->sel1, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->sel1, hal_gpio_valHIGH);   
     
         
 
-    s_hal_device_mux_initted_set(id);
+    s_hal_mux_initted_set(id);
     return(hal_res_OK);
 }
 
@@ -184,7 +190,7 @@ extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
     static const hal_gpio_val_t s_values_sel0[hal_mux_sels_number] = {hal_gpio_valLOW,   hal_gpio_valHIGH,   hal_gpio_valLOW};
     static const hal_gpio_val_t s_values_sel1[hal_mux_sels_number] = {hal_gpio_valLOW,   hal_gpio_valLOW,    hal_gpio_valHIGH};
     
-    if(hal_false == s_hal_device_mux_initted_is(id))
+    if(hal_false == s_hal_mux_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -215,7 +221,7 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
 {
     hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)];
     
-    if(hal_false == s_hal_device_mux_initted_is(id))
+    if(hal_false == s_hal_mux_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -252,19 +258,19 @@ extern hal_result_t hal_device_mux_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_mux_supported_is(hal_mux_t id)
+static hal_boolval_t s_hal_mux_supported_is(hal_mux_t id)
 {
     return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_mux__theconfig.supported_mask, HAL_device_mux_id2index(id)));
 }
 
 
-static void s_hal_device_mux_initted_set(hal_mux_t id)
+static void s_hal_mux_initted_set(hal_mux_t id)
 {
     hal_utility_bits_byte_bitset(&s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id));
 }
 
 
-static hal_boolval_t s_hal_device_mux_initted_is(hal_mux_t id)
+static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id)
 {
     return(hal_utility_bits_byte_bitcheck(s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id)));
 }
