@@ -607,6 +607,7 @@
 			_set_point[axis] = _position[axis]; \
 			init_trajectory (axis, _position[axis], _position[axis], 1); \
 			clear_lpf_ord1_3hz  (axis); \
+			_ko_openloop[axis] = 0; \
 		} \
 		else \
 			_general_board_error = ERROR_FMT; \
@@ -637,6 +638,8 @@
 				_ko_imp[1] = 0; \
 				_set_point[0] = _position[0]; \
 				_set_point[1] = _position[1]; \
+				_ko_openloop[0] = 0; \
+			    _ko_openloop[1] = 0; \
 				if (CAN_SRC==0) \
 				{ \
 					 CAN_ID = (_board_ID << 4) ; \
@@ -659,6 +662,7 @@
 				_integral[0] = 0; \
 				_ko_imp[0] = 0; \
 				_set_point[0] = _position[0]; \
+				_ko_openloop[0] = 0; \
 				if (CAN_SRC==0) \
 				{ \
 					 CAN_ID = (_board_ID << 4) ; \
