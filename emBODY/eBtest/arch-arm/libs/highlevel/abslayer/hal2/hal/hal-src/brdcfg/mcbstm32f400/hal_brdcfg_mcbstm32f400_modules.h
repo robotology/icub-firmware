@@ -61,23 +61,23 @@
 #define     HAL_USE_UTILITY_FIFO
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
-#define     HAL_USE_PERIPH_CAN
+#undef     HAL_USE_PERIPH_CAN
 #undef     HAL_USE_PERIPH_CRC
 #undef     HAL_USE_PERIPH_DMA
 #define     HAL_USE_PERIPH_ETH
 #define     HAL_USE_PERIPH_GPIO
-#define     HAL_USE_PERIPH_I2C
+#undef     HAL_USE_PERIPH_I2C
 #undef     HAL_USE_PERIPH_SPI
 #define     HAL_USE_PERIPH_TIMER
 #define     HAL_USE_PERIPH_TRACE
-#define     HAL_USE_PERIPH_UNIQUEID
-#define     HAL_USE_PERIPH_WATCHDOG
+#undef     HAL_USE_PERIPH_UNIQUEID
+#undef     HAL_USE_PERIPH_WATCHDOG
 
 // -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
 #undef  HAL_USE_DEVICE_ACCELEROMETER
-#define     HAL_USE_DEVICE_CANTRANSCEIVER
+#undef     HAL_USE_DEVICE_CANTRANSCEIVER
 #undef  HAL_USE_DEVICE_DISPLAY  
-#define     HAL_USE_DEVICE_EEPROM
+#undef     HAL_USE_DEVICE_EEPROM
 //#define HAL_USE_DEVICE_EEPROM_dummy
 #undef  HAL_USE_DEVICE_ENCODER
 #define     HAL_USE_DEVICE_ETHTRANSCEIVER
@@ -89,11 +89,11 @@
 
 
 // -- chips: define what you need to use
-#define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
+#undef     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
 #undef     HAL_USE_CHIP_ST_L3G4200D
 #undef     HAL_USE_CHIP_ST_LIS3DH
 #undef  HAL_USE_CHIP_MICREL_KS8893
-#define     HAL_USE_CHIP_XX_EEPROM
+#undef     HAL_USE_CHIP_XX_EEPROM
 
 // -- external boards: define what you need to use
 #undef     HAL_USE_EXTBRD_KEIL_MCBQVGA

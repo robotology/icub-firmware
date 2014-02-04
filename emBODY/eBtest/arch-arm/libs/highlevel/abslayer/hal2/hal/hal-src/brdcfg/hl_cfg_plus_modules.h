@@ -42,7 +42,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
+//#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
 
 #define HL_USE_CORE_CMSIS
 
@@ -54,7 +54,7 @@
 #define HL_USE_UTIL_GPIO
 #define HL_USE_UTIL_BITS
 #define HL_USE_UTIL_FIFO
-#define HL_USE_UTIL_I2C
+//#define HL_USE_UTIL_I2C
 #define HL_USE_UTIL_ETH
 #define HL_USE_UTIL_ETHTRANS
 #define HL_USE_CHIP_XX_ETHPHY
@@ -71,6 +71,23 @@
 #define HL_USE_UTIL_ETHTRANS
 #define HL_USE_CHIP_MICREL_KS8893
 #define HL_USE_UTIL_CAN
+#define HL_USE_UTIL_CAN_COMM
+
+#elif defined(HL_USE_BRD_EMS4RD)
+
+#define HL_USE_UTIL_SYS
+#define HL_USE_UTIL_GPIO
+#define HL_USE_UTIL_BITS
+#define HL_USE_UTIL_FIFO
+#define HL_USE_UTIL_I2C
+#define HL_USE_UTIL_ETH
+#define HL_USE_UTIL_ETHTRANS
+#define HL_USE_CHIP_MICREL_KS8893
+#define HL_USE_UTIL_CAN
+#define HL_USE_UTIL_CAN_COMM
+#define HL_USE_CHIP_XX_EEPROM
+
+#define EMS4RD_INIT_MICREL
 
 #endif
 
@@ -79,59 +96,6 @@
 //#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
 
 
-#if 0
-
-#if   defined(HL_USE_BRD_MCBSTM32_F400) 
-
-
-// HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
-
-#define HL_USE_UTIL_SYS
-#define HL_USE_UTIL_GPIO
-#define HL_USE_UTIL_BITS
-#define HL_USE_UTIL_FIFO
-#define HL_USE_UTIL_I2C
-#define HL_USE_UTIL_CAN
-#define HL_USE_UTIL_ETH
-#define HL_USE_UTIL_ETHTRANS
-#define HL_USE_UTIL_TIMER
-
-
-// HL_USE_CHIP_* allow compilation of the driver of a given chip
-
-#define HL_USE_CHIP_XX_EEPROM
-#define HL_USE_CHIP_ST_L3G4200D
-#define HL_USE_CHIP_ST_LIS3X
-
-#elif   defined(HL_USE_BRD_EMS004) 
-
-
-// HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
-
-#define HL_USE_UTIL_SYS
-#define HL_USE_UTIL_GPIO
-#define HL_USE_UTIL_BITS
-#define HL_USE_UTIL_FIFO
-#define HL_USE_UTIL_I2C
-#define HL_USE_UTIL_ETH
-#define HL_USE_UTIL_ETHTRANS
-#define HL_USE_UTIL_CAN
-
-
-// HL_USE_CHIP_* allow compilation of the driver of a given chip
-
-#define HL_USE_CHIP_XX_EEPROM
-#define HL_USE_CHIP_ST_L3G4200D
-#define HL_USE_CHIP_ST_LIS3X
-#define HL_USE_CHIP_MICREL_KS8893
-#define HL_USE_CHIP_XX_ETHPHY
-#define HL_USE_UTIL_TIMER
-
-#else
-    #error HL: specify the modules
-#endif
-
-#endif
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 

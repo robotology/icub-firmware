@@ -223,6 +223,76 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
     }       
 };
 
+#elif   defined(HL_USE_BRD_EMS4RD)
+
+// extern const hl_i2c_mapping_t hl_i2c_mapping =
+// {
+//     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (1 << hl_i2c3),
+//     .gpiomap            =
+//     {   
+//         {   // hl_i2c1 
+//             .scl = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portB, 
+//                     .pin    = hl_gpio_pin8
+//                 },
+//                 .af32       = GPIO_AF_I2C1          
+//             }, 
+//             .sda = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portB, 
+//                     .pin    = hl_gpio_pin9
+//                 },
+//                 .af32       = GPIO_AF_I2C1          
+//             } 
+//         }, 
+//         {   // hl_i2c2 
+//             .scl = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portNONE, 
+//                     .pin    = hl_gpio_pinNONE
+//                 },
+//                 .af32       = hl_NA32          
+//             }, 
+//             .sda = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portNONE, 
+//                     .pin    = hl_gpio_pinNONE
+//                 },
+//                 .af32       = hl_NA32           
+//             } 
+//         },  
+//         {   // hl_i2c3 
+//             .scl = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portA, 
+//                     .pin    = hl_gpio_pin8
+//                 },
+//                 .af32       = GPIO_AF_I2C3          
+//             }, 
+//             .sda = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portC, 
+//                     .pin    = hl_gpio_pin9
+//                 },
+//                 .af32       = GPIO_AF_I2C3           
+//             } 
+//         }        
+//     }       
+// };
+
 #endif
 
 #endif//defined(HL_USE_UTIL_I2C)
@@ -359,7 +429,69 @@ extern const hl_eth_mapping_t hl_eth_mapping =
     
 };
 
-#endif//defined(HL_USE_BRD_EMS004)
+#elif   defined(HL_USE_BRD_EMS4RD)
+
+// extern const hl_eth_mapping_t hl_eth_mapping =
+// {
+//     .supported          = hl_true,
+//     .gpiomap            =
+//     {
+//         .mif            = hl_eth_mif_rmii,
+//         .gpio_mif.rmii  =
+//         {   // if ETH_RMII_CRS_DV is on portD <-> use GPIO_Remap_ETH on rx-rmii
+//             .ETH_RMII_REF_CLK   =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin1 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },  
+//             .ETH_RMII_TX_EN     =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin11 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },
+//             .ETH_RMII_TXD0      =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin12 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },
+//             .ETH_RMII_TXD1      =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin13 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },
+//             .ETH_RMII_CRS_DV    =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin7 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },
+//             .ETH_RMII_RXD0      =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portC,     .pin = hl_gpio_pin4 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },
+//             .ETH_RMII_RXD1      =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portC,     .pin = hl_gpio_pin5 }, 
+//                 .af32   = GPIO_AF_ETH
+//             } 
+//         },
+//         .gpio_smi       =
+//         {
+//             .ETH_MDC        =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portC,     .pin = hl_gpio_pin1 }, 
+//                 .af32   = GPIO_AF_ETH
+//             },     
+//             .ETH_MDIO       =            
+//             {   
+//                 .gpio   = { .port = hl_gpio_portA,     .pin = hl_gpio_pin2 }, 
+//                 .af32   = GPIO_AF_ETH
+//             }     
+//         }      
+//     }
+//     
+// };
+#endif//defined(HL_USE_BRD_EMS4RD)
 
 #endif//defined(HL_USE_UTIL_ETH)
 
@@ -373,24 +505,24 @@ extern const hl_eth_mapping_t hl_eth_mapping =
 
 #if defined(HL_USE_BRD_MCBSTM32_F400)
 
-#include "hl_chip_xx_ethphy.h"
+// #include "hl_chip_xx_ethphy.h"
 
-extern const hl_ethtrans_mapping_t hl_ethtrans_mapping = 
-{
-    .supported  = hl_true
-};
+// extern const hl_ethtrans_mapping_t hl_ethtrans_mapping = 
+// {
+//     .supported  = hl_true
+// };
 
-// must redefine the ethtrans functions to use ... HL_USE_CHIP_XX_ETHPHY
-extern hl_result_t hl_ethtrans_chip_init(const hl_ethtrans_cfg_t *cfg)
-{  
-    return(hl_chip_xx_ethphy_init(NULL));
-}
+// // must redefine the ethtrans functions to use ... HL_USE_CHIP_XX_ETHPHY
+// extern hl_result_t hl_ethtrans_chip_init(void* param)
+// {  
+//     return(hl_chip_xx_ethphy_init(NULL));
+// }
 
 
-extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
-{
-    return(hl_chip_xx_ethphy_configure(targetphymode, usedphymode));
-}
+// extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
+// {
+//     return(hl_chip_xx_ethphy_configure(targetphymode, usedphymode));
+// }
 
 #elif defined(HL_USE_BRD_EMS004)
 
@@ -403,59 +535,9 @@ extern const hl_ethtrans_mapping_t hl_ethtrans_mapping =
 };
 
 
-static void s_hal_brdcfg_device_switch__mco2_init(void)
-{
-    // --- mco2: PC9
-    
-    #define SLR100MHZ               0x000C0000
-    #define SLR050MHZ               0x00080000
-    // configure pc9 af, push pull, 50mhz
-    // enable system configuration controller clock
-    RCC->APB2ENR    |= (1 << 14);  
-    // clocks port port c
-    RCC->AHB1ENR    |= 0x00000004;
-
-    GPIOC->MODER    &= ~0x000C0000;              // reset pc9
-    GPIOC->MODER    |=  0x00080000;              // alternate function
-    GPIOC->OTYPER   &= ~0x00000200;              // output push-pull (reset state)  
-    GPIOC->OSPEEDR  |=  SLR100MHZ;               // slew rate as 100MHz pin (0x000C0000) or 50mhz (0x00080000)
-    GPIOC->PUPDR    &= ~0x000C0000;              // no pull up, pull down
-
-    GPIOC->AFR[1]   &= ~0x000000F0;
-    GPIOC->AFR[1]   |=  0x00000000;              // AF0 (system) 
-}
-
-
-
-static void s_hal_brdcfg_device_switch__mco_initialise(void)
-{    
-#define HAL_SWITCH_USE_HSE  
-#undef  HAL_SWITCH_USE_PLLI2S    
-    
-    s_hal_brdcfg_device_switch__mco2_init();
-
-#if     defined(HAL_SWITCH_USE_PLLI2S)    
-    RCC_PLLI2SCmd(DISABLE);
-    RCC_PLLI2SConfig(200, 2); // 50mhz: 1mhz*200/2 = 100.  then we divide by 2 again
-    RCC_PLLI2SCmd(ENABLE);
-    // wait until it is ready
-    while(RCC_GetFlagStatus(RCC_FLAG_PLLI2SRDY) == RESET);
-    // connect mco2 with plli2s divided by 2
-    RCC_MCO2Config(RCC_MCO2Source_PLLI2SCLK, RCC_MCO2Div_2);
-#elif   defined(HAL_SWITCH_USE_HSE)
- 
-    // connect mco2 with hse divided by 1
-    RCC_MCO2Config(RCC_MCO2Source_HSE, RCC_MCO2Div_1);
-#endif    
-    
-    
-    //hal_eth_hid_rmii_refclock_init();
-}
-
 
 static hl_result_t s_hal_brdcfg_device_switch__extclock_init(void)
 {
-    s_hal_brdcfg_device_switch__mco_initialise();  
     return(hl_res_OK);    
 }
 
@@ -465,7 +547,8 @@ extern const hl_chip_micrel_ks8893_cfg_t ems004_micrel_ks8893_config =
     .i2cid              = hl_i2c1,
     .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
     .resetval           = hl_gpio_valRESET,
-    .extclockinit       = s_hal_brdcfg_device_switch__extclock_init    
+    .extclockinit       = s_hal_brdcfg_device_switch__extclock_init,
+    .targetphymode      = hl_ethtrans_phymode_auto
 };
 
 
@@ -481,7 +564,57 @@ extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, 
     return(hl_chip_micrel_ks8893_configure(targetphymode, usedphymode));
 }
 
-#endif//defined(HL_USE_BRD_EMS004)
+#elif defined(HL_USE_BRD_EMS4RD)
+
+// #include "hl_chip_micrel_ks8893.h"
+
+
+// static const hl_ethtrans_mapping_t s_hl_ethtrans_mapping = 
+// {
+//     .supported  = hl_true
+// };
+
+// #warning --> must think how link the hl_ethtrans to hal ... 
+// extern const hl_ethtrans_mapping_t* hl_ethtrans_map = &s_hl_ethtrans_mapping;
+
+
+// static hl_result_t s_hal_brdcfg_device_switch__extclock_init(void)
+// {
+//     return(hl_res_OK);    
+// }
+
+
+// extern const hl_chip_micrel_ks8893_cfg_t ems4rd_micrel_ks8893_config = 
+// {
+//     .i2cid              = hl_i2c3,
+//     .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
+//     .resetval           = hl_gpio_valRESET,
+//     .extclockinit       = s_hal_brdcfg_device_switch__extclock_init    
+// };
+
+
+// // must redefine the ethtrans functions to use ... HL_USE_CHIP_XX_ETHPHY
+// extern hl_result_t hl_ethtrans_chip_init(void* param)
+// {  
+// #if defined(EMS4RD_INIT_MICREL)     
+//     return(hl_chip_micrel_ks8893_init(&ems4rd_micrel_ks8893_config));
+// #else
+//     return(hl_res_OK);
+// #endif
+// }
+
+
+// extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
+// {
+// #if defined(EMS4RD_INIT_MICREL) 
+//     return(hl_chip_micrel_ks8893_configure(targetphymode, usedphymode));
+// #else
+//     *usedphymode = targetphymode;
+//     return(hl_res_OK);
+// #endif
+// }
+
+#endif//defined(HL_USE_BRD_EMS4RD)
 
 #endif//defined(HL_USE_UTIL_ETHTRANSCEIVER)
 
@@ -494,7 +627,7 @@ extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, 
 #if     defined(HL_USE_BRD_MCBSTM32_F400)
 
 
-extern const hl_can_mapping_t hl_can_mapping =
+static const hl_can_mapping_t s_hl_can_mapping =
 {
     .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
     .gpiomap            =
@@ -542,10 +675,11 @@ extern const hl_can_mapping_t hl_can_mapping =
     } 
 };
 
+extern const hl_can_mapping_t* hl_can_map = &s_hl_can_mapping;
+
 #elif   defined(HL_USE_BRD_EMS004)
 
-
-extern const hl_can_mapping_t hl_can_mapping =
+static const hl_can_mapping_t s_hl_can_mapping =
 {
     .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
     .gpiomap            =
@@ -593,6 +727,60 @@ extern const hl_can_mapping_t hl_can_mapping =
     } 
 };
 
+extern const hl_can_mapping_t* hl_can_map = &s_hl_can_mapping;
+
+#elif   defined(HL_USE_BRD_EMS4RD)
+
+// static const hl_can_mapping_t s_hl_can_mapping =
+// {
+//     .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
+//     .gpiomap            =
+//     {   
+//         {   // hl_can1 
+//             .rx = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portD, 
+//                     .pin    = hl_gpio_pin0
+//                 },
+//                 .af32       = GPIO_AF_CAN1          
+//             }, 
+//             .tx = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portD, 
+//                     .pin    = hl_gpio_pin1
+//                 },
+//                 .af32       = GPIO_AF_CAN1          
+//             } 
+//         }, 
+//         {   // hl_can2 
+//             .rx = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portB, 
+//                     .pin    = hl_gpio_pin5
+//                 },
+//                 .af32       = GPIO_AF_CAN2          
+//             }, 
+//             .tx = 
+//             {
+//                 .gpio   =
+//                 {
+//                     .port   = hl_gpio_portB, 
+//                     .pin    = hl_gpio_pin6
+//                 },
+//                 .af32       = GPIO_AF_CAN2          
+//             } 
+//         }   
+//     } 
+// };
+
+// extern const hl_can_mapping_t* hl_can_map = &s_hl_can_mapping;
+
 #endif
 
 #endif//defined(HL_USE_UTIL_CAN)
@@ -612,6 +800,14 @@ extern const hl_timer_mapping_t hl_timer_mapping =
 };
 
 #elif   defined(HL_USE_BRD_EMS004)
+
+extern const hl_timer_mapping_t hl_timer_mapping =
+{
+    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | 
+                          (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7) | (1 << hl_timer8),
+};
+
+#elif   defined(HL_USE_BRD_EMS4RD)
 
 extern const hl_timer_mapping_t hl_timer_mapping =
 {

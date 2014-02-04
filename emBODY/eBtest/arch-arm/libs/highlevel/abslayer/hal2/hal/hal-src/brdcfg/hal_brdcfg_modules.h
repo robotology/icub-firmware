@@ -37,7 +37,9 @@
 #elif defined(HAL_BOARD_MCBSTM32F400)
 	#include "mcbstm32f400/hal_brdcfg_mcbstm32f400_modules.h"   
 #elif defined(HAL_BOARD_EMS004)
-	#include "ems004/hal_brdcfg_ems004_modules.h"    
+	#include "ems004/hal_brdcfg_ems004_modules.h"  
+#elif defined(HAL_BOARD_EMS4RD)
+	#include "ems4rd/hal_brdcfg_ems4rd_modules.h"      
 #elif defined(HAL_BOARD_MC4PLUS)
 	#include "mc4plus/hal_brdcfg_mc4plus_modules.h"  
 #else

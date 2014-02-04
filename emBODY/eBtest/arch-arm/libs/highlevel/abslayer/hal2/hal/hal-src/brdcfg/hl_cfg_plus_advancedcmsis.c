@@ -25,6 +25,9 @@
 
 
 #include "hl_core.h"    // contains declarations in cmsis 
+ 
+#include "hl_cfg_plus_target.h"  
+#include "hl_cfg_plus_modules.h"   
 
 // // redefined the SystemCoreClock to have value ...
 // uint32_t SystemCoreClock = HSI_VALUE;
@@ -38,14 +41,35 @@
 // }
 
 
-#if     defined(HL_USE_BRD_EMS004)
+#if     defined(HL_USE_BRD_EMS4RD)
 
 // need to use a different SystemInit() because we dont have the normal clock as in mcbstm32f400 
 
 //#include "ems004_sys.c"
 
+#include "hl_gpio.h"
+#include "hl_sys.h"
 
-#endif//defined(HL_USE_BRD_EMS004)
+extern void hl_system_stm32fx_before_setsysclock(void)
+{
+#if defined(EMS4RD_INIT_MICREL)    
+    SystemCoreClockUpdate();
+    hl_gpio_t ethslv = {.port = hl_gpio_portB, .pin = hl_gpio_pin2};
+    hl_gpio_pin_output_init(ethslv);
+    
+    hl_gpio_t notethrst = {.port = hl_gpio_portH, .pin = hl_gpio_pin1};
+    hl_gpio_pin_output_init(notethrst);
+    
+    hl_gpio_pin_write(ethslv, hl_gpio_valSET);
+    hl_gpio_pin_write(notethrst, hl_gpio_valRESET);
+    hl_sys_delay(110*1000);    
+    hl_gpio_pin_write(notethrst, hl_gpio_valSET);
+    uint32_t i = 0;
+    i++;
+#endif    
+}
+
+#endif//defined(HL_USE_BRD_EMS4RD)
 
 
 
