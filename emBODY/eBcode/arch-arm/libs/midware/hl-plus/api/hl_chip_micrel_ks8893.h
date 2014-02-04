@@ -61,10 +61,11 @@
  **/
 typedef struct
 {
-    hl_i2c_t            i2cid;          /**< the I2C bus used by the chip */
-    hl_gpio_t           resetpin;       /**< the pinout of the reset pin */
-    hl_gpio_val_t       resetval;       /**< the value which puts the chip in reset mode */
-    hl_res_fp_void_t    extclockinit;   /**< the function which initialises the external clock used by the chip */
+    hl_i2c_t                i2cid;          /**< the I2C bus used by the chip */
+    hl_gpio_t               resetpin;       /**< the pinout of the reset pin */
+    hl_gpio_val_t           resetval;       /**< the value which puts the chip in reset mode */
+    hl_res_fp_void_t        extclockinit;   /**< the function which initialises the external clock used by the chip */
+    hl_ethtrans_phymode_t   targetphymode;
 } hl_chip_micrel_ks8893_cfg_t;
 
  
@@ -87,7 +88,7 @@ extern hl_result_t hl_chip_micrel_ks8893_init(const hl_chip_micrel_ks8893_cfg_t 
     @brief  	this function configure the switch with a target phy mode.
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
-extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode);
+extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmiiphymode);
 
 
 /** @fn			extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedphymode)
