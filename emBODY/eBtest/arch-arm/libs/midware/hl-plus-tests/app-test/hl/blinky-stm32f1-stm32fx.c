@@ -38,6 +38,7 @@
 #include "hl_chip_xx_eeprom.h"
 #include "hl_chip_st_l3g4200d.h"
 #include "hl_chip_st_lis3x.h"
+#include "hl_chip_micrel_ks8893.h"
 
 
 #include "board.h"  
@@ -84,6 +85,8 @@ static void test_i2c(void);
 
 static void test_eeprom(void);
 
+static void init_switch(void);
+
 static void test_delay(void);
 
 static void test_timer(uint32_t microsecs);
@@ -98,7 +101,7 @@ extern void onsystick(void) {}
 void userdef1(void) {}
 void userdef2(void) {}
     
-//#define ENABLE_EVIEWER
+#define ENABLE_EVIEWER
 static void brd_eventviewer_init(void);
 static evEntityId_t brd_eventviewer_switch(evEntityId_t ev);
 
@@ -136,11 +139,13 @@ int main(void)
     
     test_delay();
     
-//    test_i2c();
+    test_i2c();
     
-//    test_eeprom();
+    test_eeprom();
     
-    //test_mems_init();
+    test_mems_init();
+    
+    init_switch();
     
     
     systickserv_start_systick(1000, myonsystick);
@@ -164,7 +169,7 @@ int main(void)
         //systickserv_wait_for(500*1000);
         hl_sys_delay(500*1000);
         
-        //test_mems_get();
+        test_mems_get();
 
     }
 
@@ -195,28 +200,139 @@ extern void myonsystick(void)
 
 
 static void test_i2c(void)
-{
-    const hl_i2c_devaddr_t devaddr = 0xA0;
+{  
+#if     defined(HL_USE_UTIL_I2C)    
+    
+    const hl_i2c_devaddr_t devaddri2c1 = 0xA0;
     
     hl_result_t r = hl_res_NOK_generic;
     
     // init i2c1
     
-    r = hl_i2c_init(hl_i2c1, NULL);
-    
-    // ping eeprom at address 0xA0    
-    
-    r = hl_i2c_ping(hl_i2c1, devaddr);
-    
-    r = r;  
-
-    if(hl_res_OK != r)
+    r = hl_i2c_init(hl_i2c1, NULL);   
+    if(hl_res_OK == r)
+    {    
+        r = hl_i2c_ping(hl_i2c1, devaddri2c1);    
+        r = r;  
+        if(hl_res_OK != r)
+        {
+            hl_sys_itm_puts("hl_i2c1 initted but ping fails");
+        }
+    } 
+    else  
     {
-        hl_sys_itm_puts("hl_i2c_ping() failure");
+        hl_sys_itm_puts("hl_i2c1 initialisation failed");
     }        
     
+    r = hl_i2c_init(hl_i2c3, NULL);
+    if(hl_res_OK == r)
+    {    
+        r = hl_i2c_ping(hl_i2c3, 0x30);    
+        r = r; 
+        if(hl_res_OK != r)
+        {
+            hl_sys_itm_puts("hl_i2c3 initted but ping fails on 0x30");
+        }        
+        r = hl_i2c_ping(hl_i2c3, 0xd0);    
+        r = r;  
+        if(hl_res_OK != r)
+        {
+            hl_sys_itm_puts("hl_i2c3 initted but ping fails on 0xd0");
+        }        
+        r = hl_i2c_ping(hl_i2c3, 0xBE);    
+        r = r;      
+        if(hl_res_OK != r)
+        {
+            hl_sys_itm_puts("hl_i2c3 initted but ping fails on 0xbe");
+        }
+    } 
+    else  
+    {
+        hl_sys_itm_puts("hl_i2c3 initialisation failed");
+    }     
+
+#endif//defined(HL_USE_UTIL_I2C) 
 }
 
+#if     defined(HL_USE_CHIP_MICREL_KS8893) 
+#if     defined(HL_USE_BRD_EMS001)
+
+static void s_switch_mco_initialise(void)
+{
+    // this function initialises MCO in order to provide clock ref to switch.
+    // PA8 is MCO. it must be configured = Output mode, max speed 50 MHz + Alternate function output Push-pull (B)
+    // also, we connect pll3 at 50mhz to it
+    
+    // clock gpioa as alternate function
+    RCC->APB2ENR    |= 0x00000005;
+    // init pa8
+    GPIOA->CRH   &= 0xFFFFFFF0;
+    GPIOA->CRH   |= 0x0000000B;	
+
+
+    // set pll3 clock output to 50mhz: (25mhz/5)*10 = 50mhz, thus we use multiplier 10
+    RCC_PLL3Config(RCC_PLL3Mul_10);
+        
+    // enable pll3 
+    RCC_PLL3Cmd(ENABLE);
+    
+    // wait until it is ready
+    while(RCC_GetFlagStatus(RCC_FLAG_PLL3RDY) == RESET);
+    
+    // connect mco on pa8 with pll3
+    RCC_MCOConfig(RCC_MCO_PLL3CLK);
+}
+extern hl_result_t extclockinit(void)
+{
+    s_switch_mco_initialise();
+    return(hl_res_OK);
+}
+#elif   defined(HL_USE_BRD_EMS4RD)
+extern hl_result_t extclockinit(void)
+{
+    
+    return(hl_res_OK);
+}
+#endif//defined(HL_USE_BRD_EMS4RD)
+#endif//defined(HL_USE_CHIP_MICREL_KS8893)
+
+static void init_switch(void)
+{
+#if     defined(HL_USE_CHIP_MICREL_KS8893)   
+    
+#if     defined(HL_USE_BRD_EMS001)
+    const hl_chip_micrel_ks8893_cfg_t micrelcfg  = 
+    { 
+        .i2cid          = hl_i2c1,
+        .resetpin       = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
+        .resetval       = hl_gpio_valRESET,
+        .extclockinit   = extclockinit,
+        .targetphymode  = hl_ethtrans_phymode_auto // hl_ethtrans_phymode_fullduplex10mbps //hl_ethtrans_phymode_auto (
+    };  
+#elif   defined(HL_USE_BRD_EMS4RD)
+    const hl_chip_micrel_ks8893_cfg_t micrelcfg  = 
+    { 
+        .i2cid          = hl_i2c3,
+        .resetpin       = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
+        .resetval       = hl_gpio_valRESET,
+        .extclockinit   = extclockinit,
+        .targetphymode  = hl_ethtrans_phymode_auto //hl_ethtrans_phymode_fullduplex10mbps
+    }; 
+#else
+    #error -> define an eeprom cfg
+#endif   
+    
+    hl_ethtrans_phymode_t phymode = hl_ethtrans_phymode_auto;
+    hl_chip_micrel_ks8893_init(&micrelcfg);
+    //hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_fullduplex100mbps, &phymode);
+    phymode = phymode;
+    
+ 
+
+
+
+#endif    
+}
 
 static void test_eeprom(void)
 {
@@ -258,7 +374,16 @@ static void test_eeprom(void)
         .hwaddra2a1a0   = 0,
         .wp_val         = hl_gpio_valSET,
         .wp_gpio        = { .port = hl_gpio_portD, .pin = hl_gpio_pin10 }           
-    };     
+    };  
+#elif   defined(HL_USE_BRD_EMS4RD)
+    const hl_chip_xx_eeprom_cfg_t eepromcfg = 
+    {
+        .chip           = hl_chip_xx_eeprom_chip_atmel_at24c512b, 
+        .i2cid          = hl_i2c1,
+        .hwaddra2a1a0   = 0,
+        .wp_val         = hl_gpio_valSET,
+        .wp_gpio        = { .port = hl_gpio_portD, .pin = hl_gpio_pin10 }           
+    };       
 #else
     #error -> define an eeprom cfg
 #endif    
@@ -322,7 +447,7 @@ static void test_eeprom(void)
         }
         else
         {
-            //for(;;);
+            hl_sys_itm_puts("test eeprom was successful");  
         }        
         
         
@@ -338,14 +463,26 @@ static void test_mems_init(void)
 {
     hl_result_t r = hl_res_NOK_generic;
     
+#if     defined(HL_USE_BRD_EMS4V2)
+    const hl_i2c_t ic2x = hl_i2c3;
+#else
+    const hl_i2c_t ic2x = hl_i2c1;
+#endif    
+    
 #if     defined(HL_USE_CHIP_ST_L3G4200D)   
-    r = hl_chip_st_l3g4200d_init(NULL);
+    hl_chip_st_l3g4200d_cfg_t l3cfg;
+    memcpy(&l3cfg, &hl_chip_st_l3g4200d_cfg_default, sizeof(hl_chip_st_l3g4200d_cfg_t));
+    l3cfg.i2cid = ic2x;
+    r = hl_chip_st_l3g4200d_init(&l3cfg);
     r = r;
 #endif    
 
 
-#if     defined(HL_USE_CHIP_ST_LIS3X)   
-    r = hl_chip_st_lis3x_init(NULL);
+#if     defined(HL_USE_CHIP_ST_LIS3X)  
+    hl_chip_st_lis3x_cfg_t lis3cfg;
+    memcpy(&lis3cfg, &hl_chip_st_lis3x_cfg_default, sizeof(hl_chip_st_lis3x_cfg_t));
+    lis3cfg.i2cid = ic2x;
+    r = hl_chip_st_lis3x_init(&lis3cfg);
     r = r;
 #endif 
     
@@ -557,7 +694,9 @@ static evEntityId_t brd_eventviewer_switch(evEntityId_t ev)
     
     return(prev);   
 }
-    
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
