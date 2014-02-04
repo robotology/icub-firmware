@@ -459,7 +459,7 @@ static hl_eth_theinternals_t s_hl_eth_theinternals =
 
 extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
 {
-    hl_ethtrans_phymode_t usedphymode;
+    hl_ethtrans_phymode_t usedphymode = hl_ethtrans_phymode_none;
     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
 
     if(hl_true != s_hl_eth_supported_is())
@@ -535,7 +535,7 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
     
     // hl_ethtrans_phymode_fullduplex100mbps or hl_ethtrans_phymode_auto
-    hl_ethtrans_config(hl_ethtrans_phymode_fullduplex100mbps, &usedphymode);
+    hl_ethtrans_config(&usedphymode);
     #warning --> using hl_ethtrans_phymode_fullduplex100mbps
     
     if(hl_ethtrans_phymode_none == usedphymode)
@@ -548,6 +548,10 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     s_hl_eth_mac_init(cfg, rmiiphymode);
     
 
+//     char str[128];
+//     snprintf(str, sizeof(str), "using rmii w/ phymode %d", (int)rmiiphymode); 
+//     hl_sys_on_warning(str);
+      
     s_hl_eth_initted_set();
     
     return(hl_res_OK);
@@ -878,7 +882,11 @@ rel:  intitem->rx_desc[i].Stat = DMA_RX_OWN;
 
 static hl_bool_t s_hl_eth_supported_is(void)
 {
-    return(hl_eth_mapping.supported);
+    if(NULL == hl_eth_map)
+    {
+        return(hl_false);
+    }
+    return(hl_eth_map->supported);
 }
 
 static void s_hl_eth_initted_set(void)
@@ -1148,14 +1156,14 @@ static void s_hl_eth_fill_gpio_rmii_rx_init_altf(   hl_gpio_init_t* crsdvinit, h
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of crsdv, rxd0, rxd1
-    hl_gpio_fill_init(crsdvinit, &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_CRS_DV);
-    hl_gpio_fill_init(rxd0init,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_RXD0);
-    hl_gpio_fill_init(rxd1init,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_RXD1);
+    hl_gpio_fill_init(crsdvinit, &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_CRS_DV);
+    hl_gpio_fill_init(rxd0init,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_RXD0);
+    hl_gpio_fill_init(rxd1init,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_RXD1);
     
     // then we set altfun of crsdv, rxd0, rxd1
-    hl_gpio_fill_altf(crsdvaltf, &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_CRS_DV);
-    hl_gpio_fill_altf(rxd0altf,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_RXD0);    
-    hl_gpio_fill_altf(rxd1altf,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_RXD1);     
+    hl_gpio_fill_altf(crsdvaltf, &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_CRS_DV);
+    hl_gpio_fill_altf(rxd0altf,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_RXD0);    
+    hl_gpio_fill_altf(rxd1altf,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_RXD1);     
 }
 
 
@@ -1198,14 +1206,14 @@ static void s_hl_eth_fill_gpio_rmii_tx_init_altf(   hl_gpio_init_t* txeninit, hl
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of txen, txd0, txd1
-    hl_gpio_fill_init(txeninit, &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_TX_EN);
-    hl_gpio_fill_init(txd0init,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_TXD0);
-    hl_gpio_fill_init(txd1init,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_TXD1);
+    hl_gpio_fill_init(txeninit, &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_TX_EN);
+    hl_gpio_fill_init(txd0init,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_TXD0);
+    hl_gpio_fill_init(txd1init,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_TXD1);
     
     // then we set altfun of txen, txd0, txd1
-    hl_gpio_fill_altf(txenaltf, &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_TX_EN);
-    hl_gpio_fill_altf(txd0altf,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_TXD0);    
-    hl_gpio_fill_altf(txd1altf,  &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_TXD1);     
+    hl_gpio_fill_altf(txenaltf, &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_TX_EN);
+    hl_gpio_fill_altf(txd0altf,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_TXD0);    
+    hl_gpio_fill_altf(txd1altf,  &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_TXD1);     
 }
 
 
@@ -1244,11 +1252,11 @@ static void s_hl_eth_fill_gpio_rmii_refclock_init_altf(hl_gpio_init_t* refclocki
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of refclock
-    hl_gpio_fill_init(refclockinit, &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_REF_CLK);
+    hl_gpio_fill_init(refclockinit, &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_REF_CLK);
 
     
     // then we set altfun of refclock
-    hl_gpio_fill_altf(refclockaltf, &hl_eth_mapping.gpiomap.gpio_mif.rmii.ETH_RMII_REF_CLK);
+    hl_gpio_fill_altf(refclockaltf, &hl_eth_map->gpiomap.gpio_mif.rmii.ETH_RMII_REF_CLK);
 }
 
 
@@ -1288,12 +1296,12 @@ static void s_hl_eth_fill_gpio_smi_init_altf(   hl_gpio_init_t* mdcinit,  hl_gpi
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of mdc and mdio
-    hl_gpio_fill_init(mdcinit,  &hl_eth_mapping.gpiomap.gpio_smi.ETH_MDC);
-    hl_gpio_fill_init(mdioinit, &hl_eth_mapping.gpiomap.gpio_smi.ETH_MDIO);
+    hl_gpio_fill_init(mdcinit,  &hl_eth_map->gpiomap.gpio_smi.ETH_MDC);
+    hl_gpio_fill_init(mdioinit, &hl_eth_map->gpiomap.gpio_smi.ETH_MDIO);
     
     // then we set altfun of mdc and mdio
-    hl_gpio_fill_altf(mdcaltf,  &hl_eth_mapping.gpiomap.gpio_smi.ETH_MDC);
-    hl_gpio_fill_altf(mdioaltf, &hl_eth_mapping.gpiomap.gpio_smi.ETH_MDIO);       
+    hl_gpio_fill_altf(mdcaltf,  &hl_eth_map->gpiomap.gpio_smi.ETH_MDC);
+    hl_gpio_fill_altf(mdioaltf, &hl_eth_map->gpiomap.gpio_smi.ETH_MDIO);       
 }
 
 
