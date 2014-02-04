@@ -71,6 +71,7 @@ typedef enum
 typedef struct
 {
     hl_chip_xx_ethphy_chip_t            chip;
+    hl_ethtrans_phymode_t               targetphymode;
 } hl_chip_xx_ethphy_cfg_t;
 
  
@@ -94,7 +95,7 @@ extern hl_result_t hl_chip_xx_ethphy_init(const hl_chip_xx_ethphy_cfg_t *cfg);
     @brief  	this function configures the phy.
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
-extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode);
+extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t* usedphymode);
 
 
 extern hl_result_t hl_chip_xx_ethphy_getphymode(hl_ethtrans_phymode_t* usedphymode);
