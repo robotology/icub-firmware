@@ -78,14 +78,14 @@ const hl_ethtrans_cfg_t hl_ethtrans_cfg_default =
 
 typedef struct
 {
-    hl_ethtrans_cfg_t                        config;
+    hl_ethtrans_cfg_t                       config;
 } hl_ethtrans_internal_item_t;
 
 typedef struct
 {
-    uint8_t                                         initted;
-    uint8_t                                         started;
-    hl_ethtrans_internal_item_t*              items[1];   
+    uint8_t                                 initted;
+    uint8_t                                 started;
+    hl_ethtrans_internal_item_t*            items[1];   
 } hl_ethtrans_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ extern hl_result_t hl_ethtrans_init(const hl_ethtrans_cfg_t *cfg)
     }
 
     
-    res = hl_ethtrans_chip_init(cfg);
+    res = hl_ethtrans_chip_init(hl_ethtrans_chip_init_param);
 
     s_hl_ethtrans_initted_set();
 
@@ -158,7 +158,7 @@ extern hl_result_t hl_ethtrans_init(const hl_ethtrans_cfg_t *cfg)
 }
 
 
-extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
+extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t *usedmiiphymode)
 {
 
     if(hl_true != s_hl_ethtrans_supported_is())
@@ -175,21 +175,46 @@ extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t targetphymode, hl_et
 
     if(hl_true == s_hl_ethtrans_started_is())
     {
-//        hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.getphymode(usedphymode);
-        return(hl_res_OK);
+        return(hl_ethtrans_getmiiphymode(usedmiiphymode));
     }    
  
 //    targetphymode = (hl_eth_phymode_auto == targetphymode) ? (hl_brdcfg_device_ethtrans__theconfig.devcfg.targetphymode) : (targetphymode);
  
 //    hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
 
-    hl_ethtrans_chip_config(targetphymode, usedphymode);
+    hl_ethtrans_chip_config(usedmiiphymode);
 
     s_hl_ethtrans_started_set();
 
     return(hl_res_OK); 
 }
 
+
+extern hl_result_t hl_ethtrans_getmiiphymode(hl_ethtrans_phymode_t *usedmiiphymode)
+{
+
+    if(hl_true != s_hl_ethtrans_supported_is())
+    {
+        return(hl_res_NOK_unsupported);
+    }
+
+
+    if(hl_false == s_hl_ethtrans_initted_is())
+    {
+        return(hl_res_NOK_generic);
+    }
+    
+
+    if(hl_false == s_hl_ethtrans_started_is())
+    {
+        return(hl_res_NOK_generic);
+    }    
+ 
+
+    hl_ethtrans_chip_getmiiphymode(usedmiiphymode);
+
+    return(hl_res_OK); 
+}
 
 extern hl_bool_t hl_ethtrans_initted_is(void)
 {
@@ -202,19 +227,31 @@ extern hl_bool_t hl_ethtrans_started_is(void)
     return(s_hl_ethtrans_started_is());
 }
 
-__weak extern hl_result_t hl_ethtrans_chip_init(const hl_ethtrans_cfg_t *cfg)
+__weak extern hl_result_t hl_ethtrans_chip_init(void* param)
 {
     return(hl_res_OK);
 }
 
 
-__weak extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode)
+__weak extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode)
 {
-    *usedphymode = targetphymode;
+    *usedmiiphymode = hl_ethtrans_phymode_none;
     
     return(hl_res_OK);
 }
 
+
+__weak extern hl_result_t hl_ethtrans_chip_getmiiphymode(hl_ethtrans_phymode_t *usedmiiphymode)
+{
+    if(NULL == usedmiiphymode)
+    {
+        return(hl_res_NOK_generic);
+    }
+    
+    *usedmiiphymode = hl_ethtrans_phymode_none;
+    
+    return(hl_res_OK);
+}
 
 
 
@@ -233,7 +270,13 @@ __weak extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetph
 
 static hl_bool_t s_hl_ethtrans_supported_is(void)
 {
-    return(hl_ethtrans_mapping.supported); 
+    if(NULL == hl_ethtrans_map)
+    {
+        return(hl_false);
+    }
+    return(hl_ethtrans_map->supported); 
+//     return(hl_true);
+//     #warning --> for mcbstm32f400 i removed teh cjeck
 }
 
 static hl_bool_t s_hl_ethtrans_initted_is(void)
