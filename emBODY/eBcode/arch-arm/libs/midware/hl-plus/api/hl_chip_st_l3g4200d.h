@@ -74,7 +74,7 @@ typedef struct
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hl_chip_st_l3g4200d_cfg_t hl_chip_st_l3g4200d_cfg_default; // = { .i2cport = hl_i2c_port1, .range = hl_chip_st_l3g4200d_range_250dps };
+extern const hl_chip_st_l3g4200d_cfg_t hl_chip_st_l3g4200d_cfg_default; // = { .i2cport = hl_i2c1, .range = hl_chip_st_l3g4200d_range_250dps };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
