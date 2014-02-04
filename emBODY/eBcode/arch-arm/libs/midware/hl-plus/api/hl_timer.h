@@ -154,7 +154,7 @@ typedef struct
 extern const hl_timer_cfg_t hl_timer_cfg_default; // = { .mode = hl_timer_mode_master, .behaviour = hl_timer_behaviour_polling, .speed = hl_timer_speed_400kbps, .ownaddress = 0, .advcfg = NULL };
 
 // it must be externally declared.
-extern const hl_timer_mapping_t hl_timer_mapping;
+extern const hl_timer_mapping_t* hl_timer_map;
 
 
 

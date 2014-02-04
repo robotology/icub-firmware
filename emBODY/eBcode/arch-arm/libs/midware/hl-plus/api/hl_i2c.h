@@ -169,8 +169,7 @@ typedef struct
 extern const hl_i2c_cfg_t hl_i2c_cfg_default; // = { .mode = hl_i2c_mode_master, .behaviour = hl_i2c_behaviour_polling, .speed = hl_i2c_speed_400kbps, .ownaddress = 0, .advcfg = NULL };
 
 // it must be externally declared.
-extern const hl_i2c_mapping_t hl_i2c_mapping;
-
+extern const hl_i2c_mapping_t* hl_i2c_map;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

@@ -54,7 +54,7 @@
 
 
 /** @typedef    typedef enum hl_can_t 
-    @brief      hl_can_t contains the usable can ports.
+    @brief      hl_can_t contains the usable can id  s.
  **/
 typedef enum  
 { 
@@ -117,24 +117,39 @@ typedef struct
 
 extern const hl_can_cfg_t hl_can_cfg_default; // = {.baudrate = hl_can_baudrate_1mbps, .advcfg = NULL};
 
-extern const hl_can_mapping_t hl_can_mapping;
-
+extern const hl_can_mapping_t* hl_can_map;  // it must be defined externally. If NULL, then the entire hl_can will not be used
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 /** @fn         extern hl_result_t hl_can_init(hl_can_t id, const hl_can_cfg_t *cfg)
     @brief      This function configures CAN. It does not configure or enable the CAN transceiver.
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id              identifies CAN id   (CAN1 or CAN2)
     @param      cfg             the configuration of the can peripheral
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
 extern hl_result_t hl_can_init(hl_can_t id, const hl_can_cfg_t *cfg);
 
 
+/** @fn         extern hl_boolval_t hl_can_supported_is(hl_can_t id)
+    @brief      This function tells if a given can port is supported.
+    @param      id              identifies CAN port (CAN1 or CAN2)
+    @return     hl_true or hl_false
+  */
+extern hl_boolval_t hl_can_supported_is(hl_can_t id);
+
+
+/** @fn         extern hl_boolval_t hl_can_initted_is(hl_can_t id)
+    @brief      This function tells if a given can port is initted.
+    @param      id              identifies CAN port (CAN1 or CAN2)
+    @return     hl_true or hl_false
+  */
+extern hl_boolval_t hl_can_initted_is(hl_can_t id);
+
+
 /** @fn         extern hl_result_t hl_can_enable(hl_can_t id)
     @brief      This function starts CAN. It must be invoked after hl_can_init.
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id              identifies CAN port (CAN1 or CAN2)
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
 extern hl_result_t hl_can_enable(hl_can_t id);
@@ -142,7 +157,7 @@ extern hl_result_t hl_can_enable(hl_can_t id);
 
 /** @fn         extern hl_result_t hl_can_disable(hl_can_t id)
     @brief      This function disable CAN.
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id              identifies CAN port (CAN1 or CAN2)
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
 extern hl_result_t hl_can_disable(hl_can_t id);
