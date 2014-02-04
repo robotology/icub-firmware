@@ -233,6 +233,12 @@ static void SetSysClock(void);
   * @{
   */
 
+//ITT-EXT:
+__weak void hl_system_stm32fx_before_setsysclock(void) {}
+    
+//ITT-EXT: make it weak
+__weak extern void SetSysClock(void);
+
 /**
   * @brief  Setup the microcontroller system
   *         Initialize the Embedded Flash Interface, the PLL and update the 
@@ -291,6 +297,9 @@ __weak void SystemInit (void)
   #endif /* DATA_IN_ExtSRAM */
 #endif 
 
+  //IIT-EXT: added user-def function before setsysclock();   
+  hl_system_stm32fx_before_setsysclock();
+  
   /* Configure the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers */
   /* Configure the Flash Latency cycles and enable prefetch buffer */
   SetSysClock();
@@ -457,8 +466,14 @@ __weak void SystemCoreClockUpdate (void)
   * @param  None
   * @retval None
   */
-static void SetSysClock(void)
+//ITT-EXT: make it weak
+__weak extern void SetSysClock(void)
 {
+  //IIT-EXT: added enable of hse bypass
+#if defined(HL_CFG_MPUSPEED_HSEBYPASS)    
+  RCC->CR |= ((uint32_t)RCC_CR_HSEBYP);
+#endif  
+    
 #ifdef SYSCLK_FREQ_HSE
   SetSysClockToHSE();
 #elif defined SYSCLK_FREQ_24MHz

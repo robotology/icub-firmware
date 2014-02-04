@@ -337,7 +337,8 @@ const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 
   * @{
   */
 
-static void SetSysClock(void);
+//ITT-EXT: make it weak
+__weak extern void SetSysClock(void);
 
 #if defined (DATA_IN_ExtSRAM) || defined (DATA_IN_ExtSDRAM)
 static void SystemInit_ExtMemCtl(void); 
@@ -351,6 +352,7 @@ static void SystemInit_ExtMemCtl(void);
   * @{
   */
 
+__weak void hl_system_stm32fx_before_setsysclock(void) {}
 /**
   * @brief  Setup the microcontroller system
   *         Initialize the Embedded Flash Interface, the PLL and update the 
@@ -387,7 +389,10 @@ __weak void SystemInit(void)
 #if defined (DATA_IN_ExtSRAM) || defined (DATA_IN_ExtSDRAM)
   SystemInit_ExtMemCtl(); 
 #endif /* DATA_IN_ExtSRAM || DATA_IN_ExtSDRAM */
-         
+   
+  //IIT-EXT: added user-def function before setsysclock();   
+  hl_system_stm32fx_before_setsysclock();
+  
   /* Configure the System clock source, PLL Multiplier and Divider factors, 
      AHB/APBx prescalers and Flash settings ----------------------------------*/
   SetSysClock();
@@ -496,16 +501,19 @@ __weak void SystemCoreClockUpdate(void)
   * @param  None
   * @retval None
   */
-static void SetSysClock(void)
+// IIT-EXT: made it weak
+__weak extern void SetSysClock(void)
 {
 /******************************************************************************/
 /*            PLL (clocked by HSE) used as System clock source                */
 /******************************************************************************/
   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
   
-  //IIT-EXT: added enable of hse bypass    
-//  RCC->CR |= ((uint32_t)RCC_CR_HSEBYP);
-  
+  //IIT-EXT: added enable of hse bypass
+#if defined(HL_CFG_MPUSPEED_HSEBYPASS)    
+  RCC->CR |= ((uint32_t)RCC_CR_HSEBYP);
+#endif 
+    
   /* Enable HSE */
   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
  
