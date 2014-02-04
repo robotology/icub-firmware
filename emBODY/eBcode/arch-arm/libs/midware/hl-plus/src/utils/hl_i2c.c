@@ -403,7 +403,11 @@ extern hl_result_t hl_i2c_is_device_ready(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
 
 static hl_boolval_t s_hl_i2c_supported_is(hl_i2c_t id)
 {
-    return(hl_bits_byte_bitcheck(hl_i2c_mapping.supported_mask, HL_i2c_id2index(id)) );
+    if(NULL == hl_i2c_map)
+    {
+        return(hl_false);
+    }
+    return(hl_bits_byte_bitcheck(hl_i2c_map->supported_mask, HL_i2c_id2index(id)) );
 }
 
 static void s_hl_i2c_initted_set(hl_i2c_t id)
@@ -805,12 +809,12 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of scl and sda
-    hl_gpio_fill_init(sclinit, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl);
-    hl_gpio_fill_init(sdainit, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda);
+    hl_gpio_fill_init(sclinit, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].scl);
+    hl_gpio_fill_init(sdainit, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].sda);
     
     // then we set altfun of scl and sda
-    hl_gpio_fill_altf(sclaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl);
-    hl_gpio_fill_altf(sdaaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda);    
+    hl_gpio_fill_altf(sclaltf, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].scl);
+    hl_gpio_fill_altf(sdaaltf, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].sda);    
     
 }
 
