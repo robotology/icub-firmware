@@ -62,7 +62,7 @@
 #define HL_USE_UTIL_GPIO
 #define HL_USE_UTIL_BITS
 #define HL_USE_UTIL_FIFO
-#define HL_USE_UTIL_I2C
+//#define HL_USE_UTIL_I2C
 #define HL_USE_UTIL_TIMER
 //#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER04
 

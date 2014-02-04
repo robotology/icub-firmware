@@ -38,6 +38,7 @@
 
     #define HL_USE_MPU_NAME_STM32F107VC
     
+    #undef HL_CFG_MPUSPEED_HSEBYPASS
     #define HL_CFG_MPUSPEED_INTclockspeed    ((uint32_t) 8000000)
     #define HL_CFG_MPUSPEED_EXTclockspeed    ((uint32_t)25000000)    
 

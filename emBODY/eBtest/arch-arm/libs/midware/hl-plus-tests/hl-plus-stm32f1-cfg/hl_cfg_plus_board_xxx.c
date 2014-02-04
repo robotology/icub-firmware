@@ -88,7 +88,7 @@
 
 #if     defined(HL_USE_BRD_MCBSTM32_C)
 
-extern const hl_i2c_mapping_t hl_i2c_mapping =
+static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
     .gpiomap            =
@@ -96,140 +96,96 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
         {   // hl_i2c1 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin8
-                },
-                .af32       = GPIO_Remap_I2C1          
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin8 },
+                .af32   = GPIO_Remap_I2C1                    
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin9
-                },
-                .af32       = GPIO_Remap_I2C1          
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin9 },
+                .af32   = GPIO_Remap_I2C1         
             } 
         }, 
         {   // hl_i2c2 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32          
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32           
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32           
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32            
             } 
         },  
         {   // hl_i2c3 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32          
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32        
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32           
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32         
             } 
         }        
     }       
 };
+
+extern const hl_i2c_mapping_t* hl_i2c_map = &s_hl_i2c_mapping;
 
 
 #elif   defined(HL_USE_BRD_MCBSTM32)
 
-extern const hl_i2c_mapping_t hl_i2c_mapping =
+static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
-    .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
+    .supported_mask     = (0 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
     .gpiomap            =
     {   
         {   // hl_i2c1 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin8
-                },
-                .af32       = GPIO_Remap_I2C1          
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin8 },
+                .af32   = GPIO_Remap_I2C1         
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin9
-                },
-                .af32       = GPIO_Remap_I2C1          
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin9 },
+                .af32   = GPIO_Remap_I2C1       
             } 
         }, 
         {   // hl_i2c2 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32          
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32           
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32           
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32            
             } 
         },  
         {   // hl_i2c3 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32          
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32        
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32           
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32         
             } 
-        }        
+        }                
     }       
 };
+
+extern const hl_i2c_mapping_t* hl_i2c_map = &s_hl_i2c_mapping;
 
 #elif   defined(HL_USE_BRD_EMS001)
 
-extern const hl_i2c_mapping_t hl_i2c_mapping =
+static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
     .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
     .gpiomap            =
@@ -237,65 +193,43 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
         {   // hl_i2c1 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin8
-                },
-                .af32       = GPIO_Remap_I2C1          
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin8 },
+                .af32   = GPIO_Remap_I2C1         
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin9
-                },
-                .af32       = GPIO_Remap_I2C1          
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin9 },
+                .af32   = GPIO_Remap_I2C1       
             } 
         }, 
         {   // hl_i2c2 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32          
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32           
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32           
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32            
             } 
         },  
         {   // hl_i2c3 
             .scl = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32          
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32        
             }, 
             .sda = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portNONE, 
-                    .pin    = hl_gpio_pinNONE
-                },
-                .af32       = hl_NA32           
+                .gpio   = { .port = hl_gpio_portNONE,   .pin = hl_gpio_pinNONE },
+                .af32   = hl_NA32         
             } 
-        }        
+        }              
     }       
 };
+
+extern const hl_i2c_mapping_t* hl_i2c_map = &s_hl_i2c_mapping;
 
 #endif
 
@@ -308,7 +242,7 @@ extern const hl_i2c_mapping_t hl_i2c_mapping =
 
 #if     defined(HL_USE_BRD_EMS001)
 
-extern const hl_eth_mapping_t hl_eth_mapping =
+static const hl_eth_mapping_t s_hl_eth_mapping =
 {
     .supported          = hl_true,
     .gpiomap            =
@@ -369,6 +303,8 @@ extern const hl_eth_mapping_t hl_eth_mapping =
     
 };
 
+extern const hl_eth_mapping_t* hl_eth_map = &s_hl_eth_mapping;
+
 #endif//defined(HL_USE_BRD_EMS001)
 
 #endif//defined(HL_USE_UTIL_ETH)
@@ -382,10 +318,19 @@ extern const hl_eth_mapping_t hl_eth_mapping =
 
 #if defined(HL_USE_BRD_EMS001)
 
-extern const hl_ethtrans_mapping_t hl_ethtrans_mapping = 
+static const hl_ethtrans_mapping_t s_hl_ethtrans_mapping = 
 {
     .supported  = hl_true
 };
+
+extern const hl_ethtrans_mapping_t* hl_ethtrans_map = &s_hl_ethtrans_mapping;
+
+extern void* hl_ethtrans_chip_init_param = NULL;
+
+extern hl_result_t hl_ethtrans_chip_init(void* param)
+{
+    for(;;);    // it is to be initialised.
+}
 
 #endif//defined(HL_USE_BRD_EMS001)
 
@@ -406,7 +351,7 @@ extern const hl_ethtrans_mapping_t hl_ethtrans_mapping =
 #elif   defined(HL_USE_BRD_EMS001)
 
 
-extern const hl_can_mapping_t hl_can_mapping =
+static const hl_can_mapping_t s_hl_can_mapping =
 {
     .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
     .gpiomap            =
@@ -414,45 +359,31 @@ extern const hl_can_mapping_t hl_can_mapping =
         {   // hl_can1 
             .rx = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portD, 
-                    .pin    = hl_gpio_pin0
-                },
-                .af32       = GPIO_Remap2_CAN1          
+                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin0 }, 
+                .af32   = GPIO_Remap2_CAN1                
             }, 
             .tx = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portD, 
-                    .pin    = hl_gpio_pin1
-                },
-                .af32       = GPIO_Remap2_CAN1          
+                .gpio   = { .port = hl_gpio_portD,     .pin = hl_gpio_pin1 }, 
+                .af32   = GPIO_Remap2_CAN1           
             } 
         }, 
         {   // hl_can2 
             .rx = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin5
-                },
-                .af32       = GPIO_Remap_CAN2          
+                .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin5 }, 
+                .af32   = GPIO_Remap_CAN2       
             }, 
             .tx = 
             {
-                .gpio   =
-                {
-                    .port   = hl_gpio_portB, 
-                    .pin    = hl_gpio_pin6
-                },
-                .af32       = GPIO_Remap_CAN2          
+                .gpio   = { .port = hl_gpio_portB,     .pin = hl_gpio_pin6 }, 
+                .af32   = GPIO_Remap_CAN2       
             } 
         }   
     } 
 };
+
+extern const hl_can_mapping_t* hl_can_map = &s_hl_can_mapping;
 
 #endif
 
@@ -466,24 +397,32 @@ extern const hl_can_mapping_t hl_can_mapping =
 
 #if     defined(HL_USE_BRD_MCBSTM32)
 
-extern const hl_timer_mapping_t hl_timer_mapping =
+static const hl_timer_mapping_t s_hl_timer_mapping =
 {
     .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4)
 };
+
+extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
+
+
 #elif   defined(HL_USE_BRD_MCBSTM32_C)
 
 
-extern const hl_timer_mapping_t hl_timer_mapping =
+static const hl_timer_mapping_t s_hl_timer_mapping =
 {
     .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
 };
+
+extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 #elif   defined(HL_USE_BRD_EMS001)
 
-extern const hl_timer_mapping_t hl_timer_mapping =
+static const hl_timer_mapping_t s_hl_timer_mapping =
 {
     .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
 };
+
+extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 #endif
 
