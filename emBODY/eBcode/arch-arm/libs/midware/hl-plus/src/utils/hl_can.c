@@ -95,6 +95,8 @@ const hl_can_advcfg_t hl_can_advcfg_default =
     .CAN_TXFP           = ENABLE                // transmit fifo priority (if ENABLEd, priority amongst the pending mailboxes is driven by the request order) 
 };
 
+//__weak extern const hl_can_mapping_t* hl_can_map = NULL;
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -219,11 +221,20 @@ extern hl_result_t hl_can_init(hl_can_t id, const hl_can_cfg_t *cfg)
     return(hl_res_OK);
 }
 
+extern hl_boolval_t hl_can_supported_is(hl_can_t id)
+{
+    return(s_hl_can_supported_is(id));
+}
+
+
+extern hl_boolval_t hl_can_initted_is(hl_can_t id)
+{
+    return(s_hl_can_initted_is(id));
+}
 
 extern hl_result_t hl_can_enable(hl_can_t id)
 {
 	hl_result_t res;
-//    hl_can_internal_item_t* intitem = s_hl_can_theinternals.items[HL_can_id2index(id)];
 
     if(hl_false == s_hl_can_initted_is(id))
     {
@@ -281,7 +292,11 @@ extern hl_result_t hl_can_disable(hl_can_t id)
 
 static hl_boolval_t s_hl_can_supported_is(hl_can_t id)
 {
-    return(hl_bits_byte_bitcheck(hl_can_mapping.supported_mask, HL_can_id2index(id)) );
+    if(NULL == hl_can_map)
+    {
+        return(hl_false);
+    }
+    return(hl_bits_byte_bitcheck(hl_can_map->supported_mask, HL_can_id2index(id)) );
 }
 
 static void s_hl_can_initted_set(hl_can_t id)
@@ -427,8 +442,7 @@ static const hl_can_bitsampling_t* s_hl_can_get_bitsampling(uint32_t canclock)
 
 
 static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
-{
-    
+{   
     hl_can_internal_item_t* intitem = s_hl_can_theinternals.items[HL_can_id2index(id)];
     hl_can_cfg_t *cfg = &intitem->config;
     CAN_TypeDef* CANx = HL_can_port2peripheral(id);
@@ -460,7 +474,7 @@ static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
         uint32_t canclock = clocks.PCLK1_Frequency;
         
         bits2use = s_hl_can_get_bitsampling(canclock);
-        uint8_t tqtotal = bits2use->bs1 + 1 + bits2use->bs2;
+        uint8_t tqtotal = (bits2use->bs1+1) + 1 + (bits2use->bs2+1);
         
         uint32_t baudrate = 0;              
         switch(intitem->config.baudrate)
@@ -477,7 +491,7 @@ static hl_result_t s_hl_can_hw_registers_init(hl_can_t id)
         
         
         // CAN_Prescaler is the prescaler to apply to PCLK1_Frequency so that the bit has tqtotal time quanta (or ticks of the clock)
-        // where tqtotal = CAN_BS1 + 1 + CAN_BS2        
+        // where tqtotal = (CAN_BS1+1) + 1 + (CAN_BS2+1) ... stm32lib use values starting from 0 and we need starting from 1 ...        
         init2use->CAN_Prescaler = (canclock / tqtotal) / baudrate;      
         init2use->CAN_SJW       = bits2use->sjw;    // max num of time quanta the hw is allowed to stretch a bit in order to re-synch
         init2use->CAN_BS1       = bits2use->bs1;    // number of time quanta in bit-segment-1 (the one before the sampling time quantum)
@@ -579,13 +593,18 @@ static void s_hl_can_fill_gpio_init_altf(hl_can_t id, hl_gpio_init_t* rxinit, hl
     // then we verify the pin mapping and the altfun ... ok don't do it.
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
+
+    if(NULL == hl_can_map)
+    {
+        return;
+    }
     // then we set the port and pin of rx and tx
-    hl_gpio_fill_init(rxinit, &hl_can_mapping.gpiomap[HL_can_id2index(id)].rx);
-    hl_gpio_fill_init(txinit, &hl_can_mapping.gpiomap[HL_can_id2index(id)].tx);
+    hl_gpio_fill_init(rxinit, &hl_can_map->gpiomap[HL_can_id2index(id)].rx);
+    hl_gpio_fill_init(txinit, &hl_can_map->gpiomap[HL_can_id2index(id)].tx);
     
     // then we set altfun of rx and tx
-    hl_gpio_fill_altf(rxaltf, &hl_can_mapping.gpiomap[HL_can_id2index(id)].rx);
-    hl_gpio_fill_altf(txaltf, &hl_can_mapping.gpiomap[HL_can_id2index(id)].tx);  
+    hl_gpio_fill_altf(rxaltf, &hl_can_map->gpiomap[HL_can_id2index(id)].rx);
+    hl_gpio_fill_altf(txaltf, &hl_can_map->gpiomap[HL_can_id2index(id)].tx);  
 
 }
 
