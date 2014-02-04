@@ -30,27 +30,16 @@
 #endif
 
  
-#if   defined(HL_USE_BRD_MCBSTM32_F400)
 
-    #define HL_USE_MPU_NAME_STM32F407IG
-
-//     #define HL_CFG_MPUSPEED_INTclockspeed               ((uint32_t)16000000)
-//     #define HL_CFG_MPUSPEED_EXTclockspeed               ((uint32_t)25000000)
-//     
-//     #define HL_CFG_MPUSPEED_STM32F4_PLL_m               (25)
-//     #define HL_CFG_MPUSPEED_STM32F4_PLL_n               (336)
-//     #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
-//     #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)    
-    
-#elif   defined(HL_USE_BRD_EMS004)    
+#if   defined(HL_USE_BRD_EMS4RD)    
 
     #define HL_USE_MPU_NAME_STM32F407IG
     
     #define HL_CFG_MPUSPEED_INTclockspeed               ((uint32_t)16000000)
     #define HL_CFG_MPUSPEED_EXTclockspeed               ((uint32_t)50000000)
     
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_m               (25)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_n               (168)
+    #define HL_CFG_MPUSPEED_STM32F4_PLL_m               (50)
+    #define HL_CFG_MPUSPEED_STM32F4_PLL_n               (336)
     #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
     #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)
    

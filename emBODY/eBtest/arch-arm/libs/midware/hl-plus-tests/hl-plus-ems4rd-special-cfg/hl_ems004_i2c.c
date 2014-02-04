@@ -28,9 +28,10 @@
 #include "hl_cfg_plus_modules.h"
 
 
-#if     defined(HL_USE_UTIL_EMS004_I2C)
+#if     defined(HL_USE_UTIL_EMS4RC_I2C)
 
-#warning --> HL is using an alternative I2C module: HL_USE_UTIL_EMS004_I2C
+#warning --> HL is using an alternative I2C module: HL_USE_UTIL_EMS4RC_I2C
+#warning --> module HL_USE_UTIL_EMS4RC_I2C is equal to HL_USE_UTIL_I2C but shows that one can change the implementation by proper use of undef and define 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -405,7 +406,11 @@ extern hl_result_t hl_i2c_is_device_ready(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
 
 static hl_boolval_t s_hl_i2c_supported_is(hl_i2c_t id)
 {
-    return(hl_bits_byte_bitcheck(hl_i2c_mapping.supported_mask, HL_i2c_id2index(id)) );
+    if(NULL == hl_i2c_map)
+    {
+        return(hl_false);
+    }
+    return(hl_bits_byte_bitcheck(hl_i2c_map->supported_mask, HL_i2c_id2index(id)) );
 }
 
 static void s_hl_i2c_initted_set(hl_i2c_t id)
@@ -807,12 +812,12 @@ static void s_hl_i2c_fill_gpio_init_altf(hl_i2c_t id, hl_gpio_init_t* sclinit, h
     // but you could put it in here. maybe by calling an external function which depends on the mpu
     
     // then we set the port and pin of scl and sda
-    hl_gpio_fill_init(sclinit, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl);
-    hl_gpio_fill_init(sdainit, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda);
+    hl_gpio_fill_init(sclinit, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].scl);
+    hl_gpio_fill_init(sdainit, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].sda);
     
     // then we set altfun of scl and sda
-    hl_gpio_fill_altf(sclaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].scl);
-    hl_gpio_fill_altf(sdaaltf, &hl_i2c_mapping.gpiomap[HL_i2c_id2index(id)].sda);    
+    hl_gpio_fill_altf(sclaltf, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].scl);
+    hl_gpio_fill_altf(sdaaltf, &hl_i2c_map->gpiomap[HL_i2c_id2index(id)].sda);    
     
 }
 
@@ -1310,7 +1315,7 @@ static hl_result_t s_I2CRoutines_I2C_Master_BufferRead(I2C_TypeDef* I2Cx, uint8_
 #endif//defined(HL_I2C_USE_CODE_FROM_I2CRoutines_I2C_Master_BufferRead)
 
 
-#endif//defined(HL_USE_UTIL_EMS004_I2C)
+#endif//defined(HL_USE_UTIL_EMS4RC_I2C)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
