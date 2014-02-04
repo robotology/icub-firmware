@@ -57,19 +57,36 @@ extern void board_led_init(void)
     
     RCC->APB2ENR |=  1 <<  3;                      // enable GPIOB clock      
     GPIOB->CRL   &= ~0xf0000000;                   // configure GPIOB pin 7 for use as LEDs     
-    GPIOB->CRL   |=  0x30000000;                   // configure GPIOB pin 7 for use as LEDs     
+    GPIOB->CRL   |=  0x30000000;                   // configure GPIOB pin 7 for use as LEDs    
+
+    board_led_off(board_led_0);    
+    board_led_off(board_led_1);
+    board_led_off(board_led_2);
+    board_led_off(board_led_3);
+    board_led_off(board_led_4);
+    board_led_off(board_led_5);
+    board_led_off(board_led_6);
+    board_led_off(board_led_7);
 }
 
 
-extern void board_led_on(board_led_t led)
+extern void board_led_off(board_led_t led)
 {
-     s_led_data[led].port->BSRR = 1UL << s_led_data[led].pin;
+    if(NULL == s_led_data[led].port)
+    {
+        return;
+    }
+    s_led_data[led].port->BSRR = 1UL << s_led_data[led].pin;
     //GPIOE->BSRR = 1UL << s_led_data[led].pin;
 }
 
 
-extern void board_led_off(board_led_t led) 
+extern void board_led_on(board_led_t led) 
 {
+    if(NULL == s_led_data[led].port)
+    {
+        return;
+    }    
     s_led_data[led].port->BRR = 1UL << s_led_data[led].pin;
     //GPIOE->BRR = 1UL << s_led_data[led].pin;
 }
