@@ -86,7 +86,8 @@
 
 extern const hl_chip_xx_ethphy_cfg_t hl_chip_xx_ethphy_cfg_default  = 
 { 
-    .chip = hl_chip_xx_ethphy_chip_autodetect
+    .chip           = hl_chip_xx_ethphy_chip_autodetect,
+    .targetphymode  = hl_ethtrans_phymode_fullduplex100mbps
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,7 +113,7 @@ typedef struct
 static void s_hl_chip_xx_ethphy_initted_set(void);
 static hl_bool_t s_hl_chip_xx_ethphy_initted_is(void);
 
-static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cfg, hl_chip_xx_ethphy_internal_item_t* intitem);
+static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cfg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,12 +163,14 @@ extern hl_result_t hl_chip_xx_ethphy_init(const hl_chip_xx_ethphy_cfg_t *cfg)
     {
         //intitem = s_hl_chip_xx_ethphy_theinternals.items[0] = hl_sys_heap_new(sizeof(hl_chip_xx_ethphy_internal_item_t)); 
         intitem = s_hl_chip_xx_ethphy_theinternals.items[0] = &s_hl_chip_xx_ethphy_theonlyitem;        
-    }    
+    }   
 
-    if(hl_res_OK != s_hl_chip_xx_ethphy_hw_init(cfg, intitem))
-    {
-        return(hl_res_NOK_generic);
-    }
+    memcpy(&intitem->config, cfg, sizeof(hl_chip_xx_ethphy_cfg_t));    
+
+//     if(hl_res_OK != s_hl_chip_xx_ethphy_hw_init(cfg, intitem))
+//     {
+//         return(hl_res_NOK_generic);
+//     }
     
     s_hl_chip_xx_ethphy_initted_set();
 
@@ -175,14 +178,23 @@ extern hl_result_t hl_chip_xx_ethphy_init(const hl_chip_xx_ethphy_cfg_t *cfg)
 }
 
 
-extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode)
+extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t* usedphymode)
 {
+    
+    hl_chip_xx_ethphy_internal_item_t *intitem = s_hl_chip_xx_ethphy_theinternals.items[0];
+    
     //hl_result_t res = hl_res_NOK_generic;
     
     if(hl_false == s_hl_chip_xx_ethphy_initted_is())
     {
         return(hl_res_NOK_generic);
-    }     
+    }  
+
+
+    if(hl_res_OK != s_hl_chip_xx_ethphy_hw_init(&intitem->config))
+    {
+        return(hl_res_NOK_generic);
+    }    
     
 
 #if 0
@@ -198,6 +210,8 @@ extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t targetphymo
 //     aaa = regv;
 //     for(;;);
 #else
+    
+    hl_ethtrans_phymode_t targetphymode = intitem->config.targetphymode;
        
     #warning --> now we dont support the hl_ethtrans_phymode_auto: change it 
     if((hl_ethtrans_phymode_auto == targetphymode) || (hl_ethtrans_phymode_none == targetphymode))
@@ -287,7 +301,7 @@ static hl_bool_t s_hl_chip_xx_ethphy_initted_is(void)
 }
 
 
-static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cfg, hl_chip_xx_ethphy_internal_item_t* intitem)
+static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cfg)
 {
     //hl_result_t res = hl_res_NOK_generic;   
 
@@ -320,7 +334,7 @@ static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cf
     }  
 
     
-    memcpy(&intitem->config, cfg, sizeof(hl_chip_xx_ethphy_cfg_t));
+    //memcpy(&intitem->config, cfg, sizeof(hl_chip_xx_ethphy_cfg_t));
     
     return(hl_res_OK);
 }
