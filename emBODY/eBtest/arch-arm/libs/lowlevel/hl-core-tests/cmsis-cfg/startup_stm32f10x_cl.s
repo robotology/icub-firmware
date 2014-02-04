@@ -43,7 +43,7 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x00000800
+Heap_Size       EQU     0x00001000
 				EXPORT  Heap_Size
 ; IIT-EXT: exported the Heap_Size
 
