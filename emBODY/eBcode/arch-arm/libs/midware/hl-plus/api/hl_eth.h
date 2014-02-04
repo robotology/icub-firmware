@@ -171,9 +171,8 @@ typedef struct
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-
 // it must be externally declared.
-extern const hl_eth_mapping_t hl_eth_mapping;
+extern const hl_eth_mapping_t* hl_eth_map;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
