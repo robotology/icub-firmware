@@ -226,11 +226,11 @@ void TIM4_IRQHandler(void)
         
         if(50 == val)
         {
-            board_led_on(board_led_7);
+            board_led_on(board_led_5);
         }
         else if(100 == val)
         {
-            board_led_off(board_led_7);
+            board_led_off(board_led_5);
             val = 0;
         }
     }

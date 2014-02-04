@@ -75,21 +75,36 @@ extern void board_led_init(void)
     GPIO_InitStructure.GPIO_Pin =   GPIO_Pin_7 ;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);       
+    GPIO_Init(GPIOB, &GPIO_InitStructure);    
+
+    board_led_off(board_led_0);
+    board_led_off(board_led_1);
+    board_led_off(board_led_2);
+    board_led_off(board_led_3);
+    board_led_off(board_led_4);
+    board_led_off(board_led_5);
+    board_led_off(board_led_6);
+    board_led_off(board_led_7);
 }
 
 
 extern void board_led_on(board_led_t led)
 {
-    GPIO_WriteBit(s_led_data[led].port, s_led_data[led].pin, Bit_SET);
-    //s_led_data[led].port->BSRRL = 1UL << s_led_data[led].pin;
+    if(NULL == s_led_data[led].port)
+    {
+        return;
+    }
+    GPIO_WriteBit(s_led_data[led].port, s_led_data[led].pin, Bit_RESET);
 }
 
 
 extern void board_led_off(board_led_t led) 
 {
-    GPIO_WriteBit(s_led_data[led].port, s_led_data[led].pin, Bit_RESET);
-    //s_led_data[led].port->BSRRH = 1UL << s_led_data[led].pin;
+    if(NULL == s_led_data[led].port)
+    {
+        return;
+    }    
+    GPIO_WriteBit(s_led_data[led].port, s_led_data[led].pin, Bit_SET);
 }
 
 
