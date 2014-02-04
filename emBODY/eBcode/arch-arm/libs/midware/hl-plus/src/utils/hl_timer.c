@@ -637,9 +637,13 @@ static hl_boolval_t s_hl_timer_supported_is(hl_timer_t id)
 {
     if(NULL == s_hl_timer_stm32_props[HL_timer_id2index(id)])
     {
-            return(hl_false);
+        return(hl_false);
     }
-    return(hl_bits_hlfword_bitcheck(hl_timer_mapping.supported_mask, HL_timer_id2index(id)) );
+    if(NULL == hl_timer_map)
+    {
+        return(hl_false);
+    }
+    return(hl_bits_hlfword_bitcheck(hl_timer_map->supported_mask, HL_timer_id2index(id)) );
 }
 
 static void s_hl_timer_initted_set(hl_timer_t id)
