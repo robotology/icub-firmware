@@ -71,9 +71,13 @@
 #define USE_EVENTVIEWER
 //#undef  USE_EVENTVIEWER
 
+#undef  EXECUTE_TEST_FLASH
+#define EXECUTE_TEST_FLASH
 
-//#undef  EXECUTE_TEST_SYS_DELAY
-#define EXECUTE_TEST_SYS_DELAY
+
+
+#undef  EXECUTE_TEST_SYS_DELAY
+//#define EXECUTE_TEST_SYS_DELAY
 
 #undef EXECUTE_TEST_PERIPH_I2C
 #define EXECUTE_TEST_PERIPH_I2C
@@ -82,8 +86,8 @@
 #define EXECUTE_TEST_DEVICE_EEPROM
 
 
-//#undef  EXECUTE_TEST_PERIPH_TIMER
-#define EXECUTE_TEST_PERIPH_TIMER
+#undef  EXECUTE_TEST_PERIPH_TIMER
+//#define EXECUTE_TEST_PERIPH_TIMER
 
 #undef  EXECUTE_TEST_PERIPH_WATCHDOG
 //#define EXECUTE_TEST_PERIPH_WATCHDOG
@@ -93,7 +97,7 @@
 
 
 #undef EXECUTE_TEST_PERIPH_CAN
-#define EXECUTE_TEST_PERIPH_CAN
+//#define EXECUTE_TEST_PERIPH_CAN
 
 #define haLcAn1    hal_can1
 #define haLcAn2    hal_can2
@@ -114,7 +118,7 @@
 //#define EXECUTE_TEST_DEVICE_SWITCH
 
 #undef EXECUTE_TEST_PERIPH_ETH
-//#define EXECUTE_TEST_PERIPH_ETH
+#define EXECUTE_TEST_PERIPH_ETH
 
 
 #ifdef EXECUTE_TEST_PERIPH_ETH
@@ -152,6 +156,7 @@ static void brd_eventviewer_init(void);
 #endif//USE_EVENTVIEWER
 
 static void leds_init(void);
+static void leds_led0_toggle(void);
 static void leds_led1_toggle(void);
 static void leds_led2_toggle(void);
 extern void onsystick(void); // use extern to be used w/ eventviewer
@@ -165,6 +170,11 @@ static void test_has_failed(const char* msg);
 static void test_message(const char* msg);
 
 static void info_about_core_plus_led(void);
+
+
+#if     defined(EXECUTE_TEST_FLASH)    
+static void test_flash(void);
+#endif//defined(EXECUTE_TEST_FLASH)    
 
 #if     defined(EXECUTE_TEST_SYS_DELAY)    
 static void test_sys_delay(void);
@@ -223,7 +233,7 @@ static const uint32_t s_tick_slower_rate_ms = 100;
 
 #if     defined(HAL_USE_PERIPH_GPIO)
 
-static const hal_gpio_map_t user_button = 
+static const hal_gpio_maP_t user_button_map = 
 {
 #if     defined(HAL_BOARD_MCBSTM32F400)       
     .gpio       =
@@ -231,38 +241,37 @@ static const hal_gpio_map_t user_button =
         .port   = hal_gpio_portG,
         .pin    = hal_gpio_pin15
     },
-    .config     =
-    {
-        .speed  = hal_gpio_speed_low,
-        .dir    = hal_gpio_dirINP,
-        .altcfg = NULL
-    }
+    .af32       = hal_NA32
 #elif   defined(HAL_BOARD_MCBSTM32C)
     .gpio       =
     { 
         .port   = hal_gpio_portB,
         .pin    = hal_gpio_pin7
     },
-    .config     =
-    {
-        .speed  = hal_gpio_speed_low,
-        .dir    = hal_gpio_dirINP,
-        .altcfg = NULL
-    }    
+    .af32       = hal_NA32  
 #else
     .gpio       =
     {
         .port   = hal_gpio_portNONE,
         .pin    = hal_gpio_pinNONE
     },
-    .config     =
-    {
-        .speed  = hal_gpio_speed_NONE,
-        .dir    = hal_gpio_dirNONE,
-        .altcfg = NULL
-    }
+    .af32       = hal_NA32
 #endif    
 };
+
+static const hal_gpio_cfg_t user_button_config =
+{
+#if     defined(HAL_BOARD_MCBSTM32F400) | defined(HAL_BOARD_MCBSTM32C)
+    .dir    = hal_gpio_dirINP,
+    .speed  = hal_gpio_speed_low,
+    .altcfg = NULL  
+#else
+    .dir    = hal_gpio_dirNONE,
+    .speed  = hal_gpio_speed_NONE,
+    .altcfg = NULL  
+#endif    
+};
+
 
 
 static const hal_gpio_val_t user_notpushed_value = 
@@ -330,6 +339,10 @@ int main(void)
     test_message(" ----------- BEGINNING OF TESTS ----------- ");
     test_message(" ------------------------------------------ ");
     test_message("");
+    
+#if     defined(EXECUTE_TEST_FLASH)    
+    test_flash();
+#endif//defined(EXECUTE_TEST_FLASH)    
 
 #if     defined(EXECUTE_TEST_SYS_DELAY)    
     test_sys_delay();
@@ -437,6 +450,12 @@ static void leds_init(void)
     
     hal_result_t res;
     
+    res = hal_led_init(hal_led0, NULL);
+    res =  res;    
+
+    leds_led0_toggle();
+    leds_led0_toggle();
+    
     res = hal_led_init(hal_led1, NULL);
     res =  res;
     
@@ -488,6 +507,18 @@ static void leds_init(void)
 #endif//defined(HAL_USE_DEVICE_LED)
 }
 
+static void leds_led0_toggle(void)
+{
+#if     defined(HAL_USE_DEVICE_LED)
+        
+    hal_result_t res;
+    
+    res = hal_led_toggle(hal_led0);
+    res =  res;
+
+#endif//defined(HAL_USE_DEVICE_LED)    
+}
+
 static void leds_led1_toggle(void)
 {
 #if     defined(HAL_USE_DEVICE_LED)
@@ -526,7 +557,7 @@ extern void onsystick(void)
     if(led1_blink_rate_ms == count)
     {
         count = 0;
-        leds_led1_toggle();
+        leds_led0_toggle();
     }
     
     if(0 == (msTicks % s_tick_slower_rate_ms))
@@ -548,12 +579,9 @@ extern void onsystick(void)
 static void button_init(void)
 {
 #if     defined(HAL_USE_PERIPH_GPIO)
-    
-    if(hal_gpio_dirINP == user_button.config.dir)
-    {
-        hal_gpio_init(user_button.gpio, &user_button.config);
-        button_ispushed();
-    }
+ 
+    hal_gpio_init(user_button_map.gpio, &user_button_config);
+    button_ispushed();
     
 #endif//defined(HAL_USE_PERIPH_GPIO)    
 }
@@ -564,9 +592,9 @@ static uint8_t button_ispushed(void)
     
     hal_gpio_val_t v = user_notpushed_value;
     
-    if(hal_gpio_dirINP == user_button.config.dir)
+    if(hal_gpio_dirINP == user_button_config.dir)
     {
-        v = hal_gpio_getval(user_button.gpio);
+        v = hal_gpio_getval(user_button_map.gpio);
         return((user_notpushed_value == v) ? 0 : 1);        
     }
     else
@@ -681,6 +709,43 @@ static void info_about_core_plus_led(void)
 
 // -- the tests ----
 
+#if     defined(EXECUTE_TEST_FLASH)    
+static void test_flash(void)
+{
+    
+    test_is_beginning("flash: erasing a bank, writing, reading it back");
+
+    static uint32_t address = 0;
+    
+    static const uint32_t size = 128*1024;
+    static uint8_t wbuf[256] = {0};
+    static uint8_t rbuf[1024] = {0};
+
+    address = hal_flash_get_baseaddress() + 128*1024;
+    
+    hal_sys_irq_disable();   
+
+    hal_result_t res = hal_res_OK;
+
+    res = hal_flash_unlock();  
+
+    res = hal_flash_erase(address, size);  
+
+    memset(wbuf, 5, sizeof(wbuf));
+    res = hal_flash_write(address, sizeof(wbuf), wbuf);
+
+    memset(wbuf, 10, sizeof(wbuf));
+    res = hal_flash_write(address+sizeof(wbuf), sizeof(wbuf), wbuf);
+
+    res = hal_flash_read(address, sizeof(rbuf), rbuf);
+    res = res;
+
+
+    hal_sys_irq_enable();        
+
+}
+#endif//defined(EXECUTE_TEST_FLASH)    
+
 #if     defined(EXECUTE_TEST_SYS_DELAY)   
 
 static void test_sys_delay(void)
@@ -786,7 +851,10 @@ static void test_sys_delay(void)
 #if     defined(EXECUTE_TEST_PERIPH_I2C)    
 static void test_periph_i2c(void)
 {
-    
+    hal_result_t res;
+    res = hal_i2c_init(hal_i2c1, NULL);
+    res = hal_i2c_init(hal_i2c3, NULL);
+    res = res;
     test_is_beginning("i2c: if test eeprom is OK then i2c works fine. if test eeprom fails ... i2c may work or not");
     
 }
@@ -814,7 +882,7 @@ static void test_device_eeprom(void)
     
     volatile hal_result_t res;
     
-    //hal_i2c4hal_init(hal_i2c_port1, NULL);
+
 
     res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     res =  res;
@@ -1297,11 +1365,11 @@ static void test_device_switch(void)
     hal_eth_phymode_t usedphymode = hal_eth_phymode_none;
     
     hal_switch_init(NULL);
-    hal_switch_configure(hal_eth_phymode_fullduplex100mbps, &usedphymode);
+    hal_switch_configure(&usedphymode);
     
     test_message(" ----------- TEST SWITCH successful if you can use the two ports as a pass-through ----------- ");
     
-    //for(;;);
+    for(;;);
 }
 
 #endif//defined(EXECUTE_TEST_DEVICE_SWITCH)   
