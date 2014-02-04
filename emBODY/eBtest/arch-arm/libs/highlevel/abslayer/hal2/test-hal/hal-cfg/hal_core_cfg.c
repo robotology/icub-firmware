@@ -40,6 +40,9 @@
 
 static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
+static void* myheap_new(uint32_t size);
+static void myheap_delete(void* mem);
+
 
 extern const hal_core_cfg_t hal_core_cfg = 
 {   
@@ -49,7 +52,9 @@ extern const hal_core_cfg_t hal_core_cfg =
         {
             .usr_on_fatal_error                 = s_hal_core_cfg_on_fatalerror,
             .osal_system_scheduling_suspend     = NULL,
-            .osal_system_scheduling_restart     = NULL
+            .osal_system_scheduling_restart     = NULL,
+            .ext_heap_new                       = myheap_new,
+            .ext_heap_delete                    = myheap_delete
         } 
     },
     .cpucfg     =
@@ -95,7 +100,14 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
 }
 
 
-
+static void* myheap_new(uint32_t size)
+{
+    return(calloc(size, 1));  
+}
+static void myheap_delete(void* mem)
+{
+    free(mem);
+}
 
 
 
