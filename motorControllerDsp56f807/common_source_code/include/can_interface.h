@@ -152,10 +152,11 @@ void can_receive_additional_info();
 #define CAN_SET_PERIODIC_MSG_CONTENTS   111 //this message is used only for 2foc boards
 #define CAN_SET_I2T_PARAMS			112
 #define CAN_GET_I2T_PARAMS			113
+#define CAN_SET_OPENLOOP_PARAMS     114
+#define CAN_GET_OPENLOOP_PARAMS		115
 
 
-
-#define NUM_OF_MESSAGES             114
+#define NUM_OF_MESSAGES             116
 
 // class 1 messages, broadcast 
 // when in bcast mode, messages are sent periodically by the controller
