@@ -42,7 +42,7 @@
 
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
-        // to fill with what ... nothing
+        // to fill with ... nothing
         
 #elif   defined(HL_USE_MPU_ARCH_STM32F4)
 
