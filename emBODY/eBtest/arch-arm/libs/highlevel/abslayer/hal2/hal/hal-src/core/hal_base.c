@@ -87,7 +87,9 @@ typedef struct
     hal_base_cfg_t              config;
     hal_void_fp_void_t          fn_osal_system_scheduling_suspend;
     hal_void_fp_void_t          fn_osal_system_scheduling_restart;
-    hal_base_hid_fn_on_error    fn_on_error;   
+    hal_base_hid_fn_on_error    fn_on_error; 
+    hal_voidp_fp_uint32_t       fn_heap_new;
+    hal_void_fp_voidp_t         fn_heap_delete;
 } hal_base_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,6 +115,9 @@ typedef struct
 // #endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
 
 
+static void* s_hal_base_default_new(uint32_t size);
+static void s_hal_base_default_delete(void* mem);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -128,7 +133,9 @@ static hal_base_theinternals_t s_hal_base_theinternals =
     .config                             = { .extfn = NULL },
     .fn_osal_system_scheduling_suspend  = NULL,
     .fn_osal_system_scheduling_restart  = NULL,
-    .fn_on_error                        = NULL   
+    .fn_on_error                        = NULL,
+    .fn_heap_new                        = NULL,
+    .fn_heap_delete                     = NULL
 };
 
 
@@ -156,6 +163,8 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
     s_hal_base_theinternals.fn_on_error                       = cfg->extfn.usr_on_fatal_error;
     s_hal_base_theinternals.fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
     s_hal_base_theinternals.fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
+    s_hal_base_theinternals.fn_heap_new = (NULL != cfg->extfn.ext_heap_new) ? (cfg->extfn.ext_heap_new) : (s_hal_base_default_new);
+    s_hal_base_theinternals.fn_heap_delete = (NULL != cfg->extfn.ext_heap_delete) ? (cfg->extfn.ext_heap_delete) : (s_hal_base_default_delete);
 
 
 // #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
@@ -233,6 +242,25 @@ extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * erro
 }
 
 
+extern void * hal_base_heap_new(uint32_t size)
+{
+    void *p = NULL;
+    if(NULL != s_hal_base_theinternals.fn_heap_new)
+    {
+		p = s_hal_base_theinternals.fn_heap_new(size);
+    }
+    
+    return(p);
+}
+
+extern void hal_base_heap_delete(void* mem)
+{
+    if(NULL != s_hal_base_theinternals.fn_heap_delete)
+    {
+		s_hal_base_theinternals.fn_heap_delete(mem);
+    }
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -259,8 +287,17 @@ extern hal_bool_t hal_base_hid_initted_is(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+
+static void* s_hal_base_default_new(uint32_t size)
+{
+    return(calloc(size, 1));
+}
+
+static void s_hal_base_default_delete(void* mem)
+{
+    free(mem);
+}
 
 
 #endif//HAL_USE_BASE

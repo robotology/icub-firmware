@@ -105,10 +105,21 @@ typedef struct
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern void* hl_sys_heap_new(uint32_t size)
+{
+    return(hal_base_heap_new(size));    
+}
+
+
+extern void hl_sys_heap_delete(void* p)
+{
+    hal_base_heap_delete(p);
+}
+
 
 extern void* hal_heap_new(uint32_t size)
 {
-    void* p = hl_sys_heap_new(size);
+    void* p = hal_base_heap_new(size);
     if(NULL == p)
     {
         hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_heap_new(): no heap anymore");
@@ -122,7 +133,7 @@ extern void hal_heap_delete(void** pp)
     uint32_t** p = (uint32_t**)pp;
     if(NULL != *p)
     {
-        hl_sys_heap_delete(*p);
+        hal_base_heap_delete(*p);
         *p = NULL;
     }
 }

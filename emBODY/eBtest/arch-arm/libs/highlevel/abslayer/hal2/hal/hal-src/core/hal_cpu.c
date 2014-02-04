@@ -391,7 +391,7 @@ void SystemCoreClockUpdate(void)
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
   
-#warning ---> we dont redefine SystemInit()
+#warning ---> we dont redefine SystemInit(). rework the code
 #if 0
 // redefinition of function weakly defined in system_stm32f4xx.c so that the mpus uses hsi and runs at 16MHz
 void SystemInit(void)

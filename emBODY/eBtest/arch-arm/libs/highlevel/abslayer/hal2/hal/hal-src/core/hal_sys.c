@@ -480,7 +480,7 @@ extern hal_result_t hal_sys_hid_systeminit(void)
     // hence, ... we need to configure a proper clock and update the system core clock 
   
 
-#warning --> dont use hal_cpu_clocks_set()  
+#warning --> dont use hal_cpu_clocks_set(): rework the code
 //    hal_cpu_clocks_set();
     
 
