@@ -126,8 +126,15 @@ extern void hl_sys_heap_delete(void* p);
 /** @fn         extern hl_result_t hl_sys_delay(hl_reltime_t reltime)
     @brief      When called it returns after the CPU has executed this function for @e reltime microseconds.
                 In this time it is not counted the time the system has spent inside ISRs or in other tasks.
+                Apart from any of above interruptions, the precision of this delay is about 1 micro-second,
+                depending on compiler optimisation (because some parts of the function are still in C). 
+                On the STM32F407 running at 168Mhz with -O4speed optimisation the function lasts 0.45 
+                micro-sec more.               
     @param      reltime     the minimum time spent inside this function in microseconds                
     @return     hl_res_OK upon success.
+    @warning    IT MUST BE CALLED AFTER that SystemCoreClockUpdate() has been called. The reason is that the
+                function hl_sys_delay() internally computes how many simple operations to execute on the basis of  
+                the value of SystemCoreClock.
  **/
 extern hl_result_t hl_sys_delay(hl_reltime_t reltime);
 
