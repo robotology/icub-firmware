@@ -236,6 +236,8 @@ extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* 
 extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio);
 
 
+extern hl_gpio_pin_t hl_gpio_pos2pin(uint8_t pos);
+extern uint8_t hl_gpio_pin2pos(hl_gpio_pin_t pin);
 
 /** @}            
     end of group doxy_group_hl_gpio  
