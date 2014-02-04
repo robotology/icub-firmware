@@ -86,9 +86,9 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(HL_USE_MPU_ARCH_STM32F4)
+//#if     defined(HL_USE_MPU_ARCH_STM32F4)
 static uint8_t s_hl_gpio_pin2pos(hl_gpio_pin_t pin); 
-#endif//defined(HL_USE_MPU_ARCH_STM32F4)
+//#endif//defined(HL_USE_MPU_ARCH_STM32F4)
 
 
 
@@ -358,6 +358,19 @@ extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio)
 }
 
 
+extern hl_gpio_pin_t hl_gpio_pos2pin(uint8_t pos)
+{
+    if(pos > 16)
+    {
+        return(hl_gpio_pinNONE);
+    }    
+    return((hl_gpio_pin_t)(0x0001 << pos));   
+}
+
+extern uint8_t hl_gpio_pin2pos(hl_gpio_pin_t pin)
+{
+    return(s_hl_gpio_pin2pos(pin));
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -376,7 +389,7 @@ extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(HL_USE_MPU_ARCH_STM32F4)
+//#if     defined(HL_USE_MPU_ARCH_STM32F4)
 static uint8_t s_hl_gpio_pin2pos(hl_gpio_pin_t pin)
 {
     if((hl_gpio_pinNONE == pin) || (hl_gpio_pinALL == pin))
@@ -398,7 +411,7 @@ static uint8_t s_hl_gpio_pin2pos(hl_gpio_pin_t pin)
     
     return(0xff);
 }
-#endif//defined(HL_USE_MPU_ARCH_STM32F4)
+//#endif//defined(HL_USE_MPU_ARCH_STM32F4)
 
 #endif//defined(HL_USE_UTIL_GPIO)
 
