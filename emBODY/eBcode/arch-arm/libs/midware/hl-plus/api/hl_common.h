@@ -46,6 +46,15 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+// issues a compiler error if the sizeof the struct is not what in second argument
+#define hl_CHECKSIZEOF(sname, ssize)    typedef uint8_t HLGUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (-1)];
+
+// issues a compiler error if the prop is false
+#define hl_TOKENPASTE(x, y) x ## y
+#define hl_TOKENPASTE2(x, y) hl_TOKENPASTE(x, y)
+#define hl_VERIFYproposition(name, prop)    typedef uint8_t hl_TOKENPASTE2(name, __LINE__)[ ( 0 == (prop) ) ? (-1) : (1)];
+
+
 #define hl_NA08                                     ((uint8_t)(0xFF))
 #define hl_NA16                                     ((uint16_t)(0xFFFF))
 #define hl_NA32                                     ((uint32_t)(0xFFFFFFFF)) 
@@ -89,7 +98,8 @@ typedef enum
     hl_res_OK                   = 0,
     hl_res_NOK_generic          = -1,
     hl_res_NOK_nullpointer      = -2,       /**< error: a null pointer was used */
-    hl_res_NOK_nodata           = -5,       /**< error: there was not data to be retrieved */
+    hl_res_NOK_nodata           = -5,       /**< error: there is not data to be retrieved */
+    hl_res_NOK_busy             = -6,       /**< error: the service is busy and request has not been served */
     hl_res_NOK_unsupported      = -15       /**< error: unsupported feature */
 } hl_result_t;
 
