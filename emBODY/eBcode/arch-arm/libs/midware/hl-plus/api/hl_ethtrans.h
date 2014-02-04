@@ -81,7 +81,7 @@ typedef enum
 extern const hl_ethtrans_cfg_t hl_ethtrans_cfg_default;   // = { .dummy = 0};
 
 // it must be externally declared.
-extern const hl_ethtrans_mapping_t hl_ethtrans_mapping;
+extern const hl_ethtrans_mapping_t* hl_ethtrans_map;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -96,8 +96,9 @@ extern const hl_ethtrans_mapping_t hl_ethtrans_mapping;
 extern hl_result_t hl_ethtrans_init(const hl_ethtrans_cfg_t *cfg);
 
 
-extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode);
+extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t *usedmiiphymode);
 
+extern hl_result_t hl_ethtrans_getmiiphymode(hl_ethtrans_phymode_t *usedphymode);
 
 /** @fn			extern hl_bool_t hl_ethtrans_initted_is(void)
     @brief  	This function tells if the ethtrans is already initialised.
@@ -106,11 +107,13 @@ extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t targetphymode, hl_et
 extern hl_bool_t hl_ethtrans_initted_is(void);
 
 
-// must be defined extern
-extern hl_result_t hl_ethtrans_chip_init(const hl_ethtrans_cfg_t *cfg);
+// must be defined externally
+extern void* hl_ethtrans_chip_init_param;
 
-
-extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t *usedphymode);
+// weakly defined.
+extern hl_result_t hl_ethtrans_chip_init(void* param);
+extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode);
+extern hl_result_t hl_ethtrans_chip_getmiiphymode(hl_ethtrans_phymode_t *usedmiiphymode);
 
 /** @}            
     end of group arm_hl_ethtrans  
