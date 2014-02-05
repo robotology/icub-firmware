@@ -40,6 +40,9 @@
 
 static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
+static void* myheap_new(uint32_t size);
+static void myheap_delete(void* mem);
+
 
 extern const hal_core_cfg_t hal_cfg = 
 {   
@@ -49,7 +52,9 @@ extern const hal_core_cfg_t hal_cfg =
         {
             .usr_on_fatal_error                 = s_hal_core_cfg_on_fatalerror,
             .osal_system_scheduling_suspend     = NULL,
-            .osal_system_scheduling_restart     = NULL
+            .osal_system_scheduling_restart     = NULL,
+            .ext_heap_new                       = myheap_new,
+            .ext_heap_delete                    = myheap_delete
         } 
     },
     .cpucfg     =
@@ -68,6 +73,7 @@ extern const hal_core_cfg_t hal_cfg =
 };
 
 
+extern const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
 
 
 // void SysTick_Handler(void)
@@ -100,8 +106,16 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
     }
 }
 
+#include "osal_base.h"
 
-
+static void* myheap_new(uint32_t size)
+{
+    return(osal_base_memory_new(size));  
+}
+static void myheap_delete(void* mem)
+{
+    osal_base_memory_del(mem);
+}
 
 
 
