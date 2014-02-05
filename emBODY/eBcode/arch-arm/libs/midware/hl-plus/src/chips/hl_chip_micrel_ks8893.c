@@ -190,7 +190,7 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmi
     
     //const uint8_t fd100 = 0x60;
     //const uint8_t fd010 = 0x20;
-    uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
+//    uint8_t buff_write = 0x60; // FORCE FULL DUPLEX AND 100T
     uint8_t buff_read = 0xFF; 
     volatile uint32_t i = 1;
     hl_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0};
