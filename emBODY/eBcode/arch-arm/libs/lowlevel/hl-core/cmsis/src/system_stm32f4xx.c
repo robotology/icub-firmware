@@ -351,8 +351,10 @@ static void SystemInit_ExtMemCtl(void);
 /** @addtogroup STM32F4xx_System_Private_Functions
   * @{
   */
-
+//IIT-EXT
+#if		!defined(HL_CFG_OVERRIDE_hl_system_stm32fx_before_setsysclock
 __weak void hl_system_stm32fx_before_setsysclock(void) {}
+#endif
 /**
   * @brief  Setup the microcontroller system
   *         Initialize the Embedded Flash Interface, the PLL and update the 
