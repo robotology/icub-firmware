@@ -447,9 +447,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.stm32f4.ems004.lib</FileName>
+              <FileName>hal.ems4rd.beta.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.stm32f4.ems004.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1192,9 +1192,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.stm32f4.ems004.lib</FileName>
+              <FileName>hal.ems4rd.beta.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.stm32f4.ems004.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
             </File>
           </Files>
         </Group>
