@@ -178,9 +178,41 @@ extern void task_cangateway(void *p)
     eom_task_Start(p);
 }  
 
-
+#if     defined(HAL_USE_VERSION_2)
+static void errcallback(void* p) {};
+#endif
 extern void cangateway_hid_hal_init(void)
-{   
+{  
+#if     defined(HAL_USE_VERSION_2)
+    hal_can_cfg_t canxcfg = 
+    {
+        .runmode                    = hal_can_runmode_isr_1txq1rxq, 
+        .baudrate                   = hal_can_baudrate_1mbps, 
+        .priorx                     = hal_int_priorityNONE,
+        .priotx                     = hal_int_priorityNONE,
+        .capacityofrxfifoofframes   = 16,
+        .capacityoftxfifoofframes   = 16,
+        .capacityoftxfifohighprio   = 2,
+        .callback_on_rx             = NULL,
+        .arg_cb_rx                  = NULL,
+        .callback_on_tx             = NULL,
+        .arg_cb_tx                  = NULL,
+        .callback_on_err            = errcallback,
+        .arg_cb_err                 = NULL
+    };   
+
+    // init can1
+    canxcfg.priorx          = hal_int_priority07;
+    canxcfg.priotx          = hal_int_priority08;
+    canxcfg.callback_on_rx  = s_isr_alert_cangtwtask_can1;    
+    hal_can_init(hal_can_port1, &canxcfg);
+    
+    // init can2
+    canxcfg.priorx          = hal_int_priority09;
+    canxcfg.priotx          = hal_int_priority10;
+    canxcfg.callback_on_rx  = s_isr_alert_cangtwtask_can2;     
+    hal_can_init(hal_can_port2, &canxcfg);   
+#else    
     hal_can_cfg_t canxcfg = 
     {
         .runmode        = hal_can_runmode_isr_1txq1rxq, 
@@ -203,7 +235,8 @@ extern void cangateway_hid_hal_init(void)
     canxcfg.priorx          = hal_int_priority09;
     canxcfg.priotx          = hal_int_priority10;
     canxcfg.callback_on_rx  = s_isr_alert_cangtwtask_can2;     
-    hal_can_init(hal_can_port2, &canxcfg);      
+    hal_can_init(hal_can_port2, &canxcfg);   
+#endif    
 }
 
 
