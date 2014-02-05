@@ -28,9 +28,18 @@
 #include "hal.h"  
 #include "hal_core.h"  
 
-
+#if     !defined(HAL_USE_LIB)
 #include "hal_brdcfg_modules.h"
 //#include "hal_brdcfg.h"
+#else
+
+#define HAL_USE_PERIPH_GPIO
+#define HAL_USE_DEVICE_LED
+#define HAL_USE_DEVICE_EEPROM
+#define HAL_USE_PERIPH_TIMER
+
+
+#endif
 
 //#include "hal_switch.h"
 //#include "hal_led.h"
@@ -64,9 +73,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#if defined(HAL_BUILD_ONLYCORE)
-#define DONT_USE_TRACE
-#endif
+// #if defined(HAL_BUILD_ONLYCORE)
+// #define DONT_USE_TRACE
+// #endif
 
 #define USE_EVENTVIEWER
 //#undef  USE_EVENTVIEWER
