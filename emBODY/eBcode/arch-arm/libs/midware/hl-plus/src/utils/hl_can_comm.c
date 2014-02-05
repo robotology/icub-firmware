@@ -408,7 +408,7 @@ extern hl_result_t hl_can_comm_get(hl_can_t id, hl_can_comm_frame_t *frame, uint
 
 extern hl_result_t hl_can_comm_getstatus(hl_can_t id, hl_can_comm_status_t *status)
 {
-    hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
+//    hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
 
     if(hl_false == s_hl_can_comm_initted_is(id))
     {

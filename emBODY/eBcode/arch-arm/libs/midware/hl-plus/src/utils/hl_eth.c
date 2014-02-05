@@ -536,7 +536,7 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     
     // hl_ethtrans_phymode_fullduplex100mbps or hl_ethtrans_phymode_auto
     hl_ethtrans_config(&usedphymode);
-    #warning --> using hl_ethtrans_phymode_fullduplex100mbps
+    #warning --> using hl_ethtrans_phymode_fullduplex100mbps: VERIFY ITTTTTTTTTTTTTTTTTTTT
     
     if(hl_ethtrans_phymode_none == usedphymode)
     {
@@ -939,9 +939,7 @@ static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_ethtrans_phymode_t phy
     
     
     // init phymode
-    #warning --> TOBEDONE: add autonegotiation (as valentina put in hal)
-
-   
+  
     if((hl_ethtrans_phymode_halfduplex100mbps == phymode) || (hl_ethtrans_phymode_fullduplex100mbps == phymode))
     {
         ETH->MACCR |= MCR_FES;              // config 100mbs 
