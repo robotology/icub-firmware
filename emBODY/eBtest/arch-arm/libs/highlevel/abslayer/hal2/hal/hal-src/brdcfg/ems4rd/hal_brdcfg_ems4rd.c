@@ -698,20 +698,15 @@
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
     
+#if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)      
+        
     #include "hl_chip_micrel_ks8893.h"
-    
-    static hal_result_t s_hal_micrel_init(void* param)
-    {
-        // i2c3 must be initted.
-        hal_i2c_init(hal_i2c3, NULL);
-        hl_result_t r = hl_chip_micrel_ks8893_init((const hl_chip_micrel_ks8893_cfg_t*)param);
-        return((hal_result_t)r);
-    }    
     
     static hl_result_t s_hal_brdcfg_ks8893__extclock_init(void)
     {
         return(hl_res_OK);    
-    }
+    }    
+    
     extern const hl_chip_micrel_ks8893_cfg_t ks8893_config = 
     {
         .i2cid              = hl_i2c3,
@@ -719,8 +714,16 @@
         .resetval           = hl_gpio_valRESET,
         .extclockinit       = s_hal_brdcfg_ks8893__extclock_init,
         .targetphymode      = hl_ethtrans_phymode_auto        
-    };
+    };    
     
+    static hal_result_t s_hal_micrel_init(void* param)
+    {
+        // i2c3 must be initted.
+        hal_i2c_init((hal_i2c_t)ks8893_config.i2cid, NULL);        
+        hl_result_t r = hl_chip_micrel_ks8893_init((const hl_chip_micrel_ks8893_cfg_t*)param);
+        return((hal_result_t)r);
+    }    
+       
     //extern const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg;
     extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig =
     {
@@ -736,7 +739,42 @@
                 .getphymode     = (hal_device_ethtransceiver_hid_fn_getphymode_t)hl_chip_micrel_ks8893_mii_getphymode                
             }
          }
-    };   
+    }; 
+
+#else
+
+    static hal_result_t s_hal_switch_init(void* param)
+    {
+        return(hal_res_OK);
+    }   
+    static hal_result_t s_hal_switch_configure(hal_eth_phymode_t* usedphymode)
+    {
+        *usedphymode = hal_eth_phymode_fullduplex100mbps;
+        return(hal_res_OK);
+    }   
+    static hal_result_t s_hal_switch_getphymode(hal_eth_phymode_t* usedphymode)
+    {
+        *usedphymode = hal_eth_phymode_fullduplex100mbps;
+        return(hal_res_OK);
+    }    
+    extern const hal_device_ethtransceiver_hid_brdcfg_t hal_brdcfg_device_ethtransceiver__theconfig =
+    {
+        .supported      = hal_true,
+        .devcfg         =
+        {
+            .targetphymode      = HAL_ETH_PHYMODE_THEONE2USE,
+            .chipif             =
+            {   // use the micrel 
+                .init           = s_hal_switch_init,
+                .initpar        = NULL,
+                .config         = s_hal_switch_configure, 
+                .getphymode     = s_hal_switch_getphymode                
+            }
+         }
+    }; 
+    
+#endif
+    
 #endif//0
 
     
@@ -971,7 +1009,9 @@
     
 
 #ifdef HAL_USE_DEVICE_SWITCH
-    
+
+#if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)   
+
 #include "hl_chip_micrel_ks8893.h"
     
 //extern const hl_chip_micrel_ks8893_cfg_t ems4rd_micrel_ks8893_config;  // defined in ... hl somewhere
@@ -979,7 +1019,9 @@
 extern const hl_chip_micrel_ks8893_cfg_t ks8893_config;
     
 static hal_result_t chip_micrel_ks8893_init(void *cfg)
-{  
+{ 
+    // i2c3 must be initted.
+    hal_i2c_init((hal_i2c_t)ks8893_config.i2cid, NULL);    
     return((hal_result_t)hl_chip_micrel_ks8893_init((const hl_chip_micrel_ks8893_cfg_t *)cfg));
 }
 
@@ -987,6 +1029,7 @@ static hal_result_t chip_micrel_ks8893_configure(hal_eth_phymode_t* usedphymode)
 {
     return((hal_result_t)hl_chip_micrel_ks8893_configure((hl_ethtrans_phymode_t*)usedphymode));
 }
+
 
     extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig =
     {
@@ -1002,6 +1045,33 @@ static hal_result_t chip_micrel_ks8893_configure(hal_eth_phymode_t* usedphymode)
             }
         }
     };
+#else
+
+    static hal_result_t s_switch_init(void* p)
+    {
+        return(hal_res_OK);
+    }
+    static hal_result_t s_switch_configure(hal_eth_phymode_t* usedphymode)
+    {
+        *usedphymode = hal_eth_phymode_fullduplex100mbps;
+        return(hal_res_OK);
+    }    
+    extern const hal_device_switch_hid_brdcfg_t hal_brdcfg_device_switch__theconfig =
+    {
+        .supported      = hal_true,
+        .devcfg         =
+        {
+            .targetphymode  = HAL_ETH_PHYMODE_THEONE2USE,
+            .chipif         =
+            {
+                .init       = s_switch_init,
+                .initpar    = NULL,
+                .config     = s_switch_configure,          
+            }
+        }
+    };
+    
+#endif    
 
 #endif//HAL_USE_DEVICE_SWITCH
         

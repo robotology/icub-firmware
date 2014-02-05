@@ -67,6 +67,8 @@
     #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
     #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)
     
+    #define HL_CFG_OVERRIDE_hl_system_stm32fx_before_setsysclock
+    
 #else
     #error ERR: cannot define MPU_NAME
 #endif

@@ -52,7 +52,7 @@
 
 extern void hl_system_stm32fx_before_setsysclock(void)
 {
-#if defined(EMS4RD_INIT_MICREL)    
+#if defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)    
     SystemCoreClockUpdate();
     hl_gpio_t ethslv = {.port = hl_gpio_portB, .pin = hl_gpio_pin2};
     hl_gpio_pin_output_init(ethslv);
