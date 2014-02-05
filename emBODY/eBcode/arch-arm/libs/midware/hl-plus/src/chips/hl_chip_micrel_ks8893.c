@@ -309,6 +309,9 @@ static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_c
     // 3. reset the chip
     s_hl_chip_micrel_ks8893_reset(cfg);
     
+    // init anyway
+    hl_i2c_init(i2cid, NULL);
+    
     // 3. verify if i2c is initted  
     if(hl_false == hl_i2c_initted_is(i2cid))
     {
