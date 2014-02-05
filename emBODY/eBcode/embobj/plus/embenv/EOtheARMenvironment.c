@@ -29,7 +29,12 @@
 #include "EOtheErrorManager.h"
 
 #include "EOVtheEnvironment_hid.h"
+#if		!defined(HAL_USE_VERSION_2)
 #include "hal_arch_arm.h"
+#define hal_uniqueid_id64bit_get hal_arch_arm_uniqueid64_get
+#else	//HAL_USE_VERSION_2
+#include "hal_uniqueid.h"
+#endif
 
 #include "eEsharedServices.h" 
 
@@ -356,7 +361,7 @@ static void s_eo_armenv_sharedservices_synchronise(void)
     {
         eEboardInfo_t boardinfo;
         memcpy(&boardinfo, s_the_armenv.brdinfo, sizeof(eEboardInfo_t));
-        boardinfo.uniqueid = hal_arch_arm_uniqueid64_get();
+        boardinfo.uniqueid = hal_uniqueid_id64bit_get();
         if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(&boardinfo))
         {
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "cannot sync brdinfo");
