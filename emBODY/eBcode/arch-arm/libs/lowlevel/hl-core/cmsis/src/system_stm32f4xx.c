@@ -352,7 +352,7 @@ static void SystemInit_ExtMemCtl(void);
   * @{
   */
 //IIT-EXT
-#if		!defined(HL_CFG_OVERRIDE_hl_system_stm32fx_before_setsysclock
+#if		!defined(HL_CFG_OVERRIDE_hl_system_stm32fx_before_setsysclock)
 __weak void hl_system_stm32fx_before_setsysclock(void) {}
 #endif
 /**
