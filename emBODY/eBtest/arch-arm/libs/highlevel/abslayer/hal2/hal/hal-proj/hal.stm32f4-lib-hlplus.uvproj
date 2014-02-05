@@ -392,11 +392,6 @@
           <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\hal-src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
-            </File>
-            <File>
               <FileName>hl_cfg_plus_modules.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
@@ -405,6 +400,16 @@
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -777,9 +782,9 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_periph_can.c</FileName>
+              <FileName>hal_periph_can.hl.only.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.hl.only.c</FilePath>
             </File>
             <File>
               <FileName>hal_periph_crc.c</FileName>
@@ -792,9 +797,9 @@
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.c</FileName>
+              <FileName>hal_periph_eth.hl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.hl.c</FilePath>
             </File>
             <File>
               <FileName>hal_periph_gpio.c</FileName>
@@ -916,12 +921,47 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_timer.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_can_comm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hl-plus-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_lis3x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_lis3x.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
     </Target>
     <Target>
-      <TargetName>hal-ems004</TargetName>
+      <TargetName>hal-em4rd</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -958,7 +998,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>hal.stm32f4.ems004</OutputName>
+          <OutputName>hal.ems4rd.beta</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -989,7 +1029,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\hal.stm32f4.ems004.lib ..\hal-lib\hal.stm32f4.ems004.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\hal.ems4rd.beta.lib ..\hal-lib\hal.ems4rd.beta.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1262,7 +1302,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_EMS004 HL_USE_BRD_EMS004 HL_CFG_PLUS_TARGET_BY_FILE</Define>
+              <Define>HAL_BOARD_EMS4RD HL_USE_BRD_EMS4RD HL_CFG_PLUS_TARGET_BY_FILE</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\hal\hal-api;..\..\hal\hal-src\core;..\..\hal\hal-src\brdcfg;..\..\hal\hal-src\extra\chips;..\..\hal\hal-src\extra\devices;..\..\hal\hal-src\extra\extbrds;..\..\hal\hal-src\extra\periphs;..\..\hal\hal-src\extra\utilities;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\app-test\stm32f4;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
@@ -1306,11 +1346,6 @@
           <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\hal-src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
-            </File>
-            <File>
               <FileName>hl_cfg_plus_modules.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
@@ -1319,6 +1354,16 @@
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1549,11 +1594,91 @@
               <FileName>hal_chip_generic_ethtransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_generic_ethtransceiver.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>hal_chip_micrel_ks8893.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_micrel_ks8893.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>hal_chip_st_l3g4200d.c</FileName>
@@ -1569,6 +1694,46 @@
               <FileName>hal_chip_xx_eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\chips\hal_chip_xx_eeprom.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -1644,6 +1809,46 @@
               <FileName>hal_extbrd_keil_mcbqvga.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\extbrds\hal_extbrd_keil_mcbqvga.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -1651,9 +1856,9 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_periph_can.c</FileName>
+              <FileName>hal_periph_can.hl.only.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_can.hl.only.c</FilePath>
             </File>
             <File>
               <FileName>hal_periph_crc.c</FileName>
@@ -1666,9 +1871,9 @@
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_dma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.c</FileName>
+              <FileName>hal_periph_eth.hl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.c</FilePath>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_eth.hl.c</FilePath>
             </File>
             <File>
               <FileName>hal_periph_gpio.c</FileName>
@@ -1789,6 +1994,41 @@
               <FileName>hl_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_can_comm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hl-plus-chips</GroupName>
+          <Files>
+            <File>
+              <FileName>hl_chip_micrel_ks8893.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_micrel_ks8893.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_l3g4200d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_l3g4200d.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_st_lis3x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_st_lis3x.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_xx_ethphy.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
           </Files>
         </Group>
