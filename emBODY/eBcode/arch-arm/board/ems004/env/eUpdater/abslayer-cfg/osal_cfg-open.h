@@ -48,7 +48,7 @@
 //   <i> Specify CPU frequency.
 //   <i> Default: 72000000  (72MHz on STM32F107)
 #ifndef OSAL_CPUFREQ
- #define OSAL_CPUFREQ       196000000
+ #define OSAL_CPUFREQ       168000000
 #endif
 
 
