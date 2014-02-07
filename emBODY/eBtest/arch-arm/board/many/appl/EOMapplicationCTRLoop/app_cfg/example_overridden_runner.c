@@ -120,7 +120,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     }
     else
     {
-        s_xxx_delay(300);
+        s_xxx_delay(100);
     }
     
 
@@ -158,7 +158,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 //         s_xxx_delay(100);
 //     }
     
-    s_xxx_delay(100+150);
+    s_xxx_delay(200);
 #endif    
     //     
 //     //for(i=0; i<1000*2; i++)
@@ -178,51 +178,52 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 {
      
 
-    if(0 == (xxxcount % 20))
-    {
-        //s_xxx_delay(3500);
-        s_xxx_delay(150);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-    }
-    else
-    {
-    //    s_xxx_delay(50);
-    }
+//     if(0 == (xxxcount % 20))
+//     {
+//         //s_xxx_delay(3500);
+//         s_xxx_delay(150);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+//     }
+//     else
+//     {
+//     //    s_xxx_delay(50);
+//     }
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
-     
+ 
+    s_xxx_delay(100);    
 
-    if(0 == (xxxcount % 20))
-    {
-        //s_xxx_delay(3500);
-        //s_xxx_delay(400);
-         s_xxx_delay(50);
+//     if(0 == (xxxcount % 20))
+//     {
+//         //s_xxx_delay(3500);
+//         //s_xxx_delay(400);
+//          s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+// //         s_xxx_delay(50);
+//     }
+//     else
+//     {
 //         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-//         s_xxx_delay(50);
-    }
-    else
-    {
-        s_xxx_delay(50);
-    }
+//     }
 }
 
 
@@ -233,9 +234,15 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if		defined(HAL_USE_VERSION_2)
+#include "hal_sys.h"
+#endif
 static void s_xxx_delay(eOreltime_t delay)
 {
 
+#if		defined(HAL_USE_VERSION_2)    
+    hal_sys_delay(delay);
+#else
 #if 1
     uint64_t startat = osal_system_nanotime_get();
     uint64_t stopat = startat + (uint64_t)delay*1000;
@@ -288,7 +295,8 @@ static void s_xxx_delay(eOreltime_t delay)
         now = tmp;        
     } 
 
-#endif    
+#endif   
+#endif//defined(HAL_USE_VERSION_2)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
