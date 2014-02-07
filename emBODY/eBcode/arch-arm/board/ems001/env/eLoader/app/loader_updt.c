@@ -82,7 +82,6 @@
 
 
 //#define FORCE_EEPROM_ERASE // it must be undefined unless you wanto to erase the eeprom
-
 //#define DEBUG_MODE
 
 #if defined(FORCE_EEPROM_ERASE)
@@ -769,7 +768,7 @@ static void s_loader_HW_init(void)
 #endif    
     
 
-#if defined(BOARD_EMS001) || defined(BOARD_EMS004)
+#if defined(BOARD_EMS001)
     if(hal_false == hal_switch_initted_is())
     {
         hal_switch_init(NULL);
