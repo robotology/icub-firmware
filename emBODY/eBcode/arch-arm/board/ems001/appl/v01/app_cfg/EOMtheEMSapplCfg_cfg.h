@@ -17,6 +17,9 @@ extern "C" {
 
 // -  default constants ----------------------------------------------------------------------------------------------- 
 
+#if defined(USE_EMS4RD)
+    #error --> so far the ems4rd has a dedicated EOMtheEMSapplCfg_cfg.h file
+#endif
  
 // - configuration wizard ---------------------------------------------------------------------------------------------
 
@@ -32,15 +35,15 @@ extern "C" {
 
 //  <o> host IP2 address <0-255>
 //  <i> default: 255
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            0
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
 
 //  <o> host IP3 address <0-255>
 //  <i> default: 72
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            1
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            104
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            129
 
 
 //  </h>Remote Host
@@ -52,7 +55,7 @@ extern "C" {
 //  <o> ID of the EMS board     <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     2
 
 
       
@@ -218,7 +221,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   0
+#define ADDR_USEIPAL   1
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
