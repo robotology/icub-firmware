@@ -100,6 +100,7 @@ enum { hal_cans_number = 2 };
 typedef hal_can_t hal_can_port_t;
 #define hal_can_port1  hal_can1
 #define hal_can_port2  hal_can2
+#define hal_can_ports_num hal_cans_number
 
 /** @typedef    typedef enum hal_can_send_mode_t;
     @brief      expresses the send mode: immediate on normal queue or priority or deferred on normal queue
@@ -298,6 +299,8 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_t id, uint8_t mask_num, 
   */
 extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof);
 
+
+extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status);
 
 /** @}            
     end of group doxy_group_hal_can  
