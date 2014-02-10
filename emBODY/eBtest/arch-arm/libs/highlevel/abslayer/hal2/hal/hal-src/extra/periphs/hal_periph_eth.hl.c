@@ -172,8 +172,8 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     }
 
     #warning WIP --> make ipal use a cfg w/ capacityoftxfifoofframes and capacityofrxfifoofframes
-    uint8_t capacityoftxfifoofframes = 2;   // cfg->capacityoftxfifoofframes
-    uint8_t capacityofrxfifoofframes = 2;   // cfg->capacityofrxfifoofframes
+    uint8_t capacityoftxfifoofframes = hal_eth_capacityoftxfifoofframes;   // 2 cfg->capacityoftxfifoofframes
+    uint8_t capacityofrxfifoofframes = hal_eth_capacityofrxfifoofframes; // 2;   // cfg->capacityofrxfifoofframes
     
     memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
     intitem->config.capacityoftxfifoofframes = capacityoftxfifoofframes;
@@ -202,6 +202,9 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     hl_result_t r = hl_eth_init(&intitem->hl_eth_config);
     
     s_hal_eth_initted_set(id);
+    
+    // also init smi
+    hal_eth_smi_init();
  
     return((hal_result_t)r);
 }
@@ -228,6 +231,47 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
 extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
 {
     return(&s_hal_eth_fns);
+}
+
+
+extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num);
+extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num);
+extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
+
+extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num)
+{
+    return(hal_brdcfg_eth__check_links(linkst_mask, links_num));
+}
+
+
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
+{
+    return(hal_brdcfg_eth__get_links_status(link_list, links_num));
+}
+
+
+extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{
+    return(hal_brdcfg_eth__get_errors_info(phynum, errortype, result));
+}
+
+
+
+extern void hal_eth_smi_init(void)
+{
+    hl_eth_smi_init();
+    #warning --> verify if smi is initted
+}
+
+extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
+{
+    return(hl_eth_smi_read(PHYaddr, REGaddr));
+}
+
+// writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
+extern void hal_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
+{
+    hl_eth_smi_write(PHYaddr, REGaddr, value);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -287,24 +331,6 @@ static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
     return(hal_utility_bits_byte_bitcheck(s_hal_eth_theinternals.initted, HAL_eth_id2index(id)));
 }
 
-
-
-
-// extern void hal_eth_hid_smi_init(void)
-// {
-//     hl_eth_smi_init();
-// }
-
-// extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
-// {
-//     return(hl_eth_smi_read(PHYaddr, REGaddr));
-// }
-
-// // writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
-// extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
-// {
-//     hl_eth_smi_write(PHYaddr, REGaddr, value);
-// }
 
 
 // extern void hal_eth_hid_rmii_refclock_init(void)

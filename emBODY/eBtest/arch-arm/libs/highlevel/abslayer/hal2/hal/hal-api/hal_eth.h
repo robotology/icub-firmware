@@ -164,7 +164,10 @@ typedef struct
 } hal_eth_phy_errorsinfo_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const uint8_t hal_eth_capacityofrxfifoofframes;
+extern const uint8_t hal_eth_capacityoftxfifoofframes;
+
 
 
 

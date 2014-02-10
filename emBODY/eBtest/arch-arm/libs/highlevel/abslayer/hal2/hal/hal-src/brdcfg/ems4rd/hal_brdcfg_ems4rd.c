@@ -300,6 +300,290 @@
             }      
         }
     };
+    
+    extern const uint8_t hal_eth_capacityofrxfifoofframes = 4;
+    extern const uint8_t hal_eth_capacityoftxfifoofframes = 2;
+    
+    
+#warning --> taken from hal1. 
+    
+extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr);
+extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr); 
+    
+static uint8_t hal_brdcfg_eth__get_errors_code(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype);
+static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uint8_t phy_num);
+    
+    
+    
+#warning --> verify if eth_smi is already iniited
+extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num)
+{   // ok. verified. it can be used even if switch is in automatic mode (not managed). 
+    uint16_t status_link;
+    uint8_t  PHYaddr = 0x1;
+    uint8_t  REGaddr = 0x1;
+    #define  LINK_IS_UP 0x00000004
+    
+    if((NULL == linkst_mask) || (NULL == links_num))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    *linkst_mask = 0;
+    *links_num = 2;
+    
+    
+    status_link = hal_eth_smi_read(PHYaddr, REGaddr);
+    if((status_link &LINK_IS_UP) == LINK_IS_UP)
+    {
+       *linkst_mask |= 0x01;
+    }
+    
+    PHYaddr = 0x2;
+    status_link = hal_eth_smi_read(PHYaddr, REGaddr);
+    if((status_link &LINK_IS_UP) == LINK_IS_UP)
+    {
+        *linkst_mask |= 0x02;
+    }
+    return(hal_res_OK);
+}   
+
+#if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)  
+static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uint8_t phy_num)
+{   // it can be used only if the switch is in managed mode
+    uint16_t regaddr_status0, regaddr_status1;
+    uint8_t  buff_read = 0xFF;
+ //   char str[60];
+    
+    switch(phy_num)
+    {
+        case 0:
+        {
+            regaddr_status0 = 0x1E;
+            regaddr_status1 = 0x1F;
+        }break;
+        
+        case 1:
+        {
+            regaddr_status0 = 0x2E;
+            regaddr_status1 = 0x2F;
+        }break;
+        
+        case 2:
+        {
+            regaddr_status0 = 0x0; //reserved, not applied to port 3. (see datasheet)
+            regaddr_status1 = 0x3F;
+        }break;
+        
+        default:
+        {
+            return;
+        }
+    }
+
+    
+    memset(status, 0, sizeof(hal_eth_phy_status_t));
+    
+    if(phy_num <2)
+    {
+        hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status0); //port1
+        if(buff_read&0x0040)// autoneg completed
+        {
+            status->autoNeg_done = 1;
+        }
+        if(buff_read&0x0020)// link is good
+        {
+            status->linkisgood = 1;
+        }
+    }
+//     snprintf(str, sizeof(str), "get_links_status phynum=%d read=0x%x",phy_num, buff_read);
+//     hal_trace_puts(str);
+    
+    buff_read = 0;
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read, regaddr_status1); //port1
+    if(buff_read&0x0004)// link speed 1==>100
+    {
+        status->linkspeed = 1;
+    }
+    if(buff_read&0x0002)// duplex 1==>full
+    {
+        status->linkduplex = 1;
+    }
+//     snprintf(str, sizeof(str), "get_links_status phynum=%d read=0x%x",phy_num, buff_read);
+//     hal_trace_puts(str);
+    
+}
+
+#else
+static void s_hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* status, uint8_t phy_num)
+{
+    memset(status, 0, sizeof(hal_eth_phy_status_t));
+    if(phy_num <2)
+    {
+        status->autoNeg_done = 1;
+        status->linkisgood = 1;
+    }
+    
+    status->linkspeed = 1;
+    status->linkduplex = 1;
+}
+#endif
+
+extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
+{
+    uint8_t i; 
+    
+    if((NULL == link_list) || (links_num>3))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+
+    for(i=0; (i<links_num); i++)
+    {
+        s_hal_brdcfg_eth__get_links_status(&link_list[i], i);
+    }
+
+    return(hal_res_OK);
+}
+    
+static uint8_t hal_brdcfg_eth__get_errors_code(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype)
+{
+    switch(phynum)
+    {
+        case 0:
+        {
+            return(errortype);
+        }
+        
+        case 1:
+        {
+            return(0x20+errortype);
+        }
+        
+        case 2:
+        {
+            return(0x40+errortype);
+        }
+        default:
+        {
+            return(0);
+        }
+    };
+//     if(0 == phynum)
+//     {
+//         return(errortype);
+//     }
+//     else
+//     {
+//         return(0x20+errortype);
+//     }
+}
+// static uint8_t has_finished_to_read(void)
+// {
+//     uint8_t read_op = 0;
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     while((read_op & 0x80) ==0x80)
+//     {
+// //         asm("nop");
+// //         asm("nop");
+//         hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     }
+//     return 1;
+// }
+
+#if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE) 
+extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{
+
+    uint8_t errorcode;
+    uint8_t buff_write = 0x1c; // read MIB counters selected
+    uint8_t buff_read[4] = {0};
+    
+//    char str[150];
+
+    
+    if(phynum>2)
+    {
+        return(hal_res_NOK_nodata);
+    }
+    
+    if(NULL == result)
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+   
+    errorcode = hal_brdcfg_eth__get_errors_code(phynum, errortype);
+    
+    hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x79);
+
+    buff_write = errorcode;
+    hal_brdcfg_switch__reg_write_byI2C(&buff_write, 0x7A);
+    
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x79);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x79 =0x%x", read_op);
+//     hal_trace_puts(str);
+//     
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7a);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7a =0x%x errorcode=%0x", read_op, errorcode);
+//     hal_trace_puts(str);
+//     
+//     hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[3], 0x80); //reads bits from 24-31
+    //has_finished_to_read();
+    
+//      hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[2], 0x81); //reads bits from 23-16
+    //has_finished_to_read();
+//      hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[1], 0x82); //reads bits from 15-8
+    //has_finished_to_read();
+//      hal_brdcfg_switch__reg_read_byI2C(&read_op, 0x7B);
+//     snprintf(str, sizeof(str), "in HAL: read_op addr 0x7b =0x%x", read_op);
+//     hal_trace_puts(str);
+    
+    hal_brdcfg_switch__reg_read_byI2C(&buff_read[0], 0x83); //reads bits from 7-0
+    //has_finished_to_read();
+    
+    result->value = (((uint32_t)(buff_read[3]&0x3F))<< 24) | (((uint32_t)buff_read[2])<<16) | (((uint32_t)buff_read[1])<<8) | buff_read[0];
+    //result->value = aux3 <<24 | aux2<<16 | aux1<<8 | aux0;
+
+    
+    if((buff_read[3]&0x80) == 0x80)
+    {
+        result->counteroverflow = 1;
+    }
+    else
+    {
+        result->counteroverflow = 0;
+    }
+    
+    if((buff_read[3]&0x40) == 0x40)  
+    {
+        result->validvalue = 1;
+    }
+    else
+    {
+        result->validvalue = 0;
+    }
+    return(hal_res_OK);
+}  
+#else
+extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{   
+    result->value = 0;
+    result->counteroverflow = 0;
+    result->validvalue = 1;
+    
+    return(hal_res_OK);
+} 
+#endif
 
 #endif//HAL_USE_PERIPH_ETH
 
@@ -694,6 +978,15 @@
         }
     };
 #endif//HAL_USE_DEVICE_ENCODER  
+    
+#ifdef HAL_USE_DEVICE_ENCODER_FAKE
+    #include "hal_encoder.h"
+    #include "hal_device_encoder_hid.h"
+    extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig =
+    {
+        .supported_mask             = (0 << hal_encoder1) | (0 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6)
+    };
+#endif//HAL_USE_DEVICE_ENCODER_FAKE      
   
 
 #ifdef  HAL_USE_DEVICE_ETHTRANSCEIVER
@@ -1045,6 +1338,32 @@ static hal_result_t chip_micrel_ks8893_configure(hal_eth_phymode_t* usedphymode)
             }
         }
     };
+    
+    
+
+#include "hl_i2c.h"
+
+// i dont verify constants. i just map to i2c1 and address of micrel 0xbe
+
+#define HL_I2CID                    hl_i2c1
+#define HL_MICREL_DEVADR            0xBE  
+
+extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
+{
+    hl_i2c_regaddr_t regaddr = { .numofbytes = 1, .bytes.one = 0 };
+    regaddr.bytes.one = (uint8_t) (WriteAddr & 0xff);
+    hl_i2c_write(HL_I2CID, HL_MICREL_DEVADR, regaddr, pBuffer, 1);    
+}
+
+extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAddr)
+{
+    hl_i2c_regaddr_t regaddr = { .numofbytes = 1, .bytes.one = 0 };
+    regaddr.bytes.one = (uint8_t) (ReadAddr & 0xff);
+    hl_i2c_read(HL_I2CID, HL_MICREL_DEVADR, regaddr, pBuffer, 1);     
+}
+
+    
+    
 #else
 
     static hal_result_t s_switch_init(void* p)

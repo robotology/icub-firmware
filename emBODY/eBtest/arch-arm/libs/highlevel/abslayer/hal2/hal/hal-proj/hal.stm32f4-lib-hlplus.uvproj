@@ -766,6 +766,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\devices\hal_device_eeprom_dummy.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_device_encoder_fake.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\extra\devices\hal_device_encoder_fake.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1799,6 +1804,11 @@
               <FileName>hal_device_eeprom_dummy.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\devices\hal_device_eeprom_dummy.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_device_encoder_fake.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\extra\devices\hal_device_encoder_fake.c</FilePath>
             </File>
           </Files>
         </Group>

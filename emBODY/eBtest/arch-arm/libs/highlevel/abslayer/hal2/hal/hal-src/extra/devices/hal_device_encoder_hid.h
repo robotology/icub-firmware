@@ -32,8 +32,8 @@
 
 #include "hal_base.h"
 
-#include "hal_mux.h"
-#include "hal_spi.h"
+//#include "hal_mux.h"
+//#include "hal_spi.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -48,17 +48,19 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+// acemor: removed the mux, mus_sel and spi toi amke it compile w/ dummy 
 typedef struct
 {
     uint8_t                 supported_mask;
-    hal_mux_t               muxid[hal_encoders_number];         /**< which mux id is used for each encoder */
-    hal_mux_sel_t           muxsel[hal_encoders_number];        /**< which mux selection is used of the mux port */
-    hal_spi_t               spiid[hal_encoders_number];         /**< which spi port is used for each encoder */
+//    hal_mux_t               muxid[hal_encoders_number];         /**< which mux id is used for each encoder */
+//    hal_mux_sel_t           muxsel[hal_encoders_number];        /**< which mux selection is used of the mux port */
+//    hal_spi_t               spiid[hal_encoders_number];         /**< which spi port is used for each encoder */
 } hal_device_encoder_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

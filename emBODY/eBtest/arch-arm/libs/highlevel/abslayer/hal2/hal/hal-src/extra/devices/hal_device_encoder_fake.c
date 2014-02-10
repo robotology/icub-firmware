@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_ENCODER
+#ifdef HAL_USE_DEVICE_ENCODER_FAKE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -78,11 +78,11 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default = { .priority = hal_int_p
 typedef struct
 {
     hal_encoder_cfg_t       config;
-    hal_mux_t               muxid;
-    hal_mux_sel_t           muxsel;
-    hal_spi_t               spiid;
+//    hal_mux_t               muxid;
+//    hal_mux_sel_t           muxsel;
+//    hal_spi_t               spiid;
     hal_encoder_position_t  position;
-    uint8_t                 rxframe[4];
+//    uint8_t                 rxframe[4];
 } hal_device_encoder_internal_item_t;
 
 
@@ -102,14 +102,15 @@ static void s_hal_device_encoder_initted_set(hal_encoder_t id);
 static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t id);
 
 
-static void s_hal_encoder_onreceiv(void* p);
+//static void s_hal_encoder_onreceiv(void* p);
 
-static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame);
+//static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if 0
 static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
 {
     .ownership                  = hal_spi_ownership_master,
@@ -123,7 +124,7 @@ static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
     .capacityofrxfifoofframes   = 1,
     .dummytxvalue               = 0
 };   
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -134,19 +135,6 @@ static hal_device_encoder_theinternals_t s_hal_device_encoder_theinternals =
     .initted            = 0,
     .items              = { NULL }   
 };
-
-
-// static hal_device_encoder_internal_item_t s_hal_device_encoder_internals[hal_encoders_number] = 
-// {
-//     {
-//         .config     = { .priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL }, 
-//         .muxid    = hal_mux_port1, 
-//         .muxsel     = hal_mux_selNONE, 
-//         .spiid    = hal_spi_port1, 
-//         .position   = 0, 
-//         .rxframe    = {0}
-//     }
-// };
 
 
 
@@ -182,19 +170,19 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     }       
     
     memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
-    intitem->muxid   = hal_brdcfg_device_encoder__theconfig.muxid[HAL_device_encoder_id2index(id)];
-    intitem->muxsel    = hal_brdcfg_device_encoder__theconfig.muxsel[HAL_device_encoder_id2index(id)];
-    intitem->spiid   = hal_brdcfg_device_encoder__theconfig.spiid[HAL_device_encoder_id2index(id)];
+//    intitem->muxid   = hal_brdcfg_device_encoder__theconfig.muxid[HAL_device_encoder_id2index(id)];
+ //   intitem->muxsel    = hal_brdcfg_device_encoder__theconfig.muxsel[HAL_device_encoder_id2index(id)];
+//    intitem->spiid   = hal_brdcfg_device_encoder__theconfig.spiid[HAL_device_encoder_id2index(id)];
     intitem->position  = 0;
     
 
     
      
-    #warning HAL-WIP --> configure mux and spi. obviously if already initted we dont init the spi and the port anymore.
+//    #warning HAL-WIP --> configure mux and spi. obviously if already initted we dont init the spi and the port anymore.
     
-    hal_mux_init(intitem->muxid, NULL);
+//    hal_mux_init(intitem->muxid, NULL);
     
-    hal_spi_init(intitem->spiid, &s_hal_device_encoder_spicfg_master);
+//    hal_spi_init(intitem->spiid, &s_hal_device_encoder_spicfg_master);
     
  
     s_hal_device_encoder_initted_set(id);
@@ -214,11 +202,11 @@ extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
     // do something 
     
        
-    hal_mux_enable(intitem->muxid, intitem->muxsel);
+//    hal_mux_enable(intitem->muxid, intitem->muxsel);
     
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
+//    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
     
-    hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
+//    hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
     
     // quando il frame sara' stato ricevuto allora si chiamera' la callback che prima scrive in ram. poi ...
     
@@ -245,8 +233,7 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
         return(hal_res_OK);
     }
     
-    return(hal_res_NOK_generic);
-   
+    return(hal_res_NOK_generic);   
 }
 
 
@@ -288,7 +275,7 @@ static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t id)
 }
 
 
-
+#if 0
 static void s_hal_encoder_onreceiv(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversione from pointer to smaller integer
@@ -312,8 +299,10 @@ static void s_hal_encoder_onreceiv(void* p)
     }
     
 }
+#endif
 
 
+#if 0
 static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame)
 {
     uint32_t pos = 0;
@@ -324,7 +313,7 @@ static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame)
     pos = pos >> 5;
     return(pos);
 }
-
+#endif
 
 #endif//HAL_USE_DEVICE_ENCODER
 
