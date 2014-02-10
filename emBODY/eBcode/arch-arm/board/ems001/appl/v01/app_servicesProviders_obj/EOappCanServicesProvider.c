@@ -38,7 +38,12 @@
 
 //abs
 #include "hal.h"
-//#include "hal_debugPin.h"
+
+#if     defined(HAL_USE_VERSION_2)
+#warning --> this include is correct only if we use stm32f407
+#include "hal_cpu_nam_stm32f407.h"
+#include "hal_core_cfg.h"
+#endif
 
 //embobj
 #include "EoCommon.h"
@@ -238,12 +243,15 @@ extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
     return(retptr);
 }
 
+
 extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port, uint8_t *numofTXframe)
 {
     uint8_t                 numofoutframe = 0;
-    hal_arch_arm_irqn_t     irqn;
-
-    irqn = (eOcanport1 == port)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#if     defined(HAL_USE_VERSION_2)  
+    hal_irqn_t              irqn = (eOcanport1 == port)? hal_cpu_nam_stm32f407_CAN1_TX_IRQn : hal_cpu_nam_stm32f407_CAN2_TX_IRQn;    
+#else
+    hal_irqn_t              irqn = (eOcanport1 == port)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#endif    
    
     if(NULL == p)
     {
@@ -527,7 +535,6 @@ extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t ru
 extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t canport, eOboolvalues_t waitflag)
 {
     uint8_t                 numofoutframe = 0;
-    hal_arch_arm_irqn_t     irqn;
     eOresult_t              res = eores_OK;
     hal_result_t            halres;
 
@@ -537,8 +544,12 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
         return(eores_NOK_nullpointer);
     }
 
-  
-    irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#if     defined(HAL_USE_VERSION_2)  
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_cpu_nam_stm32f407_CAN1_TX_IRQn : hal_cpu_nam_stm32f407_CAN2_TX_IRQn;    
+#else
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#endif    
+     
 
     //disa tx
     hal_sys_irqn_disable(irqn);
@@ -569,7 +580,6 @@ extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t 
 
 extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport)
 {
-    hal_arch_arm_irqn_t irqn;
     osal_result_t osal_res;
     
     if(NULL == p)
@@ -593,7 +603,11 @@ extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t c
     }
     
     //if i'm here i wake up
-    irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#if     defined(HAL_USE_VERSION_2)  
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_cpu_nam_stm32f407_CAN1_TX_IRQn : hal_cpu_nam_stm32f407_CAN2_TX_IRQn;    
+#else
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#endif  
    
     //disa tx
     hal_sys_irqn_disable(irqn);
@@ -611,8 +625,6 @@ extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t c
 extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t canport)
 {
     uint8_t                 numofoutframe = 0, after = 0;
-    hal_arch_arm_irqn_t     irqn;
-//    char                    str[100];
 
     if(NULL == p)
     {
@@ -620,7 +632,11 @@ extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t ca
     }
 
 
-    irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#if     defined(HAL_USE_VERSION_2)  
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_cpu_nam_stm32f407_CAN1_TX_IRQn : hal_cpu_nam_stm32f407_CAN2_TX_IRQn;    
+#else
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#endif  
 
     //disa tx
     hal_sys_irqn_disable(irqn);
@@ -662,7 +678,11 @@ extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t can
         return(eores_NOK_nullpointer);
     }
 
-    hal_arch_arm_irqn_t irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#if     defined(HAL_USE_VERSION_2)  
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_cpu_nam_stm32f407_CAN1_TX_IRQn : hal_cpu_nam_stm32f407_CAN2_TX_IRQn;    
+#else
+    hal_irqn_t              irqn = (eOcanport1 == canport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+#endif  
    
     //disa tx
     hal_sys_irqn_disable(irqn);
@@ -1002,6 +1022,11 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
     can_cfg_port1.baudrate           = hal_can_baudrate_1mbps; 
     can_cfg_port1.priorx             = hal_int_priority11;
     can_cfg_port1.priotx             = hal_int_priority11;
+#if     defined(HAL_USE_VERSION_2)    
+    can_cfg_port1.capacityofrxfifoofframes   = HALCAN1capacityofrxfifoofframes;
+    can_cfg_port1.capacityoftxfifoofframes   = HALCAN1capacityoftxfifoofframes;
+    can_cfg_port1.capacityoftxfifohighprio   = HALCAN1capacityoftxfifohighprio;
+#endif       
     can_cfg_port1.callback_on_rx     = s_eo_appCanSP_callbackOnRx_port1_allertOnReception;
     can_cfg_port1.arg_cb_rx          = (void*)p;
     can_cfg_port1.callback_on_tx     = s_eo_appCanSP_callbackOnTx_port1_waittransmission;
@@ -1015,6 +1040,11 @@ static eOresult_t s_eo_appCanSP_canPeriphInit(EOappCanSP *p)
     can_cfg_port2.baudrate           = hal_can_baudrate_1mbps; 
     can_cfg_port2.priorx             = hal_int_priority11;
     can_cfg_port2.priotx             = hal_int_priority11;
+#if     defined(HAL_USE_VERSION_2)    
+    can_cfg_port2.capacityofrxfifoofframes   = HALCAN2capacityofrxfifoofframes;
+    can_cfg_port2.capacityoftxfifoofframes   = HALCAN2capacityoftxfifoofframes;
+    can_cfg_port2.capacityoftxfifohighprio   = HALCAN2capacityoftxfifohighprio;    
+#endif    
     can_cfg_port2.callback_on_rx     = s_eo_appCanSP_callbackOnRx_port2_allertOnReception;
     can_cfg_port2.arg_cb_rx          = (void*)p;
     can_cfg_port2.callback_on_tx     = s_eo_appCanSP_callbackOnTx_port2_waittransmission;
@@ -1170,7 +1200,11 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         {
             if(eores_NOK_busy == res)
             {
-                hal_arch_arm_irqn_t irqn = (eOcanport1 == emscanport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+                #if     defined(HAL_USE_VERSION_2)  
+                    hal_irqn_t              irqn = (eOcanport1 == emscanport)? hal_cpu_nam_stm32f407_CAN1_TX_IRQn : hal_cpu_nam_stm32f407_CAN2_TX_IRQn;    
+                #else
+                    hal_irqn_t              irqn = (eOcanport1 == emscanport)? hal_arch_arm_CAN1_TX_IRQn : hal_arch_arm_CAN2_TX_IRQn;
+                #endif  
                 
                 hal_sys_irqn_disable(irqn);
                 p->waittxdata[emscanport].waitenable = eobool_true;

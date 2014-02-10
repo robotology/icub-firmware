@@ -95,6 +95,43 @@ static void s_eo_appEncReader_check(EOappEncReader *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
+#if     defined(HAL_USE_VERSION_2)
+
+#define HALv1_encoder1      hal_encoder1
+#define HALv1_encoder2      hal_encoder2
+#define HALv1_encoder3      hal_encoder3
+#define HALv1_encoder4      hal_encoder1
+#define HALv1_encoder5      hal_encoder1
+#define HALv1_encoder6      hal_encoder1
+#define HALv1_encoder7      hal_encoder4
+#define HALv1_encoder8      hal_encoder5
+#define HALv1_encoder9      hal_encoder6
+
+static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
+{
+    /* 0 */     hal_encoder1,
+    /* 1 */     hal_encoder1,
+    /* 2 */     hal_encoder1,
+    /* 3 */     hal_encoder1,
+    /* 4 */     hal_encoder1,
+    /* 5 */     hal_encoder1
+};
+
+#warning --> in HAL2 the mapping of encoders is to be reviewed
+
+#else
+
+#define HALv1_encoder1      hal_encoder1
+#define HALv1_encoder2      hal_encoder2
+#define HALv1_encoder3      hal_encoder3
+#define HALv1_encoder4      hal_encoder4
+#define HALv1_encoder5      hal_encoder5
+#define HALv1_encoder6      hal_encoder6
+#define HALv1_encoder7      hal_encoder7
+#define HALv1_encoder8      hal_encoder8
+#define HALv1_encoder9      hal_encoder9
+
 static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
 {
     /* 0 */     hal_encoder1,
@@ -104,6 +141,8 @@ static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
     /* 4 */     hal_encoder3,
     /* 5 */     hal_encoder9
 };
+
+#endif
 
 
 
@@ -127,12 +166,12 @@ extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
     //map application encoder num in hal econder num
     s_eo_appEncReader_mapAppNumbering2HalNumbering(retptr);
     //configure connected encoders
-    s_eo_appEncReader_readConnectedEncConfg(retptr, &(retptr->configuredEnc_SPI1.readSeq), hal_encoder1, hal_encoder3 );
-    s_eo_appEncReader_readConnectedEncConfg(retptr, &(retptr->configuredEnc_SPI3.readSeq), hal_encoder7, hal_encoder9);
+    s_eo_appEncReader_readConnectedEncConfg(retptr, &(retptr->configuredEnc_SPI1.readSeq), HALv1_encoder1, HALv1_encoder3 );
+    s_eo_appEncReader_readConnectedEncConfg(retptr, &(retptr->configuredEnc_SPI3.readSeq), HALv1_encoder7, HALv1_encoder9);
 
     //configure connected encoders
-    s_eo_appEncReader_configureConnectedEncoders(retptr, hal_encoder1, hal_encoder3, &(retptr->configuredEnc_SPI1.readSeq));
-    s_eo_appEncReader_configureConnectedEncoders(retptr, hal_encoder7, hal_encoder9, &(retptr->configuredEnc_SPI3.readSeq));
+    s_eo_appEncReader_configureConnectedEncoders(retptr, HALv1_encoder1, HALv1_encoder3, &(retptr->configuredEnc_SPI1.readSeq));
+    s_eo_appEncReader_configureConnectedEncoders(retptr, HALv1_encoder7, HALv1_encoder9, &(retptr->configuredEnc_SPI3.readSeq));
     
     //reset diagnostics info
     memset(&retptr->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));
@@ -172,13 +211,13 @@ extern eOresult_t  eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *dat
         return(eores_NOK_nullpointer);
     }
 
-    hal_encoder_get_value(hal_encoder1, &data_ptr[0]);
-    hal_encoder_get_value(hal_encoder2, &data_ptr[2]);
-    hal_encoder_get_value(hal_encoder3, &data_ptr[4]);
+    hal_encoder_get_value(HALv1_encoder1, &data_ptr[0]);
+    hal_encoder_get_value(HALv1_encoder2, &data_ptr[2]);
+    hal_encoder_get_value(HALv1_encoder3, &data_ptr[4]);
 
-    hal_encoder_get_value(hal_encoder7, &data_ptr[1]);
-    hal_encoder_get_value(hal_encoder8, &data_ptr[3]);
-    hal_encoder_get_value(hal_encoder9, &data_ptr[5]);
+    hal_encoder_get_value(HALv1_encoder7, &data_ptr[1]);
+    hal_encoder_get_value(HALv1_encoder8, &data_ptr[3]);
+    hal_encoder_get_value(HALv1_encoder9, &data_ptr[5]);
 
     return(eores_OK);
 }
@@ -281,11 +320,20 @@ static void s_eo_appEncReader_readConnectedEncConfg(EOappEncReader *p, EOappEncR
 static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_encoder_t startEnc, hal_encoder_t endEnc, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX)
 {
     uint8_t i;
+#if     defined(HAL_USE_VERSION_2)    
+    hal_encoder_cfg_t enc_cfg =
+    {
+        .priority           = INTPRIO_SPI_ENCODERS,
+        .callback_on_rx     = NULL,
+        .arg                = NULL
+    };
+#else
     hal_encoder_cfg_t enc_cfg =
     {
         .priority = INTPRIO_SPI_ENCODERS,
         .bitrate = hal_encoder_bitrate_500kbps
     };
+#endif    
 
     for(i=startEnc; i<=endEnc; i++)
     {
@@ -300,7 +348,7 @@ static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_
             else
             {
                 //is the last
-                if(startEnc == hal_encoder1 )
+                if(startEnc == HALv1_encoder1 )
                 {
                     enc_cfg.callback_on_rx = s_eo_appEncReader_isrCbk_onLastEncRead_SPI1;
                 }
