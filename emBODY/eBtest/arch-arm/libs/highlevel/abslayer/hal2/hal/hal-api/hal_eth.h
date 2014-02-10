@@ -134,6 +134,34 @@ typedef enum
 } hal_eth_t;
 
 enum { hal_eths_number = 1 };
+
+
+// added for diagnostics support for ethernet
+typedef struct
+{
+    uint32_t linkisup:1;
+    uint32_t autoNeg_done:1;
+    uint32_t linkisgood:1;
+    uint32_t linkspeed:1; // 1== 100Mb 0==10Mb
+    uint32_t linkduplex:1; //1==full 0==half
+    uint32_t dummy:27;
+} hal_eth_phy_status_t;
+
+typedef enum
+{
+    rxCrcError  = 0x07,
+    rxUnicast   = 0x0D,
+    rx64Octets  = 0x0E,
+    txUnicast   = 0x1A
+} hal_eth_phy_errors_info_type_t;
+
+typedef struct
+{
+    uint32_t value;
+    uint32_t counteroverflow:1;
+    uint32_t validvalue:1;
+    uint32_t dummy:30;
+} hal_eth_phy_errorsinfo_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -181,6 +209,43 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame);
  **/
 extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void);
 
+
+
+
+/** @fn         extern hal_boolval_t hal_eth_check_links(void)
+    @brief      checks all physical links. In output linkst_mask indicate each phy status: 
+                if bit in pos x values 1 then phy num x is up, else is down. phy num starts to count from 0.
+                links_num in output contains num of used phy.
+    @return     if linkst_mask or links_num is null returns hal_res_NOK_nullpointer else hal_res_OK
+    @warning    It is board dependent.
+ **/
+extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num);
+
+
+/** @fn         extern hal_result_t hal_eth_check_links(void)
+    @brief      check all physical links.
+    @param      links_num           num of links to check. 
+                For example, in ems board @links_num can value 1-3.(third links is rmii)
+    @param      link_list           pointer to vector of @links_num elements. In output contains links' status.
+    @return     error if @links_list is null or links_num is bigger than num of link present on boards.
+    @warning    It is board dependent
+ **/
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num);
+
+
+/** @fn         extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, uint32_t *result)
+    @brief      in output @result will contain num of errors of tyepe @errortype on physical link @phynum
+    @return     hal_res_OK or hal_res_NOK_...
+    @warning    It is board dependent
+ **/
+extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
+
+extern void hal_eth_smi_init(void);
+
+extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
+
+// writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
+extern void hal_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
 
 /** @}            
