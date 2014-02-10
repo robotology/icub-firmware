@@ -103,23 +103,23 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default;   // = { .priority = hal
 extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg);
 
 
-/** @fn			extern hal_result_t hal_encoder_start(hal_encoder_t id)
+/** @fn			extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
     @brief  	This function starts reading of data from the encoder in a non-blocking way.
                 When reading is finished, then the callback on reception is invoked, which can
                 retrieve the value with hal_encoder_read().
     @param  	encoder 	    the encoder
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_start(hal_encoder_t id);
+extern hal_result_t hal_encoder_read_start(hal_encoder_t id);
 
 
-/** @fn			extern uint32_t hal_encoder_read(hal_encoder_t id, hal_encoder_position_t* value);
+/** @fn			extern uint32_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value);
     @brief  	This function reads data previously acquired by a call of hal_encoder_start().
     @param  	encoder 	    the encoder
     @param  	value 	        keeps the value.
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_read(hal_encoder_t id, hal_encoder_position_t* value);
+extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value);
 
 
 
