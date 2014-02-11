@@ -284,11 +284,10 @@ extern hl_result_t hl_can_comm_enable(hl_can_t id)
     s_hl_can_comm_nvic_err_enable(id);// VALE
 
     CAN_TypeDef* stm32can = HL_can_port2peripheral(id);
-
-#warning README: debugged with the code uncommented. commented only because v01 app in ems004 hangs in here if no can bus is attached.    
+   
     // it is in can driver by K&%L. it was not in hal-1. it seems not be important. 
-//     stm32can->MCR &= ~(1 << 0);             /* normal operating mode, reset INRQ   */
-//     while (stm32can->MSR & (1 << 0));
+    stm32can->MCR &= ~(1 << 0);             /* normal operating mode, reset INRQ   */
+    while (stm32can->MSR & (1 << 0));
 
 
     // enable scheduling 
