@@ -183,8 +183,8 @@
                 {
                     .gpio   =
                     {
-                        .port   = hal_gpio_portI, 
-                        .pin    = hal_gpio_pin9
+                        .port   = hal_gpio_portD, 
+                        .pin    = hal_gpio_pin0
                     },
                     .af32       = GPIO_AF_CAN1          
                 }, 
@@ -192,8 +192,8 @@
                 {
                     .gpio   =
                     {
-                        .port   = hal_gpio_portB, 
-                        .pin    = hal_gpio_pin5
+                        .port   = hal_gpio_portD, 
+                        .pin    = hal_gpio_pin1
                     },
                     .af32       = GPIO_AF_CAN1          
                 } 
@@ -213,7 +213,7 @@
                     .gpio   =
                     {
                         .port   = hal_gpio_portB, 
-                        .pin    = hal_gpio_pin3
+                        .pin    = hal_gpio_pin6
                     },
                     .af32       = GPIO_AF_CAN2          
                 } 
