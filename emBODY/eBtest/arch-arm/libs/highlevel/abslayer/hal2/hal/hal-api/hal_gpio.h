@@ -233,7 +233,7 @@ extern hal_result_t hal_gpio_init(hal_gpio_t gpio, const hal_gpio_cfg_t* cfg);
 
 
 /** @fn         extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
-    @brief      Sets the value of the given gpiot 
+    @brief      Sets the value of the given gpio 
     @param      gpio            The gpio. 
     @param      value           The target value.
     @return     If successful hal_res_OK

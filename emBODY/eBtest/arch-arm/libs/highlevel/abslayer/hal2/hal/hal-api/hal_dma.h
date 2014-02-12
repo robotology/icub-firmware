@@ -91,7 +91,8 @@ typedef enum
     hal_dma13 = 12,        /**< DMA port13 */
     hal_dma14 = 13,        /**< DMA port14 */
     hal_dma15 = 14,        /**< DMA port15 */
-    hal_dma16 = 15         /**< DMA port16 */
+    hal_dma16 = 15,         /**< DMA port16 */
+    hal_dmaNONE = 255,         /**< DMA port16 */
 } hal_dma_t; 
 
 enum { hal_dmas_number = 16 };
