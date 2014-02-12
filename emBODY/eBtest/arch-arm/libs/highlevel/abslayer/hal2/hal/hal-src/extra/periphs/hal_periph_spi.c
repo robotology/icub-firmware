@@ -173,11 +173,11 @@ static const SPI_InitTypeDef s_hal_spi_stm32_cfg =
     .SPI_Direction                  = SPI_Direction_2Lines_FullDuplex,
     .SPI_Mode                       = SPI_Mode_Master,                              // param
     .SPI_DataSize                   = SPI_DataSize_8b, 
-    .SPI_CPOL                       = SPI_CPOL_Low, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
-    .SPI_CPHA                       = SPI_CPHA_2Edge, //SPI_CPHA_2Edge,
+    .SPI_CPOL                       = SPI_CPOL_High, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
+    .SPI_CPHA                       = SPI_CPHA_1Edge, //SPI_CPHA_2Edge,
     .SPI_NSS                        = SPI_NSS_Soft,
     .SPI_BaudRatePrescaler          = SPI_BaudRatePrescaler_64,                      // param: depends on speed
-    .SPI_FirstBit                   = SPI_FirstBit_LSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
+    .SPI_FirstBit                   = SPI_FirstBit_MSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
     .SPI_CRCPolynomial              = 0x0007 // reset value
 };
 
@@ -202,7 +202,8 @@ static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
     static const hal_dma_t s_hal_spi_dma_port2use_tx[hal_spis_number] = { hal_dma3, hal_dma5, hal_dma9 };
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
 
-    #error to be done
+    static const hal_dma_t s_hal_spi_dma_port2use_rx[hal_spis_number] = { hal_dmaNONE, hal_dma4, hal_dma1 };
+    static const hal_dma_t s_hal_spi_dma_port2use_tx[hal_spis_number] = { hal_dmaNONE, hal_dma5, hal_dma6 };
     
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
@@ -719,6 +720,7 @@ static void s_hal_spi_hw_init(hal_spi_t id)
         // spi periph clock enable
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
         
+        // the reset and exit from reset is also done by SPI_I2S_DeInit() ..... thus it can be removed from here
         // reset spi periph
         RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1, ENABLE);
         
@@ -732,6 +734,7 @@ static void s_hal_spi_hw_init(hal_spi_t id)
         // spi periph clock enable
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPIx, ENABLE);
         
+        // the reset and exit from reset is also done by SPI_I2S_DeInit() ..... thus it can be removed from here
         // reset spi periph
         RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPIx, ENABLE);
         
@@ -907,12 +910,12 @@ static void s_hal_spi_hw_gpio_init(hal_spi_t id, hal_spi_ownership_t ownership)
     hal_bool_t foundmosi = hal_false;
 
 
-    hal_gpio_port_t portsck  = hal_brdcfg_spi__sck[HAL_spi_id2index(id)].gpio.port;
-    hal_gpio_pin_t  pinsck   = hal_brdcfg_spi__sck[HAL_spi_id2index(id)].gpio.pin;        
-    hal_gpio_port_t portmiso = hal_brdcfg_spi__miso[HAL_spi_id2index(id)].gpio.port;
-    hal_gpio_pin_t  pinmiso  = hal_brdcfg_spi__miso[HAL_spi_id2index(id)].gpio.pin;
-    hal_gpio_port_t portmosi = hal_brdcfg_spi__mosi[HAL_spi_id2index(id)].gpio.id;
-    hal_gpio_pin_t  pinmosi  = hal_brdcfg_spi__mosi[HAL_spi_id2index(id)].gpio.pin;       
+    hal_gpio_port_t portsck  = hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].sck.gpio.port;
+    hal_gpio_pin_t  pinsck   = hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].sck.gpio.pin;        
+    hal_gpio_port_t portmiso = hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].miso.gpio.port;
+    hal_gpio_pin_t  pinmiso  = hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].miso.gpio.pin;
+    hal_gpio_port_t portmosi = hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].mosi.gpio.port;
+    hal_gpio_pin_t  pinmosi  = hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].mosi.gpio.pin;       
    
     
     if(hal_spi1 == id)
@@ -994,23 +997,36 @@ static void s_hal_spi_hw_gpio_init(hal_spi_t id, hal_spi_ownership_t ownership)
     }
     
     
+    hal_gpio_cfg_t hal_spi_sck_cfg;
+    hal_gpio_cfg_t hal_spi_miso_cfg;
+    hal_gpio_cfg_t hal_spi_mosi_cfg;
     hal_gpio_altcfg_t hal_spi_sck_altcfg;   
     hal_gpio_altcfg_t hal_spi_miso_altcfg;
     hal_gpio_altcfg_t hal_spi_mosi_altcfg;
 
     
     // prepare the altcfg for sck miso mosi pins
-    memcpy(&hal_spi_sck_altcfg, &s_hal_spi_misomosisck_altcfg, sizeof(hal_gpio_altcfg_t));
-    memcpy(&hal_spi_miso_altcfg, &s_hal_spi_misomosisck_altcfg, sizeof(hal_gpio_altcfg_t));
-    memcpy(&hal_spi_mosi_altcfg, &s_hal_spi_misomosisck_altcfg, sizeof(hal_gpio_altcfg_t));
+    memcpy(&hal_spi_sck_altcfg.gpioext, &s_hal_spi_misomosisck_altcfg, sizeof(GPIO_InitTypeDef));
+    memcpy(&hal_spi_miso_altcfg.gpioext, &s_hal_spi_misomosisck_altcfg, sizeof(GPIO_InitTypeDef));
+    memcpy(&hal_spi_mosi_altcfg.gpioext, &s_hal_spi_misomosisck_altcfg, sizeof(GPIO_InitTypeDef));
     hal_spi_sck_altcfg.afname = hal_spi_miso_altcfg.afname = hal_spi_mosi_altcfg.afname = afname;
     hal_spi_sck_altcfg.afmode = hal_spi_miso_altcfg.afmode = hal_spi_mosi_altcfg.afmode = afmode;
     
+    // the gpiocfgs.
+    hal_spi_sck_cfg.dir     = hal_gpio_dirALT;
+    hal_spi_sck_cfg.speed   = hal_gpio_speed_default;
+    hal_spi_sck_cfg.altcfg  = &hal_spi_sck_altcfg;
+    hal_spi_miso_cfg.dir    = hal_gpio_dirALT;
+    hal_spi_miso_cfg.speed  = hal_gpio_speed_default;
+    hal_spi_miso_cfg.altcfg = &hal_spi_miso_altcfg;    
+    hal_spi_mosi_cfg.dir    = hal_gpio_dirALT;
+    hal_spi_mosi_cfg.speed  = hal_gpio_speed_default;
+    hal_spi_mosi_cfg.altcfg = &hal_spi_mosi_altcfg;
     
     // configure sck miso mosi pins    
-    hal_gpio_configure(hal_brdcfg_spi__sck[HAL_spi_id2index(id)], &hal_spi_sck_altcfg); 
-    hal_gpio_configure(hal_brdcfg_spi__miso[HAL_spi_id2index(id)], &hal_spi_miso_altcfg);    
-    hal_gpio_configure(hal_brdcfg_spi__mosi[HAL_spi_id2index(id)], &hal_spi_mosi_altcfg);    
+    hal_gpio_init(hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].sck.gpio, &hal_spi_sck_cfg); 
+    hal_gpio_init(hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].miso.gpio, &hal_spi_miso_cfg);    
+    hal_gpio_init(hal_brdcfg_spi__theconfig.gpiomap[HAL_spi_id2index(id)].mosi.gpio, &hal_spi_mosi_cfg);    
 
     
 #else //defined(HAL_USE_CPU_FAM_*)

@@ -176,13 +176,13 @@ static DMA_Stream_TypeDef* const s_hal_dma_memory_mapping_of_ports[hal_dmas_numb
     DMA2_Stream0, DMA2_Stream1, DMA2_Stream2, DMA2_Stream3, DMA2_Stream4, DMA2_Stream5, DMA2_Stream6, DMA2_Stream7
 }; 
 
-static const uint32_t s_hal_dma_periphclocks[hal_dmas_num] = 
+static const uint32_t s_hal_dma_periphclocks[hal_dmas_number] = 
 {
     RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1, RCC_AHB1Periph_DMA1,
     RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2, RCC_AHB1Periph_DMA2
 };
 
-static const uint32_t s_hal_dma_irqflag_gl[hal_dmas_num] =
+static const uint32_t s_hal_dma_irqflag_gl[hal_dmas_number] =
 {
     DMA_FLAG_TCIF0|DMA_FLAG_HTIF0|DMA_FLAG_TEIF0|DMA_FLAG_DMEIF0|DMA_FLAG_FEIF0, 
     DMA_FLAG_TCIF1|DMA_FLAG_HTIF1|DMA_FLAG_TEIF1|DMA_FLAG_DMEIF1|DMA_FLAG_FEIF1,
@@ -201,7 +201,7 @@ static const uint32_t s_hal_dma_irqflag_gl[hal_dmas_num] =
     DMA_FLAG_TCIF6|DMA_FLAG_HTIF6|DMA_FLAG_TEIF6|DMA_FLAG_DMEIF6|DMA_FLAG_FEIF6    
 };
 
-static const IRQn_Type s_hal_dma_irqnumber[hal_dmas_num] =
+static const IRQn_Type s_hal_dma_irqnumber[hal_dmas_number] =
 {
     DMA1_Stream0_IRQn, DMA1_Stream1_IRQn, DMA1_Stream2_IRQn, DMA1_Stream3_IRQn, DMA1_Stream4_IRQn, DMA1_Stream5_IRQn, DMA1_Stream6_IRQn, DMA1_Stream7_IRQn,
     DMA2_Stream0_IRQn, DMA2_Stream1_IRQn, DMA2_Stream2_IRQn, DMA2_Stream3_IRQn, DMA2_Stream4_IRQn, DMA2_Stream5_IRQn, DMA2_Stream6_IRQn, DMA2_Stream7_IRQn   
@@ -269,7 +269,8 @@ extern hal_result_t hal_dma_init(hal_dma_t id, const hal_dma_cfg_t *cfg)
  
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
-    #error --> verifica nel progetto stm32f4x spi con dam come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1  
+    RCC_AHB1PeriphClockCmd(s_hal_dma_periphclocks[HAL_dma_id2index(id)], ENABLE);
+    #warning --> verifica nel progetto stm32f4x spi con dma come viene inizializzato il dma. vedi anche i registri poiche' sono diversi dal stm32f1  
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif 
@@ -398,7 +399,7 @@ extern hal_result_t hal_dma_retrigger(hal_dma_t id)
     intitem->stopit = hal_false;
     
     DMA_Cmd(intitem->stm32dmaperiph, DISABLE);
-    intitem->stm32dmaperiph->CNDTR  = intitem->stm32dmainit.DMA_BufferSize;
+    intitem->stm32dmaperiph->NDTR  = intitem->stm32dmainit.DMA_BufferSize;
     DMA_Cmd(intitem->stm32dmaperiph, ENABLE);
     
     return(hal_res_OK);
@@ -439,8 +440,8 @@ extern hal_result_t hal_dma_source_set(hal_dma_t id, void* source)
     intitem->stopit = hal_false;
     
     DMA_Cmd(intitem->stm32dmaperiph, DISABLE);
-    intitem->stm32dmaperiph->CPAR   = intitem->stm32dmainit.DMA_PeripheralBaseAddr;
-    intitem->stm32dmaperiph->CNDTR  = intitem->stm32dmainit.DMA_BufferSize;
+    intitem->stm32dmaperiph->PAR   = intitem->stm32dmainit.DMA_PeripheralBaseAddr;
+    intitem->stm32dmaperiph->NDTR  = intitem->stm32dmainit.DMA_BufferSize;
     DMA_Cmd(intitem->stm32dmaperiph, ENABLE);
     
     return(hal_res_OK);
@@ -476,8 +477,8 @@ extern hal_result_t hal_dma_destin_set(hal_dma_t id, void* destin)
     intitem->stm32dmaperiph->CMAR   = intitem->stm32dmainit.DMA_MemoryBaseAddr;
     intitem->stm32dmaperiph->CNDTR  = intitem->stm32dmainit.DMA_BufferSize;
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)   
-    intitem->stm32dmaperiph->CMAR   = intitem->stm32dmainit.DMA_MemoryBaseAddr;
-    intitem->stm32dmaperiph->CNDTR  = intitem->stm32dmainit.DMA_BufferSize;
+    intitem->stm32dmaperiph->M0AR   = intitem->stm32dmainit.DMA_Memory0BaseAddr;
+    intitem->stm32dmaperiph->NDTR  = intitem->stm32dmainit.DMA_BufferSize;
 #else //defined(HAL_USE_CPU_FAM_*)
     #error ERR --> choose a HAL_USE_CPU_FAM_*
 #endif          
