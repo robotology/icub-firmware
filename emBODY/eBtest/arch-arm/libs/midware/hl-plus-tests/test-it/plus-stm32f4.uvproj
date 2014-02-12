@@ -676,6 +676,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1389,6 +1394,11 @@
               <FileName>hl_can_comm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
           </Files>
         </Group>
