@@ -253,6 +253,43 @@ struct hl_timer_advcfg_opaque_t
 // --
 // -- timer section: end
 
+
+// -- spi section: begin
+// --
+
+#include "hl_spi.h"
+
+
+
+struct hl_spi_advcfg_opaque_t
+{   // the same as SPI_InitTypeDef   
+    uint16_t    SPI_Direction;
+    uint16_t    SPI_Mode;
+    uint16_t    SPI_DataSize; 
+    uint16_t    SPI_CPOL;     
+    uint16_t    SPI_CPHA;   
+    uint16_t    SPI_NSS;   
+    uint16_t    SPI_BaudRatePrescaler;   
+    uint16_t    SPI_FirstBit;          
+    uint16_t    SPI_CRCPolynomial;      
+};
+
+extern const hl_spi_advcfg_t hl_spi_advcfg_default; // =
+//{   
+//    .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
+//    .SPI_Mode               = SPI_Mode_Master,                              
+//    .SPI_DataSize           = SPI_DataSize_8b, 
+//    .SPI_CPOL               = SPI_CPOL_High, 
+//    .SPI_CPHA               = SPI_CPHA_1Edge, 
+//    .SPI_NSS                = SPI_NSS_Soft,
+//    .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_256,                      
+//    .SPI_FirstBit           = SPI_FirstBit_MSB, 
+//    .SPI_CRCPolynomial      = 0x0007 
+//};
+
+// --
+// -- spi section: end
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
