@@ -467,6 +467,74 @@ extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 
 
+#if     defined(HL_USE_UTIL_SPI)
+
+
+#include "hl_spi.h"
+
+static const hl_spi_mapping_t s_hl_spi_mapping =
+{
+    .supported_mask     = (0 << hl_spi1) | (1 << hl_spi2) | (1 << hl_spi3),
+    .gpiomap            =
+    { 
+       {    // hl_spi1 
+            .sck = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = hl_NA32        
+            }, 
+            .miso = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = hl_NA32               
+            },
+            .mosi = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = hl_NA32               
+            }             
+        },         
+        {   // hl_spi2 
+            .sck = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = GPIO_AF_SPI2        
+            }, 
+            .miso = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = GPIO_AF_SPI2               
+            },
+            .mosi = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = GPIO_AF_SPI2               
+            }             
+        },         
+        {   // hl_spi3 
+            .sck = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = GPIO_AF_SPI3        
+            }, 
+            .miso = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = GPIO_AF_SPI3               
+            },
+            .mosi = 
+            {
+                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .af32   = GPIO_AF_SPI3               
+            }             
+        }         
+    } 
+};
+
+extern const hl_spi_mapping_t* hl_spi_map = &s_hl_spi_mapping;
+
+#endif//defined(HL_USE_UTIL_SPI)
+
 #else
     #error --> define a board
 #endif

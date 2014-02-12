@@ -91,7 +91,7 @@
 #define HL_USE_UTIL_ETHTRANS
 #define HL_USE_UTIL_CAN
 #define HL_USE_UTIL_CAN_COMM
-
+#define HL_USE_UTIL_SPI
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
 
