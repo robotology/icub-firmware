@@ -476,6 +476,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION(), CHANGE_MODE_STOP_ACC);
         o->control_mode = eomc_controlmode_velocity;
+        o->velocity_timer = VELOCITY_TIMEOUT;
         break;
 
     case eomc_controlmode_cmd_switch_everything_off:
@@ -507,6 +508,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION(), CHANGE_MODE_STOP_ACC);
         o->err = 0;
         o->control_mode = eomc_controlmode_impedance_vel;
+        o->velocity_timer = VELOCITY_TIMEOUT;
         break;
 
     case eomc_controlmode_cmd_current:
@@ -564,11 +566,12 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
         case eomc_controlmode_velocity:
             if (o->velocity_timer)
             {
-                if (!--o->velocity_timer)
-                {
-                    eo_trajectory_VelocityStop(o->trajectory);
-                    o->control_mode = eomc_controlmode_position;    
-                }
+                --o->velocity_timer;
+            }
+            else
+            {
+                eo_trajectory_VelocityStop(o->trajectory);
+                o->control_mode = eomc_controlmode_position; 
             }
         case eomc_controlmode_position:
         {            
@@ -593,14 +596,15 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
         case eomc_controlmode_impedance_vel:
             if (o->velocity_timer)
             {
-                if (!--o->velocity_timer)
-                {
-                    eo_trajectory_VelocityStop(o->trajectory);
-                    o->control_mode = eomc_controlmode_impedance_pos;
-
-                    o->err = 0;
-                }
+                --o->velocity_timer;
             }
+            else
+            {
+                eo_trajectory_VelocityStop(o->trajectory);
+                o->control_mode = eomc_controlmode_impedance_pos;
+
+                o->err = 0;
+            } 
         case eomc_controlmode_impedance_pos:
         {       
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
