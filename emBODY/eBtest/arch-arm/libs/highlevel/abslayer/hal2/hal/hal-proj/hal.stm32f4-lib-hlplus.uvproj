@@ -841,6 +841,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_periph_spi_minimal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -930,6 +935,11 @@
               <FileName>hl_can_comm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1920,6 +1930,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_periph_spi_minimal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal-src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2009,6 +2024,11 @@
               <FileName>hl_can_comm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
           </Files>
         </Group>
