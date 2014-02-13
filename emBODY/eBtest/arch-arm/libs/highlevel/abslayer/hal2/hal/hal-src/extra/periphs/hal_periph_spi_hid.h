@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+#warning --> to be reviewd with isr no dma
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _HAL_PERIPH_SPI_HID_H_
