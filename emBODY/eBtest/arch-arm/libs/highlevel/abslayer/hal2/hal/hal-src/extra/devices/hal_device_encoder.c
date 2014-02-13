@@ -115,13 +115,16 @@ static const hal_spi_cfg_t s_hal_device_encoder_spicfg_master =
     .ownership                  = hal_spi_ownership_master,
     .direction                  = hal_spi_dir_rxonly,
     .activity                   = hal_spi_act_framebased,
-    .speed                      = hal_spi_speed_0562kbps, 
+    .prescaler                  = hal_spi_prescaler_064,
+    .speed                      = hal_spi_speed_dontuse, 
     .sizeofframe                = 3,
-    .onframetransm              = NULL,
-    .onframereceiv              = s_hal_encoder_onreceiv,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
-    .dummytxvalue               = 0
+    .dummytxvalue               = 0,    
+    .onframetransm              = NULL,
+    .argonframetransm           = NULL,
+    .onframereceiv              = s_hal_encoder_onreceiv,
+    .argonframereceiv           = NULL
 };   
 
 
@@ -135,18 +138,6 @@ static hal_device_encoder_theinternals_t s_hal_device_encoder_theinternals =
     .items              = { NULL }   
 };
 
-
-// static hal_device_encoder_internal_item_t s_hal_device_encoder_internals[hal_encoders_number] = 
-// {
-//     {
-//         .config     = { .priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL }, 
-//         .muxid    = hal_mux_port1, 
-//         .muxsel     = hal_mux_selNONE, 
-//         .spiid    = hal_spi_port1, 
-//         .position   = 0, 
-//         .rxframe    = {0}
-//     }
-// };
 
 
 
@@ -182,9 +173,9 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     }       
     
     memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
-    intitem->muxid   = hal_brdcfg_device_encoder__theconfig.muxid[HAL_device_encoder_id2index(id)];
-    intitem->muxsel    = hal_brdcfg_device_encoder__theconfig.muxsel[HAL_device_encoder_id2index(id)];
-    intitem->spiid   = hal_brdcfg_device_encoder__theconfig.spiid[HAL_device_encoder_id2index(id)];
+    intitem->spiid  = hal_brdcfg_device_encoder__theconfig.spimap[HAL_device_encoder_id2index(id)].spiid;    
+    intitem->muxid  = hal_brdcfg_device_encoder__theconfig.spimap[HAL_device_encoder_id2index(id)].muxid;
+    intitem->muxsel = hal_brdcfg_device_encoder__theconfig.spimap[HAL_device_encoder_id2index(id)].muxsel;
     intitem->position  = 0;
     
 

@@ -76,7 +76,7 @@
     #include "hal_periph_i2c_hid.h"
 #endif//HAL_USE_PERIPH_I2C
 
-#ifdef HAL_USE_PERIPH_SPI
+#if     defined(HAL_USE_PERIPH_SPI) | defined(HAL_USE_PERIPH_SPI_MINIMAL)
     #include "hal_periph_spi_hid.h"
 #endif//HAL_USE_PERIPH_SPI
 
@@ -205,7 +205,7 @@
     extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig;
 #endif//HAL_USE_PERIPH_I2C
 
-#ifdef  HAL_USE_PERIPH_SPI
+#if     defined(HAL_USE_PERIPH_SPI) | defined(HAL_USE_PERIPH_SPI_MINIMAL)
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
 #endif//HAL_USE_PERIPH_SPI
          

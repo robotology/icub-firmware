@@ -140,6 +140,11 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
         return(hal_res_NOK_generic);
     }
     
+    if(hal_true == s_hal_mux_initted_is(id))
+    {
+        return(hal_res_OK);
+    }
+    
     if(NULL == cfg)
     {
         cfg = &hal_mux_cfg_default;

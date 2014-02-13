@@ -658,7 +658,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
 #endif//HAL_USE_PERIPH_I2C
 
 
-#ifdef  HAL_USE_PERIPH_SPI
+#if     defined(HAL_USE_PERIPH_SPI) | defined(HAL_USE_PERIPH_SPI_MINIMAL)
 
     extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig =
     {
@@ -719,7 +719,8 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
         }
            
     };
-#endif//HAL_USE_PERIPH_SPI
+    
+#endif//HAL_USE_PERIPH_SPI/HAL_USE_PERIPH_SPI_MINIMAL
     
       
 #ifdef  HAL_USE_PERIPH_TIMER
@@ -976,22 +977,32 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
 
 
 #ifdef HAL_USE_DEVICE_ENCODER
-#warning --> verify mapping of encoder
+
     extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig =
     {
-        .supported_mask             = (0 << hal_encoder1) | (0 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6), 
-        .muxid                      = 
-        {   
-            hal_mux1,   hal_mux1,  hal_mux1,  hal_mux1,  hal_mux1,  hal_mux1           
-        },
-        .muxsel                     = 
-        {   
-            hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE,hal_mux_selNONE           
-        },  
-        .spiid                      = 
-        {   
-            hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1,  hal_spi_port1           
+        .supported_mask             = (1 << hal_encoder1) | (1 << hal_encoder2) | (1 << hal_encoder3) | (1 << hal_encoder4) | (1 << hal_encoder5) | (1 << hal_encoder6), 
+        .spimap                     =
+        {
+            {   // hal_encoder1
+                .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selA                
+            },
+            {   // hal_encoder2
+                .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selB                
+            },            
+            {   // hal_encoder3
+                .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selC                
+            },
+            {   // hal_encoder4
+                .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selA                
+            },
+            {   // hal_encoder5
+                .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selB                
+            },            
+            {   // hal_encoder6
+                .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selC                
+            }                        
         }
+
     };
 #endif//HAL_USE_DEVICE_ENCODER  
     
@@ -1179,7 +1190,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
 #warning --> configure mux
     extern const hal_device_mux_hid_brdcfg_t hal_brdcfg_device_mux__theconfig =
     {
-        .supported_mask             = (0 << hal_mux1) | (0 << hal_mux2) | (0 << hal_mux3) | (0 << hal_mux4), 
+        .supported_mask             = (0 << hal_mux1) | (1 << hal_mux2) | (1 << hal_mux3) | (0 << hal_mux4), 
         .gpiomap                    =
         {
             {   // hal_mux1   
@@ -1202,34 +1213,34 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
             {   // hal_mux2   
                 .gpio_sel0              =                
                 {    
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .gpio   = { .port = hal_gpio_portD,  .pin = hal_gpio_pin2 }, 
                     .af32   = hal_NA32
                 },                      
                 .gpio_sel1              =
                 {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .gpio   = { .port = hal_gpio_portD,  .pin = hal_gpio_pin3 }, 
                     .af32   = hal_NA32                    
                 },
                 .gpio_enable            =
                 {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .gpio   = { .port = hal_gpio_portD,  .pin = hal_gpio_pin4 }, 
                     .af32   = hal_NA32                    
                 }
             },
             {   // hal_mux3   
                 .gpio_sel0              =                
                 {    
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .gpio   = { .port = hal_gpio_portD,  .pin = hal_gpio_pin5 }, 
                     .af32   = hal_NA32
                 },                      
                 .gpio_sel1              =
                 {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .gpio   = { .port = hal_gpio_portD,  .pin = hal_gpio_pin6 }, 
                     .af32   = hal_NA32                    
                 },
                 .gpio_enable            =
                 {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .gpio   = { .port = hal_gpio_portD,  .pin = hal_gpio_pin7 }, 
                     .af32   = hal_NA32                    
                 }
             }, 
