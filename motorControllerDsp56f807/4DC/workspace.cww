@@ -54,7 +54,7 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>462</HGT>
+            <HGT>895</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
@@ -79,7 +79,7 @@
             <COLUMN>0</COLUMN>
             <DOCKBARID>59420</DOCKBARID>
             <PCTWIDTH>1.000000</PCTWIDTH>
-            <HGT>462</HGT>
+            <HGT>895</HGT>
             <GROUPID>
                 <GIDHIGHPART>29802212</GIDHIGHPART>
                 <GIDLOWPART>1992947498</GIDLOWPART>
@@ -113,7 +113,7 @@
         <DEBUGTARGETNAME>C:\Software\iCub\src\controller_rm2\a.out</DEBUGTARGETNAME>
             <REGISTERWINDOW><WINDOWINDEX>0</WINDOWINDEX>
             <DIVIDERPOS>512</DIVIDERPOS>
-            <REGDISCLOSE NAME = "" TYPE = "115474180" DISCLOSED = "0">
+            <REGDISCLOSE NAME = "" TYPE = "113535164" DISCLOSED = "0">
                 <REGDISCLOSE NAME = "xxx remote connection" TYPE = "3" DISCLOSED = "1">
                     <REGDISCLOSE NAME = "a.out" TYPE = "4" DISCLOSED = "1">
                         <REGDISCLOSE NAME = "" TYPE = "5" DISCLOSED = "1">
