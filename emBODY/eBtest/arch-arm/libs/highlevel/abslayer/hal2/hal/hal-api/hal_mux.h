@@ -94,7 +94,7 @@ extern const hal_mux_cfg_t hal_mux_cfg_default;   // = { .dummy = 0 };
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 /** @fn			extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
-    @brief  	This function initializes the mux.
+    @brief  	This function initializes the mux. if called multiple times it initialise only the first time
     @param  	id 	            the mux id
     @param  	cfg 	        The configuration of the mux. 
     @return 	hal_res_NOK_generic in case the mux is not supported, else hal_res_OK
