@@ -983,22 +983,22 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
         .supported_mask             = (1 << hal_encoder1) | (1 << hal_encoder2) | (1 << hal_encoder3) | (1 << hal_encoder4) | (1 << hal_encoder5) | (1 << hal_encoder6), 
         .spimap                     =
         {
-            {   // hal_encoder1
+            {   // hal_encoder1:    P6 on ems4rd
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selA                
             },
-            {   // hal_encoder2
+            {   // hal_encoder2:    P8 on ems4rd
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selB                
             },            
-            {   // hal_encoder3
+            {   // hal_encoder3:    P10 on ems4rd
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selC                
             },
-            {   // hal_encoder4
+            {   // hal_encoder4:    P7 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selA                
             },
-            {   // hal_encoder5
+            {   // hal_encoder5:    P9 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selB                
             },            
-            {   // hal_encoder6
+            {   // hal_encoder6:    P11 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selC                
             }                        
         }
