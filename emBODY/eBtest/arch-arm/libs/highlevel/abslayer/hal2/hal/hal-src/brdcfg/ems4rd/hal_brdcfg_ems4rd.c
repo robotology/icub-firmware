@@ -1473,7 +1473,16 @@ static hal_result_t s_hal_brdcfg_extbrds__static_memory_init(void);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_hal_brdcfg_ems4rd_vaux_5v0_init(void);
+static void s_hal_brdcfg_ems4rd_vaux_5v0_on(void);
 
+extern hal_result_t hal_brdcfg__start(void)
+{
+    s_hal_brdcfg_ems4rd_vaux_5v0_init();
+    s_hal_brdcfg_ems4rd_vaux_5v0_on();
+
+    return(hal_res_OK);    
+}
 
 
 extern hal_result_t hal_brdcfg__static_memory_init(void)

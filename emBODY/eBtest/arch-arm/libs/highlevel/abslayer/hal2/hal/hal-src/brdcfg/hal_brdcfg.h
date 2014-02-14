@@ -48,9 +48,10 @@
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 //extern uint32_t hal_brdcfg__getsize(const hal_base_cfg_t *cfg);
+
 extern hal_result_t hal_brdcfg__static_memory_init(void);
 
-
+extern hal_result_t hal_brdcfg__start(void);
 
 // - other declarations which are specific of the chosen board
 

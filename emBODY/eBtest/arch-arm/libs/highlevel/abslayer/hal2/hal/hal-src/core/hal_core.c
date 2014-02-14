@@ -178,6 +178,8 @@ extern hal_result_t hal_core_start(void)
             
     s_hal_core_theinternals.status = hal_core_status_started;
     
+    hal_brdcfg__start();
+    
     return(hal_res_OK);
 }
 
