@@ -497,34 +497,34 @@ static const hl_spi_mapping_t s_hl_spi_mapping =
         {   // hl_spi2 
             .sck = 
             {
-                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .gpio   = { .port = hl_gpio_portB,      .pin = hl_gpio_pin10 }, 
                 .af32   = GPIO_AF_SPI2        
             }, 
             .miso = 
             {
-                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .gpio   = { .port = hl_gpio_portC,      .pin = hl_gpio_pin2 }, 
                 .af32   = GPIO_AF_SPI2               
             },
             .mosi = 
             {
-                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .gpio   = { .port = hl_gpio_portC,      .pin = hl_gpio_pin3 }, 
                 .af32   = GPIO_AF_SPI2               
             }             
         },         
         {   // hl_spi3 
             .sck = 
             {
-                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .gpio   = { .port = hl_gpio_portC,      .pin = hl_gpio_pin10 }, 
                 .af32   = GPIO_AF_SPI3        
             }, 
             .miso = 
             {
-                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .gpio   = { .port = hl_gpio_portC,      .pin = hl_gpio_pin11 }, 
                 .af32   = GPIO_AF_SPI3               
             },
             .mosi = 
             {
-                .gpio   = { .port = hl_gpio_portNONE,      .pin = hl_gpio_pinNONE }, 
+                .gpio   = { .port = hl_gpio_portC,      .pin = hl_gpio_pin12 }, 
                 .af32   = GPIO_AF_SPI3               
             }             
         }         
