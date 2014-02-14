@@ -49,6 +49,7 @@
 
 #include "hl_gpio.h"
 #include "hl_sys.h"
+//#include "hal_trace.h"
 
 extern void hl_system_stm32fx_before_setsysclock(void)
 {
@@ -66,6 +67,7 @@ extern void hl_system_stm32fx_before_setsysclock(void)
     hl_gpio_pin_write(notethrst, hl_gpio_valSET);
     uint32_t i = 0;
     i++;
+//    hal_trace_puts("executed hl_system_stm32fx_before_setsysclock() w/ code for EMS4RD_USE_MICREL_AS_MANAGED_DEVICE"); 
 #endif    
 }
 

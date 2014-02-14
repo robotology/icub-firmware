@@ -67,7 +67,8 @@
 //#include "hal_chip_generic_ethtransceiver_hid.h"
 
 
-
+#include "hl_cfg_plus_target.h"
+#include "hl_cfg_plus_modules.h"
 
 
 
@@ -178,7 +179,7 @@
         .supported_mask     = (1 << hal_can1) | (1 << hal_can2),
        .gpiomap            =
         {   
-            {   // hl_can1 
+            {   // hal_can1 
                 .rx = 
                 {
                     .gpio   =
@@ -198,7 +199,7 @@
                     .af32       = GPIO_AF_CAN1          
                 } 
             }, 
-            {   // hl_can2 
+            {   // hal_can2 
                 .rx = 
                 {
                     .gpio   =
@@ -1033,7 +1034,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
         .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
         .resetval           = hl_gpio_valRESET,
         .extclockinit       = s_hal_brdcfg_ks8893__extclock_init,
-        .targetphymode      = hl_ethtrans_phymode_auto        
+        .targetphymode      = hl_ethtrans_phymode_auto //hl_ethtrans_phymode_fullduplex10mbps //hl_ethtrans_phymode_auto        
     };    
     
     static hal_result_t s_hal_micrel_init(void* param)
