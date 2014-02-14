@@ -536,7 +536,7 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     
     // hl_ethtrans_phymode_fullduplex100mbps or hl_ethtrans_phymode_auto
     hl_ethtrans_config(&usedphymode);
-    #warning --> using hl_ethtrans_phymode_fullduplex100mbps: VERIFY ITTTTTTTTTTTTTTTTTTTT
+    //#warning --> using hl_ethtrans_phymode_fullduplex100mbps: VERIFY ITTTTTTTTTTTTTTTTTTTT
     
     if(hl_ethtrans_phymode_none == usedphymode)
     {
