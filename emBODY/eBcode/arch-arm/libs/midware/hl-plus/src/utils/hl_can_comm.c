@@ -746,7 +746,7 @@ static void s_hl_can_comm_sendframes_canx(hl_can_t id)
 
 static void s_hl_can_comm_isr_recvframe_canx(hl_can_t id)
 {
-    static hl_can_comm_frame_t canframe =
+    volatile hl_can_comm_frame_t canframe =
     {
         .id         = 0,
         .id_type    = hl_can_comm_frameID_std,
@@ -790,7 +790,8 @@ static void s_hl_can_comm_isr_recvframe_canx(hl_can_t id)
     //*((uint64_t*)pcanframe->data) = *((uint64_t*)RxMessage.Data);
     canframe.id     = RxMessage.StdId;
     canframe.size   = RxMessage.DLC;
-    *data           = *((uint64_t*)RxMessage.Data);
+    //*data           = *((uint64_t*)RxMessage.Data);
+    memcpy(data, &RxMessage.Data, sizeof(RxMessage.Data));
     
     hl_fifo_put16(fiforx, (uint8_t*)&canframe);
 
