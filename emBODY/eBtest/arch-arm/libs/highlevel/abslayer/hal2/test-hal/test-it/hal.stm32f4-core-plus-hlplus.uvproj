@@ -427,14 +427,14 @@
           <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hl_cfg_plus_modules.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
-            </File>
-            <File>
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
               <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
@@ -871,6 +871,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_periph_spi_minimal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -990,6 +995,11 @@
               <FileName>hl_can_comm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1446,14 +1456,14 @@
           <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hl_cfg_plus_modules.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
-            </File>
-            <File>
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
               <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
@@ -1890,6 +1900,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_periph_spi_minimal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2009,6 +2024,11 @@
               <FileName>hl_can_comm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2465,14 +2485,14 @@
           <GroupName>hl-plus-cfg</GroupName>
           <Files>
             <File>
-              <FileName>hl_cfg_plus_modules.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
-            </File>
-            <File>
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_target.h</FilePath>
+            </File>
+            <File>
+              <FileName>hl_cfg_plus_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\hal\hal-src\brdcfg\hl_cfg_plus_modules.h</FilePath>
             </File>
             <File>
               <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
@@ -3069,6 +3089,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_watchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_periph_spi_minimal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\hal\hal-src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3188,6 +3213,11 @@
               <FileName>hl_can_comm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_can_comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
           </Files>
         </Group>
