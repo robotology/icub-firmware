@@ -81,15 +81,16 @@ const hl_spi_cfg_t hl_spi_cfg_default =
     .advcfg         = NULL
 };
 
+// for ems001 was: SPI_CPOL_High, but SPI_CPOL_Low is OK for ems4rd 
 const hl_spi_advcfg_t hl_spi_advcfg_default =
 {   
     .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
     .SPI_Mode               = SPI_Mode_Master,                              // param
     .SPI_DataSize           = SPI_DataSize_8b, 
-    .SPI_CPOL               = SPI_CPOL_High, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
+    .SPI_CPOL               = SPI_CPOL_Low, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
     .SPI_CPHA               = SPI_CPHA_1Edge, //SPI_CPHA_2Edge,
     .SPI_NSS                = SPI_NSS_Soft,
-    .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_256,                      // param: depends on speed
+    .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_64,                      // param: depends on speed
     .SPI_FirstBit           = SPI_FirstBit_MSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
     .SPI_CRCPolynomial      = 0x0007 // reset value
 };
