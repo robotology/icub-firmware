@@ -81,7 +81,7 @@
 //#undef  USE_EVENTVIEWER
 
 #undef  EXECUTE_TEST_FLASH
-#define EXECUTE_TEST_FLASH
+//#define EXECUTE_TEST_FLASH
 
 
 
@@ -89,10 +89,10 @@
 //#define EXECUTE_TEST_SYS_DELAY
 
 #undef EXECUTE_TEST_PERIPH_I2C
-#define EXECUTE_TEST_PERIPH_I2C
+//#define EXECUTE_TEST_PERIPH_I2C
 
 #undef  EXECUTE_TEST_DEVICE_EEPROM
-#define EXECUTE_TEST_DEVICE_EEPROM
+//#define EXECUTE_TEST_DEVICE_EEPROM
 
 
 #undef  EXECUTE_TEST_PERIPH_TIMER
@@ -103,6 +103,10 @@
 
 #undef EXECUTE_TEST_PERIPH_UNIQUEID
 //#define EXECUTE_TEST_PERIPH_UNIQUEID
+
+
+#undef EXECUTE_TEST_ENCODER
+#define EXECUTE_TEST_ENCODER
 
 
 #undef EXECUTE_TEST_PERIPH_CAN
@@ -127,7 +131,7 @@
 //#define EXECUTE_TEST_DEVICE_SWITCH
 
 #undef EXECUTE_TEST_PERIPH_ETH
-#define EXECUTE_TEST_PERIPH_ETH
+//#define EXECUTE_TEST_PERIPH_ETH
 
 
 #ifdef EXECUTE_TEST_PERIPH_ETH
@@ -224,6 +228,10 @@ static void test_periph_eth(void);
 #if     defined(EXECUTE_TEST_DEVICE_SWITCH)    
 static void test_device_switch(void);
 #endif//defined(EXECUTE_TEST_DEVICE_SWITCH)   
+
+#if     defined(EXECUTE_TEST_ENCODER)    
+static void test_encoder(void);
+#endif//defined(EXECUTE_TEST_ENCODER)  
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -378,6 +386,10 @@ int main(void)
     test_periph_uniqueid();
 #endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)  
 
+
+#if     defined(EXECUTE_TEST_ENCODER)    
+    test_encoder(); // forever loop
+#endif//defined(EXECUTE_TEST_ENCODER)  
 
 // keep it last, as it contains a forever loop
 
@@ -1595,6 +1607,64 @@ static void test_periph_eth(void)
     
 }
 #endif//defined(EXECUTE_TEST_PERIPH_ETH)
+
+
+
+#if     defined(EXECUTE_TEST_ENCODER)    
+
+#include "hal_encoder.h"
+
+static hal_encoder_position_t positioncbk = 0;
+
+static void test_encoder_cbk(void* arg);
+
+static const hal_encoder_t hal_encoder = hal_encoder1;
+static void test_encoder(void)
+{
+    
+    static hal_encoder_cfg_t encodercfg =
+    {
+        .priority           = hal_int_priority03,
+        .callback_on_rx     = test_encoder_cbk,
+        .arg                = NULL
+    };
+    
+    hal_encoder_position_t position = 0;
+
+    
+    char str[128] = {0};
+
+    
+    hal_result_t res = hal_res_NOK_generic;
+    res = hal_encoder_init(hal_encoder, &encodercfg);
+    res = res;
+    uint32_t tt = 0;
+    
+    for(;;)
+    {
+        hal_sys_delay(1*hal_RELTIME_1second);
+        res = hal_encoder_read_start(hal_encoder);
+        res = res;
+        hal_sys_delay(1*hal_RELTIME_1second);
+        res = hal_encoder_get_value(hal_encoder, &position);
+        position = position;
+        tt = (position >> 2) & 0xfff0;
+        snprintf(str, sizeof(str), "encoder reading: %d, orig = 0x%x", tt, position);
+        hal_trace_puts(str);
+       
+    }
+       
+}
+
+static void test_encoder_cbk(void* arg)
+{
+    hal_result_t rr = hal_res_NOK_generic;
+    //rr = hal_encoder_get_value(hal_encoder, &positioncbk);  
+    rr = rr;    
+    positioncbk = positioncbk;    
+}
+
+#endif//defined(EXECUTE_TEST_ENCODER)  
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
