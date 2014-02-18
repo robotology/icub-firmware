@@ -47,6 +47,7 @@
 #include "hal_utility_fifo.h"
 #include "hal_heap.h"
 #include "hl_spi.h"
+#include "hl_arch.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -488,7 +489,7 @@ static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
-    hal_spi_cfg_t *usedcfg = NULL;
+    //hal_spi_cfg_t *usedcfg = NULL;
     uint8_t* tmpbuffer = NULL;
     
     if(NULL == cfg)
@@ -529,12 +530,12 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         return(hal_res_NOK_generic);
     }    
 
-    if(hal_spi_dir_rxonly != usedcfg->direction)  
+    if(hal_spi_dir_rxonly != cfg->direction)  
     {
         return(hal_res_NOK_generic);
     }   
 
-    if(0 == usedcfg->capacityofrxfifoofframes)
+    if(0 == cfg->capacityofrxfifoofframes)
     {
         return(hal_res_NOK_generic);
     }    
@@ -548,11 +549,24 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     //s_hal_spi_hw_init(id);
     //s_hal_spi_hw_enable(id, cfg);
     
+    const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
+    {   
+        .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
+        .SPI_Mode               = SPI_Mode_Master,                              // param
+        .SPI_DataSize           = SPI_DataSize_8b, 
+        .SPI_CPOL               = SPI_CPOL_Low, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
+        .SPI_CPHA               = SPI_CPHA_1Edge, //SPI_CPHA_2Edge,
+        .SPI_NSS                = SPI_NSS_Soft,
+        .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_64,                      // param: depends on speed
+        .SPI_FirstBit           = SPI_FirstBit_MSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
+        .SPI_CRCPolynomial      = 0x0007 // reset value
+    };
+    
     hl_spi_cfg_t hlcfg =
     {
         .mode       = hl_spi_mode_master,
         .prescaler  = hl_spi_prescaler_064, 
-        .advcfg     = NULL                
+        .advcfg     = &hl_spi_advcfg_ems4rd                
     };
     hlcfg.mode = (hal_spi_ownership_master == cfg->ownership) ? (hl_spi_mode_master) : (hl_spi_mode_slave); 
     hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);;
@@ -579,9 +593,10 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         // nothing to init.      
     }      
     
-    // - the config
-    usedcfg = &intitem->config;       
-    memcpy(usedcfg, cfg, sizeof(hal_spi_cfg_t));
+    // - the config   
+    memcpy(&intitem->config, cfg, sizeof(hal_spi_cfg_t));
+    hal_spi_cfg_t *usedcfg = NULL;
+    usedcfg = &intitem->config;    
     
 
     // only frame-based
