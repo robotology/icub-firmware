@@ -575,6 +575,7 @@ Int32 compute_pid_impedance(byte j)
 Int32 compute_pid_torque(byte j, Int16 strain_val)
 {
 	Int32 ProportionalPortion, DerivativePortion, IntegralPortion;
+	Int32 FeedforwardPortion;
 	Int32 IntegralError;
 	Int32 PIDoutput;
 	Int32 InputError;
@@ -603,11 +604,22 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	{
 		_error_torque[j] = extract_l(InputError);
 	}
-			
+
+    /* Feed-forward */
+    FeedforwardPortion = (Int32)strain_val * ((Int32)_kff_torque[j]);
+	if (FeedforwardPortion>=0) 
+	{
+		FeedforwardPortion = FeedforwardPortion >> _kr_torque[j]; 
+	}
+	else
+	{
+		FeedforwardPortion = -(-FeedforwardPortion >> _kr_torque[j]);
+	}
+	    
 	/* Proportional */
 	ProportionalPortion = ((Int32) _error_torque[j]) * ((Int32)_kp_torque[j]);
-	
-	if (ProportionalPortion>=0)
+
+	if (ProportionalPortion>=0) 
 	{
 		ProportionalPortion = ProportionalPortion >> _kr_torque[j]; 
 	}
@@ -663,8 +675,9 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 		IntegralPortion = - (_integral_limit_torque[j]);
 		_integral[j] = (-_integral_limit_torque[j]);
 	}
-		
-	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
+	
+	_pd[j] = L_add(ProportionalPortion, FeedforwardPortion);
+	_pd[j] = L_add(_pd[j], DerivativePortion);
 	_pi[j] = IntegralPortion;
 	PIDoutput = L_add(_pd[j], IntegralPortion);
 	
