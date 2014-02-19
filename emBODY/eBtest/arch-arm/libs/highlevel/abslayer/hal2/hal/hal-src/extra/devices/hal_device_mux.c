@@ -191,6 +191,7 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
 extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
 {    
     hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)];
+    const hal_reltime_t delay = 1; // specs say 50 ns are enough. granularity of hal_sys_delay() is 1 micro. if we use w/ arg 0 we have a very small delay of ... > 50 nano?
     
     static const hal_gpio_val_t s_values_sel0[hal_mux_sels_number] = {hal_gpio_valLOW,   hal_gpio_valHIGH,   hal_gpio_valLOW};
     static const hal_gpio_val_t s_values_sel1[hal_mux_sels_number] = {hal_gpio_valLOW,   hal_gpio_valLOW,    hal_gpio_valHIGH};
@@ -209,11 +210,10 @@ extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
     }
     
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
-    hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
+    hal_sys_delay(delay);   // specs say 50 ns are enough. granularity of hal_sys_delay() is 1 micro. we use 0 to give the smallest delay
     hal_gpio_setval(intitem->sel0, s_values_sel0[(uint8_t)muxsel]);    
-    hal_gpio_setval(intitem->sel1, s_values_sel1[(uint8_t)muxsel]);   
-    
-    hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
+    hal_gpio_setval(intitem->sel1, s_values_sel1[(uint8_t)muxsel]);       
+    hal_sys_delay(delay);   // specs say 50 ns are enough
     
     hal_gpio_setval(intitem->enable, hal_gpio_valLOW);
     
