@@ -219,7 +219,10 @@ extern hl_result_t hl_sys_delay(hl_reltime_t reltime)
     volatile uint64_t num = s_hl_sys_numofops1sec * reltime;
     num >>= 20; 
     //num -= offset; //we may remove some cycles to compensates for previous instructions, but ... we dont do it. it depends on c compiler optimisation 
-    
+    if(0 == num)
+    {
+        return(hl_res_OK);
+    }
     s_hl_sys_asm_xnumARMv7ops((uint32_t)num);
     
     return(hl_res_OK);
