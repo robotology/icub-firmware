@@ -185,7 +185,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     // initialise the eth transceiver.
     if(hal_res_OK != hal_ethtransceiver_init(NULL))
     {
-        hal_base_on_fatalerror(hal_fatalerror_missingmemory, "hal_ethtransceiver_init() failed");
+        hal_base_on_fatalerror(hal_fatalerror_generic, "hal_ethtransceiver_init() failed");
     }
     
     intitem->hl_eth_config.macaddress                = intitem->config.macaddress;
