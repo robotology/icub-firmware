@@ -401,14 +401,15 @@ extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id)
 
 
 // agisco sul bit SPE (posizione 6)
-#define hal_SPI4ENCODER_ENA(SPIx)    	        ((SPIx)->CR1 |= 0x0040)	 
+//#define hal_SPI4ENCODER_ENA(SPIx)    	        ((SPIx)->CR1 |= 0x0040)	 
 // agisco sul bit SPE (posizione 6)
-#define hal_SPI4ENCODER_DISA(SPIx)              ((SPIx)->CR1 &= 0xFFBF)	 
+//#define hal_SPI4ENCODER_DISA(SPIx)              ((SPIx)->CR1 &= 0xFFBF)	 
 
 static void s_hal_spi_periph_enable(hal_spi_t id) 
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    hal_SPI4ENCODER_ENA(SPIx);                                       // disable peripheral
+    //hal_SPI4ENCODER_ENA(SPIx);                                       
+    SPI_Cmd(SPIx, ENABLE);
 }
 
 
@@ -416,7 +417,8 @@ static void s_hal_spi_periph_disable(hal_spi_t id)
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
     while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);    // wait until it's free	
-    hal_SPI4ENCODER_DISA(SPIx);                                       // disable peripheral
+    //hal_SPI4ENCODER_DISA(SPIx);                                      
+    SPI_Cmd(SPIx, DISABLE);
 }
 
 static void s_hal_spi_read_isr(hal_spi_t id)
@@ -548,16 +550,16 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     //s_hal_spi_hw_gpio_init(id, cfg->ownership);
     //s_hal_spi_hw_init(id);
     //s_hal_spi_hw_enable(id, cfg);
-    
+    // on ems001 and ems4rd it works with SPI_CPOL_High
     const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
     {   
         .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
         .SPI_Mode               = SPI_Mode_Master,                              // param
         .SPI_DataSize           = SPI_DataSize_8b, 
-        .SPI_CPOL               = SPI_CPOL_Low, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
+        .SPI_CPOL               = SPI_CPOL_High, //SPI_CPOL_High, //SPI_CPOL_Low, //SPI_CPOL_Low, // SPI_CPOL_High high is ok with display and also ok with isr mode
         .SPI_CPHA               = SPI_CPHA_1Edge, //SPI_CPHA_2Edge,
         .SPI_NSS                = SPI_NSS_Soft,
-        .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_64,                      // param: depends on speed
+        .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_64, // param: depends on speed. with 64 it it is 42/64 = 0.65625 mhz (or 1.3125 w/ 32)
         .SPI_FirstBit           = SPI_FirstBit_MSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
         .SPI_CRCPolynomial      = 0x0007 // reset value
     };
@@ -793,20 +795,22 @@ static void s_hal_spi_isr_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 }
 
 
-#define hal_SPI4ENCODER_IT_RX_ENA(SPIx)         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
-#define hal_SPI4ENCODER_IT_RX_DISA(SPIx)        SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
+//#define hal_SPI4ENCODER_IT_RX_ENA(SPIx)         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
+//#define hal_SPI4ENCODER_IT_RX_DISA(SPIx)        SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
 //#define hal_SPI4ENCODER_IS_IT_RX_ENA(SPIx)      ((SPIx)->CR2 & 0x40)
 
 static void s_hal_spi_rx_isr_enable(hal_spi_t id)
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    hal_SPI4ENCODER_IT_RX_ENA(SPIx);
+    //hal_SPI4ENCODER_IT_RX_ENA(SPIx);
+    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
 }
 
 static void s_hal_spi_rx_isr_disable(hal_spi_t id)
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    hal_SPI4ENCODER_IT_RX_DISA(SPIx);
+    //hal_SPI4ENCODER_IT_RX_DISA(SPIx);
+    SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
 }
 
 
