@@ -443,7 +443,7 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
             .gpio_mode      = GPIO_Mode_AF,
             .gpio_speed     = GPIO_Speed_50MHz,
             .gpio_otype     = GPIO_OType_PP,
-            .gpio_pupd      = GPIO_PuPd_DOWN
+            .gpio_pupd      = GPIO_PuPd_UP
         }
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERR --> choose a HL_USE_MPU_ARCH_*
@@ -493,7 +493,7 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
             .gpio_mode      = GPIO_Mode_AF,
             .gpio_speed     = GPIO_Speed_50MHz,
             .gpio_otype     = GPIO_OType_PP,
-            .gpio_pupd      = GPIO_PuPd_DOWN
+            .gpio_pupd      = GPIO_PuPd_NOPULL
         }
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERR --> choose a HL_USE_MPU_ARCH_*
