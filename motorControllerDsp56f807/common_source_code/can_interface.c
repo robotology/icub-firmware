@@ -193,7 +193,7 @@ byte can_interface (void)
 			
 #if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION == 0x0351 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0250 || VERSION==0x0257
 
-			if (_canmsg.CAN_ID_class == ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL)
+			if (_canmsg.CAN_ID_class == ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL)
 			{
 				// for messages of class 001, the meaning of data/ID is:
 				// AAA BBBB CCCC, with AAA=Message class, BBBB Source address, CCCC message command
