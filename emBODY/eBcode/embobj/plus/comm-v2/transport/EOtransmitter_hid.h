@@ -65,7 +65,7 @@ typedef struct      // 32 bytes on arm ....
     uint16_t        ropsize;
     uint16_t        timeoffsetinsiderop;    // if time is not present its value is 0xffff 
     EOnv            thenv;
-} eo_transm_regrop_info_t;  EO_VERIFYsizeof(eo_transm_regrop_info_t, (8+24));
+} eo_transm_regrop_info_t;  // EO_VERIFYsizeof(eo_transm_regrop_info_t, (8+24));
 
 
 typedef struct
