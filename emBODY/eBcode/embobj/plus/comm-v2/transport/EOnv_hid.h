@@ -80,7 +80,7 @@ struct EOnv_hid                    // 24 bytes ... multiple of 8
     EOnv_rom_t*                     rom;        // pointer to the constant part common to every device which uses this nv
     void*                           ram;        // the ram which keeps the LOCAL value of nv 
     EOVmutexDerived*                mtx;        // the mutex which protects concurrent access to the ram of this nv (or rem ...) 
-};  EO_VERIFYsizeof(EOnv, 24);   
+};  //EO_VERIFYsizeof(EOnv, 24);   
 
 
 
