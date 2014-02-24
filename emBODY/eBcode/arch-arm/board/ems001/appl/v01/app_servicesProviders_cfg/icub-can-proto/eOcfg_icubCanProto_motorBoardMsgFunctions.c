@@ -219,6 +219,20 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_unexpected_cmd(EOicubCanProto* p
 }
 
 
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_dummy_cmd(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    canFrame->id = 0;
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 8;
+    memset(&canFrame->data[0], 0, 8);
+    return(eores_OK);
+}
+
+
+
+
 extern eOresult_t eo_icubCanProto_former_test(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
