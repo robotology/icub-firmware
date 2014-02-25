@@ -101,24 +101,13 @@ static void s_eo_appEncReader_check(EOappEncReader *p);
 #define HALv1_encoder1      hal_encoder1
 #define HALv1_encoder2      hal_encoder2
 #define HALv1_encoder3      hal_encoder3
-#define HALv1_encoder4      hal_encoder1
-#define HALv1_encoder5      hal_encoder1
-#define HALv1_encoder6      hal_encoder1
+// #define HALv1_encoder4      hal_encoder1 NOT USED 
+// #define HALv1_encoder5      hal_encoder1 NOT USED 
+// #define HALv1_encoder6      hal_encoder1 NOT USED 
 #define HALv1_encoder7      hal_encoder4
 #define HALv1_encoder8      hal_encoder5
 #define HALv1_encoder9      hal_encoder6
 
-static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
-{
-    /* 0 */     hal_encoder1,
-    /* 1 */     hal_encoder1,
-    /* 2 */     hal_encoder1,
-    /* 3 */     hal_encoder1,
-    /* 4 */     hal_encoder1,
-    /* 5 */     hal_encoder1
-};
-
-#warning --> in HAL2 the mapping of encoders is to be reviewed
 
 #else
 
@@ -132,18 +121,18 @@ static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
 #define HALv1_encoder8      hal_encoder8
 #define HALv1_encoder9      hal_encoder9
 
-static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
-{
-    /* 0 */     hal_encoder1,
-    /* 1 */     hal_encoder7,
-    /* 2 */     hal_encoder2,
-    /* 3 */     hal_encoder8,
-    /* 4 */     hal_encoder3,
-    /* 5 */     hal_encoder9
-};
-
 #endif
 
+
+static const hal_encoder_t encoderMap[eOeOappEncReader_encoderMaxNum] =
+{
+    /* 0 */     HALv1_encoder1,
+    /* 1 */     HALv1_encoder7,
+    /* 2 */     HALv1_encoder2,
+    /* 3 */     HALv1_encoder8,
+    /* 4 */     HALv1_encoder3,
+    /* 5 */     HALv1_encoder9
+};
 
 
 // --------------------------------------------------------------------------------------------------------------------
