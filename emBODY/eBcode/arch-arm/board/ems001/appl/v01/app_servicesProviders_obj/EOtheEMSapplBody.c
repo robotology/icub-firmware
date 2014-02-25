@@ -478,6 +478,7 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
 
     if(applrunMode__2foc == p->appRunMode)
     {
+        eo_emsMotorController_GoIdle();
         res = s_eo_emsapplBody_DisableTxStrain(p);
         return(res);
     }
