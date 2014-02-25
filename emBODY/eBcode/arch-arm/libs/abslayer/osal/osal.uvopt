@@ -1288,10 +1288,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>865</TopLine>
-      <CurrentLine>872</CurrentLine>
+      <TopLine>1831</TopLine>
+      <CurrentLine>1855</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\src\osal-oosiit.c</PathWithFileName>
       <FilenameWithoutPath>osal-oosiit.c</FilenameWithoutPath>

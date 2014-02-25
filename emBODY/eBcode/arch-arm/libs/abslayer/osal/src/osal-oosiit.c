@@ -1851,9 +1851,14 @@ static void s_osal_fill_cfg(oosiit_cfg_t *oosiit_c, const osal_cfg_t *osal_c)
     oosiit_c->numMessageBoxElements             = osal_c->mqueueelemnum;
     oosiit_c->sizeof64alignedStack              = osal_c->globalstacksize; 
 #else
+    #if defined(OSAL_CPUFAM_CM4 )
+    #define ISRQUEUESIZE 64
+    #else
+    #define ISRQUEUESIZE 16
+    #endif
     oosiit_c->cpufreq                           = osal_c->cpufreq;
     oosiit_c->ticktime                          = osal_c->tick;
-    oosiit_c->capacityofpostpendcommandfifo     = 16; // ???? the enqueable requests done to rtos within an ISR
+    oosiit_c->capacityofpostpendcommandfifo     = ISRQUEUESIZE; // ???? the enqueable requests done to rtos within an ISR
     oosiit_c->checkstackoverflow                = 1;   // always check stack overflow w/ osiit
     oosiit_c->memorymode                        = (osal_memmode_static == osal_c->memorymodel) ? oosiit_memmode_static : oosiit_memmode_dynamic; //oosiit_memmode_dynamic;
     oosiit_c->roundrobinenabled                 = osal_c->roundrobin;    
