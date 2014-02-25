@@ -490,9 +490,9 @@ static void s_hl_chip_micrel_ks8893_reset(const hl_chip_micrel_ks8893_cfg_t *cfg
     // 3. reset the micrel
     hl_gpio_val_t resetval = cfg->resetval;
     hl_gpio_pin_write(cfg->resetpin, resetval);
-    hl_sys_delay(10*1000);
+    hl_sys_delay(100*1000); // former was 10k
     hl_gpio_pin_write(cfg->resetpin, (hl_gpio_valRESET == resetval) ? (hl_gpio_valSET) : (hl_gpio_valRESET));
-    hl_sys_delay(100);    
+    hl_sys_delay(1000);  //former was 100  
 }
 
 #endif//defined(HL_USE_CHIP_MICREL_KS8893)
