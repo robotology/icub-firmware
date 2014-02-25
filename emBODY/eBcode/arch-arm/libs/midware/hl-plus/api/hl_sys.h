@@ -130,7 +130,8 @@ extern void hl_sys_heap_delete(void* p);
                 depending on compiler optimisation (because some parts of the function are still in C). 
                 On the STM32F407 running at 168Mhz with -O4speed optimisation the function lasts 0.45 
                 micro-sec more.               
-    @param      reltime     the minimum time spent inside this function in microseconds                
+    @param      reltime     the minimum time spent inside this function in microseconds. If 0, it lasts 0.45 micro.
+                            The max allowed time is 60 sec.    
     @return     hl_res_OK upon success.
     @warning    IT MUST BE CALLED AFTER that SystemCoreClockUpdate() has been called. The reason is that the
                 function hl_sys_delay() internally computes how many simple operations to execute on the basis of  
@@ -144,6 +145,10 @@ extern hl_result_t hl_sys_delay(hl_reltime_t reltime);
     @return     It should not return because a reset of the system is invoked, but hl_res_NOK_generic if it does not reset
  **/
 extern hl_result_t hl_sys_systemreset(void);
+
+extern hl_result_t hal_sys_canjump(uint32_t addr);
+
+extern hl_result_t hl_sys_jumpto(uint32_t addr);
 
 
 /** @fn         extern void hl_sys_irq_disable(void)
