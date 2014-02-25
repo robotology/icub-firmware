@@ -658,6 +658,17 @@ extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, 
     if (s_emsc) eo_motor_set_motor_error_status(s_emsc->motors, motor, motorerror || canerror);
 }
 
+extern void eo_emsMotorController_GoIdle(void)
+{
+    if (s_emsc)
+    {
+        JOINTS(j)
+        {
+            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off, eobool_true);
+        }
+    }
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -727,8 +738,8 @@ void set_2FOC_idle(uint8_t motor)
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
+    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 }
 
 void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
