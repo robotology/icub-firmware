@@ -220,8 +220,8 @@ extern void eom_applbasic_specialise_otherthings(void)
         .led_toggle         = (eOint8_fp_uint8_t)hal_led_toggle
     };
     
-    eo_ledpulser_Initialise(&ledpulsercfg);    
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 1*1000*1000, 0);
+//    eo_ledpulser_Initialise(&ledpulsercfg);    
+//    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 2*1000*1000, 0);
     
     //eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_five);
 }
@@ -416,11 +416,11 @@ static void s_specialise_blink(void *param)
         case 1: hal_led_toggle(hal_led1); break;
         case 2: hal_led_toggle(hal_led2); break;
         case 3: hal_led_toggle(hal_led3); break;
-        case 4: hal_led_toggle(hal_led4); break;
+        //case 4: hal_led_toggle(hal_led4); break;
         //case 5: hal_led_toggle(hal_led5); break;
     }
     
-    pos = (pos+1)%5;
+    pos = (pos+1)%4;
 }
 
 
