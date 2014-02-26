@@ -88,7 +88,10 @@
 #define HL_USE_CHIP_XX_EEPROM
 #define HL_USE_UTIL_SPI
 
-//#define EMS4RD_USE_MICREL_AS_MANAGED_DEVICE
+#if     defined(EMS4RD_ETHDBG)
+#define EMS4RD_USE_MICREL_AS_MANAGED_DEVICE
+#endif
+
 
 #endif
 

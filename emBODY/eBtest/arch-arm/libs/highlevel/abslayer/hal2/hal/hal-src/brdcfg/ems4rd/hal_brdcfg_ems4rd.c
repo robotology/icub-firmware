@@ -71,6 +71,11 @@
 #include "hl_cfg_plus_modules.h"
 
 
+#if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)
+    #warning --> using micrel as managed device w/ EMS4RD_USE_MICREL_AS_MANAGED_DEVICE
+#else
+    #warning --> using micrel as automatic un-mananaged device
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
