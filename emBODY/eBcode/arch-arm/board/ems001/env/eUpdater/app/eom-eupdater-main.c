@@ -91,9 +91,16 @@ extern void task_ethcommand(void *p);
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
 #if     defined(_DEBUG_MODE_FULL_)
-    #warning --> we are in _DEBUG_MODE_FULL_ and use macro _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_ 
-    #define _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_
+    #warning --> we are in _DEBUG_MODE_FULL_ and use macro _USE_IPADDR_FROM_IPAL_CFG_ 
+    #define _USE_IPADDR_FROM_IPAL_CFG_
+#endif
+
+#if     defined(_USE_IPADDR_FROM_IPAL_CFG_)
+    #warning --> the ip address is taken from ipal cfg, not from eeprom. to get it from eeprom undef _USE_IPADDR_FROM_IPAL_CFG_
+#else
+    #warning --> the ip address is taken from eeprom. to get it from ipal cfg please define _USE_IPADDR_FROM_IPAL_CFG_
 #endif
 
 
@@ -233,7 +240,7 @@ static void s_eom_eupdater_main_init(void)
     const ipal_cfg_t* ipalcfg = NULL;
     uint8_t *ipaddr = NULL;
     eOmipnet_cfg_addr_t* eomipnet_addr;
-#ifndef _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_
+#ifndef _USE_IPADDR_FROM_IPAL_CFG_
     const eEipnetwork_t *ipnet = NULL;
 #endif    
     char str[96];
@@ -280,7 +287,7 @@ static void s_eom_eupdater_main_init(void)
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
     
     
-#ifndef _DEBUG_MODE_IPADDR_FROM_IPAL_CFG_
+#ifndef _USE_IPADDR_FROM_IPAL_CFG_
     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
     {
         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
