@@ -298,7 +298,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         {
             if (!s_download_state)
             {
-                #warning --> in next versions ... send back a nack packet. uncomment XYZ
+                //#warning --> in next versions ... send back a nack packet. uncomment XYZ
                 // XYZ: uncomment next 3
                 //*sizeout = 2;
                 //pktout[0] = CMD_DATA;
