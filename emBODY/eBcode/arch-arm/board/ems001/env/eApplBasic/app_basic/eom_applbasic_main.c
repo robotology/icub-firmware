@@ -86,7 +86,11 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#if     defined(_USE_IPADDR_FROM_IPAL_CFG_)
+    #warning --> the ip address is taken from ipal cfg, not from eeprom. to get it from eeprom undef _USE_IPADDR_FROM_IPAL_CFG_
+#else
+    #warning --> the ip address is taken from eeprom. to get it from ipal cfg please define _USE_IPADDR_FROM_IPAL_CFG_
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -179,7 +183,7 @@ static void s_eom_applbasic_main_init(void)
 
 
     // retrieve the configuration for ipnetwork
-#ifndef _FORCE_NETWORK_FROM_IPAL_CFG
+#ifndef _USE_IPADDR_FROM_IPAL_CFG_
     if(eores_OK == eov_env_IPnetwork_Get(eo_armenv_GetHandle(), &ipnet))
     {
         eomipnet_addr = (eOmipnet_cfg_addr_t*)ipnet;   //they have the same memory layout
