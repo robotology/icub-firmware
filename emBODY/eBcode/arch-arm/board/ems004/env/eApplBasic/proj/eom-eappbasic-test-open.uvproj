@@ -427,9 +427,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>hal.ems4rd.beta.lib</FileName>
@@ -1144,9 +1144,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>hal.ems4rd.beta.lib</FileName>
