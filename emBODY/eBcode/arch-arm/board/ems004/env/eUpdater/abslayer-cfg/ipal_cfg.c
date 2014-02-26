@@ -162,16 +162,19 @@ extern const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
 {
     static volatile uint8_t a = 0;
-    char str[128];
+    char str[80];
 //    static ipal_fatalerror_t er = ipal_error_generic;
    
     snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
     hal_trace_puts(str);
+    hal_led_init(hal_led1, NULL);
     for(;;)
     {
 //        er = er;
         a++;
         a = a;
+        hal_sys_delay(250*1000);
+        hal_led_toggle(hal_led1);        
     }
 }
 
