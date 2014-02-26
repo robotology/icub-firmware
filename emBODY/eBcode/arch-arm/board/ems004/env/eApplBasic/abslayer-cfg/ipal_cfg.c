@@ -165,13 +165,16 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
     char str[80];
 //    static ipal_fatalerror_t er = ipal_error_generic;
    
-    sprintf(str, "fatal error #%d: %s\n", errorcode, errormsg);
+    snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
     hal_trace_puts(str);
+    hal_led_init(hal_led1, NULL);
     for(;;)
     {
 //        er = er;
         a++;
         a = a;
+        hal_sys_delay(250*1000);
+        hal_led_toggle(hal_led1);        
     }
 }
 

@@ -96,12 +96,11 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
         hal_trace_puts(errormsg);
     }
 
-    hal_led_init(hal_led3, NULL);
+    hal_led_init(hal_led2, NULL);
 
     for(;;)
     {
-        uint32_t volatile i = 0x100000;
-        for(;i--; i>0);
+        hal_sys_delay(250*1000);
         hal_led_toggle(hal_led2);
     }
 }

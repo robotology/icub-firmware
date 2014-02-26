@@ -33,7 +33,8 @@
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
 #include "stdlib.h"
-
+#include "hal_led.h"
+#include "hal_sys.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -114,9 +115,20 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     char str[128];
     
     osal_task_id_get(task, &tskid);
-    sprintf(str, "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
+    snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
     hal_trace_puts(str);
-    for(;;);
+
+    hal_led_off(hal_led0);
+    hal_led_off(hal_led1);
+    hal_led_off(hal_led2);
+    hal_led_off(hal_led3);
+    hal_led_off(hal_led4);
+    hal_led_off(hal_led5);     
+    for(;;)
+    {
+        hal_led_toggle(hal_led5);
+        hal_sys_delay(250*1000);        
+    }
 }
 
 static void s_osal_cfg_on_idle(void)
