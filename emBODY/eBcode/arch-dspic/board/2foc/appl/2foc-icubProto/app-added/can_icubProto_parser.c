@@ -456,7 +456,19 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
         case ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION: 
         {
-            ; //todo da leggere dalla partizione giusta della eeprom
+            uint8_t server_can_protocol_major = rxpayload->b[1]; 
+            uint8_t server_can_protocol_minor = rxpayload->b[2]; 
+            uint8_t can_protocol_ack = (CAN_PROTOCOL_VERSION_MAJOR == server_can_protocol_major && 
+                                        CAN_PROTOCOL_VERSION_MINOR == server_can_protocol_minor); 
+            *txlen = 0x8;
+            txpayload->b[0] = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
+            txpayload->b[1] = icubCanProto_boardType__2foc;
+            txpayload->b[2] = FIRMWARE_VERSION_MAJOR;
+            txpayload->b[3] = FIRMWARE_VERSION_MINOR;
+            txpayload->b[4] = FIRMWARE_VERSION_BUILD;
+            txpayload->b[5] = CAN_PROTOCOL_VERSION_MAJOR;
+            txpayload->b[6] = CAN_PROTOCOL_VERSION_MINOR;
+            txpayload->b[7] = can_protocol_ack;
         }break;
         
         case ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID: 
@@ -732,10 +744,9 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
             *txlen = 5;
             txpayload->b[0] = cmd;
             txpayload->b[1] = icubCanProto_boardType__2foc; 
-            txpayload->b[2] = 1;  //TODO  //Firmware version number for BOOTLOADER c
-            txpayload->b[3] = 0;  //TODO   //Firmware build number.
-            txpayload->b[4] = 7;  //TODO   //Firmware build number. 
-            #warning solita incoerenza tra versioni di fw sensori ed motori            
+            txpayload->b[2] = FIRMWARE_VERSION_MAJOR;
+            txpayload->b[3] = FIRMWARE_VERSION_MINOR;
+            txpayload->b[4] = FIRMWARE_VERSION_BUILD;
         } break;
                 
     
