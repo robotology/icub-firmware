@@ -28,14 +28,15 @@ typedef struct
     // Word 0
 
     SFRAC16 Param; // max nominal current. For implementation 1 
-                    // filter K * 2048. For implementation 2
+                   // filter K * 2048. For implementation 2
 
     SFRAC16 IThreshold; // Error limit for I2T (implementation 1) or
                         // filtered current threshold for implementation 2
  
     unsigned int Acc[3]; // accumulator state (ACCAL, ACCAH, ACCAU)
-	SFRAC16 IQMeasured; // measued current value 
-	SFRAC16 IDMeasured; // measued current value 
+
+    SFRAC16 IQMeasured; // measued current value
+    SFRAC16 IDMeasured; // measued current value
     
 } tI2T;
 

@@ -270,10 +270,10 @@ extern void CanIcubProtoTrasmitter_SendStatusMsg()
        
     //prapare the payload
     candata.b[0] = SysError.b[0];    
-    candata.b[0] |= (( SysError.I2TFailure << 3) | (SysError.AS5045CalcError << 5)); //adjust some values;
+    candata.b[0] |= SysError.AS5045CalcError << 5; //adjust some values;
     candata.b[1] = CanIcubProtoGetcontrol_mode(); //in case of error??
     candata.b[4] = SysError.b[1];
-    candata.b[5] = (SysError.I2TFailure << 5);
+    candata.b[5] = SysError.I2TFailure << 5;
     candata.b[6] = SysStatus.b[3];
     
     txid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);

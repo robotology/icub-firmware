@@ -25,6 +25,7 @@
 #include "tle5012.h"
 #include "dhes_lut.h"
 
+int encoder_dhes_state = 0;
 static unsigned int encoder_buffer;
 unsigned int eb;
 
@@ -299,6 +300,82 @@ inline void EncoderPositionDHS()
 //
 {
   extern tSysError SysError;
+  //static int round = 0; // ELECTRICAL round conter inside a MECHANICAL round
+  //signed char transition;
+
+    // Read HES vaue from the uC pins of choice
+#ifdef HES_CONNECTED_TO_P2_P5
+  // mask the port where the HES are connected (RP5, RP6, RP7)
+  encoder_buffer = (PORTB & 0b011100000) >> 5;
+#endif
+
+#ifdef HES_CONNECTED_TO_P1_P6
+  // HU==RP3==RB3, HV==RP8==RB8, HW==RP9==RB9
+  encoder_buffer = (PORTBbits.RB3) | (PORTBbits.RB8<<2) | (PORTBbits.RB9<<1);
+#endif
+
+  // NOTE: from the HES you get an Electrical angle! 
+
+  // used to gulp the HES value
+  eb=encoder_buffer;
+
+ // encoder_buffer &= 0b111;
+
+  if((encoder_buffer == 0) || (encoder_buffer == 7))
+  {
+     SysError.HESInvalidValue=1;
+     encoder_dhes_state = 0; // next time do not make assumption
+     FaultConditionsHandler();
+     return;
+  }
+
+  encoder_dhes_state = encoder_buffer;
+
+  /*
+  // the HES read the same val of last time. The angle
+  // has not to change. Do nothing.
+  // do not place before check for 0 and 7 : if the first time
+  // encoder_buffer reads 000 it must fault. But the
+  // first time encoder_dhes_state is 000 because it is
+  // init val
+  if(encoder_dhes_state == encoder_buffer)
+    return;
+
+  // if 0 no turn has been done
+  // if 1 or -1 a CW or CCW turn has been done
+  // if -2 error: invalid transition
+  transition = DHES_TRANSITION_LUT[encoder_dhes_state][encoder_buffer];
+
+  if(-2 == transition){
+    SysError.HESInvalidSequence = 1;
+    encoder_dhes_state = 0; // next time do not make assumption
+    FaultConditionsHandler();
+    return;
+  }
+
+  round += transition;
+
+  UnalignedMecchanicalAngle = DHES_UNALIGNEDMECANGLE_LUT[encoder_buffer];
+
+ // round += DHES_TURN_LUT[encoder_dhes_state][encoder_buffer];
+
+  if(round == NPOLEPAIRS){
+   round = 0;
+  }else if(round == -1){
+   round = NPOLEPAIRS -1;
+  }
+
+  encoder_dhes_state = encoder_buffer;
+
+  // combine the electrical angle information with the 
+  // electrical turn count to get mechanical angle
+  UnalignedMecchanicalAngle  += round * (0xFFFFU/NPOLEPAIRS);
+  */
+}
+
+/*
+{
+  extern tSysError SysError;
   static int round = 0; // ELECTRICAL round conter inside a MECHANICAL round
   static int encoder_dhes_state = 0;
   signed char transition = 0;
@@ -308,7 +385,7 @@ inline void EncoderPositionDHS()
   static int time_new = 0;
   static int angle_interp = 0;
   static unsigned int UMA_stored = 0;
-  static const int SLICE = 2730; //0xFFFFU/(6*NPOLEPAIRS);
+  static const int SLICE = 0xFFFFU/(6*NPOLEPAIRS);
 
     // Read HES vaue from the uC pins of choice
 #ifdef HES_CONNECTED_TO_P2_P5
@@ -370,7 +447,7 @@ inline void EncoderPositionDHS()
     {
       UnalignedMecchanicalAngle -= angle_interp;
     }
-
+    
     return;
   }
     
@@ -406,10 +483,11 @@ inline void EncoderPositionDHS()
 
   // combine the electrical angle information with the 
   // electrical turn count to get mechanical angle
-  UMA_stored += round * 16384; //(0xFFFFU/NPOLEPAIRS);
+  UMA_stored += round * 0xFFFFU/NPOLEPAIRS;
   
   UnalignedMecchanicalAngle = UMA_stored;
 }
+*/
 
 
 

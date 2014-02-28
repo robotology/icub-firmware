@@ -124,6 +124,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
 
   EncoderPosition();
 
+#ifndef ENCODER_DHES
   // Trigger encoder. Start to prepare data for the next reading (if needed..)
   // this for ABS encoder make SPI to initiate transfer.
   EncoderTriggerSample();
@@ -152,6 +153,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
   }
 
   Previous_position = AlignedMecchanicalAngle;
+#endif
 
   IFS0bits.T3IF = 0; // clear flag 
 }
@@ -321,6 +323,15 @@ void OverCurrentFaultIntEnable()
   IFS3bits.FLTA1IF = 0;
   //enable external fault interrupt
   IEC3bits.FLTA1IE = 1;
+}
+
+void OverCurrentFaultIntDisable()
+// over current fault interrupt disable
+{
+  //disable external fault interrupt
+  IEC3bits.FLTA1IE = 0;
+  // clear irq flag
+  IFS3bits.FLTA1IF = 0;
 }
 
 void SetupHWParameters(void)

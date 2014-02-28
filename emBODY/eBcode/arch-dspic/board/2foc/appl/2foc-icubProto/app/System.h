@@ -42,6 +42,7 @@ void Timer3Config();
 void Timer4Config();
 void ExternalFaultEnable();
 void OverCurrentFaultIntEnable();
+void OverCurrentFaultIntDisable();
 void InterruptPriorityConfig( void );
 void SetupHWParameters(void);
 void EepromSave();

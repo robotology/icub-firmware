@@ -44,16 +44,17 @@
 
 __inline__ static void s_controlMode_reset(void)
 {
-    SysStatus.b[0] = SysStatus.b[0] & 0x03;
+    SysStatus.b[0] &= 0b01100000;
 }
 
-/*the default control mode is current*/
+/*the default control mode is open loop*/
 __inline__ static void s_controlMode_setDefault(void) 
 {
-    SysStatus.b[0] |= (1 << 6);
+    s_controlMode_reset();
+    SysStatus.OpenLoop = 1;
 }
 
-
+/*
 __inline__ static void s_controlMode_setCurrent(void)
 { 
     SysStatus.b[0] |= (1 << 6);
@@ -64,9 +65,10 @@ __inline__ static void s_controlMode_setVelocity(void)
 {
     SysStatus.b[0] |= (1 << 5);
 }
+*/
  
 
-
+static unsigned char sCanProtocolCompatible = 0;
 
 static unsigned char canprotoparser_bid;
 
@@ -75,7 +77,6 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
 static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned char rxlen, tCanData *txpayload, unsigned char *txlen);
 
 extern volatile unsigned char received_canloader_msg;
-extern volatile unsigned char current_open_loop;
 
 void CanIcubProtoParserInit(unsigned char bid)
 {
@@ -152,25 +153,30 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN: // DS402 Operation Enable 
         {
             if(1 != rxlen)
-            {   // incorrect number of parameters
-//                *txlen=0x1;
-//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
-                *txlen = 0x0;
-                return(0);
+            { // incorrect number of parameters
+                //*txlen=0x1;
+                //txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen=0;
+                return 0;
             }
          
             // Command can be accepted only if current ststus is SWITCHED ON 
             if(1 != DS402_Statusword.Flags.SwitchedOn )
             {
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
-                *txlen = 0x0;
-                return(0);
+                //*txlen = 0x1;
+                //txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                *txlen=0;
+                return 0;
+            }
+
+            if (!sCanProtocolCompatible)
+            {
+                *txlen=0;
+                return 0;
             }
             
             //when start PWM ==> set the default control mode
-            s_controlMode_reset();
-           s_controlMode_setDefault();
+            s_controlMode_setDefault();
 
             // go to Operation Enable state
             DS402_Controlword.Flags.EnableOperation = 1;       
@@ -180,21 +186,21 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
-                  *txlen = 0;
+                //*txlen = 0x1;
+                //txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen = 0;
                 return(0);
             }
          
             // Command can be accepted only if current ststus is OPERATION ENABLE
             if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
             {
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
-                  *txlen = 0;
+                //*txlen = 0x1;
+                //txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                *txlen = 0;
                 return(0);
             }
-			// go to Ready to Switch On state
+			      // go to Ready to Switch On state
             DS402_Controlword.Flags.EnableVoltage = 0;   
             // In ICUB the states DISABLE_OPERATION and SHUTDOWN goes in the same state. 
             // go to Switched On state
@@ -205,23 +211,28 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
-                *txlen = 0;
-                return(0);
+                //*txlen = 0x1;
+                //txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                *txlen=0;
+                return 0;
             }
             
-			
             // Command can be accepted only if current ststus is SWITCH ON DISABLED 
             if(1 != DS402_Statusword.Flags.ReadyToSwitchOn )
             {
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
-                  *txlen = 0;
-                  return(0);
+                //*txlen = 0x1;
+                //txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
+                *txlen=0;
+                return 0;
+            }
+
+            if (!sCanProtocolCompatible)
+            {
+                *txlen=0;
+                return 0;
             }
 		
-		    received_canloader_msg=0; // start to transmit status messages
+		        received_canloader_msg=0; // start to transmit status messages
 
             // go to Switch On state
             DS402_Controlword.Flags.SwitchOn = 1;
@@ -296,36 +307,33 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             s_controlMode_reset();
 
             switch(rxpayload->b[1])
-            {           
+            {          
+                case icubCanProto_controlmode_openloop:
+                {
+                    SysStatus.TorqueControl = 0;
+                    SysStatus.OpenLoop = 1;
+                }break;	 
                 case icubCanProto_controlmode_current:
                 {
+                    SysStatus.OpenLoop = 0;
                     SysStatus.TorqueControl = 1;
-					current_open_loop=0;
                 }break;
                 case icubCanProto_controlmode_velocity:
                 {
                     SysStatus.SpeedControl = 1;
                 }break;
-                
                 case icubCanProto_controlmode_idle:
                 {
-                    // go to Switched On state
-                    DS402_Controlword.Flags.EnableOperation = 0;
+                    DS402_Controlword.Flags.EnableOperation = 0; // go to Switched On state
                 }break;
-
                 case icubCanProto_controlmode_position:
-				{
-				}break;
-                case icubCanProto_controlmode_openloop:
-				{
-					SysStatus.TorqueControl = 1;
-					current_open_loop=1;
-				}break;	
+		            {
+                    SysStatus.PositionControl = 1;
+		            }break;
                 case icubCanProto_controlmode_torque:
                 {
-                   s_controlMode_setDefault();
+                    SysStatus.TorqueSensorLoop = 1;
                 }break;
- 
                 default:
                 {
                     s_controlMode_setDefault();
@@ -439,27 +447,26 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         case ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT: 
         {
-         
-			
-			if(5 != rxlen)
+			      if(5 != rxlen)
             {   // incorrect number of parameters
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
+                // *txlen = 0x1;
+                // txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
                 *txlen = 0x0;
                 return(0);
             }
 		
-		//il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A 1310) 
-			ApplicationData.CurLimit=((rxpayload->b[2] << 8 | rxpayload->b[1])*1310)/1000;
- 
+	          ////il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A 1310)
+            //il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A=2000)
+	          ApplicationData.CurLimit=(rxpayload->b[2] << 8 | rxpayload->b[1])*2;
         }break;
         
         case ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION: 
         {
             uint8_t server_can_protocol_major = rxpayload->b[1]; 
             uint8_t server_can_protocol_minor = rxpayload->b[2]; 
-            uint8_t can_protocol_ack = (CAN_PROTOCOL_VERSION_MAJOR == server_can_protocol_major && 
-                                        CAN_PROTOCOL_VERSION_MINOR == server_can_protocol_minor); 
+            /*uint8_t can_protocol_ack*/ 
+            sCanProtocolCompatible = (CAN_PROTOCOL_VERSION_MAJOR == server_can_protocol_major && 
+                                      CAN_PROTOCOL_VERSION_MINOR == server_can_protocol_minor); 
             *txlen = 0x8;
             txpayload->b[0] = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
             txpayload->b[1] = icubCanProto_boardType__2foc;
@@ -468,7 +475,16 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             txpayload->b[4] = FIRMWARE_VERSION_BUILD;
             txpayload->b[5] = CAN_PROTOCOL_VERSION_MAJOR;
             txpayload->b[6] = CAN_PROTOCOL_VERSION_MINOR;
-            txpayload->b[7] = can_protocol_ack;
+            txpayload->b[7] = sCanProtocolCompatible; // can_protocol_ack;
+
+            if (!sCanProtocolCompatible)
+            {
+                // go to fault state
+                SysError.CANInvalidProtocol = 1;
+                // call fault handler
+                FaultConditionsHandler();
+            }
+
         }break;
         
         case ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID: 
@@ -482,13 +498,15 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 *txlen = 0x0;
                 return(0);
             }
-            ControllerGetCurrentDPIDParm(&pp,&pi,&pd,&pm);
+            //ControllerGetCurrentDPIDParm(&pp,&pi,&pd,&pm);
             pp = (rxpayload->b[2] << 8 | rxpayload->b[1]);
             pi = (rxpayload->b[4] << 8 | rxpayload->b[3]);
-            pd = (rxpayload->b[6] << 8 | rxpayload->b[5]);
+            pd = 0;
+            pm = (rxpayload->b[6] << 8 | rxpayload->b[5]);
+      
 
             ControllerSetCurrentDPIDParm(pp,pi,pd,pm);
-	    ControllerSetCurrentQPIDParm(pp,pi,pd,pm);
+	        ControllerSetCurrentQPIDParm(pp,pi,pd,pm);
         }break;
         
         case ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PID: 
@@ -549,7 +567,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 
         case ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT: 
         {
-			SFRAC16 IqRef;
+	        SFRAC16 IqRef;
             if(5 != rxlen)
             {   // incorrect number of parameters
 //                *txlen = 0x1;
@@ -567,13 +585,13 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
               return(0);
             }
 #endif
-            // Torque control references
-			IqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
-			if ((IqRef>0) && (IqRef>ApplicationData.CurLimit));
-			IqRef=ApplicationData.CurLimit;
-			if ((IqRef<0) && (IqRef<ApplicationData.CurLimit));
-			IqRef=-ApplicationData.CurLimit;            
-			CtrlReferences.qIqRef=IqRef;
+           // Torque control references
+	   IqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
+	   if (IqRef>ApplicationData.CurLimit)
+               IqRef=ApplicationData.CurLimit;
+           else if (IqRef<-ApplicationData.CurLimit)
+               IqRef=-ApplicationData.CurLimit;
+	    CtrlReferences.qIqRef=IqRef;
             // set reference value for toggling torque
             TorqueTogglingReference = CtrlReferences.qIqRef;
 
@@ -685,7 +703,6 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
     *txlen = 0;
     return(0);
 #else
-    
     switch(permsg_type)
     {
         case ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT:
@@ -696,12 +713,24 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
                 *txlen = 0;
                 return(0);
             }
-             // Torque control references
-            CtrlReferences.qIqRef = rxpayload->w[canprotoparser_bid-1];
+             
+            // Torque control references
+            
+            CtrlReferences.qIqRef = -rxpayload->w[canprotoparser_bid-1];
+
+            if (CtrlReferences.qIqRef>ApplicationData.CurLimit)
+               CtrlReferences.qIqRef= ApplicationData.CurLimit;
+            else if (CtrlReferences.qIqRef<-ApplicationData.CurLimit)
+               CtrlReferences.qIqRef=-ApplicationData.CurLimit;
+
+            CtrlReferences.qIdRef = 0;
             // set reference value for toggling torque
             TorqueTogglingReference = CtrlReferences.qIqRef;
 #ifdef SYNC_2FOC_TO_EMS
-            CanIcubProtoTrasmitterSendPeriodicData();          
+            //if (!SysError.OverCurrentFailure)
+            {
+              CanIcubProtoTrasmitterSendPeriodicData();
+            }          
 #endif   
 			*txlen = 0;
 			return(1);
@@ -739,14 +768,15 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
                 return(0);
             }
 			
-			received_canloader_msg=1; // do not transmit status messages
+			      received_canloader_msg=1; // do not transmit status messages
 
             *txlen = 5;
             txpayload->b[0] = cmd;
-            txpayload->b[1] = icubCanProto_boardType__2foc; 
+            txpayload->b[1] = icubCanProto_boardType__2foc;
             txpayload->b[2] = FIRMWARE_VERSION_MAJOR;
             txpayload->b[3] = FIRMWARE_VERSION_MINOR;
             txpayload->b[4] = FIRMWARE_VERSION_BUILD;
+            #warning solita incoerenza tra versioni di fw sensori ed motori            
         } break;
                 
     

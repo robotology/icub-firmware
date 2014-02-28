@@ -142,10 +142,473 @@ _FICD (ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 //
 #include "globals.h"
 
+#if defined DC_MOTOR
+
+// DMA0 IRQ Service Routine used for FOC loop
+void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
+{
+  //extern tPID2 CurrentQPID;
+
+  static int pwm_half=500;
+
+  //static int i1filt=0,i2filt=0;
+
+  char pwm1,pwm3;
+
+  int pwmdelay = 0;
+  int timeout;
+
+  // setting CORCON in this way rather than using CORCONbits is
+  // slightly more efficient (because CORCONbits is volatile and
+  // optimizer cannot collapse multiple bit operations)
+    
+  CORCON = 0b11110100;
+
+  // read Meccanical postion [-1..0.9999] and angle corrected with encsyncpulsepos
+  // calculate AlignedMecchanicalAngle and UnalignedMecchanicalAngle from raw encoder data 
+  //EncoderPosition();
+
+  // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
+  // scale currents by MeasCurrParm.qKa, qKb, qKc
+  // Calculate ParkParm.qIa, qIb, qIc
+  MeasAndCompIaIcCalculateIb();
+
+  if (SysStatus.OpenLoop)
+  {
+    pwm1 =  CtrlReferences.qIqRef     & 0xFF;
+    pwm3 = (CtrlReferences.qIqRef>>8) & 0xFF;  
+  }
+  else if (SysStatus.TorqueControl)
+  {
+    pwm1 = pwm3 = 0;
+
+    /*
+    static int KiErrIntH=0,KiErrIntL=0;
+
+    int Err;
+
+    if (encoder_dhes_state_stored != encoder_dhes_state)
+    {
+        encoder_dhes_state_stored  = encoder_dhes_state;
+
+        KiErrIntH=KiErrIntL=0;
+
+        switch (encoder_dhes_state)
+        {
+        case 0b001: // Sector 1: (0,0,1)   60-120 degrees
+            piH=&(ParkParm.qIa); piL=&(ParkParm.qIb); 
+            ppwmH=&PDC1; ppwmL=&PDC2; ppwm0=&PDC3; break;
+
+        case 0b011: // Sector 2: (0,1,1)  120-180 degrees
+            piH=&(ParkParm.qIa); piL=&(ParkParm.qIc);
+            ppwmH=&PDC1; ppwm0=&PDC2; ppwmL=&PDC3; break;
+
+        case 0b010: // Sector 3: (0,1,0)  180-240 degrees
+            piH=&(ParkParm.qIb); piL=&(ParkParm.qIc);
+            ppwm0=&PDC1; ppwmH=&PDC2; ppwmL=&PDC3; break;
+
+        case 0b110: // Sector 4: (1,1,0)  240-300 degrees
+            piH=&(ParkParm.qIb); piL=&(ParkParm.qIa);
+            ppwmL=&PDC1; ppwmH=&PDC2; ppwm0=&PDC3; break;
+
+        case 0b100: // Sector 5: (1,0,0)  300-360 degrees
+            piH=&(ParkParm.qIc); piL=&(ParkParm.qIa);
+            ppwmL=&PDC1; ppwm0=&PDC2; ppwmH=&PDC3; break;
+
+        case 0b101: // Sector 6: (1,0,1)    0- 60 degrees
+            piH=&(ParkParm.qIc); piL=&(ParkParm.qIb);
+            ppwm0=&PDC1; ppwmL=&PDC2; ppwmH=&PDC3; break;
+        }
+
+        iHfilt = *piH;
+        iLfilt = *piL;
+    }
+
+    //////////////////////////////////////////////////////
+
+    iHfilt += *piH;
+    iHfilt >>= 1;
+
+    Err = CtrlReferences.qIqRef - iHfilt;
+
+    pwmH = __builtin_mulss(CurrentQPID.IDPMCoefficients[2], Err) >> (16+KSHIFT_Q_P);
+
+    KiErrIntH += __builtin_mulss(CurrentQPID.IDPMCoefficients[0], Err) >> 8;
+
+    if (KiErrIntH > CurrentQPID.IDPMCoefficients[3])
+    {
+        KiErrIntH = CurrentQPID.IDPMCoefficients[3];        
+    }
+    else if (KiErrIntH < -CurrentQPID.IDPMCoefficients[3])
+    {
+       KiErrIntH = -CurrentQPID.IDPMCoefficients[3];        
+    }
+      
+    pwmH += KiErrIntH >> 8;
+
+    if (pwmH>125) pwmH=125; else if (pwmH<-125) pwmH=-125;
+
+    //////////////////////////////////////////////////////
+
+    iLfilt += *piL;
+    iLfilt >>= 1;
+
+    Err = CtrlReferences.qIqRef + iLfilt;
+
+    pwmL = __builtin_mulss(CurrentQPID.IDPMCoefficients[2], Err) >> (16+KSHIFT_Q_P);
+
+    KiErrIntL += __builtin_mulss(CurrentQPID.IDPMCoefficients[0], Err) >> 8;
+
+    if (KiErrIntL > CurrentQPID.IDPMCoefficients[3])
+    {
+        KiErrIntL = CurrentQPID.IDPMCoefficients[3];        
+    }
+    else if (KiErrIntL < -CurrentQPID.IDPMCoefficients[3])
+    {
+        KiErrIntL = -CurrentQPID.IDPMCoefficients[3];        
+    }
+      
+    pwmL += KiErrIntL >> 8;
+
+    if (pwmL>125) pwmL=125; else if (pwmL<-125) pwmL=-125;
+    */
+  }
+  else
+  {
+      pwm1 = pwm3 = 0;
+  }
+
+  // if we are close enough to the PCD register shadow copy then wait until
+  // its done before updating local PDCs
+  // The condition will became false when the PWM is counting down but it is still
+  // far from 0 or when it change direction counting up
+
+  // reset the flag that indicates if the PWM registers update was delayed
+  pwmdelay = 0;
+
+  // reset timeout counter that is used to wait for the PWM registers update
+  timeout = PWMSAFETIME;
+
+  //     PWM count DN               PWM count < PWM_SAFE_TIME
+  while((P1TMR & 0x8000) && ((P1TMR & 0x7fff) < PWMSAFETIME))
+  {
+      pwmdelay = 1;
+
+      if(0==timeout--)
+      {
+        SysError.FirmwarePWMFatalError = 1;
+        //FaultConditionsHandler();
+        break;
+      }
+  }
+
+  if(pwmdelay)
+  {
+    // if the PWM PDC update has been delayed, then increment
+    // the counter that keeps track of this event, but be
+    // careful not to overflow it
+    if (FirmwarePWMTimingErrorCount < 0xff)
+    {
+        FirmwarePWMTimingErrorCount++;
+    }
+  }
+
+  PDC1 = pwm_half+pwm1;
+  PDC2 = pwm_half;
+  PDC3 = pwm_half+pwm3;
+ 
+  // when gulp_update_request is == 1, the main loop will not access those vars. 
+  if(1 == gulp_update_request)
+  {  
+    // GULP!ed variables
+    Gulp.W[0] = *gulpadr1;
+    Gulp.W[1] = *gulpadr2;
+    Gulp.W[2] = *gulpadr3;
+    Gulp.W[3] = *gulpadr4;
+    
+    // unlock the main loop, so it will read values just updated
+    gulp_update_request = 0;
+
+    // read VDC link raw value;
+    VDCLink = ADCGetVDCLink();
+    debug_i2t = I2Tdata.Acc[1];
+  }
+
+  // perform I2T protection from ParkParm.qId,qIq 
+  //I2Tdata.IQMeasured = /*abs*/(ParkParm.qIq);
+  //I2Tdata.IDMeasured = /*abs*/(ParkParm.qId);
+
+  I2Tdata.IQMeasured = I2Tdata.IDMeasured = ParkParm.qIa;
+  I2Tdata.IQMeasured += ParkParm.qIb;
+  I2Tdata.IQMeasured += ParkParm.qIb;
+  I2Tdata.IQMeasured *= 10;
+  I2Tdata.IQMeasured >>= 4;
+
+  // Invoke the I2T integrator with new current values
+  if(I2T(&I2Tdata))
+  {
+    //The I2T grew too much. Protect!
+    SysError.I2TFailure = 1;
+    FaultConditionsHandler();
+  }
+
+  //Clear the DMA0 Interrupt Flag
+  IFS0bits.DMA0IF = 0;
+}
+
+#elif defined ENCODER_DHES
+
+// DMA0 IRQ Service Routine used for FOC loop
+void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
+{
+  extern tPID2 CurrentQPID;
+
+  static int pwm_half=500;
+
+  static int encoder_dhes_state_stored = 0;
+  static int *ppwmH=NULL,*ppwmL=NULL,*ppwm0=NULL;
+  static int *piH=NULL,*piL=NULL;
+  static int iHfilt=0,iLfilt=0;
+
+  int pwmH,pwmL;
+
+  int pwmdelay = 0;
+  int timeout;
+
+  // setting CORCON in this way rather than using CORCONbits is
+  // slightly more efficient (because CORCONbits is volatile and
+  // optimizer cannot collapse multiple bit operations)
+    
+  CORCON = 0b11110100;
+
+  // read Meccanical postion [-1..0.9999] and angle corrected with encsyncpulsepos
+  // calculate AlignedMecchanicalAngle and UnalignedMecchanicalAngle from raw encoder data 
+  EncoderPosition();
+
+  // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
+  // scale currents by MeasCurrParm.qKa, qKb, qKc
+  // Calculate ParkParm.qIa, qIb, qIc
+  MeasAndCompIaIcCalculateIb();
+
+  if (SysStatus.OpenLoop)
+  {
+    if (encoder_dhes_state_stored != encoder_dhes_state)
+    {
+        encoder_dhes_state_stored  = encoder_dhes_state;
+
+        switch (encoder_dhes_state)
+        {
+        case 0b001: // Sector 1: (0,0,1)   60-120 degrees
+            ppwmH=(int*)&PDC1; ppwmL=(int*)&PDC2; ppwm0=(int*)&PDC3; break;
+
+        case 0b011: // Sector 2: (0,1,1)  120-180 degrees
+            ppwmH=(int*)&PDC1; ppwm0=(int*)&PDC2; ppwmL=(int*)&PDC3; break;
+
+        case 0b010: // Sector 3: (0,1,0)  180-240 degrees
+            ppwm0=(int*)&PDC1; ppwmH=(int*)&PDC2; ppwmL=(int*)&PDC3; break;
+
+        case 0b110: // Sector 4: (1,1,0)  240-300 degrees
+            ppwmL=(int*)&PDC1; ppwmH=(int*)&PDC2; ppwm0=(int*)&PDC3; break;
+
+        case 0b100: // Sector 5: (1,0,0)  300-360 degrees
+            ppwmL=(int*)&PDC1; ppwm0=(int*)&PDC2; ppwmH=(int*)&PDC3; break;
+
+        case 0b101: // Sector 6: (1,0,1)    0- 60 degrees
+            ppwm0=(int*)&PDC1; ppwmL=(int*)&PDC2; ppwmH=(int*)&PDC3; break;
+        }
+    }
+
+    pwmH = CtrlReferences.qIqRef >> 6;
+
+    if (pwmH>125) pwmH=125; else if (pwmH<-125) pwmH=-125;
+
+    pwmL = pwmH;  
+  }
+  else if (SysStatus.TorqueControl)
+  {
+    static int KiErrIntH=0,KiErrIntL=0;
+
+    int Err;
+
+    if (encoder_dhes_state_stored != encoder_dhes_state)
+    {
+        encoder_dhes_state_stored  = encoder_dhes_state;
+
+        KiErrIntH=KiErrIntL=0;
+
+        switch (encoder_dhes_state)
+        {
+        case 0b001: // Sector 1: (0,0,1)   60-120 degrees
+            piH=(int*)&(ParkParm.qIa); piL=(int*)&(ParkParm.qIb); 
+            ppwmH=(int*)&PDC1; ppwmL=(int*)&PDC2; ppwm0=(int*)&PDC3; break;
+
+        case 0b011: // Sector 2: (0,1,1)  120-180 degrees
+            piH=(int*)&(ParkParm.qIa); piL=(int*)&(ParkParm.qIc);
+            ppwmH=(int*)&PDC1; ppwm0=(int*)&PDC2; ppwmL=(int*)&PDC3; break;
+
+        case 0b010: // Sector 3: (0,1,0)  180-240 degrees
+            piH=(int*)&(ParkParm.qIb); piL=(int*)&(ParkParm.qIc);
+            ppwm0=(int*)&PDC1; ppwmH=(int*)&PDC2; ppwmL=(int*)&PDC3; break;
+
+        case 0b110: // Sector 4: (1,1,0)  240-300 degrees
+            piH=(int*)&(ParkParm.qIb); piL=(int*)&(ParkParm.qIa);
+            ppwmL=(int*)&PDC1; ppwmH=(int*)&PDC2; ppwm0=(int*)&PDC3; break;
+
+        case 0b100: // Sector 5: (1,0,0)  300-360 degrees
+            piH=(int*)&(ParkParm.qIc); piL=(int*)&(ParkParm.qIa);
+            ppwmL=(int*)&PDC1; ppwm0=(int*)&PDC2; ppwmH=(int*)&PDC3; break;
+
+        case 0b101: // Sector 6: (1,0,1)    0- 60 degrees
+            piH=(int*)&(ParkParm.qIc); piL=(int*)&(ParkParm.qIb);
+            ppwm0=(int*)&PDC1; ppwmL=(int*)&PDC2; ppwmH=(int*)&PDC3; break;
+        }
+
+        iHfilt = *piH;
+        iLfilt = *piL;
+    }
+
+    //////////////////////////////////////////////////////
+
+    iHfilt += *piH;
+    iHfilt >>= 1;
+
+    Err = CtrlReferences.qIqRef - iHfilt;
+
+    pwmH = __builtin_mulss(CurrentQPID.IDPMCoefficients[2], Err) >> (16+KSHIFT_Q_P);
+
+    KiErrIntH += __builtin_mulss(CurrentQPID.IDPMCoefficients[0], Err) >> 8;
+
+    if (KiErrIntH > CurrentQPID.IDPMCoefficients[3])
+    {
+        KiErrIntH = CurrentQPID.IDPMCoefficients[3];        
+    }
+    else if (KiErrIntH < -CurrentQPID.IDPMCoefficients[3])
+    {
+       KiErrIntH = -CurrentQPID.IDPMCoefficients[3];        
+    }
+      
+    pwmH += KiErrIntH >> 8;
+
+    if (pwmH>125) pwmH=125; else if (pwmH<-125) pwmH=-125;
+
+    //////////////////////////////////////////////////////
+
+    iLfilt += *piL;
+    iLfilt >>= 1;
+
+    Err = CtrlReferences.qIqRef + iLfilt;
+
+    pwmL = __builtin_mulss(CurrentQPID.IDPMCoefficients[2], Err) >> (16+KSHIFT_Q_P);
+
+    KiErrIntL += __builtin_mulss(CurrentQPID.IDPMCoefficients[0], Err) >> 8;
+
+    if (KiErrIntL > CurrentQPID.IDPMCoefficients[3])
+    {
+        KiErrIntL = CurrentQPID.IDPMCoefficients[3];        
+    }
+    else if (KiErrIntL < -CurrentQPID.IDPMCoefficients[3])
+    {
+        KiErrIntL = -CurrentQPID.IDPMCoefficients[3];        
+    }
+      
+    pwmL += KiErrIntL >> 8;
+
+    if (pwmL>125) pwmL=125; else if (pwmL<-125) pwmL=-125;
+  }
+  else
+  {
+      pwmH = pwmL = 0;
+  }
+
+  // if we are close enough to the PCD register shadow copy then wait until
+  // its done before updating local PDCs
+  // The condition will became false when the PWM is counting down but it is still
+  // far from 0 or when it change direction counting up
+
+  // reset the flag that indicates if the PWM registers update was delayed
+  pwmdelay = 0;
+
+  // reset timeout counter that is used to wait for the PWM registers update
+  timeout = PWMSAFETIME;
+
+  //     PWM count DN               PWM count < PWM_SAFE_TIME
+  while((P1TMR & 0x8000) && ((P1TMR & 0x7fff) < PWMSAFETIME))
+  {
+      pwmdelay = 1;
+
+      if(0==timeout--)
+      {
+        SysError.FirmwarePWMFatalError = 1;
+        //FaultConditionsHandler();
+        break;
+      }
+  }
+
+  if(pwmdelay)
+  {
+    // if the PWM PDC update has been delayed, then increment
+    // the counter that keeps track of this event, but be
+    // careful not to overflow it
+    if (FirmwarePWMTimingErrorCount < 0xff)
+    {
+        FirmwarePWMTimingErrorCount++;
+    }
+  }
+
+  *ppwmH = pwm_half+pwmH;
+  *ppwm0 = pwm_half;
+  *ppwmL = pwm_half-pwmL;
+ 
+  // when gulp_update_request is == 1, the main loop will not access those vars. 
+  if(1 == gulp_update_request)
+  {  
+    // GULP!ed variables
+    //Gulp.W[0] = CtrlReferences.qIqRef; //*gulpadr1;
+    //Gulp.W[1] = ParkParm.qIa; //*gulpadr2;
+    //Gulp.W[2] = ParkParm.qIb; //*gulpadr3;
+    //Gulp.W[3] = ParkParm.qIc; //*gulpadr4;
+
+    Gulp.W[0] = *gulpadr1;
+    Gulp.W[1] = *gulpadr2;
+    Gulp.W[2] = *gulpadr3;
+    Gulp.W[3] = *gulpadr4;
+    
+    // unlock the main loop, so it will read values just updated
+    gulp_update_request = 0;
+
+    // read VDC link raw value;
+    VDCLink = ADCGetVDCLink();
+    debug_i2t = I2Tdata.Acc[1];
+  }
+
+  // perform I2T protection from ParkParm.qId,qIq 
+  //I2Tdata.IQMeasured = /*abs*/(ParkParm.qIq);
+  //I2Tdata.IDMeasured = /*abs*/(ParkParm.qId);
+
+  I2Tdata.IQMeasured = I2Tdata.IDMeasured = ParkParm.qIa;
+  I2Tdata.IQMeasured += ParkParm.qIb;
+  I2Tdata.IQMeasured += ParkParm.qIb;
+  I2Tdata.IQMeasured *= 10;
+  I2Tdata.IQMeasured >>= 4;
+
+  // Invoke the I2T integrator with new current values
+  if(I2T(&I2Tdata))
+  {
+    //The I2T grew too much. Protect!
+    SysError.I2TFailure = 1;
+    FaultConditionsHandler();
+  }
+
+  //Clear the DMA0 Interrupt Flag
+  IFS0bits.DMA0IF = 0;
+}
+
+#else
+
 void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 //
 // DMA0 IRQ Service Routine
-// used for FOC loop 
+// used for FOC loop
 //
 {
   int pwmdelay = 0;
@@ -153,9 +616,9 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   static int W_PID_Undersample= W_PID_UNDERSAMPLE;
 
 
-//DEADCATS: inizializzando idx con qualsiasi valore il controllo di velocita 
+//DEADCATS: inizializzando idx con qualsiasi valore il controllo di velocita
 //  'grattava' in una direzione.
-//  E' stata individuata la causa: la coincidenza tra il reload del contatore PWM e l`aggiornamento 
+//  E' stata individuata la causa: la coincidenza tra il reload del contatore PWM e l`aggiornamento
 //  dei valori da parte del SVG quando vengono usati encoder spi.
 //  per evitare tutto cio l'irq FOC deve terminare PRIMA della meta' della PWM!!!
 //   |\      _,,,---,,_
@@ -168,7 +631,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 //  In questo modo se il loop FOC dovesse durare piu di meta PWM abbiamo un jitter
 //  (i valori PWM vengono settati per il giro dopo) ma almeno non si inchioda tutto.
 //  Questa condizione e' comunque segnalata tramite flag di errore e sarebbe meglio
-//  che non si verificasse...   
+//  che non si verificasse...
 //
 
 #ifdef PIN_RA3_IS_DEBUG
@@ -181,7 +644,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   // Above we make it sure that the preempted code can continue
   // safely when this ISR finishes. Here we ensure that THIS
   // ISR (that will use DSP ASM funtions) can work properly, and
-  // so we set the CORCON register in proper way. 
+  // so we set the CORCON register in proper way.
 
   // setting CORCON in this way rather than using CORCONbits is
   //slightly more efficient (because CORCONbits is volatile and
@@ -194,9 +657,9 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
                       // conventional rounding mode (bit 1 set to 0)
                       // fractional multiplier (bit 0 set to 0)
                       // multiplier is signed (bit 12 set to 0)
- 
+
   // read Meccanical postion [-1..0.9999] and angle corrected with encsyncpulsepos
-  // calculate AlignedMecchanicalAngle and UnalignedMecchanicalAngle from raw encoder data 
+  // calculate AlignedMecchanicalAngle and UnalignedMecchanicalAngle from raw encoder data
   EncoderPosition();
 
   // Trigger encoder. Start to prepare data for the next reading (if needed..)
@@ -237,7 +700,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
     cnt++;
 
     if( (cnt > OL_RAMP_SLOPE) && (DeltaTheta < OL_MAX_DELTA_THETA))
-    { 
+    {
       DeltaTheta++;
       cnt = 0;
     }
@@ -245,14 +708,14 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   else // Closed Loop (torque, speed, position)
   {
     // Using QE the starting phase must be allineated with the maximum of the flux.
-    // this is done in open loop mode making a complete swap of mechanical angle 
+    // this is done in open loop mode making a complete swap of mechanical angle
     // to drag the rotor from angle 0x01 to 0xFFFF
     // If the encoder is provided with a Index than align to the Index!
     // for absolute encoders (HES and AS504x) no movment is performed
     if(1 == SysStatus.InitialRotorAlignmentInProgress)
     {
-      // Rotor alignment is done spinning the field for a complete mechanical 
-      // turn and dragging the rotor in position. 
+      // Rotor alignment is done spinning the field for a complete mechanical
+      // turn and dragging the rotor in position.
       AlignRotor();
     }
     else
@@ -265,21 +728,21 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
       // get velocity measurement from encoder registers
 #ifdef TLE_INTERNAL_SPEED
       // Attentione!!!!:
-      // la lettura di velocita' deriva nel caso dell'encoder tle dalla lettura della 
+      // la lettura di velocita' deriva nel caso dell'encoder tle dalla lettura della
       // posizione, calcolo CRC e accettazione dato  NON deve essere spostata dal loop FOC
       // in quanto deve completarsi entro il ciclo.
       tle_speed = EncoderVelocity();
 #else
-     // TODO: il calcolo della valocita` fatto oldstyle va infilato 
+     // TODO: il calcolo della valocita` fatto oldstyle va infilato
      // in alternativa in questo ramo ifdef
-     
+
      // Use FW calculated speed
      // ....
 #endif
-     
+
 
 // TODO: what happen if even the 32 bit counter overflows?
-      
+
       // detects and count complete rounds.
       if((unsigned int)AlignedMecchanicalAngle  > POSITION_TURN_DETECT_THRESHOLD && Previous_position < 65535-POSITION_TURN_DETECT_THRESHOLD)
       {
@@ -287,12 +750,12 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
         Turns--;
       }
-      else 
+      else
       {
 
         if((unsigned int)AlignedMecchanicalAngle < 65535-POSITION_TURN_DETECT_THRESHOLD &&  Previous_position > POSITION_TURN_DETECT_THRESHOLD)
         {
-            
+
           // the position was close to its max and now it is jumped near to its min value. Increase turns counter
           Turns++;
         }
@@ -304,13 +767,13 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
       // encoder value (normalized to 16bits) and turns counter
 
       Current_position = (unsigned int)AlignedMecchanicalAngle;
-      Current_position += ((long)Turns)* 0x10000;  
+      Current_position += ((long)Turns)* 0x10000;
 
-     
+
 
 #ifdef COMPLEX_VELOCITY_CALCULATION
       // TODO: comment please
-      // 
+      //
       // for complex velocity calculation algorithm
       //
       // TODO: la verifica dello speedundersampler peggiora le prestazioni del jitter del looop foc!
@@ -332,20 +795,20 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
       // only current position and last position stored at the previous speed cycle
       {
         if(speed_undersampler++ == W_SIMPLE_CALCULATION_UNDERSAMPLE)
-        // The speed calculation is done only 1 time every 
+        // The speed calculation is done only 1 time every
         // W_SIMPLE_CALCULATION_UNDERSAMPLE foc loop iterations
         {
 
           long tmp = Current_position - Previous_position_for_velocity_calc;
-         
+
           // generic division has been changed with more efficient ASM division.
           // performance increment is huge.
           //VelocityParm.Velocity /= W_SIMPLE_CALCULATION_DIVISOR ;
-          VelocityParm.Velocity = __builtin_divsd(tmp,W_SIMPLE_CALCULATION_DIVISOR);   
+          VelocityParm.Velocity = __builtin_divsd(tmp,W_SIMPLE_CALCULATION_DIVISOR);
 
           Previous_position_for_velocity_calc = Current_position;
           speed_undersampler = 0;
-          
+
 
         }
       }
@@ -353,36 +816,36 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
 #ifdef COMP_POSITION_READ_DELAY
       // using SPI encoders the (fixed) time needed for data communication
-      // can be taken in account and compensated. 
-      // the angle read from SPI is corrected taking in account the rotor speed  
+      // can be taken in account and compensated.
+      // the angle read from SPI is corrected taking in account the rotor speed
       // and the communication speed
       {
         int encoder_delay_correction;
-        // compensate for encoder delay. 
+        // compensate for encoder delay.
         // This avoids unwanted flux disalignment when speeding up..
         // TODO: how the mplam c30 compiles the double operation? Check for algo
         // complexity and eventually change (fixed point, MPY etc)
         encoder_delay_correction = ((double)VelocityParm.last_velocity * ENCODER_DELAY);
-        //TODO: ENCODER_DELAY deve essere inizializzato in funzione del tipo di encoder definito in userparams!!! 
+        //TODO: ENCODER_DELAY deve essere inizializzato in funzione del tipo di encoder definito in userparams!!!
 
         // read Meccanical postion,calculate electrical position in ParkParm.qAngle
- 
+
         ParkParm.qAngle =  (AlignedMecchanicalAngle + encoder_delay_correction) * NPOLEPAIRS;
- 
+
       }
 #else
   // do not compensate position delay
       // TODO: portare dentro, oppure fare una ElectricalPosition()
       // read Meccanical postion,calculate electrical position in ParkParm.qAngle
       ParkParm.qAngle =  AlignedMecchanicalAngle * NPOLEPAIRS;
-  
+
 #endif
     }
   }
   // per fare un cambio al volo tra encoder e sonde di hall:
   // mettere un encoder assoluto e scommentare
   //
-  // void ForceHESEmulation(); 
+  // void ForceHESEmulation();
 
   // Calculate ParkParm.qSin,qCos from ParkParm.qAngle
   SinCos();
@@ -393,14 +856,14 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   // perform Torque Sensored Control Loop
   if(1 == SysStatus.TorqueSensorLoop)
   {
-    // check if the zero torque from the sensor has been calibrated 
+    // check if the zero torque from the sensor has been calibrated
     // the name of the variable is extremly misleading but...
     if(1 == SysStatus.LoopRunning)
     {
       // TODO: rimuovere l'undersampler
       if ( ASCounter == 1)
       {
-        // set elaborated torque as torque reference   
+        // set elaborated torque as torque reference
         CtrlReferences.qIqRef = Torque;
         ASCounter=TorcAndersempling;
       }
@@ -419,11 +882,11 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
     // do velocity control loop
     // calculate ICtrlParm.qIdRef from current velocity and PID parameters
     W_PID_Undersample = W_PID_UNDERSAMPLE;
-    // run speed loop PID calculate CtrlReferences.qIqRef from VelocityParm.last_velocity, 
+    // run speed loop PID calculate CtrlReferences.qIqRef from VelocityParm.last_velocity,
     //   CtrlReferences.qWRef and PID parameters
- 
+
     OmegaControl();
- 
+
 
     // per il loop di controllo in assembler
     // CtrlReferences.qIqRef = PIParmW.qOut;
@@ -432,32 +895,32 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   // Calculate ParkParm.Vd,Vq control values from ParkParm.qId,qIq and ICtrlParm.qIdRef,qIqRef
   IdIqControl();
 
-  if (1 == SysStatus.OpenLoop) 
+  if (1 == SysStatus.OpenLoop)
   // For openloop movment calculated values for qVd, qVq are overridden
   {
     // Override Vd and Vq for open loop operation (deflux)
     ParkParm.qVd = IRA_VD; // 0;
     // force a value for Vq (controls Iq = torque)
-    ParkParm.qVq = IRA_VQ; 
+    ParkParm.qVq = IRA_VQ;
   }
-  
+
   if ( 1 == SysStatus.InitialRotorAlignmentInProgress )
   // For Initial Rotor Alignment calculated values for qVd, qVq are overridden
   {
     // Override Vd and Vq for open loop operation (deflux)
     ParkParm.qVd = IraqVd; // 0;
     // force a value for Vq (controls Iq = torque)
-    ParkParm.qVq = IraqVq; 
+    ParkParm.qVq = IraqVq;
   }
 
   // Calculate ParkParm.qValpha,qVbeta from ParkParm.qSin,qCos,qVd,qVq
   InvPark();
   // Calculate SVGenParm.Vr1,Vr2,Vr3 from ParkParm.qValpha,qVbeta (InvClarke())
 
-  
+
   CalcRefVec();
 
-  // reset the flag that indicates if the PWM registers update was delayed 
+  // reset the flag that indicates if the PWM registers update was delayed
   pwmdelay =0;
 
   // reset timeout counter that is used to wait for the PWM registers update
@@ -467,7 +930,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   // its done before updating local PDCs
   // The condition will became false when the PWM is counting down but it is still
   // far from 0 or when it change direction counting up
-  
+
   //      PWM count DN           PWM count < PWM_SAFE_TIME
   while((P1TMR & 0x8000) && ((P1TMR & 0x7fff) < PWMSAFETIME))
   {
@@ -490,13 +953,13 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
     }
   }
 
- 
+
   // Calculate and set PWM duty cycles (PDC1, PDC2, PDC3) from SVGenParm.Vr1,Vr2,Vr3
   CalcSVGen();
- 
-  // when gulp_update_request is == 1, the main loop will not access those vars. 
+
+  // when gulp_update_request is == 1, the main loop will not access those vars.
   if(1 == gulp_update_request)
-  {  
+  {
     // GULP!ed variables
     Gulp.W[0] = *gulpadr1;
     Gulp.W[1] = *gulpadr2;
@@ -507,7 +970,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
     // Draw Hall effect angle
     // DrawHallEffectAngle();
-    
+
     // unlock the main loop, so it will read values just updated
     gulp_update_request = 0;
 
@@ -516,7 +979,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   }
 
 
-  // perform I2T protection from ParkParm.qId,qIq 
+  // perform I2T protection from ParkParm.qId,qIq
   I2Tdata.IQMeasured = /*abs*/(ParkParm.qIq);
   I2Tdata.IDMeasured = /*abs*/(ParkParm.qId);
 
@@ -527,7 +990,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
     SysError.I2TFailure = 1;
     FaultConditionsHandler();
   }
-  
+
   // TODO: comment or remove please
   debug_i2t= I2Tdata.Acc[1];
 
@@ -543,7 +1006,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   // debug pin
   PORTAbits.RA3 = 0;
 #endif
- 
+
 
  if(position_limits_enabled){
    if(Current_position < position_limit_lower){
@@ -560,6 +1023,8 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
 
 }
+
+#endif
 
 void SiliconRevionTest()
 // checks for proper silicon revision
@@ -641,6 +1106,9 @@ void DriveInit()
   IIRTransposedInit(&iirt);
 
   I2TInit(&I2Tdata);
+  I2Tdata.Acc[0]=0;
+  I2Tdata.Acc[1]=0;
+  I2Tdata.Acc[2]=0;
   
   // setup for a center aigned PWM
   SetupPWM();
@@ -675,8 +1143,8 @@ void DriveInit()
   SetupControlParameters(); 
 
   // define default control strategy *only*one*can*be*activated* 
-  //SysStatus.OpenLoop = 1;
-  SysStatus.TorqueControl = 1;
+  SysStatus.OpenLoop = 1;
+  //SysStatus.TorqueControl = 1;
   //SysStatus.TorqueSensorLoop = 1;
   //SysStatus.SpeedControl = 1;
   //SysStatus.PositionControl = 1;
@@ -890,8 +1358,8 @@ readytoswitchon:
   DS402_Controlword.Flags.SwitchOn = 0;
   DS402_Controlword.Flags.EnableVoltage = 0;
   DS402_Controlword.Flags.EnableOperation = 0;
-//VALE: now the application strat to transmit status msg
-EnableIntT4;
+  //VALE: now the application strat to transmit status msg
+  EnableIntT4;
   // Stays in READY TO SWITCH ON until the command 
   // SwitchOn received from CAN
   while( 0 == DS402_Controlword.Flags.SwitchOn ){;}
@@ -1035,7 +1503,7 @@ operationenable:
 
   // TODO: enable overcurrent fault during rotor allignment
   // enable the overcurrent interrupt
-  OverCurrentFaultIntEnable();
+  //OverCurrentFaultIntEnable();
 
   // I2T will run on behalf of 2FOC loop. Stop running it in behalf of Timer 3
   DisableIntT3;

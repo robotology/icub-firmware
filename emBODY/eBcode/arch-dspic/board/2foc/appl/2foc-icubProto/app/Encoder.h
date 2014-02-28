@@ -53,4 +53,6 @@ extern volatile short IraqVd;
 extern volatile short IraqVq; 
 extern unsigned int EncoderDegradation;
 
+extern int encoder_dhes_state;
+
 #endif

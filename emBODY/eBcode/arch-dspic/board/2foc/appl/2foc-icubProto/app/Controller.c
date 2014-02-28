@@ -28,7 +28,6 @@ tPID2 TorqueSensorPID;
 tPID2 CurrentQPID;
 tPID2 CurrentDPID;
 tPID2 WPID;
-volatile unsigned char current_open_loop=0;
 
 void ControllerCurrentDPIDClear()
 {
@@ -122,16 +121,8 @@ void IdIqControl(void)
 
   CurrentDPID.controlReference = CtrlReferences.qIdRef;
 
-  if (current_open_loop)
-  {
-  	CurrentDPID.measuredOutput = 0; 
-  	CurrentQPID.measuredOutput = 0; 
-  }
-  else
-  {
-    CurrentDPID.measuredOutput = ParkParm.qId;
-  	CurrentQPID.measuredOutput = ParkParm.qIq;
-  }
+  CurrentDPID.measuredOutput = ParkParm.qId;
+  CurrentQPID.measuredOutput = ParkParm.qIq;
 
   PID2(&CurrentDPID);  
   DPIDError = CurrentDPID.controlState[1];
@@ -145,11 +136,11 @@ void IdIqControl(void)
   { 
     if(CurrentDPID.controlOutput < -Q15(DOUTMAX))
     {
-	  ParkParm.qVd = -Q15(DOUTMAX);
+      ParkParm.qVd = -Q15(DOUTMAX);
     }
     else
     {
-  	  ParkParm.qVd = CurrentDPID.controlOutput;
+      ParkParm.qVd = CurrentDPID.controlOutput;
     }
   }
 

@@ -23,11 +23,11 @@ typedef union uSysError
 /*b1*/  unsigned OverVoltageFailure:1;      /* Overvoltage */
 /*b2*/  unsigned ExternalFaultAsserted:1;   /* External Fault */
 /*b3*/  unsigned OverCurrentFailure:1;      /* OverCurrent */
-                                            //ATTENTION IN PERIODICCMD_STATUS PUT IN OR WITH I2TFailure 
 /*b4*/  unsigned HESInvalidValue:1;         /* an invalid value of HES has been detected */ 
 /*b5*/  unsigned AS5045CSumError:1;         //ATTENTION IN MSG PUNT IN OR WITH    AS5045CalcError:1;
 /*b6*/  unsigned HESInvalidSequence:1;      /* an invalid sequence of HES activation has been detected */
-/*b7*/  unsigned unused:1;                  /* UNUSED: put here for mad in msg */
+/*b7*/  unsigned CANInvalidProtocol:1;      /* can protocol incompatible with EMS */
+///*b7*/  unsigned unused:1;                  /* UNUSED: put here for mad in msg */
 
 
 /********************************************************************************************************/
@@ -77,7 +77,7 @@ typedef union uSysError
 /*b2*/  unsigned CAN_RTRFlagActive:1;       /* an RTR flag has been seen over the wire. This is not OK for LorCan */
 /*b3*/  unsigned CAN_WasWarn:1;             /* can has been in bus warn at least one time */
 /*b4*/  unsigned CAN_DLCError:1;            /* at least one DLC error has been seen */
-/*b5*/  unsigned SiliconRevisionFault:1;    /* see comments below
+/*b5*/  unsigned SiliconRevisionFault:1;    /* see comments below */
 /*b6*/  unsigned PositionLimitUpper:1; 
 /*b7*/  unsigned PositionLimitLower:1; 
 

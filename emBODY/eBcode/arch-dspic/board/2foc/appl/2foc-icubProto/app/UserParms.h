@@ -52,7 +52,7 @@
 #endif
 
 // Number of poles
-#define NPOLES      (NPOLEPAIRS*2) 
+#define NPOLES      (POLEPAIRS*2) 
 
 //#define NOMINALSPEEDINRPM 3000      // Make sure NOMINALSPEEDINRPM generates a MAXOMEGA < 1.0, Use this formula:
   // MAXOMEGA = NOMINALSPEEDINRPM*SPEEDLOOPTIME*POLEPAIRS*2/60. If MAXOMEGA > 1.0, reduce NOMINALSPEEDINRPM 
@@ -71,9 +71,9 @@
 // #define ENCODER_QE
 // #define ENCODER_ABS
 // #define ENCODER_AIE
- #define ENCODER_DHES
+#define ENCODER_DHES
 // #define ENCODER_TLE
-
+// #define DC_MOTOR
 
 // when this is enabled it is possible to degradate encoder
 // performances via CAN command.
@@ -468,12 +468,14 @@
 
 // Proportional
 //#define KPId        Q15(0.22) // 0.22 Per motori Emoteq
-#define KPId          Q15(0.09) // 0.09 per motori Kollmorgen 
+//#define KPId        Q15(0.09) // 0.09 per motori Kollmorgen
+#define KPId          0x00C0 // per motori Kollmorgen 6step
 //#define KPId        Q15(0.06) // 0.02 Per motori Mecapion
 
 // Integral
 //#define KIId        Q15(0.05) // 0.05 Per motori emoteq
-#define KIId          Q15(0.02) // 0.02 per motori Kollmorgen 
+//#define KIId          Q15(0.02) // 0.02 per motori Kollmorgen
+#define KIId          0x0080 // per motori Kollmorgen 6step 
 //#define KIId        Q15(0.02) // 0.01 per motori Kollmorgen
 
 //Excess (used only in original Microchip PI implementation)
@@ -483,7 +485,7 @@
 #define KDId          Q15(0.0) 
 
 // integral anti wind up
-#define KMId          32000
+#define KMId          0x3500
 
 // PID regulator output saturation value (Vd and Vq)
 #ifdef ENCODER_DHES
@@ -665,7 +667,7 @@
 // This is the current threshold that will cause protection to fire
 // This value is in I AD units scaled to 16bit.
 // For example AD reads about 6553 for 5A current, 1310 for 1A
-#define I2T_CURRENT_THRESHOLD   3310
+#define I2T_CURRENT_THRESHOLD   1310
 // This is 2024*K where K is
 // K = 1-(e^(-tc/tau))
 // where TC is 2FOC loop time
@@ -675,17 +677,13 @@
 // I2T warning is issued over this value
 //#define I2T_WARNING_THRESHOLD    170
 
-//CURRENT LIMIT. It is the saturation for the reference of the current expressed in AD reads (1310 for 1A)
-#define CURRENT_LIMIT Q15(0.1999)//6553 // for Kolmorgeen  
-
 //
 // PWM and Control Timing Parameters
 //
 // PWM Frequency in Hertz
 #ifdef ENCODER_DHES
  // HES can run up to 40KHz
- //#define PWMFREQUENCY   40000
- #define PWMFREQUENCY   20000     
+ #define PWMFREQUENCY   40000     
 #else
  // Higer resolution encoders
  #define PWMFREQUENCY   20000     
@@ -695,11 +693,10 @@
 // Deadtime in seconds (range 1.6 us to 25 ns)
 #ifdef ENCODER_DHES
  // HES accept a greater zero cross distortion in order to keep lower temperature
-//#define DEADTIMESEC	   0.000005
- #define DEADTIMESEC	   0.00002 
+ #define DEADTIMESEC	   0.00000025 
 #else
  // hi-res encoders try to minimize zero cross distortion
- #define DEADTIMESEC	   0.0000025 
+ #define DEADTIMESEC	   0.00000020 
 #endif
 
 // this forces the 2foc interrupt to delay PWM registers update when it is 

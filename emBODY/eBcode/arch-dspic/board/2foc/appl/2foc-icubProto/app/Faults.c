@@ -111,18 +111,35 @@ void FaultConditionsHandler(void)
 
 }
 
+char g_overcurrent_retry = 0;
+
 void __attribute__((__interrupt__,no_auto_psv)) _FLTA1Interrupt(void) 
 // Interrupt handler for OVERCURRENT fault.
 // HW will automatically stop PWM generation.
 // We need to set SW flag here in order to update SW state information 
 {
+  if (!SysStatus.PWM_is_disabled)
+  {
+    if (!g_overcurrent_retry)
+    {
+      PWMDisable();
 
-  // signal overcurrent
-  SysError.OverCurrentFailure = 1;
+      g_overcurrent_retry = 1;
 
-  // call fault handler
-  FaultConditionsHandler();
-	
+      __delay32(24);
+
+      PWMEnable();
+    }
+    else
+    {
+      // signal overcurrent
+      SysError.OverCurrentFailure = 1;
+
+      // call fault handler
+      FaultConditionsHandler();
+    }
+	}
+
   // clear irq flag
   IFS3bits.FLTA1IF = 0;
 }
