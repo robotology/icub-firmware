@@ -34,6 +34,7 @@
 #include "EOsocketDatagram_hid.h"
 #include "EOVtask.h"
 #include "EOMmutex.h"
+#include "EOMtask_hid.h"
 
 #include "EOpacket_hid.h"
 #include "EOsocket_hid.h"
@@ -114,12 +115,15 @@ const eOmipnet_cfg_addr_t eom_ipnet_addr_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#undef START_IPAL_INSIDE_eom_ipnet_Initialise
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static void s_eom_ipnet_ipal_start(void);
 
 static void e_eom_ipnet_signal_new_frame_is_available(void);
 
@@ -335,6 +339,13 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           eom_ipnettick,
                                           "ipnet.tick");
 #endif
+
+
+
+#if     defined(START_IPAL_INSIDE_eom_ipnet_Initialise)
+    s_eom_ipnet_ipal_start();
+#endif
+
                                           
     return(&s_eom_theipnet);
 }    
@@ -744,7 +755,8 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
         return;
     }
 
-    eom_task_isrSetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);   
+    //eom_task_isrSetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);   
+    osal_eventflag_set(eov_ipnet_evt_RXethframe, s_eom_theipnet.tskproc->osaltask, osal_callerAUTOdetect);
 }
 
 
@@ -761,12 +773,7 @@ static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
     ipal_sys_timetick_increment();
 }
 
-
-
-/*  @brief      the startup of tsktproc.
-    @details    in here we initialise and start the ipal, 
- **/
-static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
+static void s_eom_ipnet_ipal_start(void)
 {
     uint32_t ram32sizeip;
     uint32_t *ram32dataip = NULL;
@@ -790,8 +797,18 @@ static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
     ipal_base_initialise(&s_eom_theipnet.ipcfg, ram32dataip);
     
     // start the ipal
-    ipal_sys_start();
+    ipal_sys_start();       
+}
 
+
+/*  @brief      the startup of tsktproc.
+    @details    in here we initialise and start the ipal, 
+ **/
+static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
+{
+#if     !defined(START_IPAL_INSIDE_eom_ipnet_Initialise)
+    s_eom_ipnet_ipal_start();
+#endif
 }
 
 /*  @brief      the body of tsktproc.
