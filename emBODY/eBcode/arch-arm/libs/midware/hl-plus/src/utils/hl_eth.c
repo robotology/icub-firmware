@@ -30,6 +30,7 @@
 
 #if     defined(HL_USE_UTIL_ETH)
 
+//#define HL_ETH_USE_EVENTVIEWER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -47,6 +48,10 @@
 #include "hl_bits.h" 
 
 #include "hl_ethtrans.h" 
+
+#if	    defined(HL_ETH_USE_EVENTVIEWER)
+#include "eventviewer.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -462,6 +467,28 @@ static hl_eth_theinternals_t s_hl_eth_theinternals =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#if     defined(HL_ETH_USE_EVENTVIEWER)
+
+#define hal_arch_arm_ETH_IRQn 0
+extern void eth_irqhandler(void) {}
+extern void eth_moveframeup(void) {}
+extern void eth_alert(void) {}
+extern void eth_morethanone(void) {}
+extern void eth_cannotmoveup(void) {}
+extern void eth_error1(void) {}
+extern void eth_error2(void) {}
+extern void eth_error3(void) {}
+extern void eth_errorx(void) {}
+const evEntityId_t id_eth_irqhandler = ev_ID_first_isr+hal_arch_arm_ETH_IRQn;
+const evEntityId_t id_eth_moveframeup = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+1;
+const evEntityId_t id_eth_alert = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+2;
+const evEntityId_t id_eth_morethanone = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+3;
+const evEntityId_t id_eth_cannotmoveup = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+4;
+const evEntityId_t id_eth_error1 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+5;
+const evEntityId_t id_eth_error2 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+6;
+const evEntityId_t id_eth_error3 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+7;
+const evEntityId_t id_eth_errorx = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+8;
+#endif// defined(HL_ETH_USE_EVENTVIEWER)
 
 extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
 {
@@ -557,8 +584,25 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
 //     char str[128];
 //     snprintf(str, sizeof(str), "using rmii w/ phymode %d", (int)rmiiphymode); 
 //     hl_sys_on_warning(str);
-      
+    
+
+#if     defined(HL_ETH_USE_EVENTVIEWER)
+
+    eventviewer_init();
+    eventviewer_load(id_eth_irqhandler, eth_irqhandler);
+    eventviewer_load(id_eth_moveframeup, eth_moveframeup);
+    eventviewer_load(id_eth_alert, eth_alert);
+    eventviewer_load(id_eth_morethanone, eth_morethanone);
+    eventviewer_load(id_eth_cannotmoveup, eth_cannotmoveup);
+    eventviewer_load(id_eth_error1, eth_error1);
+    eventviewer_load(id_eth_error2, eth_error2);
+    eventviewer_load(id_eth_error3, eth_error3);
+    eventviewer_load(id_eth_errorx, eth_errorx);
+
+#endif//defined(HL_ETH_USE_EVENTVIEWER)
+    
     s_hl_eth_initted_set();
+    
     
     return(hl_res_OK);
 }
@@ -780,6 +824,11 @@ __weak extern void hl_eth_on_frame_received(hl_eth_frame_t* frame)
     
 }
 
+__weak extern void hl_eth_alert(void)
+{
+    
+}
+
 
 
 
@@ -788,96 +837,99 @@ __weak extern void hl_eth_on_frame_received(hl_eth_frame_t* frame)
 // --------------------------------------------------------------------------------------------------------------------
 
 
+
 // ---- isr of the module: begin ----
+#undef USE_OLD
+#if     defined(USE_OLD)
 
-// void ETH_IRQHandler(void) 
-// {
-//     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
-//     
-//   // questa non va cambiata. pero' .... usa OS_FRAME e chiama alloc_mem() e put_in_queue().
-//   // bisogna usare alcuni puntatori a funzione che siano inizializzati / passati in hl_eth_init().
-//   // inoltre, se si vuole segnalare l'arrivo di un frame gia' qui dentro, allora bisogna definire
-//   // un altro puntatore a funzione hl_on_rx_frame().
+void ETH_IRQHandler(void) 
+{
+    hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
+    
+  // questa non va cambiata. pero' .... usa OS_FRAME e chiama alloc_mem() e put_in_queue().
+  // bisogna usare alcuni puntatori a funzione che siano inizializzati / passati in hl_eth_init().
+  // inoltre, se si vuole segnalare l'arrivo di un frame gia' qui dentro, allora bisogna definire
+  // un altro puntatore a funzione hl_on_rx_frame().
 
-//     uint8_t* rxframedata = NULL;
-//     uint16_t rxframesize = 0;
+    uint8_t* rxframedata = NULL;
+    uint16_t rxframesize = 0;
 
-//   /* Ethernet Controller Interrupt function. */
-//   hl_eth_frame_t *frame;
-//   U32 i,RxLen;
-//   volatile U32 int_stat;
-//   U32 *sp,*dp;
+  /* Ethernet Controller Interrupt function. */
+  hl_eth_frame_t *frame;
+  U32 i,RxLen;
+  volatile U32 int_stat;
+  U32 *sp,*dp;
 
 
-//   
-//   while (((int_stat = ETH->DMASR) & INT_NISE) != 0) {   // -> read dma status register until we have the normal interrupt bit set
-//     ETH->DMASR = int_stat;                              // -> reset the dma status register
-//     if (int_stat & INT_RIE) {                           // -> in case of received frame ...
-//       /* Valid frame has been received. */
-//       i = intitem->rxbufindex; //RxBufIndex;
-//       if (intitem->rx_desc[i].Stat & DMA_RX_ERROR_MASK) {  
-//         goto rel;
-//       }
+  
+  while (((int_stat = ETH->DMASR) & INT_NISE) != 0) {   // -> read dma status register until we have the normal interrupt bit set
+    ETH->DMASR = int_stat;                              // -> reset the dma status register
+    if (int_stat & INT_RIE) {                           // -> in case of received frame ...
+      /* Valid frame has been received. */
+      i = intitem->rxbufindex; //RxBufIndex;
+      if (intitem->rx_desc[i].Stat & DMA_RX_ERROR_MASK) {  
+        goto rel;
+      }
 
-//       if ((intitem->rx_desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
-//         goto rel;
-//       }
-//       
-//       RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
-//       rxframesize = RxLen;
-//       if (RxLen > ETH_MTU) {
-//         /* Packet too big, ignore it and free buffer. */
-//         goto rel;
-//       }
-//       /* Flag 0x80000000 to skip sys_error() call when out of memory. */
-//       //frame = intitem->onframerx.frame_new(RxLen | 0x80000000);
-//       frame = hl_eth_frame_new(RxLen | 0x80000000);
-//       /* if 'frame_new()' has failed, ignore this packet. */
-//       if (frame != NULL) {
-//         sp = (U32 *)(intitem->rx_desc[i].Addr & ~3);
-//         dp = (U32 *)&frame->datafirstbyte[0];
-//         rxframedata = (uint8_t*)sp;
-//         for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
-//           *dp++ = *sp++;
+      if ((intitem->rx_desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+        goto rel;
+      }
+      
+      RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;   // -> retrieve the length of teh frame
+      rxframesize = RxLen;
+      if (RxLen > ETH_MTU) {
+        /* Packet too big, ignore it and free buffer. */
+        goto rel;
+      }
+      /* Flag 0x80000000 to skip sys_error() call when out of memory. */
+      //frame = intitem->onframerx.frame_new(RxLen | 0x80000000);
+      frame = hl_eth_frame_new(RxLen | 0x80000000);
+      /* if 'frame_new()' has failed, ignore this packet. */
+      if (frame != NULL) {
+        sp = (U32 *)(intitem->rx_desc[i].Addr & ~3);
+        dp = (U32 *)&frame->datafirstbyte[0];
+        rxframedata = (uint8_t*)sp;
+        for (RxLen = (RxLen + 3) >> 2; RxLen; RxLen--) {
+          *dp++ = *sp++;
+        }
+
+//        intitem->onframerx.frame_movetohigherlayer(frame);
+//         if(NULL != intitem->onframerx.frame_alerthigherlayer)
+//         {
+//             intitem->onframerx.frame_alerthigherlayer();
 //         }
-
-// //        intitem->onframerx.frame_movetohigherlayer(frame);
-// //         if(NULL != intitem->onframerx.frame_alerthigherlayer)
-// //         {
-// //             intitem->onframerx.frame_alerthigherlayer();
-// //         }
-//         
-//         // it moves and alerts 
-//         hl_eth_on_frame_received(frame);
-//         
-//       }
-//       else
-//       {
-//           rxframedata = 0;          
-//       }
-//       
-// //     if(NULL != hl_eth_hid_DEBUG_support.fn_inside_eth_isr)
-// //     {            
-// //         hl_eth_hid_DEBUG_support.fn_inside_eth_isr(rxframedata, rxframesize);
-// //     }
-//         
-//       /* Release this frame from ETH IO buffer. */
-
-// rel:  intitem->rx_desc[i].Stat = DMA_RX_OWN;
-//     
-//       
-//     if (++i == intitem->config.capacityofrxfifoofframes) i = 0;
-//       intitem->rxbufindex = i; 
+        
+        // it moves and alerts 
+        hl_eth_on_frame_received(frame);
+        
+      }
+      else
+      {
+          rxframedata = 0;          
+      }
+      
+//     if(NULL != hl_eth_hid_DEBUG_support.fn_inside_eth_isr)
+//     {            
+//         hl_eth_hid_DEBUG_support.fn_inside_eth_isr(rxframedata, rxframesize);
 //     }
-//     if (int_stat & INT_TIE) {
-//       /* Frame transmit completed. */
+        
+      /* Release this frame from ETH IO buffer. */
 
-//     }
-//   }             // -> we execute a new cycle only if in the execution time of the loop a new interrupt has arrived. 
+rel:  intitem->rx_desc[i].Stat = DMA_RX_OWN;
+    
+      
+    if (++i == intitem->config.capacityofrxfifoofframes) i = 0;
+      intitem->rxbufindex = i; 
+    }
+    if (int_stat & INT_TIE) {
+      /* Frame transmit completed. */
 
-// }
+    }
+  }             // -> we execute a new cycle only if in the execution time of the loop a new interrupt has arrived. 
 
+}
 
+#else
 
 void ETH_IRQHandler (void) {
   /* Ethernet Controller Interrupt function. */
@@ -887,25 +939,32 @@ void ETH_IRQHandler (void) {
   //added 
   hl_eth_frame_t *frame; 
   uint32_t size = 0;    
+  uint8_t receivedatleastone = 0; 
+   
+  uint16_t receivednum = 0;    
+  uint8_t errormode = 0;
     
-
-#if defined(HAL_USE_EVENTVIEWER_ETH)
-  evEntityId_t prev = eventviewer_switch_to(ev_ID_first_isr+hal_arch_arm_ETH_IRQn);
+#if	    defined(HL_ETH_USE_EVENTVIEWER)    
+    evEntityId_t previrq = eventviewer_switch_to(id_eth_irqhandler);
 #endif
   
     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
     i = intitem->rxbufindex; // RxBufIndex;
   do {
+         
     /* Valid frame has been received. */
     if (intitem->rx_desc[i].Stat & DMA_RX_ERROR_MASK) {
+      errormode = 1;
       goto rel;
     }
     if ((intitem->rx_desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+      errormode = 2;
       goto rel;
     }
     RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;
     if (RxLen > ETH_MTU) {
       /* Packet too big, ignore it and free buffer. */
+      errormode = 3;
       goto rel;
     }
 
@@ -945,19 +1004,67 @@ void ETH_IRQHandler (void) {
 //         {
 //             intitem->onframerx.frame_alerthigherlayer();
 //         }
-        
+
+#if	    defined(HL_ETH_USE_EVENTVIEWER)
+        evEntityId_t prevmoveup = eventviewer_switch_to(id_eth_moveframeup);     
+#endif
         hl_eth_on_frame_received(frame);
+        receivedatleastone = 1;
+        receivednum ++;
+
+#if	    defined(HL_ETH_USE_EVENTVIEWER)
+        eventviewer_switch_to(prevmoveup); 
+#endif
+  
     }
-//     else
-//     {
-//         //error: memory is missing!!
-//     }
+    else
+    {
+        //error: memory is missing!!
+        errormode = 4;     
+    }
 
         /* Release this frame from ETH IO buffer. */
 rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
 
-    if (++i == intitem->config.capacityofrxfifoofframes) i = 0;
-  } while ((intitem->rx_desc[i].Stat & DMA_RX_OWN) == 0);
+#if	    defined(HL_ETH_USE_EVENTVIEWER)
+    if(0 != errormode)
+    {
+        evEntityId_t preverror;
+        switch(errormode)
+        {
+            case 1:
+                preverror = eventviewer_switch_to(id_eth_error1);
+                eventviewer_switch_to(preverror);      
+            break;
+
+            case 2:
+                preverror = eventviewer_switch_to(id_eth_error2);
+                eventviewer_switch_to(preverror);      
+            break; 
+            
+            case 3:
+                preverror = eventviewer_switch_to(id_eth_error3);
+                eventviewer_switch_to(preverror);      
+            break;  
+
+            case 4:
+                preverror = eventviewer_switch_to(id_eth_cannotmoveup);
+                eventviewer_switch_to(preverror);      
+            break;  
+
+            
+            default:
+                preverror = eventviewer_switch_to(id_eth_errorx);
+                eventviewer_switch_to(preverror);      
+            break;                 
+        }         
+    }
+#endif
+    
+    if (++i == intitem->config.capacityofrxfifoofframes) { i = 0; };
+    intitem->rxbufindex = i;
+  // if the bit in DMA_RX_OWN is 0 (the DMA does own the descriptor) then the loop goes on
+  } while (!(intitem->rx_desc[i].Stat & DMA_RX_OWN));   
   intitem->rxbufindex = i;
 
   if (ETH->DMASR & INT_RBUIE) {
@@ -969,10 +1076,32 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
   ETH->DMASR = INT_NISE | INT_RIE;
 
 
-#if defined(HAL_USE_EVENTVIEWER_ETH)    
-  eventviewer_switch_to(prev);
+  if(0 != receivedatleastone)
+  {
+#if	    defined(HL_ETH_USE_EVENTVIEWER)
+      evEntityId_t prevalert = eventviewer_switch_to(id_eth_alert);
+#endif
+      
+      hl_eth_alert();
+
+#if	    defined(HL_ETH_USE_EVENTVIEWER)
+      eventviewer_switch_to(prevalert);
+      
+      //if(0)
+      if(receivednum > 1)
+      {
+          evEntityId_t prevmorethanone = eventviewer_switch_to(id_eth_morethanone);
+          eventviewer_switch_to(prevmorethanone);          
+      }
+#endif           
+  }  
+  
+#if	    defined(HL_ETH_USE_EVENTVIEWER)  
+    eventviewer_switch_to(previrq);
 #endif
 }
+
+#endif
 
 // ---- isr of the module: end ------
 
