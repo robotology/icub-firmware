@@ -298,12 +298,27 @@ extern void hl_eth_on_frame_received(hl_eth_frame_t* frame)
     hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];   
 
     intitem->onframerx.frame_movetohigherlayer((hal_eth_frame_t*)frame);
+	
+	// acemor on 03mar2014: it is possible to move up more than one frame inside the ETH isr handler
+	// but it is better to alert the receiving task only once
+
+//     if(NULL != intitem->onframerx.frame_alerthigherlayer)
+//     {
+//         intitem->onframerx.frame_alerthigherlayer();
+//     }    
+}
+
+
+extern void hl_eth_alert(void)
+{
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];   
+
     if(NULL != intitem->onframerx.frame_alerthigherlayer)
     {
         intitem->onframerx.frame_alerthigherlayer();
     }    
 }
-
 
 extern hal_result_t hal_eth_hid_static_memory_init(void)
 {
