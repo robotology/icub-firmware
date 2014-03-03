@@ -224,6 +224,8 @@ extern hl_eth_frame_t* hl_eth_frame_new(uint32_t len);
 
 extern void hl_eth_on_frame_received(hl_eth_frame_t* frame);
 
+extern void hl_eth_alert(void);
+
 
 extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame);
 
