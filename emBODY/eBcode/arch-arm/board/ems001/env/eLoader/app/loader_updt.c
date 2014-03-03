@@ -81,8 +81,8 @@
 #define LOADER_LED                 0x100
 
 
-//#define FORCE_EEPROM_ERASE // it must be undefined unless you wanto to erase the eeprom
-//#define DEBUG_MODE
+// #define FORCE_EEPROM_ERASE // it must be undefined unless you wanto to erase the eeprom
+// #define DEBUG_MODE
 
 #if defined(FORCE_EEPROM_ERASE)
 	#warning -> ATTENTION: FORCE_EEPROM_ERASE is set ... undef it after you have erased the eeprom
