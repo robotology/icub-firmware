@@ -167,6 +167,9 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
    
     snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
     hal_trace_puts(str);
+    
+    hal_sys_irq_disable();
+    
     hal_led_init(hal_led1, NULL);
     for(;;)
     {

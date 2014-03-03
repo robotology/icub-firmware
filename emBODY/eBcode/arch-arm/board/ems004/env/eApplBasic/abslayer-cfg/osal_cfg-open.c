@@ -117,6 +117,8 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     osal_task_id_get(task, &tskid);
     snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
     hal_trace_puts(str);
+    
+    hal_sys_irq_disable();
 
     hal_led_off(hal_led0);
     hal_led_off(hal_led1);
