@@ -928,10 +928,10 @@ extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t 
     {
         
         b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
-//         if(b_ptr->cfg_ptr->type != eobrd_mc4)
-//         {
-//             continue;
-//         }
+        if((eobrd_mc4 != b_ptr->cfg_ptr->type) && (eobrd_1foc != b_ptr->cfg_ptr->type))
+        {
+            continue;
+        }
         res &= b_ptr->isready;
         if(b_ptr->isready)
         {
