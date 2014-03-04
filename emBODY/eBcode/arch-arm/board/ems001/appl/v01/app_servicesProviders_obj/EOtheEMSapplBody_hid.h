@@ -57,7 +57,7 @@ struct EOtheEMSapplBody_hid
     const eOtheEMSapplBody_cfg_t        *cfg_ptr;//tanto e' una sola la cfg!!! enon viene riutiolizzata
     eOtheEMSapplBody_hid_states_t       st;
     eOmn_appl_runMode_t                 appRunMode;
-//    EOtimer                             *ledtimer;
+    EOtimer                             *canBoardsReady_timer;
     struct
     {
         EOappTheDB                      *appDB;

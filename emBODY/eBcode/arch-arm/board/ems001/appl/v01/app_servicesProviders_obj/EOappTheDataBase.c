@@ -886,6 +886,64 @@ extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p)
     return(p->virtualStrainData.isupdated);
 }
 
+extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_canBoardCanLocation_t *canloc_ptr)
+{
+    uint8_t                         numofboard, i;
+    eOappTheDB_hid_canBoardInfo_t   *b_ptr;
+    
+    if((NULL == p) || (NULL == canloc_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    numofboard = eo_array_Capacity(p->canboardsList);
+    for(i=0; i<numofboard; i++)
+    {
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
+        if( (b_ptr->cfg_ptr->canLoc.emscanport == canloc_ptr->emscanport) && (b_ptr->cfg_ptr->canLoc.addr == canloc_ptr->addr) )
+        {
+            b_ptr->isready = eobool_true;
+            return(eores_OK);
+        }
+    }
+    
+    return(eores_NOK_nodata);
+    
+}
+extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady)
+{
+    uint8_t                             numofboard, i;
+    eOappTheDB_hid_canBoardInfo_t       *b_ptr;
+    eObool_t                            res = eobool_true;
+    
+    if((NULL == p) && (NULL == canBoardsReady))
+    {
+        return(eobool_false);
+    }
+    
+    numofboard = eo_array_Capacity(p->canboardsList);
+    *canBoardsReady = 0;
+    
+    for(i=0; i<numofboard; i++)
+    {
+        
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
+//         if(b_ptr->cfg_ptr->type != eobrd_mc4)
+//         {
+//             continue;
+//         }
+        res &= b_ptr->isready;
+        if(b_ptr->isready)
+        {
+            *canBoardsReady |= (1<<i);
+        }
+        
+    }
+    
+    return(res);
+
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -955,6 +1013,7 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
 	
     for(i = 0; i< p->cfg.canboardsList->size; i++)
     {
+
 		b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
         
 		//1.1) save pointer to board cfg info
@@ -978,6 +1037,10 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
 //             b_ptr->s.connectedsensors =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
 //                                                     sizeof(eOas_sensorId_t), 1); //currently almost only one sensor per board
 //         }
+        
+        //set the board as not ready!
+        b_ptr->isready = eobool_false;
+        
     }
     return(eores_OK);
 }

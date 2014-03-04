@@ -54,6 +54,7 @@
 #include "EOMtheEMSapplCfg.h"
 #include "eOcfg_appTheDataBase.h"
 
+#include "EOaction_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -72,59 +73,14 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#define CANBOARDSRAEDY_CHECK_PERIOD         5000
+#define CANBOARDSRAEDY_CHECK_TIMEOUT_EVT    emsconfigurator_evt_userdef
+
+
+
+
 #include "EOMtheEMSapplCfg_cfg.h"   // to see the macros
 
-
-//definition on num of endpoint
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB1)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftupperarm       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftupperarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-        
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB2)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftlowerarm       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftlowerarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_leftlowerarm 
-        
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB3)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightupperarm       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightupperarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB4)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightlowerarm       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightlowerarm 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    endpoint_sk_emsboard_rightlowerarm 
-
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_torso       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB6)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftupperleg       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_leftupperleg 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-        
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB7)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_leftlowerleg       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB8)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightupperleg       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    endpoint_as_rightupperleg 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-
-#elif     defined(EOMTHEEMSAPPLCFG_USE_EB9)
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_mc    endpoint_mc_rightlowerleg       
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_as    EOK_uint16dummy 
-        #define EOMTHEEMSAPPLCFG_EBX_endpoint_sk    EOK_uint16dummy 
-#else
-    #error --> you must define an EBx
-    //unless you have already added function to get mc, as and sk endpoint number and use them to initialise appTheNVmapRef obj!!!
-    //Remember: remove from include eOcfg_nvsEP_sk.h 
-#endif
 
 
 #if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
@@ -204,7 +160,6 @@
 #endif
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -280,6 +235,9 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
 
+static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t canBoardsMask);
+static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p);
+
 //static eOresult_t test_4_strain(EOtheEMSapplBody *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -315,6 +273,9 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t 
     
     retptr->appRunMode = applrunMode__default;
     
+    retptr->canBoardsReady_timer = eo_timer_New();
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->canBoardsReady_timer), s_eobj_ownname, "error in creating canBoardsReady_timer");
+    
     s_eo_emsapplBody_leds_init(retptr);
     
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
@@ -325,8 +286,9 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t 
 
     s_eo_emsapplBody_checkConfig(retptr); //check config: if somethig is wrong then go to error state.
     
-    res = s_eo_emsapplBody_sendConfig2canboards(retptr);
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in sending cfg 2 canboards");
+    //res = s_eo_emsapplBody_sendConfig2canboards(retptr);
+    res = s_eo_emsapplBody_startCheckCanboards(retptr);
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in startCheckCanboards");
     
     retptr->st = eo_emsApplBody_st__inited;
         
@@ -450,7 +412,6 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
         res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
     }
     
-    #warning VALE-->come si fa ad abilitare la pelle???
     /* per ora non si e' verificato nessun problema se l'applicazione e' in cfg e la pelle spedisce a manetta*/
     return(res);
     }
@@ -514,6 +475,45 @@ extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_dev
     }
     
     return(p->cfg_ptr->hasdevice[dev]);
+}
+
+extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t canBoardsMask)
+{
+    return(s_eo_emsapplBody_sendGetFWVersion(p, canBoardsMask));
+}
+
+extern eOresult_t eo_emsapplBody_setCanBoardsAreReady(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eores_OK);
+    }
+    return(eo_timer_Stop(p->canBoardsReady_timer));
+}
+
+extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
+{
+    static eObool_t already_send = eobool_false;
+    eOresult_t res;
+    
+    if(already_send)
+    {
+        return(eores_OK);
+    }
+    
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    res = s_eo_emsapplBody_sendConfig2canboards(p);
+    if(eores_OK == res)
+    {
+        already_send = eobool_true;
+    }
+    
+    return(res);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -727,93 +727,95 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p)
 
 }
 
+
+
+static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t canBoardsMask)
+{
+    eOicubCanProto_msgCommand_t             msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION
+    };
+
+    eOicubCanProto_msgDestination_t     msgdest;
+        //EOMtheEMSapplCfg                    *emsapplCfg_ptr = eom_emsapplcfg_GetHandle();
+    uint16_t                            numofboard = eo_appTheDB_GetNumeberOfCanboards(eo_appTheDB_GetHandle());
+    uint16_t                            i;
+    eOresult_t                          res;
+    eOappTheDB_cfg_canBoardInfo_t       *cfg_canbrd_ptr;
+    EOappTheDB                          *db= eo_appTheDB_GetHandle();
+    
+    for(i=0; i<numofboard; i++)
+    {
+        
+        if( ((1<<i) & canBoardsMask) == (1<<i))
+        {
+            continue;
+        }
+        
+        res = eo_appTheDB_GetCanBoardCfg(db, (eObrd_boardId_t)i, &cfg_canbrd_ptr);
+        if(eores_OK != res)
+        {
+            continue;
+        }
+        
+        if((eobrd_mc4 != cfg_canbrd_ptr->type) && (eobrd_1foc != cfg_canbrd_ptr->type))
+        {
+            continue;
+        }
+        
+        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
+        
+        res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&p->cfg_ptr->icubcanprotoimplementedversion);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+    }
+
+    return(eores_OK);
+}
+
+static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p)
+{
+    eOresult_t                              res;
+    EOaction                                action;
+    
+    //note: can protocol version check is done only for motor control
+    
+//     if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
+//     {
+//         return(eores_OK);
+//     }
+    
+    eo_action_SetEvent(&action, CANBOARDSRAEDY_CHECK_TIMEOUT_EVT, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    eo_timer_Start(p->canBoardsReady_timer, eok_abstimeNOW, CANBOARDSRAEDY_CHECK_PERIOD, eo_tmrmode_FOREVER, &action);
+        
+    res = s_eo_emsapplBody_sendGetFWVersion(p, 0xFFFF); //here all boards are not ready, i.e. they didn't receive get_fw_ver can msg!
+    return(res);
+}
+
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
     eOresult_t                              res;
-    uint16_t                                numofjoint, i, numofboard;
-    eOmc_controlmode_t                      controlmode = eomc_controlmode_idle;
+    uint16_t                                numofjoint, i;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
-//    eOicubCanProto_bcastpolicy_t            *bcastpolicy_ptr;
     eOicubCanProto_estimShift_t             estimshift;
     icubCanProto_velocityShift_t            shift_icubCanProtValue;
-    eOappTheDB_cfg_canBoardInfo_t           *cfg_canbrd_ptr;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
     };
-    //note: can protocol version check is done only for motor control
     
-    
-    // 1) config can board if mc4 boars are connected to this ems 
-    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
-    {
-        eOicubCanProto_msgDestination_t     msgdest;
-        EOMtheEMSapplCfg                    *emsapplCfg_ptr = eom_emsapplcfg_GetHandle();
-        
-        numofboard = eo_appTheDB_GetNumeberOfCanboards(eo_appTheDB_GetHandle());
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
-        
-        for(i=0; i<numofboard; i++)
-        {
-            res = eo_appTheDB_GetCanBoardCfg(eo_appTheDB_GetHandle(), (eObrd_boardId_t)i, &cfg_canbrd_ptr);
-            if(eores_OK != res)
-            {
-                continue;
-            }
-            
-            if(eobrd_mc4 != cfg_canbrd_ptr->type)
-            {
-                continue;
-            }
-            
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
-            res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&p->cfg_ptr->icubcanprotoimplementedversion);
-            if(eores_OK != res)
-            {
-                return(res);
-            }        
-        }
-    }   
 
     // 2) config joints
     numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
     
     for(i=0; i<numofjoint; i++)
     {
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
-        res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, NULL);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
-        res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, NULL);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-        res  = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, &controlmode);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        
         if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
-        {
-//             //get bcast policy from db
-//             res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
-//             if(eores_OK != res)
-//             {
-//                 return(res);
-//             }
-//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
-//             eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
-
-            
+        {            
             //get shift values from DB
             eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &shiftval_ptr);
             
@@ -821,7 +823,6 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             shift_icubCanProtValue = shiftval_ptr->jointVelocityShift;
             eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i,  msgCmd, (void*)&shift_icubCanProtValue);
         
-                
             //set estim vel shift
             estimshift.estimShiftJointVel= shiftval_ptr->jointVelocityEstimationShift;
             estimshift.estimShiftJointAcc = 0;

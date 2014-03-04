@@ -53,6 +53,7 @@ typedef struct
             eOmc_motorId_t              *connectedmotors;
         } jm;
     } s;
+    eObool_t                            isready; // the board is ready when it responds to get_fw_ver can msg
 } eOappTheDB_hid_canBoardInfo_t;
 
 typedef struct

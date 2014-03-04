@@ -274,6 +274,9 @@ extern eOresult_t eo_appTheDB_GetVirtualStrainDataPtr(EOappTheDB *p, uint16_t **
 extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p);
 extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue);
 
+
+extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_canBoardCanLocation_t *canloc_ptr);
+extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady);
 /** @}            
     end of group eo_app_encodersReader
  **/

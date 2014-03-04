@@ -87,7 +87,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
 {
     eOresult_t  res;
     uint8_t     numofRXcanframe = 0;
+    uint32_t    canBoardsReady = 0;
     EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
    
     res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
     if(eores_OK != res)
@@ -115,6 +117,17 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
 #endif
         eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
     }
+    
+    if(eo_appTheDB_areConnectedCanBoardsReady(db,&canBoardsReady))
+    {
+        eo_emsapplBody_setCanBoardsAreReady(eo_emsapplBody_GetHandle());
+        eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
+    }
+    else
+    {
+        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), canBoardsReady);
+    }
+    
 }
 
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
