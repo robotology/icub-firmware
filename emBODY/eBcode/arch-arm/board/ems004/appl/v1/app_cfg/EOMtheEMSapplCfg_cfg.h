@@ -35,15 +35,15 @@ extern "C" {
 
 //  <o> host IP2 address <0-255>
 //  <i> default: 255
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            255
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR2                            0
 
 //  <o> host IP3 address <0-255>
 //  <i> default: 72
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            72
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR3                            1
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            129
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            104
 
 
 //  </h>Remote Host
@@ -76,13 +76,13 @@ extern "C" {
 
 //  <h> build date
 //  <o> year            <2010-2020> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2013
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2014
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        1
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        3
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          4
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         11
 //  <o> minute          <0-59> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
 //  </h>build date
@@ -221,7 +221,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   1
+#define ADDR_USEIPAL   0
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
