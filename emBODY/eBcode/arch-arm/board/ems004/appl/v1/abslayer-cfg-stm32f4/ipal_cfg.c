@@ -41,11 +41,9 @@
 
 #include "ipal_cfg.h"
 
+extern void ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);
+
 static void onethframerx(void);
-
-
-static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);;
-
 
 
 extern uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);  
@@ -118,12 +116,14 @@ extern const ipal_cfg_t ipal_cfg =
 
     .extfn                  = 
     { 
-        .usr_on_fatal_error         = s_ipal_cfg_on_fatal_error,
+        .usr_on_fatal_error         =  ipal_cfg_on_fatal_error,
 
         .osal_mutex_new             = NULL, 
         .osal_mutex_take            = NULL, 
         .osal_mutex_release         = NULL, 
         .osal_param_tout_forever    = 0, 
+        .osal_system_scheduling_suspend = osal_system_scheduling_suspend,
+        .osal_system_scheduling_restart = osal_system_scheduling_restart,
 //        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
 //        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
 //        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
@@ -159,27 +159,19 @@ extern const ipal_cfg_t ipal_cfg =
 extern const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
-static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
-{
-    static volatile uint8_t a = 0;
-    char str[80];
-//    static ipal_fatalerror_t er = ipal_error_generic;
-   
-    snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
-    hal_trace_puts(str);
-    for(;;)
-    {
-//        er = er;
-        a++;
-        a = a;
-    }
-}
 
+// #ifdef _SETPOINT_TEST_
+// extern volatile uint8_t rec_pkts_isr;
+// #endif
 static void onethframerx(void)
 {
     static volatile uint8_t b = 0;
     b++;
     b = b;
+// #ifdef _SETPOINT_TEST_
+//     hal_led_toggle(hal_led0); //red led
+//     rec_pkts_isr ++;
+// #endif
 }
 
 
