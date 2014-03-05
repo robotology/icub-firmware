@@ -42,6 +42,8 @@
 
 #include "stdlib.h"
 
+#include "hal_eth.h"
+
 
 #include "eom_applbasic_extra.h"
 
@@ -75,6 +77,7 @@ extern const ipal_cfg_t    ipal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 
 extern void task_udpserver(void *p);
+extern void task_periodic(void *p);
 
 
 
@@ -100,6 +103,10 @@ static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *
 static void s_udpserver_startup(EOMtask *p, uint32_t t);
 
 static void s_udpserver_run(EOMtask *p, uint32_t t);
+
+static void s_periodic_startup(EOMtask *p, uint32_t t);
+
+static void s_periodic_run(EOMtask *p, uint32_t t);
 
 static void s_specialise_blink(void *param);
 
@@ -220,10 +227,15 @@ extern void eom_applbasic_specialise_otherthings(void)
         .led_toggle         = (eOint8_fp_uint8_t)hal_led_toggle
     };
     
-//    eo_ledpulser_Initialise(&ledpulsercfg);    
-//    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 2*1000*1000, 0);
+    eo_ledpulser_Initialise(&ledpulsercfg);    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 2*1000*1000, 0);
     
     //eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_five);
+    
+    
+    eom_task_New(eom_mtask_Periodic, 100, 2*1024, NULL, s_periodic_run,  0, 
+                eok_reltime1sec, NULL, 
+                task_periodic, "periodic");
 }
 
 
@@ -292,6 +304,11 @@ extern void task_udpserver(void *p)
     eom_task_Start(p);
 } 
 
+extern void task_periodic(void *p)
+{
+    // do here whatever you like before startup() is executed and then forever()
+    eom_task_Start(p);
+} 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -404,7 +421,47 @@ static void s_udpserver_run(EOMtask *p, uint32_t t)
 
 }
 
+static void s_periodic_startup(EOMtask *p, uint32_t t)
+{
+    
+}
 
+static void s_periodic_run(EOMtask *p, uint32_t t)
+{
+    
+    // read the eth status
+    
+    hal_eth_phy_status_t stat[2];
+    
+    hal_result_t res = hal_res_NOK_generic;
+    
+    res = hal_eth_get_links_status(stat, 2);
+    
+    char str[128];
+
+    if(hal_res_OK == res)
+    {
+        snprintf(str, sizeof(str)-1, "stat[0] is: up = %d, autoneg = %d, link = %d, speed100 = %d, duplexfull = %d", 
+                                        stat[0].linkisup, 
+                                        stat[0].autoNeg_done, 
+                                        stat[0].linkisgood, 
+                                        stat[0].linkspeed, 
+                                        stat[0].linkduplex);
+        hal_trace_puts(str);    
+        
+        snprintf(str, sizeof(str)-1, "stat[1] is: up = %d, autoneg = %d, link = %d, speed100 = %d, duplexfull = %d", 
+                                        stat[1].linkisup, 
+                                        stat[1].autoNeg_done, 
+                                        stat[1].linkisgood, 
+                                        stat[1].linkspeed, 
+                                        stat[1].linkduplex);
+        hal_trace_puts(str);  
+    } 
+    else
+    {
+        hal_trace_puts("hal_eth_get_links_status() fails");  
+    }    
+}
 
 static void s_specialise_blink(void *param)
 {
