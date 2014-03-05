@@ -98,7 +98,8 @@ static EOtheLEDpulser s_theledpulser =
     },
     .action         = NULL,
     .timer          = {NULL},
-    .ticks          = {0}     
+    .ticks          = {0},
+    .initted        = 0   
 }; 
 
 
@@ -111,7 +112,7 @@ static EOtheLEDpulser s_theledpulser =
 extern EOtheLEDpulser * eo_ledpulser_Initialise(const eOledpulser_cfg_t *ledpulsercfg) 
 {
     // already initialised ?
-    if(NULL != s_theledpulser.timer[0]) 
+    if(0 != s_theledpulser.initted) 
     {
         // already initialised !
         return(&s_theledpulser);
@@ -160,6 +161,7 @@ extern EOtheLEDpulser * eo_ledpulser_Initialise(const eOledpulser_cfg_t *ledpuls
     
     eo_action_SetCallback(s_theledpulser.action, s_eo_ledpulser_callback, (void*)0, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
 
+    s_theledpulser.initted = 1;
     
     // return the singleton handler
     return(&s_theledpulser);

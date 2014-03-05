@@ -57,6 +57,7 @@ struct EOtheLEDpulser_hid
     EOaction                    *action;
     EOtimer                     *timer[eo_ledpulser_leds_number];
     uint32_t                    ticks[eo_ledpulser_leds_number];
+    uint8_t                     initted;
 }; 
 
 
