@@ -1362,7 +1362,10 @@ readytoswitchon:
   EnableIntT4;
   // Stays in READY TO SWITCH ON until the command 
   // SwitchOn received from CAN
-  while( 0 == DS402_Controlword.Flags.SwitchOn ){;}
+  while( 0 == DS402_Controlword.Flags.SwitchOn )
+  { 
+    if (!Fault()) LED_status.GreenBlinkRate=BLINKRATE_FAST; 
+  }
 
   // • State Transition 3: READY TO SWITCH ON => SWITCHED ON
   // Event: 'Switch On' command received.
@@ -1392,7 +1395,10 @@ switchedon:
 
     // TODO: conform coding style
     // TODO: comment please
-  	while( (0 == DS402_Controlword.Flags.EnableOperation) && (1 == DS402_Controlword.Flags.EnableVoltage) ){;}
+  	while( (0 == DS402_Controlword.Flags.EnableOperation) && (1 == DS402_Controlword.Flags.EnableVoltage) )
+    { 
+      if (!Fault()) LED_status.GreenBlinkRate=BLINKRATE_NORMAL; 
+    }
 
     // TODO: comment please
   	if (0 == DS402_Controlword.Flags.EnableVoltage)
@@ -1418,27 +1424,27 @@ switchedon:
     { 
       continue;
     }
-#ifndef NO_FAULT    
+ 
     // do not switch to operational until emergency button is pressed!
     if( ExternaFaultIsAsserted() )
     {
 		 FaultExternalTriggered();
 		 continue;
     }
-#endif
 
     // do not switch to operational until the overcurrent fault has been cleared (shutdown)
     if( 0 != SysError.OverCurrentFailure)
     {
       continue;
     }
-	break;
+	  break;
   }
   // • State Transition 4: SWITCHED ON => OPERATION ENABLE
   // Event: 'Enable Operation' command received from host.
   // Action: The drive function is enabled.
 
-operationenable:
+//operationenabled:
+  
   // DS402 Status xxxx xxxx x01x 0111 OPERATION ENABLE:
   // No faults have been detected. The drive function is enabled and power is applied to the motor.
   // The drive parameters may be changed. (This corresponds to normal operation of the drive.)

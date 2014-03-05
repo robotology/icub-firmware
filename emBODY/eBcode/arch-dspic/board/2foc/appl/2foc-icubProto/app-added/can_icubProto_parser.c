@@ -192,6 +192,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 return(0);
             }
          
+            FaultReset();
+
             // Command can be accepted only if current ststus is OPERATION ENABLE
             if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
             {
@@ -257,7 +259,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
 
             // go to Ready to Switch On state
-            DS402_Controlword.Flags.EnableVoltage = 0;   
+            //DS402_Controlword.Flags.EnableVoltage = 0;
+            DS402_Controlword.Flags.EnableOperation = 0;   
         }break;
         
         case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:
