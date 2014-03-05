@@ -1039,7 +1039,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
         .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
         .resetval           = hl_gpio_valRESET,
         .extclockinit       = s_hal_brdcfg_ks8893__extclock_init,
-        .targetphymode      = hl_ethtrans_phymode_auto //hl_ethtrans_phymode_fullduplex10mbps //hl_ethtrans_phymode_auto        
+        .targetphymode      = hl_ethtrans_phymode_auto //hl_ethtrans_phymode_fullduplex10mbps // hl_ethtrans_phymode_halfduplex10mbps //hl_ethtrans_phymode_auto        
     };    
     
     static hal_result_t s_hal_micrel_init(void* param)
@@ -1378,7 +1378,7 @@ static hal_result_t chip_micrel_ks8893_configure(hal_eth_phymode_t* usedphymode)
 
 // i dont verify constants. i just map to i2c1 and address of micrel 0xbe
 
-#define HL_I2CID                    hl_i2c1
+#define HL_I2CID                    hl_i2c3
 #define HL_MICREL_DEVADR            0xBE  
 
 extern void hal_brdcfg_switch__reg_write_byI2C(uint8_t* pBuffer, uint16_t WriteAddr)
