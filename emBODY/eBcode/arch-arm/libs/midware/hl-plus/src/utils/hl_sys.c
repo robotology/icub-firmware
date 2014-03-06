@@ -229,6 +229,12 @@ extern hl_result_t hl_sys_delay(hl_reltime_t reltime)
 }
 
 
+extern uint32_t hl_sys_sysclock_get(void) 
+{
+    RCC_ClocksTypeDef clocks;
+    RCC_GetClocksFreq(&clocks);  
+    return(clocks.SYSCLK_Frequency);    
+} 
 
 extern hl_result_t hl_sys_systemreset(void) 
 {

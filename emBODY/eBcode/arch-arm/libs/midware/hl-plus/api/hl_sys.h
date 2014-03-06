@@ -139,6 +139,8 @@ extern void hl_sys_heap_delete(void* p);
  **/
 extern hl_result_t hl_sys_delay(hl_reltime_t reltime);
 
+extern uint32_t hl_sys_sysclock_get(void);
+
 
 /** @fn         extern hl_result_t hl_sys_systemreset(void)
     @brief      Force a reset of the system.
