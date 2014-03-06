@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3 __CORTEX_M3 NDBG_MSG OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer</IncludePath>
+              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer;..\..\lowlevel\hl-core\cmsis\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -894,7 +894,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM3 __CORTEX_M3 OOSIIT_DBG_ENABLE OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer</IncludePath>
+              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer;..\..\lowlevel\hl-core\cmsis\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1438,7 +1438,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4 __CORTEX_M4 __FPU_PRESENT OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer</IncludePath>
+              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer;..\..\lowlevel\hl-core\cmsis\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1982,7 +1982,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>OOSIIT_USE_EXTERNAL_TREADSAFETY OSAL_CPUFAM_CM4 __CORTEX_M4 __FPU_PRESENT OOSIIT_DBG_ENABLE OOSIIT_USE_TIMEGET_UNDER_SVC</Define>
               <Undefine></Undefine>
-              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer</IncludePath>
+              <IncludePath>.\api;..\..\midware\oosiit\api;..\..\midware\oosiit\src\cmsis-rtx-modified\cm;..\..\midware\oosiit\src\others;..\..\midware\eventviewer;..\..\lowlevel\hl-core\cmsis\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
