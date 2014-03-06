@@ -479,6 +479,7 @@ extern void eth_error1(void) {}
 extern void eth_error2(void) {}
 extern void eth_error3(void) {}
 extern void eth_errorx(void) {}
+extern void eth_error5(void) {}
 const evEntityId_t id_eth_irqhandler = ev_ID_first_isr+hal_arch_arm_ETH_IRQn;
 const evEntityId_t id_eth_moveframeup = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+1;
 const evEntityId_t id_eth_alert = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+2;
@@ -488,6 +489,7 @@ const evEntityId_t id_eth_error1 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+5;
 const evEntityId_t id_eth_error2 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+6;
 const evEntityId_t id_eth_error3 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+7;
 const evEntityId_t id_eth_errorx = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+8;
+const evEntityId_t id_eth_error5 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+9;    
 #endif// defined(HL_ETH_USE_EVENTVIEWER)
 
 extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
@@ -598,6 +600,7 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     eventviewer_load(id_eth_error2, eth_error2);
     eventviewer_load(id_eth_error3, eth_error3);
     eventviewer_load(id_eth_errorx, eth_errorx);
+    eventviewer_load(id_eth_error5, eth_error5);
 
 #endif//defined(HL_ETH_USE_EVENTVIEWER)
     
@@ -1068,12 +1071,21 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
   intitem->rxbufindex = i;
 
   if (ETH->DMASR & INT_RBUIE) {
+#if	    defined(HL_ETH_USE_EVENTVIEWER)      
+    evEntityId_t preverror = eventviewer_switch_to(id_eth_error5);
+    eventviewer_switch_to(preverror); 
+#endif      
     /* Rx DMA suspended, resume DMA reception. */
-    ETH->DMASR   = INT_RBUIE;
+    //ETH->DMASR   = INT_RBUIE; // original but buggy: must reset INT_AISE as well
+    //ETH->DMASR = INT_AISE | INT_RBUIE; // see http://www.keil.com/forum/21608/
+    // solved:  ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
+    ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
     ETH->DMARPDR = 0;
   }
   /* Clear the interrupt pending bits. */
-  ETH->DMASR = INT_NISE | INT_RIE;
+  //ETH->DMASR = INT_NISE | INT_RIE;
+  // solved: ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
+  ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
 
 
   if(0 != receivedatleastone)
