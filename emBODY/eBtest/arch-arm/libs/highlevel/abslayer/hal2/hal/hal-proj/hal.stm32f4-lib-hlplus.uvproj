@@ -1017,8 +1017,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>0</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <DebugInformation>1</DebugInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -2106,8 +2106,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>0</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <DebugInformation>1</DebugInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
