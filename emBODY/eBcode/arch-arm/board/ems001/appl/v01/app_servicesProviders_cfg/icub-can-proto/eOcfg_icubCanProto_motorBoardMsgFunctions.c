@@ -1834,6 +1834,11 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
         {
             *eomc_controlmode = eomc_controlmode_openloop;
         }break;
+        
+        default:
+        {
+            *eomc_controlmode = eomc_controlmode_idle;
+        }break;
     }
     return(eores_OK);
 }
