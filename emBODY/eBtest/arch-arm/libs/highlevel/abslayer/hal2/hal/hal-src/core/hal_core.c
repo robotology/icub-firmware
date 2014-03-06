@@ -36,6 +36,8 @@
 
 #include "hal_base.h"
 #include "hal_sys.h"
+#include "hl_sys.h"
+#include "stdio.h"
 #include "hal_cpu.h"
 #include "hal_flash.h"
 #include "hal_heap.h"
@@ -47,6 +49,8 @@
 #include "hal_heap_hid.h"
 
 #include "hal_brdcfg.h"
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -175,6 +179,14 @@ extern hal_result_t hal_core_start(void)
     
     // call system init
     hal_sys_hid_systeminit();
+    
+    uint32_t cpuspeed = hl_sys_sysclock_get();
+    if(hal_brdcfg_cpu__theconfig.speeds.cpu != cpuspeed)
+    {
+        char str[128];
+        snprintf(str, sizeof(str), "wrong cpuspeed: %d hz", cpuspeed);
+        hal_base_on_fatalerror(hal_fatalerror_generic, str);       
+    }
             
     s_hal_core_theinternals.status = hal_core_status_started;
     
