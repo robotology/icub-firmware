@@ -76,8 +76,6 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-//#define ATCB            5 //IIT-EXT: for AdvancedTimers
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -139,9 +137,6 @@ extern void rt_iit_advtmr_synchronise(U64 oldtime);
 
 extern void rt_advtmr_psh (OS_ID timer, U32 mode);
 
-//// legacy apis
-//extern OS_ID rt_iit_advtmr_create(void *timing, void (*cbk)(void*, void*), void* par);
-//extern OS_ID rt_iit_advtmr_kill(OS_ID timer);
                                     
 
 

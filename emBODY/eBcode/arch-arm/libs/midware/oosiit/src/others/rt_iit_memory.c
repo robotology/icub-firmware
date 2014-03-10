@@ -112,14 +112,12 @@ extern void rt_iit_memory_init(void)
     // init oosiit memory which could be accessed using an _alloc_box()
     if(NULL != oosiit_cfg_mutex)
     {
-        //rt_init_box ((U32 *)oosiit_cfg_mutex, oosiit_cfg_mutex_size, 3*sizeof(U32));
         s_index_mutex = (U32 *)oosiit_cfg_mutex;
         memset(s_index_mutex, 0, oosiit_cfg_mutex_size);
     }
     
     if(NULL != oosiit_cfg_semaphore)
     {
-        //rt_init_box ((U32 *)oosiit_cfg_semaphore, oosiit_cfg_semaphore_size, 2*sizeof(U32));
         s_index_semaphore = (U32 *)oosiit_cfg_semaphore;
         memset(s_index_semaphore, 0, oosiit_cfg_semaphore_size);
     }
@@ -150,13 +148,7 @@ extern void rt_iit_memory_init(void)
 extern OS_ID rt_iit_memory_getmut(void) 
 {
     void *ret = NULL;
-    
-//    if(NULL == oosiit_cfg_mutex_memory)
-//    {
-//        return(NULL);   // dont have a mutex, thus dont have any memory
-//    }
-
-    
+       
     // take mutex
     TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
     
@@ -190,7 +182,7 @@ extern void rt_iit_memory_relmut(OS_ID mut)
      // take mutex
     TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
     
-    if(NULL == oosiit_cfg_semaphore)
+    if(NULL == oosiit_cfg_mutex)
     {
         rt_iit_memory_del(mut);
     }
@@ -206,11 +198,6 @@ extern void rt_iit_memory_relmut(OS_ID mut)
 extern OS_ID rt_iit_memory_getsem(void) 
 {
     void *ret = NULL;
-    
-//    if(NULL == oosiit_cfg_mutex_memory)
-//    {
-//        return(NULL);   // dont have a mutex, thus dont have any memory
-//    }
     
     // take mutex
     TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
@@ -262,13 +249,7 @@ extern void rt_iit_memory_relsem(OS_ID sem)
 
 extern OS_ID rt_iit_memory_getmbx(U16 nitems) 
 {
-//#define SIZEOF_BASEMBOX_ELEM            (sizeof(struct OS_MCB)-4)
     void *ret = NULL;
-    
-//    if(NULL == oosiit_cfg_mutex_memory)
-//    {
-//        return(NULL);   // dont have a mutex, thus dont have any memory
-//    }
         
     // take mutex
     TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);  
@@ -301,18 +282,30 @@ extern OS_ID rt_iit_memory_getmbx(U16 nitems)
     return(ret);
 }
 
+extern void rt_iit_memory_relmbx(OS_ID mbx) 
+{
+     // take mutex
+    TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
+    
+    if(NULL == oosiit_cfg_mbox)
+    {
+        rt_iit_memory_del(mbx);
+    }
+    else
+    {
+        // unfortunately in static mode we cannot give memory back 
+    }    
+ 
+    // release mutex
+    RELEASE_MUTEX(s_mutex_memory);
+}
+
 
 extern U64* rt_iit_memory_getstack(U16 nbytes) 
 {
     U64 *ret = NULL;
     
     U16 items = (nbytes+7) / 8;
-    
-//    if(NULL == oosiit_cfg_mutex_memory)
-//    {
-//        return(NULL);   // dont have a mutex, thus dont have any memory
-//    }
-    
     
     // take mutex
     TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
@@ -323,8 +316,7 @@ extern U64* rt_iit_memory_getstack(U16 nbytes)
         memset(ret, 0x11, 8*items);
     }
     else
-    {    
-    
+    {        
         if(((U32)s_index_stack + (items)*8 - (U32)oosiit_cfg_globstack) > oosiit_cfg_globstack_size)
         {
             RELEASE_MUTEX(s_mutex_memory); 
@@ -346,6 +338,23 @@ extern U64* rt_iit_memory_getstack(U16 nbytes)
     return(ret);
 }
 
+extern void rt_iit_memory_relstack(void* stack) 
+{
+     // take mutex
+    TAKE_MUTEX(s_mutex_memory, 0xFFFFFFFF);
+    
+    if(NULL == oosiit_cfg_globstack)
+    {
+        rt_iit_memory_del(stack);
+    }
+    else
+    {
+        // unfortunately in static mode we cannot give memory back 
+    }    
+ 
+    // release mutex
+    RELEASE_MUTEX(s_mutex_memory);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

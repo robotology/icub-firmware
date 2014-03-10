@@ -77,15 +77,8 @@
 #include "rt_iit_AdvTimer.h"
 #include "oosiit_hid.h"         
 
-#if 0
-// extern variables or functions called inside this module. we dont want to include the "osiit_cfg.h" to keep
-// complete isolation from configuration. 
-extern oosiit_arrayhead_t *oosiit_cfg_advtmr_ptrs;
-extern U32 const *oosiit_cfg_advtmr;
-extern U16 const oosiit_cfg_advtmr_size;
-#else
 #include "oosiit_storage_hid.h"
-#endif
+
 
 
 
@@ -158,8 +151,8 @@ static struct OSIIT_XADVTMR os_iit_advtmr;
 
 
 
-OS_ID rt_iit_advtmr_new (void)  {
-
+OS_ID rt_iit_advtmr_new (void)  
+{
    PIIT_ADVTMR p_tmr;
 
    
@@ -170,7 +163,6 @@ OS_ID rt_iit_advtmr_new (void)  {
    }
    else
    {
-        //p_tmr = calloc(sizeof(struct OSIIT_ADVTMR), 1);
        p_tmr = rt_iit_memory_new(sizeof(struct OSIIT_ADVTMR));
    }
    
@@ -186,7 +178,8 @@ OS_ID rt_iit_advtmr_new (void)  {
    return (p_tmr);
 }
 
-OS_RESULT rt_iit_advtmr_start (OS_ID timer, void* timing, void* action) {
+OS_RESULT rt_iit_advtmr_start (OS_ID timer, void* timing, void* action) 
+{
     OS_RESULT res;
 	
    	res = s_rt_iit_advtmr_start(timer, timing, action);
@@ -194,7 +187,8 @@ OS_RESULT rt_iit_advtmr_start (OS_ID timer, void* timing, void* action) {
 	return(res);
 }
 
-OS_RESULT rt_iit_advtmr_stop (OS_ID timer)  {
+OS_RESULT rt_iit_advtmr_stop (OS_ID timer)  
+{
     OS_RESULT res;
 	
    	res = s_rt_iit_advtmr_stop(timer);
@@ -209,7 +203,8 @@ OS_RESULT rt_iit_advtmr_isactive(OS_ID timer)
     return((1 == ((PIIT_ADVTMR)timer)->isactive) ? (OS_R_OK) : (OS_R_NOK));
 }
 
-OS_ID rt_iit_advtmr_delete (OS_ID timer)  {
+OS_ID rt_iit_advtmr_delete (OS_ID timer)  
+{
     OS_ID res;
 	
    	res = s_rt_iit_advtmr_delete(timer);
@@ -218,7 +213,8 @@ OS_ID rt_iit_advtmr_delete (OS_ID timer)  {
 }
 
 
-void rt_iit_advtmr_init(void) {
+void rt_iit_advtmr_init(void) 
+{
    // init iit advanced timers
    
    os_iit_advtmr.next = NULL;
@@ -235,47 +231,6 @@ void rt_iit_advtmr_init(void) {
    }
 }
 
-
-#ifdef _DEBUG_THE_TIME_SHIFT_
-typedef struct
-{
-    U32     tmr;
-    U32     delta;
-    U64     abstime;
-    U16     tid;
-} debug_list_info_t;
-
-debug_list_info_t debug_linfo_data[6];
-U8 debug_linfo_size = 0;
-U8 debug_tmrs[6];
-
-static void s_rt_iit_advtmr_debug_read_list_of_active_timers(void)
-{
-    struct OSIIT_XADVTMR my_iit_advtmr;
-    PIIT_ADVTMR pp;
-
-    debug_linfo_size = 0;
-    my_iit_advtmr.next = os_iit_advtmr.next;
-    my_iit_advtmr.tcnt = os_iit_advtmr.tcnt;
-    while((pp = my_iit_advtmr.next) != NULL)
-    {
-        debug_tmrs[debug_linfo_size]                = (((U32)pp->par) & 0xFF00)>>8;
-        if(0 == debug_tmrs[debug_linfo_size])       debug_tmrs[debug_linfo_size] = 1;
-        debug_linfo_data[debug_linfo_size].tmr      = (U32)pp;
-        debug_linfo_data[debug_linfo_size].delta    = pp->tcnt;
-        debug_linfo_data[debug_linfo_size].abstime  = pp->abstime_iit;
-        debug_linfo_data[debug_linfo_size].tid      = (((U32)pp->par) & 0xFFFF);
-
-        debug_linfo_size++;
-
-        my_iit_advtmr.tcnt = pp->tcnt;
-        my_iit_advtmr.next = pp->next;
-    }
-
-    debug_linfo_data[0].tmr = debug_linfo_data[0].tmr;
-}
-#endif
-
 void rt_iit_advtmr_tick (void) {
    /* Decrement delta count of timer list head. Timers having the value of   */
    /* zero are removed from the list and the callback function is called.    */
@@ -287,9 +242,9 @@ void rt_iit_advtmr_tick (void) {
    }
    os_iit_advtmr.tcnt--;
 
-#ifdef _DEBUG_THE_TIME_SHIFT_	
+#ifdef  _DEBUG_THE_TIME_SHIFT_	
    s_rt_iit_advtmr_debug_read_list_of_active_timers();
-#endif
+#endif//_DEBUG_THE_TIME_SHIFT_
 
    while ((os_iit_advtmr.tcnt == 0) && ((p = os_iit_advtmr.next) != NULL)) {
 
@@ -351,69 +306,6 @@ void rt_iit_advtmr_synchronise(U64 oldtime)
     }
 }
 
-
-#if 0
-void rt_iit_advtmr_synchronise_buggy_version(U64 oldtime) 
-{
-    // search for the os_iit_advtmr. if any timer w/ absolyte time then ...
-
-    PIIT_ADVTMR p, p_tmr;
-    U64 qsa;
-
-    p = (PIIT_ADVTMR)&os_iit_advtmr;
-
-    // search the whole list for absolute timers
-    while(NULL != p->next)  
-    {
-        // work on its next.
-        p_tmr = p->next;
-
-        if(OOSIIT_ASAPTIME != p_tmr->abstime_iit) 
-        {   // found an absolute timer 
-        
-            // remove it from the list but dont destroy it
-            p->next = p_tmr->next;
-            p->tcnt += p_tmr->tcnt;
-            
-            // if expired, compute prev abstime and insert in list with delta equal to zero (or 1)
-            if(p_tmr->abstime_iit <= oosiit_time)
-            {
-                if(0 == p_tmr->period_iit)  // one shot
-                {
-                    p_tmr->abstime_iit = p_tmr->abstime_iit;
-                    // execute asap.... but it is ok not now but at next tick
-                    s_rt_iit_advtmr_insert(p_tmr, 1);
-                }
-                else                    // periodic
-                {
-                    #define _DROP_PAST_PERIODIC_ONE_
-                    // drop this time and go to next
-                    qsa = (oosiit_time - p_tmr->abstime_iit)% p_tmr->period_iit;
-                    #ifdef _DROP_PAST_PERIODIC_ONE_
-                    p_tmr->abstime_iit = oosiit_time + p_tmr->period_iit - qsa;
-                    s_rt_iit_advtmr_insert(p_tmr, p_tmr->abstime_iit - oosiit_time);
-                    #else
-                    p_tmr->abstime_iit = oosiit_time - qsa;
-                    s_rt_iit_advtmr_insert(p_tmr, 1);
-                    #endif 
-                    
-                }
-
-                
-            }
-            // if not expired, expiry remains the same. however, insert in list at proper delta.
-            else
-            {
-                s_rt_iit_advtmr_insert(p_tmr, p_tmr->abstime_iit - oosiit_time);
-            }
-
-        }
-
-        p = p->next;
-   }
-
-}
-#endif
 
 
 OS_RESULT isr_iit_advtmr_start(OS_ID timer, void* timing, void* action) 
@@ -567,112 +459,7 @@ void rt_advtmr_psh (OS_ID timer, U32 mode)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-//// legacy functions 
-//OS_ID rt_iit_advtmr_create (void *timing, void (*cbk)(void*, void*), void* par)  {
-//
-//   PIIT_ADVTMR p_tmr, p;
-//   WIDETIME_t delta,itcnt;
-//
-//   osiit_advtmr_timing_t *tmng = (osiit_advtmr_timing_t*)timing;
-//
-//
-//   // return null if we dont have the timers
-//   if (osiit_cfg_advtmr == NULL)  {
-//      return (NULL);
-//   }
-//
-//
-//    if(OOSIIT_ASAPTIME != tmng->startat)
-//    {
-//        if(((tmng->startat+tmng->firstshot) <= osiit_time) && (0 == tmng->othershots))
-//        {
-//            return(NULL);
-//        }
-//    }
-//    else if(0 == (tmng->firstshot+tmng->othershots))
-//    {
-//        return(NULL);
-//    }
-//    
-//   // now we have either a valid incremental or a future absolute (at least in one of its periods)
-//
-//   // get the first delta
-//   if(OOSIIT_ASAPTIME == tmng->startat)
-//   {
-//        // the delta is this
-//        itcnt = (0 != tmng->firstshot) ? (tmng->firstshot) : (tmng->othershots);
-//   }
-//   else
-//   {
-//        // first absolute occurrence
-//        itcnt = tmng->startat + ((0 != tmng->firstshot) ? (tmng->firstshot) : (tmng->othershots));
-//
-//        // if it is in the past, find smallest multiple bigger than osiit_time
-//        if(itcnt <= osiit_time)
-//        {
-//            itcnt = osiit_time + tmng->othershots - ((osiit_time - itcnt) % tmng->othershots);
-//        }
-//        
-//        // and now ... save in startat the first occurrence
-//        tmng->startat = itcnt;
-//        // and in itcnt the delta
-//        itcnt = tmng->startat - osiit_time;
-//   }
-//
-//
-//   // get ram
-//   p_tmr = rt_alloc_box ((U32 *)osiit_cfg_advtmr);
-//   if (!p_tmr)  {
-//      return (NULL);
-//   }
-//
-//   // fill fields:
-//   p_tmr->period_iit    = tmng->othershots; // the period is constant
-//   p_tmr->abstime_iit   = tmng->startat;  // it may also be 0xfffffffffffffffffffffffffffffffffff
-//   p_tmr->cbk = cbk;
-//   p_tmr->par = par;
-//
-//   // look for the rigth entry 
-//   p = (PIIT_ADVTMR)&os_iit_advtmr;
-//   delta = p->tcnt;
-//   while (delta < itcnt && p->next != NULL) {
-//      p = p->next;
-//      delta += p->tcnt;
-//   }
-//   /* Right place found, insert timer into the list */
-//   p_tmr->next = p->next;
-//   p_tmr->tcnt = (TIME_t)(delta - itcnt);
-//   p->next = p_tmr;
-//   p->tcnt -= p_tmr->tcnt;
-//   return (p_tmr);
-//}
-//
-//
-//
-//
-//OS_ID rt_iit_advtmr_kill (OS_ID timer)  {
-//   /* Remove user timer from the chained timer list. */
-//   PIIT_ADVTMR p, p_tmr;
-//
-//   p_tmr = (PIIT_ADVTMR)timer;
-//   p = (PIIT_ADVTMR)&os_iit_advtmr;
-//   /* Search timer list for requested timer */
-//   while (p->next != p_tmr)  {
-//      if (p->next == NULL) {
-//         /* Failed, "timer" is not in the timer list */
-//         return (p_tmr);
-//      }
-//      p = p->next;
-//   }
-//   /* Timer was found, remove it from the list */
-//   p->next = p_tmr->next;
-//   p->tcnt += p_tmr->tcnt;
-//   rt_free_box ((U32 *)osiit_cfg_advtmr, p_tmr);
-//   /* Timer killed */
-//   return (NULL);
-//} 
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -681,8 +468,8 @@ void rt_advtmr_psh (OS_ID timer, U32 mode)
 
 static OS_RESULT s_rt_iit_advtmr_start (OS_ID timer, void* timing, void* action) {
 
-    PIIT_ADVTMR p_tmr, p;
-    WIDETIME_t delta,itcnt;
+    PIIT_ADVTMR p_tmr;
+    WIDETIME_t itcnt;
     WIDETIME_t startat = 0;
 
     const oosiit_advtmr_timing_t *tmng = (const oosiit_advtmr_timing_t*)timing;
@@ -750,23 +537,13 @@ static OS_RESULT s_rt_iit_advtmr_start (OS_ID timer, void* timing, void* action)
    p_tmr->cbk = acti->cbk;
    p_tmr->par = acti->par;
 
-   // look for the rigth entry 
-   p = (PIIT_ADVTMR)&os_iit_advtmr;
-   delta = p->tcnt;
-   while (delta < itcnt && p->next != NULL) {
-      p = p->next;
-      delta += p->tcnt;
-   }
-   /* Right place found, insert timer into the list */
-   p_tmr->next = p->next;
-   p_tmr->tcnt = (TIME_t)(delta - itcnt);
-   p->next = p_tmr;
-   p->tcnt -= p_tmr->tcnt;
-   
+   // insert in right position
+   s_rt_iit_advtmr_insert(p_tmr, itcnt);
+  
    return (OS_R_OK);
 }
 
-OS_RESULT s_rt_iit_advtmr_stop (OS_ID timer)  {
+static OS_RESULT s_rt_iit_advtmr_stop (OS_ID timer)  {
    /* Remove user timer from the chained timer list. */
    PIIT_ADVTMR p, p_tmr;
 
@@ -823,12 +600,10 @@ static OS_ID s_rt_iit_advtmr_delete (OS_ID timer)  {
    return (NULL);
 } 
 
-static void s_rt_iit_advtmr_insert(PIIT_ADVTMR p_tmr, WIDETIME_t itcnt) {
-  
+static void s_rt_iit_advtmr_insert(PIIT_ADVTMR p_tmr, WIDETIME_t itcnt) 
+{  
    PIIT_ADVTMR p;  
    WIDETIME_t delta;
-
-
 
    p = (PIIT_ADVTMR)&os_iit_advtmr;
    delta = p->tcnt;
@@ -841,7 +616,6 @@ static void s_rt_iit_advtmr_insert(PIIT_ADVTMR p_tmr, WIDETIME_t itcnt) {
    p_tmr->tcnt = (TIME_t)(delta - itcnt);
    p->next = p_tmr;
    p->tcnt -= p_tmr->tcnt;
-
 }
 
 
@@ -1069,6 +843,113 @@ static void s_rt_iit_advtmr_synchronise_dynamicversion(U64 oldtime)
     // finally delete the temporary memory
     oosiit_ext_free(storedabsolutetimers);
 }
+
+
+#ifdef  _DEBUG_THE_TIME_SHIFT_
+
+typedef struct
+{
+    U32     tmr;
+    U32     delta;
+    U64     abstime;
+    U16     tid;
+} debug_list_info_t;
+
+debug_list_info_t debug_linfo_data[6];
+U8 debug_linfo_size = 0;
+U8 debug_tmrs[6];
+
+static void s_rt_iit_advtmr_debug_read_list_of_active_timers(void)
+{
+    struct OSIIT_XADVTMR my_iit_advtmr;
+    PIIT_ADVTMR pp;
+
+    debug_linfo_size = 0;
+    my_iit_advtmr.next = os_iit_advtmr.next;
+    my_iit_advtmr.tcnt = os_iit_advtmr.tcnt;
+    while((pp = my_iit_advtmr.next) != NULL)
+    {
+        debug_tmrs[debug_linfo_size]                = (((U32)pp->par) & 0xFF00)>>8;
+        if(0 == debug_tmrs[debug_linfo_size])       debug_tmrs[debug_linfo_size] = 1;
+        debug_linfo_data[debug_linfo_size].tmr      = (U32)pp;
+        debug_linfo_data[debug_linfo_size].delta    = pp->tcnt;
+        debug_linfo_data[debug_linfo_size].abstime  = pp->abstime_iit;
+        debug_linfo_data[debug_linfo_size].tid      = (((U32)pp->par) & 0xFFFF);
+
+        debug_linfo_size++;
+
+        my_iit_advtmr.tcnt = pp->tcnt;
+        my_iit_advtmr.next = pp->next;
+    }
+
+    debug_linfo_data[0].tmr = debug_linfo_data[0].tmr;
+}
+#endif//_DEBUG_THE_TIME_SHIFT_
+
+// -- oldies
+
+#if 0
+void rt_iit_advtmr_synchronise_buggy_version(U64 oldtime) 
+{
+    // search for the os_iit_advtmr. if any timer w/ absolyte time then ...
+
+    PIIT_ADVTMR p, p_tmr;
+    U64 qsa;
+
+    p = (PIIT_ADVTMR)&os_iit_advtmr;
+
+    // search the whole list for absolute timers
+    while(NULL != p->next)  
+    {
+        // work on its next.
+        p_tmr = p->next;
+
+        if(OOSIIT_ASAPTIME != p_tmr->abstime_iit) 
+        {   // found an absolute timer 
+        
+            // remove it from the list but dont destroy it
+            p->next = p_tmr->next;
+            p->tcnt += p_tmr->tcnt;
+            
+            // if expired, compute prev abstime and insert in list with delta equal to zero (or 1)
+            if(p_tmr->abstime_iit <= oosiit_time)
+            {
+                if(0 == p_tmr->period_iit)  // one shot
+                {
+                    p_tmr->abstime_iit = p_tmr->abstime_iit;
+                    // execute asap.... but it is ok not now but at next tick
+                    s_rt_iit_advtmr_insert(p_tmr, 1);
+                }
+                else                    // periodic
+                {
+                    #define _DROP_PAST_PERIODIC_ONE_
+                    // drop this time and go to next
+                    qsa = (oosiit_time - p_tmr->abstime_iit)% p_tmr->period_iit;
+                    #ifdef _DROP_PAST_PERIODIC_ONE_
+                    p_tmr->abstime_iit = oosiit_time + p_tmr->period_iit - qsa;
+                    s_rt_iit_advtmr_insert(p_tmr, p_tmr->abstime_iit - oosiit_time);
+                    #else
+                    p_tmr->abstime_iit = oosiit_time - qsa;
+                    s_rt_iit_advtmr_insert(p_tmr, 1);
+                    #endif 
+                    
+                }
+
+                
+            }
+            // if not expired, expiry remains the same. however, insert in list at proper delta.
+            else
+            {
+                s_rt_iit_advtmr_insert(p_tmr, p_tmr->abstime_iit - oosiit_time);
+            }
+
+        }
+
+        p = p->next;
+   }
+
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

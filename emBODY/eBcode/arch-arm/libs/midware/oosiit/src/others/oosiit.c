@@ -78,13 +78,6 @@
 // used by: stack not externally provided in ram64size[1]
 #define SIZEINU64ofBOX8AL(sizeinbytes, cnt)           ((((sizeinbytes)+7)/8)*(cnt) + 2)
 
-//#define BX4(s, c)                   ((((s)+3)/4)*(c) + 3)
-//#define BX8(s, c)                   ((((s)+7)/8)*(c) + 2)
-//#define MAT(a, b)                   ((a)+(a)*(b))
-
-
-//#define P4ALIGN(s, n)               ((((p)+3)/4)*(c) + 3)
-
 
 #define SIZEOF_STDLIB32_ELEM            (24*4)
 #define SIZEOF_ARRAY_HEAD               (sizeof(oosiit_arrayhead_t)-4)
@@ -105,24 +98,22 @@
 extern const uint32_t oosiit_notimeout = OOSIIT_NOTIMEOUT;
 extern const uint64_t oosiit_asaptime = OOSIIT_ASAPTIME;
 
+// the configuration in use. it points to s_oosiit_cfg_in_use
 extern const oosiit_cfg_t *oosiit_cfg_in_use = NULL;
-
-// it must point to an array of proper size, given by ...
+// used for ram of objects specified in oosiit_cfg_in_use if static mode is used
 extern       uint32_t *oosiit_params_ram32data = NULL;
-
-// it must point to an array of proper size, given by ...
+// used for ram of objects specified in oosiit_cfg_in_use if static mode is used
 extern       uint64_t *oosiit_params_ram64data = NULL;
-
-// it may be required to be initted at compile time if results to be called before main().
+// used for stdlib32
 extern       uint32_t *oosiit_params_stdlib32data = NULL;
-
-
+// the time of the system expressed in ticks
 extern volatile uint64_t oosiit_time = 0;
-//extern volatile uint64_t oosiit_idletime = 0;
+// the duration in nanosec of each unity of the systick register
 extern uint32_t oosiit_ns_per_unit_of_systick = 0;
+// the max number of unity of the systick register
 extern uint32_t oosiit_num_units_of_systick = 0;
 
-extern uint32_t oosiit_memory_sizeofallocated = 0;
+// extern uint32_t oosiit_memory_sizeofallocated = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -171,8 +162,8 @@ static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* h
 
 
 // - memory
-SVC_1_1(svc_oosiit_memory_new,          void*,             uint32_t,                                                                   RET_pointer);
-SVC_1_1(svc_oosiit_memory_del,          oosiit_result_t,   void*,                                                                      RET_int32_t);
+SVC_1_1(svc_oosiit_memory_new,          void*,             uint32_t,                                                                    RET_pointer);
+SVC_1_1(svc_oosiit_memory_del,          oosiit_result_t,   void*,                                                                       RET_int32_t);
 
 
 
@@ -182,7 +173,7 @@ SVC_1_1(svc_oosiit_memory_getstack,     uint64_t*,          uint16_t,           
 
 // - system
 //SVC_4_1(svc_oosiit_sys_init_user,       int32_t,            void (*)(void),      uint8_t,                void*,          uint16_t,       RET_int32_t);
-SVC_2_1(svc_oosiit_sys_start,           uint32_t,    oosiit_task_properties_t*, oosiit_task_properties_t*,                       RET_uint32_t);
+SVC_2_1(svc_oosiit_sys_start,           uint32_t,    oosiit_task_properties_t*, oosiit_task_properties_t*,                              RET_uint32_t);
 //SVC_2_0(svc_oosiit_sys_start,           void,    oosiit_task_properties_t*, oosiit_task_properties_t*,                       RET_int32_t);
 SVC_4_1(svc_oosiit_sys_init_user,       oosiit_result_t,    FAKE_VOID_FP_VOID,  uint8_t,                void*,          uint16_t,       RET_int32_t);
 SVC_0_1(svc_oosiit_sys_suspend,         oosiit_result_t,                                                                                RET_int32_t);
@@ -381,12 +372,9 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *dat
     // initialise the parameters and the memory straigth away.
     if(oosiit_memmode_static == cfg->memorymode)
     {
-       oosiit_params_stdlib32data   = data04aligned;
-       oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
-       oosiit_params_ram64data      = data08aligned;    
-//         oosiit_params_stdlib32data   = NULL;
-//         oosiit_params_ram32data      = data04aligned;   
-//         oosiit_params_ram64data      = data08aligned;                
+        oosiit_params_stdlib32data   = data04aligned;
+        oosiit_params_ram32data      = data04aligned + ((SIZEOF_STDLIB32_ELEM/4)*cfg->maxnumofusertasks);   
+        oosiit_params_ram64data      = data08aligned;                 
         rt_iit_params_init();             
         rt_iit_memory_init();  
     }    
@@ -398,8 +386,8 @@ extern oosiit_result_t oosiit_memory_load(const oosiit_cfg_t *cfg, uint32_t *dat
         rt_iit_dynamic_mode_init(cfg);                  
     }
     else
-    {   // error
-        
+    {   // error    
+        oosiit_sys_error(oosiit_error_invalid_param);
     }
 
     return(oosiit_res_OK);
@@ -437,16 +425,16 @@ extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosii
         s_oosiit_started = 1;
         // init debug (if any)
         rt_iit_dbg_global_init();
-        // call svc
+        // call svc to start the system
         __svc_oosiit_sys_start(tskinit, tskidle);
     }
     
-    // but in here it nevor goes because the __svc_oosiit_sys_start() never returns
+    // but in here it never goes because the __svc_oosiit_sys_start() never returns
     return(oosiit_res_OK);    
 }
 
 extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskpriority, void* inittskstackdata, uint16_t inittskstacksize)
-{
+{   // old mode to start the system
     if(1 == s_oosiit_started)
     {
         return(oosiit_res_NOK);
@@ -470,7 +458,7 @@ extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskp
         __svc_oosiit_sys_init_user(inittskfn, inittskpriority, inittskstackdata, inittskstacksize);
     }
     
-    // but in here it nevor goes because the __svc_oosiit_sys_init_user() never returns
+    // but in here it never goes because the __svc_oosiit_sys_init_user() never returns
     return(oosiit_res_OK);
 }
 
@@ -531,25 +519,6 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes)
 
 // - task functions ---------------------------------------------------------------------------------------------------
 
-//extern oosiit_tskptr_t oosiit_tsk_create_oldversion(void (*tskfn)(void *), void *tskfnarg, uint8_t tskpriority, void *tskstackdata, uint16_t tskstacksize);
-
-// extern oosiit_tskptr_t oosiit_tsk_create_oldversion(void (*tskfn)(void *), void *tskfnarg, uint8_t tskpriority, void *tskstackdata, uint16_t tskstacksize)
-// {
-//     if(0 != __get_IPSR()) 
-//     {   // inside isr
-//         return(NULL);
-//     } 
-//     else if((NULL == tskfn) || (NULL == tskstackdata) || (0 == tskstacksize) )
-//     {
-//         return(NULL);
-//     }
-//     else
-//     {   // call svc
-//         uint32_t tskstacksize24tskpriority08 = ((((uint32_t)(tskstacksize)) << 8)&0xffffff00) | (tskpriority&0xff);
-//         return(__svc_oosiit_tsk_create(tskfn, tskfnarg, tskstackdata, tskstacksize24tskpriority08));
-//     }   
-// }
-
 extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
 {
     if(0 != __get_IPSR()) 
@@ -562,8 +531,6 @@ extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
     }
     else
     {   // call svc
-//        uint32_t tskstacksize24tskpriority08 = ((((uint32_t)(tskprop->stacksize)) << 8)&0xffffff00) | (tskprop->priority&0xff);
-//        return(__svc_oosiit_tsk_create(tskprop->function, tskprop->param, tskprop->stackdata, tskstacksize24tskpriority08));
         osiit_hid_tsk_create_other_args_t others;
         others.stacksize = tskprop->stacksize;
         others.priority = tskprop->priority;
@@ -718,7 +685,7 @@ extern oosiit_result_t oosiit_time_set(uint64_t target)
 }
 
 
-#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+#if     defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 extern uint64_t oosiit_time_get(void)
 {
@@ -782,13 +749,12 @@ extern uint64_t oosiit_nanotime_get(void)
     return(res); 
 }
 
-#else
+#else//!defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 extern uint64_t oosiit_time_get(void)
 {
     return(oosiit_time);
 }
-
 
 extern uint64_t oosiit_microtime_get(void)
 {
@@ -823,30 +789,7 @@ extern uint64_t oosiit_nanotime_get(void)
 
 
 
-#endif
-
-#if 0
-extern oosiit_result_t oosiit_secsnano_get(uint32_t *secs, uint32_t *nano)
-{
-    U64 nanosecs;// = osiit_time * osiit_params_cfg->ticktime * 1000;
-
-    // add to nanosecs the content of register systick_current_value_reg properly scaled.
-    // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
-
-    nanosecs = (os_iit_ns_per_unit_of_systick*(os_iit_num_units_of_systick-(*((volatile U32 *)0xE000E018))));
-    nanosecs += (osiit_time * osiit_params_cfg->ticktime * 1000);
-
-    if(NULL != secs)
-    {
-        *secs = nanosecs / 1000000000;
-    }
-    if(NULL != nano)
-    {
-        *nano = nanosecs % 1000000000;
-    }
-}
-#endif
+#endif//!defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 
 // - delay functions --------------------------------------------------------------------------------------------------
@@ -954,7 +897,7 @@ extern oosiit_result_t oosiit_mbx_send(oosiit_objptr_t mailbox, void* message, u
         return(oosiit_res_NOK);
     } 
  
-// i must be able to send messages which are zero.    
+// i must be able to send messages which are zero, thus i remove the control.   
 //     if(NULL == message)
 //     {
 //         return(oosiit_res_NOK);
@@ -1171,7 +1114,6 @@ extern oosiit_objptr_t oosiit_mut_create(void)
     }
 }
 
-
 extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
 {
     if(oosiit_res_NOK == s_oosiit_mut_valid(mutex))
@@ -1188,7 +1130,6 @@ extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
          return(__svc_oosiit_mut_wait(mutex, timeout));
     }
 }
-
 
 extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex)
 {
@@ -1224,8 +1165,8 @@ extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
     }    
 }
 
-// - advanced timer functions -----------------------------------------------------------------------------------------
 
+// - advanced timer functions -----------------------------------------------------------------------------------------
 
 extern oosiit_objptr_t oosiit_advtmr_new(void)
 {
@@ -1331,7 +1272,6 @@ extern uint16_t oosiit_hid_params_get_stdlib32(const oosiit_cfg_t *cfg, uint16_t
     stdlib32datasizetot += stdlib32size[0];
 
     return(stdlib32datasizetot);
-
 }
 
 extern uint16_t oosiit_hid_params_get_ram32(const oosiit_cfg_t *cfg, uint16_t *ram32size)
@@ -1421,10 +1361,7 @@ static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg)
     // 7. pointers to task control blocks: one for each user task plus one per idle task plus one per init task
     ram32datasizetot += (SIZEOF_TCBPOINTER/4)*(cfg->maxnumofusertasks+2); 
     // 8. timers  
-    //ram32datasizetot += IFN0(cfg->numTimer, SIZEINU32ofBOX4AL(SIZEOF_TMR_ELEM, cfg->numTimer));
     ram32datasizetot += IFN0(0, SIZEINU32ofBOX4AL(SIZEOF_TMR_ELEM, 0));
-
-
 
     return(ram32datasizetot);
 }
@@ -1440,8 +1377,7 @@ static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg)
 
     // the following use membox 8-aligned: stack not externally provided [1]
     ram64datasizetot += (cfg->sizeof64alignedStack+7)/8; 
-    //ram64datasizetot += SIZEINU64ofBOX8AL(4*cfg->sizeStack, cfg->maxnumofusertasks-cfg->numTaskWithUserProvidedStack+1);
-    ram64datasizetot += 0;
+
     return(ram64datasizetot);
 }
 
@@ -1501,7 +1437,7 @@ extern uint32_t svc_oosiit_sys_start(oosiit_task_properties_t* inittsk, oosiit_t
     
     rt_iit_dbg_svc_exit();
     
-    // trick to have in teh stack of idle_task the param in the position of r0.
+    // trick to have in the stack of idle_task the param in the position of r0.
     // follow with debugger hal_cm3.c after return of the function to discover why.
     return((uint32_t)idletsk->param);
 }
@@ -1522,7 +1458,7 @@ extern oosiit_result_t svc_oosiit_sys_init_user(FAKE_VOID_FP_VOID inittskfn, uin
 extern oosiit_result_t svc_oosiit_sys_suspend(void)
 {
     rt_iit_dbg_svc_enter();
-    
+    //#warning --> now rtx has a new rt_suspend() ...
     rt_tsk_lock();
     
     rt_iit_dbg_svc_exit();
@@ -1532,7 +1468,7 @@ extern oosiit_result_t svc_oosiit_sys_suspend(void)
 extern oosiit_result_t svc_oosiit_sys_resume(void)
 {
     rt_iit_dbg_svc_enter();
-    
+    //#warning --> now rtx has a new rt_resume() ...
     rt_tsk_unlock();
     
     rt_iit_dbg_svc_exit();
@@ -1542,29 +1478,13 @@ extern oosiit_result_t svc_oosiit_sys_resume(void)
 
 // - task
 
-// extern oosiit_tskptr_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tskfnarg, void *tskstackdata, uint32_t tskstacksize24tskpriority08)
-// {   // rt_tsk_create_user_ex has tskfnarg as last argument
-//     // void (*tskfn)(void *)
-//     oosiit_tskptr_t tp;
-//     rt_iit_dbg_svc_enter();
-//        
-//     tp = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
-//        
-//     rt_iit_dbg_svc_exit();
-//     return(tp);
-// }
 
 extern oosiit_tskptr_t svc_oosiit_tsk_create(FAKE_VOID_FP_VOIDP tskfn, void *tskfnarg, void *tskstackdata, void* others)
 {   // rt_tsk_create_user_ex has tskfnarg as last argument
     // void (*tskfn)(void *)
     oosiit_tskptr_t tp;
-    //osiit_hid_tsk_create_other_args_t *otherparams;
     rt_iit_dbg_svc_enter();
-    
-    //otherparams = (osiit_hid_tsk_create_other_args_t*) others;
        
-//    tp = rt_iit_tsk_create((FUNCP)tskfn, tskstacksize24tskpriority08, tskstackdata, tskfnarg);
-    
     tp = rt_iit_tsk_create((FUNCP)tskfn, tskfnarg, tskstackdata, others);
        
     rt_iit_dbg_svc_exit();
@@ -1654,7 +1574,7 @@ extern oosiit_result_t svc_oosiit_time_set(uint32_t low, uint32_t high)
     return(oosiit_res_OK);
 }
 
-#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+#if     defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 extern oosiit_result_t svc_oosiit_time_get(uint32_t* low, uint32_t* high)
 {
@@ -1684,7 +1604,8 @@ extern oosiit_result_t svc_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
     return(oosiit_res_OK);    
 }
 
-#endif
+#endif//defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+
 
 // delay
 
@@ -1729,7 +1650,6 @@ extern void* svc_oosiit_mbx_create(uint16_t numofmessages)
     ret = rt_iit_memory_getmbx(numofmessages);
     if(NULL != ret)
     {
-        // rt_mbx_init(ret, 16+(4*numofmessages));  // 16 is: ((sizeof(struct OS_MCB)-4). then rt_mbx_init() operates to retrieve numofmessages, thus ...
         iitchanged_rt_mbx_init(ret, numofmessages);
     }
     
@@ -1743,9 +1663,9 @@ extern oosiit_result_t svc_oosiit_mbx_delete(oosiit_objptr_t mailbox)
     OS_RESULT res;
     rt_iit_dbg_svc_enter();
  
-    res = iitdeveloped_rt_mbx_delete(mailbox);
+    res = rt_iit_mbx_delete(mailbox);
     
-    rt_iit_memory_relsem(mailbox);
+    rt_iit_memory_relmbx(mailbox);
     
     rt_iit_dbg_svc_exit();
     return((oosiit_result_t)res);   
@@ -1840,11 +1760,6 @@ extern oosiit_result_t svc_oosiit_evt_clr(uint32_t flags)
     return(oosiit_res_NOK);
 }
 
-
-//void iitchanged_rt_evt_clr_runningtask(EVENT_t flags)
-//{
-//    os_tsk.run->events &= ~flags;
-//}
 
 // semaphore
 
@@ -1956,8 +1871,7 @@ extern oosiit_result_t svc_oosiit_mut_delete(oosiit_objptr_t mutex)
     OS_RESULT res;
     rt_iit_dbg_svc_enter();
  
-    res = rt_iit_mut_delete(mutex);
-    
+    res = rt_mut_delete(mutex);
     rt_iit_memory_relmut(mutex);
     
     rt_iit_dbg_svc_exit();
@@ -2088,7 +2002,7 @@ static __INLINE oosiit_result_t isr_oosiit_evt_set(uint32_t flags, oosiit_tskptr
 
 static __INLINE oosiit_result_t isr_oosiit_sem_send(oosiit_objptr_t sem)
 {
-    iitchanged_isr_sem_send(sem);
+    isr_sem_send(sem);
     return(oosiit_res_OK);
 }
 
@@ -2159,7 +2073,7 @@ static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op)
     return(oosiit_res_OK);    
 }
 
-#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+#if     defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high)
 {
@@ -2199,7 +2113,7 @@ static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* h
     return(oosiit_res_OK);    
 }
 
-#endif
+#endif//defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

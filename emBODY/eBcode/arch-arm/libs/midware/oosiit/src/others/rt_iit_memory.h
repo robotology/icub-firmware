@@ -73,8 +73,10 @@ extern OS_ID rt_iit_memory_getsem(void);
 extern void rt_iit_memory_relsem(OS_ID sem);
 
 extern OS_ID rt_iit_memory_getmbx(U16 nitems);
+extern void rt_iit_memory_relmbx(OS_ID mbx);
 
 extern U64* rt_iit_memory_getstack(U16 nbytes);
+extern void rt_iit_memory_relstack(void* stack);
 
                                     
 

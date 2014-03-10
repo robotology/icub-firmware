@@ -108,7 +108,7 @@
 #define SCB             0x62
 #define MUCB            0x63
 #define HCB             0x64
-#define ATCB            0x65 //IIT-EXT: for AdvancedTimers
+#define ATCB            0x65 // IIT-EXT: for AdvancedTimers
 
 #define OS_R_OBJDELETED 0x10
 
@@ -122,15 +122,6 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
-// typedef void (*oosiit_tskfn_t)(void);
-// typedef struct
-// {
-//     uint8_t         priority;
-//     uint16_t        stacksize;
-//     uint64_t*       stackdata;
-//     oosiit_tskfn_t  execfn;         
-// } oosiit_task_properties_t;
 
 
 #if 1
@@ -152,35 +143,16 @@ typedef void    *OS_ID;
 typedef void*   OS_TPTR;      // points to a struct OS_TCB
 typedef U32     OS_RESULT;
 
-typedef struct
-{
-    void* param;
-    void* extdata;
-} iit_tsk_create_others_t;
-
-
-
-// 
 typedef struct OS_TCB *P_TCB_Opaque; 
 
 #endif
 
 
-    typedef U32 TIME_t;
-    typedef U64 WIDETIME_t;
-    typedef U32 EVENT_t;
-//    typedef U32 TMRSIG_iit;
-    #define MSB_TIME_t      0x80000000
-    #define NOTIMEOUT       0xffffffff
-    // EXTRAOFFSET is 4 if TIME_t is U32 and EVENT_t is U16. if both are U32, then it becomes 8.
-    #define EXTRAOFFSET     (8+8)
-// if there is experimental support for send2front in message box ... use 12
-// AS I HAVE ADDED: msgsendmode + dummy1 + dummy2 there are 4 more bytes
-//    #define EXTRAOFFSET     12
-// if we add the total_run_time which is 8 bytes ... 
-//    #define EXTRAOFFSET     16
-    #define SIZEOFSTRUCTOSTCB (48+EXTRAOFFSET)
-//    #define OSIIT_ADVTMR_SIZE 32
+typedef U32 TIME_t;
+typedef U64 WIDETIME_t;
+typedef U32 EVENT_t;
+#define MSB_TIME_t      0x80000000
+#define NOTIMEOUT       0xffffffff
 
 
 
@@ -191,12 +163,10 @@ typedef struct OS_TCB *P_TCB_Opaque;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 extern void* rt_iit_memory_new(uint32_t size);
-
 extern void rt_iit_memory_del(void* mem);
 
 // - sys routines -
 extern void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_t* idletsk);
-//extern OS_TPTR rt_iit_tsk_create (FUNCP task, U32 prio_stksz, void *stk, iit_tsk_create_others_t* others);
 OS_TPTR rt_iit_tsk_create (FUNCP task, void *taskfnarg, void *taskstackdata, osiit_hid_tsk_create_other_args_t* others);
 extern OS_TPTR rt_iit_tsk_self (void);
 extern OS_RESULT rt_iit_tsk_prio (OS_TPTR taskp, U8 new_prio);
@@ -219,7 +189,6 @@ extern void      iitchanged_rt_itv_wait(void);
 
 // - mutex management routines -
 extern OS_RESULT iitchanged_rt_mut_wait(OS_ID mutex, TIME_t timeout);
-extern OS_RESULT rt_iit_mut_delete (OS_ID mutex);
 
 // - event flag management routines -
 extern OS_RESULT iitchanged_rt_evt_wait(EVENT_t wait_flags,  TIME_t timeout, BOOL and_wait); 
@@ -232,7 +201,7 @@ extern void iitchanged_rt_evt_psh (U32 arg_u32, U32 set_flags);
 
 // - mailbox management routines -
 extern void iitchanged_rt_mbx_init (OS_ID mailbox, U16 numofmessages);
-extern OS_RESULT iitdeveloped_rt_mbx_delete (OS_ID mailbox);
+extern OS_RESULT rt_iit_mbx_delete (OS_ID mailbox);
 extern OS_RESULT iitchanged_rt_mbx_send(OS_ID mailbox, void *p_msg,    TIME_t timeout);
 extern OS_RESULT iitchanged_rt_mbx_wait(OS_ID mailbox, void **message, TIME_t timeout);
 extern OS_RESULT rt_iit_mbx_count(OS_ID mailbox);
@@ -249,26 +218,19 @@ extern OS_RESULT rt_iit_sem_delete (OS_ID semaphore);
 
 
 // - task delays management routines -
-extern void iitchanged_rt_block(TIME_t timeout, U8 block_state, const TIME_t notimeout);
+extern void iitchanged_rt_block(TIME_t timeout, U8 block_state);
 extern void  iitchanged_rt_put_dly(P_TCB_Opaque p_task, TIME_t delay);
 extern void iitchanged_rt_dec_dly(void);
 
 // - round robin routines -
-extern void iitchanged_rt_init_robin(void);
-extern void iitchanged_rt_chk_robin(void);
 
 
 // - debug routines -
-
 extern void rt_iit_dbg_global_init(void);
-
 extern void rt_iit_dbg_init(void);
-
 extern void rt_iit_dbg_task_notify(void* ptcb, BOOL create);
 extern void rt_iit_dbg_task_switch(U32 task_id);
-
 extern void rt_iit_dbg_syscall_register (U8 id);
-
 extern void rt_iit_dbg_systick_enter(void);
 extern void rt_iit_dbg_systick_exit(void);
 extern void rt_iit_dbg_pendsv_enter(void);

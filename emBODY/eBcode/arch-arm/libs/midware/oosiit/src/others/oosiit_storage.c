@@ -78,6 +78,7 @@
 
 #include "oosiit.h"
 #include "stdlib.h"
+#include "rt_TypeDef.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -98,14 +99,13 @@
 
 // - the types needed by some funtions 
 typedef uint32_t OS_TID;
-typedef uint32_t OS_MUT[3];
+typedef uint32_t OS_MUT[sizeof(struct OS_MUCB)/4];
 typedef void*    OS_ID;
 typedef void*   OS_TPTR;      // points to a struct OS_TCB
 typedef uint32_t OS_RESULT;
 typedef uint32_t TIME_t;
 
 // - some dependency for functions used in here. these functions are defined inside oosiit.lib
-//extern OS_TID    rt_tsk_self(void);
 extern OS_TPTR rt_iit_tsk_self (void);
 extern void      rt_mut_init(OS_ID mutex);
 extern OS_RESULT iitchanged_rt_mut_wait(OS_ID mutex, TIME_t timeout);
@@ -116,7 +116,6 @@ extern void* rt_iit_tsk_perthread_libspace_get(OS_TPTR taskp);
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define runtask_id()    rt_tsk_self()
 #define mutex_init(m)   rt_mut_init(m)
 #define mutex_wait(m)   iitchanged_rt_mut_wait(m, OOSIIT_NOTIMEOUT)
 #define mutex_rel(m)    rt_mut_release(m)
@@ -236,9 +235,7 @@ void *__user_perthread_libspace (void) {
 
   return ((void *)&std_libspace[idx-1]);
 #else
-    oosiit_tskptr_t tp = NULL;
-
-    tp = rt_iit_tsk_self();
+    oosiit_tskptr_t tp = rt_iit_tsk_self();
     if(NULL == tp)
     {
         // oosiit not running yet

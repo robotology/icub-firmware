@@ -53,49 +53,23 @@ typedef struct
 
 // - declaration of externally defined variables ----------------------------------------------------------------------
 
+// the configuration in use
 extern const oosiit_cfg_t *oosiit_cfg_in_use;
-
-// it must point to an array of proper size, given by ...
+// used for ram of objects specified in oosiit_cfg_in_use if static mode is used
 extern       uint32_t *oosiit_params_ram32data;
-
-// it must point to an array of proper size, given by ...
+// used for ram of objects specified in oosiit_cfg_in_use if static mode is used
 extern       uint64_t *oosiit_params_ram64data;
-
-// it may be required to be initted at compile time because it is called before main().
-// its must contain OSIIT_PARAMS_STDLIB_32SIZETOT(ntask, nsysmutex) U32 elements.
+// used for stdlib32
 extern       uint32_t *oosiit_params_stdlib32data;
 
-
+// the time of the system expressed in ticks
 extern volatile uint64_t oosiit_time;
-//extern volatile uint64_t oosiit_idletime;
+// the duration in nanosec of each unity of the systick register
 extern uint32_t oosiit_ns_per_unit_of_systick;
+// the max number of unity of the systick register
 extern uint32_t oosiit_num_units_of_systick;
 
 // - definition of hidden constants -----------------------------------------------------------------------------------
-
-#if 0
-
-// IIT-REDEF-begin
-typedef signed char     S8;
-typedef unsigned char   U8;
-typedef short           S16;
-typedef unsigned short  U16;
-typedef int             S32;
-typedef unsigned int    U32;
-typedef long long       S64;
-typedef unsigned long long U64;
-// IIT-REDEF-end
-
-
-typedef U32 TIME_t;
-typedef U64 WIDETIME_t;
-typedef U32 EVENT_t;
-typedef U32 TMRSIG_iit;
-#define MSB_TIME_t      0x80000000
-//    #define NOTIMEOUT       0xffffffff
-#define EXTRAOFFSET     8
-
-#endif
 
 
 
