@@ -181,7 +181,8 @@ typedef enum
     oosiit_error_memory_allocation      = 12,       /**< there is not heap anymore */
     oosiit_error_memory_preallocated    = 13,       /**< there is not preallocated memory anymore */
     oosiit_error_invalid_tskptr         = 14,       /**< the API have detected the use of an incorrect oosiit_tskptr_t */
-    oosiit_error_invalid_objptr         = 15        /**< the API have detected the use of an incorrect oosiit_objptr_t */
+    oosiit_error_invalid_objptr         = 15,       /**< the API have detected the use of an incorrect oosiit_objptr_t */
+    oosiit_error_invalid_param          = 16        /**< the API have detected the use of an incorrect parameter */
 } oosiit_error_code_t;
 
 
