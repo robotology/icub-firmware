@@ -52,7 +52,7 @@ struct OS_ROBIN os_robin;
  *---------------------------------------------------------------------------*/
 
 /*--------------------------- rt_init_robin ---------------------------------*/
-
+// IIT-EXT: it affects redefinition of rt_init_robin()
 __weak void rt_init_robin (void) {
   /* Initialize Round Robin variables. */
   os_robin.task = NULL;
@@ -60,7 +60,7 @@ __weak void rt_init_robin (void) {
 }
 
 /*--------------------------- rt_chk_robin ----------------------------------*/
-
+// IIT-EXT: it affects redefinition of rt_chk_robin()
 __weak void rt_chk_robin (void) {
   /* Check if Round Robin timeout expired and switch to the next ready task.*/
   P_TCB p_new;

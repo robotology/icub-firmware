@@ -166,7 +166,7 @@ res:rt_rmv_list (p_task);
 
 
 /*--------------------------- rt_put_dly ------------------------------------*/
-
+// ITT-EXT: it affects iitchanged_rt_put_dly()
 void rt_put_dly (P_TCB p_task, U16 delay) {
   /* Put a task identified with "p_task" into chained delay wait list using */
   /* a delay value of "delay".                                              */
@@ -206,7 +206,7 @@ last: p_task->p_dlnk = NULL;
 
 
 /*--------------------------- rt_dec_dly ------------------------------------*/
-
+// IIT-EXT: it affects iitchanged_rt_dec_dly()
 void rt_dec_dly (void) {
   /* Decrement delta time of list head: remove tasks having a value of zero.*/
   P_TCB p_rdy;

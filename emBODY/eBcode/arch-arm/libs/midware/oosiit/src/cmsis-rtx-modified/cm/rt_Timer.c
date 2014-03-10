@@ -36,8 +36,8 @@
 #include "RTX_Config.h"
 #include "rt_Timer.h"
 #include "rt_MemBox.h"
-
-
+// IIT-EXT: removed this file
+#if 0
 /*----------------------------------------------------------------------------
  *      Global Variables
  *---------------------------------------------------------------------------*/
@@ -50,7 +50,7 @@ struct OS_XTMR os_tmr;
  *---------------------------------------------------------------------------*/
 
 /*--------------------------- rt_tmr_tick -----------------------------------*/
-
+// IIT-EXT: it affects rt_iit_advtmr_tick()
 void rt_tmr_tick (void) {
   /* Decrement delta count of timer list head. Timers having the value of   */
   /* zero are removed from the list and the callback function is called.    */
@@ -70,7 +70,7 @@ void rt_tmr_tick (void) {
 }
 
 /*--------------------------- rt_tmr_create ---------------------------------*/
-
+// IIT-EXT: it affects some code for advanced timers in s_rt_iit_advtmr_start() + s_rt_iit_advtmr_insert() + ..
 OS_ID rt_tmr_create (U16 tcnt, U16 info)  {
   /* Create an user timer and put it into the chained timer list using      */
   /* a timeout count value of "tcnt". User parameter "info" is used as a    */
@@ -101,7 +101,7 @@ OS_ID rt_tmr_create (U16 tcnt, U16 info)  {
 }
 
 /*--------------------------- rt_tmr_kill -----------------------------------*/
-
+// IIT-EXT: it affects some code for advanced timers in s_rt_iit_advtmr_stop() + 
 OS_ID rt_tmr_kill (OS_ID timer)  {
   /* Remove user timer from the chained timer list. */
   P_TMR p, p_tmr;
@@ -123,7 +123,8 @@ OS_ID rt_tmr_kill (OS_ID timer)  {
   /* Timer killed */
   return (NULL);
 }
-
+// IIT-EXT: removed this file
+#endif
 /*----------------------------------------------------------------------------
  * end of file
  *---------------------------------------------------------------------------*/

@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_TYPEDEF.H
  *      Purpose: Type Definitions
- *      Rev.:    V4.70
+ *      Rev.:    V4.73
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
@@ -54,7 +54,7 @@ typedef void               (*FUNCP)(void);
 typedef U32     OS_TID;
 typedef void    *OS_ID;
 typedef U32     OS_RESULT;
-
+// IIT-EXT: if any modification to this type, also change the static initialisation of os_idle_TCB (struct OS_TCB os_idle_TCB = ...) and function rt_init_context() (see file rt_iit-changes.c)
 typedef struct OS_TCB {
   /* General part: identical for all implementations.                        */
   U8     cb_type;                 /* Control Block Type                      */
@@ -69,17 +69,14 @@ typedef struct OS_TCB {
   TIME_t interval_time;           /* Time interval for periodic waits        */ //IIT-EXT: was U16
   EVENT_t events;                 /* Event flags                             */ //IIT-EXT: was U16
   EVENT_t waits;                  /* Wait flags                              */ //IIT-EXT: was U16
-//  U8     msgsendmode;               //IIT-EXT: for sent2front added 0 is toback, 1 tofront
-//  U8     dummy1;                    //IIT-EXT: for sent2front
-//  U16    dummy2;                    //IIT-EXT: for sent2front
   void   **msg;                   /* Direct message passing when task waits  */
-  //U8    perthread_libspace[96];   //IIT-EXT: added
-  void   *ptr_perthread_libspace;   //IIT-EXT: added 
-  void   *extdata;                  //IIT-EXT: added
+  struct OS_MUCB *p_mlnk;         /* Link pointer for mutex owner list       */
+  U8     prio_base;               /* Base priority                           */
+  void   *ptr_perthread_libspace; // IIT-EXT: added 
+  void   *extdata;                // IIT-EXT: added
 
   /* Hardware dependant part: specific for CM processor                      */
   U8     stack_frame;             /* Stack frame: 0=Basic, 1=Extended        */
-  U8     reserved;
   U16    priv_stack;              /* Private stack size, 0= system assigned  */
   U32    tsk_stack;               /* Current task Stack pointer (R13)        */
   U32    *stack;                  /* Pointer to Task Stack memory block      */
@@ -87,8 +84,8 @@ typedef struct OS_TCB {
   /* Task entry point used for uVision debugger                              */
   FUNCP  ptask;                   /* Task entry address                      */
 } *P_TCB;
-#define TCB_STACKF      (32+EXTRAOFFSET)        /* 'stack_frame' offset                    */ //IIT-EXT
-#define TCB_TSTACK      (36+EXTRAOFFSET)        /* 'tsk_stack' offset                      */ //IIT-EXT
+#define TCB_STACKF      56        /* 'stack_frame' offset                    */ //IIT-EXT
+#define TCB_TSTACK      60        /* 'tsk_stack' offset                      */ //IIT-EXT
 
 typedef struct OS_PSFE {          /* Post Service Fifo Entry                 */
   void  *id;                      /* Object Identification                   */
@@ -109,9 +106,9 @@ typedef struct OS_TSK {
 } *P_TSK;
 
 typedef struct OS_ROBIN {         /* Round Robin Control                     */
-  P_TCB  task;                    /* Round Robin task                        */
+  P_TCB task;                    /* Round Robin task                        */
   WIDETIME_t time;                /* Round Robin switch time                 */  //IIT-EXT: was U16
-  TIME_t tout;                    /* Round Robin timeout                     */  //IIT-EXT: was U16
+  TIME_t     tout;                /* Round Robin timeout                     */  //IIT-EXT: was U16
 } *P_ROBIN;
 
 typedef struct OS_XCB {
@@ -120,7 +117,7 @@ typedef struct OS_XCB {
   struct OS_TCB *p_rlnk;          /* Link pointer for sem./mbx lst backwards */
   struct OS_TCB *p_dlnk;          /* Link pointer for delay list             */
   struct OS_TCB *p_blnk;          /* Link pointer for delay list backwards   */
-  TIME_t    delta_time;           /* Time until time out                     */  //IIT-EXT: was U16
+  TIME_t delta_time;              /* Time until time out                     */  //IIT-EXT: was U16
 } *P_XCB;
 
 typedef struct OS_MCB {
@@ -138,17 +135,17 @@ typedef struct OS_MCB {
 typedef struct OS_SCB {
   U8     cb_type;                 /* Control Block Type                      */
   U8     mask;                    /* Semaphore token mask                    */
-  U8     tokens;                  /* Semaphore tokens                        */  //IIT-EXT: changed from u16 to u8 to accomodate maxtokens                */
-  U8     maxtokens;               //IIT-EXT: added to set a limit to the number of tokens contained in semaphore
+  U8     tokens;                  /* Semaphore tokens                        */  // IIT-EXT: changed from u16 to u8 to accomodate maxtokens                */
+  U8     maxtokens;               // IIT-EXT: added to set a limit to the number of tokens contained in semaphore
   struct OS_TCB *p_lnk;           /* Chain of tasks waiting for tokens       */
 } *P_SCB;
-
+// IIT-EXT: its size affects OS_MUT
 typedef struct OS_MUCB {
   U8     cb_type;                 /* Control Block Type                      */
-  U8     prio;                    /* Owner task default priority             */
   U16    level;                   /* Call nesting level                      */
   struct OS_TCB *p_lnk;           /* Chain of tasks waiting for mutex        */
   struct OS_TCB *owner;           /* Mutex owner task                        */
+  struct OS_MUCB *p_mlnk;         /* Chain of mutexes by owner task          */
 } *P_MUCB;
 
 typedef struct OS_XTMR {

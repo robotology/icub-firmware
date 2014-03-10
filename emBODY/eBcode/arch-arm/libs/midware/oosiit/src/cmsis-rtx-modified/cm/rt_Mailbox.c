@@ -48,7 +48,7 @@
 
 
 /*--------------------------- rt_mbx_init -----------------------------------*/
-
+// IIT-EXT: changes in here must be reflected into iitchanged_rt_mbx_init()
 void rt_mbx_init (OS_ID mailbox, U16 mbx_size) {
   /* Initialize a mailbox */
   P_MCB p_MCB = mailbox;
@@ -66,7 +66,7 @@ void rt_mbx_init (OS_ID mailbox, U16 mbx_size) {
 
 
 /*--------------------------- rt_mbx_send -----------------------------------*/
-
+// IIT-EXT: changes in here must be reflected into iitchanged_rt_mbx_send()
 OS_RESULT rt_mbx_send (OS_ID mailbox, void *p_msg, U16 timeout) {
   /* Send message to a mailbox */
   P_MCB p_MCB = mailbox;
@@ -119,7 +119,7 @@ OS_RESULT rt_mbx_send (OS_ID mailbox, void *p_msg, U16 timeout) {
 
 
 /*--------------------------- rt_mbx_wait -----------------------------------*/
-
+// IIT-EXT: changes in here must be reflected into iitchanged_rt_mbx_wait()
 OS_RESULT rt_mbx_wait (OS_ID mailbox, void **message, U16 timeout) {
   /* Receive a message; possibly wait for it */
   P_MCB p_MCB = mailbox;

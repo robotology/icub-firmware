@@ -47,7 +47,7 @@
 
 
 /*--------------------------- rt_sem_init -----------------------------------*/
-
+// IIT-EXT: it reflects into iitchanged_rt_sem_init()
 void rt_sem_init (OS_ID semaphore, U16 token_count) {
   /* Initialize a semaphore */
   P_SCB p_SCB = semaphore;
@@ -59,7 +59,7 @@ void rt_sem_init (OS_ID semaphore, U16 token_count) {
 
 
 /*--------------------------- rt_sem_delete ---------------------------------*/
-
+// IIT-EXT: it reflects into rt_iit_sem_delete()
 #ifdef __CMSIS_RTOS
 OS_RESULT rt_sem_delete (OS_ID semaphore) {
   /* Delete semaphore */
@@ -90,7 +90,7 @@ OS_RESULT rt_sem_delete (OS_ID semaphore) {
 
 
 /*--------------------------- rt_sem_send -----------------------------------*/
-
+// IIT-EXT: it reflects into iitchanged_rt_sem_send() and also of rt_iit_sem_set()
 OS_RESULT rt_sem_send (OS_ID semaphore) {
   /* Return a token to semaphore */
   P_SCB p_SCB = semaphore;
@@ -116,7 +116,7 @@ OS_RESULT rt_sem_send (OS_ID semaphore) {
 
 
 /*--------------------------- rt_sem_wait -----------------------------------*/
-
+// IIT-EXT: it reflects into iitchanged_rt_sem_wait()
 OS_RESULT rt_sem_wait (OS_ID semaphore, U16 timeout) {
   /* Obtain a token; possibly wait for it */
   P_SCB p_SCB = semaphore;
@@ -145,7 +145,7 @@ OS_RESULT rt_sem_wait (OS_ID semaphore, U16 timeout) {
 /*--------------------------- isr_sem_send ----------------------------------*/
 
 void isr_sem_send (OS_ID semaphore) {
-  /* Same function as "os_sem"send", but to be called by ISRs */
+  /* Same function as "os_sem_send", but to be called by ISRs */
   P_SCB p_SCB = semaphore;
 
   rt_psq_enq (p_SCB, 0);
@@ -154,7 +154,7 @@ void isr_sem_send (OS_ID semaphore) {
 
 
 /*--------------------------- rt_sem_psh ------------------------------------*/
-
+// IIT-EXT: it reflects into iitchanged_rt_sem_psh()
 void rt_sem_psh (P_SCB p_CB) {
   /* Check if task has to be waken up */
   P_TCB p_TCB;

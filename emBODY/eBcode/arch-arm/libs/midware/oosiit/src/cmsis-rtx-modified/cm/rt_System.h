@@ -33,9 +33,8 @@
  *---------------------------------------------------------------------------*/
 
 /* Variables */
-//IIT-EXT: need to change the following to make it work ...
-//#define os_psq  ((P_PSQ)&os_fifo)	    //IIT-EXT
-#define os_psq  ((P_PSQ)os_fifo)        //IIT-EXT
+#define os_psq  ((P_PSQ)os_fifo)            //IIT-EXT: must be like that ...
+// #define os_psq  ((P_PSQ)&os_fifo)	    //IIT-EXT: and not as it was
 extern int os_tick_irqn;
 
 /* Functions */

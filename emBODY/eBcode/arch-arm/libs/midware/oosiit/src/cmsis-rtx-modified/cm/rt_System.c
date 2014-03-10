@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------------
  *      Name:    RT_SYSTEM.C
  *      Purpose: System Task Manager
- *      Rev.:    V4.70
+ *      Rev.:    V4.73
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
@@ -63,29 +63,39 @@ int os_tick_irqn;
  *      Global Functions
  *---------------------------------------------------------------------------*/
 
+#define RL_RTX_VER      0x473
+
 #if defined (__CC_ARM)
 __asm void $$RTX$$version (void) {
    /* Export a version number symbol for a version control. */
 
                 EXPORT  __RL_RTX_VER
 
-__RL_RTX_VER    EQU     0x450
+__RL_RTX_VER    EQU     RL_RTX_VER
 }
 #endif
 
 
 /*--------------------------- rt_suspend ------------------------------------*/
-//IIT-EXT: made it overridable
-__weak U32 rt_suspend (void) {
+
+extern U32 sysUserTimerWakeupTime(void);
+
+U32 rt_suspend (void) {
   /* Suspend OS scheduler */
   U32 delta = 0xFFFF;
-  
+#ifdef __CMSIS_RTOS
+  U32 sleep;
+#endif
+
   rt_tsk_lock();
   
   if (os_dly.p_dlnk) {
     delta = os_dly.delta_time;
   }
-#ifndef __CMSIS_RTOS
+#ifdef __CMSIS_RTOS
+  sleep = sysUserTimerWakeupTime();
+  if (sleep < delta) delta = sleep;
+#else
   if (os_tmr.next) {
     if (os_tmr.tcnt < delta) delta = os_tmr.tcnt;
   }
@@ -96,8 +106,10 @@ __weak U32 rt_suspend (void) {
 
 
 /*--------------------------- rt_resume -------------------------------------*/
-//IIT-EXT: made it overridable
-__weak void rt_resume (U32 sleep_time) {
+
+extern void sysUserTimerUpdate (U32 sleep_time);
+
+void rt_resume (U32 sleep_time) {
   /* Resume OS scheduler after suspend */
   P_TCB next;
   U32   delta;
@@ -128,8 +140,10 @@ __weak void rt_resume (U32 sleep_time) {
     os_time += sleep_time;
   }
 
-#ifndef __CMSIS_RTOS
   /* Check the user timers. */
+#ifdef __CMSIS_RTOS
+  sysUserTimerUpdate(sleep_time);
+#else
   if (os_tmr.next) {
     delta = sleep_time;
     if (delta >= os_tmr.tcnt) {
@@ -155,7 +169,7 @@ __weak void rt_resume (U32 sleep_time) {
 
 
 /*--------------------------- rt_tsk_lock -----------------------------------*/
-//IIT-EXT: made it overridable
+// IIT-EXT: made it overridable
 __weak void rt_tsk_lock (void) {
   /* Prevent task switching by locking out scheduler */
   if (os_tick_irqn < 0) {
@@ -171,7 +185,7 @@ __weak void rt_tsk_lock (void) {
 
 
 /*--------------------------- rt_tsk_unlock ---------------------------------*/
-//IIT-EXT: made it overridable
+// IIT-EXT: made it overridable
 __weak void rt_tsk_unlock (void) {
   /* Unlock scheduler and re-enable task switching */
   if (os_tick_irqn < 0) {
@@ -202,7 +216,7 @@ void rt_psh_req (void) {
 
 
 /*--------------------------- rt_pop_req ------------------------------------*/
-//IIT-EXT: made it overridable
+// IIT-EXT: made it overridable
 __weak void rt_pop_req (void) {
   /* Process an ISR post service requests. */
   struct OS_XCB *p_CB;
@@ -297,7 +311,7 @@ __weak void rt_systick (void) {
 }
 
 /*--------------------------- rt_stk_check ----------------------------------*/
-
+//IIT-EXT: it affects re-implementaion on oosiit.c
 __weak void rt_stk_check (void) {
   /* Check for stack overflow. */
   if ((os_tsk.run->tsk_stack < (U32)os_tsk.run->stack) || 
