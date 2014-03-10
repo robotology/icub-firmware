@@ -36,7 +36,7 @@
 #include "hal.h"
 #include "hal_arch_dspic.h"
 #include "eEcommon.h"
-#include "eEmemorymap_dspic33.h"
+#include "eEmemorymap_dspic33boards.h"
 
 #include "bootloader_sm.h"
 #include "bootloader_parser.h"
