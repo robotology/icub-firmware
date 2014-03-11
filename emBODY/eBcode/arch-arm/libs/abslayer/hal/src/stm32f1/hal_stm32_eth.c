@@ -477,7 +477,8 @@ void ETH_IRQHandler (void) {
   U32 *sp,*dp;
   //added 
   hal_eth_frame_t *frame; 
-  uint32_t size = 0;    
+  uint32_t size = 0; 
+  uint8_t receivedatleastone = 0;    
     
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)
@@ -532,10 +533,12 @@ void ETH_IRQHandler (void) {
         
         //put_in_queue (frame);
         s_onframerx.frame_movetohigherlayer(frame);
-        if(NULL != s_onframerx.frame_alerthigherlayer)
-        {
-            s_onframerx.frame_alerthigherlayer();
-        }
+        receivedatleastone = 1;
+// we send the event only once        
+//         if(NULL != s_onframerx.frame_alerthigherlayer)
+//         {
+//             s_onframerx.frame_alerthigherlayer();
+//         }
     }
 //     else
 //     {
@@ -551,11 +554,23 @@ rel:Rx_Desc[i].Stat = DMA_RX_OWN;
 
   if (ETH->DMASR & INT_RBUIE) {
     /* Rx DMA suspended, resume DMA reception. */
-    ETH->DMASR   = INT_RBUIE;
+    //ETH->DMASR   = INT_RBUIE; // original but buggy: must reset INT_AISE as well
+    //ETH->DMASR = INT_AISE | INT_RBUIE; // see http://www.keil.com/forum/21608/
+    // but better clearing everything:  ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
+    ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
     ETH->DMARPDR = 0;
   }
   /* Clear the interrupt pending bits. */
   ETH->DMASR = INT_NISE | INT_RIE;
+  
+  
+  if(0 != receivedatleastone)
+  {  // we send the event only if we have received at least one 
+     if(NULL != s_onframerx.frame_alerthigherlayer)
+     {
+       s_onframerx.frame_alerthigherlayer();
+     } 
+  }        
 
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)    
