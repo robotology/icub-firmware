@@ -622,7 +622,7 @@ extern "C" {
 
 //  <o> task stack size <256-2048:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   1200
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   1536
 
 //  </h>Configurator object configuration
 
