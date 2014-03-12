@@ -432,9 +432,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal.ems4rd.beta.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.ethdbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1149,9 +1149,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal.ems4rd.beta.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
