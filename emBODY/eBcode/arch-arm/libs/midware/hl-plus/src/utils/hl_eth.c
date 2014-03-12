@@ -1067,7 +1067,12 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
 #endif 
         
         char str[64];
-        snprintf(str, sizeof(str), "ETH_IRQHandler(): error %d for frame[%d]", errormode, RxLen);
+        int32_t len = RxLen;
+        if(2 == errormode) 
+        {
+            len = -1;
+        }
+        snprintf(str, sizeof(str), "ETH_IRQHandler(): error %d for frame[%d]", errormode, len);
         hl_sys_on_error(hl_error_warning, str);        
        
     }
