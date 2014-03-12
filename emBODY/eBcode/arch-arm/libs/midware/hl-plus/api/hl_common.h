@@ -114,7 +114,8 @@ typedef enum
     hl_error_missingmemory              = 0xE2,       
     hl_error_incorrectparameter         = 0xE3,       
     hl_error_unsupportedbehaviour       = 0xE4,
-    hl_error_runtimefault               = 0xE5
+    hl_error_runtimefault               = 0xE5,
+    hl_error_warning                    = 0xF0
 } hl_error_t;
 
 

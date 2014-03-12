@@ -352,6 +352,10 @@ __weak extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errorm
 {
     errorcode = errorcode;
     hl_sys_itm_puts(errormsg);
+    if(hl_error_warning == errorcode)
+    {
+        return;
+    }
     for(;;);
 }
 
