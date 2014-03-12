@@ -93,6 +93,8 @@
 //  MPLABX v1.90
 //
 
+//  Rev 2.10.9 del 11/03/2014
+//  added the diagnostic for each triagle
 
 #include<p30f4011.h>
 #include"can_interface.h"
@@ -127,11 +129,16 @@ _FOSC(CSW_FSCM_OFF & EC_PLL8);
 _FWDT(WDT_OFF);      // WD disabled
 //
  
- _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
+ _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
 
 
 
+enum Errors
+    {
+      error_ok,
+      error_noack
+    };
 
 // static unsigned int value=0;
 //------------------------------------------------------------------------
@@ -172,6 +179,15 @@ struct s_eeprom _EEDATA(1) ee_data =
 
 // Board Configuration image from EEPROM
 struct s_eeprom BoardConfig = {0}; 
+
+typedef struct error_cap
+{
+    unsigned int error_outofrange;
+    unsigned int error;
+} error_cap;
+
+struct error_cap err;
+
 
 volatile char flag;
 volatile char flag2;
@@ -870,14 +886,16 @@ void TrianglesInit_all(unsigned char Channel)
 static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 {
     unsigned char data[8];
-    unsigned int i,j,error;
+    unsigned int i,j;
     int value; //difference of the current measurement and the initial value (_pCapOffset)
     unsigned int txdata[12];
 
     unsigned int GAIN[12]={70,96,83,38,38,70, 0,45,77,164,0,77}; //this gains are moltiplied by 128 with respect to matlab
-	unsigned int GAIN_PALM[12]={0,0,0,0,0,0,0,0,0,0,0,0}; //this gains are moltiplied by 128 with respect to matlab
+    unsigned int GAIN_PALM[12]={0,0,0,0,0,0,0,0,0,0,0,0}; //this gains are moltiplied by 128 with respect to matlab
+
 	int UP_LIMIT, BOT_LIMIT;	
-		error=0;
+        err.error=error_ok;
+
 		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
 		BOT_LIMIT=(NOLOAD)<<SHIFT;
 		
@@ -891,8 +909,8 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 	    {
 		    if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0))))
 		    {
-			    error=1;
-			    ERROR_COUNTER++; 
+			    err.error=error_noack;
+//			    ERROR_COUNTER++;
 			}
 			if (TEMP_COMPENSATION==1)
 			{
@@ -939,7 +957,7 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 		    if (value<=-UP_LIMIT) 
 		    {
 		    	txdata[i]=MAXVAL; // out of range, pressure too low
-		    }
+                    }
 		    if (value>=BOT_LIMIT) 
 		    {
 		    	txdata[i]=MINVAL; // out of range, pressure too high    	
@@ -947,21 +965,14 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 		    if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
 		    {   
 		            txdata[i]=NOLOAD-(value>>SHIFT);
-		    } 
+		    }
+            //check if the sensor is far from the limits -> taxel could be broken;
+                    if ((value<=-(UP_LIMIT<<1)) || (value>=(BOT_LIMIT<<1)))
+                    {
+                        err.error_outofrange += 1<<i;
+                    }    
 	    }
-	    
-	    if (error==1)
-	    {
-	//	      for (j=0;j<4;j++)
-			  
-				j=(triangleN/4);
-				ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
-	    
-			  	
-			  return;
-			   }
-		else 
-		{
+	    	
 		    PMsgID=0x300;   
 		    PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
 		    //First message	
@@ -996,11 +1007,17 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
 		 	#warning "debug"
 		 	
 	//	 	data[6]=(unsigned char) (ERROR_COUNTER &0xFF);//stagecomplete0[0][0];
-		 	data[6]=drift;
-		 //	data[7]= (unsigned char) (ERROR_COUNTER &0xFF);
-		
-		    CAN1_send(PMsgID,1,7,data);
-		}
+		 	data[6]=(unsigned char) ((err.error_outofrange &0x0ff0)>>4);
+                        data[7]=(unsigned char) ((err.error_outofrange &0xf)<<4)+err.error;
+
+		    CAN1_send(PMsgID,1,8,data);
+
+            if (err.error==error_noack) //do again the configuration since an error has occured
+	    {
+		j=(triangleN/4);
+		ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
+                return;
+            }
 }
 static void FillCanMessages8bit_fingertip(unsigned char Channel,unsigned char triangleN)
 {
