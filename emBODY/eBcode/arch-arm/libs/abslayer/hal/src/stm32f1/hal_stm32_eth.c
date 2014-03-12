@@ -35,6 +35,7 @@
 #include "stdlib.h"
 #include "stm32f1.h"
 #include "string.h"
+#include "stdio.h"
 #include "hal_stm32_base_hid.h" 
 #include "hal_stm32_sys_hid.h"
 #include "hal_brdcfg.h"
@@ -540,10 +541,13 @@ void ETH_IRQHandler (void) {
 //             s_onframerx.frame_alerthigherlayer();
 //         }
     }
-//     else
-//     {
-//         //error: memory is missing!!
-//     }
+    else
+    {
+        //error: memory is missing!!
+        char str[64];
+        snprintf(str, sizeof(str), "ETH_IRQHandler(): cant get frame[%d]", RxLen);
+        hal_base_hid_on_fatalerror(hal_fatalerror_warning, str);
+    }
 
         /* Release this frame from ETH IO buffer. */
 rel:Rx_Desc[i].Stat = DMA_RX_OWN;
