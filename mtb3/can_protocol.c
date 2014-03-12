@@ -63,7 +63,7 @@ Bit 3:1 : NU
 
 B[1-7] Pressure Measurements
 
-Note: if Bit 7 of B[0] is 1 then the second message has a payload of 6 byte instead of 8 and the last two bytes are the temperature drift value
+Note: if Bit 7 of B[0] is 1 then the second message has the last 5 measurements plus error status B[6] e B[7]
 */
 #define CAN_MSG_CLASS_LOADER   0x700
 
