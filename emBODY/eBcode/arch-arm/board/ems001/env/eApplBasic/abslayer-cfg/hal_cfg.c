@@ -81,16 +81,28 @@ extern const hal_cfg_t hal_cfg =
 
 extern const hal_cfg_t *hal_cfgMINE = &hal_cfg;
 
-
+#define STM32F10X_CL
+#include "cmsis_stm32f1.h"
 
 static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
     char str[80];
+    volatile uint32_t ipsr = __get_IPSR();
     errorcode = errorcode;
     if(NULL != errormsg)
     {
-        sprintf(str, "fatal error #%d: %s\n", errorcode, errormsg);
+        snprintf(str, sizeof(str), "fatal error #%d: %s [isr = %d]\n", errorcode, errormsg, ipsr);
         hal_trace_puts(str);
+    }
+    else
+    {
+        snprintf(str, sizeof(str), "fatal error #%d: [isr = %d]\n", errorcode, ipsr);
+        hal_trace_puts(str);        
+    }
+
+    if(hal_fatalerror_warning == errorcode)
+    {
+        return;
     }
 
     for(;;);
