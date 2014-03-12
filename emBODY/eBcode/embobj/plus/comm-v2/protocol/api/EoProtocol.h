@@ -74,7 +74,7 @@ typedef uint32_t eOprotIP_t;
  **/
 typedef uint8_t eOprotBRD_t;
 
-enum { eoprot_boards_maxnumberof = 10 };    // this number forces static allocation of some data structure, thus keep it low
+enum { eoprot_boards_maxnumberof = 16 };    // this number forces static allocation of some data structure, thus keep it low
 
 enum { eoprot_board_localboard = 254 };     // use this value to retrieve info about the board configured as local
 
