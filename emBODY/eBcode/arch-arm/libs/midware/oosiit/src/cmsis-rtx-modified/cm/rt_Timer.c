@@ -36,8 +36,8 @@
 #include "RTX_Config.h"
 #include "rt_Timer.h"
 #include "rt_MemBox.h"
-// IIT-EXT: removed this file
-#if 0
+// IIT-EXT: dont need this file but i dont remove it
+#if 1
 /*----------------------------------------------------------------------------
  *      Global Variables
  *---------------------------------------------------------------------------*/
