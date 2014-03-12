@@ -422,9 +422,9 @@
               <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
             </File>
             <File>
-              <FileName>osal.cm4.dbg.lib</FileName>
+              <FileName>osal.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.cm4.lib</FileName>
@@ -1139,9 +1139,9 @@
               <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
             </File>
             <File>
-              <FileName>osal.cm4.dbg.lib</FileName>
+              <FileName>osal.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.cm4.lib</FileName>
