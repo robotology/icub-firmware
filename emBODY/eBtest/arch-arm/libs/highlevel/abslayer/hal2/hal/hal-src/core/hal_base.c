@@ -33,6 +33,7 @@
 
 #include "stdlib.h"
 #include "string.h"
+#include "hl_sys.h"
 
 #include "hal_middleware_interface.h"
 
@@ -223,6 +224,11 @@ extern void hal_base_osal_scheduling_restart(void)
 } 
 
 
+extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errormsg)
+{
+    hal_base_on_fatalerror((hal_fatalerror_t)errorcode, errormsg);
+}
+
 extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
     hal_base_osal_scheduling_suspend();
@@ -230,10 +236,18 @@ extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * erro
     if(NULL != s_hal_base_theinternals.fn_on_error)
     {
         s_hal_base_theinternals.fn_on_error(errorcode, errormsg);
+        if(errorcode == hal_fatalerror_warning)
+        {
+            return;
+        }
         for(;;);
     } 
     else
-    {   
+    {  
+        if(errorcode == hal_fatalerror_warning)
+        {
+            return;
+        }
         for(;;)
         {
             errorcode = errorcode;

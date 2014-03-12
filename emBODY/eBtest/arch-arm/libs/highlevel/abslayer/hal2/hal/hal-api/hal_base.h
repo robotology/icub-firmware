@@ -110,7 +110,8 @@ typedef enum
     hal_fatalerror_missingmemory             = 0xE2,       
     hal_fatalerror_incorrectparameter        = 0xE3,       
     hal_fatalerror_unsupportedbehaviour      = 0xE4,
-    hal_fatalerror_runtimefault              = 0xE5
+    hal_fatalerror_runtimefault              = 0xE5,
+    hal_fatalerror_warning                   = 0xF0
 } hal_fatalerror_t;
 
 
