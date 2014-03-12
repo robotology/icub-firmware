@@ -954,6 +954,8 @@ void ETH_IRQHandler (void) {
     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
     i = intitem->rxbufindex; // RxBufIndex;
   do {
+      
+    RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;  
          
     /* Valid frame has been received. */
     if (intitem->rx_desc[i].Stat & DMA_RX_ERROR_MASK) {
@@ -964,7 +966,7 @@ void ETH_IRQHandler (void) {
       errormode = 2;
       goto rel;
     }
-    RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;
+    //RxLen = ((intitem->rx_desc[i].Stat >> 16) & 0x3FFF) - 4;
     if (RxLen > ETH_MTU) {
       /* Packet too big, ignore it and free buffer. */
       errormode = 3;
@@ -1029,9 +1031,10 @@ void ETH_IRQHandler (void) {
         /* Release this frame from ETH IO buffer. */
 rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
 
-#if	    defined(HL_ETH_USE_EVENTVIEWER)
+
     if(0 != errormode)
     {
+#if	    defined(HL_ETH_USE_EVENTVIEWER)       
         evEntityId_t preverror;
         switch(errormode)
         {
@@ -1060,9 +1063,15 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
                 preverror = eventviewer_switch_to(id_eth_errorx);
                 eventviewer_switch_to(preverror);      
             break;                 
-        }         
+        } 
+#endif 
+        
+        char str[64];
+        snprintf(str, sizeof(str), "ETH_IRQHandler(): error %d for frame[%d]", errormode, RxLen);
+        hl_sys_on_error(hl_error_warning, str);        
+       
     }
-#endif
+
     
     if (++i == intitem->config.capacityofrxfifoofframes) { i = 0; };
     intitem->rxbufindex = i;
@@ -1074,7 +1083,11 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
 #if	    defined(HL_ETH_USE_EVENTVIEWER)      
     evEntityId_t preverror = eventviewer_switch_to(id_eth_error5);
     eventviewer_switch_to(preverror); 
-#endif      
+#endif   
+    if(0 == errormode)
+    {
+        errormode = 5;
+    }
     /* Rx DMA suspended, resume DMA reception. */
     //ETH->DMASR   = INT_RBUIE; // original but buggy: must reset INT_AISE as well
     //ETH->DMASR = INT_AISE | INT_RBUIE; // see http://www.keil.com/forum/21608/
