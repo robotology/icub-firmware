@@ -95,6 +95,11 @@ static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * err
         hal_trace_puts(str);
     }
     
+    if(hal_fatalerror_warning == errorcode)
+    {
+        return;
+    }    
+    
     hal_led_init(hal_led3, &cfg);
 
     hal_led_on(hal_led3);
