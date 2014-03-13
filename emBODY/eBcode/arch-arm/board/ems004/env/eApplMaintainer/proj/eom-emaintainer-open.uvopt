@@ -800,10 +800,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>38</TopLine>
-      <CurrentLine>39</CurrentLine>
+      <TopLine>114</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\env\eApplMaintainer\app\emaintainer-info.c</PathWithFileName>
       <FilenameWithoutPath>emaintainer-info.c</FilenameWithoutPath>
