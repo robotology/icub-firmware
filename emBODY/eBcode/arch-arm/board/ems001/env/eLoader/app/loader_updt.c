@@ -131,6 +131,106 @@ static void s_eeprom_erase(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(BOARD_EMS001)
+
+static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procLoader,
+            .version    = 
+            { 
+                .major = 2, 
+                .minor = 4
+            },  
+            .builddate  = 
+            {
+                .year  = 2014,
+                .month = 3,
+                .day   = 13,
+                .hour  = 18,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
+            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
+            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_none,
+        .name           = "eLoader"
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 0, .minor = 0},
+        .can1protversion = { .major = 0, .minor = 0},
+        .can2protversion = { .major = 0, .minor = 0},
+        .gtwprotversion  = { .major = 0, .minor = 0}
+    },
+    .extra      = {0}
+};
+
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = 0x11,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2011,
+                .month = 11,
+                .day   = 3,
+                .hour  = 18,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "ems001"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
+
+#elif defined(BOARD_MCBSTM32C)
 
 static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -183,55 +283,6 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
     .extra      = {0}
 };
 
-#if defined(BOARD_EMS001)
-
-static eEboardInfo_t s_loader_boardinfo =                        
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_board,
-            .signature  = 0x11,
-            .version    = 
-            { 
-                .major = 1, 
-                .minor = 0
-            },  
-            .builddate  = 
-            {
-                .year  = 2011,
-                .month = 11,
-                .day   = 3,
-                .hour  = 18,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_ROMSTART,
-            .size   = EENV_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_RAMSTART,
-            .size   = EENV_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_eeprom,
-            .size   = EENV_STGSIZE,
-            .addr   = EENV_STGSTART
-        },
-        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
-        .name           = "ems001"
-    },
-    .uniqueid       = 0,
-    .extra          = {0}
-};
-
-#elif defined(BOARD_MCBSTM32C)
-
 static eEboardInfo_t s_loader_boardinfo =                        
 {
     .info           =
@@ -278,6 +329,58 @@ static eEboardInfo_t s_loader_boardinfo =
 };
 
 #elif defined(BOARD_EMS004)
+
+static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procLoader,
+            .version    = 
+            { 
+                .major = 2, 
+                .minor = 4
+            },  
+            .builddate  = 
+            {
+                .year  = 2014,
+                .month = 3,
+                .day   = 13,
+                .hour  = 18,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
+            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
+            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_none,
+        .name           = "eLoader"
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 0, .minor = 0},
+        .can1protversion = { .major = 0, .minor = 0},
+        .can2protversion = { .major = 0, .minor = 0},
+        .gtwprotversion  = { .major = 0, .minor = 0}
+    },
+    .extra      = {0}
+};
+
 
 static eEboardInfo_t s_loader_boardinfo =                        
 {
