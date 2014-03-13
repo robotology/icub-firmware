@@ -65,7 +65,7 @@
 //   <o> heap size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much heap you want.
 #ifndef HAL_SYS_HEAPSIZE
- #define HAL_SYS_HEAPSIZE      0x0000C000
+ #define HAL_SYS_HEAPSIZE      0x0000C100
 #endif
 
 
