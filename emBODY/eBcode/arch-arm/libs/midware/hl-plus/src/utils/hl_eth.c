@@ -1089,16 +1089,16 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
     evEntityId_t preverror = eventviewer_switch_to(id_eth_error5);
     eventviewer_switch_to(preverror); 
 #endif   
-    if(0 == errormode)
-    {
-        errormode = 5;
-    }
     /* Rx DMA suspended, resume DMA reception. */
     //ETH->DMASR   = INT_RBUIE; // original but buggy: must reset INT_AISE as well
     //ETH->DMASR = INT_AISE | INT_RBUIE; // see http://www.keil.com/forum/21608/
     // solved:  ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
     ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
     ETH->DMARPDR = 0;
+      
+    errormode = 5;
+    hl_sys_on_error(hl_error_warning, "ETH_IRQHandler(): error 5");        
+      
   }
   /* Clear the interrupt pending bits. */
   //ETH->DMASR = INT_NISE | INT_RIE;
