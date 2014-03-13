@@ -71,6 +71,8 @@ extern const ipal_cfg_t    ipal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if     defined(BOARD_EMS001)
+
 extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
@@ -82,14 +84,14 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 5
+                .minor = 6
             },  
             .builddate  = 
             {
-                .year  = 2013,
-                .month = 11,
-                .day   = 25,
-                .hour  = 13,
+                .year  = 2014,
+                .month = 3,
+                .day   = 13,
+                .hour  = 16,
                 .min   = 00
             }
         },
@@ -121,6 +123,62 @@ extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDA
     },
     .extra      = {0}
 };
+
+#elif   defined(BOARD_EMS004)
+
+extern const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procUpdater,
+            .version    = 
+            { 
+                .major = 2, 
+                .minor = 6
+            },  
+            .builddate  = 
+            {
+                .year  = 2014,
+                .month = 3,
+                .day   = 13,
+                .hour  = 16,
+                .min   = 00
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_EUPDATER_ROMADDR,
+            .size   = EENV_MEMMAP_EUPDATER_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_MEMMAP_EUPDATER_RAMADDR,
+            .size   = EENV_MEMMAP_EUPDATER_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
+        .name           = "eUpdGWTopen"
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 1, .minor = 1},
+        .can1protversion = { .major = 0, .minor = 0},
+        .can2protversion = { .major = 0, .minor = 1},
+        .gtwprotversion  = { .major = 1, .minor = 0}
+    },
+    .extra      = {0}
+};
+
+
+#endif
 
 extern const eOmsystem_cfg_t eupdater_syscfg =
 {
