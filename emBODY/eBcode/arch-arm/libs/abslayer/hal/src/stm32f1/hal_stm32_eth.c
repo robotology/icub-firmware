@@ -480,6 +480,7 @@ void ETH_IRQHandler (void) {
   hal_eth_frame_t *frame; 
   uint32_t size = 0; 
   uint8_t receivedatleastone = 0;    
+  uint8_t errormode = 0;
     
 
 #if defined(HAL_USE_EVENTVIEWER_ETH)
@@ -489,16 +490,22 @@ void ETH_IRQHandler (void) {
 
   i = RxBufIndex;
   do {
+      
+    RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;
+      
     /* Valid frame has been received. */
     if (Rx_Desc[i].Stat & DMA_RX_ERROR_MASK) {
+      errormode = 1;
       goto rel;
     }
     if ((Rx_Desc[i].Stat & DMA_RX_SEG_MASK) != DMA_RX_SEG_MASK) {
+      errormode = 2;
       goto rel;
     }
-    RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;
+    //RxLen = ((Rx_Desc[i].Stat >> 16) & 0x3FFF) - 4;
     if (RxLen > ETH_MTU) {
       /* Packet too big, ignore it and free buffer. */
+      errormode = 3;
       goto rel;
     }
 
@@ -543,14 +550,27 @@ void ETH_IRQHandler (void) {
     }
     else
     {
+        errormode = 4;
         //error: memory is missing!!
-        char str[64];
-        snprintf(str, sizeof(str), "ETH_IRQHandler(): cant get frame[%d]", RxLen);
-        hal_base_hid_on_fatalerror(hal_fatalerror_warning, str);
+//         char str[64];
+//         snprintf(str, sizeof(str), "ETH_IRQHandler(): cant get frame[%d]", RxLen);
+//         hal_base_hid_on_fatalerror(hal_fatalerror_warning, str);
     }
 
         /* Release this frame from ETH IO buffer. */
 rel:Rx_Desc[i].Stat = DMA_RX_OWN;
+    
+    if(0 != errormode)
+    {
+        char str[64];
+        int32_t len = RxLen;
+        if(2 == errormode) 
+        {
+            len = -1;
+        }
+        snprintf(str, sizeof(str), "ETH_IRQHandler(): error %d for frame[%d]", errormode, len);
+        hal_base_hid_on_fatalerror(hal_fatalerror_warning, str);               
+    }
 
     if (++i == hal_base_hid_params.eth_dmarxbuffer_num) i = 0;
   } while ((Rx_Desc[i].Stat & DMA_RX_OWN) == 0);
@@ -563,6 +583,9 @@ rel:Rx_Desc[i].Stat = DMA_RX_OWN;
     // but better clearing everything:  ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
     ETH->DMASR = INT_NISE | INT_AISE | INT_RBUIE | INT_RIE;
     ETH->DMARPDR = 0;
+      
+    errormode = 5;
+    hal_base_hid_on_fatalerror(hal_fatalerror_warning, "ETH_IRQHandler(): error 5");            
   }
   /* Clear the interrupt pending bits. */
   ETH->DMASR = INT_NISE | INT_RIE;
