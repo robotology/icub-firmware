@@ -34,8 +34,6 @@
 #include "hal.h"
 #include "osal.h"
 
-#define STM32F10X_CL
-#include "cmsis_stm32f1.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -168,19 +166,8 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
 {
     static volatile uint8_t a = 0;
     char str[80];
-    volatile uint32_t ipsr = __get_IPSR();
-    ipsr = ipsr;
-//    static ipal_fatalerror_t er = ipal_error_generic;
+
     
-    if(0 == ipsr)
-    {
-        EOMtask *task = NULL;
-        uint8_t prio = 0;
-        task = eov_sys_GetRunningTask(eov_sys_GetHandle());  
-        eom_task_PriorityGet(task, &prio);        
-        snprintf(str, sizeof(str), "task %d, prio %d\n", eov_task_GetID(task), prio);
-        hal_trace_puts(str);        
-    }
    
     snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
     hal_trace_puts(str);
@@ -189,7 +176,6 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
 //        er = er;
         a++;
         a = a;
-        ipsr = ipsr;
     }
 }
 

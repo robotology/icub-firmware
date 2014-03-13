@@ -220,6 +220,8 @@ static void s_eom_applbasic_main_init(void)
     // 5. call specialisation function
 
     eom_applbasic_specialise_otherthings();
+    
+    hal_trace_puts("quitting the s_eom_applbasic_main_init() function");
 
 }
 

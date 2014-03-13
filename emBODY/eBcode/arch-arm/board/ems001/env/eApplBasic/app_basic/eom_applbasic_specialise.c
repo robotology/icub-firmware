@@ -447,7 +447,7 @@ static void s_periodic_run(EOMtask *p, uint32_t t)
                                         stat[0].linkisgood, 
                                         stat[0].linkspeed, 
                                         stat[0].linkduplex);
-        hal_trace_puts(str);    
+        //hal_trace_puts(str);    
         
         snprintf(str, sizeof(str)-1, "stat[1] is: up = %d, autoneg = %d, link = %d, speed100 = %d, duplexfull = %d", 
                                         stat[1].linkisup, 
@@ -455,7 +455,7 @@ static void s_periodic_run(EOMtask *p, uint32_t t)
                                         stat[1].linkisgood, 
                                         stat[1].linkspeed, 
                                         stat[1].linkduplex);
-        hal_trace_puts(str);  
+        //hal_trace_puts(str);  
     } 
     else
     {
