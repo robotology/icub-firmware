@@ -587,8 +587,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</PathWithFileName>
-      <FilenameWithoutPath>osal.cm4.dbg.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.lib</PathWithFileName>
+      <FilenameWithoutPath>osal.cm4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -603,8 +603,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</PathWithFileName>
-      <FilenameWithoutPath>ipal.base.medium.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</PathWithFileName>
+      <FilenameWithoutPath>ipal.base.medium.cm4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -619,8 +619,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</PathWithFileName>
-      <FilenameWithoutPath>hal.ems4rd.beta.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.ethdbg.lib</PathWithFileName>
+      <FilenameWithoutPath>hal.ems4rd.beta.ethdbg.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -640,8 +640,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>94</TopLine>
+      <CurrentLine>99</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\hal_core_cfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_core_cfg.c</FilenameWithoutPath>

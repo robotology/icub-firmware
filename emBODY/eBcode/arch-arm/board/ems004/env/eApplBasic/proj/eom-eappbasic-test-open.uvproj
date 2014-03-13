@@ -1065,7 +1065,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_USE_ARCH_ARM HAL_USE_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
+              <Define>HAL_USE_ARCH_ARM BOARD_EMS004 HAL_USE_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api;..\..\..\..\ems001\env\eApplBasic\app_basic;..\..\..\..\ems001\env\eApplBasic\app_extra</IncludePath>
             </VariousControls>
