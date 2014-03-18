@@ -134,14 +134,36 @@ extern hl_boolval_t hl_bits_hlfword_bitcheck(uint16_t hword, uint8_t bit)
     }
 }
 
+extern hl_boolval_t hl_bits_hlfword_maskcheck(uint16_t hword, uint16_t mask)
+{
+    if(hword & mask)
+    {
+        return(hl_true);
+    }
+    else
+    {
+        return(hl_false);
+    }
+}
+
 extern void hl_bits_hlfword_bitset(uint16_t* hword, uint8_t bit)
 {
     (*hword) |= (1<<bit);    
 }
 
+extern void hl_bits_hlfword_maskset(uint16_t* hword, uint16_t mask)
+{
+    (*hword) |= (mask);    
+}
+
 extern void hl_bits_hlfword_bitclear(uint16_t* hword, uint8_t bit)
 {
     (*hword) &= (~(1<<bit));    
+}
+
+extern void hl_bits_hlfword_maskclear(uint16_t* hword, uint16_t mask)
+{
+    (*hword) &= (~(mask));    
 }
 
 extern void hl_bits_hlfword_bittoggle(uint16_t* hword, uint8_t bit)
@@ -162,6 +184,7 @@ extern hl_boolval_t hl_bits_word_bitcheck(uint32_t word, uint8_t bit)
         return(hl_false);
     }
 }
+
 
 extern void hl_bits_word_bitset(uint32_t* word, uint8_t bit)
 {

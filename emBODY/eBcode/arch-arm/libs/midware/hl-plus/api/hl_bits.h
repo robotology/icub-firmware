@@ -71,9 +71,15 @@ extern void hl_bits_byte_bittoggle(uint8_t* byte, uint8_t bit);
 
 extern hl_boolval_t hl_bits_hlfword_bitcheck(uint16_t hword, uint8_t bit);
 
+extern hl_boolval_t hl_bits_hlfword_maskcheck(uint16_t hword, uint16_t mask);
+
 extern void hl_bits_hlfword_bitset(uint16_t* hword, uint8_t bit);
 
+extern void hl_bits_hlfword_maskset(uint16_t* hword, uint16_t mask);
+
 extern void hl_bits_hlfword_bitclear(uint16_t* hword, uint8_t bit);
+
+extern void hl_bits_hlfword_maskclear(uint16_t* hword, uint16_t mask);
 
 extern void hl_bits_hlfword_bittoggle(uint16_t* hword, uint8_t bit);
 
