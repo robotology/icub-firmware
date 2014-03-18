@@ -823,10 +823,7 @@ extern hl_result_t hl_fifo_put01(hl_fifo_t *fifo, uint8_t *data)
 // empty-section
 // ---- isr of the module: end ------
 
-extern hl_result_t hl_fifo_hid_static_memory_init(void)
-{
-    return(hl_res_OK); 
-}
+
 
 
 

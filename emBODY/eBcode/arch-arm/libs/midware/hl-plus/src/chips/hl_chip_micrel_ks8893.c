@@ -266,12 +266,6 @@ extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* u
 
 
 
-extern hl_result_t hl_chip_micrel_ks8893_hid_static_memory_init(void)
-{
-    memset(&s_hl_chip_micrel_ks8893_theinternals, 0, sizeof(s_hl_chip_micrel_ks8893_theinternals));
-    return(hl_res_OK);  
-}
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
