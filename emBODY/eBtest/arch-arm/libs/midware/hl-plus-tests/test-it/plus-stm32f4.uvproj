@@ -681,6 +681,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_crc07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_crc07.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_crc16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_crc16.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_crc32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_crc32.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1399,6 +1414,21 @@
               <FileName>hl_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_crc07.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_crc07.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_crc16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_crc16.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_crc32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_crc32.c</FilePath>
             </File>
           </Files>
         </Group>

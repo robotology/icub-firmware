@@ -93,6 +93,10 @@
 #define HL_USE_UTIL_CAN_COMM
 #define HL_USE_UTIL_SPI
 
+#define HL_USE_UTIL_CRC07
+#define HL_USE_UTIL_CRC16
+#define HL_USE_UTIL_CRC32
+
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
 
 #define HL_USE_CHIP_XX_EEPROM

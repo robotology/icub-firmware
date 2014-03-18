@@ -81,6 +81,8 @@
 
 extern void myonsystick(void);
 
+static void test_crc(void);
+
 static void test_i2c(void);
 
 static void test_eeprom(void);
@@ -139,6 +141,8 @@ int main(void)
     
     test_delay();
     
+    test_crc();
+    
     test_i2c();
     
     test_eeprom();
@@ -190,7 +194,78 @@ int main(void)
 // - definition of static functions 
 // -------------------------------------------------------------------------------------------------------------------- 
 
+#if     defined(HL_USE_UTIL_CRC07) 
+#include "hl_crc07.h"
+#endif
 
+#if     defined(HL_USE_UTIL_CRC16) 
+#include "hl_crc16.h"
+#endif
+
+#if     defined(HL_USE_UTIL_CRC32) 
+#include "hl_crc32.h"
+#endif
+
+static void test_crc(void)
+{
+    uint8_t data[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    evEntityId_t prev;
+
+#if     defined(HL_USE_UTIL_CRC07) 
+    
+    uint8_t crc07 = 0;
+    crc07 = hl_crc07_compute(hl_crc07_table_0x09, 0, data, sizeof(data));
+    crc07 = crc07;
+
+    uint8_t hl_crc07_table_polin[256] = {0};
+    hl_crc07_table_get(0x09, hl_crc07_table_polin);
+
+    uint8_t crc7a = 0;
+    crc7a = hl_crc07_compute(hl_crc07_table_polin, 0, data, sizeof(data));
+    crc7a = crc7a;
+
+#endif   
+
+#if     defined(HL_USE_UTIL_CRC16) 
+    
+    uint16_t crc16 = 0;
+    crc16 = hl_crc16_compute(hl_crc16_table_0x1021, 0, data, sizeof(data));
+    crc16 = crc16;
+
+    uint16_t hl_crc16_table_polin[256] = {0};
+    hl_crc16_table_get(0x1021, hl_crc16_table_polin);
+
+    uint16_t crc16a = 0;
+    crc16a = hl_crc16_compute(hl_crc16_table_polin, 0, data, sizeof(data));
+    crc16a = crc16a;
+
+#endif  
+    
+#if     defined(HL_USE_UTIL_CRC32) 
+    
+    uint32_t crc32 = 0;
+    crc32 = hl_crc32_compute(hl_crc32_table_0x04c11db7, 0, data, sizeof(data));
+    crc32 = crc32;
+
+    uint32_t hl_crc32_table_polin[256] = {0};
+    hl_crc32_table_get(0x04c11db7, hl_crc32_table_polin);
+
+    uint32_t crc32a = 0;
+    prev = brd_eventviewer_switch(ev_ID_first_usrdef+1);
+    crc32a = hl_crc32_compute(hl_crc32_table_polin, 0, data, sizeof(data));
+    crc32a = crc32a;
+    brd_eventviewer_switch(prev);
+    
+    volatile uint32_t crc32h = 0;
+    crc32h = hl_crc32_compute(NULL, 0, data, sizeof(data)); // first time is for init hw
+    prev = brd_eventviewer_switch(ev_ID_first_usrdef+2);
+    crc32h = hl_crc32_compute(NULL, 0, data, sizeof(data));
+    brd_eventviewer_switch(prev);
+    crc32h = crc32h;    
+
+#endif    
+    
+}
 
 extern void myonsystick(void)
 {   
