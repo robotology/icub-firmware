@@ -29,6 +29,7 @@
 
 #include "stdio.h"
 #include "string.h"
+#include "stdio.h"
 #include "osal.h"
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
@@ -114,7 +115,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     char str[128];
     
     osal_task_id_get(task, &tskid);
-    sprintf(str, "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
+    snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
     hal_trace_puts(str);
     for(;;);
 }

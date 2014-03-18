@@ -27,10 +27,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stdio.h"
 
 #include "ipal.h"
-
-
 #include "hal.h"
 #include "osal.h"
 
@@ -120,14 +119,14 @@ extern const ipal_cfg_t ipal_cfg =
     { 
         .usr_on_fatal_error         = s_ipal_cfg_on_fatal_error,
 
-        .osal_mutex_new             = NULL, 
-        .osal_mutex_take            = NULL, 
-        .osal_mutex_release         = NULL, 
-        .osal_param_tout_forever    = 0, 
-//        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
-//        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
-//        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
-//        .osal_param_tout_forever    = OSAL_timeINFINITE,
+//         .osal_mutex_new             = NULL, 
+//         .osal_mutex_take            = NULL, 
+//         .osal_mutex_release         = NULL, 
+//         .osal_param_tout_forever    = 0, 
+        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
+        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
+        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
+        .osal_param_tout_forever    = OSAL_reltimeINFINITE,
 
         .hal_eth_init               = (ipal_result_t (*)(void*)) hal_eth_init,
         .hal_eth_enable             = (ipal_result_t (*)(void))  hal_eth_enable,
@@ -165,7 +164,7 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
     char str[80];
 //    static ipal_fatalerror_t er = ipal_error_generic;
    
-    sprintf(str, "fatal error #%d: %s\n", errorcode, errormsg);
+    snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
     hal_trace_puts(str);
     for(;;)
     {
