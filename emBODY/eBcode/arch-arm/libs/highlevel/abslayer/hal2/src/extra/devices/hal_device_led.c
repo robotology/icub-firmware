@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 
 
@@ -206,11 +206,6 @@ extern hal_result_t hal_led_toggle(hal_led_t id)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_device_led_hid_static_memory_init(void)
-{
-    s_hal_device_led_initted = 0;
-    return(hal_res_OK);  
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -218,17 +213,17 @@ extern hal_result_t hal_device_led_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_device_led_supported_is(hal_led_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_led__theconfig.supported_mask, HAL_device_led_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_led__theconfig.supported_mask, HAL_device_led_id2index(id)) );
 }
 
 static void s_hal_device_led_initted_set(hal_led_t id)
 {
-    hal_utility_bits_halfword_bitset(&s_hal_device_led_initted, HAL_device_led_id2index(id));
+    hl_bits_hlfword_bitset(&s_hal_device_led_initted, HAL_device_led_id2index(id));
 }
 
 static hal_boolval_t s_hal_device_led_initted_is(hal_led_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(s_hal_device_led_initted, HAL_device_led_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_device_led_initted, HAL_device_led_id2index(id)));
 }
 
 

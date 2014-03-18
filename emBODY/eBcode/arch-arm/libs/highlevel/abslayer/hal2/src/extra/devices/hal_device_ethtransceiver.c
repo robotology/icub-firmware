@@ -39,7 +39,7 @@
 
 #include "hal_brdcfg.h"
 
-#include "hal_utility_bits.h"
+#include "hl_bits.h"
 
 #include "hl_ethtrans.h"
 
@@ -221,11 +221,6 @@ extern hal_bool_t hal_device_ethtransceiver_started_is(void)
 // empty-section
 // ---- isr of the module: end ------
 
-extern hal_result_t hal_device_ethtransceiver_hid_static_memory_init(void)
-{
-    memset(&s_hal_device_ethtransceiver_theinternals, 0, sizeof(s_hal_device_ethtransceiver_theinternals));
-    return(hal_res_OK);
-}
 
 extern hl_result_t hl_ethtrans_chip_init(void *param)
 {
@@ -253,24 +248,24 @@ static hal_bool_t s_hal_device_ethtransceiver_supported_is(void)
 
 static hal_bool_t s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id)));
 }
 
 static void s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id));
+    hl_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id));
 }
 
 
 static hal_bool_t s_hal_device_ethtransceiver_started_is(hal_ethtransceiver_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id)));
 }
 
 
 static void s_hal_device_ethtransceiver_started_set(hal_ethtransceiver_t id)
 {
-     hal_utility_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id));
+     hl_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id));
 }
 
 

@@ -40,7 +40,7 @@
 #include "hal_dma.h"
 
 
-#include "hal_utility_bits.h"
+#include "hl_bits.h"
 #include "hal_utility_fifo.h"
 #include "hal_heap.h"
 
@@ -479,12 +479,6 @@ extern hal_result_t hal_spi_on_frametransm_set(hal_spi_t id, hal_callback_t onfr
 
 // ---- isr of the module: end ------
 
-extern hal_result_t hal_spi_hid_static_memory_init(void)
-{ 
-    memset(&s_hal_spi_theinternals, 0, sizeof(s_hal_spi_theinternals));
-
-    return(hal_res_OK);
-}
 
 extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id)
 {   
@@ -501,19 +495,19 @@ extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id)
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_id2index(id)) );
 }
 
 
 static void s_hal_spi_initted_set(hal_spi_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_spi_theinternals.initted, HAL_spi_id2index(id));
+    hl_bits_byte_bitset(&s_hal_spi_theinternals.initted, HAL_spi_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 {   
-    return(hal_utility_bits_byte_bitcheck(s_hal_spi_theinternals.initted, HAL_spi_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_spi_theinternals.initted, HAL_spi_id2index(id)));
 }
 
 

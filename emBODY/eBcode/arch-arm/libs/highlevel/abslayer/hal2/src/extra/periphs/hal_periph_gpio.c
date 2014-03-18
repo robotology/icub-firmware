@@ -39,7 +39,7 @@
 
 #include "hal_base_hid.h" 
 
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 #include "hal_brdcfg.h"
 
@@ -351,13 +351,6 @@ extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio)
 // empty-section
 // ---- isr of the module: end ------
 
-
-extern hal_result_t hal_gpio_hid_static_memory_init(void)
-{
-    memset(&s_hal_gpio_theinternals, 0, sizeof(s_hal_gpio_theinternals));
-    return(hal_res_OK);
-}
-
   
 
 
@@ -368,44 +361,44 @@ extern hal_result_t hal_gpio_hid_static_memory_init(void)
 static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t p = hal_brdcfg_gpio__theconfig.supported_mask_byport[HAL_gpio_port2index(port)];
-    //acemor-pin-old: return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
-    return(hal_utility_bits_halfword_maskcheck(p, pin));
+    //acemor-pin-old: return((hal_boolval_t)hl_bits_hlfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+    return((hal_boolval_t)hl_bits_hlfword_maskcheck(p, pin));
 }
 
 
 static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
     uint16_t *pp = &s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
-    //acemor-pin-old: hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
-    hal_utility_bits_halfword_maskset(pp, pin);
+    //acemor-pin-old: hl_bits_hlfword_bitset(pp, HAL_gpio_pin2index(pin));
+    hl_bits_hlfword_maskset(pp, pin);
 }
 
 static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
     uint16_t p = s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
-    //acemor-pin-old: return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
-    return(hal_utility_bits_halfword_maskcheck(p, pin));
+    //acemor-pin-old: return((hal_boolval_t)hl_bits_hlfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+    return((hal_boolval_t)hl_bits_hlfword_maskcheck(p, pin));
 }
 
 static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
-    //acemor-pin-old: hal_utility_bits_halfword_bitset(pp, HAL_gpio_pin2index(pin));
-    hal_utility_bits_halfword_maskset(pp, pin);
+    //acemor-pin-old: hl_bits_hlfword_bitset(pp, HAL_gpio_pin2index(pin));
+    hl_bits_hlfword_maskset(pp, pin);
 }
 
 static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
     //acemor-pin-old: hal_utility_bits_halfword_bitclear(pp, HAL_gpio_pin2index(pin));
-    hal_utility_bits_halfword_maskclear(pp, pin);
+    hl_bits_hlfword_maskclear(pp, pin);
 }
 
 static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
     uint16_t p = s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
-    //acemor-pin-old: return(hal_utility_bits_halfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
-    return(hal_utility_bits_halfword_maskcheck(p, pin));
+    //acemor-pin-old: return((hal_boolval_t)hl_bits_hlfword_bitcheck(p, HAL_gpio_pin2index(pin)) );
+    return((hal_boolval_t)hl_bits_hlfword_maskcheck(p, pin));
 }
 
 static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, hal_gpio_dir_t dir, hal_gpio_speed_t speed) 

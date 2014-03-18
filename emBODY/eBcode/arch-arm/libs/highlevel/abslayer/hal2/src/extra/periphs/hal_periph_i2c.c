@@ -41,7 +41,7 @@
 #include "hal_heap.h"
 
 
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 
 #include "hl_i2c.h"
@@ -364,12 +364,6 @@ extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
 // empty-section
 // ---- isr of the module: end ------
 
-extern hal_result_t hal_i2c_hid_static_memory_init(void)
-{
-    memset(&s_hal_i2c_theinternals, 0, sizeof(s_hal_i2c_theinternals));
-    return(hal_res_OK);
-}
-
 
 
 
@@ -379,17 +373,17 @@ extern hal_result_t hal_i2c_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_i2c_supported_is(hal_i2c_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_i2c__theconfig.supported_mask, HAL_i2c_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_i2c__theconfig.supported_mask, HAL_i2c_id2index(id)) );
 }
 
 static void s_hal_i2c_initted_set(hal_i2c_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_i2c_theinternals.initted, HAL_i2c_id2index(id));
+    hl_bits_byte_bitset(&s_hal_i2c_theinternals.initted, HAL_i2c_id2index(id));
 }
 
 static hal_boolval_t s_hal_i2c_initted_is(hal_i2c_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_i2c_theinternals.initted, HAL_i2c_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_i2c_theinternals.initted, HAL_i2c_id2index(id)));
 }
 
 static void s_hal_i2c_status_set(hal_i2c_t id, hal_bool_t locked, hal_i2c_devaddr_t devaddr)

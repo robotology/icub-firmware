@@ -60,7 +60,6 @@ typedef struct
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_result_t hal_dma_hid_static_memory_init(void);
 
 
 

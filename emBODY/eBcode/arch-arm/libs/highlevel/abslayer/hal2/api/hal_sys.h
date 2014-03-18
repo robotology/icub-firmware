@@ -76,13 +76,6 @@ extern const hal_sys_cfg_t hal_sys_cfg_default;  // = { .stacksize = 0, .heapsiz
 extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg);
 
 
-///** @fn         extern hal_result_t hal_sys_systeminit(void)
-//    @brief      Initialise the system. OBSOLETE
-//    @return     hal_res_OK, or hal_res_NOK_generic if hal_initialise() was not already succesfully called.
-// **/
-//extern hal_result_t hal_sys_systeminit(void);
-
-
 /** @fn         extern uint32_t hal_sys_stack_get_totalsize(void);
     @brief      It returns size of configured stack.
     @return     The size of configured stack in bytes.
@@ -95,6 +88,7 @@ extern uint32_t hal_sys_stack_get_totalsize(void);
     @return     The size of configured heap in bytes.
  **/
 extern uint32_t hal_sys_heap_get_totalsize(void);
+
 
 /** @fn         extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
     @brief      When called it returns after the CPU has executed this function for @e reltime microseconds.
@@ -209,12 +203,19 @@ extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t 
 extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn);
  
  
+/** @fn         extern hal_boolval_t hal_sys_irq_is_running(void)
+    @brief      Tells if the caller is an ISR.
+    @return     hal_true or hal_false
+ **/ 
+extern hal_boolval_t hal_sys_irq_is_running(void); 
+
+ 
 /** @fn         extern hal_result_t hal_sys_criticalsection_take(void *p, hal_reltime_t tout)
     @brief      Takes exclusive control of the system so that no ISR will interrupt the thread of execution contained
                 between a _take() and a _release(). This function can be called multiple times with no harm, so that the
                 protection vs. ISR can be nested in several layers of function calls.
     @param      p               A dummy pointer required by some EmbObj object. 
-    @param      t               A dummy timeout required by some EmbObj object.
+    @param      tout            A dummy timeout required by some EmbObj object.
     @return     Always hal_res_OK.
  **/
 extern hal_result_t hal_sys_criticalsection_take(void *p, hal_reltime_t tout);

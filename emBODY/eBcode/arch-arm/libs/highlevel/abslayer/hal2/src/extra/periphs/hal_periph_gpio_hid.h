@@ -86,7 +86,7 @@ extern const uint16_t  hal_gpio_hid_pins[];
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_result_t hal_gpio_hid_static_memory_init(void);
+
 
 
 

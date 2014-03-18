@@ -35,7 +35,7 @@
 #include "stdlib.h"
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 #include "hal_heap.h"
 
 
@@ -589,12 +589,6 @@ void TIM8_IRQHandler(void)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_timer_hid_static_memory_init(void)
-{
-    memset(&s_hal_timer_theinternals, 0, sizeof(s_hal_timer_theinternals));
-
-    return(hal_res_OK);  
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -607,7 +601,7 @@ static hal_bool_t s_hal_timer_supported_is(hal_timer_t id)
             return(hal_false);
     }
     
-    return(hal_utility_bits_halfword_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
 }
 
 static void s_hal_timer_initted_set(hal_timer_t id)

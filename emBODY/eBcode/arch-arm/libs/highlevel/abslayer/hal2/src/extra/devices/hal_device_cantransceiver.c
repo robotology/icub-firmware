@@ -38,7 +38,7 @@
 
 #include "hal_brdcfg.h"
 
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -198,13 +198,6 @@ extern hal_bool_t hal_cantransceiver_initted_is(hal_cantransceiver_t id)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_device_cantransceiver_hid_static_memory_init(void)
-{
-    // removed dependency from nzi ram
-    memset(&s_hal_device_cantransceiver_theinternals, 0, sizeof(s_hal_device_cantransceiver_theinternals));
-
-    return(hal_res_OK);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -213,18 +206,18 @@ extern hal_result_t hal_device_cantransceiver_hid_static_memory_init(void)
 
 static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_cantransceiver_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_cantransceiver__theconfig.supported_mask, HAL_device_cantransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_cantransceiver__theconfig.supported_mask, HAL_device_cantransceiver_id2index(id)));
 }
 
 
 static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_cantransceiver_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id)));
 }
 
 static void s_hal_device_cantransceiver_initted_set(hal_cantransceiver_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id));
+    hl_bits_byte_bitset(&s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id));
 }
 
 

@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 #include "hal_heap.h"
 
 
@@ -247,11 +247,6 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_device_encoder_hid_static_memory_init(void)
-{
-    memset(&s_hal_device_encoder_theinternals, 0, sizeof(s_hal_device_encoder_theinternals));
-    return(hal_res_OK);  
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -259,19 +254,19 @@ extern hal_result_t hal_device_encoder_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_device_encoder_supported_is(hal_encoder_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_encoder__theconfig.supported_mask, HAL_device_encoder_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_encoder__theconfig.supported_mask, HAL_device_encoder_id2index(id)) );
 }
 
 
 static void s_hal_device_encoder_initted_set(hal_encoder_t id)
 {
-    hal_utility_bits_halfword_bitset(&s_hal_device_encoder_theinternals.initted, HAL_device_encoder_id2index(id));
+    hl_bits_hlfword_bitset(&s_hal_device_encoder_theinternals.initted, HAL_device_encoder_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_device_encoder_initted_is(hal_encoder_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(s_hal_device_encoder_theinternals.initted, HAL_device_encoder_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_device_encoder_theinternals.initted, HAL_device_encoder_id2index(id)));
 }
 
 

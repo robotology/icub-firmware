@@ -41,12 +41,21 @@
 #include "hal_cpu.h"
 #include "hal_cpu_hid.h"
 
+#if defined(HAL_USE_UTILITY_BITS)
 #include "hal_utility_bits_hid.h" 
+#endif
+#if defined(HAL_USE_UTILITY_CRC07)
 #include "hal_utility_crc07_hid.h" 
+#endif
+#if defined(HAL_USE_UTILITY_CRC16)
 #include "hal_utility_crc16_hid.h" 
-#include "hal_utility_crc32_hid.h" 
+#endif
+#if defined(HAL_USE_UTILITY_CRC32)
+#include "hal_utility_crc32_hid.h"
+#endif
+#if defined(HAL_USE_UTILITY_FIFO)
 #include "hal_utility_fifo_hid.h" 
-
+#endif
 
 #include "hal_periph_can_hid.h"
 #include "hal_periph_spi_hid.h"
@@ -62,8 +71,8 @@
 
 //#include "hal_chip_xx_eeprom_hid.h"
 //#include "hal_chip_micrel_ks8893_hid.h"
-#include "hal_chip_st_l3g4200d_hid.h"
-#include "hal_chip_st_lis3dh_hid.h"
+//#include "hal_chip_st_l3g4200d_hid.h"
+//#include "hal_chip_st_lis3dh_hid.h"
 //#include "hal_chip_generic_ethtransceiver_hid.h"
 
 
@@ -123,26 +132,26 @@
         .family             = hal_cpu_fam_stm32f4,
         .name               = hal_cpu_nam_stm32f407,
         .speeds             =
-        { 
+        {   // these values must be coherent w/ HL_CFG_MPUSPEED_STM32xxx valued defined in hl_cfg_plus_target.h 
             .max                = 168000000,
             .cpu                = 168000000,
             .fastbus            =  84000000,
             .slowbus            =  42000000
-        },
-        .clockcfg                      =
-        {
-            .keepinternalclockatstartup     = hal_false,      // false is the preferred mode
-            .refclock                       = hal_cpu_refclock_pll_on_external_osc,  
-            .intclockspeed                  =  16000000,
-            .extclockspeed                  =  50000000,
-            .pllcfg                         =
-            {   // pllfreq = n*(source/m), speedcpu = pllfreq/p, 48mhz = pllfreq/q
-                .m                  =  25, 
-                .n                  = 168,
-                .p                  =   2,
-                .q                  =   7
-            }
-        }   
+        }//,
+//         .clockcfg                      =
+//         {
+//             .keepinternalclockatstartup     = hal_false,      // false is the preferred mode
+//             .refclock                       = hal_cpu_refclock_pll_on_external_osc,  
+//             .intclockspeed                  =  16000000,
+//             .extclockspeed                  =  50000000,
+//             .pllcfg                         =
+//             {   // pllfreq = n*(source/m), speedcpu = pllfreq/p, 48mhz = pllfreq/q
+//                 .m                  =  50, 
+//                 .n                  = 336,
+//                 .p                  =   2,
+//                 .q                  =   7
+//             }
+//         }   
     };    
 #endif//HAL_USE_CPU  
 
@@ -1464,10 +1473,6 @@ extern void hal_brdcfg_switch__reg_read_byI2C(uint8_t* pBuffer, uint16_t ReadAdd
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_result_t s_hal_brdcfg_chips__static_memory_init(void);
-
-static hal_result_t s_hal_brdcfg_extbrds__static_memory_init(void);
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -1491,236 +1496,6 @@ extern hal_result_t hal_brdcfg__start(void)
 }
 
 
-extern hal_result_t hal_brdcfg__static_memory_init(void)
-{
-
-
-    // - utilities ----------------------------------------------------------------------------------------------------
-    
-#ifdef  HAL_USE_UTILITY_BITS
-    if(hal_res_OK != hal_utility_bits_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_UTILITY_BITS
-
-#ifdef  HAL_USE_UTILITY_CRC07
-    if(hal_res_OK != hal_utility_crc07_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_UTILITY_CRC07      
-    
-#ifdef  HAL_USE_UTILITY_CRC16
-    if(hal_res_OK != hal_utility_crc16_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_UTILITY_CRC16    
-
-#ifdef  HAL_USE_UTILITY_CRC32
-    if(hal_res_OK != hal_utility_crc32_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_UTILITY_CRC32        
-    
-#ifdef  HAL_USE_UTILITY_FIFO
-    if(hal_res_OK != hal_utility_fifo_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_UTILITY_FIFO    
-    
-     
-        
-    
-    // - mpu peripherals ----------------------------------------------------------------------------------------------    
-
-#ifdef  HAL_USE_PERIPH_CAN
-    if(hal_res_OK != hal_can_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_CAN
-
-
-#ifdef  HAL_USE_PERIPH_CRC
-    if(hal_res_OK != hal_crc_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_CRC
-
-    
-#ifdef  HAL_USE_PERIPH_DMA
-    if(hal_res_OK != hal_dma_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_DMA    
-    
-
-#ifdef  HAL_USE_PERIPH_ETH
-    if(hal_res_OK != hal_eth_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_ETH 
- 
-
-#ifdef  HAL_USE_PERIPH_GPIO
-    if(hal_res_OK != hal_gpio_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_GPIO
-    
-#ifdef  HAL_USE_PERIPH_I2C
-    if(hal_res_OK != hal_i2c_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_I2C     
-    
-#ifdef HAL_USE_PERIPH_SPI
-    if(hal_res_OK != hal_spi_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_SPI    
-
-#ifdef HAL_USE_PERIPH_TIMER
-    if(hal_res_OK != hal_timer_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_TIMER
-
-#ifdef HAL_USE_PERIPH_TRACE
-    if(hal_res_OK != hal_trace_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_TRACE
-       
-    
-#ifdef HAL_USE_PERIPH_UNIQUEID
-    if(hal_res_OK != hal_uniqueid_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_UNIQUEID    
-
-#ifdef HAL_USE_PERIPH_WATCHDOG
-    if(hal_res_OK != hal_watchdog_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_PERIPH_WATCHDOG
-
-
-    // - devices ------------------------------------------------------------------------------------------------------
-    
-    
-#ifdef HAL_USE_DEVICE_ACCELEROMETER
-    if(hal_res_OK != hal_device_accelerometer_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_ACCELEROMETER   
-
-#ifdef HAL_USE_DEVICE_CANTRANSCEIVER
-    if(hal_res_OK != hal_device_cantransceiver_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_CANTRANSCEIVER     
-    
-#ifdef HAL_USE_DEVICE_DISPLAY
-    if(hal_res_OK != hal_device_display_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_DISPLAY
-    
-#ifdef HAL_USE_DEVICE_EEPROM
-    if(hal_res_OK != hal_device_eeprom_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_EEPROM
-  
-#ifdef HAL_USE_DEVICE_ENCODER
-    if(hal_res_OK != hal_device_encoder_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_ENCODER  
-    
-#ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
-    if(hal_res_OK != hal_device_ethtransceiver_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_ETHTRANSCEIVER    
-    
-#ifdef HAL_USE_DEVICE_GYROSCOPE
-    if(hal_res_OK != hal_device_gyroscope_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_GYROSCOPE  
-    
-#ifdef  HAL_USE_DEVICE_LED
-    if(hal_res_OK != hal_device_led_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_LED
-
-#ifdef HAL_USE_DEVICE_MUX
-    if(hal_res_OK != hal_device_mux_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_MUX   
-
-#ifdef HAL_USE_DEVICE_TERMOMETER
-    if(hal_res_OK != hal_device_termometer_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_TERMOMETER        
-        
-#ifdef HAL_USE_DEVICE_SWITCH
-    if(hal_res_OK != hal_device_switch_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_DEVICE_SWITCH
-        
-        
-    // board (hence chips)
-    
-    if(hal_res_OK != s_hal_brdcfg_chips__static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    } 
-    
-
-    // - board, hence extborads ---------------------------------------------------------------------------------------
-    
-    if(hal_res_OK != s_hal_brdcfg_extbrds__static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    
-
-    return(hal_res_OK);        
-}
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1734,62 +1509,7 @@ extern hal_result_t hal_brdcfg__static_memory_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static hal_result_t s_hal_brdcfg_chips__static_memory_init(void)
-{
 
-// #ifdef  HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-//     if(hal_res_OK != hal_chip_generic_ethtransceiver_hid_static_memory_init())
-//     {
-//         return(hal_res_NOK_generic);
-//     }
-// #endif//HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-    
-// #ifdef  HAL_USE_CHIP_MICREL_KS8893
-//     if(hal_res_OK != hal_chip_micrel_ks8893_hid_static_memory_init())
-//     {
-//         return(hal_res_NOK_generic);
-//     }    
-// #endif//HAL_USE_CHIP_MICREL_KS8893       
-    
-#ifdef  HAL_USE_CHIP_ST_L3G4200D
-    if(hal_res_OK != hal_chip_st_l3g4200d_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }     
-#endif//HAL_USE_CHIP_ST_L3G4200D    
-
-#ifdef  HAL_USE_CHIP_ST_LIS3DH
-    if(hal_res_OK != hal_chip_st_lis3dh_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }     
-#endif//HAL_USE_CHIP_ST_LIS3DH        
-     
-// #ifdef  HAL_USE_CHIP_XX_EEPROM
-//     if(hal_res_OK != hal_chip_xx_eeprom_hid_static_memory_init())
-//     {
-//         return(hal_res_NOK_generic);
-//     }    
-// #endif//HAL_USE_CHIP_XX_EEPROM          
-    
-    
-    return(hal_res_OK);  
-}
-
-
-
-static hal_result_t s_hal_brdcfg_extbrds__static_memory_init(void)
-{
-
-#ifdef  HAL_USE_EXTBRD_KEIL_MCBQVGA
-    if(hal_res_OK != hal_extbrd_keil_mcbqvga_hid_static_memory_init())
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif//HAL_USE_EXTBRD_KEIL_MCBQVGA
-       
-    return(hal_res_OK);  
-}
 
 
 #ifdef  HAL_USE_DEVICE_SWITCH

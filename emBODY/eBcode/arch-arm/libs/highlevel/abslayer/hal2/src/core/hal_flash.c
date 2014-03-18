@@ -24,6 +24,7 @@
 **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
+
 #include "hal_brdcfg_modules.h"
 
 #ifdef HAL_USE_FLASH
@@ -78,6 +79,18 @@ extern const hal_flash_cfg_t hal_flash_cfg_default  =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
+/** @typedef    typedef enum hal_flash_t 
+    @brief      contains ids of every possible flash bank.
+ **/ 
+typedef enum  
+{ 
+    hal_flash1_internal = 0             /**< the only flash bank */
+} hal_flash_t;
+
+enum { hal_flashes_number = 1 };
+
+
 typedef struct
 {
     uint8_t                     nothing;
@@ -120,21 +133,12 @@ static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword);
 #define s_hal_flash_BASEADDR        (hal_brdcfg_flash__theconfig.baseaddress)
 #define s_hal_flash_TOTALSIZE       (hal_brdcfg_flash__theconfig.totalsize)
 
-//#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
-//static const uint32_t s_hal_flash_BASEADDR          = 0x08000000;
-//#else //defined(HAL_USE_CPU_FAM_*)
-//    #error ERR --> choose a HAL_USE_CPU_FAM_*
-//#endif 
-
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
 
-//static const uint32_t s_hal_flash_TOTALSIZE         = 256*1024;
 static const uint32_t s_hal_flash_PAGESIZE          = 2*1024;
 
 #elif   defined(HAL_USE_CPU_FAM_STM32F4)
-
-//static const uint32_t s_hal_flash_TOTALSIZE         = 1024*1024;
 
 static const uint32_t s_hal_flash_PAGESNUM          = 12;
 
@@ -193,14 +197,7 @@ static hal_flash_theinternals_t s_hal_flash_theinternals =
 extern hal_result_t hal_flash_init(const hal_flash_cfg_t *cfg)
 {
     const hal_flash_t id = hal_flash1_internal;
-    //hal_flash_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_flash_id2index(id)];
 
-//    we always have the flash ...
-//    if(hal_false == s_hal_flash_supported_is(id))
-//    {
-//        return(hal_res_NOK_generic);
-//    }
-    
     if(hal_true == s_hal_flash_initted_is(id))
     {
         return(hal_res_NOK_generic);
@@ -223,12 +220,6 @@ extern hal_result_t hal_flash_init(const hal_flash_cfg_t *cfg)
 
 extern hal_result_t hal_flash_lock(void)
 {
-//    const hal_flash_t id = hal_flash1;
-//    if(hal_false == s_hal_flash_initted_is(id))
-//    {
-//        return(hal_res_NOK_generic);
-//    } 
-    
     FLASH_Lock();
     return(hal_res_OK);
 }
@@ -236,12 +227,6 @@ extern hal_result_t hal_flash_lock(void)
 
 extern hal_result_t hal_flash_unlock(void)
 {
-//    const hal_flash_t id = hal_flash1;
-//    if(hal_false == s_hal_flash_initted_is(id))
-//    {
-//        return(hal_res_NOK_generic);
-//    } 
-
     FLASH_Unlock();
     return(hal_res_OK);
 }
@@ -249,15 +234,9 @@ extern hal_result_t hal_flash_unlock(void)
 
 extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
 {
-//    const hal_flash_t id = hal_flash1;
-//    if(hal_false == s_hal_flash_initted_is(id))
-//    {
-//        return(hal_res_NOK_generic);
-//    } 
 
     hal_result_t res = hal_res_NOK_generic;
 
-    //uint32_t pageindex;
     uint32_t pagesize;
 
     if(hal_false == hal_flash_address_isvalid(addr))
@@ -270,8 +249,6 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
         return(hal_res_NOK_generic);    
     }
 
-    //pageindex = s_hal_flash_pageindex_get(addr);
-    //size += (addr % s_hal_flash_PAGESIZES[pageindex]);   
     pagesize = s_hal_flash_quickget_pagesize(addr);
     size += (addr % pagesize);
     
@@ -285,15 +262,10 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
             return(hal_res_NOK_generic);
         }
 
-        //pageindex = s_hal_flash_pageindex_get(addr);
-        //addr += s_hal_flash_PAGESIZES[pageindex];
+
         pagesize = s_hal_flash_quickget_pagesize(addr);
         addr += pagesize;
 
-        //if(size >= s_hal_flash_PAGESIZES[pageindex])
-        //{
-        //    size -= s_hal_flash_PAGESIZES[pageindex];
-        //}
         if(size >= pagesize)
         {
             size -= pagesize;
@@ -310,11 +282,6 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
 
 extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
 {
-//    const hal_flash_t id = hal_flash1;
-//    if(hal_false == s_hal_flash_initted_is(id))
-//    {
-//        return(hal_res_NOK_generic);
-//    } 
 
     hal_result_t res = hal_res_NOK_generic;
     uint8_t addr4 = 0;
@@ -337,7 +304,6 @@ extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
     }
     else
     {
-        //hal_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_flash_write() unsupports it");
         return(hal_res_NOK_generic);
     }
 
@@ -352,7 +318,6 @@ extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
     }
     else
     {
-        //hal_hid_on_fatalerror(hal_fatalerror_unsupportedbehaviour, "hal_flash_write() unsupports it");
         return(hal_res_NOK_generic);
     }
 
@@ -420,7 +385,6 @@ extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
     }
 
 
-
     // never in here
     // return(hal_res_NOK_generic);
 }
@@ -428,12 +392,6 @@ extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
 
 extern hal_result_t hal_flash_read(uint32_t addr, uint32_t size, void *data)
 {
-//    const hal_flash_t id = hal_flash1;
-//    if(hal_false == s_hal_flash_initted_is(id))
-//    {
-//        return(hal_res_NOK_generic);
-//    } 
-
     const void *flashaddr = (const void*)addr;
  
     if((hal_false == hal_flash_address_isvalid(addr)) || (0 == size) || (NULL == data))
@@ -503,27 +461,8 @@ extern uint32_t hal_flash_get_totalsize(void)
     return(s_hal_flash_TOTALSIZE);
 }
 
-// for stm32f1 there is ...
-#if 0
-extern uint32_t hal_flash_get_unitsize(uint32_t addr)
-{
-    extern const uint32_t hal_flash_UNITSIZE   = 2;
-    if(hal_false == hal_flash_address_isvalid(addr))
-    {
-        return(hal_NA32);
-    }
-    
-    return(hal_flash_UNITSIZE);
-}
-#endif
 
 
-//extern hal_result_t hal_flash_setlatency(hal_flash_cycles_t ncycles)
-//{
-//    FLASH_SetLatency(ncycles);
-//    hal_on_fatalerror(0, msgerr);
-//    return(hal_res_OK);
-//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -535,12 +474,6 @@ extern uint32_t hal_flash_get_unitsize(uint32_t addr)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_flash_hid_static_memory_init(void)
-{
-    memset(&s_hal_flash_theinternals, 0, sizeof(s_hal_flash_theinternals));
-    return(hal_res_OK);  
-}
-
 
 
   
@@ -549,21 +482,15 @@ extern hal_result_t hal_flash_hid_static_memory_init(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//static hal_boolval_t s_hal_flash_supported_is(hal_flash_t id)
-//{
-//    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_flash__theconfig.supported_mask, HAL_flash_id2index(id)) );
-//}
 
 static void s_hal_flash_initted_set(hal_flash_t id)
 {
     s_hal_flash_theinternals.initted = 1;
-    //hal_utility_bits_byte_bitset(&s_hal_flash_theinternals.initted, HAL_flash_id2index(id));
 }
 
 static hal_boolval_t s_hal_flash_initted_is(hal_flash_t id)
 {
     return((0 == s_hal_flash_theinternals.initted) ? (hal_false) : (hal_true));
-    //return(hal_utility_bits_byte_bitcheck(s_hal_flash_theinternals.initted, HAL_flash_id2index(id)));
 }
 
 
@@ -625,37 +552,7 @@ static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword)
     return((FLASH_COMPLETE==status)?(hal_res_OK):(hal_res_NOK_generic));
 }
 
-#if 0
-static hal_result_t s_hal_flash_writeword(uint32_t addr, uint32_t word)
-{
-    FLASH_Status status = FLASH_COMPLETE;
 
-    if(hal_false == hal_flash_address_isvalid(addr))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    if(0 != (addr&0x00000003))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    if(0xFFFFFFFF != *((volatile uint32_t*)addr))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // no need to write a 0xffffffff
-    if(0xFFFFFFFF == word)
-    {
-        return(hal_res_OK);
-    }
-
-    status = FLASH_ProgramWord(addr, word);
-
-    return((FLASH_COMPLETE==status)?(hal_res_OK):(hal_res_NOK_generic));
-}
-#endif
 
 static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t *data)
 {
@@ -703,6 +600,7 @@ static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t
     return((FLASH_COMPLETE == status) ? (hal_res_OK) :(hal_res_NOK_generic));
 }
 
+
 #if   defined(HAL_USE_CPU_FAM_STM32F4)  
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
 {
@@ -730,6 +628,7 @@ static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
 }
 #endif
 
+
 #if     defined(HAL_USE_CPU_FAM_STM32F4)
 static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
 {
@@ -749,6 +648,7 @@ static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
     return(FLASH_Sectors[s_hal_flash_pageindex_get(addr)]);    
 }
 #endif
+
 
 static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr)
 {

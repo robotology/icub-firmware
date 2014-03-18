@@ -41,7 +41,7 @@
 #include "hal_base_hid.h" 
 #include "hal_periph_gpio_hid.h" 
 #include "hal_utility_fifo.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 #include "hal_heap.h"
 #include "hal_cantransceiver.h"
 
@@ -730,17 +730,6 @@ void CAN2_SCE_IRQHandler(void)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_can_hid_static_memory_init(void)
-{
-    
-    memset(&s_hal_can_theinternals, 0, sizeof(s_hal_can_theinternals));
-
-//     memset(s_hal_can_internals, 0, sizeof(s_hal_can_internals));
-//     s_hal_can_initted = 0;
-
-    return(hal_res_OK);
-}
-
 
 
 
@@ -750,17 +739,17 @@ extern hal_result_t hal_can_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_can_supported_is(hal_can_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_can__theconfig.supported_mask, HAL_can_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_can__theconfig.supported_mask, HAL_can_id2index(id)));
 }
 
 static void s_hal_can_initted_set(hal_can_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_can_theinternals.initted, HAL_can_id2index(id));
+    hl_bits_byte_bitset(&s_hal_can_theinternals.initted, HAL_can_id2index(id));
 }
 
 static hal_boolval_t s_hal_can_initted_is(hal_can_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_can_theinternals.initted, HAL_can_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_can_theinternals.initted, HAL_can_id2index(id)));
 }
 
 

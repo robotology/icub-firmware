@@ -45,7 +45,7 @@
 #include "hal_periph_gpio_hid.h"
 
 
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 #include "hal_heap.h"
 
 
@@ -320,12 +320,6 @@ extern void hl_eth_alert(void)
     }    
 }
 
-extern hal_result_t hal_eth_hid_static_memory_init(void)
-{
-    memset(&s_hal_eth_theinternals, 0, sizeof(s_hal_eth_theinternals));
-
-    return(hal_res_OK);
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -338,12 +332,12 @@ static hal_bool_t s_hal_eth_supported_is(void)
 
 static void s_hal_eth_initted_set(hal_eth_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_eth_theinternals.initted, HAL_eth_id2index(id));
+    hl_bits_byte_bitset(&s_hal_eth_theinternals.initted, HAL_eth_id2index(id));
 }
 
 static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_eth_theinternals.initted, HAL_eth_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_eth_theinternals.initted, HAL_eth_id2index(id)));
 }
 
 

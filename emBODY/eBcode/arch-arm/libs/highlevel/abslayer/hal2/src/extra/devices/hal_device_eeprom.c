@@ -42,7 +42,7 @@
 
 
 
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -495,12 +495,6 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t id, uint32_t addr)
 
 
 
-extern hal_result_t hal_device_eeprom_hid_static_memory_init(void)
-{
-    memset(&s_hal_device_eeprom_theinternals, 0, sizeof(s_hal_device_eeprom_theinternals));
-    return(hal_res_OK); 
-}
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -509,17 +503,17 @@ extern hal_result_t hal_device_eeprom_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_device_eeprom_supported_is(hal_eeprom_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_eeprom__theconfig.supported_mask, HAL_device_eeprom_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_eeprom__theconfig.supported_mask, HAL_device_eeprom_id2index(id)));
 }
 
 static void s_hal_device_eeprom_initted_set(hal_eeprom_t id)
 {
-     hal_utility_bits_byte_bitset(&s_hal_device_eeprom_theinternals.initted, HAL_device_eeprom_id2index(id));
+     hl_bits_byte_bitset(&s_hal_device_eeprom_theinternals.initted, HAL_device_eeprom_id2index(id));
 }
 
 static hal_boolval_t s_hal_device_eeprom_initted_is(hal_eeprom_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_eeprom_theinternals.initted, HAL_device_eeprom_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_eeprom_theinternals.initted, HAL_device_eeprom_id2index(id)));
 }
 
 

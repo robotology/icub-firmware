@@ -105,17 +105,6 @@ typedef struct
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void* hl_sys_heap_new(uint32_t size)
-{
-    return(hal_base_heap_new(size));    
-}
-
-
-extern void hl_sys_heap_delete(void* p)
-{
-    hal_base_heap_delete(p);
-}
-
 
 extern void* hal_heap_new(uint32_t size)
 {
@@ -149,10 +138,6 @@ extern void hal_heap_delete(void** pp)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_heap_hid_static_memory_init(void)
-{
-    return(hal_res_OK); 
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------

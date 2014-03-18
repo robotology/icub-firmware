@@ -58,7 +58,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                     supported_mask;
+    uint16_t                    supported_mask;
     hal_device_encoder_spimap_t spimap[hal_encoders_number];
 } hal_device_encoder_hid_brdcfg_t;
 
@@ -68,8 +68,6 @@ typedef struct
 extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-extern hal_result_t hal_device_encoder_hid_static_memory_init(void);
 
 
 

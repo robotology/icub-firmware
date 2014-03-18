@@ -43,8 +43,9 @@
 
 
 
-#include "hal_utility_bits.h"
-#include "hal_utility_fifo.h"
+#include "hl_bits.h"
+//#include "hal_utility_fifo.h"
+#include "hl_fifo.h"
 #include "hal_heap.h"
 #include "hl_spi.h"
 #include "hl_arch.h"
@@ -108,7 +109,7 @@ typedef struct
     uint8_t*            dummytxframe;
     uint8_t*            isrrxframe;
     uint8_t             isrrxcounter;
-    hal_utility_fifo_t  fiforx;
+    hl_fifo_t*          fiforx;
     hal_spi_t           id;
     uint8_t             frameburstcountdown;
     hal_bool_t          isrisenabled;
@@ -381,12 +382,6 @@ void SPI3_IRQHandler(void)
 
 // ---- isr of the module: end ------
 
-extern hal_result_t hal_spi_hid_static_memory_init(void)
-{ 
-    memset(&s_hal_spi_theinternals, 0, sizeof(s_hal_spi_theinternals));
-
-    return(hal_res_OK);
-}
 
 extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id)
 {   
@@ -448,11 +443,11 @@ static void s_hal_spi_read_isr(hal_spi_t id)
         
         // copy the rxframe into the rx fifo
         
-        if(hal_true == hal_utility_fifo_full(&(intitem->fiforx)))
+        if(hl_true == hl_fifo_full(intitem->fiforx))
         {
-            hal_utility_fifo_pop(&(intitem->fiforx));
+            hl_fifo_pop(intitem->fiforx);
         }
-        hal_utility_fifo_put(&(intitem->fiforx), intitem->isrrxframe);         
+        hl_fifo_put(intitem->fiforx, intitem->isrrxframe);         
         
         // now manage the callback
         hal_callback_t onframereceiv = intitem->config.onframereceiv;
@@ -472,19 +467,19 @@ static void s_hal_spi_read_isr(hal_spi_t id)
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_id2index(id)) );
 }
 
 
 static void s_hal_spi_initted_set(hal_spi_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_spi_theinternals.initted, HAL_spi_id2index(id));
+    hl_bits_byte_bitset(&s_hal_spi_theinternals.initted, HAL_spi_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 {   
-    return(hal_utility_bits_byte_bitcheck(s_hal_spi_theinternals.initted, HAL_spi_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_spi_theinternals.initted, HAL_spi_id2index(id)));
 }
 
 
@@ -492,7 +487,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     //hal_spi_cfg_t *usedcfg = NULL;
-    uint8_t* tmpbuffer = NULL;
+    //uint8_t* tmpbuffer = NULL;
     
     if(NULL == cfg)
     {
@@ -608,8 +603,10 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     intitem->isrrxcounter = 0;
  
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
-    tmpbuffer = (uint8_t*) hal_heap_new(usedcfg->capacityofrxfifoofframes*usedcfg->sizeofframe);
-    hal_utility_fifo_init(&intitem->fiforx, usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, tmpbuffer, NULL);
+    //tmpbuffer = (uint8_t*) hal_heap_new(usedcfg->capacityofrxfifoofframes*usedcfg->sizeofframe);
+   // hl_fifo_init(intitem->fiforx, usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, tmpbuffer, NULL);
+    
+    intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
 
  
     // - the id
@@ -738,7 +735,7 @@ static hal_result_t s_hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remai
 
 #if 1
 
-    return(hal_utility_fifo_get(&intitem->fiforx, rxframe, remainingrxframes));
+    return((hal_result_t)hl_fifo_get(intitem->fiforx, rxframe, remainingrxframes));
     
 #else
       
@@ -755,7 +752,7 @@ static hal_result_t s_hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remai
         s_hal_spi_rx_isr_disable(id);
     } 
     
-    res =  hal_utility_fifo_get(&intitem->fiforx, rxframe, remainingrxframes);
+    res =  (hal_result_t)hl_fifo_get(intitem->fiforx, rxframe, remainingrxframes);
     
     if(hal_true == isrisenabled)
     {

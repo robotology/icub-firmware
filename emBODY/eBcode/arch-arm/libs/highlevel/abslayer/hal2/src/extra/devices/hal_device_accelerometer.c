@@ -41,7 +41,7 @@
 
 //#include "hal_stm32xx_include.h"
 
-#include "hal_utility_bits.h"
+#include "hl_bits.h"
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -222,11 +222,6 @@ extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerom
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_device_accelerometer_hid_static_memory_init(void)
-{
-    memset(&s_hal_device_accelerometer_theinternals, 0, sizeof(s_hal_device_accelerometer_theinternals));
-    return(hal_res_OK);  
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -235,17 +230,17 @@ extern hal_result_t hal_device_accelerometer_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_device_accelerometer_supported_is(hal_accelerometer_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_accelerometer__theconfig.supported_mask, HAL_device_accelerometer_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_accelerometer__theconfig.supported_mask, HAL_device_accelerometer_id2index(id)) );
 }
 
 static void s_hal_device_accelerometer_initted_set(hal_accelerometer_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_device_accelerometer_theinternals.initted, HAL_device_accelerometer_id2index(id));
+    hl_bits_byte_bitset(&s_hal_device_accelerometer_theinternals.initted, HAL_device_accelerometer_id2index(id));
 }
 
 static hal_boolval_t s_hal_device_accelerometer_initted_is(hal_accelerometer_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_accelerometer_theinternals.initted, HAL_device_accelerometer_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_accelerometer_theinternals.initted, HAL_device_accelerometer_id2index(id)));
 }
 
 

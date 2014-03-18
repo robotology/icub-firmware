@@ -44,7 +44,7 @@
 #include "stdlib.h"
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 #include "hal_heap.h"
 
@@ -311,11 +311,7 @@ void WWDG_IRQHandler(void)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_watchdog_hid_static_memory_init(void)
-{
-    memset(&s_hal_watchdog_theinternals, 0, sizeof(s_hal_watchdog_theinternals));
-    return(hal_res_OK);  
-}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -323,17 +319,17 @@ extern hal_result_t hal_watchdog_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_watchdog_supported_is(hal_watchdog_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_watchdog__theconfig.supported_mask, HAL_watchdog_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_watchdog__theconfig.supported_mask, HAL_watchdog_id2index(id)));
 }
 
 static void s_hal_watchdog_initted_set(hal_watchdog_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_watchdog_theinternals.initted, HAL_watchdog_id2index(id));
+    hl_bits_byte_bitset(&s_hal_watchdog_theinternals.initted, HAL_watchdog_id2index(id));
 }
 
 static hal_boolval_t s_hal_watchdog_initted_is(hal_watchdog_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_watchdog_theinternals.initted, HAL_watchdog_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_watchdog_theinternals.initted, HAL_watchdog_id2index(id)));
 }
 
 

@@ -17,6 +17,7 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
+
 #ifndef _HAL_HEAP_HID_H_
 #define _HAL_HEAP_HID_H_
 
@@ -53,7 +54,7 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern hal_result_t hal_heap_hid_static_memory_init(void);
+
 
 
 // - definition of extern hidden inline functions ---------------------------------------------------------------------

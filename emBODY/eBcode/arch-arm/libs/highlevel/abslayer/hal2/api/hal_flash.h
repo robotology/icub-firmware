@@ -51,16 +51,6 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-/** @typedef    typedef enum hal_flash_t 
-    @brief      contains ids of every possible flash bank.
- **/ 
-typedef enum  
-{ 
-    hal_flash1_internal = 0             /**< the only flash bank */
-} hal_flash_t;
-
-enum { hal_flashes_number = 1 };
-
 
 
 /** @typedef    typedef struct hal_flash_cfg_t 
@@ -139,7 +129,7 @@ extern hal_result_t hal_flash_read(uint32_t addr, uint32_t size, void *data);
 
 /** @fn         extern uint32_t hal_flash_get_baseaddress(void)
     @brief      Retrieves the base address of the FLASH.
-    @return     0x0800000 on STM32F1x.
+    @return     0x0800000 on STM32Fx.
  **/
 extern uint32_t hal_flash_get_baseaddress(void);
 
@@ -173,15 +163,6 @@ extern uint32_t hal_flash_get_pagesize(uint32_t addr);
     @return     Always 2048-aligned on STM32F1x for a valid address, or hal_NA32 if addr is not on FLASH
  **/
 extern uint32_t hal_flash_get_pageaddr(uint32_t addr);
-
-
-/** @fn         extern uint32_t hal_flash_get_unitsize(uint32_t addr))
-    @brief      Retrieves the unit size of the FLASH at address @addr. The unit is the smallest writeable 
-                piece of FLASH.
-    @param      addr        The address of the memory of which one wants the unit size
-    @return     Always 2 on STM32F1x for a valid address, or hal_NA32 if addr is not on FLASH
- **/
-extern uint32_t hal_flash_get_unitsize(uint32_t addr);
 
 
 

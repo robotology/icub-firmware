@@ -33,7 +33,6 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hl_sys.h"
 
 #include "hal_middleware_interface.h"
 
@@ -57,9 +56,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
-#define HAL_BASE_VERIFY_STACK_HEAP_SIZES
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -96,25 +92,6 @@ typedef struct
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-// #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
-//     // removed by acemor on 09-mar-2011 to avoid problems of ... 
-//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
-//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-// __asm int s_hal_base_getstacksize (void) {
-//         IMPORT  Stack_Size
-//         LDR     R0,=Stack_Size
-//         BX      LR
-// }
-
-
-// __asm int s_hal_base_getheapsize (void) {
-//         IMPORT  Heap_Size
-//         LDR     R0,=Heap_Size
-//         BX      LR
-// }
-// #endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
-
 
 static void* s_hal_base_default_new(uint32_t size);
 static void s_hal_base_default_delete(void* mem);
@@ -168,24 +145,6 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
     s_hal_base_theinternals.fn_heap_delete = (NULL != cfg->extfn.ext_heap_delete) ? (cfg->extfn.ext_heap_delete) : (s_hal_base_default_delete);
 
 
-// #if     defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
-//     // removed by acemor on 09-mar-2011 to avoid problems of ... 
-//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
-//     // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-//     // but ... as long as we dont use shalPART.axf (shared library) we dont care.
-//     if(cfg->stacksize != s_hal_base_getstacksize())
-//     {   
-//         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
-//         return(hal_res_NOK_generic);
-//     }
-
-//     if(cfg->heapsize != s_hal_base_getheapsize())
-//     {   
-//         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
-//         return(hal_res_NOK_generic);
-//     }
-// #endif//defined(HAL_BASE_VERIFY_STACK_HEAP_SIZES)
-//  
     
     // finally ... sets used config
     memcpy(&s_hal_base_theinternals.config, cfg, sizeof(hal_base_cfg_t));
@@ -198,7 +157,7 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
 
 extern void hal_base_osal_scheduling_suspend(void)
 {
-	if(0 != (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk))
+	if(hal_true == hal_sys_irq_is_running())
 	{	// no need if it is called by an isr
 	 	return;
 	}
@@ -212,7 +171,7 @@ extern void hal_base_osal_scheduling_suspend(void)
 
 extern void hal_base_osal_scheduling_restart(void)
 {
-	if(0 != (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk))
+	if(hal_true == hal_sys_irq_is_running())
 	{	// no need if it is called by an isr
 	 	return;
 	}
@@ -223,10 +182,16 @@ extern void hal_base_osal_scheduling_restart(void)
     }
 } 
 
-
-extern void hl_sys_on_error(hl_errorcode_t errorcode, const char * errormsg)
+extern void hal_base_on_warning(const char * warningmsg)
 {
-    hal_base_on_fatalerror((hal_fatalerror_t)errorcode, errormsg);
+    hal_base_osal_scheduling_suspend();
+    
+    if(NULL != s_hal_base_theinternals.fn_on_error)
+    {
+        s_hal_base_theinternals.fn_on_error(hal_fatalerror_warning, warningmsg);
+    } 
+    
+    hal_base_osal_scheduling_restart();
 }
 
 extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
@@ -238,6 +203,7 @@ extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * erro
         s_hal_base_theinternals.fn_on_error(errorcode, errormsg);
         if(errorcode == hal_fatalerror_warning)
         {
+            hal_base_osal_scheduling_restart();
             return;
         }
         for(;;);
@@ -246,6 +212,7 @@ extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * erro
     {  
         if(errorcode == hal_fatalerror_warning)
         {
+            hal_base_osal_scheduling_restart();
             return;
         }
         for(;;)
@@ -285,11 +252,6 @@ extern void hal_base_heap_delete(void* mem)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_base_hid_static_memory_init(void)
-{
-    memset(&s_hal_base_theinternals, 0, sizeof(hal_base_theinternals_t));
-    return(hal_res_OK); 
-}
 
 extern hal_bool_t hal_base_hid_initted_is(void)
 {

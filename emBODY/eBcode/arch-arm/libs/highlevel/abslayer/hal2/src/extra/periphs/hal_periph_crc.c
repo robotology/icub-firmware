@@ -39,7 +39,7 @@
 #include "hal_heap.h"
 
 
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 #if defined(HAL_USE_UTILITY_CRC07)
 #include "hal_utility_crc07.h"
@@ -321,11 +321,7 @@ extern hal_result_t hal_crc_compute(hal_crc_t id, hal_crc_compute_mode_t mode, c
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_crc_hid_static_memory_init(void)
-{
-    memset(&s_hal_crc_theinternals, 0, sizeof(s_hal_crc_theinternals));
-    return(hal_res_OK);  
-}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -333,17 +329,17 @@ extern hal_result_t hal_crc_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_crc_supported_is(hal_crc_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_crc__theconfig.supported_mask, HAL_crc_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_crc__theconfig.supported_mask, HAL_crc_id2index(id)) );
 }
 
 static void s_hal_crc_initted_set(hal_crc_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_crc_theinternals.initted, HAL_crc_id2index(id));
+    hl_bits_byte_bitset(&s_hal_crc_theinternals.initted, HAL_crc_id2index(id));
 }
 
 static hal_boolval_t s_hal_crc_initted_is(hal_crc_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_crc_theinternals.initted, HAL_crc_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_crc_theinternals.initted, HAL_crc_id2index(id)));
 }
 
 

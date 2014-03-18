@@ -39,7 +39,7 @@
 #include "hal_periph_gpio_hid.h"
 
 
-#include "hal_utility_bits.h"
+#include "hl_bits.h"
 #include "hal_utility_fifo.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -772,7 +772,7 @@ static void s_hal_spi_theisr_safe_but_slow(SPI_TypeDef* SPIx, hal_spi_internals_
 #endif
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_port_t port)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_port2index(port)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_port2index(port)) );
 }
 
 static void s_hal_spi_initted_set(hal_spi_port_t port)

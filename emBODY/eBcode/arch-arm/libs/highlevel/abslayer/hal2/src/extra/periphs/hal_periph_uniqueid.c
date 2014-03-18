@@ -44,7 +44,7 @@
 #include "stdlib.h"
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 #include "hal_middleware_interface.h" 
 
@@ -203,10 +203,6 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_uniqueid_hid_static_memory_init(void)
-{
-    return(hal_res_OK);  
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -214,7 +210,7 @@ extern hal_result_t hal_uniqueid_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
 }
 
 

@@ -45,7 +45,7 @@
 
 #include "hal_brdcfg.h"
 
-#include "hal_utility_bits.h"
+#include "hl_bits.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -235,11 +235,7 @@ extern hal_bool_t hal_switch_started_is(void)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_device_switch_hid_static_memory_init(void)
-{
-    memset(&s_hal_device_switch_theinternals, 0, sizeof(s_hal_device_switch_theinternals));
-    return(hal_res_OK);
-}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -255,27 +251,27 @@ static hal_bool_t s_hal_device_switch_supported_is(void)
 static hal_boolval_t s_hal_device_switch_initted_is(void)
 {
     const hal_switch_t id = hal_switch1;
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_switch_theinternals.initted, HAL_device_switch_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_switch_theinternals.initted, HAL_device_switch_id2index(id)));
 }
 
 static void s_hal_device_switch_initted_set(void)
 {
     const hal_switch_t id = hal_switch1;
-    hal_utility_bits_byte_bitset(&s_hal_device_switch_theinternals.initted, HAL_device_switch_id2index(id));
+    hl_bits_byte_bitset(&s_hal_device_switch_theinternals.initted, HAL_device_switch_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_device_switch_started_is(void)
 {
     const hal_switch_t id = hal_switch1;
-    return(hal_utility_bits_byte_bitcheck(s_hal_device_switch_theinternals.started, HAL_device_switch_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_switch_theinternals.started, HAL_device_switch_id2index(id)));
 }
 
 
 static void s_hal_device_switch_started_set(void)
 {
     const hal_switch_t id = hal_switch1;
-    hal_utility_bits_byte_bitset(&s_hal_device_switch_theinternals.started, HAL_device_switch_id2index(id));
+    hl_bits_byte_bitset(&s_hal_device_switch_theinternals.started, HAL_device_switch_id2index(id));
 }
 
 

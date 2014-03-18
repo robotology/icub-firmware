@@ -42,7 +42,7 @@
 #include "hal_base_hid.h" 
 #include "hal_periph_gpio_hid.h" 
 #include "hal_utility_fifo.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -646,12 +646,7 @@ void DMA2_Stream7_IRQHandler(void)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_dma_hid_static_memory_init(void)
-{
-    memset(&s_hal_dma_theinternals, 0, sizeof(s_hal_dma_theinternals));
 
-    return(hal_res_OK);
-}
 
 
 
@@ -662,17 +657,17 @@ extern hal_result_t hal_dma_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_dma_supported_is(hal_dma_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(hal_brdcfg_dma__theconfig.supported_mask, HAL_dma_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_dma__theconfig.supported_mask, HAL_dma_id2index(id)));
 }
 
 static void s_hal_dma_initted_set(hal_dma_t id)
 {
-    hal_utility_bits_halfword_bitset(&s_hal_dma_theinternals.initted, HAL_dma_id2index(id));
+    hl_bits_hlfword_bitset(&s_hal_dma_theinternals.initted, HAL_dma_id2index(id));
 }
 
 static hal_boolval_t s_hal_dma_initted_is(hal_dma_t id)
 {
-    return(hal_utility_bits_halfword_bitcheck(s_hal_dma_theinternals.initted, HAL_dma_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_dma_theinternals.initted, HAL_dma_id2index(id)));
 }
 
 

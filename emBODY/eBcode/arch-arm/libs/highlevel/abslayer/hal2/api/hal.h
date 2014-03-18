@@ -52,7 +52,6 @@
 #include "hal_can.h"
 #include "hal_cantransceiver.h"
 #include "hal_crc.h"
-#include "hal_display.h"
 #include "hal_eeprom.h"
 #include "hal_encoder.h"
 #include "hal_eth.h"

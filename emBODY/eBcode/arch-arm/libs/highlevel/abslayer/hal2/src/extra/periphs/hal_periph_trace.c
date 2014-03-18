@@ -182,11 +182,6 @@ extern int hal_trace_puts(const char * str)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_trace_hid_static_memory_init(void)
-{
-    hal_trace_init(NULL);
-    return(hal_res_OK);  
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

@@ -93,8 +93,6 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_core_modules_in_core_static_memory_init(void);
-static void s_hal_core_modules_in_brdcfg_static_memory_init(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -139,15 +137,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     // sets used config. it may be used to retrieve params for hal_cpu_init() and hal_sys_init()
     
     memcpy(&s_hal_core_theinternals.config, cfg, sizeof(hal_core_cfg_t));    
-    
-     
-    // call something which prepares memory in core modules
-    s_hal_core_modules_in_core_static_memory_init();
-    
-    // call something which prepares memory of other modules specified in brdcfg
-    s_hal_core_modules_in_brdcfg_static_memory_init();
-    
-    
+               
     // -- call initialisation of base    
     hal_base_init(&cfg->basecfg);
     
@@ -177,16 +167,9 @@ extern hal_result_t hal_core_start(void)
         return(hal_res_NOK_generic);    
     }
     
-    // call system init
-    hal_sys_hid_systeminit();
+    // call system init: dont do that
+    //hal_sys_hid_systeminit();
     
-    uint32_t cpuspeed = hl_sys_sysclock_get();
-    if(hal_brdcfg_cpu__theconfig.speeds.cpu != cpuspeed)
-    {
-        char str[128];
-        snprintf(str, sizeof(str), "wrong cpuspeed: %d hz", cpuspeed);
-        hal_base_on_fatalerror(hal_fatalerror_generic, str);       
-    }
             
     s_hal_core_theinternals.status = hal_core_status_started;
     
@@ -218,14 +201,6 @@ const hal_core_cfg_t* hal_core_cfg_get(void)
 
 
 
-
-
-// extern hal_result_t hal_core_hid_static_memory_init(void)
-// {
-//     #warning --> IT MUST NOT BE USED OTHERWISE IT CLEARS the static variables of core ...
-//     return(hal_res_OK); 
-// }
-
 //
 // extern hal_bool_t hal_core_hid_initted_is(void)
 // {
@@ -239,30 +214,6 @@ const hal_core_cfg_t* hal_core_cfg_get(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_core_modules_in_core_static_memory_init(void)
-{
-    // base
-    hal_base_hid_static_memory_init();
-    
-    // cpu
-    hal_cpu_hid_static_memory_init();
-    
-    // flash
-    hal_flash_hid_static_memory_init();
-
-    // heap
-    hal_heap_hid_static_memory_init();
-        
-    // sys
-    hal_sys_hid_static_memory_init();   
-}
-
-
-static void s_hal_core_modules_in_brdcfg_static_memory_init(void)
-{
-    // brdcfg
-    hal_brdcfg__static_memory_init();
-}
 
 
 #endif//HAL_USE_CORE

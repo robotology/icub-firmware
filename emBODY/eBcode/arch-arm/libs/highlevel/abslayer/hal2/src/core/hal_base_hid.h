@@ -53,7 +53,7 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern hal_result_t hal_base_hid_static_memory_init(void);
+
 extern hal_bool_t hal_base_hid_initted_is(void);
 
 

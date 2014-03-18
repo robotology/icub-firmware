@@ -54,11 +54,11 @@
 #ifndef HAL_BUILD_ONLYCORE 
 
 // -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
-#define     HAL_USE_UTILITY_BITS
-#define     HAL_USE_UTILITY_CRC07
-#define     HAL_USE_UTILITY_CRC16
-#define     HAL_USE_UTILITY_CRC32
-#define     HAL_USE_UTILITY_FIFO
+//#define     HAL_USE_UTILITY_BITS
+//#define     HAL_USE_UTILITY_CRC07
+//#define     HAL_USE_UTILITY_CRC16
+//#define     HAL_USE_UTILITY_CRC32
+//#define     HAL_USE_UTILITY_FIFO
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
 #define     HAL_USE_PERIPH_CAN

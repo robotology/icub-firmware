@@ -73,7 +73,6 @@ typedef struct
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_result_t hal_device_gyroscope_hid_static_memory_init(void);
 
 
 #endif  // include guard

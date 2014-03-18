@@ -66,7 +66,7 @@ typedef struct
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern hal_result_t hal_spi_hid_static_memory_init(void);
+
 
 extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id);
 

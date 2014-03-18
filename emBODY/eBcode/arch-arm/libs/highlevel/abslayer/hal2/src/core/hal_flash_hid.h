@@ -18,6 +18,7 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
+
 #ifndef _HAL_FLASH_HID_H_
 #define _HAL_FLASH_HID_H_
 
@@ -59,7 +60,6 @@ typedef struct
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_result_t hal_flash_hid_static_memory_init(void);
 
 
 

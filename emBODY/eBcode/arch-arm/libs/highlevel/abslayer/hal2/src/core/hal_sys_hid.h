@@ -116,9 +116,8 @@ typedef struct
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_result_t hal_sys_hid_static_memory_init(void);
 
-extern hal_result_t hal_sys_hid_systeminit(void);
+//extern hal_result_t hal_sys_hid_systeminit(void);
 
 
 

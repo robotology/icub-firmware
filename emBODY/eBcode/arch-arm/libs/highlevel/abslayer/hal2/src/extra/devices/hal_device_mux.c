@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+#include "hl_bits.h" 
 #include "hal_heap.h" 
 
 
@@ -252,12 +252,7 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
 // empty-section
 // ---- isr of the module: end ------
 
-extern hal_result_t hal_device_mux_hid_static_memory_init(void)
-{
-    memset(&s_hal_mux_theinternals, 0, sizeof(s_hal_mux_theinternals));
-    
-    return(hal_res_OK);  
-}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -265,19 +260,19 @@ extern hal_result_t hal_device_mux_hid_static_memory_init(void)
 
 static hal_boolval_t s_hal_mux_supported_is(hal_mux_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(hal_brdcfg_device_mux__theconfig.supported_mask, HAL_device_mux_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_mux__theconfig.supported_mask, HAL_device_mux_id2index(id)));
 }
 
 
 static void s_hal_mux_initted_set(hal_mux_t id)
 {
-    hal_utility_bits_byte_bitset(&s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id));
+    hl_bits_byte_bitset(&s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id)
 {
-    return(hal_utility_bits_byte_bitcheck(s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id)));
 }
 
 

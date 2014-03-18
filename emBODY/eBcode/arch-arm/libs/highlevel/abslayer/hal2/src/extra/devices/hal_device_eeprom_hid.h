@@ -90,7 +90,6 @@ typedef struct
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_result_t hal_device_eeprom_hid_static_memory_init(void);
 
 
 ///* @fn			extern hal_result_t hal_hid_eeprom_waitstandbystate(void);

@@ -44,8 +44,6 @@
 #include "hal_brdcfg.h"
 #include "hal_flash.h"
 
-//extern uint32_t SystemCoreClock;
-
 #include "hl_sys.h"
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -121,29 +119,6 @@ static hal_sys_theinternals_t s_hal_sys_theinternals =
 };
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of __asm functions
-// --------------------------------------------------------------------------------------------------------------------
-
-#if     defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
-    // removed by acemor on 09-mar-2011 to avoid problems of ... 
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-__asm static int hal_sys_getstacksize (void) {
-        IMPORT  Stack_Size
-        LDR     R0,=Stack_Size
-        BX      LR
-}
-
-
-__asm static int hal_sys_getheapsize (void) {
-        IMPORT  Heap_Size
-        LDR     R0,=Heap_Size
-        BX      LR
-}
-#endif//defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -159,17 +134,13 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
 
     // verify stack and heap
 #if     defined(HAL_SYS_VERIFY_STACK_HEAP_SIZES)
-    // removed by acemor on 09-mar-2011 to avoid problems of ... 
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Heap_Size (referred from hal_stm32.o).
-    // .\obj\shalPART.axf: Error: L6218E: Undefined symbol Stack_Size (referred from hal_stm32.o).
-    // but ... as long as we dont use shalPART.axf (shared library) we dont care.
-    if(cfg->stacksize != hal_sys_getstacksize())
+    if(cfg->stacksize != hal_sys_stack_get_totalsize())
     {   
         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect stack size");
         return(hal_res_NOK_generic);
     }
 
-    if(cfg->heapsize != hal_sys_getheapsize())
+    if(cfg->heapsize != hal_sys_heap_get_totalsize())
     {   
         hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect heap size");
         return(hal_res_NOK_generic);
@@ -178,79 +149,43 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
      
     
     
-    memcpy(&s_hal_sys_theinternals.config, cfg, sizeof(hal_sys_cfg_t));
-    
-    // acemor: added to remove dependencies from NZI data
+    memcpy(&s_hal_sys_theinternals.config, cfg, sizeof(hal_sys_cfg_t));    
     s_hal_sys_theinternals.cs_takes            = 0;
     s_hal_sys_theinternals.fn_SYSTICK_handler  = NULL;
+    
+    
+    // set priority levels
+    
+    // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
+    // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
+    // bits[7:4] for pre-emption priority and bits[3:0} for subpriority. but stm32 only has the 4 msb bits.
+    // see page 114 of joseph yiu's book.
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     
     return(hal_res_OK);   
 }
 
 extern uint32_t hal_sys_stack_get_totalsize(void)
 {
-    return(hal_sys_getstacksize());   
+    return(hl_sys_stack_totalsize_get());   
 }
 
 
 extern uint32_t hal_sys_heap_get_totalsize(void)
 {
-    return(hal_sys_getheapsize());   
+    return(hl_sys_heap_totalsize_get());   
 }
-
-
-// uint8_t hal_sys_howmanyARMv7ops(void)
-// {
-// #if     defined(HAL_USE_CPU_FAM_STM32F1)
-//     return(3+3);
-//     //return(3+3+3);      // number seems to be rather empirical. can anybody help me finding a rule?
-// #elif   defined(HAL_USE_CPU_FAM_STM32F4)
-//     return(3+1);
-// #else //defined(HAL_USE_CPU_FAM_*)
-//     #error ERR --> choose a HAL_USE_CPU_FAM_*
-// #endif  
-// }
-// __asm void hal_sys_someARMv7ops(uint32_t numberof) 
-// {   // it takes 3+p cycles: 1+1+1+p, p = 1, 2, or 3. where p is what is needed to fill the pipeline
-//     // cm3: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0337i/index.html
-//     ALIGN
-// loop
-//     CBZ     r0, exit
-//     SUB     r0,#1
-//     B       loop
-// exit
-//     BX      LR     
-
-//     ALIGN
-// }
 
 
 extern hal_result_t hal_sys_delay(hal_reltime_t reltime)
 {
-//     static uint32_t s_hal_sys_numofops1usec = 0;
-//     if(0 == s_hal_sys_numofops1usec)
-//     {
-//         if(0 == SystemCoreClock)
-//         {
-//             return(hal_res_NOK_generic);
-//         }
-//         // to occupy a microsec i execute an operation for a number of times which depends on: SystemCoreCloc and 1.25 dmips/mhz, 
-//         //s_hal_sys_numofinstructions1usec = ((SystemCoreClock/1000000) * 125l) / 100l;
-//         s_hal_sys_numofops1usec = (SystemCoreClock/1000000) / hal_sys_howmanyARMv7ops();
-//     }
-//         
-//     hal_sys_someARMv7ops(s_hal_sys_numofops1usec * reltime);
-
-//     return(hal_res_OK);
     return((hal_result_t)hl_sys_delay(reltime));
 }
 
 
 extern hal_result_t hal_sys_systemreset(void) 
 {
-    NVIC_SystemReset();
-    
-    return(hal_res_NOK_generic);
+    return((hal_result_t)hl_sys_systemreset());
 }
 
 
@@ -271,43 +206,17 @@ extern hal_result_t hal_sys_canexecuteataddress(uint32_t addr)
     }
 #endif
     
-    if(((*(volatile uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
-    {
-        return(hal_res_OK);
-    }
-    else 
-    {
-        return(hal_res_NOK_generic);
-    }
+    return((hal_result_t)hal_sys_canjump(addr));
 }
 
 extern hal_result_t hal_sys_executenowataddress(uint32_t addr) 
 {
-    volatile uint32_t jumpaddr;
-    void (*app_fn)(void) = NULL;
-
-    if(hal_res_NOK_generic == hal_sys_canexecuteataddress(addr))
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    // prepare jump address 
-    jumpaddr = *(volatile uint32_t*) (addr + 4);
-    // prepare jumping function
-    app_fn = (void (*)(void)) jumpaddr;
-    // initialize user application's stack pointer 
-    __set_MSP(*(volatile uint32_t*) addr);
-    // jump.
-    app_fn(); 
-    
-    // never in here.
-    return(hal_res_NOK_generic);   
+    return((hal_result_t)hl_sys_jumpto(addr));   
 }
 
 extern hal_result_t hal_sys_vectortable_relocate(uint32_t offset) 
 {
     NVIC_SetVectorTable(NVIC_VectTab_FLASH, offset);
-
     return(hal_res_OK);
 }
 
@@ -349,41 +258,48 @@ extern hal_void_fp_void_t hal_sys_systick_gethandler(void)
 
 extern void hal_sys_irq_disable(void) 
 {
-    __disable_irq();
+    hl_sys_irq_disable();
 }    
 
 
 extern void hal_sys_irq_enable(void) 
 {
-     __enable_irq();    
+     hl_sys_irq_enable();    
 }
 
 
 extern void hal_sys_irqn_disable(hal_irqn_t irqn) 
 {
-    NVIC_DisableIRQ((IRQn_Type)irqn);
+    hl_sys_irqn_disable((hl_irqn_t)irqn);
 }    
 
 
 extern void hal_sys_irqn_enable(hal_irqn_t irqn) 
-{
-     NVIC_EnableIRQ((IRQn_Type)irqn);    
+{ 
+    hl_sys_irqn_enable((hl_irqn_t)irqn);
 }  
 
 extern void hal_sys_irqn_priority_set(hal_irqn_t irqn, hal_interrupt_priority_t prio) 
 {
-    if(hal_int_priorityNONE == prio)
-    {
-        return;
-    }
-
-    NVIC_SetPriority((IRQn_Type)irqn, prio);    
+    hl_sys_irqn_priority_set((hl_irqn_t)irqn, (hl_irqpriority_t) prio);
 } 
 
 extern hal_interrupt_priority_t hal_sys_irqn_priority_get(hal_irqn_t irqn) 
 {
-    return((hal_interrupt_priority_t)NVIC_GetPriority((IRQn_Type)irqn));    
+    return((hal_interrupt_priority_t)hl_sys_irqn_priority_get((hl_irqn_t)irqn));
 }
+
+extern hal_boolval_t hal_sys_irq_is_running(void) 
+{
+    if(0 != (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk))
+    {
+        return(hal_true);        
+    }
+    else
+    {
+        return(hal_false);
+    }
+} 
 
 
 // - hal_sys_atomic_*:     functions which perform an operation operate without being interrupted by an ISR
@@ -456,43 +372,33 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 // ---- isr of the module: end ------
 
 
-extern hal_result_t hal_sys_hid_static_memory_init(void)
-{
-    // removed dependency from nzi data
-    s_hal_sys_theinternals.cs_takes            = 0;
-    s_hal_sys_theinternals.fn_SYSTICK_handler  = NULL;
 
-    return(hal_res_OK);  
-}
+// extern hal_result_t hal_sys_hid_systeminit(void) 
+// {
+//     if(hal_false == hal_base_hid_initted_is())
+//     {
+//          return(hal_res_NOK_generic);
+//     }
+//     
+//     // if we use hal, then at startup the system runs a SystemInit() which was re-defined by hal 
+//     // the redefined function just configures the internal clock and does not use any prescaling for internal buses.
+//     
+//     // hence, ... we need to configure a proper clock and update the system core clock 
+//   
 
+// #warning --> dont use hal_cpu_clocks_set(): rework the code
+// //    hal_cpu_clocks_set();
+//     
 
-
-extern hal_result_t hal_sys_hid_systeminit(void) 
-{
-    if(hal_false == hal_base_hid_initted_is())
-    {
-         return(hal_res_NOK_generic);
-    }
-    
-    // if we use hal, then at startup the system runs a SystemInit() which was re-defined by hal 
-    // the redefined function just configures the internal clock and does not use any prescaling for internal buses.
-    
-    // hence, ... we need to configure a proper clock and update the system core clock 
-  
-
-#warning --> dont use hal_cpu_clocks_set(): rework the code
-//    hal_cpu_clocks_set();
-    
-
-    // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
-    // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
-    // bits[7:4] for pre-emption priority and bits[3:0} for subpriority. but stm32 only has the 4 msb bits.
-    // see page 114 of joseph yiu's book.
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+//     // configure once and only once the nvic to hold 4 bits for interrupt priorities and 0 for subpriorities
+//     // in stm32 lib ... NVIC_PriorityGroup_4 is 0x300, thus cmsis priority group number 3, thus
+//     // bits[7:4] for pre-emption priority and bits[3:0} for subpriority. but stm32 only has the 4 msb bits.
+//     // see page 114 of joseph yiu's book.
+// //    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 
-    return(hal_res_OK);
-}
+//     return(hal_res_OK);
+// }
 
 
 

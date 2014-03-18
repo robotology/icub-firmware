@@ -298,12 +298,22 @@ extern void hal_base_osal_scheduling_restart(void);
     @brief      It is called by HAL when an internal fatal error occurs, but it can be called by a HAL 
                 user as well. The function at first stops OSAL scheduling by calling 
                 hal_base_osal_scheduling_suspend(), then calls an externally defined function passed through 
-                hal_base_cfg_t::extfn.osal_system_scheduling_suspend (if not NULL), and finally enters in an
-                infinite loop.
+                hal_base_cfg_t::extfn.osal_system_scheduling_suspend (if not NULL), and if error is not hal_fatalerror_warning
+                it finally enters in an infinite loop. If error is hal_fatalerror_warning it resumes scheduling and returns.
     @param      errorcode       The error code. 
     @param      errormsg        The error message.
  **/
 extern void hal_base_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
+
+
+/** @fn         extern void hal_base_on_warning(const char * warningmsg)
+    @brief      It is called by HAL when an internal warning occurs, but it can be called by a HAL 
+                user as well. The function at first stops OSAL scheduling by calling 
+                hal_base_osal_scheduling_suspend(), then calls an externally defined function passed through 
+                hal_base_cfg_t::extfn.osal_system_scheduling_suspend (if not NULL), and then it resumes scheduling and returns.
+    @param      errormsg        The warning message.
+ **/
+extern void hal_base_on_warning(const char * warningmsg);
 
 
 extern void * hal_base_heap_new(uint32_t size);
