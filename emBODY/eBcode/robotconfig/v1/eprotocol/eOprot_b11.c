@@ -202,9 +202,13 @@ EO_VERIFYproposition(s_eoprot_b11_sk_val, 3 == eoprot_endpoint_skin);
 
 static uint16_t s_eoprot_b11_ep2index(eOnvEP8_t ep)
 {    
-    if(ep < eoprot_b11_endpoints_numberof)
+    if(eoprot_endpoint_management == ep)
     {
-        return(ep);
+        return(0);
+    }
+    if(eoprot_endpoint_skin ==ep)
+    {
+        return(1);
     }
     return(EOK_uint16dummy);
 }
