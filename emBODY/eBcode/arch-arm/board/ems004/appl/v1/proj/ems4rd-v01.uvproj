@@ -1116,6 +1116,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
             </File>
+            <File>
+              <FileName>eOprot_b10.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b10.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b11.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b11.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2284,6 +2294,16 @@
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b10.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b10.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOprot_b11.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b11.c</FilePath>
             </File>
           </Files>
         </Group>
