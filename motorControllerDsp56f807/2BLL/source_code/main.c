@@ -514,13 +514,13 @@ led0_on
 			//computing the PWM value (PID)
 			PWMoutput[i] = compute_pwm(i);
 
-			// PWM filtering in torque control 
+			// PWM filtering in torque control if there is no bemf compensation
 			#if (VERSION != 0x0351)
 			if (_control_mode[i] == MODE_TORQUE ||
 			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
 			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
 				{
-					PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
+					if (_kff_torque[i] == 0) PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
 				}	
 			// saving the PWM value before the decoupling					
 			_bfc_PWMoutput[i] = PWMoutput_old[i] = PWMoutput[i];

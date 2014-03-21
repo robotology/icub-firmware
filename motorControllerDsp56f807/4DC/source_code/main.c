@@ -524,9 +524,9 @@ void main(void)
 			if (_control_mode[i] == MODE_TORQUE ||
 				_control_mode[i] == MODE_IMPEDANCE_POS ||
 				_control_mode[i] == MODE_IMPEDANCE_VEL)
-			{
+		;	{
 				// PWM filtering
-				PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);	
+				if (_kff_torque[i] == 0) PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
 				// Protection for joints out of the admissible range during force control
 				check_range_torque(i, _safeband[i], PWMoutput);
 				// PWM saturation
