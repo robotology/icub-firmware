@@ -140,7 +140,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O207 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO19 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
+          <Name>-UP1123158 -O207 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO19 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -205,7 +205,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -233,12 +233,6 @@
       </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
-      <SystemViewers>
-        <Entry>
-          <Name>OS Support\Event Viewer</Name>
-          <WinId>35905</WinId>
-        </Entry>
-      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -362,7 +356,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123158 -O207 -S12 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
+          <Name>-UP1123158 -O207 -S12 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO19 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -485,10 +479,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>43</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>95</TopLine>
+      <CurrentLine>102</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</PathWithFileName>
       <FilenameWithoutPath>eom_emsappl_main.c</FilenameWithoutPath>
@@ -499,7 +493,7 @@
 
   <Group>
     <GroupName>abslayer-lib</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -514,8 +508,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</PathWithFileName>
-      <FilenameWithoutPath>ipal.base.medium.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</PathWithFileName>
+      <FilenameWithoutPath>ipal.base.medium.cm4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -559,8 +553,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>203</TopLine>
+      <CurrentLine>209</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</PathWithFileName>
       <FilenameWithoutPath>hal_startup_cpu_nam_stm32f407.s</FilenameWithoutPath>
@@ -613,10 +607,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>55</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>68</TopLine>
+      <CurrentLine>70</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg-stm32f4\hal_core_cfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_core_cfg.c</FilenameWithoutPath>
@@ -629,10 +623,10 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>30</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>55</TopLine>
+      <CurrentLine>63</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg-stm32f4\hal_core_cfg.h</PathWithFileName>
       <FilenameWithoutPath>hal_core_cfg.h</FilenameWithoutPath>
@@ -645,10 +639,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>43</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>135</TopLine>
+      <CurrentLine>142</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg-stm32f4\ipal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
@@ -663,8 +657,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>115</TopLine>
+      <CurrentLine>124</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg-stm32f4\osal_cfg.c</PathWithFileName>
       <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
@@ -879,8 +873,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>173</TopLine>
+      <CurrentLine>198</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOtheErrorManager.c</PathWithFileName>
       <FilenameWithoutPath>EOtheErrorManager.c</FilenameWithoutPath>
@@ -1023,8 +1017,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>115</TopLine>
+      <CurrentLine>117</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\core\core\EOVtheSystem.c</PathWithFileName>
       <FilenameWithoutPath>EOVtheSystem.c</FilenameWithoutPath>
@@ -1079,8 +1073,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>808</TopLine>
+      <CurrentLine>810</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</PathWithFileName>
       <FilenameWithoutPath>EOMtask.c</FilenameWithoutPath>
@@ -1111,8 +1105,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>157</TopLine>
+      <CurrentLine>159</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheSystem.c</FilenameWithoutPath>
@@ -1149,10 +1143,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>874</TopLine>
+      <CurrentLine>876</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheIPnet.c</FilenameWithoutPath>
@@ -1261,10 +1255,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>32</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>157</TopLine>
+      <CurrentLine>170</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</PathWithFileName>
       <FilenameWithoutPath>eventviewer.c</FilenameWithoutPath>
@@ -1453,10 +1447,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>76</ColumnNumber>
+      <ColumnNumber>22</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>167</TopLine>
+      <CurrentLine>168</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSconfigurator.c</FilenameWithoutPath>
@@ -1501,10 +1495,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>11</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>224</TopLine>
+      <CurrentLine>256</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSerror.c</FilenameWithoutPath>
@@ -1519,8 +1513,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>923</TopLine>
+      <CurrentLine>924</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSrunner.c</FilenameWithoutPath>
@@ -1573,10 +1567,10 @@
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>72</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>304</TopLine>
+      <CurrentLine>305</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app_cfg\EOMtheEMSapplCfg_cfg.h</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSapplCfg_cfg.h</FilenameWithoutPath>
@@ -1589,10 +1583,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>5</ColumnNumber>
+      <ColumnNumber>35</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>792</TopLine>
+      <CurrentLine>859</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_runner.c</PathWithFileName>
       <FilenameWithoutPath>overridden_runner.c</FilenameWithoutPath>
@@ -1605,10 +1599,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_appl.c</PathWithFileName>
       <FilenameWithoutPath>overridden_appl.c</FilenameWithoutPath>
@@ -1669,10 +1663,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>3</ColumnNumber>
+      <ColumnNumber>15</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>58</TopLine>
+      <CurrentLine>88</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_error.c</PathWithFileName>
       <FilenameWithoutPath>overridden_error.c</FilenameWithoutPath>
@@ -1741,10 +1735,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>28</ColumnNumber>
+      <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1094</TopLine>
+      <CurrentLine>1096</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
@@ -1805,10 +1799,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>45</ColumnNumber>
+      <ColumnNumber>34</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>15</TopLine>
+      <CurrentLine>16</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</PathWithFileName>
       <FilenameWithoutPath>EOtheEMSapplBody.c</FilenameWithoutPath>
@@ -1845,10 +1839,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>29</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1303</TopLine>
+      <CurrentLine>1304</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilenameWithoutPath>
@@ -1965,10 +1959,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>8</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>164</TopLine>
+      <CurrentLine>166</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilenameWithoutPath>
@@ -2221,10 +2215,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>14</ColumnNumber>
+      <ColumnNumber>23</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>473</TopLine>
+      <CurrentLine>475</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\board\ems001\EOtheEMSapplDiagnostics.c</PathWithFileName>
       <FilenameWithoutPath>EOtheEMSapplDiagnostics.c</FilenameWithoutPath>
@@ -2239,8 +2233,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>146</TopLine>
+      <CurrentLine>186</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\userdef_onerror.c</PathWithFileName>
       <FilenameWithoutPath>userdef_onerror.c</FilenameWithoutPath>
@@ -2391,8 +2385,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>576</TopLine>
+      <CurrentLine>577</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOropframe.c</PathWithFileName>
       <FilenameWithoutPath>EOropframe.c</FilenameWithoutPath>
@@ -2509,10 +2503,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>64</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>61</TopLine>
+      <CurrentLine>62</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\robotconfig\v1\eprotocol\eOprot_b02.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b02.c</FilenameWithoutPath>

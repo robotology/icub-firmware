@@ -402,9 +402,9 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm4.dbg.lib</FileName>
@@ -1571,9 +1571,9 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm4.dbg.lib</FileName>
