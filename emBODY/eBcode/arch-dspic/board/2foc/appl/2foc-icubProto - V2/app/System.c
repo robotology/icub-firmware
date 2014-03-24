@@ -130,7 +130,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
 // used to run I2T (in order to unwind it) when 2FOC loop is stopped
 // and to perform encoder turn count
 {
-  SFRAC16 encoder_value;
+  SFRAC16 encoder_value,encoder_aux_value;
   I2Tdata.IQMeasured = 0;
   I2Tdata.IDMeasured = 0;
 
@@ -138,14 +138,16 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
 
   encoder_value = EncoderPosition(0);
 
-#ifndef SIX_STEP
+//#ifndef SIX_STEP
 
 #ifdef ENCODER_ENABLE_AUX
   // read Meccanical postion [-1..0.9999] from aux encoder
   // this IS necessary because certain encoder (DHES) have
   // a SW internal state machine (electrical->mechanical turn
   // count) that need to run in norder not to loose alignment.
-  EncoderPosition(1);
+  encoder_aux_value = EncoderPosition(1);
+#else
+  encoder_aux_value = encoder_value;
 #endif
 
   // Trigger encoder. Start to prepare data for the next reading (if needed..)
@@ -157,7 +159,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
   {
     UpdatePositionVariables(encoder_value);
   }
-#endif
+//#endif
 
   IFS0bits.T3IF = 0; // clear flag
 }

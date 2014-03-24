@@ -121,6 +121,7 @@ inline SFRAC16 EncoderPositionQE()
 // Read raw mechanical angle from QE encoder and return it
 //
 {
+  /*
   unsigned long tmp;
  
   
@@ -129,9 +130,11 @@ inline SFRAC16 EncoderPositionQE()
   tmp = QEPGet();
 
   // mult by 16-bit full range (about +1 in SFRAC16)
-  tmp *= 65536;
+  //tmp *= 65536;
+  tmp <<= 16;
+
   // divide by encoder PPR*4 -1. 
-  tmp /= QE_RESOLUTION - 1;
+  tmp /= QE_RESOLUTION; // - 1;
   
   // cast: if ulong = 0 then sfrac =0. if ulong > 0 and ulong < half-scale then sfrac > 0
   // if ulong > half-scale then sfrac <0.
@@ -146,6 +149,9 @@ inline SFRAC16 EncoderPositionQE()
   //     0 |/____________
   //ULONG  0     half  0xffff
   return (SFRAC16)(tmp);
+  */
+
+  return (SFRAC16)QEPGet();
 }
 
 

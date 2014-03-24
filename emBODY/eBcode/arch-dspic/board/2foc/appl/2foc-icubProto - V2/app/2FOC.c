@@ -403,14 +403,29 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
   // read Meccanical postion [-1..0.9999] and angle corrected with encsyncpulsepos
   // calculate AlignedMecchanicalAngle and UnalignedMecchanicalAngle from raw encoder data 
-  EncoderPosition(0);
+  encoder_value = EncoderPosition(0);
+
+  #ifdef ENCODER_ENABLE_AUX
+  // read Meccanical postion [-1..0.9999] from aux encoder
+  encoder_aux_value = EncoderPosition(1);
+  #else
+  // to make it possible to avoid some #ifdef in the code.
+  // when there is no AUX encoder emulate it with the same value of
+  // the reference encoder. In this way some portions of code
+  // can use the encoder aux value without worrying if it
+  // really exists or not..
+  encoder_aux_value = encoder_value;
+  #endif
+
+  // empty function
+  //EncoderTriggerSample();
 
   // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
   // scale currents by MeasCurrParm.qKa, qKb, qKc
   // Calculate ParkParm.qIa, qIb, qIc
   MeasAndCompIaIcCalculateIb();
 
-  if (SysStatus.OpenLoop)
+  if (SysStatus.OpenLoop) // OPEN LOOP
   {
     if (hes_state_stored != g_hes_state)
     {
@@ -444,7 +459,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
     pwmL = pwmH;  
   }
-  else if (SysStatus.TorqueControl)
+  else if (SysStatus.TorqueControl) // start TORQUE CONTROL
   {
     static int KiErrIntH=0,KiErrIntL=0;
 
@@ -535,7 +550,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
 
     if (pwmL>125) pwmL=125; else if (pwmL<-125) pwmL=-125;
   }
-  else
+  else // end TORQUE CONTROL
   {
       pwmH = pwmL = 0;
   }
@@ -583,15 +598,15 @@ void __attribute__((__interrupt__,no_auto_psv)) _DMA0Interrupt(void)
   if(1 == gulp_update_request)
   {  
     // GULP!ed variables
-    //Gulp.W[0] = CtrlReferences.qIqRef; //*gulpadr1;
-    //Gulp.W[1] = ParkParm.qIa; //*gulpadr2;
-    //Gulp.W[2] = ParkParm.qIb; //*gulpadr3;
-    //Gulp.W[3] = ParkParm.qIc; //*gulpadr4;
+    Gulp.W[0] = 100;
+    Gulp.W[1] = 200;
+    Gulp.W[2] = encoder_value;
+    Gulp.W[3] = encoder_aux_value;
 
-    Gulp.W[0] = *gulpadr1;
-    Gulp.W[1] = *gulpadr2;
-    Gulp.W[2] = *gulpadr3;
-    Gulp.W[3] = *gulpadr4;
+    //Gulp.W[0] = *gulpadr1;
+    //Gulp.W[1] = *gulpadr2;
+    //Gulp.W[2] = *gulpadr3;
+    //Gulp.W[3] = *gulpadr4;
     
     // unlock the main loop, so it will read values just updated
     gulp_update_request = 0;

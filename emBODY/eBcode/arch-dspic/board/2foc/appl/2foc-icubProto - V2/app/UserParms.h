@@ -205,11 +205,11 @@
 //   ENCODER_ABS, absolute SPI encoder (AS5045)
 //   ENCODER_DHES, digital Hall effect sensors as encoder
 //   ENCODER_TLE, Infineon TLE5012 absolute magnetic GMR encoder
-// #define ENCODER_AUX_QE
+#define ENCODER_AUX_QE
 // #define ENCODER_AUX_ABS
 // #define ENCODER_AUX_DHES
 // #define ENCODER_AUX_TLE
-#define ENCODER_AUX_NONE
+// #define ENCODER_AUX_NONE
 
 
 //
@@ -308,7 +308,7 @@
   //uncomment the following to use parameters for AS5304
   // #define QE_AS5304_PARAMS
   //uncomment the following to use ChipEncoder CE300-4 reflective encoder
-  // #define QE_CE300_4_PARAMS
+  #define QE_CE300_4_PARAMS
   //uncomment the following to use *THE REFERENCE* encoder RI58
   // #define QE_RI58
   //uncomment the following to use Avago AEDR-850x reflective encoder interpolation x1
@@ -906,7 +906,7 @@
 #define CAN_CMD_ALWAYS_ACCEPT
 
 // Oscillator Parameters
-#define PLLIN          10000000  // External Crystal or Clock Frequency (Hz)
+#define PLLIN              10000000  // External Crystal or Clock Frequency (Hz)
 #define DESIREDMIPS	   40000000  // Enter desired MIPS
 
 // number of elements in the list of possible contents of periodic message
