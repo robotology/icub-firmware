@@ -27,6 +27,12 @@
 
 #include "hal_brdcfg_modules.h"
 
+#if     defined(HAL_BUILD_ONLYCORE)
+    #warning HAL is being built in mode ONLYCORE
+#elif   !defined(HAL_BUILD_ONLYCORE)
+    #warning HAL is being built in mode ONLYCORE + EXTRA
+#endif//!defined(HAL_BUILD_ONLYCORE)
+
 // - the file ---------------------------------------------------------------------------------------------------------
 
 #if   defined(HAL_BOARD_MCBSTM32C)
