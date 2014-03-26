@@ -91,12 +91,12 @@ typedef struct
  **/
 typedef struct
 {
-    hal_interrupt_priority_t        priority;   /**< keeps priority of teh ISR */
-    hal_eth_onframereception_t*     onframerx;  /**< The user must customise the behavior in reception using these functions.
-                                                     Only the alert function can be NULL. */
-    hal_eth_macaddress_t            macaddress; /**< Keeps the mac address */
-    uint8_t                         capacityoftxfifoofframes;   /**< the number of eth frames buffered in transmission */
-    uint8_t                         capacityofrxfifoofframes;   /**< the number of eth frames buffered before the ISR can move to higher layers */
+    hal_interrupt_priority_t        priority;                   /**< keeps priority of the ISR */
+    uint8_t                         capacityoftxfifoofframes;   /**< the number of eth frames buffered by tx dma in transmission */
+    uint8_t                         capacityofrxfifoofframes;   /**< the number of eth frames buffered in rx dma before the ISR can move to higher layers */    
+    uint8_t                         dummy;                      /**< nothing */
+    hal_eth_onframereception_t*     onframerx;                  /**< The user must customise the behavior in reception using these functions. Only the alert function can be NULL. */
+    hal_eth_macaddress_t            macaddress;                 /**< Keeps the mac address */
 } hal_eth_cfg_t;
 
 
@@ -114,16 +114,6 @@ typedef struct
 
 
 
-typedef enum
-{
-    hal_eth_phymode_auto                = 0,
-    hal_eth_phymode_halfduplex10mbps    = 1,
-    hal_eth_phymode_halfduplex100mbps   = 2,
-    hal_eth_phymode_fullduplex10mbps    = 3,
-    hal_eth_phymode_fullduplex100mbps   = 4,
-    hal_eth_phymode_none                = 255
-} hal_eth_phymode_t;
-
 
 /** @typedef    typedef enum hal_eth_t 
     @brief      contains ids of every possible eth peripheral.
@@ -135,38 +125,9 @@ typedef enum
 
 enum { hal_eths_number = 1 };
 
-
-// added for diagnostics support for ethernet
-typedef struct
-{
-    uint32_t linkisup:1;
-    uint32_t autoNeg_done:1;
-    uint32_t linkisgood:1;
-    uint32_t linkspeed:1; // 1== 100Mb 0==10Mb
-    uint32_t linkduplex:1; //1==full 0==half
-    uint32_t dummy:27;
-} hal_eth_phy_status_t;
-
-typedef enum
-{
-    rxCrcError  = 0x07,
-    rxUnicast   = 0x0D,
-    rx64Octets  = 0x0E,
-    txUnicast   = 0x1A
-} hal_eth_phy_errors_info_type_t;
-
-typedef struct
-{
-    uint32_t value;
-    uint32_t counteroverflow:1;
-    uint32_t validvalue:1;
-    uint32_t dummy:30;
-} hal_eth_phy_errorsinfo_t;
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const uint8_t hal_eth_capacityofrxfifoofframes;
-extern const uint8_t hal_eth_capacityoftxfifoofframes;
 
 
 
@@ -213,6 +174,62 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame);
 extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void);
 
 
+/** @fn         extern void hal_eth_smi_init(void)
+    @brief      initialises the smi. this function is called inside hal_eth_init(). however, it is good practice to
+                call it again (it does not harm) before using smi.
+ **/
+extern void hal_eth_smi_init(void);
+
+
+/** @fn         extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
+    @brief      reads the 16 bits of register REGaddr in the physical with address PHYaddr. Both REGaddr and PHYaddr 
+                have range is 0-31.
+    @param      PHYaddr     The phy address w/ range 0-31.            
+    @param      REGaddr     The reg address w/ range 0-31.
+    @return     The 16-bit value of the register.    
+ **/
+extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
+
+/** @fn         extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
+    @brief      writes the 16 bits value in register REGaddr in the physical with address PHYaddr. Both REGaddr and PHYaddr 
+                have range is 0-31.
+    @param      PHYaddr     The phy address w/ range 0-31.            
+    @param      REGaddr     The reg address w/ range 0-31.
+    @param      value       the 16-bit value to write.    
+ **/
+extern void hal_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
+
+
+// -- eth diagnostics ----
+// marco accame on 26 march 2014:
+// the following are maintained as hal_eth, but you should use the similar hal_ethtransceiver functions
+
+// added for diagnostics support for ethernet
+typedef struct
+{
+    uint32_t linkisup:1;
+    uint32_t autoNeg_done:1;
+    uint32_t linkisgood:1;
+    uint32_t linkspeed:1; // 1== 100Mb 0==10Mb
+    uint32_t linkduplex:1; //1==full 0==half
+    uint32_t dummy:27;
+} hal_eth_phy_status_t;
+
+typedef enum
+{
+    rxCrcError  = 0x07,
+    rxUnicast   = 0x0D,
+    rx64Octets  = 0x0E,
+    txUnicast   = 0x1A
+} hal_eth_phy_errors_info_type_t;
+
+typedef struct
+{
+    uint32_t value;
+    uint32_t counteroverflow:1;
+    uint32_t validvalue:1;
+    uint32_t dummy:30;
+} hal_eth_phy_errorsinfo_t;
 
 
 /** @fn         extern hal_boolval_t hal_eth_check_links(void)
@@ -242,13 +259,6 @@ extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, ui
     @warning    It is board dependent
  **/
 extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
-
-extern void hal_eth_smi_init(void);
-
-extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
-
-// writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
-extern void hal_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
 
 /** @}            
