@@ -78,27 +78,6 @@ enum { hal_gpio_ports_number = 12 };
     @brief      hal_gpio_pin_t contains all possible pins that a silicon GPIO can have. It it correct make the id start
                 from 0 rather than 1, as usual in HAL, because silicon vendors make it start from 0.
  **/    
-// typedef enum 
-// {
-//     hal_gpio_pin0 = 0,
-//     hal_gpio_pin1,
-//     hal_gpio_pin2,
-//     hal_gpio_pin3,
-//     hal_gpio_pin4,
-//     hal_gpio_pin5,
-//     hal_gpio_pin6,
-//     hal_gpio_pin7,
-//     hal_gpio_pin8,
-//     hal_gpio_pin9,
-//     hal_gpio_pin10,  
-//     hal_gpio_pin11,
-//     hal_gpio_pin12,
-//     hal_gpio_pin13,
-//     hal_gpio_pin14,
-//     hal_gpio_pin15,
-//     hal_gpio_pinNONE = hal_NA08     /**< use when no pin can be specified. it does not count in hal_gpio_pinss_number */   
-// } hal_gpio_pin_t;   
-
 typedef enum 
 {
     hal_gpio_pin0       = 0x0001 << 0,
@@ -117,6 +96,7 @@ typedef enum
     hal_gpio_pin13      = 0x0001 << 13,
     hal_gpio_pin14      = 0x0001 << 14,
     hal_gpio_pin15      = 0x0001 << 15,
+    hal_gpio_pinALL     = 0xffff,
     hal_gpio_pinNONE    = 0x0000     /**< use when no pin can be specified. it does not count in hal_gpio_pinss_number */   
 } hal_gpio_pin_t; 
 
@@ -171,40 +151,23 @@ typedef enum
 } hal_gpio_val_t; 
  
 
-/** @typedef    typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t 
-    @brief      hal_gpio_altcfg_t is an opaque struct, which is defined in the hal_gpio_hid.h file. it depends on a 
-                specific HAL_USE_CPU_FAM_xxx family of CPUs, and for such a reason it is not made visible in the public API.
-    @details    It contains the configuration needs for a gpio which are specific of the chosen MPU. It is mainly used by 
-                internal modules of hal. An example of its use is when we need to configure the ETH_RMII_TX_EN pin of 
-                hal_eth in alternate function push-pull at 50MHz.
- **/
-typedef struct hal_gpio_hid_altcfg_t hal_gpio_altcfg_t;
-
-
 /** @typedef    typedef enum hal_gpio_cfg_t 
     @brief      hal_gpio_cfg_t contains the configuration for a gpio. it can be a normal input or output or even an alternate
-                function. in this latter case, we use altcfg if .dir has value hal_gpio_dirALT.
+                function. in this latter case, we use altcfg.
  **/
 typedef struct 
 {
     hal_gpio_dir_t      dir;
     hal_gpio_speed_t    speed;
-    hal_gpio_altcfg_t*  altcfg;
+    void*               altcfg;
 } hal_gpio_cfg_t;
 
 
 
 /** @typedef    typedef enum hal_gpio_map_t 
-    @brief      hal_gpio_map_t contains the mapping of gpio with dir and speed and it config.
+    @brief      hal_gpio_map_t contains the mapping of gpio with dir and speed and its alternate config.
                 It is used in mapping a peripheral into a given gpio
  **/
-// typedef struct 
-// {
-//     hal_gpio_t          gpio;
-//     hal_gpio_cfg_t      config;
-// } hal_gpio_map_t;
-
-
 typedef struct 
 {
     hal_gpio_t          gpio;
