@@ -33,7 +33,8 @@
 // - modules to be built ----------------------------------------------------------------------------------------------
 
 //#define     HAL_BUILD_ONLYCORE
-//#define     HAL_BUILD_ONLYBLINKY
+#undef      HAL_BUILD_ONLYCORE
+
 
 
 // -- core: these values must be always defined
@@ -51,55 +52,37 @@
 #define     HAL_USE_CPU_NAM_STM32F407
 
 // -- the utilities, mpu peripherals, devices, chips, and external boards are used only if the build is not forced to core only 
-#ifndef HAL_BUILD_ONLYCORE 
 
-// -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
-//#define     HAL_USE_UTILITY_BITS
-//#define     HAL_USE_UTILITY_CRC07
-//#define     HAL_USE_UTILITY_CRC16
-//#define     HAL_USE_UTILITY_CRC32
-//#define     HAL_USE_UTILITY_FIFO
+#if     defined(HAL_BUILD_ONLYCORE)
+// -- nothing else to build
+#elif   !defined(HAL_BUILD_ONLYCORE) 
 
 // -- mpu peripherals: define what you need to use (beware of cross dependencies)
-#define     HAL_USE_PERIPH_CAN
-#undef     HAL_USE_PERIPH_CRC
-#undef     HAL_USE_PERIPH_DMA
-#define     HAL_USE_PERIPH_ETH
-#define     HAL_USE_PERIPH_GPIO
-#define     HAL_USE_PERIPH_I2C
-#undef     HAL_USE_PERIPH_SPI
-#define     HAL_USE_PERIPH_SPI_MINIMAL
-#define     HAL_USE_PERIPH_TIMER
-#define     HAL_USE_PERIPH_TRACE
-#define     HAL_USE_PERIPH_UNIQUEID
-#define     HAL_USE_PERIPH_WATCHDOG
+#define     HAL_USE_CAN
+#define     HAL_USE_ETH
+#define     HAL_USE_GPIO
+#define     HAL_USE_I2C
+#define     HAL_USE_SPI
+#define     HAL_USE_SPI_DMA
+#define     HAL_USE_TIMER
+#define     HAL_USE_TRACE
+#define     HAL_USE_UNIQUEID
+#define     HAL_USE_WATCHDOG
 
-// -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
-#undef  HAL_USE_DEVICE_ACCELEROMETER
-#define     HAL_USE_DEVICE_CANTRANSCEIVER
-#undef  HAL_USE_DEVICE_DISPLAY  
-#define     HAL_USE_DEVICE_EEPROM
-#define  HAL_USE_DEVICE_ENCODER
-#undef HAL_USE_DEVICE_ENCODER_FAKE
-#define     HAL_USE_DEVICE_ETHTRANSCEIVER
-#undef  HAL_USE_DEVICE_GYROSCOPE
-#define     HAL_USE_DEVICE_LED
-#define     HAL_USE_DEVICE_MUX
-#define HAL_USE_DEVICE_SWITCH
-#undef  HAL_USE_DEVICE_TERMOMETER
+// -- devices: define what you need to use (beware of cross dependencies)
+#define  HAL_USE_ACCELEROMETER
+#define     HAL_USE_CANTRANSCEIVER
+#define     HAL_USE_EEPROM
+#define     HAL_USE_ENCODER
+#define     HAL_USE_ETHTRANSCEIVER
+#define  HAL_USE_GYROSCOPE
+#define     HAL_USE_LED
+#define     HAL_USE_MUX
+#define     HAL_USE_SWITCH
+#define  HAL_USE_TERMOMETER
 
 
-// -- chips: define what you need to use
-//#undef     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-#undef     HAL_USE_CHIP_ST_L3G4200D
-#undef     HAL_USE_CHIP_ST_LIS3DH
-//#undef  HAL_USE_CHIP_MICREL_KS8893
-//#define     HAL_USE_CHIP_XX_EEPROM
-
-// -- external boards: define what you need to use
-#undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
-
-#endif//HAL_BUILD_ONLYCORE 
+#endif//!defined(HAL_BUILD_ONLYCORE)  
 
 
 // - exceptions -------------------------------------------------------------------------------------------------------
