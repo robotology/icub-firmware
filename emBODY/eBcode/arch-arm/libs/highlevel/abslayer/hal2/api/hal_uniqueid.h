@@ -51,6 +51,14 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+typedef enum
+{
+    hal_uniqueid_id64bit        = 0,
+    hal_uniqueid_macaddr        = 1
+} hal_uniqueid_id_t;
+
+enum { hal_uniqueid_ids_num = 2 };
+
 
 /** @typedef    typedef uint64_t hal_uniqueid_id64bit_t
     @brief      expresses a ID of 64 bits which is unique, i.e., it is different in every micro-processor-unit.
