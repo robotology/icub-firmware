@@ -78,10 +78,14 @@ typedef enum
     hal_timer9  = 8,
     hal_timer10 = 9,
     hal_timer11 = 10,
-    hal_timer12 = 11
+    hal_timer12 = 11,
+    hal_timer13 = 12,
+    hal_timer14 = 13,
+    hal_timer15 = 14,
+    hal_timer16 = 15
 } hal_timer_t;
 
-enum { hal_timers_number = 12 };
+enum { hal_timers_number = 16 };
 
 
 /** @typedef    typedef enum hal_timer_status_t 
