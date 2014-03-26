@@ -40,8 +40,9 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
+
 #include "hal_base.h"
-#include "hal_eth.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -60,6 +61,20 @@ typedef enum
 enum { hal_ethtransceivers_number = 1 };
 
 
+/** @typedef    typedef enum hal_ethtransceiver_phy_t 
+    @brief      contains the id of the eth phy transceiver
+ **/
+typedef enum  
+{ 
+    hal_ethtransceiver_phy0 = 0,            /**<  */
+    hal_ethtransceiver_phy1 = 1,            /**<  */
+    hal_ethtransceiver_phy2 = 2,            /**<  */
+} hal_ethtransceiver_phy_t; 
+
+enum { hal_ethtransceiver_phys_number = 3 };
+
+
+
 /** @typedef    typedef struct hal_ethtransceiver_cfg_t;
     @brief      contains configuration data of ethtransceiver.
  **/
@@ -68,6 +83,48 @@ typedef struct
     uint8_t dummy;          /**< dummy...     */
 } hal_ethtransceiver_cfg_t;
 
+
+typedef enum
+{
+    hal_ethtransceiver_phymode_auto                 = 0,
+    hal_ethtransceiver_phymode_halfduplex10mbps     = 1,
+    hal_ethtransceiver_phymode_halfduplex100mbps    = 2,
+    hal_ethtransceiver_phymode_fullduplex10mbps     = 3,
+    hal_ethtransceiver_phymode_fullduplex100mbps    = 4,
+    hal_ethtransceiver_phymode_none                 = 255
+} hal_ethtransceiver_phymode_t;
+
+
+// added for diagnostics support for ethernet
+typedef struct
+{
+    uint32_t linkisup       :1;
+    uint32_t autoNeg_done   :1;
+    uint32_t linkisgood     :1;
+    uint32_t linkspeed      :1;     // 1 -> 100Mb, 0 -> 10Mb
+    uint32_t linkduplex     :1;     // 1 -> full,  0 -> half
+    uint32_t dummy          :27;
+} hal_ethtransceiver_phystatus_t;
+
+
+typedef enum
+{
+    hal_ethtransceiver_phyerror_rxCrc           = 0x07,
+    hal_ethtransceiver_phyerror_rxUnicast       = 0x0D,
+    hal_ethtransceiver_phyerror_rx64Octets      = 0x0E,
+    hal_ethtransceiver_phyerror_txUnicast       = 0x1A
+} hal_ethtransceiver_phyerror_t;
+
+typedef struct
+{
+    uint32_t value;
+    uint32_t counteroverflow    :1;
+    uint32_t validvalue         :1;
+    uint32_t dummy              :30;
+} hal_ethtransceiver_phyerrorinfo_t;
+
+
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -75,6 +132,9 @@ extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+extern void hal_ethtransceiver_prepare_hl_ethtrans_map(void);
+
 
 /** @fn			extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
     @brief  	This function initializes the ethtransceiver attached to the MPU
@@ -86,7 +146,7 @@ extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .
 extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg);
 
 
-extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t *usedmiiphymode);
+extern hal_result_t hal_ethtransceiver_config(hal_ethtransceiver_phymode_t *usedmiiphymode);
 
 
 /** @fn			extern hal_bool_t hal_ethtransceiver_initted_is(void)
@@ -94,6 +154,31 @@ extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t *usedmiiphymode)
     @return 	hal_true or hal_false.
   */
 extern hal_bool_t hal_ethtransceiver_initted_is(void);
+
+
+
+extern hal_result_t hal_ethtransceiver_phy_numberof(uint8_t *num);
+
+
+/** @fn         extern hal_result_t hal_ethtransceiver_phy_linkupmask(uint8_t *mask)
+    @brief      checks if physical links are up. In output mask indicates each link status: 
+                if bit in pos x values 1 then phy num x is up, else is down. phy num starts to count from 0.
+    @return     if mask is NULL it returns hal_res_NOK_nullpointer else hal_res_OK. If the feature is
+                not supported it returns hal_res_NOK_generic.
+ **/
+extern hal_result_t hal_ethtransceiver_phy_linkupmask(uint8_t *mask);
+
+
+
+extern hal_result_t hal_ethtransceiver_phy_status(hal_ethtransceiver_phystatus_t *array, uint8_t sizeofarray);
+
+
+
+/** @fn         extern hal_result_t hal_ethtransceiver_phy_errorinfo(uint8_t phynum, hal_ethtransceiver_phyerror_t error, hal_ethtransceiver_phyerrorinfo_t *result)
+    @brief      in output @result contains info about error of type @errortype on physical link @phynum
+    @return     hal_res_OK or hal_res_NOK_...
+ **/
+extern hal_result_t hal_ethtransceiver_phy_errorinfo(uint8_t phynum, hal_ethtransceiver_phyerror_t error, hal_ethtransceiver_phyerrorinfo_t *result);
 
 /** @}            
     end of group arm_hal_ethtransceiver  
