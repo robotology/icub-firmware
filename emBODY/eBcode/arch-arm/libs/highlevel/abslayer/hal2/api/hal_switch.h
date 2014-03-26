@@ -41,24 +41,13 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 #include "hal_base.h"
-#include "hal_eth.h"
+#include "hal_ethtransceiver.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-
-
-/** @typedef    typedef enum hal_switch_t 
-    @brief      contains ids of every possible eth switch.
- **/ 
-typedef enum  
-{ 
-    hal_switch1         = 0             /**< the only one */
-} hal_switch_t;
-
-enum { hal_switches_number = 1 };
 
 
 /** @typedef    typedef struct hal_switch_cfg_t;
@@ -87,7 +76,7 @@ extern const hal_switch_cfg_t hal_switch_cfg_default;   // = { .dummy = 0};
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg);
 
 
-extern hal_result_t hal_switch_configure(hal_eth_phymode_t *usedmiiphymode);
+extern hal_result_t hal_switch_configure(hal_ethtransceiver_phymode_t *usedmiiphymode);
 
 
 /** @fn			extern hal_bool_t hal_switch_initted_is(void)
