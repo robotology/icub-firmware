@@ -165,34 +165,60 @@ typedef uint64_t    hal_nanotime_t;
 
 
 /** @typedef    typedef hal_result_t (*hal_res_fp_void_t) (void)
-    @brief      hal_res_fp_void_t is a pointer to a function which returns a hal_result_t and has a void argument.
+    @brief      is a pointer to a function which returns a hal_result_t and has a void argument.
  **/
 typedef hal_result_t (*hal_res_fp_void_t) (void);
 
 
-/** @typedef    typedef hal_result_t (*hal_res_fp_voidp_t) (void)
-    @brief      hal_res_fp_voidp_t is a pointer to a function which returns a hal_result_t and has a void pointer argument.
+/** @typedef    typedef hal_result_t (*hal_res_fp_voidp_t) (void*)
+    @brief      is a pointer to a function which returns a hal_result_t and has a void pointer argument.
  **/
 typedef hal_result_t (*hal_res_fp_voidp_t) (void* p);
 
 
+/** @typedef    typedef hal_result_t (*hal_res_fp_voidp_voidp_t) (void* p, void* q)
+    @brief      is a pointer to a function which returns a hal_result_t and has two void pointer arguments.
+ **/
+typedef hal_result_t (*hal_res_fp_voidp_voidp_t) (void* p, void* q);
+
+/** @typedef    typedef hal_result_t (*hal_res_fp_voidp_uint8_t) (void* p, uint8_t n)
+    @brief      is a pointer to a function which returns a hal_result_t and an void pointer argument and a size.
+ **/
+typedef hal_result_t (*hal_res_fp_voidp_uint8_t) (void* p, uint8_t n);
+
+
+/** @typedef    typedef hal_result_t (*hal_res_fp_uint8_uint32_voidp_t) (uint8_t n, uint32_t u, void *p)
+    @brief      is a pointer to a function which returns a hal_result_t and an void pointer argument and a size.
+ **/
+typedef hal_result_t (*hal_res_fp_uint8_uint32_voidp_t) (uint8_t n, uint32_t u, void *p);
+
+
+
+/** @typedef    typedef hal_result_t (*hal_res_fp_int32_voidp_t) (int32_t, void*)
+    @brief      is a pointer to a function which returns a hal_result_t and has a void pointer argument.
+ **/
+typedef hal_result_t (*hal_res_fp_int32_voidp_t) (int32_t, void* p);
+
+
 /** @typedef    typedef void (*hal_void_fp_void_t) (void)
-    @brief      hal_void_fp_void_t is a pointer to a function which returns void and has a void argument.
+    @brief      is a pointer to a function which returns void and has a void argument.
  **/
 typedef void (*hal_void_fp_void_t) (void);
+
 
 typedef void* (*hal_voidp_fp_uint32_t) (uint32_t);
 
 typedef void (*hal_void_fp_voidp_t) (void*);
 
+
 /** @typedef    typedef uint8_t (*hal_uint8_fp_void_t) (void)
-    @brief      hal_uint8_fp_void_t is a pointer to a function which returns uint8_t and has a void argument.
+    @brief      is a pointer to a function which returns uint8_t and has a void argument.
  **/
 typedef uint8_t (*hal_uint8_fp_void_t) (void);
 
 
 /** @typedef    typedef void (*hal_callback_t) (void* p)
-    @brief      hal_callback_t is a pointer to a callback function which returns void and has a void pointer argument.
+    @brief      is a pointer to a callback function which returns void and has a void pointer argument.
  **/
 typedef void (*hal_callback_t) (void* p);
 
