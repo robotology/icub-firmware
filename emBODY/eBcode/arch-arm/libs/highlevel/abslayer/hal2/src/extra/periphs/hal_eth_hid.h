@@ -89,8 +89,10 @@ typedef struct
 
 typedef struct
 {
-    hal_bool_t          supported;      /**< hal_true if supported */
-    hal_eth_gpiomap_t   gpiomap;        /**< the gpio mapping */
+    hal_bool_t          supported;          /**< hal_true if supported */
+    uint8_t             rxdmafifocapacity;  /**< if non hal_NA08 use them, otherwise use the ones from hal_eth_cfg_t param of hal_eth_init() */
+    uint8_t             txdmafifocapacity;  /**< if non hal_NA08 use them, otherwise use the ones from hal_eth_cfg_t param of hal_eth_init() */
+    hal_eth_gpiomap_t   gpiomap;            /**< the gpio mapping */
 } hal_eth_hid_brdcfg_t;
 
 
@@ -101,23 +103,11 @@ typedef struct
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
+extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig;
+
 extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-
-
-// extern void hal_eth_hid_rmii_prepare(void);
-// extern void hal_eth_hid_rmii_refclock_init(void);
-// extern void hal_eth_hid_rmii_tx_init(void);
-// extern void hal_eth_hid_rmii_rx_init(void);
-
-//extern void hal_eth_hid_microcontrollerclockoutput_init(void);
-
-
-// extern void hal_eth_hid_smi_init(void);
-// extern uint16_t hal_eth_hid_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
-// extern void hal_eth_hid_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
 
 #endif  // include guard

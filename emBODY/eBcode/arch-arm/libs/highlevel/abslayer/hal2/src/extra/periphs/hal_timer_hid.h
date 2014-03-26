@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_PERIPH_UNIQUEID_HID_H_
-#define _HAL_PERIPH_UNIQUEID_HID_H_
+#ifndef _HAL_TIMER_HID_H_
+#define _HAL_TIMER_HID_H_
 
 
-/* @file       hal_periph_uniqueid_hid.h
-    @brief      This header file implements hidden interface to a uniqueid
+/* @file       hal_timer_hid.h
+    @brief      This header file implements hidden interface to a timer
     @author     marco.accame@iit.it
-    @date       02/27/2013
+    @date       09/12/2011
  **/
 
 
@@ -35,7 +35,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_uniqueid.h"
+#include "hal_timer.h"
 
 
 
@@ -45,22 +45,14 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef enum
-{
-    hal_uniqueid_id64bit        = 0,
-    hal_uniqueid_macaddr        = 1
-} hal_uniqueid_hid_id_t;
-
-enum { hal_uniqueid_hid_ids_num = 2 };
-
 typedef struct
 {
-    uint8_t                 supported_mask;
-    uint32_t                macoui;
-} hal_uniqueid_hid_brdcfg_t;
+    uint16_t            supported_mask;
+} hal_timer_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

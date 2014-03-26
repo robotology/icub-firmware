@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       hal_trace.c
-	@brief      This file implements internal implementation of the hal trace module.
+/* @file       hal_timer.c
+	@brief      This file implements internal implementation of the hal timer module.
 	@author     marco.accame@iit.it
     @date       09/12/2011
 **/
@@ -25,65 +25,65 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_TRACE
+#ifdef HAL_USE_TIMER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "string.h"
 #include "stdlib.h"
-
-#include "hal_middleware_interface.h"
-#include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
+#include "hal_brdcfg.h"
+#include "hl_bits.h" 
+#include "hal_heap.h"
+
+#include "hl_timer.h"
+
+#include "hal_middleware_interface.h" 
+
 
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_trace.h"
+#include "hal_timer.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_periph_trace_hid.h"
+#include "hal_timer_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#define HAL_timer_id2index(t)       ((uint8_t)((t)))
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
-
-const hal_trace_cfg_t hal_trace_cfg_default =
-{
-    .dummy  = 0
-};
-
+// it must be defined in order to use hl_timer.
+extern const hl_timer_mapping_t* hl_timer_map = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-typedef struct
-{
-    uint8_t         nothing;     
-} hal_trace_theinternals_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_trace_supported_is(void);
+static hal_bool_t s_hal_timer_supported_is(hal_timer_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -91,82 +91,180 @@ static hal_bool_t s_hal_trace_supported_is(void);
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of static variables
+// - definition (and initialisation) of variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// static hal_trace_theinternals_t s_hal_trace_theinternals =
-// {
-//     .nothing = 0
-// };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
+extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error)
 {
-    
-    if(hal_true != s_hal_trace_supported_is())
+    if(hal_false == s_hal_timer_supported_is(id))
     {
-        return(hal_res_NOK_unsupported);
+        return(hal_res_NOK_generic);
     }
-    
-       
+
     if(NULL == cfg)
     {
-        cfg = &hal_trace_cfg_default;
+        return(hal_res_NOK_nullpointer);
+    }
+       
+
+    // init the hl_timer
+    #warning --> the hl_timer_map as well as the other hl_xxx_maps could be initted in a common init funtion at startup ....
+    // we must initialise hl_timer_map w/ suited values. 
+    // we have built hal_brdcfg_timer__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_timer_mapping_t) == sizeof(hal_timer_hid_brdcfg_t));   
+    hl_timer_map = (hl_timer_mapping_t*)&hal_brdcfg_timer__theconfig;  
+    // now we convert the cfg
+    hl_timer_cfg_t hlcfg;
+    hlcfg.countdown = cfg->countdown;
+    hlcfg.mode      = (hal_timer_mode_oneshot == cfg->mode) ? (hl_timer_mode_oneshot) : (hl_timer_mode_periodic);
+    hlcfg.priority  = (hl_irqpriority_t)cfg->priority;
+    hlcfg.callback  = cfg->callback_on_exp;
+    hlcfg.arg       = cfg->arg;
+    hl_result_t r = hl_timer_init((hl_timer_t)id, &hlcfg, error);
+    if(hl_res_OK != r)
+    {
+        return(hal_res_NOK_generic);
     }
 
-    
-    ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
-    
+
+    return((hal_result_t)r);
+}
+
+
+extern hal_result_t hal_timer_start(hal_timer_t id)
+{
+    return((hal_result_t)hl_timer_start((hl_timer_t)id));
+}
+
+
+
+extern hal_result_t hal_timer_stop(hal_timer_t id)
+{
+    return((hal_result_t)hl_timer_stop((hl_timer_t)id));
+}
+
+
+#if 1
+    #warning --> hal_timer_countdown_set() not implemented
+#else
+extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_reltime_t countdown, hal_reltime_t *error)
+{                                                                           
+    hal_timer_cfg_t *curcfg = NULL;
+    hal_timer_cfg_t newcfg;
+    uint8_t wasrunning = 0;
+
+    if(hal_false == s_hal_timer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    // if running stop.
+    if(hal_timer_status_running == hal_timer_status_get(id))
+    {
+        wasrunning = 1;
+    }
+
+    // computes the values to be put in registers
+    curcfg = &s_hal_timer_theinternals.items[HAL_timer_id2index(id)]->config;
+    memcpy(&newcfg, curcfg, sizeof(hal_timer_cfg_t));
+    newcfg.countdown = countdown;
+
+    hal_timer_init(id, &newcfg, error);
+
+    if(1 == wasrunning)
+    {
+        hal_timer_start(id);
+    }
+
     return(hal_res_OK);
+  
+}
+#endif  
+
+#if 1
+    #warning --> hal_timer_priority_set() not implemented
+#else
+extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priority_t prio)
+{
+    if(hal_false == s_hal_timer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    // do something 
+
+    return(hal_res_NOK_unsupported);
+}
+#endif
+
+
+#if 1
+    #warning --> hal_timer_interrupt_enable() not implemented
+#else
+extern hal_result_t hal_timer_interrupt_enable(hal_timer_t id)
+{
+    if(hal_false == s_hal_timer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    // do something 
+
+    return(hal_res_NOK_unsupported);
+}
+#endif
+
+
+#if 1
+    #warning --> hal_timer_interrupt_disable() not implemented
+#else
+extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id)
+{
+    if(hal_false == s_hal_timer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    // do something 
+
+    return(hal_res_NOK_unsupported);
+}
+#endif
+
+
+extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *remaining_time)
+{
+    return((hal_result_t)hl_timer_remainingtime_get((hl_timer_t)id, remaining_time));
 }
 
 
-extern int hal_trace_getchar(void) 
+#if 1
+    #warning --> hal_timer_offset_write() not implemented
+#else
+extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset)
 {
-    if(hal_true != s_hal_trace_supported_is())
+    if(hal_false == s_hal_timer_initted_is(id))
     {
-        return(-1);
+        return(hal_res_NOK_generic);
     }
 
-    while(ITM_CheckChar() != 1);
-    return(ITM_ReceiveChar());
-}    
+    // do something 
 
-
-extern int hal_trace_putchar(int ch) 
-{
-    if(hal_true != s_hal_trace_supported_is())
-    {
-        return(-1);
-    }
-    return(ITM_SendChar(ch));    
+    // not supported
+    return(hal_res_NOK_unsupported);
 }
+#endif
 
-extern int hal_trace_puts(const char * str) 
+extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
 {
-    if(hal_true != s_hal_trace_supported_is())
-    {
-        return(0);
-    }
-    
-    uint32_t ch;
-    int16_t num = 0;
-    while('\0' != (ch = *str))
-    {
-        ITM_SendChar(ch);
-        str++;
-        num++;
-    }
-     
-    ITM_SendChar('\n');
-    return(++num);    
+    return((hal_timer_status_t)hl_timer_status_get((hl_timer_t)id));
 }
 
 
@@ -176,9 +274,7 @@ extern int hal_trace_puts(const char * str)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-
 // ---- isr of the module: begin ----
-// empty-section
 // ---- isr of the module: end ------
 
 
@@ -187,14 +283,13 @@ extern int hal_trace_puts(const char * str)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_trace_supported_is(void)
+static hal_bool_t s_hal_timer_supported_is(hal_timer_t id)
 {
-    return(hal_brdcfg_trace__theconfig.supported); 
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
 }
 
 
-
-#endif//HAL_USE_PERIPH_TRACE
+#endif//HAL_USE_TIMER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

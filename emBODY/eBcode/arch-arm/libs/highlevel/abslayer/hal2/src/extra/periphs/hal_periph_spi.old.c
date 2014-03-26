@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_SPI
+#ifdef HAL_USE_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -1518,7 +1518,7 @@ static hal_result_t s_hal_spi_isr_rxbyte_put(hal_spi_internals_t* spixint, uint8
     return(hal_res_OK);  
 }
 
-#endif//HAL_USE_PERIPH_SPI
+#endif//HAL_USE_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

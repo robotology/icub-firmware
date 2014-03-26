@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_CAN
+#ifdef HAL_USE_CAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -1448,7 +1448,7 @@ static void s_hal_can_isr_err_enable(hal_can_t id)
 }
 
 
-#endif//HAL_USE_PERIPH_CAN
+#endif//HAL_USE_CAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

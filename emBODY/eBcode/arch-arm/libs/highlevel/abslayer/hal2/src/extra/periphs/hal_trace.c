@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -16,76 +16,59 @@
  * Public License for more details
 */
 
-/* @file       hal_uniqueid.c
-	@brief      This file implements internal implementation of the hal uniqueid module.
+/* @file       hal_trace.c
+	@brief      This file implements internal implementation of the hal trace module.
 	@author     marco.accame@iit.it
-    @date       02/27/2013
+    @date       09/12/2011
 **/
-
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_UNIQUEID
-
-
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
-#warning WIP --> verify that the uniqueid peripheral is the same in stm32f1 and stm32f4
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif 
+#ifdef HAL_USE_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "string.h"
 #include "stdlib.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
-#include "hl_bits.h" 
 
-#include "hal_middleware_interface.h" 
+#include "hal_middleware_interface.h"
+#include "hal_brdcfg.h"
+#include "hal_base_hid.h" 
+
+#include "hl_sys.h" 
 
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_uniqueid.h"
-
+#include "hal_trace.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_periph_uniqueid_hid.h"
+#include "hal_trace_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_uiniqueid2index(t)              ((uint8_t)((t)))
 
-
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-    #define HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress 0x1FFFF7E8
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
-    #define HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress 0x1FFF7A10
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
+extern volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
+
+const hal_trace_cfg_t hal_trace_cfg_default =
 {
-    .dummy                  = 0
+    .dummy  = 0
 };
 
 
@@ -93,16 +76,16 @@ const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-typedef struct
-{
-    uint8_t         nothing;     
-} hal_uiniqueid_theinternals_t;
+//typedef struct
+//{
+//    uint8_t         nothing;     
+//} hal_trace_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid);
+static hal_bool_t s_hal_trace_supported_is(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,11 +93,13 @@ static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// static hal_uiniqueid_theinternals_t s_hal_uniqueid_theinternals =
+// static hal_trace_theinternals_t s_hal_trace_theinternals =
 // {
 //     .nothing = 0
 // };
@@ -124,71 +109,57 @@ static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_uniqueid_init(const hal_uniqueid_cfg_t *cfg)
+extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
 {
-    hal_result_t res = hal_res_NOK_generic;
-
-//    if(hal_false == s_hal_uniqueid_supported_is(uniqueid))
-//    {
-//        return(hal_res_NOK_unsupported);
-//    }
-
-     
+    
+    if(hal_true != s_hal_trace_supported_is())
+    {
+        return(hal_res_NOK_unsupported);
+    }
+    
+       
 //    if(NULL == cfg)
 //    {
-//        cfg = &hal_uniqueid_cfg_default;
+//        cfg = &hal_trace_cfg_default;
 //    }
 
     
-    // nothing to configure
+    ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
     
-    res = hal_res_OK;
-   
-//    if(hal_res_OK == res)
-//    {
-//        s_hal_uniqueid_initted_set(uniqueid);
-//    }
-
-    return(res);
+    return(hal_res_OK);
 }
 
+#warning --> use a HAL_BEH_REMOVE_RUNTIME_PARAM_CHECK which ...
 
-extern hal_uniqueid_id64bit_t hal_uniqueid_id64bit_get(void)
+extern int hal_trace_getchar(void) 
 {
-     if(hal_false == s_hal_uniqueid_supported_is(hal_uniqueid_id64bit))
+    if(hal_true != s_hal_trace_supported_is())
     {
-        return(hal_NA64);
-    } 
-    
-    uint64_t val = *((const uint64_t *) (HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress));
-    val += *((const uint32_t *) (HAL_MPU_UNIQUEID_UniqueDeviceID96_baseaddress+8));
-    if((0xFFFFFFFFFFFFFFFF+0xFFFFFFFF) == val)
-    {   // 0xFFFFFFFE (=0xFFFFFFFFFFFFFFFF+0xFFFFFFFF) is the result when all the 96 bits have value 1 (some old versions of stm32f107 have such a hw bug)
-        return(hal_NA64);
+        return(-1);
     }
-    else
-    {
-        return(val);
-    }    
 
+    while(ITM_CheckChar() != 1);
+    return(ITM_ReceiveChar());
+}    
+
+
+extern int hal_trace_putchar(int ch) 
+{
+    if(hal_true != s_hal_trace_supported_is())
+    {
+        return(-1);
+    }
+    return(ITM_SendChar(ch));    
 }
 
-
-extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
+extern int hal_trace_puts(const char * str) 
 {
-     if(hal_false == s_hal_uniqueid_supported_is(hal_uniqueid_macaddr))
+    if(hal_true != s_hal_trace_supported_is())
     {
-        return(hal_NA64);
-    } 
+        return(0);
+    }
     
-
-#if defined(HAL_BOARD_EMS004)
-    #warning WIP --> must define the mac retrieval for ems004
-    return(hal_NA64);
-#else
-    return(hal_NA64);
-#endif    
-
+    return(hl_sys_itm_puts(str));   
 }
 
 
@@ -197,6 +168,7 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
+
 
 // ---- isr of the module: begin ----
 // empty-section
@@ -208,16 +180,14 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
+static hal_bool_t s_hal_trace_supported_is(void)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
+    return(hal_brdcfg_trace__theconfig.supported); 
 }
 
 
 
-
-
-#endif//HAL_USE_PERIPH_UNIQUEID
+#endif//HAL_USE_TRACE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

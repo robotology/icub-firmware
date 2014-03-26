@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_ETH
+#ifdef HAL_USE_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -35,14 +35,13 @@
 #include "stdlib.h"
 #include "string.h"
 
+#include "hl_common.h" 
 #include "hl_eth.h" 
 
 #include "hal_middleware_interface.h"
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 #include "hal_ethtransceiver.h"
-
-#include "hal_periph_gpio_hid.h"
 
 
 #include "hl_bits.h" 
@@ -67,7 +66,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_periph_eth_hid.h" 
+#include "hal_eth_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -167,13 +166,31 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     
     if(NULL == intitem)
     {
-        intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)] = hal_heap_new(sizeof(hal_eth_internal_item_t));
-    
+        intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)] = hal_heap_new(sizeof(hal_eth_internal_item_t));    
     }
 
     #warning WIP --> make ipal use a cfg w/ capacityoftxfifoofframes and capacityofrxfifoofframes
-    uint8_t capacityoftxfifoofframes = hal_eth_capacityoftxfifoofframes;   // 2 cfg->capacityoftxfifoofframes
-    uint8_t capacityofrxfifoofframes = hal_eth_capacityofrxfifoofframes; // 2;   // cfg->capacityofrxfifoofframes
+    uint8_t capacityoftxfifoofframes = hal_brdcfg_eth__theconfig.txdmafifocapacity;    // in hal1 was: cfg->capacityoftxfifoofframes
+    uint8_t capacityofrxfifoofframes = hal_brdcfg_eth__theconfig.rxdmafifocapacity;    // in hal1 was: cfg->capacityofrxfifoofframes
+    
+    if(hal_NA08 == capacityoftxfifoofframes)
+    {
+        capacityoftxfifoofframes = cfg->capacityoftxfifoofframes;
+    }
+    if(hal_NA08 == capacityofrxfifoofframes)
+    {
+        capacityofrxfifoofframes = cfg->capacityofrxfifoofframes;
+    }    
+    if(0 == capacityoftxfifoofframes)
+    {
+        hal_base_on_warning("hal_eth_init() found txdmacapacity at 0. set it to 2"); 
+        capacityoftxfifoofframes = 2;
+    }
+    if(0 == capacityofrxfifoofframes)
+    {
+        hal_base_on_warning("hal_eth_init() found rxdmacapacity at 0. set it to 2");
+        capacityofrxfifoofframes = 2;
+    }      
     
     memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
     intitem->config.capacityoftxfifoofframes = capacityoftxfifoofframes;
@@ -181,12 +198,12 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     
     memcpy(&intitem->onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));    
 
-#warning --> for mcbstm32f400 i removed teh init of the transceiver in here SEE IF WE CAN KEEP IT >>>>>>>>>>   
     // initialise the eth transceiver.
     if(hal_res_OK != hal_ethtransceiver_init(NULL))
     {
-        hal_base_on_fatalerror(hal_fatalerror_generic, "hal_ethtransceiver_init() failed");
-    }
+       hal_base_on_fatalerror(hal_fatalerror_generic, "hal_ethtransceiver_init() failed");
+    }   
+
     
     intitem->hl_eth_config.macaddress                = intitem->config.macaddress;
     intitem->hl_eth_config.behaviour                 = hl_eth_beh_dmatxrx;
@@ -234,33 +251,10 @@ extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
 }
 
 
-extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num);
-extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num);
-extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
-
-extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num)
-{
-    return(hal_brdcfg_eth__check_links(linkst_mask, links_num));
-}
-
-
-extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
-{
-    return(hal_brdcfg_eth__get_links_status(link_list, links_num));
-}
-
-
-extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
-{
-    return(hal_brdcfg_eth__get_errors_info(phynum, errortype, result));
-}
-
-
 
 extern void hal_eth_smi_init(void)
 {
     hl_eth_smi_init();
-    #warning --> verify if smi is initted
 }
 
 extern uint16_t hal_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
@@ -273,6 +267,79 @@ extern void hal_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
 {
     hl_eth_smi_write(PHYaddr, REGaddr, value);
 }
+
+
+//extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num);
+//extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num);
+//extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
+
+// extern hal_result_t hal_eth_check_links(uint8_t *linkmask, uint8_t *numoflinks)
+// {
+//     return(hal_ethtransceiver_links_check(linkmask, numoflinks));
+// //    return(hal_brdcfg_eth__check_links(linkst_mask, links_num));
+// }
+
+
+// extern hal_result_t hal_eth_get_links_status(hal_ethtransceiver_phystatus_t* statusarray, uint8_t numoflinks)
+// {
+//     return(hal_ethtransceiver_links_get_status(linkmask, numoflinks));
+// //    return(hal_brdcfg_eth__get_links_status(statusarray, numoflinks));
+// }
+
+
+// extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+// {
+//     return(hal_brdcfg_eth__get_errors_info(phynum, errortype, result));
+// }
+
+
+
+extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num)
+{
+    hal_result_t res = hal_res_NOK_generic;
+    
+    if((NULL == linkst_mask) || (NULL == links_num))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    
+    // i get the number ... resuult is always res_OK if argument is not NULL.
+    res = hal_ethtransceiver_phy_numberof(links_num); 
+    
+    res = hal_ethtransceiver_phy_linkupmask(linkst_mask);
+    
+    return(res);
+}
+
+
+// must be sure that the layout of hal_eth_phy_status_t is equal to the layout of hal_ethtransceiver_phystatus_t
+// it is type definition
+hl_VERIFYproposition(xxx, sizeof(hal_eth_phy_status_t) == sizeof(hal_ethtransceiver_phystatus_t))
+
+extern hal_result_t hal_eth_get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num)
+{
+    hal_result_t res = hal_res_NOK_generic;    
+    res = hal_ethtransceiver_phy_status((hal_ethtransceiver_phystatus_t*)link_list, links_num);    
+    return(res);
+}   
+
+
+// must be sure that the layout of hal_eth_phy_errorsinfo_t is equal to the layout of hal_ethtransceiver_phyerrorinfo_t
+// also check about values of hal_eth_phy_errors_info_type_t and hal_ethtransceiver_phyerror_t
+// they are type definitions
+hl_VERIFYproposition(xxx, sizeof(hal_eth_phy_errorsinfo_t) == sizeof(hal_ethtransceiver_phyerrorinfo_t))
+hl_VERIFYproposition(xxx, rxCrcError == hal_ethtransceiver_phyerror_rxCrc)
+hl_VERIFYproposition(xxx, rxUnicast == hal_ethtransceiver_phyerror_rxUnicast)
+hl_VERIFYproposition(xxx, rx64Octets == hal_ethtransceiver_phyerror_rx64Octets)
+hl_VERIFYproposition(xxx, txUnicast == hal_ethtransceiver_phyerror_txUnicast)
+
+extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
+{
+    hal_result_t res = hal_res_NOK_generic;
+    res = hal_ethtransceiver_phy_errorinfo(phynum, (hal_ethtransceiver_phyerror_t)errortype, (hal_ethtransceiver_phyerrorinfo_t*)result);
+    return(res);
+    
+} 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -354,7 +421,7 @@ static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
 
 
 
-#endif//HAL_USE_PERIPH_ETH
+#endif//HAL_USE_ETH
 
 
 

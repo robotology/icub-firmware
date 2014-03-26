@@ -16,13 +16,14 @@
  * Public License for more details
 */
 
+
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_PERIPH_CAN_HID_H_
-#define _HAL_PERIPH_CAN_HID_H_
+#ifndef _HAL_GPIO_HID_H_
+#define _HAL_GPIO_HID_H_
 
 
-/* @file       hal_periph_can_hid.h
-    @brief      This header file implements hidden interface to hal eth. 
+/* @file       hal_gpio_hid.h
+    @brief      This header file implements hidden interface to hal gpio.
     @author     marco.accame@iit.it
     @date       09/12/2011
  **/
@@ -31,13 +32,16 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
-#include "hal_gpio.h"
-#include "hal_base_hid.h"
+
+#include "hal_middleware_interface.h"
+
+// to see HAL_USE_CPU_FAM_xxxx 
+#include "hal_brdcfg_modules.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_can.h"
+#include "hal_gpio.h"
 
 
 
@@ -47,23 +51,19 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
-{
-    hal_gpio_maP_t      rx;         /**< gpio map used for rx pin */
-    hal_gpio_maP_t      tx;         /**< gpio map used for tx pin */ 
-} hal_can_gpiomap_t;
 
 typedef struct
 {
-    uint8_t             supported_mask;             /**< bit in position hal_can_portx must be 1 if portx is supported */
-    hal_can_gpiomap_t   gpiomap[hal_cans_number];
-} hal_can_hid_brdcfg_t;
+    uint16_t supported_mask_byport[hal_gpio_ports_number];    /**< the bit in position J-th of supported_mask_byport[i] tells if port i and pin J is supported */
+} hal_gpio_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
+extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+
 
 
 

@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       hal_periph_can.c
+/* @file       hal_can.c
 	@brief      This file implements internal implementation of the hal can module in optimized way.
 	@author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       02/16/2012
@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_CAN
+#ifdef HAL_USE_CAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -39,8 +39,7 @@
 
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h" 
-#include "hal_periph_gpio_hid.h" 
-//#include "hal_utility_fifo.h"
+//#include "hal_periph_gpio_hid.h" 
 #include "hl_bits.h" 
 #include "hal_heap.h"
 #include "hal_cantransceiver.h"
@@ -60,7 +59,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_periph_can_hid.h" 
+#include "hal_can_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -382,7 +381,7 @@ static hal_boolval_t s_hal_can_initted_is(hal_can_t id)
 }
 
 
-#endif//HAL_USE_PERIPH_CAN
+#endif//HAL_USE_CAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

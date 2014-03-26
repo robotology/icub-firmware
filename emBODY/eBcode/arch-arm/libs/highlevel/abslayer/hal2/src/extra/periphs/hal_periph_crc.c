@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_CRC
+#ifdef HAL_USE_CRC
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -460,7 +460,7 @@ static uint32_t s_hal_crc07_sw_compute(hal_crc_internal_item_t *intitem, const v
 #endif    
 }
 
-#endif//HAL_USE_PERIPH_CRC
+#endif//HAL_USE_CRC
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -27,9 +27,9 @@
 #include "hal_brdcfg_modules.h"
 
 
-#ifdef HAL_USE_PERIPH_SPI_MINIMAL
+#ifdef HAL_USE_SPI
 
-#warning --> HAL_USE_PERIPH_SPI_MINIMAL supports only master mode, rx only, isr-mode, no dma, prescaler only, one frame at a time
+#warning --> HAL_USE_SPI supports only master mode, rx only, isr-mode, no dma, prescaler only, one frame at a time
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -39,12 +39,11 @@
 #include "string.h"
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h"
-#include "hal_periph_gpio_hid.h"
+
 
 
 
 #include "hl_bits.h"
-//#include "hal_utility_fifo.h"
 #include "hl_fifo.h"
 #include "hal_heap.h"
 #include "hl_spi.h"
@@ -61,7 +60,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_periph_spi_hid.h"
+#include "hal_spi_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,8 +70,6 @@
 #define HAL_spi_id2index(p)             ((uint8_t)(p))
 
 #define HAL_spi_id2stmSPI(p)            (s_hal_spi_stmSPImap[HAL_spi_id2index(p)])
-
-#undef HAL_MPU_SPI_DEBUG_MODE
 
 
 
@@ -139,8 +136,6 @@ static hal_bool_t s_hal_spi_is_speed_correct(int32_t speed);
 static hal_result_t s_hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes);
 
 
-//static hal_result_t s_hal_spi_timeoutexpired(void);
-
 static hl_spi_prescaler_t s_hal_spi_get_hl_prescaler(hal_spi_t id, const hal_spi_cfg_t* cfg);
 
 static void s_hal_spi_read_isr(hal_spi_t id);
@@ -157,15 +152,10 @@ static void s_hal_spi_periph_disable(hal_spi_t id);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
-static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
-#endif 
 
-//static const uint32_t s_hal_spi_timeout_flag = 0x00010000;
+static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
+
+
    
     
 // --------------------------------------------------------------------------------------------------------------------
@@ -192,6 +182,11 @@ extern hal_result_t hal_spi_init(const hal_spi_t id, const hal_spi_cfg_t *cfg)
     return(s_hal_spi_init(id, cfg));
 }
 
+extern hal_boolval_t hal_spi_initted_is(hal_spi_t id)
+{   
+    return(s_hal_spi_initted_is(id));
+}
+
 #if 0
 extern hal_result_t hal_spi_raw_master_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte)
 {
@@ -201,7 +196,7 @@ extern hal_result_t hal_spi_raw_master_writeread(hal_spi_t id, uint8_t byte, uin
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
     
     
-    if(hal_false == hal_spi_hid_initted_is(id))
+    if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -243,24 +238,6 @@ extern hal_result_t hal_spi_raw_master_writeread(hal_spi_t id, uint8_t byte, uin
 }
 #endif
 
-#if 0
-extern hal_result_t hal_spi_put(hal_spi_t id, uint8_t* txframe)
-{ 
-    if(hal_false == hal_spi_hid_initted_is(id))
-    {
-        return(hal_res_NOK_generic);
-    }
-       
-    if(NULL == txframe)
-    {
-        return(hal_res_NOK_nullpointer);
-    }
-    
-    return(hal_res_NOK_generic);
-    //return(s_hal_spi_put(id, txframe));
-}
-#endif
-
    
 extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
 {
@@ -268,7 +245,7 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
     uint8_t num2use = 1;
     
-    if(hal_false == hal_spi_hid_initted_is(id))
+    if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }  
@@ -291,9 +268,9 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
     memset(intitem->isrrxframe, 0, intitem->config.sizeofframe);
     intitem->isrrxcounter = 0;
     
-    s_hal_spi_rx_isr_enable(id);    // hal_SPI4ENCODER_IT_RX_ENA(SPIx);    // enable interrupt rx
+    s_hal_spi_rx_isr_enable(id);        // enable interrupt rx
 
-    s_hal_spi_periph_enable(id);      // hal_SPI4ENCODER_ENA(SPIx);	        // enable spi peripheral
+    s_hal_spi_periph_enable(id);        // enable spi peripheral
     
 	// in order to read data I have to write a dummy byte. the channel is configured in full duplex mode.
 	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
@@ -308,7 +285,7 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
 
 extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes)
 {
-    if(hal_false == hal_spi_hid_initted_is(id))
+    if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -325,7 +302,7 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
 
 extern hal_result_t hal_spi_stop(hal_spi_t id)
 {
-    if(hal_false == hal_spi_hid_initted_is(id))
+    if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -344,7 +321,7 @@ extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onfr
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
     
-    if(hal_false == hal_spi_hid_initted_is(id))
+    if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -383,10 +360,6 @@ void SPI3_IRQHandler(void)
 // ---- isr of the module: end ------
 
 
-extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id)
-{   
-    return(s_hal_spi_initted_is(id));
-}
 
 
 
@@ -395,15 +368,9 @@ extern hal_boolval_t hal_spi_hid_initted_is(hal_spi_t id)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// agisco sul bit SPE (posizione 6)
-//#define hal_SPI4ENCODER_ENA(SPIx)    	        ((SPIx)->CR1 |= 0x0040)	 
-// agisco sul bit SPE (posizione 6)
-//#define hal_SPI4ENCODER_DISA(SPIx)              ((SPIx)->CR1 &= 0xFFBF)	 
-
 static void s_hal_spi_periph_enable(hal_spi_t id) 
 {
-    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    //hal_SPI4ENCODER_ENA(SPIx);                                       
+    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);                                   
     SPI_Cmd(SPIx, ENABLE);
 }
 
@@ -411,8 +378,7 @@ static void s_hal_spi_periph_enable(hal_spi_t id)
 static void s_hal_spi_periph_disable(hal_spi_t id) 
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);    // wait until it's free	
-    //hal_SPI4ENCODER_DISA(SPIx);                                      
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);    // wait until it's free	                                   
     SPI_Cmd(SPIx, DISABLE);
 }
 
@@ -499,7 +465,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         return(hal_res_NOK_unsupported);
     }
 
-    if(hal_true == hal_spi_hid_initted_is(id))
+    if(hal_true == hal_spi_initted_is(id))
     {
         return(hal_res_OK);
     }   
@@ -577,7 +543,6 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
     hl_spi_enable((hl_spi_t)id);            // the SPI_Init(), but not the DMA ...
 
-    #warning --> see in hal1 if there is anything about isr of spi 
     
     // --------------------------------------------------------------------------------------
     // init the spi internals data structure
@@ -651,79 +616,7 @@ static hl_spi_prescaler_t s_hal_spi_get_hl_prescaler(hal_spi_t id, const hal_spi
     hl_spi_prescaler_t hlprescaler = hl_spi_prescaler_064;
     
     return(hlprescaler);
-    
-//     if((hal_spi_speed_dontuse == cfg->speed) && (hal_spi_prescaler_dontuse == cfg->prescaler))
-//     {
-//          hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use one of speed or prescaler");
-//     }
-//     if((hal_spi_speed_dontuse != cfg->speed) && (hal_spi_prescaler_dontuse != cfg->prescaler))
-//     {
-//          hal_base_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_spi_init(): use either speed or prescaler, not both");
-//     }
-//     
-//     if(hal_spi_prescaler_dontuse != cfg->prescaler)
-//     {   // ok, we have the prescaler. need only to convert it in stm32fx format
-//         
-//         switch(cfg->prescaler)
-//         {   // remember that hal_spi_prescaler_xxx is referred to high speed bus, 
-//             // and prescaler_stm32fx to high speed bus for spi1 but to low speed for spi2 and spi3
-//             case hal_spi_prescaler_004: 
-//             { 
-//                 hlprescaler = hl_spi_prescaler_004;    
-//             } break;
-//             case hal_spi_prescaler_008: 
-//             {
-//                 hlprescaler = hl_spi_prescaler_008;
-//             } break;
-//             case hal_spi_prescaler_016: 
-//             {
-//                 hlprescaler = hl_spi_prescaler_016;  
-//             } break;
-//             case hal_spi_prescaler_032: 
-//             { 
-//                 hlprescaler = hl_spi_prescaler_032;   
-//             } break;
-//             case hal_spi_prescaler_064: 
-//             {
-//                 hlprescaler = hl_spi_prescaler_064;   
-//             } break;
-//             case hal_spi_prescaler_128: 
-//             {
-//                 hlprescaler = hl_spi_prescaler_128;  
-//             } break;
-//             case hal_spi_prescaler_256: 
-//             {
-//                hlprescaler = hl_spi_prescaler_256;  
-//             } break;
-//             default:                    
-//             {
-//                 hlprescaler = hl_spi_prescaler_256; 
-//             } break;
-//         }        
-//     }    
-//     else if(hal_spi_speed_dontuse != cfg->speed)
-//     {   // ok, use the speed to compute the prescaler in stm32fx format
-//         
-//         // remember that hal_spi_prescaler_xxx is referred to high speed bus, 
-//         // and prescaler_stm32fx to high speed bus for spi1 but to low speed for spi2 and spi3
-//         uint16_t factor = (hal_spi1 == id) ? (hal_brdcfg_cpu__theconfig.speeds.fastbus / cfg->speed) : (hal_brdcfg_cpu__theconfig.speeds.slowbus / cfg->speed);
-//         
-//         switch(factor)
-//         {
-//             case 2:     hlprescaler = hl_spi_prescaler_002;  break;  
-//             case 4:     hlprescaler = hl_spi_prescaler_004;  break;
-//             case 8:     hlprescaler = hl_spi_prescaler_008;  break;
-//             case 16:    hlprescaler = hl_spi_prescaler_016;  break;
-//             case 32:    hlprescaler = hl_spi_prescaler_032;  break;
-//             case 64:    hlprescaler = hl_spi_prescaler_064;  break;
-//             case 128:   hlprescaler = hl_spi_prescaler_128;  break;
-//             case 256:   hlprescaler = hl_spi_prescaler_256;  break;
-//             default:    hlprescaler = hl_spi_prescaler_256;  break;
-//         }        
-//     } 
-
-
-//     return(hlprescaler);    
+ 
 }
 
 
@@ -733,36 +626,7 @@ static hal_result_t s_hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remai
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
 
-#if 1
-
-    return((hal_result_t)hl_fifo_get(intitem->fiforx, rxframe, remainingrxframes));
-    
-#else
-      
-    hal_result_t res = hal_res_NOK_generic;
-    hal_spi_cfg_t* cfg = &intitem->config;  
-    if(hal_spi_act_framebased != cfg->activity)
-    {
-        return(hal_res_NOK_generic);
-    }      
-    
-    hal_bool_t isrisenabled = s_hal_spi_is_isr_enabled(id);
-    if(hal_true == isrisenabled)
-    {
-        s_hal_spi_rx_isr_disable(id);
-    } 
-    
-    res =  (hal_result_t)hl_fifo_get(intitem->fiforx, rxframe, remainingrxframes);
-    
-    if(hal_true == isrisenabled)
-    {
-        s_hal_spi_rx_isr_enable(id);
-    }  
-
-    return(res);   
-    
-#endif
-       
+    return((hal_result_t)hl_fifo_get(intitem->fiforx, rxframe, remainingrxframes));      
 }
 
 
@@ -791,28 +655,21 @@ static void s_hal_spi_isr_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     
 }
 
-
-//#define hal_SPI4ENCODER_IT_RX_ENA(SPIx)         SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
-//#define hal_SPI4ENCODER_IT_RX_DISA(SPIx)        SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
-//#define hal_SPI4ENCODER_IS_IT_RX_ENA(SPIx)      ((SPIx)->CR2 & 0x40)
-
 static void s_hal_spi_rx_isr_enable(hal_spi_t id)
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    //hal_SPI4ENCODER_IT_RX_ENA(SPIx);
     SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, ENABLE);
 }
 
 static void s_hal_spi_rx_isr_disable(hal_spi_t id)
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    //hal_SPI4ENCODER_IT_RX_DISA(SPIx);
     SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
 }
 
 
 
-#endif//HAL_USE_PERIPH_SPI
+#endif//HAL_USE_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

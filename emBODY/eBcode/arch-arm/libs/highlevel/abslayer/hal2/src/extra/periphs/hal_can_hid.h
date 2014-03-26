@@ -17,25 +17,27 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_PERIPH_WATCHDOG_HID_H_
-#define _HAL_PERIPH_WATCHDOG_HID_H_
+#ifndef _HAL_CAN_HID_H_
+#define _HAL_CAN_HID_H_
 
 
-/* @file       hal_periph_watchdog_hid.h
-    @brief      This header file implements hidden interface to a watchdog
+/* @file       hal_can_hid.h
+    @brief      This header file implements hidden interface to hal eth. 
     @author     marco.accame@iit.it
-    @date       10/21/2011
+    @date       09/12/2011
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
+#include "hal_gpio.h"
+#include "hal_base_hid.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_watchdog.h"
+#include "hal_can.h"
 
 
 
@@ -47,11 +49,20 @@
 
 typedef struct
 {
-    uint8_t                 supported_mask;
-} hal_watchdog_hid_brdcfg_t;
+    hal_gpio_maP_t      rx;         /**< gpio map used for rx pin */
+    hal_gpio_maP_t      tx;         /**< gpio map used for tx pin */ 
+} hal_can_gpiomap_t;
+
+typedef struct
+{
+    uint8_t             supported_mask;             /**< bit in position hal_can_portx must be 1 if portx is supported */
+    hal_can_gpiomap_t   gpiomap[hal_cans_number];
+} hal_can_hid_brdcfg_t;
+
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_I2C4HAL
+#ifdef HAL_USE_I2C4HAL
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -938,7 +938,7 @@ static hal_result_t s_hal_i2c4hal_timeoutexpired(void)
 }
 
 
-#endif//HAL_USE_PERIPH_I2C4HAL
+#endif//HAL_USE_I2C4HAL
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

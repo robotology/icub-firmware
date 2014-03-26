@@ -56,6 +56,7 @@ typedef struct
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
+extern const hal_dma_hid_brdcfg_t hal_brdcfg_dma__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

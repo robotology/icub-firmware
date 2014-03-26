@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_ETH
+#ifdef HAL_USE_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -768,7 +768,7 @@ static void s_hal_eth_rmii_init(void)
 
 }
 
-#endif//HAL_USE_PERIPH_ETH
+#endif//HAL_USE_ETH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

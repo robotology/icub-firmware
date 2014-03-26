@@ -17,7 +17,7 @@
 */
 
 
-/* @file       hal_periph_i2c.c
+/* @file       hal_i2c.c
 	@brief      This file implements internal implementation of the hal i2c module.
 	@author     valentina.gaggero@iit.it
     @date       28/02/2011
@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_I2C
+#ifdef HAL_USE_I2C
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -36,7 +36,7 @@
 #include "string.h"
 #include "hal_brdcfg.h"
 #include "hal_base_hid.h"
-#include "hal_periph_gpio_hid.h"
+
 
 #include "hal_heap.h"
 
@@ -57,7 +57,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_periph_i2c_hid.h"
+#include "hal_i2c_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -271,7 +271,7 @@ extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i
 
 extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
 {
-   hal_result_t res;
+    hal_result_t res;
     
     if(hal_false == hal_i2c_initted_is(id))
     {
@@ -506,7 +506,7 @@ static void s_hal_i2c_scheduling_restart(void)
 
 
 
-#endif//HAL_USE_PERIPH_I2C
+#endif//HAL_USE_I2C
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

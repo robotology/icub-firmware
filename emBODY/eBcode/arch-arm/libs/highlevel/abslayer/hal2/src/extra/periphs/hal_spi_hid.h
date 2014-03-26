@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -16,26 +16,28 @@
  * Public License for more details
 */
 
+
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_PERIPH_TIMER_HID_H_
-#define _HAL_PERIPH_TIMER_HID_H_
+#ifndef _HAL_SPI_HID_H_
+#define _HAL_SPI_HID_H_
 
 
-/* @file       hal_periph_timer_hid.h
-    @brief      This header file implements hidden interface to a timer
+/* @file       hal_spi_hid.h
+    @brief      This header file implements hidden interface to a generic hal spi module
     @author     marco.accame@iit.it
-    @date       09/12/2011
+    @date       10/29/2012
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
+#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_timer.h"
+#include "hal_spi.h"
 
 
 
@@ -47,14 +49,23 @@
 
 typedef struct
 {
-    uint16_t            supported_mask;
-} hal_timer_hid_brdcfg_t;
+    hal_gpio_maP_t          sck;        /**<  */
+    hal_gpio_maP_t          miso;       /**<  */
+    hal_gpio_maP_t          mosi;       /**<  */
+} hal_spi_gpiomap_t;
+
+typedef struct
+{
+    uint8_t             supported_mask;                     /**< bit in position hal_spix must be 1 if portx is supported */
+    hal_spi_gpiomap_t   gpiomap[hal_spis_number];
+} hal_spi_hid_brdcfg_t;
+
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
 
 
 

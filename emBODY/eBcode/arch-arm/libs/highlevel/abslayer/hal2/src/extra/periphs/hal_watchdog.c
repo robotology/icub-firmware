@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_WATCHDOG
+#ifdef HAL_USE_WATCHDOG
 
 
 #if     defined(HAL_USE_CPU_FAM_STM32F1)
@@ -415,7 +415,7 @@ static void s_hal_watchdog_window_start(hal_watchdog_internal_item_t *intitem)
 
 
 
-#endif//HAL_USE_PERIPH_WATCHDOG
+#endif//HAL_USE_WATCHDOG
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

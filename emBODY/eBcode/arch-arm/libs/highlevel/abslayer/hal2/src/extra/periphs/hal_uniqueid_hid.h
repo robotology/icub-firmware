@@ -45,13 +45,6 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef enum
-{
-    hal_uniqueid_id64bit        = 0,
-    hal_uniqueid_macaddr        = 1
-} hal_uniqueid_hid_id_t;
-
-enum { hal_uniqueid_hid_ids_num = 2 };
 
 typedef struct
 {
@@ -60,7 +53,8 @@ typedef struct
 } hal_uniqueid_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_uniqueid_hid_brdcfg_t hal_brdcfg_uniqueid__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

@@ -28,7 +28,7 @@
 #include "hal_brdcfg_modules.h"
 
 
-#ifdef HAL_USE_PERIPH_SPI
+#ifdef HAL_USE_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -1064,7 +1064,7 @@ static void s_hal_spi_dma_on_tranfer_done_tx(void* p)
 
 
 
-#endif//HAL_USE_PERIPH_SPI
+#endif//HAL_USE_SPI
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

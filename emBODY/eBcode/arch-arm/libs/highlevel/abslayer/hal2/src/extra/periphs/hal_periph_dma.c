@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_DMA
+#ifdef HAL_USE_DMA
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -755,7 +755,7 @@ static void s_hal_dma_isr_clear_flag(hal_dma_t id)
 }
 
 
-#endif//HAL_USE_PERIPH_DMA
+#endif//HAL_USE_DMA
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

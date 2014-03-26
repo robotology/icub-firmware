@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_PERIPH_UNIQUEID
+#ifdef HAL_USE_UNIQUEID
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_uiniqueid2index(t)              ((uint8_t)((t)))
+//#define HAL_uiniqueid2index(t)              ((uint8_t)((t)))
 
 
 
@@ -81,16 +81,16 @@ const hal_uniqueid_cfg_t hal_uniqueid_cfg_default =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-typedef struct
-{
-    uint8_t         nothing;     
-} hal_uiniqueid_theinternals_t;
+//typedef struct
+//{
+//    uint8_t         nothing;     
+//} hal_uiniqueid_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid);
+//static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -143,19 +143,20 @@ extern hal_result_t hal_uniqueid_init(const hal_uniqueid_cfg_t *cfg)
 
 extern hal_uniqueid_id64bit_t hal_uniqueid_id64bit_get(void)
 {
-     if(hal_false == s_hal_uniqueid_supported_is(hal_uniqueid_id64bit))
-    {
-        return(hal_NA64);
-    } 
+//    if(hal_false == s_hal_uniqueid_supported_is(hal_uniqueid_id64bit))
+//    {
+//        return(hal_NA64);
+//    } 
     
     return(hl_sys_uniqueid64bit_get());
 }
 
-#if 0
+
 extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 {
+    return(hal_NA64);
 }
-#endif
+
 
 
 
@@ -173,16 +174,16 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
-{
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
-}
+//static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
+//{
+//    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
+//}
 
 
 
 
 
-#endif//HAL_USE_PERIPH_UNIQUEID
+#endif//HAL_USE_UNIQUEID
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
