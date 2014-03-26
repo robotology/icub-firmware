@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -16,17 +16,16 @@
  * Public License for more details
 */
 
-
-/*  @file       hal_device_cantransceiver.c
-	@brief      This file implements internals of a eth cantransceiver device.
-	@author     valentina.gaggero@iit.it, marco.accame@iit.it
-    @date       10/18/2011
+/* @file       hal_termometer.c
+	@brief      This file implements internals of the temperature sensing device
+	@author     marco.accame@iit.it
+    @date       10/24/2012
 **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_CANTRANSCEIVER
+#ifdef HAL_USE_TERMOMETER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -34,72 +33,77 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_sys.h"
-
+#include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 
-#include "hl_bits.h" 
+
+#include "hal_trace.h"
+#include "stdio.h"
+
+#include "hl_bits.h"
 
 
+
+
+
+ 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_cantransceiver.h"
+#include "hal_termometer.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_cantransceiver_hid.h" 
-
+#include "hal_termometer_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_cantransceiver_id2index(p)           ((uint8_t)((p)))
+#define HAL_termometer_id2index(t)              ((uint8_t)((t)))
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_cantransceiver_cfg_t hal_cantransceiver_cfg_default = 
+extern const hal_termometer_cfg_t hal_termometer_cfg_default  = 
 { 
     .dummy = 0 
 };
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+typedef struct
+{
+    hal_termometer_cfg_t        config;
+} hal_termometer_internal_item_t;
 
 typedef struct
 {
-    hal_cantransceiver_cfg_t                        config;
-} hal_device_cantransceiver_internal_item_t;
+    uint8_t                                 initted;
+    hal_termometer_internal_item_t   items[hal_termometers_number];
+} hal_termometer_theinternals_t;
 
-typedef struct
-{
-    uint8_t                                         initted;
-    hal_device_cantransceiver_internal_item_t*      items[hal_cantransceivers_number];   
-} hal_device_cantransceiver_theinternals_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_cantransceiver_t id);
-static void s_hal_device_cantransceiver_initted_set(hal_cantransceiver_t id);
-static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_cantransceiver_t id);
+static hal_boolval_t s_hal_termometer_supported_is(hal_termometer_t id);
+static void s_hal_termometer_initted_set(hal_termometer_t id);
+static hal_boolval_t s_hal_termometer_initted_is(hal_termometer_t id);
 
-
-static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg);
-
+static hal_result_t s_hal_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,8 +116,7 @@ static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_cantransceiver
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-
-static hal_device_cantransceiver_theinternals_t s_hal_device_cantransceiver_theinternals =
+static hal_termometer_theinternals_t s_hal_termometer_theinternals =
 {
     .initted            = 0,
     .items              = { NULL }   
@@ -126,67 +129,58 @@ static hal_device_cantransceiver_theinternals_t s_hal_device_cantransceiver_thei
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-extern hal_result_t hal_cantransceiver_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
+extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
 {
-    hal_result_t res = hal_res_NOK_generic;
+//     hal_termometer_internal_item_t *info = s_hal_termometer_theinternals.items[0];
 
-    if(hal_true != s_hal_device_cantransceiver_supported_is(id))
+    if(hal_false == s_hal_termometer_supported_is(id))
     {
-        return(hal_res_NOK_unsupported);
+        return(hal_res_NOK_generic);
     }
-
-
-    if(hal_true == s_hal_device_cantransceiver_initted_is(id))
-    {
-        return(hal_res_OK);
-    }
-
+     
     if(NULL == cfg)
     {
-        cfg = &hal_cantransceiver_cfg_default;
+        cfg  = &hal_termometer_cfg_default;
     }
-
-
-    res = s_hal_device_cantransceiver_lowlevel_init(id, cfg);
-
-    s_hal_device_cantransceiver_initted_set(id);
-
-    return(res);
-}
-
-
-extern hal_result_t hal_cantransceiver_enable(hal_cantransceiver_t id)
-{
-    if(hal_false == s_hal_device_cantransceiver_initted_is(id))
+    
+    if(hal_true == s_hal_termometer_initted_is(id))
+    {
+        return(hal_res_OK);
+    } 
+ 
+    if(hal_res_OK != s_hal_termometer_hw_init(id, cfg))
     {
         return(hal_res_NOK_generic);
     }
     
-    hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.enable(id);
+    s_hal_termometer_initted_set(id);
 
-    return(hal_res_OK); 
+    return(hal_res_OK);
 }
 
-extern hal_result_t hal_cantransceiver_disable(hal_cantransceiver_t id)
+extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degrees_t* degrees)
 {
-    if(hal_false == s_hal_device_cantransceiver_initted_is(id))
+    hal_result_t res = hal_res_NOK_generic; 
+//    hal_termometer_internal_item_t *info = s_hal_termometer_theinternals.items[0];
+    int8_t data08 = 0;
+
+    if(NULL == degrees)
     {
         return(hal_res_NOK_generic);
     }
     
-    hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.disable(id);
+    if(hal_false == s_hal_termometer_initted_is(id))
+    {
+        *degrees = -128;
+        return(hal_res_NOK_generic);
+    }
 
-    return(hal_res_OK); 
+
+    res = hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.read(&data08);
+    *degrees = (int16_t) data08;  
+    
+    return(res);    
 }
-
-extern hal_bool_t hal_cantransceiver_initted_is(hal_cantransceiver_t id)
-{
-    return(s_hal_device_cantransceiver_initted_is(id));
-}
-
-
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -204,39 +198,42 @@ extern hal_bool_t hal_cantransceiver_initted_is(hal_cantransceiver_t id)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_device_cantransceiver_supported_is(hal_cantransceiver_t id)
+
+static hal_boolval_t s_hal_termometer_supported_is(hal_termometer_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_cantransceiver__theconfig.supported_mask, HAL_device_cantransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_termometer__theconfig.supported_mask, HAL_termometer_id2index(id)) );
+}
+
+static void s_hal_termometer_initted_set(hal_termometer_t id)
+{
+    hl_bits_byte_bitset(&s_hal_termometer_theinternals.initted, HAL_termometer_id2index(id));
+}
+
+static hal_boolval_t s_hal_termometer_initted_is(hal_termometer_t id)
+{
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_termometer_theinternals.initted, HAL_termometer_id2index(id)));
 }
 
 
-static hal_bool_t s_hal_device_cantransceiver_initted_is(hal_cantransceiver_t id)
-{
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id)));
-}
-
-static void s_hal_device_cantransceiver_initted_set(hal_cantransceiver_t id)
-{
-    hl_bits_byte_bitset(&s_hal_device_cantransceiver_theinternals.initted, HAL_device_cantransceiver_id2index(id));
-}
-
-
-
-static hal_result_t s_hal_device_cantransceiver_lowlevel_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
-{
-    if((NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.init)   && 
-       (NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.enable) &&
-       (NULL != hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.disable) )
+static hal_result_t s_hal_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
+{   
+    if((NULL != hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.init) && (NULL != hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.read))
     {
-        return(hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.init(id, hal_brdcfg_device_cantransceiver__theconfig.devcfg.chipif.initpar));
+        return(hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.init(hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.initpar));
     }
-
-    return(hal_res_NOK_generic);    
+    else
+    {
+        return(hal_res_NOK_generic);
+    }
 }
 
 
-#endif//HAL_USE_DEVICE_CANTRANSCEIVER
+#endif//HAL_USE_TERMOMETER
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
+
+
+

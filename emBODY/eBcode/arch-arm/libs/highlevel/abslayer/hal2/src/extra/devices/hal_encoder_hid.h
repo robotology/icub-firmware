@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -17,14 +17,15 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_LED_HID_H_
-#define _HAL_DEVICE_LED_HID_H_
+
+#ifndef _HAL_ENCODER_HID_H_
+#define _HAL_ENCODER_HID_H_
 
 
-/* @file       hal_device_led_hid.h
-    @brief      This header file implements hidden interface to a led
+/* @file       hal_encoder_hid.h
+    @brief      This header file implements hidden interface to a encoder
     @author     marco.accame@iit.it, valentina.gaggero@iit.it
-    @date       09/16/2011
+    @date       02/07/2013
  **/
 
 
@@ -32,12 +33,13 @@
 
 #include "hal_base.h"
 
-#include "hal_gpio.h"
+#include "hal_mux.h"
+#include "hal_spi.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_led.h"
+#include "hal_encoder.h"
 
 
 
@@ -49,23 +51,24 @@
 
 typedef struct
 {
-    hal_gpio_maP_t      led;       
-} hal_led_gpiomap_t;
+    hal_spi_t               spiid;          /**< which spi port is used for each encoder */
+    hal_mux_t               muxid;          /**< which mux id is used for each encoder */
+    hal_mux_sel_t           muxsel;         /**< which mux selection is used of the mux port */    
+} hal_encoder_spimap_t;
+
 
 typedef struct
 {
-    uint8_t                 supported_mask;
-    hal_gpio_val_t          value_on;
-    hal_gpio_val_t          value_off;
-    hal_led_gpiomap_t       gpiomap[hal_leds_number];
-} hal_device_led_hid_brdcfg_t;
+    uint16_t                    supported_mask;
+    hal_encoder_spimap_t        spimap[hal_encoders_number];
+} hal_encoder_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_encoder_hid_brdcfg_t hal_brdcfg_encoder__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
 
 
 

@@ -17,7 +17,7 @@
 */
 
 
-/* @file       hal_device_led.c
+/* @file       hal_led.c
 	@brief      This file implements internal implementation of the hal led module.
 	@author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       09/16/2011
@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_LED
+#ifdef HAL_USE_LED
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -37,7 +37,7 @@
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
 #include "hl_bits.h" 
-
+#include "hl_gpio.h" 
 
 
  
@@ -53,14 +53,14 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_led_hid.h"
+#include "hal_led_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_led_id2index(t)              ((uint8_t)((t)))
+#define HAL_led_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -91,16 +91,16 @@ static const hal_gpio_cfg_t s_hal_led_gpio_config =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_led_supported_is(hal_led_t id);
-static void s_hal_device_led_initted_set(hal_led_t id);
-static hal_boolval_t s_hal_device_led_initted_is(hal_led_t id);
+static hal_boolval_t s_hal_led_supported_is(hal_led_t id);
+static void s_hal_led_initted_set(hal_led_t id);
+static hal_boolval_t s_hal_led_initted_is(hal_led_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_hal_device_led_initted = 0;
+static uint16_t s_hal_led_initted = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,13 +113,14 @@ extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
     const hal_gpio_maP_t *gm = NULL;
     hal_result_t res = hal_res_NOK_generic;
 
-    if(hal_false == s_hal_device_led_supported_is(id))
+    if(hal_false == s_hal_led_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
      
-    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
+    gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
     
+    // much better to init w/ hal_gpio_init() and not with hl_gpio_init() so that we fill the data structure of the gpio in hal.  
     res = hal_gpio_init(gm->gpio, &s_hal_led_gpio_config);
     
     if(hal_res_OK != res)
@@ -127,72 +128,76 @@ extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
         return(res);
     }
     
-    hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_off);
- 
-    s_hal_device_led_initted_set(id);
+    s_hal_led_initted_set(id);    
+    
+    // hal_led_off() must be after s_hal_led_initted_set();
+    hal_led_off(id);
+
     return(hal_res_OK);
 }
 
 
 extern hal_result_t hal_led_on(hal_led_t id)
-{
-    const hal_gpio_maP_t *gm = NULL;
-    
-    if(hal_false == s_hal_device_led_initted_is(id))
+{   
+    if(hal_false == s_hal_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    // do something 
-    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
+    const hal_gpio_maP_t *gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
     
-    return(hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_on));
+    // return(hal_gpio_setval(gm->gpio, hal_brdcfg_led__theconfig.value_on));
+    // NOTE alphabetagamma: it is correct using hal_gpio_setval(), but the use of hl_gpio_pin_write() is quicker. 
+    // it does not verify that the gpio is configured as output, etc., but that is redundant as we are protected by 
+    // s_hal_led_initted_is() function.
+        
+    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gm->gpio.port, .pin = (hl_gpio_pin_t)gm->gpio.pin };
+    return((hal_result_t)hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)hal_brdcfg_led__theconfig.value_on));     
 }
 
 
 
 extern hal_result_t hal_led_off(hal_led_t id)
 {
-    const hal_gpio_maP_t *gm = NULL;
-    
-    if(hal_false == s_hal_device_led_initted_is(id))
+    if(hal_false == s_hal_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    // do something 
-    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
+    const hal_gpio_maP_t *gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
     
-    return(hal_gpio_setval(gm->gpio, hal_brdcfg_device_led__theconfig.value_off));
+    // return(hal_gpio_setval(gm->gpio, hal_brdcfg_led__theconfig.value_off));
+    // see NOTE alphabetagamma.
+    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gm->gpio.port, .pin = (hl_gpio_pin_t)gm->gpio.pin };
+    return((hal_result_t)hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)hal_brdcfg_led__theconfig.value_off));     
 }
 
 
 
 extern hal_result_t hal_led_toggle(hal_led_t id)
 {
-    const hal_gpio_maP_t *gm = NULL;
-    hal_gpio_val_t val = hal_gpio_valNONE;
-    
-    if(hal_false == s_hal_device_led_initted_is(id))
+    if(hal_false == s_hal_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    // do something 
-    gm = &hal_brdcfg_device_led__theconfig.gpiomap[HAL_device_led_id2index(id)].led;
+    const hal_gpio_maP_t *gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
     
-    val = hal_gpio_getval(gm->gpio);
+    // hal_gpio_val_t val = hal_gpio_getval(gm->gpio);    
+    // if(hal_brdcfg_led__theconfig.value_off == val)
+    // {
+    //     val = hal_brdcfg_led__theconfig.value_on;
+    // }
+    // else
+    // {
+    //     val = hal_brdcfg_led__theconfig.value_off;
+    // }
+    // return(hal_gpio_setval(gm->gpio, val));
+ 
+    // see NOTE alphabetagamma.
+    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gm->gpio.port, .pin = (hl_gpio_pin_t)gm->gpio.pin };
+    return((hal_result_t)hl_gpio_pin_toggle(hlgpio));   
     
-    if(hal_brdcfg_device_led__theconfig.value_off == val)
-    {
-        val = hal_brdcfg_device_led__theconfig.value_on;
-    }
-    else
-    {
-        val = hal_brdcfg_device_led__theconfig.value_off;
-    }
-
-    return(hal_gpio_setval(gm->gpio, val));
 }
 
 
@@ -211,25 +216,25 @@ extern hal_result_t hal_led_toggle(hal_led_t id)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_led_supported_is(hal_led_t id)
+static hal_boolval_t s_hal_led_supported_is(hal_led_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_led__theconfig.supported_mask, HAL_device_led_id2index(id)) );
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_led__theconfig.supported_mask, HAL_led_id2index(id)) );
 }
 
-static void s_hal_device_led_initted_set(hal_led_t id)
+static void s_hal_led_initted_set(hal_led_t id)
 {
-    hl_bits_hlfword_bitset(&s_hal_device_led_initted, HAL_device_led_id2index(id));
+    hl_bits_hlfword_bitset(&s_hal_led_initted, HAL_led_id2index(id));
 }
 
-static hal_boolval_t s_hal_device_led_initted_is(hal_led_t id)
+static hal_boolval_t s_hal_led_initted_is(hal_led_t id)
 {
-    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_device_led_initted, HAL_device_led_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_led_initted, HAL_led_id2index(id)));
 }
 
 
 
 
-#endif//HAL_USE_DEVICE_LED
+#endif//HAL_USE_LED
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

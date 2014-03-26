@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_ENCODER_HID_H_
-#define _HAL_DEVICE_ENCODER_HID_H_
+#ifndef _HAL_ACCELEROMETER_HID_H_
+#define _HAL_ACCELEROMETER_HID_H_
 
 
-/* @file       hal_device_encoder_hid.h
-    @brief      This header file implements hidden interface to a encoder
-    @author     marco.accame@iit.it, valentina.gaggero@iit.it
-    @date       02/07/2013
+/* @file       hal_accelerometer_hid.h
+    @brief      This header file implements hidden interface to accelerometer device
+    @author     marco.accame@iit.it
+    @date       10/26/2012
  **/
 
 
@@ -32,13 +32,11 @@
 
 #include "hal_base.h"
 
-#include "hal_mux.h"
-#include "hal_spi.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_encoder.h"
+#include "hal_accelerometer.h"
 
 
 
@@ -48,24 +46,30 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
-{
-    hal_spi_t               spiid;          /**< which spi port is used for each encoder */
-    hal_mux_t               muxid;          /**< which mux id is used for each encoder */
-    hal_mux_sel_t           muxsel;         /**< which mux selection is used of the mux port */    
-} hal_device_encoder_spimap_t;
 
+typedef hal_result_t (*hal_accelerometer_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
 
 typedef struct
-{
-    uint16_t                    supported_mask;
-    hal_device_encoder_spimap_t spimap[hal_encoders_number];
-} hal_device_encoder_hid_brdcfg_t;
+{   
+    hal_res_fp_voidp_t                              init;       // init(initpar)
+    void*                                           initpar;    
+    hal_accelerometer_hid_fn_read_t                 read;       // read(accx, accy, accz)
+} hal_accelerometer_hid_chip_interface_t;
 
+typedef struct
+{   
+    hal_accelerometer_hid_chip_interface_t          chipif;
+} hal_accelerometer_hid_dev_cfg_t;
+
+typedef struct
+{
+    uint8_t                                         supported_mask;
+    hal_accelerometer_hid_dev_cfg_t                 devcfg[hal_accelerometers_number];
+} hal_accelerometer_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_device_encoder_hid_brdcfg_t hal_brdcfg_device_encoder__theconfig;
+extern const hal_accelerometer_hid_brdcfg_t hal_brdcfg_accelerometer__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

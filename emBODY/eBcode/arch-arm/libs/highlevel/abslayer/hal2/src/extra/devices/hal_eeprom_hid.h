@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_EEPROM_HID_H_
-#define _HAL_DEVICE_EEPROM_HID_H_
+#ifndef _HAL_EEPROM_HID_H_
+#define _HAL_EEPROM_HID_H_
 
 
-/* @file       hal_device_eeprom_hid.h
+/* @file       hal_eeprom_hid.h
     @brief      This header file keeps hidden interface to eeprom.
     @author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       09/12/2011
@@ -47,56 +47,49 @@
 
 typedef struct
 {   
-    uint32_t                                baseaddress;
-    uint32_t                                totalsize;
-} hal_device_eeprom_hid_flashemul_cfg_t;
+    uint32_t                            baseaddress;
+    uint32_t                            totalsize;
+} hal_eeprom_hid_flashemul_cfg_t;
 
-typedef hal_result_t (*hal_device_eeprom_hid_fn_read_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
-typedef hal_result_t (*hal_device_eeprom_hid_fn_write_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
-
+typedef hal_result_t (*hal_eeprom_hid_fn_read_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
+typedef hal_result_t (*hal_eeprom_hid_fn_write_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
+///typedef hal_result_t (*hal_res_fp_uint32_uint32_uint8p_uint32p_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
 typedef struct
-{   // used inside the public functions of hal_device_eeprom to communicate to the chip, but defined inside brdcfg
-    hal_res_fp_voidp_t                      init;
-    void*                                   initpar;
-    hal_device_eeprom_hid_fn_read_t         read;
-    hal_device_eeprom_hid_fn_write_t        write; 
-} hal_device_eeprom_hid_chip_interface_t;
+{   // used inside the public functions of hal_eeprom to communicate to the chip, but defined inside brdcfg
+    hal_res_fp_voidp_t                  init;       // init(initpar)
+    void*                               initpar;
+    hal_eeprom_hid_fn_read_t            read;       // read(addr, size, data, readbytes)
+    hal_eeprom_hid_fn_write_t           write;      // write(addr, size, data, writtenbytes)
+} hal_eeprom_hid_chip_interface_t;
 
 typedef struct
 {   
-    uint32_t                                baseaddress;
-    uint32_t                                totalsize;
-    hal_i2c_t                               i2cid;
-    hal_device_eeprom_hid_chip_interface_t  chipif;
-} hal_device_eeprom_hid_i2cbased_cfg_t;
+    uint32_t                            baseaddress;
+    uint32_t                            totalsize;
+    hal_i2c_t                           i2cid;
+    hal_eeprom_hid_chip_interface_t     chipif;
+} hal_eeprom_hid_i2cbased_cfg_t;
 
 typedef union
 {
-    hal_device_eeprom_hid_flashemul_cfg_t   flashemul;
-    hal_device_eeprom_hid_i2cbased_cfg_t    i2cbased;
-} hal_device_eeprom_hid_dev_cfg_t; 
+    hal_eeprom_hid_flashemul_cfg_t      flashemul;
+    hal_eeprom_hid_i2cbased_cfg_t       i2cbased;
+} hal_eeprom_hid_dev_cfg_t; 
 
 typedef struct
 {
-    uint8_t                                 supported_mask;
-    hal_device_eeprom_hid_dev_cfg_t         devcfg[hal_eeproms_number];
-} hal_device_eeprom_hid_brdcfg_t;
+    uint8_t                             supported_mask;
+    hal_eeprom_hid_dev_cfg_t            devcfg[hal_eeproms_number];
+} hal_eeprom_hid_brdcfg_t;
 
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_eeprom_hid_brdcfg_t hal_brdcfg_eeprom__theconfig; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-
-
-
-///* @fn			extern hal_result_t hal_hid_eeprom_waitstandbystate(void);
-//  * @brief  	Wait for EEPROM Standby state
-//  */
-//extern hal_result_t hal_device_eeprom_hid_waitstandbystate(hal_device_eeprom_t eep);
-
+// empty-section
 
 
 #endif  // include guard

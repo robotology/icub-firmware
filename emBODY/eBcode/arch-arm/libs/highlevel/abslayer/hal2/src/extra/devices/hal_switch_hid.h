@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_ETHTRANSCEIVER_HID_H_
-#define _HAL_DEVICE_ETHTRANSCEIVER_HID_H_
+#ifndef _HAL_SWITCH_HID_H_
+#define _HAL_SWITCH_HID_H_
 
 
-/* @file       hal_device_ethtransceiver_hid.h
+/* @file       hal_switch_hid.h
     @brief      This header file implements hidden interface to ...
     @author     valentina.gaggero@iit.it / marco.accame@iit.it
     @date       09/09/2010
@@ -29,13 +29,13 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "hal_middleware_interface.h"
+
 #include "hal_base.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_ethtransceiver.h"
+#include "hal_switch.h"
 
 
 
@@ -44,33 +44,33 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_device_ethtransceiver_hid_fn_config_t) (hal_eth_phymode_t* usedphymode);
-typedef hal_result_t (*hal_device_ethtransceiver_hid_fn_getphymode_t) (hal_eth_phymode_t* usedphymode);
+
 typedef struct
-{   // used inside the public functions of hal_device_ethtransceiver to communicate to the chip, but defined inside brdcfg
-    hal_res_fp_voidp_t                              init;
-    void*                                           initpar;
-    hal_device_ethtransceiver_hid_fn_config_t       config;
-    hal_device_ethtransceiver_hid_fn_getphymode_t   getphymode;
-} hal_device_ethtransceiver_hid_chip_interface_t;
+{   // used inside the public functions of hal_switch to communicate to the chip, but defined inside brdcfg
+    hal_res_fp_voidp_t                      init;       // init(chosendevice_cfg_t* initpar)
+    void*                                   initpar;
+    hal_res_fp_voidp_t                      config;     // config(hal_ethtransceiver_phymode_t* usedphymode)
+} hal_switch_hid_chip_interface_t;
 
 
 typedef struct
 {   
-    hal_eth_phymode_t                               targetphymode;
-    hal_device_ethtransceiver_hid_chip_interface_t  chipif;
-} hal_device_ethtransceiver_hid_dev_cfg_t;
+    hal_ethtransceiver_phymode_t            targetphymode;
+    hal_switch_hid_chip_interface_t         chipif;
+} hal_switch_hid_dev_cfg_t;
+
 
 typedef struct
 {
-    hal_bool_t                                      supported;
-    hal_device_ethtransceiver_hid_dev_cfg_t         devcfg;
-} hal_device_ethtransceiver_hid_brdcfg_t;
+    hal_bool_t                              supported;
+    hal_switch_hid_dev_cfg_t                devcfg;
+} hal_switch_hid_brdcfg_t;
 
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_switch_hid_brdcfg_t hal_brdcfg_switch__theconfig;
 
 
 // - declaration of extern hidden macros ------------------------------------------------------------------------------    
@@ -78,6 +78,8 @@ typedef struct
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+
+
 
 
 

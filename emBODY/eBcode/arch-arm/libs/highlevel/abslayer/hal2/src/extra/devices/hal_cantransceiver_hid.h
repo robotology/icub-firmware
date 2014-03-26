@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Valentina Gaggero, Marco Accame
  * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
@@ -17,53 +17,67 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_MUX_HID_H_
-#define _HAL_DEVICE_MUX_HID_H_
+
+#ifndef _HAL_CANTRANSCEIVER_HID_H_
+#define _HAL_CANTRANSCEIVER_HID_H_
 
 
-/* @file       hal_device_mux_hid.h
-    @brief      This header file implements hidden interface to a id
-    @author     marco.accame@iit.it, valentina.gaggero@iit.it
-    @date       02/07/2013
+/* @file       hal_cantransceiver_hid.h
+    @brief      This header file implements hidden interface to ...
+    @author     valentina.gaggero@iit.it / marco.accame@iit.it
+    @date       09/09/2010
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "hal_can.h"
 #include "hal_base.h"
-
-#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_mux.h"
+#include "hal_cantransceiver.h"
 
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// empty-section
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef hal_result_t (*hal_cantransceiver_hid_fn_init_t) (hal_cantransceiver_t id, void* initpar);
+typedef hal_result_t (*hal_cantransceiver_hid_fn_enabledisable_t) (hal_cantransceiver_t id);
 typedef struct
-{
-    hal_gpio_maP_t          gpio_sel0;    /**<  */
-    hal_gpio_maP_t          gpio_sel1;    /**<  */
-    hal_gpio_maP_t          gpio_enable;    /**<  */
-} hal_device_mux_gpiomap_t;
+{   // used inside the public functions of hal_cantransceiver to communicate to the chip, but defined inside brdcfg
+    hal_cantransceiver_hid_fn_init_t            init;
+    void*                                       initpar;
+    hal_cantransceiver_hid_fn_enabledisable_t   enable;
+    hal_cantransceiver_hid_fn_enabledisable_t   disable;
+} hal_cantransceiver_hid_chip_interface_t;
 
 
 typedef struct
+{   
+    hal_cantransceiver_hid_chip_interface_t     chipif;
+} hal_cantransceiver_hid_dev_cfg_t;
+
+typedef struct
 {
-    uint8_t                     supported_mask;
-    hal_device_mux_gpiomap_t    gpiomap[hal_muxes_number];
-} hal_device_mux_hid_brdcfg_t;
+    uint8_t                                     supported_mask;
+    hal_cantransceiver_hid_dev_cfg_t            devcfg;
+} hal_cantransceiver_hid_brdcfg_t;
+
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
+
+extern const hal_cantransceiver_hid_brdcfg_t hal_brdcfg_cantransceiver__theconfig;
+
+
+// - declaration of extern hidden macros ------------------------------------------------------------------------------    
 // empty-section
+
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

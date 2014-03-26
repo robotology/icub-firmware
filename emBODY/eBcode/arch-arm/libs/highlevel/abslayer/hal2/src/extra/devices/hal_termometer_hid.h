@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_TERMOMETER_HID_H_
-#define _HAL_DEVICE_TERMOMETER_HID_H_
+#ifndef _HAL_TERMOMETER_HID_H_
+#define _HAL_TERMOMETER_HID_H_
 
 
-/* @file       hal_device_termometer_hid.h
+/* @file       hal_termometer_hid.h
     @brief      This header file implements hidden interface to a termometer
     @author     marco.accame@iit.it
     @date       10/24/2012
@@ -46,30 +46,31 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_device_termometer_hid_fn_read_t) (int8_t*);
+typedef hal_result_t (*hal_termometer_hid_fn_read_t) (int8_t*);
 
 typedef struct
 {   
-    hal_res_fp_voidp_t                              init;
+    hal_res_fp_voidp_t                              init;           // init(initpar)
     void*                                           initpar;
-    hal_device_termometer_hid_fn_read_t             read;
-} hal_device_termometer_hid_chip_interface_t;
+    hal_termometer_hid_fn_read_t                    read;           // read(temp)
+} hal_termometer_hid_chip_interface_t;
 
 
 typedef struct
 {   
-    hal_device_termometer_hid_chip_interface_t      chipif;
-} hal_device_termometer_hid_dev_cfg_t;
+    hal_termometer_hid_chip_interface_t             chipif;
+} hal_termometer_hid_dev_cfg_t;
 
 typedef struct
 {
     uint8_t                                         supported_mask;
-    hal_device_termometer_hid_dev_cfg_t             devcfg[hal_termometers_number];
-} hal_device_termometer_hid_brdcfg_t;
+    hal_termometer_hid_dev_cfg_t                    devcfg[hal_termometers_number];
+} hal_termometer_hid_brdcfg_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_termometer_hid_brdcfg_t hal_brdcfg_termometer__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

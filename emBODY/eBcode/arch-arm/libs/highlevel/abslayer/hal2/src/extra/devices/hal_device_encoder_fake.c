@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_ENCODER_FAKE
+#ifdef HAL_USE_ENCODER_FAKE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -310,7 +310,7 @@ static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame)
 }
 #endif
 
-#endif//HAL_USE_DEVICE_ENCODER
+#endif//HAL_USE_ENCODER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

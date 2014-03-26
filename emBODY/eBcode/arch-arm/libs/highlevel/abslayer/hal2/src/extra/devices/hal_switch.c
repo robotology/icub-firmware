@@ -17,8 +17,8 @@
 */
 
 
-/*  @file       hal_device_ethtransceiver.c
-	@brief      This file implements internals of a eth ethtransceiver device.
+/*  @file       hal_switch.c
+	@brief      This file implements internals of a eth switch device.
 	@author     valentina.gaggero@iit.it, marco.accame@iit.it
     @date       10/18/2011
 **/
@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_ETHTRANSCEIVER
+#ifdef HAL_USE_SWITCH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -34,28 +34,31 @@
 
 #include "stdlib.h"
 #include "string.h"
-//#include "hal_stm32xx_include.h" no need as it is a device
+
+#include "hal_base_hid.h" 
+#include "hal_i2c.h" 
+
 #include "hal_sys.h"
+
+#include "hal_i2c_hid.h"
 
 #include "hal_brdcfg.h"
 
 #include "hl_bits.h"
-
-#include "hl_ethtrans.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_ethtransceiver.h"
+#include "hal_switch.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_ethtransceiver_hid.h" 
+#include "hal_switch_hid.h" 
 
 
 
@@ -63,57 +66,66 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_ethtransceiver_id2index(p)           ((uint8_t)((p)))
+#define HAL_switch_id2index(t)              ((uint8_t)((t)))
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default = 
+const hal_switch_cfg_t hal_switch_cfg_default = 
 { 
     .dummy = 0 
 };
 
-extern const hl_ethtrans_mapping_t* hl_ethtrans_map = NULL;
 
-extern void* hl_ethtrans_chip_init_param = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-typedef struct
-{
-    hal_ethtransceiver_cfg_t                        config;
-} hal_device_ethtransceiver_internal_item_t;
+/** @typedef    typedef enum hal_switch_t 
+    @brief      contains ids of every possible eth switch.
+ **/ 
+typedef enum  
+{ 
+    hal_switch1         = 0             /**< the only one */
+} hal_switch_t;
+
+enum { hal_switches_number = 1 };
 
 typedef struct
 {
-    uint8_t                                         initted;
-    uint8_t                                         started;
-    hal_device_ethtransceiver_internal_item_t*      items[hal_ethtransceivers_number];   
-} hal_device_ethtransceiver_theinternals_t;
+    hal_switch_cfg_t                config;
+} hal_switch_internal_item_t;
+
+
+typedef struct
+{
+    uint8_t                         initted;
+    uint8_t                         started;
+    hal_switch_internal_item_t*     items[hal_switches_number];   
+} hal_switch_theinternals_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_device_ethtransceiver_supported_is(void);
-static void s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver_t id);
-static hal_bool_t s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver_t id);
-static void s_hal_device_ethtransceiver_started_set(hal_ethtransceiver_t id);
-static hal_bool_t s_hal_device_ethtransceiver_started_is(hal_ethtransceiver_t id);
+static hal_bool_t s_hal_switch_supported_is(void);
+static void s_hal_switch_initted_set(void);
+static hal_boolval_t s_hal_switch_initted_is(void);
+static void s_hal_switch_started_set(void);
+static hal_boolval_t s_hal_switch_started_is(void);
 
 
-static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg);
+static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg);
 
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-
-static hl_ethtrans_mapping_t s_hl_ethtrans_mapping = { .supported = hl_true };
+// empty-section
 
 
 
@@ -121,12 +133,13 @@ static hl_ethtrans_mapping_t s_hl_ethtrans_mapping = { .supported = hl_true };
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_device_ethtransceiver_theinternals_t s_hal_device_ethtransceiver_theinternals =
+static hal_switch_theinternals_t s_hal_switch_theinternals =
 {
     .initted            = 0,
     .started            = 0,
     .items              = { NULL }   
 };
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -135,82 +148,85 @@ static hal_device_ethtransceiver_theinternals_t s_hal_device_ethtransceiver_thei
 
 
 
-extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
+extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
 {
+    const hal_switch_t id = hal_switch1;
     hal_result_t res = hal_res_NOK_generic;
+    hal_switch_internal_item_t* intitem = s_hal_switch_theinternals.items[HAL_switch_id2index(id)];
 
 
-    if(hal_true != s_hal_device_ethtransceiver_supported_is())
+    if(hal_true != s_hal_switch_supported_is())
     {
         return(hal_res_NOK_unsupported);
     }
+    
+    if(NULL == intitem)
+    {
+        intitem = s_hal_switch_theinternals.items[HAL_switch_id2index(id)] = hal_heap_new(sizeof(hal_switch_internal_item_t));
+        // no initialisation is needed
+    }
 
 
-    if(hal_true == s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver1))
+    if(hal_true == s_hal_switch_initted_is())
     {
         return(hal_res_OK);
     }
 
     if(NULL == cfg)
     {
-        cfg = &hal_ethtransceiver_cfg_default;
+        cfg = &hal_switch_cfg_default;
     }
 
-    
-    res = s_hal_device_ethtransceiver_lowlevel_init(cfg);
+    memcpy(&intitem->config, cfg, sizeof(hal_switch_cfg_t));
 
-    s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver1);
+    res = s_hal_switch_lowlevel_init(cfg);
+
+    s_hal_switch_initted_set();
 
     return(res);
 }
 
 
-extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t *usedmiiphymode)
+extern hal_result_t hal_switch_configure(hal_ethtransceiver_phymode_t *usedmiiphymode)
 {
-//    hal_result_t res = hal_res_NOK_generic;
-    hl_ethtrans_phymode_t usedmiiphmo;
 
-    if(hal_true != s_hal_device_ethtransceiver_supported_is())
+    if(hal_true != s_hal_switch_supported_is())
     {
         return(hal_res_NOK_unsupported);
     }
 
 
-    if(hal_false == s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver1))
+    if(hal_false == s_hal_switch_initted_is())
     {
         return(hal_res_NOK_generic);
     }
     
 
-    if(hal_true == s_hal_device_ethtransceiver_started_is(hal_ethtransceiver1))
+    if(hal_true == s_hal_switch_started_is())
     {
-        hl_ethtrans_chip_getmiiphymode(&usedmiiphmo);
-        *usedmiiphymode = (hal_eth_phymode_t)usedmiiphmo;
         return(hal_res_OK);
     }    
+
+    
+    hal_brdcfg_switch__theconfig.devcfg.chipif.config(usedmiiphymode);
+
+    s_hal_switch_started_set();
+
+    return(hal_res_OK);
  
-    //targetphymode = (hal_eth_phymode_auto == targetphymode) ? (hal_brdcfg_device_ethtransceiver__theconfig.devcfg.targetphymode) : (targetphymode);
- 
-    hl_ethtrans_chip_config(&usedmiiphmo);
-    *usedmiiphymode = (hal_eth_phymode_t)usedmiiphmo;
-
-    s_hal_device_ethtransceiver_started_set(hal_ethtransceiver1);
-
-    return(hal_res_OK); 
 }
 
 
-extern hal_bool_t hal_device_ethtransceiver_initted_is(void)
+extern hal_bool_t hal_switch_initted_is(void)
 {
-    return(s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver1));
+    return(s_hal_switch_initted_is());
 }
 
 
-extern hal_bool_t hal_device_ethtransceiver_started_is(void)
+extern hal_bool_t hal_switch_started_is(void)
 {
-    return(s_hal_device_ethtransceiver_started_is(hal_ethtransceiver1));
+    return(s_hal_switch_started_is());
 }
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -222,77 +238,57 @@ extern hal_bool_t hal_device_ethtransceiver_started_is(void)
 // ---- isr of the module: end ------
 
 
-extern hl_result_t hl_ethtrans_chip_init(void *param)
-{
-    hal_result_t res = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init(param);
-    return((hl_result_t)res);
-}
-    
-extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode)
-{
-    hal_eth_phymode_t usedmiiphmo;
-    hal_result_t res = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config(&usedmiiphmo);
-    *usedmiiphymode = (hl_ethtrans_phymode_t)usedmiiphmo;
-    return((hl_result_t)res);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_device_ethtransceiver_supported_is(void)
+static hal_bool_t s_hal_switch_supported_is(void)
 {
-    return(hal_brdcfg_device_ethtransceiver__theconfig.supported); 
+    //const hal_switch_t id = hal_switch1;
+    return(hal_brdcfg_switch__theconfig.supported); 
 }
 
-static hal_bool_t s_hal_device_ethtransceiver_initted_is(hal_ethtransceiver_t id)
+static hal_boolval_t s_hal_switch_initted_is(void)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id)));
+    const hal_switch_t id = hal_switch1;
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_switch_theinternals.initted, HAL_switch_id2index(id)));
 }
 
-static void s_hal_device_ethtransceiver_initted_set(hal_ethtransceiver_t id)
+static void s_hal_switch_initted_set(void)
 {
-    hl_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.initted, HAL_device_ethtransceiver_id2index(id));
-}
-
-
-static hal_bool_t s_hal_device_ethtransceiver_started_is(hal_ethtransceiver_t id)
-{
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id)));
+    const hal_switch_t id = hal_switch1;
+    hl_bits_byte_bitset(&s_hal_switch_theinternals.initted, HAL_switch_id2index(id));
 }
 
 
-static void s_hal_device_ethtransceiver_started_set(hal_ethtransceiver_t id)
+static hal_boolval_t s_hal_switch_started_is(void)
 {
-     hl_bits_byte_bitset(&s_hal_device_ethtransceiver_theinternals.started, HAL_device_ethtransceiver_id2index(id));
+    const hal_switch_t id = hal_switch1;
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_switch_theinternals.started, HAL_switch_id2index(id)));
 }
 
 
-
-static hal_result_t s_hal_device_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg)
+static void s_hal_switch_started_set(void)
 {
-    if((NULL == hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.init)         || 
-       (NULL == hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config)       ||
-       (NULL == hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.getphymode) 
-      )
+    const hal_switch_t id = hal_switch1;
+    hl_bits_byte_bitset(&s_hal_switch_theinternals.started, HAL_switch_id2index(id));
+}
+
+
+static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg)
+{
+    if((NULL != hal_brdcfg_switch__theconfig.devcfg.chipif.init) && (NULL != hal_brdcfg_switch__theconfig.devcfg.chipif.config))
     {
-        return(hal_res_NOK_generic);        
+        return(hal_brdcfg_switch__theconfig.devcfg.chipif.init(hal_brdcfg_switch__theconfig.devcfg.chipif.initpar));
     }
 
-    // init the hl transceiver ..
-    s_hl_ethtrans_mapping.supported = hal_brdcfg_device_ethtransceiver__theconfig.supported;
-    hl_ethtrans_map = &s_hl_ethtrans_mapping;
-    hl_ethtrans_chip_init_param = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.initpar;
-    //hl_result_t r = hl_ethtrans_chip_init(hl_ethtrans_chip_init_param);
-    hl_result_t r = hl_ethtrans_init(NULL);
-    
-    return((hal_result_t)r);
-   
+    return(hal_res_NOK_generic);    
 }
 
 
-#endif//HAL_USE_DEVICE_ETHTRANSCEIVER
+#endif//HAL_USE_SWITCH
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

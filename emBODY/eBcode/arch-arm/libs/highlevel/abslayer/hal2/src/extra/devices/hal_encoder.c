@@ -17,8 +17,8 @@
 */
 
 
-/* @file       hal_device_mux.c
-	@brief      This file implements internal implementation of the hal id module.
+/* @file       hal_encoder.c
+	@brief      This file implements internal implementation of the hal encoder module.
 	@author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       02/07/2013
 **/
@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_MUX
+#ifdef HAL_USE_ENCODER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -37,7 +37,8 @@
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
 #include "hl_bits.h" 
-#include "hal_heap.h" 
+#include "hal_heap.h"
+
 
 
  
@@ -45,7 +46,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_mux.h"
+#include "hal_encoder.h"
 
 
 
@@ -53,14 +54,14 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_mux_hid.h"
+#include "hal_encoder_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_mux_id2index(t)              ((uint8_t)((t)))
+#define HAL_encoder_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -68,7 +69,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const hal_mux_cfg_t hal_mux_cfg_default = { .dummy = 0 };
+extern const hal_encoder_cfg_t hal_encoder_cfg_default = { .priority = hal_int_priority15, .callback_on_rx = NULL, .arg = NULL };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -76,48 +77,62 @@ extern const hal_mux_cfg_t hal_mux_cfg_default = { .dummy = 0 };
 
 typedef struct
 {
-    hal_mux_cfg_t           config;
-    // altre cose tipo gpio etc etc ...
-    hal_gpio_t              enable;
-    hal_gpio_t              sel0;
-    hal_gpio_t              sel1;     
-} hal_mux_internal_item_t;
+    hal_encoder_cfg_t       config;
+    hal_mux_t               muxid;
+    hal_mux_sel_t           muxsel;
+    hal_spi_t               spiid;
+    hal_encoder_position_t  position;
+    uint8_t                 rxframe[4]; // it could be 3 ...
+} hal_encoder_internal_item_t;
 
 
 typedef struct
 {
-    uint8_t                     initted;
-    hal_mux_internal_item_t*    items[hal_muxes_number];   
-} hal_mux_theinternals_t;
-
+    uint16_t                                initted;
+    hal_encoder_internal_item_t*            items[hal_encoders_number];   
+} hal_encoder_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_mux_supported_is(hal_mux_t id);
-static void s_hal_mux_initted_set(hal_mux_t id);
-static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id);
+static hal_boolval_t s_hal_encoder_supported_is(hal_encoder_t id);
+static void s_hal_encoder_initted_set(hal_encoder_t id);
+static hal_boolval_t s_hal_encoder_initted_is(hal_encoder_t id);
 
+
+static void s_hal_encoder_onreceiv(void* p);
+
+static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const hal_gpio_cfg_t s_hal_mux_gpio_config = 
+static const hal_spi_cfg_t s_hal_encoder_spicfg_master =
 {
-    .dir    = hal_gpio_dirOUT,
-    .speed  = hal_gpio_speed_max,
-    .altcfg = NULL
-};
+    .ownership                  = hal_spi_ownership_master,
+    .direction                  = hal_spi_dir_rxonly,
+    .activity                   = hal_spi_act_framebased,
+    .prescaler                  = hal_spi_prescaler_064,
+    .speed                      = hal_spi_speed_dontuse, 
+    .sizeofframe                = 3,
+    .capacityoftxfifoofframes   = 0,
+    .capacityofrxfifoofframes   = 1,
+    .dummytxvalue               = 0,    
+    .onframetransm              = NULL,
+    .argonframetransm           = NULL,
+    .onframereceiv              = s_hal_encoder_onreceiv,
+    .argonframereceiv           = NULL
+};   
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_mux_theinternals_t s_hal_mux_theinternals =
+static hal_encoder_theinternals_t s_hal_encoder_theinternals =
 {
     .initted            = 0,
     .items              = { NULL }   
@@ -131,115 +146,87 @@ static hal_mux_theinternals_t s_hal_mux_theinternals =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
+extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
 {
-    hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)];
+    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
 
-    if(hal_false == s_hal_mux_supported_is(id))
+    if(hal_false == s_hal_encoder_supported_is(id))
     {
         return(hal_res_NOK_generic);
-    }
-    
-    if(hal_true == s_hal_mux_initted_is(id))
-    {
-        return(hal_res_OK);
     }
     
     if(NULL == cfg)
     {
-        cfg = &hal_mux_cfg_default;
+        cfg = &hal_encoder_cfg_default;
     }
      
         
-    // configure the required mux port and put it in selNONE.
-    
+    // configure the required mux port and spi port.
     
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)] = hal_heap_new(sizeof(hal_mux_internal_item_t));
+        intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)] = hal_heap_new(sizeof(hal_encoder_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }       
     
-    memcpy(&intitem->config, cfg, sizeof(hal_mux_cfg_t));   
+    memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
+    intitem->spiid  = hal_brdcfg_encoder__theconfig.spimap[HAL_encoder_id2index(id)].spiid;    
+    intitem->muxid  = hal_brdcfg_encoder__theconfig.spimap[HAL_encoder_id2index(id)].muxid;
+    intitem->muxsel = hal_brdcfg_encoder__theconfig.spimap[HAL_encoder_id2index(id)].muxsel;
+    intitem->position  = 0;
     
-    memcpy(&intitem->enable, &hal_brdcfg_device_mux__theconfig.gpiomap[HAL_device_mux_id2index(id)].gpio_enable.gpio, sizeof(hal_gpio_t));
-    memcpy(&intitem->sel0,   &hal_brdcfg_device_mux__theconfig.gpiomap[HAL_device_mux_id2index(id)].gpio_sel0.gpio, sizeof(hal_gpio_t));
-    memcpy(&intitem->sel1,   &hal_brdcfg_device_mux__theconfig.gpiomap[HAL_device_mux_id2index(id)].gpio_sel1.gpio, sizeof(hal_gpio_t));
-
+    hal_mux_init(intitem->muxid, NULL);
     
+    hal_spi_init(intitem->spiid, &s_hal_encoder_spicfg_master);
     
-    hal_gpio_init(intitem->enable, &s_hal_mux_gpio_config);
-    hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
-    
-    hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
-    
-    hal_gpio_init(intitem->sel0, &s_hal_mux_gpio_config);
-    hal_gpio_setval(intitem->sel0, hal_gpio_valHIGH);
-    
-    hal_gpio_init(intitem->sel1, &s_hal_mux_gpio_config);
-    hal_gpio_setval(intitem->sel1, hal_gpio_valHIGH);   
-    
-        
-
-    s_hal_mux_initted_set(id);
+ 
+    s_hal_encoder_initted_set(id);
     return(hal_res_OK);
 }
 
 
-extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
-{    
-    hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)];
-    const hal_reltime_t delay = 1; // specs say 50 ns are enough. granularity of hal_sys_delay() is 1 micro. if we use w/ arg 0 we have a very small delay of ... > 50 nano?
+extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
+{  
+    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];   
     
-    static const hal_gpio_val_t s_values_sel0[hal_mux_sels_number] = {hal_gpio_valLOW,   hal_gpio_valHIGH,   hal_gpio_valLOW};
-    static const hal_gpio_val_t s_values_sel1[hal_mux_sels_number] = {hal_gpio_valLOW,   hal_gpio_valLOW,    hal_gpio_valHIGH};
-    
-    if(hal_false == s_hal_mux_initted_is(id))
+    if(hal_false == s_hal_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    // do something 
+       
+    hal_mux_enable(intitem->muxid, intitem->muxsel);
     
+    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
     
-    if(hal_mux_selNONE == muxsel)
-    {
-        return(hal_mux_disable(id));
-    }
+    hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
     
-    hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
-    hal_sys_delay(delay);   // specs say 50 ns are enough. granularity of hal_sys_delay() is 1 micro. we use 0 to give the smallest delay
-    hal_gpio_setval(intitem->sel0, s_values_sel0[(uint8_t)muxsel]);    
-    hal_gpio_setval(intitem->sel1, s_values_sel1[(uint8_t)muxsel]);       
-    hal_sys_delay(delay);   // specs say 50 ns are enough
-    
-    hal_gpio_setval(intitem->enable, hal_gpio_valLOW);
+    // when the frame is received, then the isr will call s_hal_encoder_onreceiv() to copy the frame into local memory,
+    // so that hal_encoder_get_value() can be called to retrieve teh encoder value
     
     return(hal_res_OK);
 }
 
 
 
-extern hal_result_t hal_mux_disable(hal_mux_t id)
+extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value)
 {
-    hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_device_mux_id2index(id)];
+    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
     
-    if(hal_false == s_hal_mux_initted_is(id))
+    if(hal_false == s_hal_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    // do something 
+    if(NULL != value)
+    {
+        *value = intitem->position; 
+        return(hal_res_OK);
+    }
     
-
-    hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
-    hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
-    hal_gpio_setval(intitem->sel0, hal_gpio_valHIGH);    
-    hal_gpio_setval(intitem->sel1, hal_gpio_valHIGH);   
-    
-    return(hal_res_OK);
+    return(hal_res_NOK_generic);  
 }
 
 
@@ -254,31 +241,68 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
 
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_mux_supported_is(hal_mux_t id)
+static hal_boolval_t s_hal_encoder_supported_is(hal_encoder_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_mux__theconfig.supported_mask, HAL_device_mux_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_encoder__theconfig.supported_mask, HAL_encoder_id2index(id)) );
 }
 
 
-static void s_hal_mux_initted_set(hal_mux_t id)
+static void s_hal_encoder_initted_set(hal_encoder_t id)
 {
-    hl_bits_byte_bitset(&s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id));
+    hl_bits_hlfword_bitset(&s_hal_encoder_theinternals.initted, HAL_encoder_id2index(id));
 }
 
 
-static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id)
+static hal_boolval_t s_hal_encoder_initted_is(hal_encoder_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_mux_theinternals.initted, HAL_device_mux_id2index(id)));
+    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_encoder_theinternals.initted, HAL_encoder_id2index(id)));
 }
 
 
 
+static void s_hal_encoder_onreceiv(void* p)
+{
+    int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversion from pointer to smaller integer
+    hal_encoder_t id = (hal_encoder_t)tmp;
+    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    
+    hal_spi_stop(intitem->spiid);
+    hal_mux_disable(intitem->muxid);
+    
+    // ok ... now i get the frame of three bytes.
+    
+    hal_spi_get(intitem->spiid, intitem->rxframe, NULL);
+    
+    intitem->position = s_hal_encoder_frame2position(intitem->rxframe);
+    
+    // ok. now i call the callbcak on execution of encoder
+    
+    if(NULL != intitem->config.callback_on_rx)
+    {
+        intitem->config.callback_on_rx(intitem->config.arg);
+    }
+    
+}
 
-#endif//HAL_USE_DEVICE_MUX
+
+static hal_encoder_position_t s_hal_encoder_frame2position(uint8_t* frame)
+{
+    uint32_t pos = 0;
+    
+    //pos = frame[0] | (frame[1] << 8) | (frame[2] << 16);
+    // VALE formatting result
+    pos = ((frame[0] & 0x7F) << 16) | (frame[1] << 8) | (frame[2] & 0xE0);
+    pos = pos >> 5;
+    return(pos);
+}
+
+
+#endif//HAL_USE_ENCODER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

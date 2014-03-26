@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Author:  Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_ACCELEROMETER_HID_H_
-#define _HAL_DEVICE_ACCELEROMETER_HID_H_
+#ifndef _HAL_LED_HID_H_
+#define _HAL_LED_HID_H_
 
 
-/* @file       hal_device_accelerometer_hid.h
-    @brief      This header file implements hidden interface to accelerometer device
-    @author     marco.accame@iit.it
-    @date       10/26/2012
+/* @file       hal_dled_hid.h
+    @brief      This header file implements hidden interface to a led
+    @author     marco.accame@iit.it, valentina.gaggero@iit.it
+    @date       09/16/2011
  **/
 
 
@@ -32,11 +32,12 @@
 
 #include "hal_base.h"
 
+#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_accelerometer.h"
+#include "hal_led.h"
 
 
 
@@ -46,31 +47,26 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
-typedef hal_result_t (*hal_device_accelerometer_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
-
 typedef struct
-{   
-    hal_res_fp_voidp_t                              init;
-    void*                                           initpar;
-    hal_device_accelerometer_hid_fn_read_t          read;
-} hal_device_accelerometer_hid_chip_interface_t;
-
-typedef struct
-{   
-    hal_device_accelerometer_hid_chip_interface_t   chipif;
-} hal_device_accelerometer_hid_dev_cfg_t;
+{
+    hal_gpio_maP_t      led;       
+} hal_led_gpiomap_t;
 
 typedef struct
 {
-    uint8_t                                         supported_mask;
-    hal_device_accelerometer_hid_dev_cfg_t          devcfg[hal_accelerometers_number];
-} hal_device_accelerometer_hid_brdcfg_t;
+    uint16_t                supported_mask;
+    hal_gpio_val_t          value_on;
+    hal_gpio_val_t          value_off;
+    hal_led_gpiomap_t       gpiomap[hal_leds_number];
+} hal_led_hid_brdcfg_t;
+
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_led_hid_brdcfg_t hal_brdcfg_led__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+
 
 
 

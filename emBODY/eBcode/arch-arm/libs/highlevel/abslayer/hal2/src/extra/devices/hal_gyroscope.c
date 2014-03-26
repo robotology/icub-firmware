@@ -16,8 +16,8 @@
  * Public License for more details
 */
 
-/* @file       hal_device_termometer.c
-	@brief      This file implements internals of the temperature sensing device
+/* @file       hal_gyroscope.c
+	@brief      This file implements internals of the gyroscope module.
 	@author     marco.accame@iit.it
     @date       10/24/2012
 **/
@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_DEVICE_TERMOMETER
+#ifdef HAL_USE_GYROSCOPE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -36,14 +36,9 @@
 #include "hal_base_hid.h" 
 #include "hal_brdcfg.h"
 
-
-#include "hal_trace.h"
 #include "stdio.h"
 
 #include "hl_bits.h"
-
-
-
 
 
  
@@ -51,7 +46,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_termometer.h"
+#include "hal_gyroscope.h"
 
 
 
@@ -59,14 +54,14 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_device_termometer_hid.h"
+#include "hal_gyroscope_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_device_termometer_id2index(t)              ((uint8_t)((t)))
+#define HAL_gyroscope_id2index(t)              ((uint8_t)((t)))
 
 
 
@@ -74,7 +69,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const hal_termometer_cfg_t hal_termometer_cfg_default  = 
+extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default  = 
 { 
     .dummy = 0 
 };
@@ -83,27 +78,28 @@ extern const hal_termometer_cfg_t hal_termometer_cfg_default  =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
 typedef struct
 {
-    hal_termometer_cfg_t        config;
-} hal_device_termometer_internal_item_t;
+    hal_gyroscope_cfg_t           config;
+} hal_gyroscope_internal_item_t;
 
 typedef struct
 {
     uint8_t                                 initted;
-    hal_device_termometer_internal_item_t   items[hal_termometers_number];
-} hal_device_termometer_theinternals_t;
+    hal_gyroscope_internal_item_t*   items[hal_gyroscopes_number];   
+} hal_gyroscope_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_device_termometer_supported_is(hal_termometer_t id);
-static void s_hal_device_termometer_initted_set(hal_termometer_t id);
-static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_t id);
+static hal_boolval_t s_hal_gyroscope_supported_is(hal_gyroscope_t id);
+static void s_hal_gyroscope_initted_set(hal_gyroscope_t id);
+static hal_boolval_t s_hal_gyroscope_initted_is(hal_gyroscope_t id);
 
-static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg);
+static hal_result_t s_hal_gyroscope_hw_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -116,12 +112,12 @@ static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_t id, const h
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_device_termometer_theinternals_t s_hal_device_termometer_theinternals =
+
+static hal_gyroscope_theinternals_t s_hal_gyroscope_theinternals =
 {
     .initted            = 0,
     .items              = { NULL }   
 };
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -129,58 +125,84 @@ static hal_device_termometer_theinternals_t s_hal_device_termometer_theinternals
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
+extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
 {
-//     hal_device_termometer_internal_item_t *info = s_hal_device_termometer_theinternals.items[0];
+//    hal_result_t res = hal_res_NOK_generic; // dont remove ...
+//    hal_gyroscope_internals_t *info = NULL;
 
-    if(hal_false == s_hal_device_termometer_supported_is(id))
+    if(hal_false == s_hal_gyroscope_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
      
     if(NULL == cfg)
     {
-        cfg  = &hal_termometer_cfg_default;
+        cfg  = &hal_gyroscope_cfg_default;
     }
-    
-    if(hal_true == s_hal_device_termometer_initted_is(id))
+
+    if(hal_true == s_hal_gyroscope_initted_is(id))
     {
         return(hal_res_OK);
     } 
- 
-    if(hal_res_OK != s_hal_device_termometer_hw_init(id, cfg))
+    
+    if(hal_res_OK != s_hal_gyroscope_hw_init(id, cfg))
     {
         return(hal_res_NOK_generic);
     }
     
-    s_hal_device_termometer_initted_set(id);
+    s_hal_gyroscope_initted_set(id);
 
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degrees_t* degrees)
+
+// static int32_t s_hal_gyroscope_convert(int32_t v)
+// {
+//     // the range is +-250 dps. it means that 32k is mapped into 250 -> 32k/250 = 131.072
+//     // if i have 1 degree i must read 131.072 ...
+//     // if i want to transform in milli-degree, i must read 131.072 / 1000 = 0.131072 = G
+//     // to have the measure in milli-degree i must multiply the read for G.
+//     // G = 8590 / (64*1024) = 0.131072998046875 .... i multiply and then i shift 16 times
+
+//     uint8_t neg = (v < 0) ? (1) : (0);
+//     int32_t r = (0 == neg) ? (8590*v) : (8590*(-v));
+//     // now r is positive
+//     r >>= 16;
+//     r = (0 == neg) ? (r) : (-r);
+//     
+//     return(r);  
+// }
+    
+
+extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate)
 {
     hal_result_t res = hal_res_NOK_generic; 
-//    hal_device_termometer_internal_item_t *info = s_hal_device_termometer_theinternals.items[0];
-    int8_t data08 = 0;
-
-    if(NULL == degrees)
+ 
+    if(NULL == angrate)
     {
         return(hal_res_NOK_generic);
     }
     
-    if(hal_false == s_hal_device_termometer_initted_is(id))
-    {
-        *degrees = -128;
-        return(hal_res_NOK_generic);
-    }
-
-
-    res = hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.read(&data08);
-    *degrees = (int16_t) data08;  
+    angrate->xar = 0;
+    angrate->yar = 0;
+    angrate->zar = 0;
+    int32_t xar = 0;
+    int32_t yar = 0;
+    int32_t zar = 0;
+       
+    res = hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.read(&xar, &yar, &zar);
     
-    return(res);    
+    if(hal_res_OK == res)
+    {
+ 
+        angrate->xar = xar; //  factor is about 8.75 or 35/4
+        angrate->yar = yar;
+        angrate->zar = zar;        
+    }
+    
+    return(res);
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -199,27 +221,27 @@ extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degr
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static hal_boolval_t s_hal_device_termometer_supported_is(hal_termometer_t id)
+static hal_boolval_t s_hal_gyroscope_supported_is(hal_gyroscope_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_device_termometer__theconfig.supported_mask, HAL_device_termometer_id2index(id)) );
+    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_gyroscope__theconfig.supported_mask, HAL_gyroscope_id2index(id)) );
 }
 
-static void s_hal_device_termometer_initted_set(hal_termometer_t id)
+static void s_hal_gyroscope_initted_set(hal_gyroscope_t id)
 {
-    hl_bits_byte_bitset(&s_hal_device_termometer_theinternals.initted, HAL_device_termometer_id2index(id));
+    hl_bits_byte_bitset(&s_hal_gyroscope_theinternals.initted, HAL_gyroscope_id2index(id));
 }
 
-static hal_boolval_t s_hal_device_termometer_initted_is(hal_termometer_t id)
+static hal_boolval_t s_hal_gyroscope_initted_is(hal_gyroscope_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_device_termometer_theinternals.initted, HAL_device_termometer_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_gyroscope_theinternals.initted, HAL_gyroscope_id2index(id)));
 }
 
 
-static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
-{   
-    if((NULL != hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.init) && (NULL != hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.read))
+static hal_result_t s_hal_gyroscope_hw_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
+{
+    if((NULL != hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.init) && (NULL != hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.read))
     {
-        return(hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.init(hal_brdcfg_device_termometer__theconfig.devcfg[HAL_device_termometer_id2index(id)].chipif.initpar));
+        return(hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.init(hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.initpar));
     }
     else
     {
@@ -228,7 +250,7 @@ static hal_result_t s_hal_device_termometer_hw_init(hal_termometer_t id, const h
 }
 
 
-#endif//HAL_USE_DEVICE_TERMOMETER
+#endif//HAL_USE_GYROSCOPE
 
 
 // --------------------------------------------------------------------------------------------------------------------

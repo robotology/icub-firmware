@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero, Marco Accame
+ * email:   valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -17,14 +17,14 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_DEVICE_GYROSCOPE_HID_H_
-#define _HAL_DEVICE_GYROSCOPE_HID_H_
+#ifndef _HAL_MUX_HID_H_
+#define _HAL_MUX_HID_H_
 
 
-/* @file       hal_device_gyroscope_hid.h
-    @brief      This header file implements hidden interface to a gyroscope
-    @author     marco.accame@iit.it
-    @date       10/24/2012
+/* @file       hal_mux_hid.h
+    @brief      This header file implements hidden interface to a id
+    @author     marco.accame@iit.it, valentina.gaggero@iit.it
+    @date       02/07/2013
  **/
 
 
@@ -32,11 +32,12 @@
 
 #include "hal_base.h"
 
+#include "hal_gpio.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_gyroscope.h"
+#include "hal_mux.h"
 
 
 
@@ -46,29 +47,24 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_device_gyroscope_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
-
 typedef struct
-{   
-    hal_res_fp_voidp_t                          init;
-    void*                                       initpar;
-    hal_device_gyroscope_hid_fn_read_t          read;
-} hal_device_gyroscope_hid_chip_interface_t;
+{
+    hal_gpio_maP_t          gpio_sel0;      /**<  */
+    hal_gpio_maP_t          gpio_sel1;      /**<  */
+    hal_gpio_maP_t          gpio_enable;    /**<  */
+} hal_mux_gpiomap_t;
 
-
-typedef struct
-{   
-    hal_device_gyroscope_hid_chip_interface_t   chipif;
-} hal_device_gyroscope_hid_dev_cfg_t;
 
 typedef struct
 {
-    uint8_t                                     supported_mask;
-    hal_device_gyroscope_hid_dev_cfg_t          devcfg[hal_gyroscopes_number];
-} hal_device_gyroscope_hid_brdcfg_t;
+    uint8_t                     supported_mask;
+    hal_mux_gpiomap_t           gpiomap[hal_muxes_number];
+} hal_mux_hid_brdcfg_t;
+
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_mux_hid_brdcfg_t hal_brdcfg_mux__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
