@@ -48,7 +48,8 @@ typedef struct
 } hal_base_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_base_hid_brdcfg_t hal_brdcfg_base__theconfig;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

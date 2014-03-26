@@ -18,7 +18,6 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-
 #ifndef _HAL_FLASH_HID_H_
 #define _HAL_FLASH_HID_H_
 
@@ -55,7 +54,8 @@ typedef struct
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

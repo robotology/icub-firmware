@@ -17,7 +17,6 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-
 #ifndef _HAL_HEAP_HID_H_
 #define _HAL_HEAP_HID_H_
 
@@ -49,7 +48,8 @@ typedef struct
 } hal_heap_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

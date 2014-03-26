@@ -42,35 +42,6 @@
 
 // - definition of hidden structs -------------------------------------------------------------------------------------
 
-// typedef enum 
-// {
-//     hal_cpu_refclock_internal               = 0,
-//     hal_cpu_refclock_external_xtl           = 1,
-//     hal_cpu_refclock_external_osc           = 2,
-//     hal_cpu_refclock_pll_on_internal        = 3,
-//     hal_cpu_refclock_pll_on_external_xtl    = 4,   
-//     hal_cpu_refclock_pll_on_external_osc    = 5   
-// } hal_cpu_hid_refclock_t;
-
-
-// #if     defined(HAL_USE_CPU_FAM_STM32F1)
-// typedef struct 
-// {   // pll2clock = pll2mul*(hse/prediv2), speedcpu = pllmul*(pll2clock/prediv1) 
-//     uint32_t                        prediv2;    
-//     uint32_t                        pll2mul;
-//     uint32_t                        prediv1;
-//     uint32_t                        pllmul;
-// } hal_cpu_hid_pll_cfg_t;
-// #elif   defined(HAL_USE_CPU_FAM_STM32F4)
-// typedef struct 
-// {   // pllfreq = n*(source/m), speedcpu = pllfreq/p, 48mhz = pllfreq/q 
-//     uint32_t                        m;    
-//     uint32_t                        n;
-//     uint32_t                        p;
-//     uint32_t                        q;
-// } hal_cpu_hid_pll_cfg_t;
-// #endif
-
 
 typedef struct 
 {
@@ -81,27 +52,17 @@ typedef struct
 } hal_cpu_hid_speeds_t;
 
 
-// typedef struct 
-// {
-//     hal_bool_t                      keepinternalclockatstartup; // if hal_true: it runs at intclockspeed at startup and changes to refclock inside hal_cpu_systeminit()
-//     hal_cpu_hid_refclock_t          refclock;                   // the clock or mixture of clock and pll to use          
-//     uint32_t                        intclockspeed;              // the speed of the internal clock   
-//     uint32_t                        extclockspeed;              // teh speed of teh external clock
-//     hal_cpu_hid_pll_cfg_t           pllcfg;                     // the way the pll, if used, is configured
-// } hal_cpu_hid_clock_cfg_t;
-
-
 typedef struct
 {
     hal_cpu_architecture_t          architecture;
     hal_cpu_family_t                family;
     hal_cpu_name_t                  name;
     hal_cpu_hid_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
-//    hal_cpu_hid_clock_cfg_t         clockcfg;           // the configuration of clock etc., which are used to achieve the above speeds
 } hal_cpu_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
-// empty-section
+
+extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
