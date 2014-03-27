@@ -50,28 +50,11 @@
 
 #if   defined(HL_USE_BRD_MCBSTM32_F400) 
 
-// #define HL_USE_UTIL_SYS
-// #define HL_USE_UTIL_GPIO
-// #define HL_USE_UTIL_BITS
-// #define HL_USE_UTIL_FIFO
-// //#define HL_USE_UTIL_I2C
-// #define HL_USE_UTIL_ETH
-// #define HL_USE_UTIL_ETHTRANS
-// #define HL_USE_CHIP_XX_ETHPHY
-
+    #error --> using board f400
 
 #elif defined(HL_USE_BRD_EMS004)
 
-// #define HL_USE_UTIL_SYS
-// #define HL_USE_UTIL_GPIO
-// #define HL_USE_UTIL_BITS
-// #define HL_USE_UTIL_FIFO
-// #define HL_USE_UTIL_I2C
-// #define HL_USE_UTIL_ETH
-// #define HL_USE_UTIL_ETHTRANS
-// #define HL_USE_CHIP_MICREL_KS8893
-// #define HL_USE_UTIL_CAN
-// #define HL_USE_UTIL_CAN_COMM
+    #error --> using board ems004
 
 #elif defined(HL_USE_BRD_EMS4RD)
 
