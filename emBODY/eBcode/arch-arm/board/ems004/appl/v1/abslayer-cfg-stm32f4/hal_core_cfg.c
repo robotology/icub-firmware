@@ -101,7 +101,7 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
         return;
     }
 
-    hal_led_init(hal_led3, NULL);
+    hal_led_init(hal_led2, NULL);
 
     for(;;)
     {

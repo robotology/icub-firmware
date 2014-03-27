@@ -77,8 +77,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
-
+#define MAX_WAITFOR2FOC     300
+static uint32_t waittimefor2foc=0;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,7 +125,14 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     }
     else
     {
-        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), canBoardsReady);
+        if(waittimefor2foc<MAX_WAITFOR2FOC)
+        {
+            waittimefor2foc++;
+        }
+        else
+        {
+            eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), canBoardsReady);
+        }
     }
     
 }

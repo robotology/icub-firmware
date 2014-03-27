@@ -73,7 +73,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define CANBOARDSRAEDY_CHECK_PERIOD         5000
+#define CANBOARDSRAEDY_CHECK_PERIOD         10000
 #define CANBOARDSRAEDY_CHECK_TIMEOUT_EVT    emsconfigurator_evt_userdef
 
 
@@ -778,7 +778,7 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
 
 static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p)
 {
-    eOresult_t                              res;
+    eOresult_t                              res = eores_OK;
     EOaction                                action;
     
     //note: can protocol version check is done only for motor control
@@ -790,8 +790,7 @@ static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p)
     
     eo_action_SetEvent(&action, CANBOARDSRAEDY_CHECK_TIMEOUT_EVT, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     eo_timer_Start(p->canBoardsReady_timer, eok_abstimeNOW, CANBOARDSRAEDY_CHECK_PERIOD, eo_tmrmode_FOREVER, &action);
-        
-    res = s_eo_emsapplBody_sendGetFWVersion(p, 0xFFFF); //here all boards are not ready, i.e. they didn't receive get_fw_ver can msg!
+    //res = s_eo_emsapplBody_sendGetFWVersion(p, 0xFFFF); //here all boards are not ready, i.e. they didn't receive get_fw_ver can msg!
     return(res);
 }
 
