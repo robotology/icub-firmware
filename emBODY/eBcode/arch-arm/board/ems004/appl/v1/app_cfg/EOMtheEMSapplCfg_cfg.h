@@ -53,9 +53,9 @@ extern "C" {
 
 
 //  <o> ID of the EMS board     <0=> Use external file <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
-//                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
+//                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9   <10=>EB10   <11=>EB11
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     0
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     11
 
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 0
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
@@ -945,6 +945,24 @@ extern "C" {
         #include    "eOcfg_EPs_eb9.h"
         #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb9_object
         #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb9_hashfunction_ep2index  
+#endif
+#elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+        #define     EOMTHEEMSAPPLCFG_USE_EB10
+        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB10"
+#if defined(EO_USE_EPROT_V2)
+        #include    "eOprot_b10.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b10_nvsetDEVcfg
+#else        
+       #error undefined netvars for board 10 in eth proto version  1
+#endif
+#elif   (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+        #define     EOMTHEEMSAPPLCFG_USE_EB11
+        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB11"
+#if defined(EO_USE_EPROT_V2)
+        #include    "eOprot_b11.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b11_nvsetDEVcfg
+#else        
+       #error undefined netvars for board 11 in eth proto version  1
 #endif
 #endif
 
