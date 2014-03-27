@@ -65,12 +65,12 @@ and with id not continuos. */
 #define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_AS_MSG_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_pollingSkinMsg_inTbl_max               1//ICUBCANPROTO_POL_AS_CMD_MAXNUM
-#define eo_icubCanProto_pollingSkinMsgClass_maxNum             ICUBCANPROTO_POL_SK_CMD_MAXNUM
+#define eo_icubCanProto_pollingSkinMsg_inTbl_max               3//ICUBCANPROTO_POL_AS_CMD_MAXNUM
+//#define eo_icubCanProto_pollingSkinMsgClass_maxNum             ICUBCANPROTO_POL_SK_CMD_MAXNUM commented because unused
 
 /*currently only one message per class is managed (test porpouse)*/
 #define eo_icubCanProto_periodicSkinMsg_inTbl_max              1//ICUBCANPROTO_PER_AS_CMD_MAXNUM 
-#define eo_icubCanProto_periodicSkinMsg_maxNum                 ICUBCANPROTO_PER_SK_CMD_MAXNUM
+//#define eo_icubCanProto_periodicSkinMsg_maxNum                 ICUBCANPROTO_PER_SK_CMD_MAXNUM commented because unused
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -225,8 +225,14 @@ extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_former_
 /* DECLARATION OF POLLING SKIN FORMER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingSkinMsg_formerFn_list[eo_icubCanProto_pollingSkinMsg_inTbl_max] = 
 {
-    {   // 76 tact setup			
+    {   // 76 tact setup
         EO_INIT(.former)    eo_icubCanProto_former_pol_sk_cmd__tactSetup
+    },
+    {   // 77 tact setup
+        EO_INIT(.former)    eo_icubCanProto_former_pol_sb_unexpected_cmd
+    },
+    {   // 78 tact setup2
+        EO_INIT(.former)    eo_icubCanProto_former_pol_sk_cmd__tactSetup2
     }
 };        
 

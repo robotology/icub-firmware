@@ -157,6 +157,21 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
             {
                 return;
             }
+            
+            if(i == 0xE)
+            {
+                eOicubCanProto_msgCommand_t msgCmd2 = 
+                {
+                    EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
+                    EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2
+                };
+                
+                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd2, NULL);
+                if(eores_OK != res)
+                {
+                    return;
+                }
+            }
         }
 
     }// end if

@@ -614,34 +614,39 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
     canFrame->id = ICUBCANPROTO_POL_SK_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
-    
+    canFrame->size = 8;
 
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
-    
-    if(0xE == dest.s.canAddr)
-    {
-        canFrame->data[0]=0x4E; 
-        canFrame->data[1]=0x02;  
-        canFrame->data[2]=0x22;
-        canFrame->data[3]=0xf0;
-        canFrame->data[4]=0x00;
-        canFrame->data[5]=0xFF;
-        canFrame->data[6]=0xff;
-        canFrame->size = 7;
-    }
-    else
-    {
-        canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;  
-        canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
-        canFrame->data[2]=0x01;  //==> invia ogni 40 milli
-        canFrame->data[3]=0x03;
-        canFrame->data[4]=0;
-        canFrame->data[5]=0x20;
-        canFrame->data[6]=0;
-        canFrame->data[7]=35;
-        canFrame->size = 8;
-    }
-    
+
+    canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;  
+    canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
+    canFrame->data[2]=0x01;  //==> invia ogni 40 milli
+    canFrame->data[3]=0x03;
+    canFrame->data[4]=0;
+    canFrame->data[5]=0x20;
+    canFrame->data[6]=0;
+    canFrame->data[7]=35;
+
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup2(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_SK_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 7;
+
+    /* 2) set can command (see SkinPrototype::calibrateSensor)*/
+    canFrame->data[0]=ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2; 
+    canFrame->data[1]=0x00;  
+    canFrame->data[2]=0x22;
+    canFrame->data[3]=0xf0;
+    canFrame->data[4]=0x00;
+    canFrame->data[5]=0xFF;
+    canFrame->data[6]=0xff;
 
     return(eores_OK);
 }
