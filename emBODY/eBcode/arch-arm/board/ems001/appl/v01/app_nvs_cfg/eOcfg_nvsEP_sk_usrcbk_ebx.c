@@ -37,7 +37,7 @@
 #include "EOnv_hid.h"
 
 #include "EOSkin.h"
-//#include "eOcfg_nvsEP_sk.h"
+#include "EoProtocol.h"
 
 //application
 #include "EOtheEMSapplBody.h"
@@ -121,10 +121,11 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
 {
     eOresult_t                      res;
     uint8_t                         i;
-    eOappTheDB_SkinCanLocation_t    canLoc;
-    eOsk_skinId_t                   skId = 0; //for DB the skin is unique entity
+    eOsk_skinId_t                   skId = eoprot_ID2index(rd->id32);
     eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->ram;
     EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
+    uint8_t                         boardEndAddr;
     
     /* NOTE: corrently any skin board starts to send can frame when it finishes its initilisation
             and pc104 configures only signal mode and not skin boards. (how many triangulars, resolution bits, etc).
@@ -135,22 +136,23 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
     {
         eOicubCanProto_msgCommand_t msgCmd = 
         {
-            EO_INIT(.class) 4,
+            EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
             EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP
         };
-
-//        hal_led_on(hal_led2);
         
-        res = eo_appTheDB_GetSkinCanLocation(eo_appTheDB_GetHandle(), skId, &canLoc);
+        res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
         if(eores_OK != res)
         {
             return;
         }
-        for(i=8; i<15; i++)
+        
+        boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
+        
+        for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
         {
             eOicubCanProto_msgDestination_t msgdest;
             msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-            res = eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+            res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd, NULL);
             if(eores_OK != res)
             {
                 return;

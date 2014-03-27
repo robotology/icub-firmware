@@ -156,8 +156,16 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrStrain__ptr = &s_eo_
 static const eOappTheDB_cfg_skinInfo_t  s_cfg_appDB_skin [] = 
 {
     {// 0
+        EO_INIT(.connected2emsport)                       eOcanport1,
+        EO_INIT(.boardAddrStart)                          1,
+        EO_INIT(.numofboards)                             7
+    },
+    //1
+    {
         EO_INIT(.connected2emsport)                       eOcanport2,
-   }
+        EO_INIT(.boardAddrStart)                          8,
+        EO_INIT(.numofboards)                             7
+    }
 };
 
 

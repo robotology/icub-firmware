@@ -54,7 +54,11 @@
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB8)
       #include    "eOcfg_applDataBase_eb8.c"
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
-      #include    "eOcfg_applDataBase_eb9.c"
+        #include    "eOcfg_applDataBase_eb9.c"
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10)
+        #include    "eOcfg_applDataBase_eb10.c"
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB11)
+        #include    "eOcfg_applDataBase_eb11.c"
 #else
     #error --> you must define an EBx
 #endif

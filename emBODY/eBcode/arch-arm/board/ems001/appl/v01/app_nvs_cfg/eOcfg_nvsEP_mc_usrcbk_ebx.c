@@ -200,12 +200,13 @@ const eOmc_joint_t joint_default_value =
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
       #include    "eOcfg_nvsEP_mc_joint_usrcbk_ebx_2foc.c"
 #else
-    #error --> you must define an EBx
+    #warning --> no eth proto user callback defined!!!
 #endif
 
-//this file is equal for all ems
-#include    "eOcfg_nvsEP_mc_motor_usrcbk_ebx.c"
-
+//this file is equal for all ems except eb10 and eb11
+#if !defined(EOMTHEEMSAPPLCFG_USE_EB10) & !defined(EOMTHEEMSAPPLCFG_USE_EB11)
+    #include    "eOcfg_nvsEP_mc_motor_usrcbk_ebx.c"
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

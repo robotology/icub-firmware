@@ -110,7 +110,9 @@ typedef struct
 
 typedef struct
 {
-    eOcanport_t                           	connected2emsport;
+    eOcanport_t                               connected2emsport;
+    uint8_t                                   boardAddrStart;
+    uint8_t                                   numofboards;
 } eOappTheDB_cfg_skinInfo_t;
 
 
@@ -120,7 +122,7 @@ typedef struct
     uint8_t     jointVelocityEstimationShift;
     uint8_t     jointAccelerationEstimationShift;
     uint8_t     dummy;
-    /* put here ather shift values like: 
+    /* put here other shift values like: 
             uint8_t     motorVelocityEstimationShift;
             uint8_t     motorAccelerationEstimationShift;
             uint8_t     jointVelocityEstimationShift;
@@ -131,41 +133,15 @@ typedef struct
 
 typedef struct
 {
-    //EOnvsCfg                        *nvsCfg;       /**<  Network Variable configuration          */
-//     eOnvEP8_t                        mc_endpoint;   /**<  motion control endpoint managed by the application */
-//     eOnvEP8_t                        as_endpoint;   /**<  analog sensor endpoint managed by the application */
-//     eOnvEP8_t                        sk_endpoint;   /**<  analog sensor endpoint managed by the application */
     /* if one of endpoints is not present ==> then set endpoint to EOK_uint16dummy */
-    const EOconstvector* const      canboardsList; /**< list of CAN boards connected to ems by can */
-    const EOconstvector* const      jointsList;    /**< list of joints managed by an EMS board */
-    const EOconstvector* const      motorsList;    /**< list of motors managed by an EMS board */
-    const EOconstvector* const      snsrMaisList;   /**< list of sensors managed by an EMS board */
-    const EOconstvector* const      snsrStrainList; /**< list of sensors managed by an EMS board */
-    const EOconstvector* const      skinList;      /**< list of skin managed by an EMS board */
+    const EOconstvector* const      canboardsList;   /**< list of CAN boards connected to ems by can */
+    const EOconstvector* const      jointsList;      /**< list of joints managed by an EMS board */
+    const EOconstvector* const      motorsList;      /**< list of motors managed by an EMS board */
+    const EOconstvector* const      snsrMaisList;    /**< list of sensors managed by an EMS board */
+    const EOconstvector* const      snsrStrainList;  /**< list of sensors managed by an EMS board */
+    const EOconstvector* const      skinList;        /**< list of skin managed by an EMS board */
 } eOappTheDB_cfg_t;
 
-
-// typedef struct
-// {
-// 	struct
-// 	{
-// 		EOnvsCfg                        *nvsCfg;      /**<  Network Variable configuration          */
-// 		eOnvEP_t                        mc_endpoint;   /**<  motion control endopoint managed by the application */
-// 		eOnvEP_t                        as_endpoint;   /**<  analog sensor endopoint managed by the application */
-// 		eOnvEP_t                        sk_endpoint;   /**<  analog sensor endopoint managed by the application */
-// 	}nvsdata;
-// 	
-// 	struct
-// 	{
-// 		const EOconstvector* const      canboardsList; /**< list of CAN boars connected to ems by can */
-// 		const EOconstvector* const      jointsList;    /**< list of joints managed by an EMS board */
-// 		const EOconstvector* const      motorsList;    /**< list of motors managed by an EMS board */
-// 		const EOconstvector* const      snrMaisList;   /**< list of sensors managed by an EMS board */
-// 		const EOconstvector* const      snrStrainList; /**< list of sensors managed by an EMS board */
-// 		const EOconstvector* const      skinList;      /**< list of skin managed by an EMS board */
-// 	} connectedStuff;
-// 	
-// } eOappTheDB_cfg_t;
 
 typedef struct
 {
@@ -235,6 +211,8 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strai
 
 extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_SkinCanLocation_t *canloc_ptr);
 
+extern eOresult_t eo_appTheDB_GetSkinId_BySkinCanLocation(EOappTheDB *p, eOappTheDB_SkinCanLocation_t *canloc_ptr, eOsk_skinId_t *skId_ptr);
+
 extern eOresult_t eo_appTheDB_GetCanBoardCfg(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_cfg_canBoardInfo_t **cfg_canbrd_ptr);
 
 extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTheDB_canBoardCanLocation_t *canloc_ptr, eObrd_boardId_t *bid_ptr); 
@@ -263,9 +241,9 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId
 
 
 
-// extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOsk_config_t **skconfig_ptr);
+extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOappTheDB_cfg_skinInfo_t **skconfig_ptr);
 // extern eOresult_t eo_appTheDB_GetSkinStatusPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOsk_status_t **skstatus_ptr);
-extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr);
+//extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr);
 extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_skinId_t skId,  EOarray_of_10canframes **arrayof10canframes_ptr);
 
 

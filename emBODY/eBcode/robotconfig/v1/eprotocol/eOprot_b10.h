@@ -83,7 +83,7 @@ typedef struct                  // 124+24+0 = 128
 
 // - skin
 
-enum { eoprot_b10_sk_skins_numberof = 1 };
+enum { eoprot_b10_sk_skins_numberof = 2 };
             
 
 /** @typedef    typedef struct eOprot_b10_skin_t;
@@ -91,7 +91,7 @@ enum { eoprot_b10_sk_skins_numberof = 1 };
  **/
 typedef struct                  // 176+0 = 176              
 {
-    eOsk_skin_t                 skin; 
+    eOsk_skin_t                 skin[eoprot_b10_sk_skins_numberof]; 
 } eOprot_b10_skin_t;            //EO_VERIFYsizeof(eOprot_b10_skin_t, 176); 
 
 

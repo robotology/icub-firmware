@@ -266,7 +266,10 @@ extern eOresult_t eo_appTheDB_GetJointCanLocation(EOappTheDB *p, eOmc_jointId_t 
     canloc_ptr->indexinboard = j_ptr->cfg_ptr->canLoc.indexinboard;
 
     b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, j_ptr->cfg_ptr->canLoc.belong2board);
-	
+    if(NULL == b_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
     canloc_ptr->addr = b_ptr->cfg_ptr->canLoc.addr;
     canloc_ptr->emscanport = b_ptr->cfg_ptr->canLoc.emscanport;
     
@@ -298,7 +301,10 @@ extern eOresult_t eo_appTheDB_GetMotorCanLocation(EOappTheDB *p, eOmc_motorId_t 
     canloc_ptr->indexinboard = m_ptr->cfg_ptr->canLoc.indexinboard;
 
     b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, m_ptr->cfg_ptr->canLoc.belong2board);
-	
+    if(NULL == b_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
     canloc_ptr->addr = b_ptr->cfg_ptr->canLoc.addr;
     canloc_ptr->emscanport = b_ptr->cfg_ptr->canLoc.emscanport;
 
@@ -327,6 +333,11 @@ extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOapp
     }
 
 	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
+    if(NULL == b_ptr)
+    {
+       return(eores_NOK_nodata);
+    }
+    
     *mId_ptr = b_ptr->s.jm.connectedmotors[canloc_ptr->indexinboard];
     if(*mId_ptr == DB_NULL_VALUE_U08)
     {
@@ -352,7 +363,11 @@ extern eOresult_t eo_appTheDB_GetJointId_ByJointCanLocation(EOappTheDB *p, eOapp
         return(eores_NOK_generic);
     }
 
-	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
+    b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
+    if(NULL == b_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
     *jId_ptr = b_ptr->s.jm.connectedjoints[canloc_ptr->indexinboard];
 
     return(eores_OK);
@@ -365,35 +380,37 @@ extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, e
 {
     eOappTheDB_hid_canBoardInfo_t *b_ptr;
     eOappTheDB_hid_snsrMaisInfo_t  *s_ptr;
+    uint8_t i, size;
     
     if((NULL == p) || (NULL == canloc_ptr) || (NULL == sId_ptr))
     {
         return(eores_NOK_nullpointer);
     }
 
-    s_ptr = eo_array_At(p->snsrMaisList, 0);
+    size = eo_array_Capacity(p->snsrMaisList); //i used capacity instead of size, because array is not filled with pushback function
     
-    /* currently only one mais is connetced to a ems.
-       so i check if the can loc is of connected mais. */
-    
-    if(NULL == s_ptr)
+    for(i=0; i<size; i++)
     {
-        return(eores_NOK_nodata);
+        s_ptr = eo_array_At(p->snsrMaisList, i);
+        if(NULL == s_ptr)
+        {
+            return(eores_NOK_nodata); //error somethis is wrong...
+        }
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, s_ptr->cfg_ptr->belong2board);
+        if(NULL == b_ptr)
+        {
+            return(eores_NOK_nodata);
+        }
+         if( (canloc_ptr->emscanport == b_ptr->cfg_ptr->canLoc.emscanport) &&
+             (canloc_ptr->addr == b_ptr->cfg_ptr->canLoc.addr) )
+        {
+            //ok, i found the mais with can location canloc_ptr!!!
+            *sId_ptr = i;
+            return(eores_OK);
+        }
     }
     
-    
-	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, s_ptr->cfg_ptr->belong2board);
-    if( (canloc_ptr->emscanport == b_ptr->cfg_ptr->canLoc.emscanport) &&
-        (canloc_ptr->addr == b_ptr->cfg_ptr->canLoc.addr) )
-    {
-        *sId_ptr = 0; 
-        return(eores_OK);
-    }
-    else
-    {
-        return(eores_NOK_nodata);
-    }
-
+    return(eores_NOK_nodata);
 }
 
 
@@ -415,7 +432,10 @@ extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOas_maisId_
     }
 
     b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, s_ptr->cfg_ptr->belong2board);
-	
+    if(NULL == b_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
     canloc_ptr->addr = b_ptr->cfg_ptr->canLoc.addr;
     canloc_ptr->emscanport = b_ptr->cfg_ptr->canLoc.emscanport;
     
@@ -427,35 +447,37 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p,
 {
     eOappTheDB_hid_canBoardInfo_t *b_ptr;
     eOappTheDB_hid_snsrStrainInfo_t  *s_ptr;
+    uint8_t i, size;
     
     if((NULL == p) || (NULL == canloc_ptr) || (NULL == sId_ptr))
     {
         return(eores_NOK_nullpointer);
     }
 
-    s_ptr = eo_array_At(p->snsrStrainList, 0);
+    size = eo_array_Capacity(p->snsrStrainList); //i used capacity instead of size, because array is not filled with pushback function
     
-    /* currently only one strain is connetced to a ems.
-       so i check if the can loc is of connected mais. */
-    
-    if(NULL == s_ptr)
+    for(i=0; i<size; i++)
     {
-        return(eores_NOK_nodata);
+        s_ptr = eo_array_At(p->snsrStrainList, i);
+        if(NULL == s_ptr)
+        {
+            return(eores_NOK_nodata); //error somethis is wrong...
+        }
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, s_ptr->cfg_ptr->belong2board);
+        if(NULL == b_ptr)
+        {
+            return(eores_NOK_nodata);
+        }
+         if( (canloc_ptr->emscanport == b_ptr->cfg_ptr->canLoc.emscanport) &&
+             (canloc_ptr->addr == b_ptr->cfg_ptr->canLoc.addr) )
+        {
+            //ok, i found the strain with can location canloc_ptr!!!
+            *sId_ptr = i;
+            return(eores_OK);
+        }
     }
     
-    
-	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, s_ptr->cfg_ptr->belong2board);
-    if( (canloc_ptr->emscanport == b_ptr->cfg_ptr->canLoc.emscanport) &&
-        (canloc_ptr->addr == b_ptr->cfg_ptr->canLoc.addr) )
-    {
-        *sId_ptr = 0;
-        return(eores_OK);        
-    }
-    else
-    {
-        return(eores_NOK_nodata);
-    }
-
+    return(eores_NOK_nodata);
 }
 
 
@@ -477,7 +499,10 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strai
     }
 
     b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, s_ptr->cfg_ptr->belong2board);
-	
+    if(NULL == b_ptr)
+    {
+        return(eores_NOK_nodata);
+    }
     canloc_ptr->addr = b_ptr->cfg_ptr->canLoc.addr;
     canloc_ptr->emscanport = b_ptr->cfg_ptr->canLoc.emscanport;
     
@@ -487,7 +512,7 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strai
 
 extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_SkinCanLocation_t *canloc_ptr)
 {
-    eOappTheDB_hid_skinInfo_t   		*sk_ptr;
+    eOappTheDB_hid_skinInfo_t           *sk_ptr;
     
     if((NULL == p) || (NULL == canloc_ptr))
     {
@@ -506,6 +531,36 @@ extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t sk
 }
 
 
+extern eOresult_t eo_appTheDB_GetSkinId_BySkinCanLocation(EOappTheDB *p, eOappTheDB_SkinCanLocation_t *canloc_ptr, eOsk_skinId_t *skId_ptr)
+{
+    eOappTheDB_hid_skinInfo_t  *sk_ptr;
+    uint8_t i, size;
+    
+    if((NULL == p) || (NULL == canloc_ptr) || (NULL == skId_ptr))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    size = eo_array_Capacity(p->skinList); //i used capacity instead of size, because array is not filled with pushback function
+    
+    for(i=0; i<size; i++)
+    {
+        sk_ptr = eo_array_At(p->skinList, i);
+        if(NULL == sk_ptr)
+        {
+            return(eores_NOK_nodata); //error somethis is wrong...
+        }
+         if(canloc_ptr->emscanport == sk_ptr->cfg_ptr->connected2emsport)
+        {
+            //ok, i found the strain with can location canloc_ptr!!!
+            *skId_ptr = i;
+            return(eores_OK);
+        }
+    }
+    
+    return(eores_NOK_nodata);
+
+}
 extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_config_t **jconfig_ptr)
 {
 	if((NULL == p) || (NULL == jconfig_ptr))
@@ -746,23 +801,41 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId
 
 }
 
-extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr)
+// extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr)
+// {
+// 	if((NULL == p) || (NULL == sigmode_ptr))
+// 	{
+//         return(eores_NOK_nullpointer);
+// 	}
+//     
+//     eOsk_skin_t *sk_ptr = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)skId);
+//     
+//     if(NULL == sk_ptr)
+//     {
+//         return(eores_NOK_nodata);
+//     }
+//     *sigmode_ptr = (eOsk_sigmode_t*)&(sk_ptr->config.sigmode);
+//     
+//     return(eores_OK);
+
+// }
+
+extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOappTheDB_cfg_skinInfo_t **skconfig_ptr)
 {
-	if((NULL == p) || (NULL == sigmode_ptr))
-	{
+    eOappTheDB_hid_skinInfo_t  *sk_ptr;
+    if((NULL == p) || (NULL == skconfig_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
-    eOsk_skin_t *sk_ptr = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)skId);
-    
+    sk_ptr = eo_array_At(p->skinList, sId);
     if(NULL == sk_ptr)
     {
         return(eores_NOK_nodata);
     }
-    *sigmode_ptr = (eOsk_sigmode_t*)&(sk_ptr->config.sigmode);
-    
-    return(eores_OK);
 
+    *skconfig_ptr = sk_ptr->cfg_ptr;
+    return(eores_OK);
 }
 extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_skinId_t skId,  EOarray_of_10canframes **arrayof10canframes_ptr)
 {
@@ -1001,7 +1074,16 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
     eOsizecntnr_t 					i, k;
     eOappTheDB_cfg_canBoardInfo_t 	*b_cfg_ptr = NULL;	// pointer to configuration 
 	eOappTheDB_hid_canBoardInfo_t 	*b_ptr = NULL;		// pointer to db memory
-        
+    
+    
+    //if no canboard is connected to board (skin only mode) ==> nothing to do and return ok 
+    if(0 == p->cfg.canboardsList->size)
+    {
+        p->canboardsList = NULL;
+        return(eores_OK);
+    }
+    
+    
     //1) create canboardsList
     p->canboardsList = eo_array_New(p->cfg.canboardsList->size, sizeof(eOappTheDB_hid_canBoardInfo_t), NULL);
 	if(NULL == p->canboardsList)
@@ -1053,6 +1135,15 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
     eOappTheDB_hid_canBoardInfo_t       *b_ptr = NULL;
     eOappTheDB_jointShiftValues_t       *shiftvalues_ptr;
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;    
+    
+    //if no joint is connected to board (skin only mode) ==> nothing to do and return ok 
+    if(0 == p->cfg.jointsList->size)
+    {
+        p->jointsList = NULL;
+        return(eores_OK);
+    }
+    
+    
     //1) create jointList
     p->jointsList = eo_array_New(p->cfg.jointsList->size, sizeof(eOappTheDB_hid_jointInfo_t), NULL);
 	if(NULL == p->jointsList)
@@ -1091,7 +1182,14 @@ static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
 	eOappTheDB_hid_motorInfo_t		    *m_ptr = NULL; 		//pointer to db memory
     eOappTheDB_hid_canBoardInfo_t       *b_ptr = NULL;
 
-        
+    //if no motor is connected to board (skin only mode) ==> nothing to do and return ok 
+    if(0 == p->cfg.motorsList->size)
+    {
+        p->motorsList = NULL;
+        return(eores_OK);
+    }
+    
+
     //1) create jointList
     p->motorsList = eo_array_New(p->cfg.motorsList->size, sizeof(eOappTheDB_hid_motorInfo_t), NULL);
 	if(NULL == p->motorsList)
@@ -1230,7 +1328,14 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
     eOsizecntnr_t 		     		 	i;
 // 	eObrd_boardId_t						maxusedcanaddr = 0;
     icubCanProto_canBoardAddress_t 	    maxusedcanaddr = 0, addr;
-
+    
+    if(0 == p->cfg.canboardsList->size)
+    {
+        p->canaddressLookuptbl.capacity = 0;
+        p->canaddressLookuptbl.tbl = NULL;
+        return(eores_OK);
+    }
+    
     //1) get max used can address (it will be in range [1,E]. 0 is ems can port address and F is bradcast address)
 	eOappTheDB_cfg_canBoardInfo_t *b_cfg_ptr = (eOappTheDB_cfg_canBoardInfo_t*)(p->cfg.canboardsList->item_array_data);
 	

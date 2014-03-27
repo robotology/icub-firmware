@@ -108,7 +108,7 @@ extern "C" {
 //  <o> day             <1-31> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          27
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         17
 //  <o> minute          <0-59> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
 //  </h>build date

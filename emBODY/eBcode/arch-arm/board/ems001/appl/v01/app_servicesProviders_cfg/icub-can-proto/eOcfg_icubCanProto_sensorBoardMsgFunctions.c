@@ -583,21 +583,21 @@ extern eOresult_t eo_icubCanProto_former_per_sb_cmd__torqueVector(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    eOresult_t          res;
-    eOsk_skinId_t     sId = 0;
-//    eOskin_status_t     *skstatus_ptr;
-    EOarray_of_10canframes *arrayof10canframes_ptr = NULL;
+    eOresult_t                      res;
+    eOsk_skinId_t                   skId = 0;
+    EOarray_of_10canframes          *arrayof10canframes_ptr = NULL;
+    EOappTheDB                      *db = eo_appTheDB_GetHandle();
+    eOappTheDB_SkinCanLocation_t    canloc;
 
-//uncomment this code when status and config nvvar are used.
-//     res = eo_appTheDB_GetSkinStatusPtr(eo_appTheDB_GetHandle(), sId,  &skstatus_ptr);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-//     res =  eo_array_PushBack((EOarray*)(&skstatus_ptr->arrayof10canframes), frame);
-
-    res = eo_appTheDB_GetSkinStArray10CanFramesPtr(eo_appTheDB_GetHandle(), sId,  &arrayof10canframes_ptr);
+    canloc.emscanport = canPort;
+    res = eo_appTheDB_GetSkinId_BySkinCanLocation(db, &canloc, &skId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    
+    res = eo_appTheDB_GetSkinStArray10CanFramesPtr(db, skId,  &arrayof10canframes_ptr);
     if(eores_OK != res)
     {
         return(res);

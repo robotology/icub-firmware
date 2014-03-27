@@ -91,6 +91,10 @@
     #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
     #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
     #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
+    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
+    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
+    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
 #else
     #error --> you must define an EBx
 #endif
@@ -124,7 +128,7 @@
                                                         (ENC_DISA << eOeOappEncReader_encoder4) |   \
                                                         (ENC_DISA << eOeOappEncReader_encoder5)     \
                                                     )
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
         #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (ENC_DISA << eOeOappEncReader_encoder0) |  \
                                                         (ENC_DISA << eOeOappEncReader_encoder1) |  \
                                                         (ENC_DISA << eOeOappEncReader_encoder2) |  \
@@ -151,7 +155,7 @@
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
         #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_WAIST
 
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)  || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
         #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
 
 
@@ -271,7 +275,9 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t 
     //save in obj its configuration
     retptr->cfg_ptr = cfg;
     
-    retptr->appRunMode = applrunMode__default;
+    //retptr->appRunMode = applrunMode__default;
+    res = s_eo_emsapplBody_getRunMode(retptr); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
     
     retptr->canBoardsReady_timer = eo_timer_New();
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->canBoardsReady_timer), s_eobj_ownname, "error in creating canBoardsReady_timer");
@@ -280,13 +286,9 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t 
     
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
     eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "obj-body inited OK");
-    
-    res = s_eo_emsapplBody_getRunMode(retptr); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
 
     s_eo_emsapplBody_checkConfig(retptr); //check config: if somethig is wrong then go to error state.
     
-    //res = s_eo_emsapplBody_sendConfig2canboards(retptr);
     res = s_eo_emsapplBody_startCheckCanboards(retptr);
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in startCheckCanboards");
     
@@ -618,33 +620,35 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
 //     res = eo_appTheDB_SetJointsBcastpolicyPtr(EOappTheDB *p, &bcastpolicy);
 //     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appDB), s_eobj_ownname, "error in SetjointsShiftValues");
 
-    
-    res = eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), 0, &shiftval_ptr);
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetShiftValuesOfJointPtr");
-    
-    //here i don't use memcpy because the two struct have different type
-    shiftval_ptr->jointVelocityShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointVelocityShift;
-    shiftval_ptr->jointVelocityEstimationShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointVelocityEstimationShift;
-    shiftval_ptr->jointAccelerationEstimationShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointAccelerationEstimationShift;  
-    
-    res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), 0, &bcastpolicy_ptr);
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetJointBcastpolicyPtr");
-    
-    //set bacast value as mask
-    memset(bcastpolicy_ptr, 0, sizeof(eOicubCanProto_bcastpolicy_t)); //reset
-    for(i=0; i<eOicubCanProto_bcastpolicy_maxsize; i++)
+    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
-        if(0 == p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i])
+        res = eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), 0, &shiftval_ptr);
+        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetShiftValuesOfJointPtr");
+        
+        //here i don't use memcpy because the two struct have different type
+        shiftval_ptr->jointVelocityShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointVelocityShift;
+        shiftval_ptr->jointVelocityEstimationShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointVelocityEstimationShift;
+        shiftval_ptr->jointAccelerationEstimationShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointAccelerationEstimationShift;  
+        
+        res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), 0, &bcastpolicy_ptr);
+        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetJointBcastpolicyPtr");
+        
+        //set bacast value as mask
+        memset(bcastpolicy_ptr, 0, sizeof(eOicubCanProto_bcastpolicy_t)); //reset
+        for(i=0; i<eOicubCanProto_bcastpolicy_maxsize; i++)
         {
-            continue;
-        }
-        if(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]<9)
-        {
-            bcastpolicy_ptr->val2bcastList[0] |= (1 <<(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
-        }
-        else if(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]<17)
-        {
-            bcastpolicy_ptr->val2bcastList[1] |= (1<<(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+            if(0 == p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i])
+            {
+                continue;
+            }
+            if(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]<9)
+            {
+                bcastpolicy_ptr->val2bcastList[0] |= (1 <<(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+            }
+            else if(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]<17)
+            {
+                bcastpolicy_ptr->val2bcastList[1] |= (1<<(p->cfg_ptr->configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+            }
         }
     }
 }
@@ -720,6 +724,12 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p)
 {
     eOappMeasConv_cfg_t cfg = {0};
+
+    if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
+    {
+        return;
+    }
+    
     p->bodyobjs.appMeasConv = eo_appMeasConv_New(&cfg);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appMeasConv), 
@@ -832,38 +842,38 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         }
     }
     
-   
-    //config skin if connected
-    if(eo_appTheDB_isSkinConnected(eo_appTheDB_GetHandle()))
-    {
+////VALE:removed because i send it when r.i. send me commnadS
+//     //config skin if connected
+//     if(eo_appTheDB_isSkinConnected(eo_appTheDB_GetHandle()))
+//     {
 
-        eOappTheDB_jointOrMotorCanLocation_t    canLoc; //here I don't use eOappTheDB_SkinCanLocation_t because i need jmindexId filed to set triangle id
-        eOappTheDB_SkinCanLocation_t            skincanLoc;
+//         eOappTheDB_jointOrMotorCanLocation_t    canLoc; //here I don't use eOappTheDB_SkinCanLocation_t because i need jmindexId filed to set triangle id
+//         eOappTheDB_SkinCanLocation_t            skincanLoc;
 
-        msgCmd.class =  icubCanProto_msgCmdClass_skinBoard; //currently this class not exist and it is remaped on sensor class
-        msgCmd.cmdId =  ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
-
-
-        res = eo_appTheDB_GetSkinCanLocation(eo_appTheDB_GetHandle(), 0, &skincanLoc);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
-        canLoc.emscanport = skincanLoc.emscanport;
+//         msgCmd.class =  icubCanProto_msgCmdClass_skinBoard; //currently this class not exist and it is remaped on sensor class
+//         msgCmd.cmdId =  ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
 
 
-        for(i=8; i<15; i++)
-        {
-            eOicubCanProto_msgDestination_t msgdest;
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, i);
-            res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, canLoc.emscanport, msgdest, msgCmd, NULL);
-            if(eores_OK != res)
-            {
-                return(res);
-            }
-        }
+//         res = eo_appTheDB_GetSkinCanLocation(eo_appTheDB_GetHandle(), 0, &skincanLoc);
+//         if(eores_OK != res)
+//         {
+//             return(res);
+//         }
+//         canLoc.emscanport = skincanLoc.emscanport;
 
-    }
+
+//         for(i=8; i<15; i++)
+//         {
+//             eOicubCanProto_msgDestination_t msgdest;
+//             msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, i);
+//             res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, canLoc.emscanport, msgdest, msgCmd, NULL);
+//             if(eores_OK != res)
+//             {
+//                 return(res);
+//             }
+//         }
+
+//     }
     
     return(eores_OK);
 }
