@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>ems4rd.ulpro.burn.target</TargetName>
+      <TargetName>ems4ulproburn</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
