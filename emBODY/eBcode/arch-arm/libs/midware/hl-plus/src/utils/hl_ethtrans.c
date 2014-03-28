@@ -275,8 +275,6 @@ static hl_bool_t s_hl_ethtrans_supported_is(void)
         return(hl_false);
     }
     return(hl_ethtrans_map->supported); 
-//     return(hl_true);
-//     #warning --> for mcbstm32f400 i removed teh cjeck
 }
 
 static hl_bool_t s_hl_ethtrans_initted_is(void)
