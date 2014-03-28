@@ -75,6 +75,33 @@ typedef enum
     hl_ethtrans_phymode_none                = 255
 } hl_ethtrans_phymode_t;
 
+
+typedef struct
+{
+    uint32_t linkisup           :1;
+    uint32_t autoNeg_done       :1;
+    uint32_t linkisgood         :1;
+    uint32_t linkspeed          :1;     // 1 -> 100Mb, 0 -> 10Mb
+    uint32_t linkduplex         :1;     // 1 -> full,  0 -> half
+    uint32_t dummy              :27;
+} hl_ethtrans_phystatus_t;
+
+typedef enum
+{
+    hl_ethtrans_phyerror_rxCrc          = 0x07,
+    hl_ethtrans_phyerror_rxUnicast      = 0x0D,
+    hl_ethtrans_phyerror_rx64Octets     = 0x0E,
+    hl_ethtrans_phyerror_txUnicast      = 0x1A
+} hl_ethtrans_phyerror_t;
+
+typedef struct
+{
+    uint32_t value;
+    uint32_t counteroverflow    :1;
+    uint32_t validvalue         :1;
+    uint32_t dummy              :30;
+} hl_ethtrans_phyerrorinfo_t;
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
