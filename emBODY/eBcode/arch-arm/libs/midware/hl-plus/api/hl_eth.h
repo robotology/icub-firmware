@@ -209,8 +209,10 @@ extern hl_result_t hl_eth_disable(void);
 extern void hl_eth_rmii_refclock_init(void);
 
 
-// protection vs multiple calls. it NOT called internally to hl_eth_init()
+// protection vs multiple calls. it is NOT called internally to hl_eth_init()
 extern void hl_eth_smi_init(void);
+
+extern hl_bool_t hl_eth_smi_initted(void);
 
 // if hl_eth_smi_init() never called it does nothing and returns 0
 extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);

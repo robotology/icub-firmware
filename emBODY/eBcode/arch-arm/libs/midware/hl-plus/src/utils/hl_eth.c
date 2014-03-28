@@ -49,6 +49,7 @@
 
 #include "hl_ethtrans.h" 
 
+//#define HL_ETH_USE_EVENTVIEWER
 #if	    defined(HL_ETH_USE_EVENTVIEWER)
 #include "eventviewer.h"
 #endif
@@ -661,6 +662,10 @@ extern hl_result_t hl_eth_disable(void)
     return(hl_res_OK);
 }
 
+extern hl_bool_t hl_eth_smi_initted(void)
+{
+    return(s_hl_eth_theinternals.smi_initted);
+}
 
 extern void hl_eth_smi_init(void)
 {   
@@ -705,12 +710,12 @@ extern void hl_eth_smi_init(void)
 // reads the 16 bits of register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
 extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+//#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
     if(hl_false == s_hl_eth_theinternals.smi_initted)
     {
         return(0);
     } 
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)   
+//#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)   
     
     uint32_t tout;
         
@@ -730,12 +735,12 @@ extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
 // writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
 extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
 { 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+//#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
     if(hl_false == s_hl_eth_theinternals.smi_initted)
     {
         return;
     } 
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
+//#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
     
     uint32_t tout = 0;   
     
