@@ -21,7 +21,6 @@
 #ifndef _HL_CFG_PLUS_TARGET_H_
 #define _HL_CFG_PLUS_TARGET_H_
 
-//#include "hl_target.h"
 
 // -- definitions of macros used in hl
 
@@ -29,48 +28,8 @@
     #warning HL: HL_CFG_PLUS_TARGET_BY_FILE is not defined and you are using hl_cfg_plus_target.h
 #endif
 
- 
-#if   defined(HL_USE_BRD_MCBSTM32_F400)
-
-    #define HL_USE_MPU_NAME_STM32F407IG
-
-    #define HL_CFG_MPUSPEED_INTclockspeed               ((uint32_t)16000000)
-    #define HL_CFG_MPUSPEED_EXTclockspeed               ((uint32_t)25000000)
-    
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_m               (25)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_n               (336)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)    
-    
-#elif   defined(HL_USE_BRD_EMS004)    
-
-    #error --> using board ems004
- 
-#elif   defined(HL_USE_BRD_EMS4RD)    
-
-    #define HL_USE_MPU_NAME_STM32F407IG
-    
-    #define HL_CFG_OVERRIDE_hl_system_stm32fx_before_setsysclock
-    #define HL_CFG_MPUSPEED_HSEBYPASS
-    #define HL_CFG_MPUSPEED_INTclockspeed               ((uint32_t)16000000)
-    #define HL_CFG_MPUSPEED_EXTclockspeed               ((uint32_t)50000000)
-    
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_m               (50)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_n               (336)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
-    #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)
-    
-#else
-    #error ERR: cannot define MPU_NAME
-#endif
-
-// MPU ARCH:
-#include "hl_mpu2arch.h"
-
-
-// MPU SPEED CFG:
-#include "hl_mpuspeed.h"
-
+// whatever is required by hl_cfg_plus_target is inside a proper section of hal_brdcfg.h
+#include "hal_brdcfg.h"
 
 
 #endif  // include-guard

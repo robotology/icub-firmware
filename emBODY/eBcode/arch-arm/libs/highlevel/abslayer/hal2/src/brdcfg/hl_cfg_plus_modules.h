@@ -22,80 +22,18 @@
 #ifndef _HL_CFG_PLUS_MODULES_H_
 #define _HL_CFG_PLUS_MODULES_H_
 
-// - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hl_cfg_plus_modules.h
-    @brief      This header file keeps which plus modules to build in hl library
-    @author     marco.accame@iit.it
-    @date       10/21/2013
-**/
-
-// - external dependencies --------------------------------------------------------------------------------------------
+// -- definitions of macros used in hl
 
 #include "hl_common.h"
 
-#if     defined(HL_CFG_TARGET_BY_FILE )
+#if     defined(HL_CFG_TARGET_BY_FILE)
     #include "hl_cfg_plus_target.h"
 #endif
 
 
-
-// - public #define  --------------------------------------------------------------------------------------------------
-
-//#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
-
-#define HL_USE_CORE_CMSIS
-
-#define HL_USE_CORE_STM32
-
-#if   defined(HL_USE_BRD_MCBSTM32_F400) 
-
-    #error --> using board f400
-
-#elif defined(HL_USE_BRD_EMS004)
-
-    #error --> using board ems004
-
-#elif defined(HL_USE_BRD_EMS4RD)
-
-#define HL_USE_UTIL_SYS
-#define HL_USE_UTIL_GPIO
-#define HL_USE_UTIL_BITS
-#define HL_USE_UTIL_FIFO
-#define HL_USE_UTIL_I2C
-#define HL_USE_UTIL_ETH
-#define HL_USE_UTIL_ETHTRANS
-#define HL_USE_CHIP_MICREL_KS8893
-#define HL_USE_UTIL_CAN
-#define HL_USE_UTIL_CAN_COMM
-#define HL_USE_CHIP_XX_EEPROM
-#define HL_USE_UTIL_SPI
-#define HL_USE_UTIL_TIMER
-#define HL_USE_CHIP_ST_LIS3X
-#define HL_USE_CHIP_ST_L3G4200D
-
-#if     defined(EMS4RD_ETHDBG)
-#define EMS4RD_USE_MICREL_AS_MANAGED_DEVICE
-#endif
-
-
-#endif
-
-// HL_BEH_* contain behaviours to be applied to every module
-
-//#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
-
-
-
-// - declaration of public user-defined types ------------------------------------------------------------------------- 
-
-
-// - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-
-
-
-// - declaration of extern public functions ---------------------------------------------------------------------------
-
+// whatever is required by hl_cfg_plus_modules is inside a proper section of hal_brdcfg.h
+#include "hal_brdcfg.h"
 
 
 
