@@ -341,6 +341,28 @@ extern int hl_sys_itm_puts(const char* str)
     return(++num);    
 }
 
+extern uint64_t hl_sys_uniqueid64bit_get(void)
+{
+#if     defined(HL_USE_MPU_ARCH_STM32F1)
+    #define UniqueDeviceID96_baseaddress 0x1FFFF7E8
+#elif   defined(HL_USE_MPU_ARCH_STM32F4)
+    #define UniqueDeviceID96_baseaddress 0x1FFF7A10
+#else 
+    #error ERR --> choose a HL_USE_MPU_ARCH_STM32F*
+#endif     
+    
+    uint64_t val = *((const uint64_t *) (UniqueDeviceID96_baseaddress));
+    val += *((const uint32_t *) (UniqueDeviceID96_baseaddress+8));
+    if((0xFFFFFFFFFFFFFFFF+0xFFFFFFFF) == val)
+    {   // 0xFFFFFFFE (=0xFFFFFFFFFFFFFFFF+0xFFFFFFFF) is the result when all the 96 bits have value 1 (some old versions of stm32f107 have such a hw bug)
+        return(hl_NA64);
+    }
+    else
+    {
+        return(val);
+    }    
+}
+
 
 __weak extern void hl_sys_on_warning(const char * warningmsg)
 {
