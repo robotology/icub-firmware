@@ -38,8 +38,8 @@
 #include "hal_base.h"
 #include "hal_base_hid.h"
 
-#include "hal_cpu.h"
-#include "hal_cpu_hid.h"
+#include "hal_mpu.h"
+#include "hal_mpu_hid.h"
 
 
 
@@ -208,19 +208,22 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 // -- core
 
 #ifdef  HAL_USE_BASE
+
     extern const hal_base_hid_brdcfg_t hal_brdcfg_base__theconfig  =
     {
         .dummy  = 0
-    };    
+    };  
+    
 #endif//HAL_USE_BASE  
     
     
-#ifdef  HAL_USE_CPU
-    extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig  =
+#ifdef  HAL_USE_MPU
+    
+    extern const hal_mpu_hid_brdcfg_t hal_brdcfg_mpu__theconfig  =
     {
-        .architecture       = hal_cpu_arc_armcm4,
-        .family             = hal_cpu_fam_stm32f4,
-        .name               = hal_cpu_nam_stm32f407,
+        .architecture       = hal_mpu_arch_armcm4,
+        .type               = hal_mpu_type_stm32f4,
+        .name               = hal_mpu_name_stm32f407ig,
         .speeds             =
         {   // these values must be coherent w/ HL_CFG_MPUSPEED_STM32xxx valued defined in hl_cfg_plus_target.h 
             .max                = 168000000,
@@ -228,36 +231,45 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
             .fastbus            =  84000000,
             .slowbus            =  42000000
         } 
-    };    
-#endif//HAL_USE_CPU  
+    }; 
+    
+#endif//HAL_USE_MPU  
 
+    
 #ifdef  HAL_USE_FLASH
+    
     extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig =
     {
         .baseaddress    =   0x08000000,                 // on every stm32
-        .totalsize      =
-        #if     defined(HAL_USE_CPU_NAM_STM32F107)
+        .totalsize      =   
+        #if     defined(HAL_USE_MPU_NAME_STM32F107VC)
                             256*1024
-        #elif   defined(HAL_USE_CPU_NAM_STM32F407)
+        #elif   defined(HAL_USE_MPU_NAME_STM32F407IG)
                             1024*1024
+        #else
+                            #error -> must specify a MPU_NAME
         #endif
     };
 #endif//HAL_USE_FLASH
  
 
 #ifdef  HAL_USE_HEAP
+    
     extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig =
     {
         .nothingsofar   = 0
     };
+    
 #endif//HAL_USE_HEAP    
    
     
 #ifdef  HAL_USE_SYS
+    
     extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
     {
         .dummy             = 0
-    };    
+    };   
+    
 #endif//HAL_USE_SYS   
    
 
@@ -750,6 +762,7 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     extern const hal_encoder_hid_brdcfg_t hal_brdcfg_encoder__theconfig =
     {
         .supported_mask             = (1 << hal_encoder1) | (1 << hal_encoder2) | (1 << hal_encoder3) | (1 << hal_encoder4) | (1 << hal_encoder5) | (1 << hal_encoder6), 
+        .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
         .spimap                     =
         {
             {   // hal_encoder1:    P6 on ems4rd
@@ -1113,6 +1126,51 @@ extern hal_result_t hal_brdcfg__start(void)
     s_hal_brdcfg_ems4rd_vaux_5v0_on();
 
     return(hal_res_OK);    
+}
+
+
+// hl_system_stm32fx_before_setsysclock() as used inside hl_wrap_system.c
+#include "hl_core.h"    // contains declarations in cmsis 
+ 
+#include "hl_cfg_plus_target.h"  
+#include "hl_cfg_plus_modules.h"   
+
+#include "hl_gpio.h"
+#include "hl_sys.h"
+
+
+extern void hl_system_stm32fx_before_setsysclock(void)
+{   // this function executes inside SystemInit() before SetSysClock(). 
+    
+#if     !defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE) 
+    
+        #warning --> hl_system_stm32fx_before_setsysclock() is empty
+    
+#elif   defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)  
+
+    #warning --> hl_system_stm32fx_before_setsysclock() enables the micrel to use the managed mode
+    
+    // this code forces the micrel to use managed mode, so that the application in runtime can use i2c to configure it.
+    // this forcing mode must be done before the mpu initialises the proper hw registers of the clock inside SetSysClock()
+    
+    SystemCoreClockUpdate();    // required so that the hl_sys_delay(0 function works properly 
+    
+    const hl_gpio_t ethslv = {.port = hl_gpio_portB, .pin = hl_gpio_pin2};
+    hl_gpio_pin_output_init(ethslv);
+    
+    const hl_gpio_t notethrst = {.port = hl_gpio_portH, .pin = hl_gpio_pin1};
+    hl_gpio_pin_output_init(notethrst);
+
+    const hl_reltime_t resettime = 110*1000;    // 110 milli
+    
+    hl_gpio_pin_write(ethslv, hl_gpio_valSET);
+    hl_gpio_pin_write(notethrst, hl_gpio_valRESET);
+    hl_sys_delay(resettime);    
+    hl_gpio_pin_write(notethrst, hl_gpio_valSET);
+    
+//    hl_sys_itm_puts("executed hl_system_stm32fx_before_setsysclock() w/ code for EMS4RD_USE_MICREL_AS_MANAGED_DEVICE"); 
+    
+#endif//defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)    
 }
 
 
