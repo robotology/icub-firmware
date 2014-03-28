@@ -167,6 +167,40 @@ static hl_spi_theinternals_t s_hl_spi_theinternals =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern uint32_t hl_spi_speedofbus_get(hl_spi_t id)
+{
+    uint32_t res = 0;
+    
+    if(hl_false == s_hl_spi_supported_is(id))
+    {
+        return(0);
+    }
+    
+    RCC_ClocksTypeDef clocks;
+    RCC_GetClocksFreq(&clocks);  
+    
+    switch(id)
+    {
+        case hl_spi1:
+        {
+            res = clocks.PCLK2_Frequency;      
+        } break;
+
+        case hl_spi2:
+        case hl_spi3:
+        {
+            res = clocks.PCLK1_Frequency;
+        } break;  
+
+        default:
+        {
+            res = 0;
+        } break;        
+    }  
+    
+    return(res);
+}
+
 
 extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
 {
@@ -373,9 +407,10 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id)
     
     static const uint16_t s_hl_spi_stm32_baudrateprescalers[] = 
     { 
+        0,  // prescaler 1 is not available .... 
         SPI_BaudRatePrescaler_2,    SPI_BaudRatePrescaler_4,    SPI_BaudRatePrescaler_8,    SPI_BaudRatePrescaler_16, 
         SPI_BaudRatePrescaler_32,   SPI_BaudRatePrescaler_64,   SPI_BaudRatePrescaler_128,  SPI_BaudRatePrescaler_256
-    }; hl_VERIFYproposition(a2, hl_spi_prescaler_002 == 0); hl_VERIFYproposition(a4, hl_spi_prescaler_004 == 1);  hl_VERIFYproposition(a256, hl_spi_prescaler_256 == 7);
+    }; hl_VERIFYproposition(a2, hl_spi_prescaler_002 == 1); hl_VERIFYproposition(a4, hl_spi_prescaler_004 == 2);  hl_VERIFYproposition(a256, hl_spi_prescaler_256 == 8);
     
     SPI_InitTypeDef* init2use = NULL;
         

@@ -104,14 +104,14 @@ typedef enum
  **/
 typedef enum
 {
-    hl_spi_prescaler_002        = 0,
-    hl_spi_prescaler_004        = 1,
-    hl_spi_prescaler_008        = 2,
-    hl_spi_prescaler_016        = 3,
-    hl_spi_prescaler_032        = 4,
-    hl_spi_prescaler_064        = 5,
-    hl_spi_prescaler_128        = 6,
-    hl_spi_prescaler_256        = 7
+    hl_spi_prescaler_002        = 1,
+    hl_spi_prescaler_004        = 2,
+    hl_spi_prescaler_008        = 3,
+    hl_spi_prescaler_016        = 4,
+    hl_spi_prescaler_032        = 5,
+    hl_spi_prescaler_064        = 6,
+    hl_spi_prescaler_128        = 7,
+    hl_spi_prescaler_256        = 8
 } hl_spi_prescaler_t;
 
 
@@ -142,6 +142,15 @@ extern const hl_spi_mapping_t* hl_spi_map;  // it must be defined externally. If
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+/** @fn			extern uint32_t hl_spi_speedofbus_get(hl_spi_t id)
+    @brief  	this function tells what is the internal bus speed of an spi id. it can be used to chose the right value of the
+                prescaler to be assigned inside the hl_spi_cfg_t argument to be passed to hl_spi_init().
+    @param  	id 	        the id of spi
+    @return 	the speed of the internal bus or 0 if the specified spi is not supported
+  */
+extern uint32_t hl_spi_speedofbus_get(hl_spi_t id);
+
 
 /** @fn         extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
     @brief      This function configures SPI. It does not configure or enable the SPI transceiver.
