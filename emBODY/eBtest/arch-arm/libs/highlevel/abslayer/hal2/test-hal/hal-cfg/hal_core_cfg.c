@@ -57,7 +57,7 @@ extern const hal_core_cfg_t hal_core_cfg =
             .ext_heap_delete                    = myheap_delete
         } 
     },
-    .cpucfg     =
+    .mpucfg     =
     {
         .dummy                  = 0
     },
@@ -94,6 +94,11 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
     {
 //        hal_display_putstring(4, (uint8_t*)errormsg);
         hal_trace_puts(errormsg);
+    }
+    
+    if(hal_fatalerror_warning == errorcode)
+    {
+        return;
     }
 
     for(;;);
