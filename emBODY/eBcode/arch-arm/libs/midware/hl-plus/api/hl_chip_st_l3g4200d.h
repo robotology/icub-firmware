@@ -52,7 +52,7 @@
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef enum hl_chip_st_l3g4200d_range_t 
-    @brief      hl_chip_st_l3g4200d_cfg_t contains possible ranges for the sensor.
+    @brief      contains possible ranges for the sensor.
  **/
 typedef enum
 {
@@ -63,7 +63,7 @@ typedef enum
 
 
 /** @typedef    typedef struct hl_chip_st_l3g4200d_cfg_t 
-    @brief      hl_chip_st_l3g4200d_cfg_t contains the configuration for the chip.
+    @brief      contains the configuration for the chip.
  **/
 typedef struct
 {
