@@ -133,8 +133,6 @@ extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void hal_ethtransceiver_prepare_hl_ethtrans_map(void);
-
 
 /** @fn			extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg)
     @brief  	This function initializes the ethtransceiver attached to the MPU

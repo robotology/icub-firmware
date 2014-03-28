@@ -43,7 +43,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
-#include "hal_cpu.h"
+#include "hal_mpu.h"
 #include "hal_flash.h"
 #include "hal_sys.h"
 
@@ -60,7 +60,7 @@
 typedef struct
 {
     hal_base_cfg_t      basecfg;    /**< the configuration of the base module */
-    hal_cpu_cfg_t       cpucfg;     /**< the configuration of the cpu module */
+    hal_mpu_cfg_t       mpucfg;     /**< the configuration of the cpu module */
     hal_flash_cfg_t     flashcfg;   /**< the confoguration of the flash module */
     hal_sys_cfg_t       syscfg;     /**< the configuration of the sys module */
 } hal_core_cfg_t;

@@ -18,18 +18,18 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_CPU_FAM_STM32F1_H_
-#define _HAL_CPU_FAM_STM32F1_H_
+#ifndef _HAL_MPU_ARCH_ARMCMX_H_
+#define _HAL_MPU_ARCH_ARMCMX_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       hal_cpu_fam_stm32f1.h
-    @brief      This header file keeps public interface to the hal parts which are specific of cpu family: stm32f1
+/** @file       hal_mpu_arch_armcmx.h
+    @brief      This header file keeps public interface to the hal parts which are specific of cpu architecture: arm cmx.
     @author     marco.accame@iit.it
     @date       02/27/2013
 **/
 
-/** @defgroup doxy_group_hal_cpu_fam_stm32f1 HAL CPU STM32F1 FAMILY
+/** @defgroup doxy_group_hal_mpu_arch_armcm3 HAL CPU ARM CMX ARCHITECTURE
 
     cecece
  
@@ -42,49 +42,33 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-
+//#warning --> maybe change it 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "stdint.h"
-
-#include "hal_base.h"
-#include "hal_sys.h"
-#include "hal_cpu.h"
+#include "hal_mpu.h"
 
 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
+/** @typedef    typedef enum hal_mpu_arch_armcmx_irqn_t
+    @brief      contains the irq numbers for the cortex cmx processors.
+ **/
+typedef enum 
+{
+    hal_mpu_arch_armcmx_NonMaskableInt_IRQn         = -14,    /**< Non Maskable Interrupt                             */
+    hal_mpu_arch_armcmx_MemoryManagement_IRQn       = -12,    /**<  Cortex-M3 Memory Management Interrupt              */
+    hal_mpu_arch_armcmx_BusFault_IRQn               = -11,    /**<  Cortex-M3 Bus Fault Interrupt                      */
+    hal_mpu_arch_armcmx_UsageFault_IRQn             = -10,    /**<  Cortex-M3 Usage Fault Interrupt                    */
+    hal_mpu_arch_armcmx_SVCall_IRQn                 = -5,     /**<  Cortex-M3 SV Call Interrupt                       */
+    hal_mpu_arch_armcmx_DebugMonitor_IRQn           = -4,     /**<  Cortex-M3 Debug Monitor Interrupt                 */
+    hal_mpu_arch_armcmx_PendSV_IRQn                 = -2,     /**<  Cortex-M3 Pend SV Interrupt                       */
+    hal_mpu_arch_armcmx_SysTick_IRQn                = -1      /**<  Cortex-M3 System Tick Interrupt                   */
+} hal_mpu_arch_armcmx_irqn_t;
 
-
-
-#if 1
-typedef enum
-{   // values from stm32f10x_gpio.h
-    hal_cpu_fam_stm32f1_gpio_speed_10mhz    = 1,
-    hal_cpu_fam_stm32f1_gpio_speed_2mhz,
-    hal_cpu_fam_stm32f1_gpio_speed_50mhz
-} hal_cpu_fam_stm32f1_gpio_speed_t;
-typedef enum
-{   // values from stm32f10x_gpio.h
-    hal_cpu_fam_stm32f1_gpio_mode_AIN           = 0x0,
-    hal_cpu_fam_stm32f1_gpio_mode_IN_FLOATING   = 0x04,
-    hal_cpu_fam_stm32f1_gpio_mode_IPD           = 0x28,
-    hal_cpu_fam_stm32f1_gpio_mode_IPU           = 0x48,
-    hal_cpu_fam_stm32f1_gpio_mode_Out_OD        = 0x14,
-    hal_cpu_fam_stm32f1_gpio_mode_Out_PP        = 0x10,
-    hal_cpu_fam_stm32f1_gpio_mode_AF_OD         = 0x1C,
-    hal_cpu_fam_stm32f1_gpio_mode_AF_PP         = 0x18   
-} hal_cpu_fam_stm32f1_gpio_mode_t;
-typedef struct
-{   // from stm32f10x_gpio.h
-    uint16_t                                gpiopin;
-    hal_cpu_fam_stm32f1_gpio_speed_t        gpiospeed;
-    hal_cpu_fam_stm32f1_gpio_mode_t         gpiomode;
-} hal_cpu_fam_stm32f1_gpio_altcfg_t;
-#endif
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -97,7 +81,7 @@ typedef struct
 
 
 /** @}            
-    end of group doxy_group_hal_cpu_fam_stm32f1  
+    end of group doxy_group_hal_mpu_arch_armcmx  
  **/
 
 #endif  // include-guard
