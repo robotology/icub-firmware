@@ -60,6 +60,7 @@ typedef struct
 typedef struct
 {
     uint16_t                    supported_mask;
+    uint32_t                    spimaxspeed;                    // in hz
     hal_encoder_spimap_t        spimap[hal_encoders_number];
 } hal_encoder_hid_brdcfg_t;
 

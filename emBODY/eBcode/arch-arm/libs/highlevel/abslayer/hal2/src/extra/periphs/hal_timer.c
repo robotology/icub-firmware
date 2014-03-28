@@ -85,6 +85,8 @@ extern const hl_timer_mapping_t* hl_timer_map = NULL;
 
 static hal_bool_t s_hal_timer_supported_is(hal_timer_t id);
 
+static void s_hal_timer_prepare_hl_timer_map(void);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
@@ -114,12 +116,9 @@ extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, h
     }
        
 
-    // init the hl_timer
-    #warning --> the hl_timer_map as well as the other hl_xxx_maps could be initted in a common init funtion at startup ....
-    // we must initialise hl_timer_map w/ suited values. 
-    // we have built hal_brdcfg_timer__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_timer_mapping_t) == sizeof(hal_timer_hid_brdcfg_t));   
-    hl_timer_map = (hl_timer_mapping_t*)&hal_brdcfg_timer__theconfig;  
+    // init the hl_timer_map    
+    s_hal_timer_prepare_hl_timer_map();
+    
     // now we convert the cfg
     hl_timer_cfg_t hlcfg;
     hlcfg.countdown = cfg->countdown;
@@ -288,6 +287,13 @@ static hal_bool_t s_hal_timer_supported_is(hal_timer_t id)
     return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
 }
 
+static void s_hal_timer_prepare_hl_timer_map(void)
+{
+    // we must initialise hl_timer_map w/ suited values. 
+    // we have built hal_brdcfg_timer__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_timer_mapping_t) == sizeof(hal_timer_hid_brdcfg_t));   
+    hl_timer_map = (hl_timer_mapping_t*)&hal_brdcfg_timer__theconfig;  
+}
 
 #endif//HAL_USE_TIMER
 

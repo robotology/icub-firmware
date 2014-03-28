@@ -279,7 +279,7 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
 
 
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
     const hl_gpio_initmode_f1_t gpiomodeOUT =
     {
         .gpio_pins  = 0,
@@ -292,7 +292,7 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         .gpio_speed = 0,
         .gpio_mode  = GPIO_Mode_IN_FLOATING                  
     };    
-#elif   defined(HAL_USE_CPU_FAM_STM32F4) 
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4) 
     const hl_gpio_initmode_fx_t gpiomodeOUT =
     {
         .gpio_pins  = 0,
@@ -309,8 +309,8 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         .gpio_otype = GPIO_OType_PP, 
         .gpio_pupd  = GPIO_PuPd_NOPULL    
     };
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif
 
     hl_gpio_init_t gpioinit;
@@ -398,7 +398,7 @@ static hal_result_t s_hal_gpio_altfun_configure(hal_gpio_t gpio, const hal_gpio_
 
 static GPIOSpeed_TypeDef s_hal_gpio_get_stm32_speed( hal_gpio_speed_t speed)
 {
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
     static const uint8_t s_hal_gpio_hid_speeds[hal_gpio_speeds_number] = 
     { 
         GPIO_Speed_2MHz,        // hal_gpio_speed_default
@@ -407,7 +407,7 @@ static GPIOSpeed_TypeDef s_hal_gpio_get_stm32_speed( hal_gpio_speed_t speed)
         GPIO_Speed_50MHz,       // hal_gpio_speed_high  
         GPIO_Speed_50MHz        // hal_gpio_speed_max     
     }; 
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)
     static const uint8_t s_hal_gpio_hid_speeds[hal_gpio_speeds_number] = 
     { 
         GPIO_Speed_2MHz,        // hal_gpio_speed_default
@@ -416,8 +416,8 @@ static GPIOSpeed_TypeDef s_hal_gpio_get_stm32_speed( hal_gpio_speed_t speed)
         GPIO_Speed_50MHz,       // hal_gpio_speed_high,  
         GPIO_Speed_100MHz       // hal_gpio_speed_max       
     };
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif 
 
     return((GPIOSpeed_TypeDef)s_hal_gpio_hid_speeds[HAL_gpio_speed2index(speed)]);

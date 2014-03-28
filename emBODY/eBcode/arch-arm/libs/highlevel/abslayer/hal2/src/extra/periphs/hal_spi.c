@@ -83,7 +83,7 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .direction                  = hal_spi_dir_rxonly,
     .activity                   = hal_spi_act_framebased,      
     .prescaler                  = hal_spi_prescaler_064,   
-    .speed                      = hal_spi_speed_dontuse,           
+    .maxspeed                   = 0,           
     .sizeofframe                = 4,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
@@ -131,10 +131,11 @@ static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id);
 
 static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg);
 
-static hal_bool_t s_hal_spi_is_speed_correct(int32_t speed);
+//static hal_bool_t s_hal_spi_is_speed_correct(hal_spi_prescaler_t prescaler, uint32_t speed);
 
 static hal_result_t s_hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes);
 
+static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t *cfg);
 
 static hl_spi_prescaler_t s_hal_spi_get_hl_prescaler(hal_spi_t id, const hal_spi_cfg_t* cfg);
 
@@ -146,6 +147,8 @@ static void s_hal_spi_rx_isr_disable(hal_spi_t id);
 
 static void s_hal_spi_periph_enable(hal_spi_t id);
 static void s_hal_spi_periph_disable(hal_spi_t id); 
+
+static void s_hal_spi_prepare_hl_spi_map(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
@@ -176,9 +179,33 @@ extern const hl_spi_mapping_t* hl_spi_map = NULL;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+// this is not implemented in here.
+// /** @fn			extern hal_result_t hal_spi_send(hal_spi_t id, uint8_t* txframe, uint8_t size)
+//     @brief  	this function adds the frame to the transmission buffer.  
+//                 if the id is configured having activity hal_spi_act_continuous, then the sendnow enables or disables the activity.
+//                 the txframe, if its size is not zero, is sent as soon as a new frame starts. otherwise, frames are taken from the 
+//                 txfifoofframes or are just zero data.
+//     @param  	id	        the id
+//     @param  	txframe 	    the frame to transmit
+//     @return 	hal_res_OK or hal_res_NOK_generic on failure
+//   */
+// extern hal_result_t hal_spi_put(hal_spi_t id, uint8_t* txframe);
+//
+// extern hal_result_t hal_spi_on_frametransm_set(hal_spi_t id, hal_callback_t onframetransm, void* arg); 
+// 
+// used in master raw-mode only. the master sends the byte and it blocks until it receives another back.
+// extern hal_result_t hal_spi_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte);
+//
 
-extern hal_result_t hal_spi_init(const hal_spi_t id, const hal_spi_cfg_t *cfg)
+extern uint32_t hal_spi_speedofbus_get(hal_spi_t id)
+{   
+    s_hal_spi_prepare_hl_spi_map(); 
+    return(hl_spi_speedofbus_get((hl_spi_t)id));   
+}
+
+extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
+    s_hal_spi_prepare_hl_spi_map();
     return(s_hal_spi_init(id, cfg));
 }
 
@@ -188,7 +215,7 @@ extern hal_boolval_t hal_spi_initted_is(hal_spi_t id)
 }
 
 #if 0
-extern hal_result_t hal_spi_raw_master_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte)
+extern hal_result_t hal_spi_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     hal_spi_cfg_t* cfg = NULL;
@@ -239,7 +266,7 @@ extern hal_result_t hal_spi_raw_master_writeread(hal_spi_t id, uint8_t byte, uin
 #endif
 
    
-extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
+extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
@@ -259,7 +286,7 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
       
 
     // protect ... may be not needed
-    s_hal_spi_rx_isr_disable(id);       //hal_SPI4ENCODER_IT_RX_DISA(SPIx);
+    s_hal_spi_rx_isr_disable(id);       
     
     // tells how many frames to use
     intitem->frameburstcountdown = num2use;
@@ -283,14 +310,28 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t lengthofburst)
     return(hal_res_OK);    
 }
 
+
+extern hal_bool_t hal_spi_active_is(hal_spi_t id)
+{
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
+    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+    
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_true);
+    }  
+  
+    return((0 == intitem->frameburstcountdown) ? (hal_true) : (hal_false));     
+}
+
+
 extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes)
 {
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
-       
+    
     if(NULL == rxframe)
     {
         return(hal_res_NOK_nullpointer);
@@ -299,22 +340,27 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
     return(s_hal_spi_get(id, rxframe, remainingrxframes));       
 }
 
+// /** @fn			extern hal_result_t hal_spi_stop(hal_spi_t id)
+//     @brief  	this function stops communication. 
+//     @param  	id	            the id
+//     @return 	hal_res_OK or hal_res_NOK_generic on failure
+//   */
+// extern hal_result_t hal_spi_stop(hal_spi_t id);
+// extern hal_result_t hal_spi_stop(hal_spi_t id)
+// {
+//     if(hal_false == hal_spi_initted_is(id))
+//     {
+//         return(hal_res_NOK_generic);
+//     }
 
-extern hal_result_t hal_spi_stop(hal_spi_t id)
-{
-    if(hal_false == hal_spi_initted_is(id))
-    {
-        return(hal_res_NOK_generic);
-    }
 
-
-    // empty ...
-    #warning --> it must be called only if the spi has already stopped inside the isr
-    
-    //s_hal_spi_periph_dma_disable(id);
-           
-    return(hal_res_OK);    
-}
+//     // empty ...
+//     #warning --> it must be called only if the spi has already stopped inside the isr
+//     
+//     //s_hal_spi_periph_dma_disable(id);
+//            
+//     return(hal_res_OK);    
+// }
 
 
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
@@ -399,8 +445,8 @@ static void s_hal_spi_read_isr(hal_spi_t id)
     {   // ok. the frame is finished
     
         // 1. stop spi 
-        s_hal_spi_periph_disable(id);         // disable periph                                        	     
-		s_hal_spi_rx_isr_disable(id); //hal_SPI4ENCODER_IT_RX_DISA(port);   // disable interrupt rx
+        s_hal_spi_periph_disable(id);           // disable periph                                        	     
+		s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
         
         // set back to zero the frame burst
         intitem->frameburstcountdown = 0;
@@ -452,8 +498,6 @@ static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
-    //hal_spi_cfg_t *usedcfg = NULL;
-    //uint8_t* tmpbuffer = NULL;
     
     if(NULL == cfg)
     {
@@ -470,48 +514,19 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         return(hal_res_OK);
     }   
 
-    // mild verification of the config: speed, activity, sizeofframe only
+    // mild verification of the config:    
+    if(hal_false == s_hal_spi_config_is_correct(id, cfg))
+    {
+        return(hal_res_NOK_generic);
+    }
     
-    if(hal_false == s_hal_spi_is_speed_correct((int32_t)cfg->speed))
-    {
-        return(hal_res_NOK_generic);
-    }
- 
-
-    if(hal_spi_ownership_master != cfg->ownership)
-    {
-        return(hal_res_NOK_generic);
-    }
-        
-    if(hal_spi_act_framebased != cfg->activity)
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    if(0 == cfg->sizeofframe)
-    {
-        return(hal_res_NOK_generic);
-    }    
-
-    if(hal_spi_dir_rxonly != cfg->direction)  
-    {
-        return(hal_res_NOK_generic);
-    }   
-
-    if(0 == cfg->capacityofrxfifoofframes)
-    {
-        return(hal_res_NOK_generic);
-    }    
 
     // acemor: very important info.
     // init the miso and mosi gpio before calling hw_init. 
     // because if the spi is already initted and it detects mosi or miso low it sets
     // register SPI_SR2.BUSY to 1, which makes things hang up.
     
-    //s_hal_spi_hw_gpio_init(id, cfg->ownership);
-    //s_hal_spi_hw_init(id);
-    //s_hal_spi_hw_enable(id, cfg);
-    // on ems001 and ems4rd it works with SPI_CPOL_High
+
     const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
     {   
         .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
@@ -532,12 +547,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .advcfg     = &hl_spi_advcfg_ems4rd                
     };
     hlcfg.mode = (hal_spi_ownership_master == cfg->ownership) ? (hl_spi_mode_master) : (hl_spi_mode_slave); 
-    hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);;
-
-    // we must initialise hl_spi_map w/ suited values. 
-    // we have built hal_brdcfg_spi__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_spi_mapping_t) == sizeof(hal_spi_hid_brdcfg_t));
-    hl_spi_map = (hl_spi_mapping_t*)&hal_brdcfg_spi__theconfig;
+    hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);
     
     
     hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
@@ -568,9 +578,6 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     intitem->isrrxcounter = 0;
  
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
-    //tmpbuffer = (uint8_t*) hal_heap_new(usedcfg->capacityofrxfifoofframes*usedcfg->sizeofframe);
-   // hl_fifo_init(intitem->fiforx, usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, tmpbuffer, NULL);
-    
     intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
 
  
@@ -596,17 +603,58 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     return(hal_res_OK);
 }
 
-static hal_bool_t s_hal_spi_is_speed_correct(int32_t speed)
+
+static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
-    if(hal_spi_speed_dontuse == speed)
+    // mild verification of the config: ownership, activity, sizeofframe, direction, capacity of frames.
+    // so far we support only master, framebase, rxonly   
+    
+//     if(hal_false == s_hal_spi_is_speed_correct(cfg->prescaler, cfg->maxspeed))
+//     {
+//         return(hal_false);
+//     }
+ 
+
+    if(hal_spi_ownership_master != cfg->ownership)
     {
-        return(hal_true);
+        return(hal_false);
     }
-    else
+        
+    if(hal_spi_act_framebased != cfg->activity)
+    {
+        return(hal_false);
+    }
+
+    if(0 == cfg->sizeofframe)
+    {
+        return(hal_false);
+    }    
+
+    if(hal_spi_dir_rxonly != cfg->direction)  
     {
         return(hal_false);
     }   
+
+    if(0 == cfg->capacityofrxfifoofframes)
+    {
+        return(hal_false);
+    }    
+
+    return(hal_true);
 }
+
+// static hal_bool_t s_hal_spi_is_speed_correct(hal_spi_prescaler_t prescaler, uint32_t speed)
+// {
+// //     if(hal_spi_prescaler_auto != prescaler)
+// //     {   
+//          return(hal_true);
+// //     }
+// //     else
+// //     {
+// //         #warning --> must search a speed 
+// //         return(hal_false);
+// //     }   
+// }
 
 
 
@@ -615,8 +663,58 @@ static hl_spi_prescaler_t s_hal_spi_get_hl_prescaler(hal_spi_t id, const hal_spi
 {
     hl_spi_prescaler_t hlprescaler = hl_spi_prescaler_064;
     
-    return(hlprescaler);
- 
+    if(hal_spi_prescaler_auto != cfg->prescaler)
+    {   // we keep the specified prescaler
+        hlprescaler = (hl_spi_prescaler_t)cfg->prescaler;
+    }   
+    else
+    {   // we compute the prescaler according to the specified max speed and to the speed of bus       
+        if(0 == cfg->maxspeed)
+        {   // dont have specified a max speed: use a safe prescaler
+            hlprescaler = hl_spi_prescaler_064;
+        }
+        else
+        {   // must compute the hlprescaler to match the max speed.
+            uint32_t busspeed = hl_spi_speedofbus_get((hl_spi_t)id);
+            uint32_t div = busspeed / cfg->maxspeed;
+            uint32_t rem = busspeed % cfg->maxspeed;
+            if((div < 2) || ((2 == div) && (0 == rem)))
+            {   // it is ok even if div is zero,
+                hlprescaler = hl_spi_prescaler_002;
+            }
+            else if((div < 4) || ((4 == div) && (0 == rem)))
+            {
+                hlprescaler = hl_spi_prescaler_004;
+            }
+            else if((div < 8) || ((8 == div) && (0 == rem)))
+            {
+                hlprescaler = hl_spi_prescaler_008;
+            }   
+            else if((div < 16) || ((16 == div) && (0 == rem)))
+            {
+                hlprescaler = hl_spi_prescaler_016;
+            }
+            else if((div < 32) || ((32 == div) && (0 == rem)))
+            {
+                hlprescaler = hl_spi_prescaler_032;
+            }    
+            else if((div < 64) || ((64 == div) && (0 == rem)))
+            {
+                hlprescaler = hl_spi_prescaler_064;
+            }
+            else if((div < 128) || ((128 == div) && (0 == rem)))
+            {
+                hlprescaler = hl_spi_prescaler_128;
+            }   
+            else
+            {
+                hlprescaler = hl_spi_prescaler_256;
+            }
+        }
+    }
+    
+    
+    return(hlprescaler); 
 }
 
 
@@ -667,7 +765,13 @@ static void s_hal_spi_rx_isr_disable(hal_spi_t id)
     SPI_I2S_ITConfig(SPIx, SPI_I2S_IT_RXNE, DISABLE);
 }
 
-
+static void s_hal_spi_prepare_hl_spi_map(void)
+{
+    // we must initialise hl_spi_map w/ suited values. 
+    // we have built hal_brdcfg_spi__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_spi_mapping_t) == sizeof(hal_spi_hid_brdcfg_t));
+    hl_spi_map = (hl_spi_mapping_t*)&hal_brdcfg_spi__theconfig;
+}
 
 #endif//HAL_USE_SPI
 

@@ -115,8 +115,10 @@ static const hal_spi_cfg_t s_hal_encoder_spicfg_master =
     .ownership                  = hal_spi_ownership_master,
     .direction                  = hal_spi_dir_rxonly,
     .activity                   = hal_spi_act_framebased,
-    .prescaler                  = hal_spi_prescaler_064,
-    .speed                      = hal_spi_speed_dontuse, 
+//     .prescaler                  = hal_spi_prescaler_064,
+//     .maxspeed                   = 0, 
+    .prescaler                  = hal_spi_prescaler_auto,
+    .maxspeed                   = 1000*1000,   
     .sizeofframe                = 3,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
@@ -179,7 +181,12 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     
     hal_mux_init(intitem->muxid, NULL);
     
-    hal_spi_init(intitem->spiid, &s_hal_encoder_spicfg_master);
+    // we get the max speed of spi from what specified in hal_brdcfg_encoder__theconfig
+    hal_spi_cfg_t spicfg;
+    memcpy(&spicfg, &s_hal_encoder_spicfg_master, sizeof(hal_spi_cfg_t));
+    spicfg.maxspeed = hal_brdcfg_encoder__theconfig.spimaxspeed;
+    
+    hal_spi_init(intitem->spiid, &spicfg);
     
  
     s_hal_encoder_initted_set(id);
@@ -271,7 +278,7 @@ static void s_hal_encoder_onreceiv(void* p)
     hal_encoder_t id = (hal_encoder_t)tmp;
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
     
-    hal_spi_stop(intitem->spiid);
+    //hal_spi_stop(intitem->spiid);
     hal_mux_disable(intitem->muxid);
     
     // ok ... now i get the frame of three bytes.

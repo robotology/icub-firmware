@@ -68,10 +68,10 @@
 
 #define HAL_can_id2index(p)           ((uint8_t)((p)))
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1) || defined(HAL_USE_CPU_FAM_STM32F4)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1) || defined(HAL_USE_MPU_TYPE_STM32F4)
 #define HAL_can_port2peripheral(p)      ( ( hal_can1 == (p) ) ? (CAN1) : (CAN2) )
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif 
 
 
@@ -123,6 +123,8 @@ typedef struct
 static hal_boolval_t s_hal_can_supported_is(hal_can_t id);
 static void s_hal_can_initted_set(hal_can_t id);
 static hal_boolval_t s_hal_can_initted_is(hal_can_t id);
+
+static void s_hal_can_prepare_hl_can_map(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -200,12 +202,10 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     
     hl_can_cfg_t cancfg;
     cancfg.baudrate = (hal_can_baudrate_1mbps == cfg->baudrate) ? hl_can_baudrate_1mbps : hl_can_baudrate_500kbps;
-    cancfg.advcfg   = NULL;    
- 
-    // we must initialise hl_can_map w/ suited values. 
-    // we have built hal_brdcfg_can__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_can_mapping_t) == sizeof(hal_can_hid_brdcfg_t));
-    hl_can_map = (hl_can_mapping_t*)&hal_brdcfg_can__theconfig;
+    cancfg.advcfg   = NULL;  
+    
+    // we must initialise hl_can_map w/ suited values.
+    s_hal_can_prepare_hl_can_map();
     
     hl_can_init((hl_can_t)id, &cancfg);
 
@@ -380,6 +380,14 @@ static hal_boolval_t s_hal_can_initted_is(hal_can_t id)
     return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_can_theinternals.initted, HAL_can_id2index(id)));
 }
 
+
+static void s_hal_can_prepare_hl_can_map(void)
+{
+    // we must initialise hl_can_map w/ suited values. 
+    // we have built hal_brdcfg_can__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_can_mapping_t) == sizeof(hal_can_hid_brdcfg_t));
+    hl_can_map = (hl_can_mapping_t*)&hal_brdcfg_can__theconfig;
+}
 
 #endif//HAL_USE_CAN
 

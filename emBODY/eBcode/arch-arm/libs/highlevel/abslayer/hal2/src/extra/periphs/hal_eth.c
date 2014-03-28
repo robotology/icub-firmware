@@ -116,7 +116,7 @@ static hal_bool_t s_hal_eth_supported_is(void);
 static void s_hal_eth_initted_set(hal_eth_t id);
 static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id);
 
-
+static void s_hal_eth_prepare_hl_eth_map(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -211,10 +211,8 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     intitem->hl_eth_config.capacityoftxfifoofframes  = intitem->config.capacityoftxfifoofframes;
     intitem->hl_eth_config.capacityofrxfifoofframes  = intitem->config.capacityofrxfifoofframes;
 
-    // we must initialise hl_can_map w/ suited values. 
-    // we have built hal_brdcfg_eth__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_eth_mapping_t) == sizeof(hal_eth_hid_brdcfg_t));       
-    hl_eth_map = (hl_eth_mapping_t*)&hal_brdcfg_eth__theconfig;
+    // we must initialise hl_eth_map w/ suited values. 
+    s_hal_eth_prepare_hl_eth_map();
     
     hl_result_t r = hl_eth_init(&intitem->hl_eth_config);
     
@@ -408,17 +406,13 @@ static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
 }
 
 
-
-// extern void hal_eth_hid_rmii_refclock_init(void)
-// {   // used by mac but also by external phy or switch    
-//     hl_eth_rmii_refclock_init();
-// }
-
-
-//extern void hal_eth_hid_rmii_prepare(void)
-//{
-//}
-
+static void s_hal_eth_prepare_hl_eth_map(void)
+{
+    // we must initialise hl_eth_map w/ suited values. 
+    // we have built hal_brdcfg_eth__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_eth_mapping_t) == sizeof(hal_eth_hid_brdcfg_t));       
+    hl_eth_map = (hl_eth_mapping_t*)&hal_brdcfg_eth__theconfig;
+}
 
 
 #endif//HAL_USE_ETH

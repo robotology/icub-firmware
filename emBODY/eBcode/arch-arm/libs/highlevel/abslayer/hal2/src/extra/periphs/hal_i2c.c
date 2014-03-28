@@ -128,7 +128,7 @@ static hal_result_t s_hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
 static hal_result_t s_hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 
-
+static void s_hal_i2c_prepare_hl_i2c_map(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
@@ -438,9 +438,8 @@ static hal_result_t s_hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg)
     }           
     
     // we must initialise hl_i2c_map w/ suited values. 
-    // we have built hal_brdcfg_i2c__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_i2c_mapping_t) == sizeof(hal_i2c_hid_brdcfg_t));   
-    hl_i2c_map = (hl_i2c_mapping_t*)&hal_brdcfg_i2c__theconfig;
+    s_hal_i2c_prepare_hl_i2c_map();
+    
     hl_i2c_init((hl_i2c_t)id, NULL);
      
     
@@ -504,7 +503,13 @@ static void s_hal_i2c_scheduling_restart(void)
     hal_base_osal_scheduling_restart();
 }
 
-
+static void s_hal_i2c_prepare_hl_i2c_map(void)
+{
+    // we must initialise hl_i2c_map w/ suited values. 
+    // we have built hal_brdcfg_i2c__theconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_i2c_mapping_t) == sizeof(hal_i2c_hid_brdcfg_t));   
+    hl_i2c_map = (hl_i2c_mapping_t*)&hal_brdcfg_i2c__theconfig;
+}
 
 #endif//HAL_USE_I2C
 

@@ -106,13 +106,13 @@ static hal_bool_t s_hal_ethtransceiver_started_is(hal_ethtransceiver_t id);
 
 static hal_result_t s_hal_ethtransceiver_lowlevel_init(const hal_ethtransceiver_cfg_t *cfg);
 
-
+static void s_hal_ethtransceiver_prepare_hl_ethtrans_map(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern hl_ethtrans_mapping_t hal_ethtransceiver_hl_ethtrans_mapping = { .supported = hl_true };
+static hl_ethtrans_mapping_t s_hal_ethtransceiver_hl_ethtrans_mapping = { .supported = hl_true };
 
 
 
@@ -257,12 +257,6 @@ extern hal_result_t hal_ethtransceiver_phy_errorinfo(uint8_t phynum, hal_ethtran
 
 
 
-extern void hal_ethtransceiver_prepare_hl_ethtrans_map(void)
-{
-    hal_ethtransceiver_hl_ethtrans_mapping.supported = hal_brdcfg_ethtransceiver__theconfig.supported;
-    hl_ethtrans_map = &hal_ethtransceiver_hl_ethtrans_mapping;
-}
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -341,8 +335,18 @@ static hal_result_t s_hal_ethtransceiver_lowlevel_init(const hal_ethtransceiver_
     
     // we dont call the user-defined device interface for the ethtransceiver in here, but by means of hl_ethtrans_init()
     // which we must prepare
-    hal_ethtransceiver_prepare_hl_ethtrans_map();  
+    s_hal_ethtransceiver_prepare_hl_ethtrans_map();  
     return((hal_result_t)hl_ethtrans_init(NULL));  
+}
+
+
+static void s_hal_ethtransceiver_prepare_hl_ethtrans_map(void)
+{
+    // we must initialise hl_ethtrans_map w/ suited values. 
+    // we have created a local hl_ethtrans_mapping_t variable (s_hal_ethtransceiver_hl_ethtrans_mapping)
+    // which we set according what in hal_brdcfg_ethtransceiver__theconfig. then we use the pointer to this variable.
+    s_hal_ethtransceiver_hl_ethtrans_mapping.supported = hal_brdcfg_ethtransceiver__theconfig.supported;
+    hl_ethtrans_map = &s_hal_ethtransceiver_hl_ethtrans_mapping;
 }
 
 

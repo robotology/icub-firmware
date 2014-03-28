@@ -29,11 +29,11 @@
 #ifdef HAL_USE_WATCHDOG
 
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)
 #warning WIP --> verify that the watchdog peripheral is the same in stm32f1 and stm32f4
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif 
 
 // --------------------------------------------------------------------------------------------------------------------
