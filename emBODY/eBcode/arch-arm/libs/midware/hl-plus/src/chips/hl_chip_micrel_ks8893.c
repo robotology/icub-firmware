@@ -76,14 +76,10 @@
 extern const hl_chip_micrel_ks8893_cfg_t hl_chip_micrel_ks8893_cfg_default  = 
 { 
     .i2cid          = hl_i2c1,
-    .resetpin       = 
-    {   
-        .port = hl_gpio_portNONE,  
-        .pin  = hl_gpio_pinNONE
-    },
-    .resetval      = hl_gpio_valRESET
+    .resetpin       = { .port = hl_gpio_portNONE, .pin  = hl_gpio_pinNONE },
+    .resetval       = hl_gpio_valRESET,
     .extclockinit   = NULL,
-    .targetphymode
+    .targetphymode  = hl_ethtrans_phymode_auto
 };
 #endif
 
@@ -120,6 +116,15 @@ static void s_hl_chip_micrel_ks8893_mii_phymode_get(hl_ethtrans_phymode_t* usedm
 static void s_hl_chip_micrel_ks8893_start(const hl_chip_micrel_ks8893_cfg_t *cfg);
 
 static void s_hl_chip_micrel_ks8893_reset(const hl_chip_micrel_ks8893_cfg_t *cfg);
+
+static hl_result_t s_hl_chip_micrel_ks8893_linkupmask(uint8_t* linkmask);
+
+static void s_hl_chip_micrel_ks8893_phy_onestatus(hl_ethtrans_phystatus_t* phystatus, uint8_t phypos);
+static hl_result_t s_hl_chip_micrel_ks8893_phy_status(hl_ethtrans_phystatus_t* phyarray, uint8_t arraysize);
+
+static uint8_t s_hl_chip_micrel_ks8893_phy_errorcode_get(uint8_t phynum, hl_ethtrans_phyerror_t errortype);
+
+static hl_result_t s_hl_chip_micrel_ks8893_phy_errorinfo(uint8_t phynum, hl_ethtrans_phyerror_t errortype, hl_ethtrans_phyerrorinfo_t *result);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
@@ -254,6 +259,44 @@ extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* u
     s_hl_chip_micrel_ks8893_mii_phymode_get(usedmiiphymode);
     return(hl_res_OK);
 }
+
+
+extern hl_result_t hl_chip_micrel_ks8893_linkupmask(uint8_t* linkmask)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+    if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
+    {
+        return(hl_res_NOK_generic);
+    }  
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+    
+    return(s_hl_chip_micrel_ks8893_linkupmask(linkmask));     
+}
+
+extern hl_result_t hl_chip_micrel_ks8893_phy_status(hl_ethtrans_phystatus_t* phyarray, uint8_t arraysize)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+    if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
+    {
+        return(hl_res_NOK_generic);
+    }  
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+    
+    return(s_hl_chip_micrel_ks8893_phy_status(phyarray, arraysize));  
+}
+
+extern hl_result_t hl_chip_micrel_ks8893_phy_errorinfo(uint8_t phynum, hl_ethtrans_phyerror_t errortype, hl_ethtrans_phyerrorinfo_t *result)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+    if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
+    {
+        return(hl_res_NOK_generic);
+    }  
+#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+    
+    return(s_hl_chip_micrel_ks8893_phy_errorinfo(phynum, errortype, result));  
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -453,6 +496,235 @@ static void s_hl_chip_micrel_ks8893_mii_phymode_get(hl_ethtrans_phymode_t* usedm
 }
 
 
+static hl_result_t s_hl_chip_micrel_ks8893_linkupmask(uint8_t* linkmask)
+{
+    // we do it by smi ...
+    // 0 is port 0, 1 is port 1, 2 is rmii
+    
+    uint16_t status_link;
+    uint8_t  PHYaddr = 0x1;
+    uint8_t  REGaddr = 0x1;
+    #define  LINK_IS_UP 0x0004
+    
+    if(NULL == linkmask)
+    {
+        return(hl_res_NOK_nullpointer);
+    }
+    
+    // at first assign all links down
+    *linkmask = 0;
+    
+    // now verify link port 0
+    PHYaddr = 0x1;
+    status_link = hl_eth_smi_read(PHYaddr, REGaddr);
+    if((status_link & LINK_IS_UP) == LINK_IS_UP)
+    {
+       *linkmask |= 0x01;
+    }
+    
+    // now verify link port 1
+    PHYaddr = 0x2;
+    status_link = hl_eth_smi_read(PHYaddr, REGaddr);
+    if((status_link & LINK_IS_UP) == LINK_IS_UP)
+    {
+        *linkmask |= 0x02;
+    }
+    
+    return(hl_res_OK);    
+    
+}
+
+static void s_hl_chip_micrel_ks8893_phy_onestatus(hl_ethtrans_phystatus_t* phystatus, uint8_t phypos)
+{   
+    hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
+    hl_i2c_t i2cid = intitem->config.i2cid;
+    uint16_t regaddr_status0, regaddr_status1;
+    uint8_t  buff_read = 0xFF;
+    hl_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0};
+    
+    switch(phypos)
+    {
+        case 0:
+        {
+            regaddr_status0 = 0x1E;
+            regaddr_status1 = 0x1F;
+        } break;
+        
+        case 1:
+        {
+            regaddr_status0 = 0x2E;
+            regaddr_status1 = 0x2F;
+        } break;
+        
+        case 2:
+        {
+            regaddr_status0 = 0x0;  //  reserved, not applied to port 3. (see datasheet)
+            regaddr_status1 = 0x3F;
+        } break;
+        
+        default:
+        {
+            return;
+        }
+    }
+
+    
+    memset(phystatus, 0, sizeof(hl_ethtrans_phystatus_t));
+    
+    if(phypos < 2)
+    {       
+        regaddr.numofbytes = 1;
+        regaddr.bytes.one = regaddr_status0;
+        hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);           
+        
+        if(buff_read&0x0040)    // autoneg completed
+        {
+            phystatus->autoNeg_done = 1;
+        }
+        if(buff_read&0x0020)    // link is good
+        {
+            phystatus->linkisgood = 1;
+        }
+    }
+
+    buff_read = 0;
+
+    regaddr.numofbytes = 1;
+    regaddr.bytes.one = regaddr_status1;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);       
+    
+    if(buff_read&0x0004)        // link speed 1==>100
+    {
+        phystatus->linkspeed = 1;
+    }
+    if(buff_read&0x0002)        // duplex 1==>full
+    {
+        phystatus->linkduplex = 1;
+    }
+    
+}
+
+static hl_result_t s_hl_chip_micrel_ks8893_phy_status(hl_ethtrans_phystatus_t* phyarray, uint8_t arraysize)
+{
+    uint8_t i; 
+    
+    if((NULL == phyarray) || (arraysize > 3))
+    {
+        return(hl_res_NOK_nullpointer);
+    }
+
+    for(i=0; (i<arraysize); i++)
+    {
+        s_hl_chip_micrel_ks8893_phy_onestatus(&phyarray[i], i);
+    }
+
+    return(hl_res_OK);
+    
+}
+
+
+static uint8_t s_hl_chip_micrel_ks8893_phy_errorcode_get(uint8_t phynum, hl_ethtrans_phyerror_t errortype)
+{
+    switch(phynum)
+    {
+        case 0:
+        {
+            return(errortype);
+        }
+        
+        case 1:
+        {
+            return(0x20+errortype);
+        }
+        
+        case 2:
+        {
+            return(0x40+errortype);
+        }
+        default:
+        {
+            return(0);
+        }
+    };
+
+}
+
+static hl_result_t s_hl_chip_micrel_ks8893_phy_errorinfo(uint8_t phynum, hl_ethtrans_phyerror_t errortype, hl_ethtrans_phyerrorinfo_t *result)
+{
+    hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
+    hl_i2c_t i2cid = intitem->config.i2cid;
+    hl_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0 };
+
+    uint8_t errorcode;
+    uint8_t buff_write = 0x1c; // read MIB counters selected
+    uint8_t buff_read[4] = {0};
+    
+    
+    if(phynum > 2)
+    {
+        return(hl_res_NOK_nodata);
+    }
+    
+    if(NULL == result)
+    {
+        return(hl_res_NOK_nullpointer);
+    }
+   
+    errorcode = s_hl_chip_micrel_ks8893_phy_errorcode_get(phynum, errortype);
+ 
+    buff_write = 0x1c;
+    regaddr.bytes.one = 0x79;    
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write, 1);
+    
+
+    buff_write = errorcode;
+    regaddr.bytes.one = 0x7A;    
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write, 1);    
+   
+
+    
+    // read bits 24-31
+    regaddr.bytes.one = 0x80;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read[3], 1);    
+    
+    // read bits 16-23
+    regaddr.bytes.one = 0x81;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read[2], 1); 
+
+    // read bits 8-15
+    regaddr.bytes.one = 0x82;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read[1], 1);     
+ 
+    // read bits 0-7
+    regaddr.bytes.one = 0x83;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read[0], 1);     
+
+   
+    
+    result->value = (((uint32_t)(buff_read[3]&0x3F))<< 24) | (((uint32_t)buff_read[2])<<16) | (((uint32_t)buff_read[1])<<8) | buff_read[0];
+
+    
+    if((buff_read[3]&0x80) == 0x80)
+    {
+        result->counteroverflow = 1;
+    }
+    else
+    {
+        result->counteroverflow = 0;
+    }
+    
+    if((buff_read[3]&0x40) == 0x40)  
+    {
+        result->validvalue = 1;
+    }
+    else
+    {
+        result->validvalue = 0;
+    }
+    return(hl_res_OK);
+}  
+
+
 static void s_hl_chip_micrel_ks8893_start(const hl_chip_micrel_ks8893_cfg_t *cfg)
 {
     //hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
@@ -475,6 +747,7 @@ static void s_hl_chip_micrel_ks8893_start(const hl_chip_micrel_ks8893_cfg_t *cfg
         hl_sys_on_error(hl_error_runtimefault, "hl_chip_micrel_ks8893_configure(): SWITCH not configured");
     }
 }
+
 
 static void s_hl_chip_micrel_ks8893_reset(const hl_chip_micrel_ks8893_cfg_t *cfg)
 {

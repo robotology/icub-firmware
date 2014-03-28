@@ -68,6 +68,7 @@ typedef struct
     hl_ethtrans_phymode_t   targetphymode;
 } hl_chip_micrel_ks8893_cfg_t;
 
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
@@ -96,6 +97,17 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmi
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
 extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedphymode);
+
+
+/** @fn			extern hl_result_t hl_chip_micrel_ks8893_linkupmask(uint8_t* linkmask)
+    @brief  	this function retrieves the binary status of the links (on = 1b / off = 0b).
+    @return 	hl_res_NOK_generic on error else hl_res_OK
+  */
+extern hl_result_t hl_chip_micrel_ks8893_linkupmask(uint8_t* linkmask);
+
+extern hl_result_t hl_chip_micrel_ks8893_phy_status(hl_ethtrans_phystatus_t* phyarray, uint8_t arraysize);
+
+extern hl_result_t hl_chip_micrel_ks8893_phy_errorinfo(uint8_t phynum, hl_ethtrans_phyerror_t errortype, hl_ethtrans_phyerrorinfo_t *result);
 
 
 
