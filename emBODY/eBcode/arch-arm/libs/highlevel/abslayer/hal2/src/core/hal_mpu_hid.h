@@ -21,7 +21,7 @@
 #define _HAL_CPU_HID_H_
 
 
-/* @file       hal_cpu_hid.h
+/* @file       hal_mpu_hid.h
     @brief      This header file implements hidden interface to hal.
     @author     marco.accame@iit.it
     @date       02/27/2013
@@ -34,7 +34,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_cpu.h"
+#include "hal_mpu.h"
 
 
 // - #define used with hidden structs ---------------------------------------------------------------------------------
@@ -49,20 +49,20 @@ typedef struct
     uint32_t                        cpu;
     uint32_t                        fastbus;
     uint32_t                        slowbus;
-} hal_cpu_hid_speeds_t;
+} hal_mpu_hid_speeds_t;
 
 
 typedef struct
 {
-    hal_cpu_architecture_t          architecture;
-    hal_cpu_family_t                family;
-    hal_cpu_name_t                  name;
-    hal_cpu_hid_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
-} hal_cpu_hid_brdcfg_t;
+    hal_mpu_arch_t          architecture;
+    hal_mpu_type_t                  type;
+    hal_mpu_name_t                  name;
+    hal_mpu_hid_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
+} hal_mpu_hid_brdcfg_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_cpu_hid_brdcfg_t hal_brdcfg_cpu__theconfig;
+extern const hal_mpu_hid_brdcfg_t hal_brdcfg_mpu__theconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

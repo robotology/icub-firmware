@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       hal_cpu.c
+/* @file       hal_mpu.c
 	@brief      This file keeps implementation of the base hal module for stm32.
 	@author     marco.accame@iit.it
     @date       02/27/2013
@@ -25,7 +25,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#ifdef HAL_USE_CPU
+#ifdef HAL_USE_MPU
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -44,14 +44,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_cpu.h"
+#include "hal_mpu.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_cpu_hid.h" 
+#include "hal_mpu_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_cpu_cfg_t hal_cpu_cfg_default = { .dummy = 0 };
+const hal_mpu_cfg_t hal_mpu_cfg_default = { .dummy = 0 };
 
 
 
@@ -75,7 +75,7 @@ const hal_cpu_cfg_t hal_cpu_cfg_default = { .dummy = 0 };
 typedef struct
 {
     uint8_t     nothing;
-} hal_cpu_theinternals_t;
+} hal_mpu_theinternals_t;
 
 
 
@@ -94,7 +94,7 @@ typedef struct
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// static hal_cpu_theinternals_t s_hal_cpu_theinternals =
+// static hal_mpu_theinternals_t s_hal_mpu_theinternals =
 // {
 //     .nothing     = 0
 // };
@@ -104,22 +104,22 @@ typedef struct
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_result_t hal_cpu_init(const hal_cpu_cfg_t* cfg)
+extern hal_result_t hal_mpu_init(const hal_mpu_cfg_t* cfg)
 {
     if(NULL == cfg)
     {
-        cfg  = &hal_cpu_cfg_default;
+        cfg  = &hal_mpu_cfg_default;
     } 
     
     RCC_ClocksTypeDef clocks;
     RCC_GetClocksFreq(&clocks);      
     
-    if((hal_brdcfg_cpu__theconfig.speeds.cpu     != clocks.SYSCLK_Frequency) ||
-       (hal_brdcfg_cpu__theconfig.speeds.fastbus != clocks.PCLK2_Frequency)  ||
-       (hal_brdcfg_cpu__theconfig.speeds.slowbus != clocks.PCLK1_Frequency) )
+    if((hal_brdcfg_mpu__theconfig.speeds.cpu     != clocks.SYSCLK_Frequency) ||
+       (hal_brdcfg_mpu__theconfig.speeds.fastbus != clocks.PCLK2_Frequency)  ||
+       (hal_brdcfg_mpu__theconfig.speeds.slowbus != clocks.PCLK1_Frequency) )
     {
         char str[64];
-        snprintf(str, sizeof(str), "hal_cpu wrong speeds: cpu = %d hz, fbus = %d hz, sbus = %d hz", clocks.SYSCLK_Frequency, clocks.PCLK2_Frequency, clocks.PCLK1_Frequency);
+        snprintf(str, sizeof(str), "hal_mpu wrong speeds: cpu = %d hz, fbus = %d hz, sbus = %d hz", clocks.SYSCLK_Frequency, clocks.PCLK2_Frequency, clocks.PCLK1_Frequency);
         hal_base_on_fatalerror(hal_fatalerror_generic, str);       
     }    
    
@@ -127,25 +127,25 @@ extern hal_result_t hal_cpu_init(const hal_cpu_cfg_t* cfg)
 }
 
 
-extern hal_cpu_architecture_t hal_cpu_architecture_get(void)
+extern hal_mpu_arch_t hal_mpu_arch_get(void)
 {
-    return(hal_brdcfg_cpu__theconfig.architecture);
+    return(hal_brdcfg_mpu__theconfig.architecture);
 }
 
 
-extern hal_cpu_family_t hal_cpu_family_get(void)
+extern hal_mpu_type_t hal_mpu_type_get(void)
 {
-    return(hal_brdcfg_cpu__theconfig.family);
+    return(hal_brdcfg_mpu__theconfig.type);
 }
 
 
-extern hal_cpu_name_t hal_cpu_name_get(void)
+extern hal_mpu_name_t hal_mpu_name_get(void)
 {
-    return(hal_brdcfg_cpu__theconfig.name);
+    return(hal_brdcfg_mpu__theconfig.name);
 }
 
 
-extern uint32_t hal_cpu_speed_get(hal_cpu_speedtype_t speedtype)
+extern uint32_t hal_mpu_speed_get(hal_mpu_speedtype_t speedtype)
 {
     uint32_t res  = 0;   
     RCC_ClocksTypeDef clocks;
@@ -153,10 +153,10 @@ extern uint32_t hal_cpu_speed_get(hal_cpu_speedtype_t speedtype)
     
     switch(speedtype)
     {
-        case hal_cpu_speedtype_max:         res = hal_brdcfg_cpu__theconfig.speeds.max;         break;
-        case hal_cpu_speedtype_cpu:         res = clocks.SYSCLK_Frequency;                      break;
-        case hal_cpu_speedtype_fastbus:     res = clocks.PCLK2_Frequency;                       break;
-        case hal_cpu_speedtype_slowbus:     res = clocks.PCLK1_Frequency;                       break;
+        case hal_mpu_speedtype_max:         res = hal_brdcfg_mpu__theconfig.speeds.max;         break;
+        case hal_mpu_speedtype_cpu:         res = clocks.SYSCLK_Frequency;                      break;
+        case hal_mpu_speedtype_fastbus:     res = clocks.PCLK2_Frequency;                       break;
+        case hal_mpu_speedtype_slowbus:     res = clocks.PCLK1_Frequency;                       break;
         default:                            res = 0;                                            break;        
     }
     

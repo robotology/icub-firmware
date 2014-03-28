@@ -34,7 +34,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_cpu.h"
+#include "hal_mpu.h"
 
 #include "hal_middleware_interface.h"
 
@@ -43,6 +43,8 @@
 
 #include "hal_brdcfg.h"
 #include "hal_flash.h"
+
+#include "hal_mpu_name.h"
 
 #include "hl_sys.h"
  
@@ -242,7 +244,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
     r = SysTick_Config(SystemCoreClock / tickinsec);
 
 
-    hal_sys_irqn_priority_set(hal_cpu_arc_armcmx_SysTick_IRQn, priority);
+    hal_sys_irqn_priority_set(hal_mpu_arch_armcmx_SysTick_IRQn, priority);
 
 
     return((0==r) ? (hal_res_OK) : (hal_res_NOK_generic));

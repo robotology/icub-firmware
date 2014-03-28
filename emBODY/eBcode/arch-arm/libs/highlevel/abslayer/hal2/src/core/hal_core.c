@@ -38,13 +38,13 @@
 #include "hal_sys.h"
 #include "hl_sys.h"
 #include "stdio.h"
-#include "hal_cpu.h"
+#include "hal_mpu.h"
 #include "hal_flash.h"
 #include "hal_heap.h"
 
 #include "hal_base_hid.h"
 #include "hal_sys_hid.h"
-#include "hal_cpu_hid.h"
+#include "hal_mpu_hid.h"
 #include "hal_flash_hid.h"
 #include "hal_heap_hid.h"
 
@@ -142,7 +142,7 @@ extern hal_result_t hal_core_init(const hal_core_cfg_t *cfg)
     hal_base_init(&cfg->basecfg);
     
     // -- call initialisation of cpu
-    hal_cpu_init(&cfg->cpucfg);
+    hal_mpu_init(&cfg->mpucfg);
     
     // -- call initialisation of flash   
     hal_flash_init(&cfg->flashcfg);    

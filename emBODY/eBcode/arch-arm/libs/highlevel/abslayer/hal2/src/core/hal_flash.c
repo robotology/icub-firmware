@@ -111,13 +111,13 @@ static void s_hal_flash_initted_set(hal_flash_t id);
 static hal_boolval_t s_hal_flash_initted_is(hal_flash_t id);
 
 
-#if   defined(HAL_USE_CPU_FAM_STM32F4)  
+#if   defined(HAL_USE_MPU_TYPE_STM32F4)  
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr);
 #endif
 
 static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr);
 
-#if     defined(HAL_USE_CPU_FAM_STM32F4)
+#if     defined(HAL_USE_MPU_TYPE_STM32F4)
 static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr);
 #endif
 
@@ -134,11 +134,11 @@ static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword);
 #define s_hal_flash_TOTALSIZE       (hal_brdcfg_flash__theconfig.totalsize)
 
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
 
 static const uint32_t s_hal_flash_PAGESIZE          = 2*1024;
 
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)
 
 static const uint32_t s_hal_flash_PAGESNUM          = 12;
 
@@ -174,8 +174,8 @@ static const uint32_t s_hal_flash_PAGEADDRS[12]     =
     0x080E0000          // s_hal_flash_BASEADDR + 896k
 };
 
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -443,16 +443,16 @@ extern uint32_t hal_flash_get_pageaddr(uint32_t addr)
         return(hal_NA32);
     }
 
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
     // every page is 2k
     addr >>= 11;
     addr <<= 11;
     return(addr);
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)    
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)    
     uint32_t pageindex = s_hal_flash_pageindex_get(addr);   
     return(s_hal_flash_PAGEADDRS[pageindex]);
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif    
 }
 
@@ -503,17 +503,17 @@ static hal_result_t s_hal_flash_erasepage(uint32_t addr)
         return(hal_res_NOK_generic);
     }
     
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
     // find beginning of page
     addr = hal_flash_get_pageaddr(addr);
     FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
     status = FLASH_ErasePage(addr);
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)
     FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
     // important: FLASH_EraseSector() DOES NOT use the pageindex, but its own values. 
     status = FLASH_EraseSector(s_hal_flash_stm32f4_sector_get(addr), VoltageRange_3);
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif  
 
     return((FLASH_COMPLETE==status)?(hal_res_OK):(hal_res_NOK_generic));
@@ -601,16 +601,16 @@ static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t
 }
 
 
-#if   defined(HAL_USE_CPU_FAM_STM32F4)  
+#if   defined(HAL_USE_MPU_TYPE_STM32F4)  
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
 {
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
     addr -= s_hal_flash_BASEADDR;
     //return(addr / s_hal_flash_PAGESIZE);
     // if s_hal_flash_PAGESIZE is 2k (= 2^11) -> division is equivalent to shift by 11 bits
     addr >>= 11;
     return(addr);
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)
     uint8_t i;
 
     for(i=0; i<(s_hal_flash_PAGESNUM-1); i++)
@@ -622,14 +622,14 @@ static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
     }
 
     return(s_hal_flash_PAGESNUM-1);  
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif    
 }
 #endif
 
 
-#if     defined(HAL_USE_CPU_FAM_STM32F4)
+#if     defined(HAL_USE_MPU_TYPE_STM32F4)
 static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
 {
     static const uint16_t FLASH_Sectors[12] =
@@ -652,13 +652,13 @@ static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
 
 static uint32_t s_hal_flash_quickget_pagesize(uint32_t addr)
 {
-#if     defined(HAL_USE_CPU_FAM_STM32F1)
+#if     defined(HAL_USE_MPU_TYPE_STM32F1)
     return(s_hal_flash_PAGESIZE);
-#elif   defined(HAL_USE_CPU_FAM_STM32F4)    
+#elif   defined(HAL_USE_MPU_TYPE_STM32F4)    
     uint32_t pageindex = s_hal_flash_pageindex_get(addr);   
     return(s_hal_flash_PAGESIZES[pageindex]);
-#else //defined(HAL_USE_CPU_FAM_*)
-    #error ERR --> choose a HAL_USE_CPU_FAM_*
+#else //defined(HAL_USE_MPU_TYPE_*)
+    #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif    
 }
 
