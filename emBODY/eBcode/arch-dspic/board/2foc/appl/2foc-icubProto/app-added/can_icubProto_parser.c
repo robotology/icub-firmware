@@ -778,8 +778,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
             txpayload->b[1] = icubCanProto_boardType__2foc;
             txpayload->b[2] = FIRMWARE_VERSION_MAJOR;
             txpayload->b[3] = FIRMWARE_VERSION_MINOR;
-            txpayload->b[4] = FIRMWARE_VERSION_BUILD;
-            #warning solita incoerenza tra versioni di fw sensori ed motori            
+            txpayload->b[4] = FIRMWARE_VERSION_BUILD;         
         } break;
                 
     

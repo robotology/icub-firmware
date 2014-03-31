@@ -81,14 +81,8 @@
 //get periodic message type. it is equal to get dest for polling msg
 #define CAN_ICUBPROTO_STDID_RX_GETPERMSGTYPE(rxid)  CAN_ICUBPROTO_STDID_RX_GETDEST(rxid)
 
-/* PAY ATTENTION: this values are synchronized with ICUBPROTO_CONTROLMODE_* value!!!!!*/
-typedef enum
-{
-    controlMode_idle = 0x0,             /* ==> ICUBPROTO_CONTROLMODE_IDLE */
-    controlMode_velocity = 0x2,         /* ==> ICUBPROTO_CONTROLMODE_VELOCITY */
-    controlMode_current = 0x3,          /* ==> ICUBPROTO_CONTROLMODE_TORQUE */
-    controlMode_error = 0xFF            /* ==> not exist in icub protocol. used for error detection*/
-}icubProtoControlMode_t;
+#define controlMode_error 0xFF /* currently is not used in icubCanProto. i'm waintg new "control mode version" */
+
 
 extern unsigned int *gulpadr1;
 extern unsigned int *gulpadr2;
@@ -100,6 +94,6 @@ extern void CanIcubProtoTxAck(unsigned int stid);
 extern void CanIcubProtoTxErrorCode(unsigned int stid, unsigned char len, tCanData *errordata);
 extern void CanIcubProtoInit(unsigned char bid);
 extern void CanIcubProtoSetFilters(unsigned char bid);
-extern icubProtoControlMode_t CanIcubProtoGetcontrol_mode(void);
+extern icubCanProto_controlmode_t CanIcubProtoGetcontrol_mode(void);
 extern const unsigned int * PeriodicData[ELEMENTS_IN_PREIODIC_DATA_LIST];
 #endif
