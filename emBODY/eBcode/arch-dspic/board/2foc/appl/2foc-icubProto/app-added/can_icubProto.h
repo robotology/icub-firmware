@@ -81,9 +81,6 @@
 //get periodic message type. it is equal to get dest for polling msg
 #define CAN_ICUBPROTO_STDID_RX_GETPERMSGTYPE(rxid)  CAN_ICUBPROTO_STDID_RX_GETDEST(rxid)
 
-#define controlMode_error 0xFF /* currently is not used in icubCanProto. i'm waintg new "control mode version" */
-
-
 extern unsigned int *gulpadr1;
 extern unsigned int *gulpadr2;
 extern unsigned int *gulpadr3;

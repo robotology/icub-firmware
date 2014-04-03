@@ -274,7 +274,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
             
             txpayload->b[1] = CanIcubProtoGetcontrol_mode();
-            if( controlMode_error == txpayload->b[1])
+            if( icubCanProto_controlmode_unknownError == txpayload->b[1])
             {
 //                *txlen = 0x1;
 //                txpayload->b[0] =  CAN_ERROR_INCONSISTENT_STATE;

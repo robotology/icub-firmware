@@ -111,7 +111,7 @@ extern icubCanProto_controlmode_t CanIcubProtoGetcontrol_mode(void)
     }
     else
     {
-        return(controlMode_error);
+        return(icubCanProto_controlmode_unknownError);
     }
 
 }
