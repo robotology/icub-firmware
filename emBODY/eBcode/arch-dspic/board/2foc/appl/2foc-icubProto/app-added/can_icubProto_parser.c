@@ -234,7 +234,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 return 0;
             }
 		
-		        received_canloader_msg=0; // start to transmit status messages
+		    received_canloader_msg=0; // start to transmit status messages
 
             // go to Switch On state
             DS402_Controlword.Flags.SwitchOn = 1;
@@ -473,9 +473,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             *txlen = 0x8;
             txpayload->b[0] = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
             txpayload->b[1] = icubCanProto_boardType__2foc;
-            txpayload->b[2] = FIRMWARE_VERSION_MAJOR;
-            txpayload->b[3] = FIRMWARE_VERSION_MINOR;
-            txpayload->b[4] = FIRMWARE_VERSION_BUILD;
+            txpayload->b[2] = FW_VERSION_MAJOR;
+            txpayload->b[3] = FW_VERSION_MINOR;
+            txpayload->b[4] = FW_VERSION_BUILD;
             txpayload->b[5] = CAN_PROTOCOL_VERSION_MAJOR;
             txpayload->b[6] = CAN_PROTOCOL_VERSION_MINOR;
             txpayload->b[7] = sCanProtocolCompatible; // can_protocol_ack;
@@ -771,14 +771,14 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
                 return(0);
             }
 			
-			      received_canloader_msg=1; // do not transmit status messages
+			received_canloader_msg=1; // do not transmit status messages
 
             *txlen = 5;
             txpayload->b[0] = cmd;
             txpayload->b[1] = icubCanProto_boardType__2foc;
-            txpayload->b[2] = FIRMWARE_VERSION_MAJOR;
-            txpayload->b[3] = FIRMWARE_VERSION_MINOR;
-            txpayload->b[4] = FIRMWARE_VERSION_BUILD;         
+            txpayload->b[2] = FW_VERSION_MAJOR;
+            txpayload->b[3] = FW_VERSION_MINOR;
+            txpayload->b[4] = FW_VERSION_BUILD;            
         } break;
                 
     
