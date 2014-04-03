@@ -21,7 +21,6 @@
  *     get the definition of messages and params of the dsp controller
  * define __ONLY_DEF before inclusion on Linux/Winnt/Qnx
  */
-#include "stdint.h"
 #include "iCubCanProto_types.h"
 //board_types
 #define BOARD_TYPE_DSP    icubCanProto_boardType__dsp
