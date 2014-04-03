@@ -1260,22 +1260,14 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
     }
 
     #warning VALE--> before use current, vel and pos of 2foc be sure to had configured 2foc periodic msg content!!!
-    mstatus_ptr->basic.current = *((int16_t*)&(frame->data[0]));
+    mstatus_ptr->basic.current  = *((int16_t*)&(frame->data[0]));
     mstatus_ptr->basic.velocity = *((int16_t*)&(frame->data[2]));
     mstatus_ptr->basic.position = *((int32_t*)&(frame->data[4]));
      
-    
-    
-    /* TAG_ALE */
 #ifdef USE_2FOC_FAST_ENCODER
-    if ((frame->id & 0xFFFFFF0F) == 0x104)
-    {
-        eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
-    }
+    eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
 #endif
 
-    
-    
     return(eores_OK);
 }
 
@@ -1675,16 +1667,6 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
     if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinboard)
     {
         mstatus_ptr->basic.current = *((uint16_t*)&(frame->data[0]));
-				
-        #ifdef USE_2FOC_FAST_ENCODER
-        if ((frame->id & 0xFFFFFF0F) == 0x104)
-        {
-            if(applrunMode__2foc == eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle()))
-            {
-                eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(((int16_t*)frame->data)[1]));
-            }
-        }
-        #endif
     }
     else
     {
@@ -1821,11 +1803,7 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
             *eomc_controlmode = eomc_controlmode_impedance_vel;
         }break;
 
-        case  icubCanProto_controlmode_calib_abs_pos_sens:
-        case  icubCanProto_controlmode_calib_hard_stops:
-        case  icubCanProto_controlmode_handle_hard_stops:
-        case  icubCanProto_controlmode_margin_reached:
-        case  icubCanProto_controlmode_calib_abs_and_incremental:
+        case  icubCanProto_controlmode_calibration:
         {
             *eomc_controlmode = eomc_controlmode_calib;
         }break;
