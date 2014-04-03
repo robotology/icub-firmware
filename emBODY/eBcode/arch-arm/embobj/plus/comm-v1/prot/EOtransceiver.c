@@ -146,7 +146,7 @@ extern EOtransceiver* eo_transceiver_New(const eOtransceiver_cfg_t *cfg)
     retptr->transmitter = eo_transmitter_New(&tra_cfg);
     
 #if defined(USE_DEBUG_EOTRANSCEIVER)    
-    memset(&retptr->DEBUG, 0, sizeof(EOtransceiverDEBUG_t)); 
+    memset(&retptr->debug, 0, sizeof(EOtransceiverDEBUG_t));
 #endif
 
 //     if((eo_trans_protection_enabled == cfg->protection) && (NULL != cfg->mutex_fn_new))
@@ -205,7 +205,7 @@ extern eOresult_t eo_transceiver_Receive(EOtransceiver *p, EOpacket *pkt, uint16
         {   // DEBUG
             if(eores_OK != res)
             {
-                p->DEBUG.failuresinloadofreplyropframe ++;            
+                p->debug.failuresinloadofreplyropframe ++;
             }
         }
 #endif        
@@ -286,7 +286,7 @@ extern eOresult_t eo_transceiver_rop_regular_Load(EOtransceiver *p, eOropdescrip
     {   // DEBUG    
         if(eores_OK != res)
         {
-            p->DEBUG.cannotloadropinregulars ++;
+            p->debug.cannotloadropinregulars ++;
         }
     } 
 #endif    
@@ -327,7 +327,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load_without_data(EOtransceiver 
     {   // DEBUG    
         if(eores_OK != res)
         {
-            p->DEBUG.cannotloadropinoccasionals ++;
+            p->debug.cannotloadropinoccasionals ++;
         }
     }     
 #endif
@@ -372,7 +372,7 @@ extern eOresult_t eo_transceiver_rop_occasional_Load(EOtransceiver *p, eOropdesc
     {   // DEBUG    
         if(eores_OK != res)
         {
-            p->DEBUG.cannotloadropinoccasionals ++;
+            p->debug.cannotloadropinoccasionals ++;
         }
     }   
 #endif

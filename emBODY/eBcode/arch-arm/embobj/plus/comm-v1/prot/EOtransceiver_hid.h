@@ -69,7 +69,7 @@ struct EOtransceiver_hid
     EOreceiver*                 receiver;
     EOtransmitter*              transmitter;   
 #if defined(USE_DEBUG_EOTRANSCEIVER)    
-    EOtransceiverDEBUG_t        DEBUG;
+    EOtransceiverDEBUG_t        debug;
 #endif    
     //EOVmutexDerived*            mtx_tx_replies;
     //EOVmutexDerived*            mtx_tx_regulars;

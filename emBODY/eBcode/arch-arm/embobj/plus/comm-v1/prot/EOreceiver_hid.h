@@ -79,7 +79,7 @@ struct EOreceiver_hid
     uint8_t*                    bufferropframereply;
     uint64_t                    rx_seqnum;
 #if defined(USE_DEBUG_EORECEIVER)      
-    EOreceiverDEBUG_t           DEBUG;
+    EOreceiverDEBUG_t           debug;
 #endif    
 }; 
 

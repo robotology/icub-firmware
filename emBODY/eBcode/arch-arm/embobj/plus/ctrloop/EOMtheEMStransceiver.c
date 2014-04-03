@@ -317,9 +317,9 @@ extern eOemstransceiver_diagnosticsinfo_t* eom_emstransceiver_GetDiagnosticsInfo
 static void s_eom_emstransceiver_update_diagnosticsinfo(void)
 {
     // retrieve the DEBUG variables of transceiver, transmitter, receiver and put them inside here.
-    EOtransceiverDEBUG_t* transceiverDBG = &s_emstransceiver_singleton.transceiver->DEBUG;
-    EOtransmitterDEBUG_t* transmitterDBG = &s_emstransceiver_singleton.transceiver->transmitter->DEBUG;
-    EOreceiverDEBUG_t*    receiverDBG    = &s_emstransceiver_singleton.transceiver->receiver->DEBUG;
+    EOtransceiverDEBUG_t* transceiverDBG = &s_emstransceiver_singleton.transceiver->debug;
+    EOtransmitterDEBUG_t* transmitterDBG = &s_emstransceiver_singleton.transceiver->transmitter->debug;
+    EOreceiverDEBUG_t*    receiverDBG    = &s_emstransceiver_singleton.transceiver->receiver->debug;
     
     // update the extern variable used for debug ...
     s_eom_emstransceiver_diagnosticsinfo.rxinvalidropframes             = receiverDBG->rxinvalidropframes;
