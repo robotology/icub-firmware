@@ -9,5 +9,8 @@ void disable_motor_pwm (char axis);
 void enable_control (char axis);
 void disable_control (char axis);
 void set_control_mode(char axis);
+void get_control_mode(char axis);
+void set_control_mode_new(char axis);
+void get_control_mode_new(char axis);
 
 #endif

@@ -7,8 +7,10 @@
 #include "can_interface.h"
 #include "trajectory.h"
 #include "filters.h"
+#include "messages.h"
 
 extern canmsg_t _canmsg;
+extern  byte	_board_ID ;
 #define CAN_DATA _canmsg.CAN_data
 #define CAN_FRAME_TYPE _canmsg.CAN_frameType
 #define CAN_FRAME_FMT _canmsg.CAN_frameFormat
@@ -16,6 +18,46 @@ extern canmsg_t _canmsg;
 #define CAN_ID _canmsg.CAN_messID
 #define CAN_SRC _canmsg.CAN_ID_src
 
+//-----------------------------------------------------------------------------------------------------------------------
+byte controlmode_api_to_fw(byte mode)
+{
+	switch (mode)
+	{
+		case icubCanProto_controlmode_idle:          return MODE_IDLE;
+		case icubCanProto_controlmode_position:      return MODE_POSITION;
+		case icubCanProto_controlmode_velocity:      return MODE_VELOCITY;
+		case icubCanProto_controlmode_torque:        return MODE_TORQUE;
+		case icubCanProto_controlmode_impedance_pos: return MODE_IMPEDANCE_POS;
+		case icubCanProto_controlmode_impedance_vel: return MODE_IMPEDANCE_VEL;
+        case icubCanProto_controlmode_openloop:      return MODE_OPENLOOP;
+	}
+	
+	return MODE_UNKNOWN_ERROR;
+}
+
+//-----------------------------------------------------------------------------------------------------------------------
+byte controlmode_fw_to_api(byte mode)
+{
+	switch (mode)
+	{
+		case MODE_IDLE:						 return icubCanProto_controlmode_idle;
+		case MODE_POSITION:			   	     return icubCanProto_controlmode_position;
+		case MODE_VELOCITY:					 return icubCanProto_controlmode_velocity;
+		case MODE_TORQUE:					 return icubCanProto_controlmode_torque;
+		case MODE_IMPEDANCE_POS:			 return icubCanProto_controlmode_impedance_pos;
+		case MODE_IMPEDANCE_VEL:			 return icubCanProto_controlmode_impedance_vel;
+		case MODE_CALIB_ABS_POS_SENS:		 return icubCanProto_controlmode_calibration;
+		case MODE_CALIB_HARD_STOPS:      	 return icubCanProto_controlmode_calibration;
+		case MODE_HANDLE_HARD_STOPS:		 return icubCanProto_controlmode_calibration;
+		case MODE_MARGIN_REACHED:   		 return icubCanProto_controlmode_calibration;
+		case MODE_CALIB_ABS_AND_INCREMENTAL: return icubCanProto_controlmode_calibration;
+		case MODE_OPENLOOP:                  return icubCanProto_controlmode_openloop;		
+	}
+	
+	return icubCanProto_controlmode_unknownError;
+}
+
+//=======================================================================================================================
 void disable_motor_pwm (char axis) 
 {
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
@@ -113,7 +155,6 @@ void enable_motor_pwm (char axis)
 {
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 //this is for waist coupling
-	#define CAN_ENABLE_PWM_PAD_HANDLER(x)   
 	{   
 		if (_can_protocol_ack == false)   
 		{   
@@ -135,7 +176,6 @@ void enable_motor_pwm (char axis)
 	}
 #elif VERSION == 0x0215 || VERSION == 0x0115
 //this is for eyes coupling
-	#define CAN_ENABLE_PWM_PAD_HANDLER(x)   
 	{   
 		if (_can_protocol_ack == false)   
 		{   
@@ -160,7 +200,6 @@ void enable_motor_pwm (char axis)
 	} 
 #elif VERSION == 0x0219 || VERSION == 0x0119
 //this is for wrist coupling
-	#define CAN_ENABLE_PWM_PAD_HANDLER(x)   
 	{   
 		if (_can_protocol_ack == false)   
 		{   
@@ -223,7 +262,6 @@ void enable_motor_pwm (char axis)
 	}
 #else
 	#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
-		#define CAN_ENABLE_PWM_PAD_HANDLER(x)   
 		{   
 			if (_can_protocol_ack == false)   
 			{   
@@ -235,7 +273,6 @@ void enable_motor_pwm (char axis)
 			can_printf("PWM ENA:%d",axis);  
 		}
 	#else //(CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
-		#define CAN_ENABLE_PWM_PAD_HANDLER(x)   
 		{   
 			if (_can_protocol_ack == false)   
 			{   
@@ -467,14 +504,87 @@ void disable_control(char axis)
 	}
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------------
+void get_control_mode(char axis)
+{
+    byte m=controlmode_fw_to_api(_control_mode[axis]);
+    
+	PREPARE_HEADER; 
+	CAN_LEN = 3; 
+	CAN_DATA[1] = m; 
+	CAN_DATA[2] = 0; 
+	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA);	
+}
+		
+//---------------------------------------------------------------------------------------------------------------------------
+void get_control_mode_new(char axis)
+{
+    byte m=controlmode_fw_to_api(_control_mode[axis]);
+
+	PREPARE_HEADER; 
+	CAN_LEN = 3; 
+	CAN_DATA[1] = m; 
+	CAN_DATA[2] = 0; 
+	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
+    
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+void set_control_mode_new(char axis)
+{
+    byte value = controlmode_api_to_fw(CAN_DATA[1]);
+	
+	//special case from fault you can go anyrwhere, execept IDLE
+	if (_control_mode[axis]==MODE_IDLE)
+	{
+        if (value!=MODE_IDLE)	
+        {
+	        enable_motor_pwm(axis);
+			enable_control(axis);
+			set_control_mode(axis);	
+        }
+        return;
+	}
+	
+	//special case, from FAULT you can only go to idle
+	if (_control_mode[axis]==MODE_IDLE) //HARDWARE FAULT
+	{
+		if (value==MODE_IDLE)	
+		{
+			disable_control(axis);
+			disable_motor_pwm(axis);
+			set_control_mode(axis);
+		}
+		return;
+	}
+	
+	//here current controlmode != IDLE, != FAULT, (motors are on)
+	//if you want to turn off motors do this...
+	if (value==MODE_IDLE)
+	{
+		disable_control(axis);
+		disable_motor_pwm(axis);
+		set_control_mode(axis);
+		return;
+	}
+	
+	//otherwise just change control mode.
+	{
+		set_control_mode(axis);
+	}
+}
+
 //---------------------------------------------------------------------------------------------------------------------------
 void set_control_mode(char axis)
 {
-#if VERSION != 0x0351 //normal boards
 	byte value = 0; 
+	value = (CAN_DATA[1]);
+	
+#if VERSION != 0x0351 //normal boards
 	if (CAN_LEN == 2) 
 	{ 
-		value = (CAN_DATA[1]);
+		
 		can_printf("CTRLMODE SET:%d",value);
 		if (value>=0 && value <=0x50) _control_mode[axis] = value;
 		_desired_torque[axis]=0;
@@ -488,12 +598,10 @@ void set_control_mode(char axis)
 		_ko_openloop[axis] = 0;
 	} 
 #elif VERSION == 0x0351 //ikart
-	byte value = 0;
 	if (CAN_LEN == 2)
 	{
 		if (_board_ID == 1)
 		{
-			value = (CAN_DATA[1]);
 			can_printf("CTRLMODE SET COUPLED 012:%d",value);
 			if (value>=0 && value <=0x50)
 				{
@@ -522,7 +630,6 @@ void set_control_mode(char axis)
 		else
 		if (_board_ID == 2)
 		{ 
-			value = (CAN_DATA[1]); 
 			can_printf("CTRLMODE SET COUPLED 012:%d",value);
 			if (value>=0 && value <=0x50)
 				{ 
