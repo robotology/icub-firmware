@@ -274,7 +274,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
             
             txpayload->b[1] = CanIcubProtoGetcontrol_mode();
-            if( controlMode_error == txpayload->b[1])
+            if( icubCanProto_controlmode_unknownError == txpayload->b[1])
             {
 //                *txlen = 0x1;
 //                txpayload->b[0] =  CAN_ERROR_INCONSISTENT_STATE;
@@ -778,8 +778,7 @@ static int s_canIcubProtoParser_parse_canLoaderMsg(tCanData *rxpayload, unsigned
             txpayload->b[1] = icubCanProto_boardType__2foc;
             txpayload->b[2] = FW_VERSION_MAJOR;
             txpayload->b[3] = FW_VERSION_MINOR;
-            txpayload->b[4] = FW_VERSION_BUILD;
-            #warning solita incoerenza tra versioni di fw sensori ed motori            
+            txpayload->b[4] = FW_VERSION_BUILD;            
         } break;
                 
     

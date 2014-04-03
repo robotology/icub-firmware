@@ -80,14 +80,12 @@ void DHESTriggerSample(void)
 // trigger for the next DHES angle read
 {
   // no operation is needed
-#warning maybe_buffering_is_needed_for_dhes_and_qe
 }
 
 void QETriggerSample(void)
 // trigger for the next DHES angle read
 {
   // no operation is needed
-#warning maybe_buffering_is_needed_for_dhes_and_qe
 }
 
 void EncoderTriggerSample()
@@ -151,7 +149,11 @@ inline SFRAC16 EncoderPositionQE()
   return (SFRAC16)(tmp);
   */
 
-  return (SFRAC16)QEPGet();
+    static const unsigned int DIVISOR = QE_RESOLUTION;
+
+    return (SFRAC16)__builtin_divud(0xFFFFUL*QEPGet(),DIVISOR);
+
+    //return (SFRAC16)QEPGet();
 }
 
 

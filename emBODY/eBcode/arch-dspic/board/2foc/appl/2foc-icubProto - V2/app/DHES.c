@@ -39,7 +39,7 @@ unsigned int DHES_UNALIGNEDMECANGLE_LUT[7] = {
 extern unsigned int hes_antibump_engaged;
 
 static SFRAC16 hes_val = 0;
-static int hes_round = 0; // ELECTRICAL hes_round conter inside a MECHANICAL hes_round
+//static int hes_round = 0; // ELECTRICAL hes_round conter inside a MECHANICAL hes_round
 
 int g_hes_state = 0;
 

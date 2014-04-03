@@ -20,7 +20,6 @@
 #include "can_icubProto.h"
 #include "can_icubProto_parser.h"
 #include "can_icubProto_trasmitter.h"
-#include "can_icubProto_messages.h"
 #include "ecan.h"
 
 #ifndef NULL
@@ -74,33 +73,45 @@ void CanIcubProtoSetFilters(unsigned char bid)
 {
 //    hal_can_receptionfilter_set( 0, 0xfff, 0, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, ICUBPROTO_PERIODIC_EMSTO2FOC_SETPOINT_CURRENT), 0/*standard_id*/);
 //    hal_can_receptionfilter_set( 0, 0xfff, 0, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, ICUBPROTO_PERIODIC_EMSTO2FOC_SETPOINT_VELOCITY), 0/*standard_id*/);
-    hal_can_receptionfilter_set( 0, 0xfff, 0, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_POLLING_MOTORBOARD, bid), 0/*standard_id*/);
-    hal_can_receptionfilter_set( 0, 0xfff, 1, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_POLLING_MOTORBOARD, 0xF/*broadcast*/), 0/*standard_id*/);
-    hal_can_receptionfilter_set( 0, 0xfff, 2, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_CANLOADER, bid), 0/*standard_id*/);
-    hal_can_receptionfilter_set( 0, 0xfff, 3, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_CANLOADER, 0xF/*broadcast*/), 0/*standard_id*/);
+    hal_can_receptionfilter_set( 0, 0xfff, 0, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL, bid), 0/*standard_id*/);
+    hal_can_receptionfilter_set( 0, 0xfff, 1, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL, 0xF/*broadcast*/), 0/*standard_id*/);
+    hal_can_receptionfilter_set( 0, 0xfff, 2, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBCANPROTO_CLASS_BOOTLOADER, bid), 0/*standard_id*/);
+    hal_can_receptionfilter_set( 0, 0xfff, 3, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBCANPROTO_CLASS_BOOTLOADER, 0xF/*broadcast*/), 0/*standard_id*/);
 #ifdef DESIRED_CURR_IN_PER_MSG_BY_EMS
-    hal_can_receptionfilter_set( 0, 0xfff, 4, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBPROTO_CLASS_PERIODIC_MOTORBOARD, ICUBPROTO_PERIODICCMD_EMSTO2FOC_DESIRED_CURRENT), 0/*standard_id*/);
+    hal_can_receptionfilter_set( 0, 0xfff, 4, CAN_ICUBPROTO_STDID_MAKE_RX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT), 0/*standard_id*/);
 #endif
 }
 
-
-extern icubProtoControlMode_t CanIcubProtoGetcontrol_mode(void)
+extern icubCanProto_controlmode_t CanIcubProtoGetcontrol_mode(void)
 {
     if(1 != DS402_Controlword.Flags.EnableOperation)
     {
-       return(controlMode_idle);    
+       return(icubCanProto_controlmode_idle);    
     }
     
-    if(SysStatus.TorqueControl)
+    if(SysStatus.OpenLoop)
     {
-        return(controlMode_current); 
+        return(icubCanProto_controlmode_openloop);
+    }
+    else if(SysStatus.TorqueControl)
+    {
+        return(icubCanProto_controlmode_current);
     }
     else if(SysStatus.SpeedControl)
     {
-       return(controlMode_velocity); 
+       return(icubCanProto_controlmode_velocity);
+    }
+    else if(SysStatus.PositionControl)
+    {
+       return(icubCanProto_controlmode_position);   
+    }
+    else if(SysStatus.TorqueSensorLoop)
+    {
+        return(icubCanProto_controlmode_torque);
     }
     else
     {
-        return(controlMode_error);
-     }
+        return(icubCanProto_controlmode_unknownError);
+    }
+
 }

@@ -18,9 +18,8 @@
 #include "faults.h"
 #include "ecan.h"
 #include "encoder.h"
-#include "rotor_alignment.h"
+//#include "rotor_alignment.h"
 #include "crc16.h"
-
 
 //some local constants to make code cleaner..
 unsigned char * eeprom_header_start = (unsigned char *) &ApplicationData;
@@ -130,38 +129,17 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
 // used to run I2T (in order to unwind it) when 2FOC loop is stopped
 // and to perform encoder turn count
 {
-  SFRAC16 encoder_value,encoder_aux_value;
-  I2Tdata.IQMeasured = 0;
-  I2Tdata.IDMeasured = 0;
+    //extern SFRAC16 encoder_value,encoder_aux_value;
+    I2Tdata.IQMeasured = 0;
+    I2Tdata.IDMeasured = 0;
 
-  I2T(&I2Tdata);
+    I2T(&I2Tdata);
 
-  encoder_value = EncoderPosition(0);
+    updateOdometry();
 
-//#ifndef SIX_STEP
+    updateGulp();
 
-#ifdef ENCODER_ENABLE_AUX
-  // read Meccanical postion [-1..0.9999] from aux encoder
-  // this IS necessary because certain encoder (DHES) have
-  // a SW internal state machine (electrical->mechanical turn
-  // count) that need to run in norder not to loose alignment.
-  encoder_aux_value = EncoderPosition(1);
-#else
-  encoder_aux_value = encoder_value;
-#endif
-
-  // Trigger encoder. Start to prepare data for the next reading (if needed..)
-  // this for ABS encoder make SPI to initiate transfer.
-  EncoderTriggerSample();
-
-
-  if(1 == SysStatus.InitialRotorAlignmentComplete)
-  {
-    UpdatePositionVariables(encoder_value);
-  }
-//#endif
-
-  IFS0bits.T3IF = 0; // clear flag
+    IFS0bits.T3IF = 0; // clear flag
 }
 
 void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
@@ -365,16 +343,6 @@ void OverCurrentFaultIntEnable()
   //enable external fault interrupt
   IEC3bits.FLTA1IE = 1;
 }
-
-void OverCurrentFaultIntDisable()
-// over current fault interrupt disable
-{
-  //disable external fault interrupt
-  IEC3bits.FLTA1IE = 0;
-  // clear irq flag
-  IFS3bits.FLTA1IF = 0;
-}
-
 
 void SetupHWParameters(void)
 // Setup variables related to HW implementation
@@ -735,15 +703,17 @@ void __attribute__((__interrupt__,no_auto_psv)) _CNInterrupt(void)
   // clear interrupt flag
   IFS1bits.CNIF = 0;
 
+  /*
   // the QEP zero signal has been detected
   if(PORTBbits.RB7)
   {
     QEPZeroInt();
   }
+  */
 
 #ifndef PIN_RA3_IS_DEBUG
   // an external fault has been triggered
-  if( ExternaFaultIsAsserted())
+  if (ExternaFaultIsAsserted())
   {
     FaultExternalTriggered();
   }
@@ -850,9 +820,9 @@ void EepromSave()
   ApplicationData.periodic_command3 = PeriodicMessageContents[2];
   ApplicationData.periodic_command4 = PeriodicMessageContents[3];
 
-  ApplicationData.Ira_qVq = IraqVq_max;
-  ApplicationData.Ira_direction = Ira_direction;
-  ApplicationData.Ira_ramp_steepness = Ira_ramp_steepness;
+  //ApplicationData.Ira_qVq = IraqVq_max;
+  //ApplicationData.Ira_direction = Ira_direction;
+  //ApplicationData.Ira_ramp_steepness = Ira_ramp_steepness;
 
   // dummy CRC to calculate dummy CRC itself
   ApplicationData.app_data_crc16 = 0;
@@ -914,7 +884,7 @@ void EepromLoad()
   PeriodicMessageContents[2] = ApplicationData.periodic_command3;
   PeriodicMessageContents[3] = ApplicationData.periodic_command4;
 
-  IraqVq_max = ApplicationData.Ira_qVq;
-  Ira_direction = ApplicationData.Ira_direction;
-  Ira_ramp_steepness = ApplicationData.Ira_ramp_steepness;
+  //IraqVq_max = ApplicationData.Ira_qVq;
+  //Ira_direction = ApplicationData.Ira_direction;
+  //Ira_ramp_steepness = ApplicationData.Ira_ramp_steepness;
 }

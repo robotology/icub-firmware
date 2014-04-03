@@ -59,7 +59,7 @@ void Timer4Config();
 void Timer5Config();
 void ExternalFaultEnable();
 void OverCurrentFaultIntEnable();
-void OverCurrentFaultIntDisable();
+//void OverCurrentFaultIntDisable();
 void InterruptPriorityConfig( void );
 void SetupHWParameters(void);
 void EepromSave();
@@ -90,7 +90,8 @@ typedef union
 // PWM loops per velocity calculation (and fresh samples expected for velocity calc)
 #define IRP_PERCALC (unsigned int)(SPEEDLOOPTIME/LOOPTIMEINSEC)
 #define SPEEDLOOPTIME (float)(1.0/W_COMPLEX_CALCULATION_FREQ)   // Speed Control Period
-#define LOOPINTCY	(LOOPTIMEINSEC/DTCY)             // Basic loop period in units of Tcy
+//#define LOOPINTCY	(LOOPTIMEINSEC/DTCY)             // Basic loop period in units of Tcy
+#define LOOPINTCY       (DESIREDMIPS/PWMFREQUENCY)
 #define LOCKTIME	(unsigned int)(LOCKTIMEINSEC*(1.0/LOOPTIMEINSEC))
    // Time it takes to ramp from zero to MINSPEEDINRPM. Time represented in seconds
 #define DELTA_STARTUP_RAMP	(unsigned int)(MINSPEEDINRPM*POLEPAIRS*LOOPTIMEINSEC* \
@@ -186,5 +187,7 @@ typedef struct eeprom_data {
 
 extern DECLARE_EMU_ROM_READVAR(ApplicationData, tEepromData);
 extern PLACE_EMU_ROM_DATA(EMURomSpace, tEepromData);
-extern void UpdatePositionVariables(SFRAC16 encoder_value);
+//extern void UpdatePositionVariables(SFRAC16 encoder_value);
+extern void updateOdometry(void);
+extern void updateGulp(void);
 #endif

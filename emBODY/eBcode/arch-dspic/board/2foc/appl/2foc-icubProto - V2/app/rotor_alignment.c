@@ -241,6 +241,7 @@ void RotorAlignStartDHESAux(SFRAC16 reference_encoder_position,SFRAC16 rotor_ali
 // skills.. This means trusting the absolute position
 // read by the encoder and asjusting internal variables
 // to get aligned with current well-known position..
+/*
 void RotorAlignStartABS(SFRAC16 reference_encoder_position,SFRAC16 rotor_alignment_encoder_position)
 // Initiate rotor alignment with ABSolute encoder (AS504x or TLE)
 {
@@ -251,7 +252,7 @@ void RotorAlignStartABS(SFRAC16 reference_encoder_position,SFRAC16 rotor_alignme
   RotorAlignFinish(reference_encoder_position, rotor_alignment_encoder_position);
   
 }
-
+*/
 #ifdef ENCODER_DHES
 // initiate rotor alignement with DHES (as main encoder!) 
 // specific skills.. 

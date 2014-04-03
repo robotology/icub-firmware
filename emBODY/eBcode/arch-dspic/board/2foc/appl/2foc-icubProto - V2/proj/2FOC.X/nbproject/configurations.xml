@@ -31,7 +31,6 @@
         <itemPath>../../app/pi.h</itemPath>
         <itemPath>../../app/pid2.h</itemPath>
         <itemPath>../../app/qep.h</itemPath>
-        <itemPath>../../app/rotor_alignment.h</itemPath>
         <itemPath>../../app/svgen.h</itemPath>
         <itemPath>../../app/tle5012.h</itemPath>
         <itemPath>../../app/velocity.h</itemPath>
@@ -80,7 +79,6 @@
         <itemPath>../../app/crc16.c</itemPath>
         <itemPath>../../app/ecan.c</itemPath>
         <itemPath>../../app/qep.c</itemPath>
-        <itemPath>../../app/rotor_alignment.c</itemPath>
         <itemPath>../../app/tle5012.c</itemPath>
         <itemPath>../../app/traps.c</itemPath>
         <itemPath>../../app/velocity.c</itemPath>

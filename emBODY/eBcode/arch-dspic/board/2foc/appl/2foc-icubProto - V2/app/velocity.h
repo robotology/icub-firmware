@@ -29,7 +29,7 @@
 #define POSITIONS_BUFFER_NUM (IRP_PERCALC + POSITIONS_BUFFER_SAFETY_MARGIN + POSITIONS_BUFFER_PAST_HISTORY)
 
 typedef struct {
-  unsigned long positions_buffer[POSITIONS_BUFFER_NUM];
+  //unsigned long positions_buffer[POSITIONS_BUFFER_NUM];
   unsigned int positions_buffer_index;
   // TODO: make main loop check this 
   unsigned int positions_buffer_index_r;

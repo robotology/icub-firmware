@@ -12,7 +12,7 @@
 // default variable indexes for periodic data 
 // packet (Gulp packet for data plot)
 //
-#define GULP_DEFAULT1 0x6   //Current
+#define GULP_DEFAULT1 0x2A  //Measured Current
 #define GULP_DEFAULT2 0x17  //Motor velocity
 #define GULP_DEFAULT3 0x15  //Motor Position first 16 bit
 #define GULP_DEFAULT4 0x16  //Motor Position last 16 bit 
@@ -23,7 +23,6 @@
 tParkParm ParkParm;
 
 unsigned int as5045SpiErrors = 0 ;
-unsigned int debug_i2t = 0;
 
 // Space vector generator parameters
 tSVGenParm SVGenParm;
@@ -105,7 +104,7 @@ int OpenloopAngle;
 //
 volatile tVelocityParm VelocityParm;
 // used for the velocity calculation undersampling
-int speed_undersampler =  W_SIMPLE_CALCULATION_UNDERSAMPLE;
+//int speed_undersampler = 0; // W_SIMPLE_CALCULATION_UNDERSAMPLE;
 
 // Velocity measurement from TLE5012
 volatile int tle_speed;
@@ -404,14 +403,14 @@ unsigned int Zero = 0;
 
 // global only to enable gulp, could be local otherwise
 // it's the (main) encoder value
-SFRAC16 encoder_value = 0;
+unsigned int encoder_value = 0;
 
 // global only to enable gulp, could be local otherwise
 // it's the AUX encoder value (if present)
-SFRAC16 encoder_aux_value = 0;
+unsigned int encoder_aux_value = 0;
 
 // DELME
-extern SFRAC16 rotor_alignment_dhes_approx_espp;
+//extern SFRAC16 rotor_alignment_dhes_approx_espp;
 
 //
 // list of possible contents of the periodic message
@@ -453,8 +452,8 @@ const unsigned int * PeriodicData[ELEMENTS_IN_PREIODIC_DATA_LIST]={
 /* 12 */ (unsigned int*) &Zero,
 /* 13 */ (unsigned int*) &ParkParm.qSin,
 /* 14 */ (unsigned int*) &ParkParm.qCos,
-/* 15 */ (unsigned int*) (((void*)(&Reported_position)) + 2), // position is 32bit wide
-/* 16 */ (unsigned int*) ((void*)(&Reported_position)),
+/* 15 */ (unsigned int*) &Reported_position, 
+/* 16 */ (unsigned int*) &Reported_position + 1, // position is 32bit wide
 
 
   //
@@ -489,9 +488,9 @@ const unsigned int * PeriodicData[ELEMENTS_IN_PREIODIC_DATA_LIST]={
 /* 26 */ (unsigned int*) &encoder_aux_value,
 /* 27 */ (unsigned int*) &encoder_value,
 /* 28 */ (unsigned int*) &Encoder_SyncPulsePosition,
-/* 29 */ (unsigned int*) &rotor_alignment_dhes_approx_espp,
-/* 2A */ (unsigned int*) &Zero,
-/* 2B */ (unsigned int*) &Zero,
+/* 29 */ (unsigned int*) &Zero,//&rotor_alignment_dhes_approx_espp,
+/* 2A */ (unsigned int*) &I2Tdata.IQMeasured,
+/* 2B */ (unsigned int*) &I2Tdata.IDMeasured,
 /* 2C */ (unsigned int*) &Zero,
 /* 2D */ (unsigned int*) &Zero,
 /* 2E */ (unsigned int*) &Zero,
