@@ -21,14 +21,15 @@
  *     get the definition of messages and params of the dsp controller
  * define __ONLY_DEF before inclusion on Linux/Winnt/Qnx
  */
-
+#include "stdint.h"
+#include "iCubCanProto_types.h"
 //board_types
-#define BOARD_TYPE_DSP    0x00
-#define BOARD_TYPE_PIC    0x01
-#define BOARD_TYPE_2DC    0x02
-#define BOARD_TYPE_4DC    0x03
-#define BOARD_TYPE_BLL    0x04
-#define BOARD_TYPE_2BLLDC 0x04
+#define BOARD_TYPE_DSP    icubCanProto_boardType__dsp
+#define BOARD_TYPE_PIC    icubCanProto_boardType__pic
+#define BOARD_TYPE_2DC    icubCanProto_boardType__2dc
+#define BOARD_TYPE_4DC    icubCanProto_boardType__4dc
+#define BOARD_TYPE_BLL    icubCanProto_boardType__bll
+#define BOARD_TYPE_2BLLDC icubCanProto_boardType__bll
 
 
 
@@ -39,25 +40,25 @@
 
 
 
-#define MODE_IDLE						0x00
-#define MODE_POSITION 					0x01
-#define MODE_VELOCITY					0x02
-#define MODE_TORQUE						0x03
-#define MODE_IMPEDANCE_POS				0x04
-#define MODE_IMPEDANCE_VEL				0x05
-#define MODE_CALIB_ABS_POS_SENS			0x10
-#define MODE_CALIB_HARD_STOPS			0x20
-#define MODE_HANDLE_HARD_STOPS			0x30
-#define MODE_MARGIN_REACHED    			0x40
-#define MODE_CALIB_ABS_AND_INCREMENTAL	0x41
-#define MODE_OPENLOOP               	0x50
+#define MODE_IDLE						icubCanProto_controlmode_idle
+#define MODE_POSITION 					icubCanProto_controlmode_position
+#define MODE_VELOCITY					icubCanProto_controlmode_velocity
+#define MODE_TORQUE						icubCanProto_controlmode_torque
+#define MODE_IMPEDANCE_POS				icubCanProto_controlmode_impedance_pos
+#define MODE_IMPEDANCE_VEL				icubCanProto_controlmode_impedance_vel
+#define MODE_CALIB_ABS_POS_SENS			icubCanProto_controlmode_calib_abs_pos_sens
+#define MODE_CALIB_HARD_STOPS			icubCanProto_controlmode_calib_hard_stops
+#define MODE_HANDLE_HARD_STOPS			icubCanProto_controlmode_handle_hard_stops
+#define MODE_MARGIN_REACHED    			icubCanProto_controlmode_margin_reached
+#define MODE_CALIB_ABS_AND_INCREMENTAL	icubCanProto_controlmode_calib_abs_and_incremental
+#define MODE_OPENLOOP               	icubCanProto_controlmode_openloop
 
 //   Calibration Type Messages 
-#define CALIB_HARD_STOPS            0 
-#define CALIB_ABS_POS_SENS          1
-#define CALIB_HARD_STOPS_DIFF       2 
-#define CALIB_ABS_DIGITAL           3
-#define CALIB_ABS_AND_INCREMENTAL   4
+#define CALIB_HARD_STOPS            icubCanProto_calibration_type0_hard_stops 
+#define CALIB_ABS_POS_SENS          icubCanProto_calibration_type1_abs_sens_analog
+#define CALIB_HARD_STOPS_DIFF       icubCanProto_calibration_type2_hard_stops_diff 
+#define CALIB_ABS_DIGITAL           icubCanProto_calibration_type3_abs_sens_digital
+#define CALIB_ABS_AND_INCREMENTAL   icubCanProto_calibration_type4_abs_and_incremental
 
 #define DEFAULT_VELOCITY 10
 #define DEFAULT_ACCELERATION 10
