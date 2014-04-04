@@ -1061,7 +1061,7 @@ extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_
             {   // use the micrel 
                 .init           = s_hal_micrel_init,
                 .initpar        = (void*)&ks8893_config,
-                .config         = (hal_device_ethtransceiver_hid_fn_config_t)hl_chip_micrel_ks8893_configure, 
+                .config         = (hal_device_ethtransceiver_hid_fn_config_t)hl_chip_micrel_ks8893_start, 
                 .getphymode     = (hal_device_ethtransceiver_hid_fn_getphymode_t)hl_chip_micrel_ks8893_mii_getphymode                
             }
          }
@@ -1353,7 +1353,7 @@ static hal_result_t chip_micrel_ks8893_init(void *cfg)
 
 static hal_result_t chip_micrel_ks8893_configure(hal_eth_phymode_t* usedphymode)
 {
-    return((hal_result_t)hl_chip_micrel_ks8893_configure((hl_ethtrans_phymode_t*)usedphymode));
+    return((hal_result_t)hl_chip_micrel_ks8893_start((hl_ethtrans_phymode_t*)usedphymode));
 }
 
 

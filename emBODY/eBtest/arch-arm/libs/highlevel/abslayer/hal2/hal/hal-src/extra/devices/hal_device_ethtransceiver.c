@@ -191,7 +191,7 @@ extern hal_result_t hal_ethtransceiver_config(hal_eth_phymode_t *usedmiiphymode)
  
     //targetphymode = (hal_eth_phymode_auto == targetphymode) ? (hal_brdcfg_device_ethtransceiver__theconfig.devcfg.targetphymode) : (targetphymode);
  
-    hl_ethtrans_chip_config(&usedmiiphmo);
+    hl_ethtrans_chip_start(&usedmiiphmo);
     *usedmiiphymode = (hal_eth_phymode_t)usedmiiphmo;
 
     s_hal_device_ethtransceiver_started_set(hal_ethtransceiver1);
@@ -233,7 +233,7 @@ extern hl_result_t hl_ethtrans_chip_init(void *param)
     return((hl_result_t)res);
 }
     
-extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode)
+extern hl_result_t hl_ethtrans_chip_start(hl_ethtrans_phymode_t *usedmiiphymode)
 {
     hal_eth_phymode_t usedmiiphmo;
     hal_result_t res = hal_brdcfg_device_ethtransceiver__theconfig.devcfg.chipif.config(&usedmiiphmo);

@@ -272,6 +272,8 @@ extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
 
    
     hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gpio.port, .pin = (hl_gpio_pin_t)gpio.pin };
+    hlgpio.port = (hl_gpio_port_t)gpio.port;
+    hlgpio.pin  = (hl_gpio_pin_t)gpio.pin;
     hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)val);
     
     return(hal_res_OK);
@@ -291,6 +293,8 @@ extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio)
     }
 
     hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gpio.port, .pin = (hl_gpio_pin_t)gpio.pin };
+    hlgpio.port = (hl_gpio_port_t)gpio.port;
+    hlgpio.pin  = (hl_gpio_pin_t)gpio.pin;
     hl_gpio_val_t v;
     
     
