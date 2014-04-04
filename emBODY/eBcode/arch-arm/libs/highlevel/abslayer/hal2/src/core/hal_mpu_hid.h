@@ -49,20 +49,20 @@ typedef struct
     uint32_t                        cpu;
     uint32_t                        fastbus;
     uint32_t                        slowbus;
-} hal_mpu_hid_speeds_t;
+} hal_mpu_speeds_t;
 
 
 typedef struct
 {
-    hal_mpu_arch_t          architecture;
-    hal_mpu_type_t                  type;
-    hal_mpu_name_t                  name;
-    hal_mpu_hid_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
-} hal_mpu_hid_brdcfg_t;
+    hal_mpu_arch_t              architecture;
+    hal_mpu_type_t              type;
+    hal_mpu_name_t              name;
+    hal_mpu_speeds_t            speeds;             // the speeds for cpu, fast bus and slow bus that the system has
+} hal_mpu_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_mpu_hid_brdcfg_t hal_brdcfg_mpu__theconfig;
+extern const hal_mpu_boardconfig_t hal_mpu__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

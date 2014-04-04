@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_I2C
 
@@ -34,16 +36,8 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_brdcfg.h"
-#include "hal_base_hid.h"
-
-
 #include "hal_heap.h"
-
-
 #include "hl_bits.h" 
-
-
 #include "hl_i2c.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -93,11 +87,12 @@ typedef struct
 {
     hal_bool_t          locked;
     hal_i2c_devaddr_t   devaddr;   
+    hal_i2c_cfg_t       config;
 } hal_i2c_internal_item_t;
 
 typedef struct
 {
-    uint8_t                     initted;
+    uint32_t                    inittedmask;
     hal_i2c_internal_item_t*    items[hal_i2cs_number];   
 } hal_i2c_theinternals_t;
 
@@ -142,7 +137,7 @@ static void s_hal_i2c_prepare_hl_i2c_map(void);
 
 static hal_i2c_theinternals_t s_hal_i2c_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -169,18 +164,20 @@ extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2
 {
     hal_result_t res;
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_false == hal_i2c_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif    
     
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
     if(0 == devaddr)
     {
         return(hal_res_NOK_generic);
     }
     
-    devaddr &= ~0x01;
-
     if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
     {
         return(hal_res_NOK_unsupported);
@@ -195,7 +192,9 @@ extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2
     {
         return(hal_res_OK);
     }
+#endif    
     
+    devaddr &= ~0x01;    
     s_hal_i2c_scheduling_suspend();    
     if(hal_true == s_hal_i2c_is_status_locked(id))
     {
@@ -220,18 +219,19 @@ extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2
 extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
     hal_result_t res;
-    
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_false == hal_i2c_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)
     if(0 == devaddr)
     {
         return(hal_res_NOK_generic);
     }   
-
-    devaddr &= ~0x01;    
     
     if((0 == regaddr.numofbytes) || (regaddr.numofbytes > 3))
     {
@@ -247,8 +247,9 @@ extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i
     {
         return(hal_res_OK);
     }
+#endif
     
-    
+    devaddr &= ~0x01;      
     s_hal_i2c_scheduling_suspend();    
     if(hal_true == s_hal_i2c_is_status_locked(id))
     {
@@ -272,20 +273,23 @@ extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i
 extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
 {
     hal_result_t res;
-    
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_false == hal_i2c_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-    
+#endif
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)             
     if(0 == devaddr)
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
     devaddr &= ~0x01;
-    
-    
+        
     s_hal_i2c_scheduling_suspend();    
     if(hal_true == s_hal_i2c_is_status_locked(id))
     {
@@ -306,8 +310,7 @@ extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
     {
         
     }
-    
-    
+        
     s_hal_i2c_scheduling_suspend();
     s_hal_i2c_status_set(id, hal_false, 0);
     s_hal_i2c_scheduling_restart();    
@@ -319,16 +322,20 @@ extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
 extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr)      
 {
     hal_result_t res;
-    
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_false == hal_i2c_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-    
+#endif
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)       
     if(0 == devaddr)
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
     devaddr &= ~0x01;
     
@@ -373,17 +380,17 @@ extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
 
 static hal_boolval_t s_hal_i2c_supported_is(hal_i2c_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_i2c__theconfig.supported_mask, HAL_i2c_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_i2c__theboardconfig.supportedmask, HAL_i2c_id2index(id)) );
 }
 
 static void s_hal_i2c_initted_set(hal_i2c_t id)
 {
-    hl_bits_byte_bitset(&s_hal_i2c_theinternals.initted, HAL_i2c_id2index(id));
+    hl_bits_word_bitset(&s_hal_i2c_theinternals.inittedmask, HAL_i2c_id2index(id));
 }
 
 static hal_boolval_t s_hal_i2c_initted_is(hal_i2c_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_i2c_theinternals.initted, HAL_i2c_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_i2c_theinternals.inittedmask, HAL_i2c_id2index(id)));
 }
 
 static void s_hal_i2c_status_set(hal_i2c_t id, hal_bool_t locked, hal_i2c_devaddr_t devaddr)
@@ -426,8 +433,16 @@ static hal_result_t s_hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg)
 
     if(hal_true == hal_i2c_initted_is(id))
     {
-        return(hal_res_OK);
-    }  
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_i2c_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }    
+    
 
    // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
@@ -435,26 +450,45 @@ static hal_result_t s_hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg)
         intitem = s_hal_i2c_theinternals.items[HAL_i2c_id2index(id)] = hal_heap_new(sizeof(hal_i2c_internal_item_t));
         // minimal initialisation of the internal item
         s_hal_i2c_status_set(id, hal_false, 0);      
-    }           
+    }  
+
+    // copy cfg into config
+    memcpy(&intitem->config, cfg, sizeof(hal_i2c_cfg_t));
     
     // we must initialise hl_i2c_map w/ suited values. 
     s_hal_i2c_prepare_hl_i2c_map();
     
-    hl_i2c_init((hl_i2c_t)id, NULL);
-     
+    // we must propagate the hal_i2c_cfg_t into hl_i2c_cfg_t
+    // but also verify coherence of some hal and hl enum
+    hl_VERIFYproposition(xxx, (hal_i2c_speed_100kbps == hal_i2c_speed_100kbps));
+    hl_VERIFYproposition(xxx, (hal_i2c_speed_200kbps == hal_i2c_speed_200kbps));
+    hl_VERIFYproposition(xxx, (hal_i2c_speed_400kbps == hal_i2c_speed_400kbps));
+    hl_VERIFYproposition(xxx, (hal_i2c_mode_master == hl_i2c_mode_master));
+    hl_VERIFYproposition(xxx, (hal_i2c_mode_slave == hl_i2c_mode_slave));
+    hl_i2c_cfg_t hlcfg;
+    hlcfg.mode          = (hl_i2c_mode_t)cfg->mode;
+    hlcfg.behaviour     = hl_i2c_behaviour_polling;
+    hlcfg.speed         = (hl_i2c_speed_t)cfg->speed;
+    hlcfg.ownaddress    = 0;
+    hlcfg.advcfg        = NULL;
     
+    hl_result_t r = hl_i2c_init((hl_i2c_t)id, &hlcfg);
+     
+    if(hl_res_OK != r)
+    {
+        return(hal_res_NOK_generic);
+    }
+
     s_hal_i2c_initted_set(id);
     
     s_hal_i2c_status_set(id, hal_false, 0);
-    
-    
+       
     return(hal_res_OK);
 }
  
 
 static hal_result_t s_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
-
     hl_result_t r;    
     hl_i2c_regaddr_t ra;
     ra.numofbytes = regaddr.numofbytes;
@@ -506,9 +540,9 @@ static void s_hal_i2c_scheduling_restart(void)
 static void s_hal_i2c_prepare_hl_i2c_map(void)
 {
     // we must initialise hl_i2c_map w/ suited values. 
-    // we have built hal_brdcfg_i2c__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_i2c_mapping_t) == sizeof(hal_i2c_hid_brdcfg_t));   
-    hl_i2c_map = (hl_i2c_mapping_t*)&hal_brdcfg_i2c__theconfig;
+    // we have built hal_i2c__theboardconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_i2c_mapping_t) == sizeof(hal_i2c_boardconfig_t));   
+    hl_i2c_map = (hl_i2c_mapping_t*)&hal_i2c__theboardconfig;
 }
 
 #endif//HAL_USE_I2C

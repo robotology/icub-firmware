@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_TIMER
 
@@ -33,14 +35,9 @@
 
 #include "string.h"
 #include "stdlib.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
 #include "hl_bits.h" 
 #include "hal_heap.h"
-
 #include "hl_timer.h"
-
-#include "hal_middleware_interface.h" 
 
 
  
@@ -120,18 +117,18 @@ extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, h
     s_hal_timer_prepare_hl_timer_map();
     
     // now we convert the cfg
-    hl_timer_cfg_t hlcfg;
+    hl_timer_cfg_t hlcfg = {0};
     hlcfg.countdown = cfg->countdown;
     hlcfg.mode      = (hal_timer_mode_oneshot == cfg->mode) ? (hl_timer_mode_oneshot) : (hl_timer_mode_periodic);
     hlcfg.priority  = (hl_irqpriority_t)cfg->priority;
     hlcfg.callback  = cfg->callback_on_exp;
     hlcfg.arg       = cfg->arg;
+    hlcfg.advcfg    = NULL;
     hl_result_t r = hl_timer_init((hl_timer_t)id, &hlcfg, error);
     if(hl_res_OK != r)
     {
         return(hal_res_NOK_generic);
     }
-
 
     return((hal_result_t)r);
 }
@@ -284,15 +281,15 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
 
 static hal_bool_t s_hal_timer_supported_is(hal_timer_t id)
 {
-    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_timer__theconfig.supported_mask, HAL_timer_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_timer__theboardconfig.supportedmask, HAL_timer_id2index(id)));
 }
 
 static void s_hal_timer_prepare_hl_timer_map(void)
 {
     // we must initialise hl_timer_map w/ suited values. 
-    // we have built hal_brdcfg_timer__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_timer_mapping_t) == sizeof(hal_timer_hid_brdcfg_t));   
-    hl_timer_map = (hl_timer_mapping_t*)&hal_brdcfg_timer__theconfig;  
+    // we have built hal_timer__theboardconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_timer_mapping_t) == sizeof(hal_timer_boardconfig_t));   
+    hl_timer_map = (hl_timer_mapping_t*)&hal_timer__theboardconfig;  
 }
 
 #endif//HAL_USE_TIMER

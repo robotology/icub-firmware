@@ -30,7 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -46,31 +46,33 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_termometer_hid_fn_read_t) (int8_t*);
+typedef struct
+{
+    void*                                   initpar; 
+} hal_termometer_driver_cfg_t;
 
 typedef struct
 {   
-    hal_res_fp_voidp_t                              init;           // init(initpar)
-    void*                                           initpar;
-    hal_termometer_hid_fn_read_t                    read;           // read(temp)
-} hal_termometer_hid_chip_interface_t;
-
+    hal_res_fp_int32_voidp_t                init;   // init(id, void* initpar)
+    hal_res_fp_int32_voidp_t                read;   // read(id, int8_t* termp)
+} hal_termometer_driver_fun_t;
 
 typedef struct
-{   
-    hal_termometer_hid_chip_interface_t             chipif;
-} hal_termometer_hid_dev_cfg_t;
+{ 
+    hal_termometer_driver_cfg_t             cfg;    
+    hal_termometer_driver_fun_t             fun;
+} hal_termometer_driver_t;   
 
 typedef struct
 {
-    uint8_t                                         supported_mask;
-    hal_termometer_hid_dev_cfg_t                    devcfg[hal_termometers_number];
-} hal_termometer_hid_brdcfg_t;
+    uint32_t                                supportedmask;
+    hal_termometer_driver_t                 driver[hal_termometers_number];
+} hal_termometer_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_termometer_hid_brdcfg_t hal_brdcfg_termometer__theconfig;
+extern const hal_termometer_boardconfig_t hal_termometer__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

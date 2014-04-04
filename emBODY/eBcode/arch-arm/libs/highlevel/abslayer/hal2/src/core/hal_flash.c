@@ -24,8 +24,9 @@
 **/
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
-
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_FLASH
 
@@ -35,12 +36,6 @@
 
 #include "stdlib.h"
 #include "string.h"
-
-#include "hal_brdcfg.h"
-
-#include "hal_middleware_interface.h"
-
-#include "hal_base_hid.h" 
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -129,9 +124,6 @@ static hal_result_t s_hal_flash_writehalfword(uint32_t addr, uint16_t hword);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-
-#define s_hal_flash_BASEADDR        (hal_brdcfg_flash__theconfig.baseaddress)
-#define s_hal_flash_TOTALSIZE       (hal_brdcfg_flash__theconfig.totalsize)
 
 
 #if     defined(HAL_USE_MPU_TYPE_STM32F1)
@@ -234,20 +226,21 @@ extern hal_result_t hal_flash_unlock(void)
 
 extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
 {
-
     hal_result_t res = hal_res_NOK_generic;
 
     uint32_t pagesize;
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if(hal_false == hal_flash_address_isvalid(addr))
     {
         return(hal_res_NOK_generic);
     }
-
+ 
     if(0 == size)
     {
         return(hal_res_NOK_generic);    
     }
+#endif
 
     pagesize = s_hal_flash_quickget_pagesize(addr);
     size += (addr % pagesize);
@@ -277,7 +270,6 @@ extern hal_result_t hal_flash_erase(uint32_t addr, uint32_t size)
     }
     
     return(hal_res_OK);     
-
 }
 
 extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
@@ -287,12 +279,13 @@ extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
     uint8_t addr4 = 0;
     uint8_t size4 = 0;
     uint8_t *dd = data;
- 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if((hal_false == hal_flash_address_isvalid(addr)) || (0 == size) || (NULL == data))
     {
         return(hal_res_NOK_generic);
     }
-
+#endif
 
     if(0 == (addr&0x00000003))
     {
@@ -393,12 +386,14 @@ extern hal_result_t hal_flash_write(uint32_t addr, uint32_t size, void *data)
 extern hal_result_t hal_flash_read(uint32_t addr, uint32_t size, void *data)
 {
     const void *flashaddr = (const void*)addr;
- 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if((hal_false == hal_flash_address_isvalid(addr)) || (0 == size) || (NULL == data))
     {
         return(hal_res_NOK_generic);
     }
- 
+#endif
+    
     memcpy(data, flashaddr, size);
 
     return(hal_res_OK);
@@ -408,7 +403,7 @@ extern hal_result_t hal_flash_read(uint32_t addr, uint32_t size, void *data)
 
 extern uint32_t hal_flash_get_baseaddress(void)
 {
-    return(s_hal_flash_BASEADDR);
+    return(hal_flash__theboardconfig.baseaddress);
 }
 
 
@@ -458,7 +453,7 @@ extern uint32_t hal_flash_get_pageaddr(uint32_t addr)
 
 extern uint32_t hal_flash_get_totalsize(void)
 {
-    return(s_hal_flash_TOTALSIZE);
+    return(hal_flash__theboardconfig.totalsize);
 }
 
 
@@ -605,7 +600,7 @@ static hal_result_t s_hal_flash_writedata(uint32_t addr, uint32_t size, uint32_t
 static uint32_t s_hal_flash_pageindex_get(uint32_t addr)
 {
 #if     defined(HAL_USE_MPU_TYPE_STM32F1)
-    addr -= s_hal_flash_BASEADDR;
+    addr -= hal_flash__theboardconfig.baseaddress;
     //return(addr / s_hal_flash_PAGESIZE);
     // if s_hal_flash_PAGESIZE is 2k (= 2^11) -> division is equivalent to shift by 11 bits
     addr >>= 11;
@@ -638,10 +633,6 @@ static uint32_t s_hal_flash_stm32f4_sector_get(uint32_t addr)
         FLASH_Sector_6, FLASH_Sector_7, FLASH_Sector_8, FLASH_Sector_9, FLASH_Sector_10, FLASH_Sector_11       
     };
 
-//     if(hal_false == hal_flash_address_isvalid(addr))
-//     {
-//         return(hal_res_NOK_generic);
-//     }
 
     // find pageindex;
 

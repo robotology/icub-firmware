@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_CANTRANSCEIVER
 
@@ -34,10 +36,8 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_sys.h"
 
-#include "hal_brdcfg.h"
-
+#include "hal_heap.h"
 #include "hl_bits.h" 
 
 
@@ -85,7 +85,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                                         initted;
+    uint32_t                                        inittedmask;
     hal_cantransceiver_internal_item_t*             items[hal_cantransceivers_number];   
 } hal_cantransceiver_theinternals_t;
 
@@ -115,7 +115,7 @@ static hal_result_t s_hal_cantransceiver_lowlevel_init(hal_cantransceiver_t id, 
 
 static hal_cantransceiver_theinternals_t s_hal_cantransceiver_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -130,28 +130,45 @@ static hal_cantransceiver_theinternals_t s_hal_cantransceiver_theinternals =
 extern hal_result_t hal_cantransceiver_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
 {
     hal_result_t res = hal_res_NOK_generic;
+    hal_cantransceiver_internal_item_t *intitem = s_hal_cantransceiver_theinternals.items[HAL_cantransceiver_id2index(id)];
 
     if(hal_true != s_hal_cantransceiver_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
-
-
-    if(hal_true == s_hal_cantransceiver_initted_is(id))
-    {
-        return(hal_res_OK);
-    }
-
     
     if(NULL == cfg)
     {
         cfg = &hal_cantransceiver_cfg_default;
-    }
+    }    
 
+    if(hal_true == s_hal_cantransceiver_initted_is(id))
+    {
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_cantransceiver_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }    
 
+    if(NULL == intitem)
+    {
+        intitem = s_hal_cantransceiver_theinternals.items[HAL_cantransceiver_id2index(id)] = hal_heap_new(sizeof(hal_cantransceiver_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }    
+    memcpy(&intitem->config, cfg, sizeof(hal_cantransceiver_cfg_t));
+    
+    
     res = s_hal_cantransceiver_lowlevel_init(id, cfg);
-
-    s_hal_cantransceiver_initted_set(id);
+    
+    if(hal_res_OK == res)
+    {
+        s_hal_cantransceiver_initted_set(id);
+    }
 
     return(res);
 }
@@ -159,24 +176,28 @@ extern hal_result_t hal_cantransceiver_init(hal_cantransceiver_t id, const hal_c
 
 extern hal_result_t hal_cantransceiver_enable(hal_cantransceiver_t id)
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == s_hal_cantransceiver_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
-    hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.enable(id);
+    hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].fun.enable(id);
 
     return(hal_res_OK); 
 }
 
 extern hal_result_t hal_cantransceiver_disable(hal_cantransceiver_t id)
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == s_hal_cantransceiver_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
-    hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.disable(id);
+    hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].fun.disable(id);
 
     return(hal_res_OK); 
 }
@@ -207,29 +228,29 @@ extern hal_bool_t hal_cantransceiver_initted_is(hal_cantransceiver_t id)
 
 static hal_bool_t s_hal_cantransceiver_supported_is(hal_cantransceiver_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_cantransceiver__theconfig.supported_mask, HAL_cantransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_cantransceiver__theboardconfig.supportedmask, HAL_cantransceiver_id2index(id)));
 }
 
 
 static hal_bool_t s_hal_cantransceiver_initted_is(hal_cantransceiver_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_cantransceiver_theinternals.initted, HAL_cantransceiver_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_cantransceiver_theinternals.inittedmask, HAL_cantransceiver_id2index(id)));
 }
 
 static void s_hal_cantransceiver_initted_set(hal_cantransceiver_t id)
 {
-    hl_bits_byte_bitset(&s_hal_cantransceiver_theinternals.initted, HAL_cantransceiver_id2index(id));
+    hl_bits_word_bitset(&s_hal_cantransceiver_theinternals.inittedmask, HAL_cantransceiver_id2index(id));
 }
 
 
 
 static hal_result_t s_hal_cantransceiver_lowlevel_init(hal_cantransceiver_t id, const hal_cantransceiver_cfg_t *cfg)
 {
-    if((NULL != hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.init)   && 
-       (NULL != hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.enable) &&
-       (NULL != hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.disable) )
+    if((NULL != hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].fun.init)   && 
+       (NULL != hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].fun.enable) &&
+       (NULL != hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].fun.disable) )
     {
-        return(hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.init(id, hal_brdcfg_cantransceiver__theconfig.devcfg.chipif.initpar));
+        return(hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].fun.init(id, hal_cantransceiver__theboardconfig.driver[HAL_cantransceiver_id2index(id)].cfg.initpar));
     }
 
     return(hal_res_NOK_generic);    

@@ -24,7 +24,6 @@
 
  
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
-
 #include "hal_brdcfg_modules.h"
 
 #ifdef HAL_USE_MIDDLEWARE_INTERFACE

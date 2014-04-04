@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_GYROSCOPE
 
@@ -33,10 +35,9 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
-
 #include "stdio.h"
+
+#include "hal_heap.h"
 
 #include "hl_bits.h"
 
@@ -86,8 +87,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                                 initted;
-    hal_gyroscope_internal_item_t*   items[hal_gyroscopes_number];   
+    uint32_t                            inittedmask;
+    hal_gyroscope_internal_item_t*      items[hal_gyroscopes_number];   
 } hal_gyroscope_theinternals_t;
 
 
@@ -115,7 +116,7 @@ static hal_result_t s_hal_gyroscope_hw_init(hal_gyroscope_t id, const hal_gyrosc
 
 static hal_gyroscope_theinternals_t s_hal_gyroscope_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -127,8 +128,7 @@ static hal_gyroscope_theinternals_t s_hal_gyroscope_theinternals =
 
 extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
 {
-//    hal_result_t res = hal_res_NOK_generic; // dont remove ...
-//    hal_gyroscope_internals_t *info = NULL;
+    hal_gyroscope_internal_item_t *intitem = s_hal_gyroscope_theinternals.items[HAL_gyroscope_id2index(id)];
 
     if(hal_false == s_hal_gyroscope_supported_is(id))
     {
@@ -142,8 +142,24 @@ extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_c
 
     if(hal_true == s_hal_gyroscope_initted_is(id))
     {
-        return(hal_res_OK);
-    } 
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_gyroscope_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }  
+
+    if(NULL == intitem)
+    {
+        intitem = s_hal_gyroscope_theinternals.items[HAL_gyroscope_id2index(id)] = hal_heap_new(sizeof(hal_gyroscope_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }    
+    memcpy(&intitem->config, cfg, sizeof(hal_gyroscope_cfg_t));
+    
     
     if(hal_res_OK != s_hal_gyroscope_hw_init(id, cfg))
     {
@@ -177,11 +193,20 @@ extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_c
 extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate)
 {
     hal_result_t res = hal_res_NOK_generic; 
- 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
+    if(hal_true != s_hal_gyroscope_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    } 
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
     if(NULL == angrate)
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
     angrate->xar = 0;
     angrate->yar = 0;
@@ -190,11 +215,10 @@ extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angular
     int32_t yar = 0;
     int32_t zar = 0;
        
-    res = hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.read(&xar, &yar, &zar);
+    res = hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.read(id, &xar, &yar, &zar);
     
     if(hal_res_OK == res)
     {
- 
         angrate->xar = xar; //  factor is about 8.75 or 35/4
         angrate->yar = yar;
         angrate->zar = zar;        
@@ -223,25 +247,25 @@ extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angular
 
 static hal_boolval_t s_hal_gyroscope_supported_is(hal_gyroscope_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_gyroscope__theconfig.supported_mask, HAL_gyroscope_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_gyroscope__theboardconfig.supportedmask, HAL_gyroscope_id2index(id)) );
 }
 
 static void s_hal_gyroscope_initted_set(hal_gyroscope_t id)
 {
-    hl_bits_byte_bitset(&s_hal_gyroscope_theinternals.initted, HAL_gyroscope_id2index(id));
+    hl_bits_word_bitset(&s_hal_gyroscope_theinternals.inittedmask, HAL_gyroscope_id2index(id));
 }
 
 static hal_boolval_t s_hal_gyroscope_initted_is(hal_gyroscope_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_gyroscope_theinternals.initted, HAL_gyroscope_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_gyroscope_theinternals.inittedmask, HAL_gyroscope_id2index(id)));
 }
 
 
 static hal_result_t s_hal_gyroscope_hw_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
 {
-    if((NULL != hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.init) && (NULL != hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.read))
+    if((NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init) && (NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.read))
     {
-        return(hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.init(hal_brdcfg_gyroscope__theconfig.devcfg[HAL_gyroscope_id2index(id)].chipif.initpar));
+        return(hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init(id, hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].cfg.initpar));
     }
     else
     {

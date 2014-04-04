@@ -30,7 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -47,12 +47,12 @@
 
 typedef struct
 {
-    uint8_t                 supported_mask;
-} hal_watchdog_hid_brdcfg_t;
+    uint32_t        supportedmask;
+} hal_watchdog_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig;
+extern const hal_watchdog_boardconfig_t hal_watchdog__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

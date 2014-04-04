@@ -31,7 +31,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 #include "hal_gpio.h"
 
 
@@ -49,21 +49,21 @@
 
 typedef struct
 {
-    hal_gpio_maP_t          sck;        /**<  */
-    hal_gpio_maP_t          miso;       /**<  */
-    hal_gpio_maP_t          mosi;       /**<  */
+    hal_gpio_map_t          sck;        /**<  */
+    hal_gpio_map_t          miso;       /**<  */
+    hal_gpio_map_t          mosi;       /**<  */
 } hal_spi_gpiomap_t;
 
 typedef struct
 {
-    uint8_t             supported_mask;                     /**< bit in position hal_spix must be 1 if portx is supported */
-    hal_spi_gpiomap_t   gpiomap[hal_spis_number];
-} hal_spi_hid_brdcfg_t;
+    uint32_t                supportedmask;          /**< bit in position hal_spix must be 1 if portx is supported */
+    hal_spi_gpiomap_t       gpiomap[hal_spis_number];
+} hal_spi_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig;
+extern const hal_spi_boardconfig_t hal_spi__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

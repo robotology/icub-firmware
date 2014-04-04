@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_MPU
 
@@ -34,9 +36,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
-#include "hal_brdcfg.h"
 
-#include "hal_middleware_interface.h"
 
 
 
@@ -114,9 +114,9 @@ extern hal_result_t hal_mpu_init(const hal_mpu_cfg_t* cfg)
     RCC_ClocksTypeDef clocks;
     RCC_GetClocksFreq(&clocks);      
     
-    if((hal_brdcfg_mpu__theconfig.speeds.cpu     != clocks.SYSCLK_Frequency) ||
-       (hal_brdcfg_mpu__theconfig.speeds.fastbus != clocks.PCLK2_Frequency)  ||
-       (hal_brdcfg_mpu__theconfig.speeds.slowbus != clocks.PCLK1_Frequency) )
+    if((hal_mpu__theboardconfig.speeds.cpu     != clocks.SYSCLK_Frequency) ||
+       (hal_mpu__theboardconfig.speeds.fastbus != clocks.PCLK2_Frequency)  ||
+       (hal_mpu__theboardconfig.speeds.slowbus != clocks.PCLK1_Frequency) )
     {
         char str[64];
         snprintf(str, sizeof(str), "hal_mpu wrong speeds: cpu = %d hz, fbus = %d hz, sbus = %d hz", clocks.SYSCLK_Frequency, clocks.PCLK2_Frequency, clocks.PCLK1_Frequency);
@@ -129,19 +129,19 @@ extern hal_result_t hal_mpu_init(const hal_mpu_cfg_t* cfg)
 
 extern hal_mpu_arch_t hal_mpu_arch_get(void)
 {
-    return(hal_brdcfg_mpu__theconfig.architecture);
+    return(hal_mpu__theboardconfig.architecture);
 }
 
 
 extern hal_mpu_type_t hal_mpu_type_get(void)
 {
-    return(hal_brdcfg_mpu__theconfig.type);
+    return(hal_mpu__theboardconfig.type);
 }
 
 
 extern hal_mpu_name_t hal_mpu_name_get(void)
 {
-    return(hal_brdcfg_mpu__theconfig.name);
+    return(hal_mpu__theboardconfig.name);
 }
 
 
@@ -153,7 +153,7 @@ extern uint32_t hal_mpu_speed_get(hal_mpu_speedtype_t speedtype)
     
     switch(speedtype)
     {
-        case hal_mpu_speedtype_max:         res = hal_brdcfg_mpu__theconfig.speeds.max;         break;
+        case hal_mpu_speedtype_max:         res = hal_mpu__theboardconfig.speeds.max;         break;
         case hal_mpu_speedtype_cpu:         res = clocks.SYSCLK_Frequency;                      break;
         case hal_mpu_speedtype_fastbus:     res = clocks.PCLK2_Frequency;                       break;
         case hal_mpu_speedtype_slowbus:     res = clocks.PCLK1_Frequency;                       break;

@@ -22,9 +22,10 @@
     @date       02/27/2013
 **/
 
-
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_UNIQUEID
 
@@ -35,13 +36,7 @@
 
 #include "string.h"
 #include "stdlib.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
 #include "hl_bits.h" 
-
-#include "hal_middleware_interface.h" 
-
- 
 #include "hl_sys.h"
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -176,7 +171,7 @@ extern hal_uniqueid_id64bit_t hal_uniqueid_macaddr_get(void)
 
 //static hal_boolval_t s_hal_uniqueid_supported_is(hal_uniqueid_hid_id_t uniqueid)
 //{
-//    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_uniqueid__theconfig.supported_mask, HAL_uiniqueid2index(uniqueid)));
+//    return((hal_boolval_t)hl_bits_word_bitcheck(hal_uniqueid__theboardconfig.supportedmask, HAL_uiniqueid2index(uniqueid)));
 //}
 
 

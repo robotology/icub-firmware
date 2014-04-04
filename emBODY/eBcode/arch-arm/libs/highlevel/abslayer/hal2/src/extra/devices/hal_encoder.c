@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_ENCODER
 
@@ -35,7 +37,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal_gpio.h"
-#include "hal_brdcfg.h"
 #include "hl_bits.h" 
 #include "hal_heap.h"
 
@@ -88,7 +89,7 @@ typedef struct
 
 typedef struct
 {
-    uint16_t                                initted;
+    uint32_t                                inittedmask;
     hal_encoder_internal_item_t*            items[hal_encoders_number];   
 } hal_encoder_theinternals_t;
 
@@ -136,7 +137,7 @@ static const hal_spi_cfg_t s_hal_encoder_spicfg_master =
 
 static hal_encoder_theinternals_t s_hal_encoder_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -151,6 +152,7 @@ static hal_encoder_theinternals_t s_hal_encoder_theinternals =
 extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
 {
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_result_t res = hal_res_NOK_generic;
 
     if(hal_false == s_hal_encoder_supported_is(id))
     {
@@ -162,32 +164,51 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
         cfg = &hal_encoder_cfg_default;
     }
      
-        
-    // configure the required mux port and spi port.
+    if(hal_true == s_hal_encoder_initted_is(id))
+    {
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_encoder_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }   
     
+  
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
         intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)] = hal_heap_new(sizeof(hal_encoder_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
-    }       
-    
+    } 
     memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
-    intitem->spiid  = hal_brdcfg_encoder__theconfig.spimap[HAL_encoder_id2index(id)].spiid;    
-    intitem->muxid  = hal_brdcfg_encoder__theconfig.spimap[HAL_encoder_id2index(id)].muxid;
-    intitem->muxsel = hal_brdcfg_encoder__theconfig.spimap[HAL_encoder_id2index(id)].muxsel;
+    
+    // configure the required mux port and spi port.   
+    
+    intitem->spiid  = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;    
+    intitem->muxid  = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxid;
+    intitem->muxsel = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
     intitem->position  = 0;
     
-    hal_mux_init(intitem->muxid, NULL);
+    res = hal_mux_init(intitem->muxid, NULL);
+    if(hal_res_OK != res)
+    {
+        return(res);
+    }
     
-    // we get the max speed of spi from what specified in hal_brdcfg_encoder__theconfig
+    // we get the max speed of spi from what specified in hal_encoder__theboardconfig
     hal_spi_cfg_t spicfg;
     memcpy(&spicfg, &s_hal_encoder_spicfg_master, sizeof(hal_spi_cfg_t));
-    spicfg.maxspeed = hal_brdcfg_encoder__theconfig.spimaxspeed;
+    spicfg.maxspeed = hal_encoder__theboardconfig.spimaxspeed;
     
-    hal_spi_init(intitem->spiid, &spicfg);
-    
+    res = hal_spi_init(intitem->spiid, &spicfg);
+    if(hal_res_OK != res)
+    {
+        return(res);
+    }
  
     s_hal_encoder_initted_set(id);
     return(hal_res_OK);
@@ -198,11 +219,12 @@ extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
 {  
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];   
     
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     if(hal_false == s_hal_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
+#endif
        
     hal_mux_enable(intitem->muxid, intitem->muxsel);
     
@@ -221,19 +243,25 @@ extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
 extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value)
 {
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
-    
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     if(hal_false == s_hal_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 
-    if(NULL != value)
+#endif
+ 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == value)
     {
-        *value = intitem->position; 
-        return(hal_res_OK);
+        return(hal_res_NOK_generic); 
     }
+#endif    
+
+    *value = intitem->position; 
     
-    return(hal_res_NOK_generic);  
+    return(hal_res_OK);
 }
 
 
@@ -255,19 +283,19 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
 
 static hal_boolval_t s_hal_encoder_supported_is(hal_encoder_t id)
 {
-    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_encoder__theconfig.supported_mask, HAL_encoder_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_encoder__theboardconfig.supportedmask, HAL_encoder_id2index(id)) );
 }
 
 
 static void s_hal_encoder_initted_set(hal_encoder_t id)
 {
-    hl_bits_hlfword_bitset(&s_hal_encoder_theinternals.initted, HAL_encoder_id2index(id));
+    hl_bits_word_bitset(&s_hal_encoder_theinternals.inittedmask, HAL_encoder_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_encoder_initted_is(hal_encoder_t id)
 {
-    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_encoder_theinternals.initted, HAL_encoder_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_encoder_theinternals.inittedmask, HAL_encoder_id2index(id)));
 }
 
 

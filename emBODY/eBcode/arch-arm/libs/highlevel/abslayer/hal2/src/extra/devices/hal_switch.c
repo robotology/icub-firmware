@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_SWITCH
 
@@ -35,16 +37,10 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_base_hid.h" 
 #include "hal_i2c.h" 
-
 #include "hal_sys.h"
-
-#include "hal_i2c_hid.h"
-
-#include "hal_brdcfg.h"
-
 #include "hl_bits.h"
+#include "hal_heap.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,15 +79,7 @@ const hal_switch_cfg_t hal_switch_cfg_default =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-/** @typedef    typedef enum hal_switch_t 
-    @brief      contains ids of every possible eth switch.
- **/ 
-typedef enum  
-{ 
-    hal_switch1         = 0             /**< the only one */
-} hal_switch_t;
 
-enum { hal_switches_number = 1 };
 
 typedef struct
 {
@@ -101,8 +89,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                         initted;
-    uint8_t                         started;
+    uint8_t                         inittedmask08;
+    uint8_t                         startedmask08;
     hal_switch_internal_item_t*     items[hal_switches_number];   
 } hal_switch_theinternals_t;
 
@@ -111,11 +99,11 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_switch_supported_is(void);
-static void s_hal_switch_initted_set(void);
-static hal_boolval_t s_hal_switch_initted_is(void);
-static void s_hal_switch_started_set(void);
-static hal_boolval_t s_hal_switch_started_is(void);
+static hal_bool_t s_hal_switch_supported_is(hal_switch_t id);
+static void s_hal_switch_initted_set(hal_switch_t id);
+static hal_boolval_t s_hal_switch_initted_is(hal_switch_t id);
+static void s_hal_switch_started_set(hal_switch_t id);
+static hal_boolval_t s_hal_switch_started_is(hal_switch_t id);
 
 
 static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg);
@@ -135,8 +123,8 @@ static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg);
 
 static hal_switch_theinternals_t s_hal_switch_theinternals =
 {
-    .initted            = 0,
-    .started            = 0,
+    .inittedmask08      = 0,
+    .startedmask08      = 0,
     .items              = { NULL }   
 };
 
@@ -155,62 +143,59 @@ extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
     hal_switch_internal_item_t* intitem = s_hal_switch_theinternals.items[HAL_switch_id2index(id)];
 
 
-    if(hal_true != s_hal_switch_supported_is())
+    if(hal_true != s_hal_switch_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
     
+    if(NULL == cfg)
+    {
+        cfg = &hal_switch_cfg_default;
+    }    
+    
+    if(hal_true == s_hal_switch_initted_is(id))
+    {
+        return(hal_res_OK);
+    }
+        
     if(NULL == intitem)
     {
         intitem = s_hal_switch_theinternals.items[HAL_switch_id2index(id)] = hal_heap_new(sizeof(hal_switch_internal_item_t));
         // no initialisation is needed
     }
-
-
-    if(hal_true == s_hal_switch_initted_is())
-    {
-        return(hal_res_OK);
-    }
-
-    if(NULL == cfg)
-    {
-        cfg = &hal_switch_cfg_default;
-    }
-
     memcpy(&intitem->config, cfg, sizeof(hal_switch_cfg_t));
 
     res = s_hal_switch_lowlevel_init(cfg);
 
-    s_hal_switch_initted_set();
+    if(hal_res_OK == res)
+    {
+        s_hal_switch_initted_set(id);
+    }
 
     return(res);
 }
 
 
-extern hal_result_t hal_switch_configure(hal_ethtransceiver_phymode_t *usedmiiphymode)
+extern hal_result_t hal_switch_start(hal_ethtransceiver_phymode_t *usedmiiphymode)
 {
+    const hal_switch_t id = hal_switch1;
 
-    if(hal_true != s_hal_switch_supported_is())
-    {
-        return(hal_res_NOK_unsupported);
-    }
-
-
-    if(hal_false == s_hal_switch_initted_is())
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == s_hal_switch_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-    
+#endif    
 
-    if(hal_true == s_hal_switch_started_is())
+    if(hal_true == s_hal_switch_started_is(id))
     {
         return(hal_res_OK);
     }    
 
     
-    hal_brdcfg_switch__theconfig.devcfg.chipif.config(usedmiiphymode);
+    hal_switch__theboardconfig.driver[HAL_switch_id2index(id)].fun.start(id, usedmiiphymode);
 
-    s_hal_switch_started_set();
+    s_hal_switch_started_set(id);
 
     return(hal_res_OK);
  
@@ -219,13 +204,15 @@ extern hal_result_t hal_switch_configure(hal_ethtransceiver_phymode_t *usedmiiph
 
 extern hal_bool_t hal_switch_initted_is(void)
 {
-    return(s_hal_switch_initted_is());
+    const hal_switch_t id = hal_switch1;
+    return(s_hal_switch_initted_is(id));
 }
 
 
 extern hal_bool_t hal_switch_started_is(void)
 {
-    return(s_hal_switch_started_is());
+    const hal_switch_t id = hal_switch1;
+    return(s_hal_switch_started_is(id));
 }
 
 
@@ -244,44 +231,39 @@ extern hal_bool_t hal_switch_started_is(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t s_hal_switch_supported_is(void)
+static hal_bool_t s_hal_switch_supported_is(hal_switch_t id)
 {
-    //const hal_switch_t id = hal_switch1;
-    return(hal_brdcfg_switch__theconfig.supported); 
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_switch__theboardconfig.supportedmask, HAL_switch_id2index(id))); 
 }
 
-static hal_boolval_t s_hal_switch_initted_is(void)
+static hal_boolval_t s_hal_switch_initted_is(hal_switch_t id)
 {
-    const hal_switch_t id = hal_switch1;
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_switch_theinternals.initted, HAL_switch_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_switch_theinternals.inittedmask08, HAL_switch_id2index(id)));
 }
 
-static void s_hal_switch_initted_set(void)
+static void s_hal_switch_initted_set(hal_switch_t id)
 {
-    const hal_switch_t id = hal_switch1;
-    hl_bits_byte_bitset(&s_hal_switch_theinternals.initted, HAL_switch_id2index(id));
+    hl_bits_byte_bitset(&s_hal_switch_theinternals.inittedmask08, HAL_switch_id2index(id));
 }
 
 
-static hal_boolval_t s_hal_switch_started_is(void)
+static hal_boolval_t s_hal_switch_started_is(hal_switch_t id)
 {
-    const hal_switch_t id = hal_switch1;
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_switch_theinternals.started, HAL_switch_id2index(id)));
+    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_switch_theinternals.startedmask08, HAL_switch_id2index(id)));
 }
 
 
-static void s_hal_switch_started_set(void)
+static void s_hal_switch_started_set(hal_switch_t id)
 {
-    const hal_switch_t id = hal_switch1;
-    hl_bits_byte_bitset(&s_hal_switch_theinternals.started, HAL_switch_id2index(id));
+    hl_bits_byte_bitset(&s_hal_switch_theinternals.startedmask08, HAL_switch_id2index(id));
 }
 
 
 static hal_result_t s_hal_switch_lowlevel_init(const hal_switch_cfg_t *cfg)
 {
-    if((NULL != hal_brdcfg_switch__theconfig.devcfg.chipif.init) && (NULL != hal_brdcfg_switch__theconfig.devcfg.chipif.config))
+    if((NULL != hal_switch__theboardconfig.driver[0].fun.init) && (NULL != hal_switch__theboardconfig.driver[0].fun.start))
     {
-        return(hal_brdcfg_switch__theconfig.devcfg.chipif.init(hal_brdcfg_switch__theconfig.devcfg.chipif.initpar));
+        return(hal_switch__theboardconfig.driver[0].fun.init(hal_switch1, hal_switch__theboardconfig.driver[0].cfg.initpar));
     }
 
     return(hal_res_NOK_generic);    

@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_ETH
 
@@ -37,14 +39,9 @@
 
 #include "hl_common.h" 
 #include "hl_eth.h" 
-
-#include "hal_middleware_interface.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
-#include "hal_ethtransceiver.h"
-
-
 #include "hl_bits.h" 
+
+#include "hal_ethtransceiver.h"
 #include "hal_heap.h"
 
 
@@ -80,10 +77,10 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support =
-{
-    .fn_inside_eth_isr  = NULL
-};
+// extern hal_eth_hid_debug_support_t hal_eth_hid_DEBUG_support =
+// {
+//     .fn_inside_eth_isr  = NULL
+// };
 
 // it must be defined in order to use hl_eth.
 extern const hl_eth_mapping_t* hl_eth_map = NULL;
@@ -103,7 +100,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                     initted;
+    uint32_t                    inittedmask;
     hal_eth_internal_item_t*    items[hal_eths_number];
 } hal_eth_theinternals_t;
 
@@ -138,7 +135,7 @@ static const hal_eth_network_functions_t s_hal_eth_fns =
 
 static hal_eth_theinternals_t s_hal_eth_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -152,15 +149,28 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
 {
     const hal_eth_t id = hal_eth1;
     hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];
+    hal_result_t res = hal_res_NOK_generic;
 
     if(hal_true != s_hal_eth_supported_is())
     {
         return(hal_res_NOK_unsupported);
     }
     
+    if(NULL == cfg)
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+    
     if(hal_true == s_hal_eth_initted_is(id))
     {
-        return(hal_res_NOK_generic);
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_eth_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
     }    
     
     
@@ -169,9 +179,9 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
         intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)] = hal_heap_new(sizeof(hal_eth_internal_item_t));    
     }
 
-    #warning WIP --> make ipal use a cfg w/ capacityoftxfifoofframes and capacityofrxfifoofframes
-    uint8_t capacityoftxfifoofframes = hal_brdcfg_eth__theconfig.txdmafifocapacity;    // in hal1 was: cfg->capacityoftxfifoofframes
-    uint8_t capacityofrxfifoofframes = hal_brdcfg_eth__theconfig.rxdmafifocapacity;    // in hal1 was: cfg->capacityofrxfifoofframes
+    #warning TODO --> make ipal use a cfg w/ capacityoftxfifoofframes and capacityofrxfifoofframes. so far we use hal_eth__theboardconfig
+    uint8_t capacityoftxfifoofframes = hal_eth__theboardconfig.txdmafifocapacity;    
+    uint8_t capacityofrxfifoofframes = hal_eth__theboardconfig.rxdmafifocapacity;    
     
     if(hal_NA08 == capacityoftxfifoofframes)
     {
@@ -193,8 +203,6 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     }      
     
     memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
-    intitem->config.capacityoftxfifoofframes = capacityoftxfifoofframes;
-    intitem->config.capacityofrxfifoofframes = capacityofrxfifoofframes;
     
     memcpy(&intitem->onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));    
 
@@ -208,20 +216,28 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     intitem->hl_eth_config.macaddress                = intitem->config.macaddress;
     intitem->hl_eth_config.behaviour                 = hl_eth_beh_dmatxrx;
     intitem->hl_eth_config.priority                  = (hl_irqpriority_t)intitem->config.priority;
-    intitem->hl_eth_config.capacityoftxfifoofframes  = intitem->config.capacityoftxfifoofframes;
-    intitem->hl_eth_config.capacityofrxfifoofframes  = intitem->config.capacityofrxfifoofframes;
+    intitem->hl_eth_config.capacityoftxfifoofframes  = capacityoftxfifoofframes;
+    intitem->hl_eth_config.capacityofrxfifoofframes  = capacityofrxfifoofframes;
 
     // we must initialise hl_eth_map w/ suited values. 
     s_hal_eth_prepare_hl_eth_map();
     
     hl_result_t r = hl_eth_init(&intitem->hl_eth_config);
     
+    if(hl_res_OK != r)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    // now start the hal_ethtransceiver
+    res = hal_ethtransceiver_start(NULL);
+    
     s_hal_eth_initted_set(id);
     
     // also init smi
     hal_eth_smi_init();
  
-    return((hal_result_t)r);
+    return(hal_res_OK);
 }
 
 
@@ -267,39 +283,17 @@ extern void hal_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
 }
 
 
-//extern hal_result_t hal_brdcfg_eth__check_links(uint8_t *linkst_mask, uint8_t *links_num);
-//extern hal_result_t hal_brdcfg_eth__get_links_status(hal_eth_phy_status_t* link_list, uint8_t links_num);
-//extern hal_result_t hal_brdcfg_eth__get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result);
-
-// extern hal_result_t hal_eth_check_links(uint8_t *linkmask, uint8_t *numoflinks)
-// {
-//     return(hal_ethtransceiver_links_check(linkmask, numoflinks));
-// //    return(hal_brdcfg_eth__check_links(linkst_mask, links_num));
-// }
-
-
-// extern hal_result_t hal_eth_get_links_status(hal_ethtransceiver_phystatus_t* statusarray, uint8_t numoflinks)
-// {
-//     return(hal_ethtransceiver_links_get_status(linkmask, numoflinks));
-// //    return(hal_brdcfg_eth__get_links_status(statusarray, numoflinks));
-// }
-
-
-// extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_info_type_t errortype, hal_eth_phy_errorsinfo_t *result)
-// {
-//     return(hal_brdcfg_eth__get_errors_info(phynum, errortype, result));
-// }
-
-
 
 extern hal_result_t hal_eth_check_links(uint8_t *linkst_mask, uint8_t *links_num)
 {
     hal_result_t res = hal_res_NOK_generic;
-    
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
     if((NULL == linkst_mask) || (NULL == links_num))
     {
         return(hal_res_NOK_nullpointer);
     }
+#endif
     
     // i get the number ... resuult is always res_OK if argument is not NULL.
     res = hal_ethtransceiver_phy_numberof(links_num); 
@@ -392,26 +386,26 @@ extern void hl_eth_alert(void)
 
 static hal_bool_t s_hal_eth_supported_is(void)
 {
-    return(hal_brdcfg_eth__theconfig.supported);
+    return(hal_eth__theboardconfig.supported);
 }
 
 static void s_hal_eth_initted_set(hal_eth_t id)
 {
-    hl_bits_byte_bitset(&s_hal_eth_theinternals.initted, HAL_eth_id2index(id));
+    hl_bits_word_bitset(&s_hal_eth_theinternals.inittedmask, HAL_eth_id2index(id));
 }
 
 static hal_boolval_t s_hal_eth_initted_is(hal_eth_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_eth_theinternals.initted, HAL_eth_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_eth_theinternals.inittedmask, HAL_eth_id2index(id)));
 }
 
 
 static void s_hal_eth_prepare_hl_eth_map(void)
 {
     // we must initialise hl_eth_map w/ suited values. 
-    // we have built hal_brdcfg_eth__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_eth_mapping_t) == sizeof(hal_eth_hid_brdcfg_t));       
-    hl_eth_map = (hl_eth_mapping_t*)&hal_brdcfg_eth__theconfig;
+    // we have built hal_eth__theboardconfig to have compatible layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_eth_mapping_t) == sizeof(hal_eth_boardconfig_t));       
+    hl_eth_map = (hl_eth_mapping_t*)&hal_eth__theboardconfig;
 }
 
 

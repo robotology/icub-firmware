@@ -21,7 +21,7 @@
 #define _HAL_BRDCFG_MODULES_H_
 
 
-/* @file       hal_brdcfg.h
+/* @file       hal_brdcfg_modules.h
     @brief      This header file includes .h dependent on board
     @author     marco.accame@iit.it
     @date       11/18/2011

@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_TERMOMETER
 
@@ -33,13 +35,8 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
-
-
-#include "hal_trace.h"
 #include "stdio.h"
-
+#include "hal_heap.h"
 #include "hl_bits.h"
 
 
@@ -85,13 +82,13 @@ extern const hal_termometer_cfg_t hal_termometer_cfg_default  =
 
 typedef struct
 {
-    hal_termometer_cfg_t        config;
+    hal_termometer_cfg_t                config;
 } hal_termometer_internal_item_t;
 
 typedef struct
 {
-    uint8_t                                 initted;
-    hal_termometer_internal_item_t   items[hal_termometers_number];
+    uint32_t                            inittedmask;
+    hal_termometer_internal_item_t*     items[hal_termometers_number];
 } hal_termometer_theinternals_t;
 
 
@@ -118,7 +115,7 @@ static hal_result_t s_hal_termometer_hw_init(hal_termometer_t id, const hal_term
 
 static hal_termometer_theinternals_t s_hal_termometer_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -131,7 +128,7 @@ static hal_termometer_theinternals_t s_hal_termometer_theinternals =
 
 extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
 {
-//     hal_termometer_internal_item_t *info = s_hal_termometer_theinternals.items[0];
+    hal_termometer_internal_item_t *intitem = s_hal_termometer_theinternals.items[HAL_termometer_id2index(id)];
 
     if(hal_false == s_hal_termometer_supported_is(id))
     {
@@ -142,11 +139,27 @@ extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termomete
     {
         cfg  = &hal_termometer_cfg_default;
     }
-    
+        
     if(hal_true == s_hal_termometer_initted_is(id))
     {
-        return(hal_res_OK);
-    } 
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_termometer_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }  
+
+    if(NULL == intitem)
+    {
+        intitem = s_hal_termometer_theinternals.items[HAL_termometer_id2index(id)] = hal_heap_new(sizeof(hal_termometer_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }    
+    memcpy(&intitem->config, cfg, sizeof(hal_termometer_cfg_t));    
+    
  
     if(hal_res_OK != s_hal_termometer_hw_init(id, cfg))
     {
@@ -161,22 +174,23 @@ extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termomete
 extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degrees_t* degrees)
 {
     hal_result_t res = hal_res_NOK_generic; 
-//    hal_termometer_internal_item_t *info = s_hal_termometer_theinternals.items[0];
     int8_t data08 = 0;
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)  
+    if(hal_false == s_hal_termometer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if(NULL == degrees)
     {
         return(hal_res_NOK_generic);
     }
-    
-    if(hal_false == s_hal_termometer_initted_is(id))
-    {
-        *degrees = -128;
-        return(hal_res_NOK_generic);
-    }
+#endif    
 
-
-    res = hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.read(&data08);
+    res = hal_termometer__theboardconfig.driver[HAL_termometer_id2index(id)].fun.read(id, &data08);
     *degrees = (int16_t) data08;  
     
     return(res);    
@@ -201,25 +215,25 @@ extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degr
 
 static hal_boolval_t s_hal_termometer_supported_is(hal_termometer_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_termometer__theconfig.supported_mask, HAL_termometer_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_termometer__theboardconfig.supportedmask, HAL_termometer_id2index(id)) );
 }
 
 static void s_hal_termometer_initted_set(hal_termometer_t id)
 {
-    hl_bits_byte_bitset(&s_hal_termometer_theinternals.initted, HAL_termometer_id2index(id));
+    hl_bits_word_bitset(&s_hal_termometer_theinternals.inittedmask, HAL_termometer_id2index(id));
 }
 
 static hal_boolval_t s_hal_termometer_initted_is(hal_termometer_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_termometer_theinternals.initted, HAL_termometer_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_termometer_theinternals.inittedmask, HAL_termometer_id2index(id)));
 }
 
 
 static hal_result_t s_hal_termometer_hw_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg)
 {   
-    if((NULL != hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.init) && (NULL != hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.read))
+    if((NULL != hal_termometer__theboardconfig.driver[HAL_termometer_id2index(id)].fun.init) && (NULL != hal_termometer__theboardconfig.driver[HAL_termometer_id2index(id)].fun.read))
     {
-        return(hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.init(hal_brdcfg_termometer__theconfig.devcfg[HAL_termometer_id2index(id)].chipif.initpar));
+        return(hal_termometer__theboardconfig.driver[HAL_termometer_id2index(id)].fun.init(id, hal_termometer__theboardconfig.driver[HAL_termometer_id2index(id)].cfg.initpar));
     }
     else
     {

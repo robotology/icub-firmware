@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_EEPROM
 
@@ -89,7 +91,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                                 initted;
+    uint32_t                                inittedmask;
     hal_eeprom_cfg_t                        config_of_emulated_flash;
 } hal_eeprom_theinternals_t;
 
@@ -118,7 +120,7 @@ static hal_result_t s_hal_eeprom_writeflash(uint32_t addr, uint32_t size, void *
 
 static hal_eeprom_theinternals_t s_hal_eeprom_theinternals =
 {
-    .initted                    = 0,
+    .inittedmask                = 0,
     .config_of_emulated_flash   = { .flashpagebuffer = NULL, .flashpagesize = 0 }
 };
 
@@ -137,17 +139,30 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg
         return(hal_res_NOK_unsupported);
     }
     
-    if(hal_true == s_hal_eeprom_initted_is(id))
-    {
-        return(hal_res_OK);
-    }
-
     if(NULL == cfg)
     {
         cfg = &hal_eeprom_cfg_default;
     }
-    
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+           
+    if(hal_true == s_hal_eeprom_initted_is(id))
+    {
+        if(hal_eeprom_emulatedflash != id)
+        {
+            return(hal_res_OK);
+        }
+        else if(0 == memcmp(cfg, &s_hal_eeprom_theinternals.config_of_emulated_flash, sizeof(hal_eeprom_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+        
+    }
+        
+
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
 
     switch(id)
     {
@@ -168,17 +183,17 @@ extern hal_result_t hal_eeprom_init(hal_eeprom_t id, const hal_eeprom_cfg_t *cfg
         case hal_eeprom_i2c_01:
         case hal_eeprom_i2c_02:
         {
-            res = hal_i2c_init(devcfg->i2cbased.i2cid, NULL);   // i use default configuration for i2c
+            res = hal_i2c_init(driver->cfg.i2c.i2cid, NULL);   // i use default configuration for i2c
             if(hal_res_OK != res)
             {
                 return(res);
             }
             
-            if((NULL != devcfg->i2cbased.chipif.init) &&
-               (NULL != devcfg->i2cbased.chipif.read) &&
-               (NULL != devcfg->i2cbased.chipif.write)  )
+            if((NULL != driver->fun.init) &&
+               (NULL != driver->fun.read) &&
+               (NULL != driver->fun.write)  )
             {
-                res = devcfg->i2cbased.chipif.init(devcfg->i2cbased.chipif.initpar);
+                res = driver->fun.init(id, driver->cfg.i2c.initpar);
             }
             else
             {
@@ -214,12 +229,14 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t id, uint32_t addr, uint32_t si
     uint32_t rem8 = 0;
     uint32_t i = 0;
 
-    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     if(hal_true != s_hal_eeprom_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
     if(size == 0)
     {
          return(hal_res_NOK_generic);
@@ -234,10 +251,11 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t id, uint32_t addr, uint32_t si
     {   // cannot write at the address the last bytes
         return(hal_res_NOK_generic);
     }    
-
+#endif
+    
     // marker: evaluate the kind of eeprom
     
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
     
     switch(id)
     {
@@ -255,14 +273,14 @@ extern hal_result_t hal_eeprom_erase(hal_eeprom_t id, uint32_t addr, uint32_t si
 
             for(i=0; i<num8; i++)
             {
-                res = devcfg->i2cbased.chipif.write(addr, factor, (uint8_t*)&value8, NULL);
+                res = driver->fun.write(id, addr, factor, (uint8_t*)&value8, NULL);
                 if(hal_res_OK != res) return(hal_res_NOK_generic);
                 addr += factor;
             }
 
             if(0 != rem8)
             {
-                res = devcfg->i2cbased.chipif.write(addr, rem8, (uint8_t*)&value8, NULL);
+                res = driver->fun.write(id, addr, rem8, (uint8_t*)&value8, NULL);
                 if(hal_res_OK != res) return(hal_res_NOK_generic);
             }
 
@@ -286,11 +304,14 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t id, uint32_t addr, uint32_t si
 {
     hal_result_t res = hal_res_NOK_generic;
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     if(hal_true != s_hal_eeprom_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if((NULL == data)  || (size == 0))
     {
          return(hal_res_NOK_generic);
@@ -305,9 +326,9 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t id, uint32_t addr, uint32_t si
     {   // cannot write at the address the last bytes
         return(hal_res_NOK_generic);
     }    
-
+#endif
     
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
     
     switch(id)
     {
@@ -320,7 +341,7 @@ extern hal_result_t hal_eeprom_write(hal_eeprom_t id, uint32_t addr, uint32_t si
         case hal_eeprom_i2c_01:
         case hal_eeprom_i2c_02:    
         {
-            res = devcfg->i2cbased.chipif.write(addr, size, (uint8_t*)data, NULL);
+            res = driver->fun.write(id, addr, size, (uint8_t*)data, NULL);
         } break;
 
         default:
@@ -338,11 +359,15 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t id, uint32_t addr, uint32_t siz
 {
     hal_result_t res = hal_res_NOK_generic;
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     if(hal_true != s_hal_eeprom_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif
 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)       
 	if((NULL == data)  || (size == 0))
 	{
 	     return(hal_res_NOK_generic);
@@ -357,9 +382,9 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t id, uint32_t addr, uint32_t siz
     {   // cannot write at the address the last bytes
         return(hal_res_NOK_generic);
     }  
+#endif
 
-
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
     
     switch(id)
     {
@@ -372,7 +397,7 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t id, uint32_t addr, uint32_t siz
         case hal_eeprom_i2c_01:
         case hal_eeprom_i2c_02:
         {
-            res = devcfg->i2cbased.chipif.read(addr, size, (uint8_t*)data, NULL);
+            res = driver->fun.read(id, addr, size, (uint8_t*)data, NULL);
         } break;
 
         default:
@@ -392,20 +417,20 @@ extern uint32_t hal_eeprom_get_baseaddress(hal_eeprom_t id)
 {
     uint32_t val = hal_NA32;
     
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
 
     switch(id)
     {
 #if     defined(HAL_USE_EEPROM_EMULATEDFLASH)       
         case hal_eeprom_emulatedflash:
         {
-            val = devcfg->flashemul.baseaddress;;
+            val = driver->cfg.fls.baseaddress;;
         } break;
 #endif//defined(HAL_USE_EEPROM_EMULATEDFLASH) 
         case hal_eeprom_i2c_01:
         case hal_eeprom_i2c_02:    
         {
-            val = devcfg->i2cbased.baseaddress;
+            val = driver->cfg.i2c.baseaddress;
         } break;
 
         default:
@@ -422,20 +447,20 @@ extern uint32_t hal_eeprom_get_totalsize(hal_eeprom_t id)
 {
     uint32_t val = hal_NA32;
     
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
 
     switch(id)
     {
 #if     defined(HAL_USE_EEPROM_EMULATEDFLASH)        
         case hal_eeprom_emulatedflash:
         {
-            val = devcfg->flashemul.totalsize;
+            val = driver->cfg.fls.totalsize;
         } break;
 #endif//defined(HAL_USE_EEPROM_EMULATEDFLASH)
         case hal_eeprom_i2c_01:
         case hal_eeprom_i2c_02:    
         {
-            val = devcfg->i2cbased.totalsize;
+            val = driver->cfg.i2c.totalsize;
         } break;
 
         default:
@@ -453,22 +478,22 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t id, uint32_t addr)
     uint32_t base;
     uint32_t size;
     
-    const hal_eeprom_hid_dev_cfg_t* devcfg = &hal_brdcfg_eeprom__theconfig.devcfg[HAL_eeprom_id2index(id)];
+    const hal_eeprom_driver_t* driver = &hal_eeprom__theboardconfig.driver[HAL_eeprom_id2index(id)];
 
     switch(id)
     {
 #if     defined(HAL_USE_EEPROM_EMULATEDFLASH)        
         case hal_eeprom_emulatedflash:
         {
-            base = devcfg->flashemul.baseaddress;
-            size = devcfg->flashemul.totalsize;
+            base = driver->cfg.fls.baseaddress;
+            size = driver->cfg.fls.totalsize;
         } break;
 #endif//defined(HAL_USE_EEPROM_EMULATEDFLASH)
         case hal_eeprom_i2c_01:
         case hal_eeprom_i2c_02:    
         {
-            base = devcfg->i2cbased.baseaddress;
-            size = devcfg->i2cbased.totalsize;
+            base = driver->cfg.i2c.baseaddress;
+            size = driver->cfg.i2c.totalsize;
         } break;
 
         default:
@@ -520,17 +545,17 @@ static hal_boolval_t s_hal_eeprom_supported_is(hal_eeprom_t id)
         return(hal_false);
     }
 #endif//!defined(HAL_USE_EEPROM_EMULATEDFLASH)    
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_eeprom__theconfig.supported_mask, HAL_eeprom_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_eeprom__theboardconfig.supportedmask, HAL_eeprom_id2index(id)));
 }
 
 static void s_hal_eeprom_initted_set(hal_eeprom_t id)
 {
-     hl_bits_byte_bitset(&s_hal_eeprom_theinternals.initted, HAL_eeprom_id2index(id));
+     hl_bits_word_bitset(&s_hal_eeprom_theinternals.inittedmask, HAL_eeprom_id2index(id));
 }
 
 static hal_boolval_t s_hal_eeprom_initted_is(hal_eeprom_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_eeprom_theinternals.initted, HAL_eeprom_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_eeprom_theinternals.inittedmask, HAL_eeprom_id2index(id)));
 }
 
 

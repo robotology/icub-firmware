@@ -31,8 +31,8 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "hal_common.h"
 #include "hal_can.h"
-#include "hal_base.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -46,33 +46,37 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_cantransceiver_hid_fn_init_t) (hal_cantransceiver_t id, void* initpar);
-typedef hal_result_t (*hal_cantransceiver_hid_fn_enabledisable_t) (hal_cantransceiver_t id);
-typedef struct
-{   // used inside the public functions of hal_cantransceiver to communicate to the chip, but defined inside brdcfg
-    hal_cantransceiver_hid_fn_init_t            init;
-    void*                                       initpar;
-    hal_cantransceiver_hid_fn_enabledisable_t   enable;
-    hal_cantransceiver_hid_fn_enabledisable_t   disable;
-} hal_cantransceiver_hid_chip_interface_t;
-
-
-typedef struct
-{   
-    hal_cantransceiver_hid_chip_interface_t     chipif;
-} hal_cantransceiver_hid_dev_cfg_t;
 
 typedef struct
 {
-    uint8_t                                     supported_mask;
-    hal_cantransceiver_hid_dev_cfg_t            devcfg;
-} hal_cantransceiver_hid_brdcfg_t;
+    void*                               initpar; 
+} hal_cantransceiver_driver_cfg_t;
 
+typedef struct
+{   
+    hal_res_fp_int32_voidp_t            init;       // init(id, void* initpar)
+    hal_res_fp_int32_t                  enable;     // enable(id)
+    hal_res_fp_int32_t                  disable;    // disable(id)
+} hal_cantransceiver_driver_fun_t;
+
+
+typedef struct
+{ 
+    hal_cantransceiver_driver_cfg_t     cfg;    
+    hal_cantransceiver_driver_fun_t     fun;
+} hal_cantransceiver_driver_t;   
+
+
+typedef struct
+{
+    uint32_t                            supportedmask;
+    hal_cantransceiver_driver_t         driver[hal_cantransceivers_number];
+} hal_cantransceiver_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_cantransceiver_hid_brdcfg_t hal_brdcfg_cantransceiver__theconfig;
+extern const hal_cantransceiver_boardconfig_t hal_cantransceiver__theboardconfig;
 
 
 // - declaration of extern hidden macros ------------------------------------------------------------------------------    

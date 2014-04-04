@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_TRACE
 
@@ -32,11 +34,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
-
-#include "hal_middleware_interface.h"
-#include "hal_brdcfg.h"
-#include "hal_base_hid.h" 
-
 #include "hl_sys.h" 
 
  
@@ -116,27 +113,27 @@ extern hal_result_t hal_trace_init(const hal_trace_cfg_t* cfg)
     {
         return(hal_res_NOK_unsupported);
     }
-    
-       
+          
 //    if(NULL == cfg)
 //    {
 //        cfg = &hal_trace_cfg_default;
 //    }
-
-    
+  
     ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
     
     return(hal_res_OK);
 }
 
-#warning --> use a HAL_BEH_REMOVE_RUNTIME_PARAM_CHECK which ...
+
 
 extern int hal_trace_getchar(void) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_true != s_hal_trace_supported_is())
     {
         return(-1);
     }
+#endif
 
     while(ITM_CheckChar() != 1);
     return(ITM_ReceiveChar());
@@ -145,19 +142,23 @@ extern int hal_trace_getchar(void)
 
 extern int hal_trace_putchar(int ch) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
     if(hal_true != s_hal_trace_supported_is())
     {
         return(-1);
     }
+#endif    
     return(ITM_SendChar(ch));    
 }
 
 extern int hal_trace_puts(const char * str) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_true != s_hal_trace_supported_is())
     {
         return(0);
     }
+#endif
     
     return(hl_sys_itm_puts(str));   
 }
@@ -182,7 +183,7 @@ extern int hal_trace_puts(const char * str)
 
 static hal_bool_t s_hal_trace_supported_is(void)
 {
-    return(hal_brdcfg_trace__theconfig.supported); 
+    return(hal_trace__theboardconfig.supported); 
 }
 
 

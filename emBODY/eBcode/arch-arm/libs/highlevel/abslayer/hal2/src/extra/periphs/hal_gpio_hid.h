@@ -31,12 +31,8 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
-#include "hal_middleware_interface.h"
-
-// to see HAL_USE_CPU_FAM_xxxx 
-#include "hal_brdcfg_modules.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -54,13 +50,13 @@
 
 typedef struct
 {
-    uint16_t supported_mask_byport[hal_gpio_ports_number];    /**< the bit in position J-th of supported_mask_byport[i] tells if port i and pin J is supported */
-} hal_gpio_hid_brdcfg_t;
+    uint16_t supportedmask_byport[hal_gpio_ports_number];    /**< the bit in position J-th of supported_mask_byport[i] tells if port i and pin J is supported */
+} hal_gpio_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig;
+extern const hal_gpio_boardconfig_t hal_gpio__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

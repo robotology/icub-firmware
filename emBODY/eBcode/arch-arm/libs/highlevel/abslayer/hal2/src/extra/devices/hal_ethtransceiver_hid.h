@@ -29,8 +29,8 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "hal_middleware_interface.h"
-#include "hal_base.h"
+
+#include "hal_common.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -46,36 +46,43 @@
 
 
 typedef struct
-{   // used inside the public functions of hal_ethtransceiver to communicate to the chip, but defined inside brdcfg
-    hal_res_fp_voidp_t                              init;               // param is the initpar
-    void*                                           initpar;
-    hal_res_fp_voidp_t                              config;             // config(hal_ethtransceiver_phymode_t* usedphymode)
-    hal_res_fp_voidp_t                              getphymode;         // getphymode(hal_ethtransceiver_phymode_t* usedphymode)
-    hal_res_fp_voidp_t                              phylinkupmask;      // phylinkareup(uint8_t *mask);
-    hal_res_fp_voidp_uint8_t                        phystatus;          // phystatus(hal_ethtransceiver_phy_status_t *array, uint8_t sizeofarray)
-    hal_res_fp_uint8_uint32_voidp_t                 phyerrorinfo;       // phyerrorinfo() see hal_ethtransceiver_phy_errorinfo().                                  
-} hal_ethtransceiver_hid_chip_interface_t;
+{
+    uint8_t                                 numofphysicals;
+    hal_ethtransceiver_phymode_t            targetphymode;    
+    void*                                   initpar; 
+} hal_ethtransceiver_driver_cfg_t;
 
 
 typedef struct
 {   
-    uint8_t                                         numofphysicals;
-    hal_ethtransceiver_phymode_t                    targetphymode;
-    hal_ethtransceiver_hid_chip_interface_t         chipif;
-} hal_ethtransceiver_hid_dev_cfg_t;
+    hal_res_fp_int32_voidp_t                init;           // init(id, void* initpar)
+    hal_res_fp_int32_voidp_t                start;          // start(id, hal_ethtransceiver_phymode_t* usedmiiphymode)
+    hal_res_fp_int32_voidp_t                getmiiphymode;  // getmiiphymode(id, hal_ethtransceiver_phymode_t* usedmiiphymode)
+    hal_res_fp_int32_voidp_t                phylinkupmask;  // phylinkareup(id, uint8_t *mask);
+    hal_res_fp_int32_voidp_uint8_t          phystatus;      // phystatus(id, hal_ethtransceiver_phy_status_t *array, uint8_t sizeofarray)
+    hal_res_fp_int32_uint8_uint32_voidp_t   phyerrorinfo;   // phyerrorinfo() see hal_ethtransceiver_phy_errorinfo(). 
+} hal_ethtransceiver_driver_fun_t;
+
+
+typedef struct
+{ 
+    hal_ethtransceiver_driver_cfg_t         cfg;    
+    hal_ethtransceiver_driver_fun_t         fun;
+} hal_ethtransceiver_driver_t;   
+
 
 typedef struct
 {
-    hal_bool_t                                      supported;
-    hal_ethtransceiver_hid_dev_cfg_t                devcfg;
-} hal_ethtransceiver_hid_brdcfg_t;
+    uint32_t                                supportedmask;
+    hal_ethtransceiver_driver_t             driver[hal_ethtransceivers_number];
+} hal_ethtransceiver_boardconfig_t;
 
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
 // it must be externally defined
-extern const hal_ethtransceiver_hid_brdcfg_t hal_brdcfg_ethtransceiver__theconfig;
+extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig;
 
 
 // - declaration of extern hidden macros ------------------------------------------------------------------------------    

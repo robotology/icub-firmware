@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_SYS
 
@@ -33,19 +35,9 @@
 
 #include "stdlib.h"
 #include "string.h"
-
 #include "hal_mpu.h"
-
-#include "hal_middleware_interface.h"
-
-#include "hal_base_hid.h" 
-
-
-#include "hal_brdcfg.h"
 #include "hal_flash.h"
-
 #include "hal_mpu_name.h"
-
 #include "hl_sys.h"
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -228,7 +220,7 @@ extern hal_result_t hal_sys_systick_sethandler(void (*systickhandler)(void), hal
     uint32_t tickinsec = 1000*1000 / period;
     uint8_t r = 0;
 
-    if(hal_false == hal_base_hid_initted_is())
+    if(hal_false == hal_base_initted_is())
     {
          return(hal_res_NOK_generic);
     }
@@ -377,7 +369,7 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask)
 
 // extern hal_result_t hal_sys_hid_systeminit(void) 
 // {
-//     if(hal_false == hal_base_hid_initted_is())
+//     if(hal_false == hal_base_initted_is())
 //     {
 //          return(hal_res_NOK_generic);
 //     }

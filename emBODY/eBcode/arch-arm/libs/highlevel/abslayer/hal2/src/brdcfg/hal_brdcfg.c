@@ -26,6 +26,9 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 
 #include "hal_brdcfg_modules.h"
+#include "hal_middleware_interface.h"
+
+#include "hal_brdcfg.h"
 
 #if     defined(HAL_BUILD_ONLYCORE)
     #warning HAL is being built in mode ONLYCORE

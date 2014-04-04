@@ -32,6 +32,8 @@
 
 #include "hal_base.h"
 
+#include "hal_brdcfg_modules.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section

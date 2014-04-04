@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_CORE
 
@@ -41,13 +43,6 @@
 #include "hal_mpu.h"
 #include "hal_flash.h"
 #include "hal_heap.h"
-
-#include "hal_base_hid.h"
-#include "hal_sys_hid.h"
-#include "hal_mpu_hid.h"
-#include "hal_flash_hid.h"
-#include "hal_heap_hid.h"
-
 #include "hal_brdcfg.h"
 
 
@@ -166,9 +161,6 @@ extern hal_result_t hal_core_start(void)
         hal_base_on_fatalerror(hal_fatalerror_generic, "hal_core_init() not called yet or hal_core_start() already called");
         return(hal_res_NOK_generic);    
     }
-    
-    // call system init: dont do that
-    //hal_sys_hid_systeminit();
     
             
     s_hal_core_theinternals.status = hal_core_status_started;

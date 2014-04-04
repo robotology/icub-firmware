@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_LED
 
@@ -34,10 +36,11 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_gpio.h"
-#include "hal_brdcfg.h"
-#include "hl_bits.h" 
+
 #include "hl_gpio.h" 
+#include "hal_gpio.h"
+#include "hl_bits.h" 
+
 
 
  
@@ -100,7 +103,7 @@ static hal_boolval_t s_hal_led_initted_is(hal_led_t id);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_hal_led_initted = 0;
+static uint32_t s_hal_led_inittedmask = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,15 +113,20 @@ static uint16_t s_hal_led_initted = 0;
 
 extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 {
-    const hal_gpio_maP_t *gm = NULL;
+    const hal_gpio_map_t *gm = NULL;
     hal_result_t res = hal_res_NOK_generic;
 
     if(hal_false == s_hal_led_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
+    
+    if(hal_true == s_hal_led_initted_is(id))
+    {
+        return(hal_res_OK);
+    }       
      
-    gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
+    gm = &hal_led__theboardconfig.gpiomap[HAL_led_id2index(id)].led;
     
     // much better to init w/ hal_gpio_init() and not with hl_gpio_init() so that we fill the data structure of the gpio in hal.  
     res = hal_gpio_init(gm->gpio, &s_hal_led_gpio_config);
@@ -138,64 +146,68 @@ extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 
 
 extern hal_result_t hal_led_on(hal_led_t id)
-{   
+{ 
+    hl_gpio_t hlgpio = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }; 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
     if(hal_false == s_hal_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
-    const hal_gpio_maP_t *gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
+#endif
     
-    // return(hal_gpio_setval(gm->gpio, hal_brdcfg_led__theconfig.value_on));
+    const hal_gpio_map_t *gm = &hal_led__theboardconfig.gpiomap[HAL_led_id2index(id)].led;
+    
+    // return(hal_gpio_setval(gm->gpio, hal_led__theboardconfig.value_on));
     // NOTE alphabetagamma: it is correct using hal_gpio_setval(), but the use of hl_gpio_pin_write() is quicker. 
     // it does not verify that the gpio is configured as output, etc., but that is redundant as we are protected by 
     // s_hal_led_initted_is() function.
         
-    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gm->gpio.port, .pin = (hl_gpio_pin_t)gm->gpio.pin };
-    return((hal_result_t)hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)hal_brdcfg_led__theconfig.value_on));     
+    hlgpio.port     = (hl_gpio_port_t)gm->gpio.port;
+    hlgpio.pin      = (hl_gpio_pin_t)gm->gpio.pin;    
+    return((hal_result_t)hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)hal_led__theboardconfig.boardcommon.value_on));     
 }
 
 
 
 extern hal_result_t hal_led_off(hal_led_t id)
 {
+    hl_gpio_t hlgpio = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE };
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
     if(hal_false == s_hal_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
-    const hal_gpio_maP_t *gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
+#endif
     
-    // return(hal_gpio_setval(gm->gpio, hal_brdcfg_led__theconfig.value_off));
+    const hal_gpio_map_t *gm = &hal_led__theboardconfig.gpiomap[HAL_led_id2index(id)].led;
+    
+    // return(hal_gpio_setval(gm->gpio, hal_led__theboardconfig.value_off));
     // see NOTE alphabetagamma.
-    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gm->gpio.port, .pin = (hl_gpio_pin_t)gm->gpio.pin };
-    return((hal_result_t)hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)hal_brdcfg_led__theconfig.value_off));     
+    hlgpio.port     = (hl_gpio_port_t)gm->gpio.port;
+    hlgpio.pin      = (hl_gpio_pin_t)gm->gpio.pin;
+    return((hal_result_t)hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)hal_led__theboardconfig.boardcommon.value_off));     
 }
 
 
 
 extern hal_result_t hal_led_toggle(hal_led_t id)
 {
+    hl_gpio_t hlgpio = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE };
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
     if(hal_false == s_hal_led_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
-    const hal_gpio_maP_t *gm = &hal_brdcfg_led__theconfig.gpiomap[HAL_led_id2index(id)].led;
+#endif
     
-    // hal_gpio_val_t val = hal_gpio_getval(gm->gpio);    
-    // if(hal_brdcfg_led__theconfig.value_off == val)
-    // {
-    //     val = hal_brdcfg_led__theconfig.value_on;
-    // }
-    // else
-    // {
-    //     val = hal_brdcfg_led__theconfig.value_off;
-    // }
-    // return(hal_gpio_setval(gm->gpio, val));
- 
+    const hal_gpio_map_t *gm = &hal_led__theboardconfig.gpiomap[HAL_led_id2index(id)].led;
+    
     // see NOTE alphabetagamma.
-    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gm->gpio.port, .pin = (hl_gpio_pin_t)gm->gpio.pin };
+    hlgpio.port     = (hl_gpio_port_t)gm->gpio.port;
+    hlgpio.pin      = (hl_gpio_pin_t)gm->gpio.pin;  
     return((hal_result_t)hl_gpio_pin_toggle(hlgpio));   
     
 }
@@ -218,17 +230,17 @@ extern hal_result_t hal_led_toggle(hal_led_t id)
 
 static hal_boolval_t s_hal_led_supported_is(hal_led_t id)
 {
-    return((hal_boolval_t)hl_bits_hlfword_bitcheck(hal_brdcfg_led__theconfig.supported_mask, HAL_led_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_led__theboardconfig.supportedmask, HAL_led_id2index(id)) );
 }
 
 static void s_hal_led_initted_set(hal_led_t id)
 {
-    hl_bits_hlfword_bitset(&s_hal_led_initted, HAL_led_id2index(id));
+    hl_bits_word_bitset(&s_hal_led_inittedmask, HAL_led_id2index(id));
 }
 
 static hal_boolval_t s_hal_led_initted_is(hal_led_t id)
 {
-    return((hal_boolval_t)hl_bits_hlfword_bitcheck(s_hal_led_initted, HAL_led_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_led_inittedmask, HAL_led_id2index(id)));
 }
 
 

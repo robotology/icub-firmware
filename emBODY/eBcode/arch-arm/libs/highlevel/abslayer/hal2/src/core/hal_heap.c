@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_HEAP
 
@@ -35,8 +37,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hl_sys.h"
-
-#include "hal_base_hid.h"
 
 
 
@@ -138,6 +138,15 @@ extern void hal_heap_delete(void** pp)
 // ---- isr of the module: end ------
 
 
+extern void* hl_sys_heap_new(uint32_t size)
+{
+    return(hal_heap_new(size));
+}
+
+extern void hl_sys_heap_delete(void* p)
+{
+    hal_heap_delete(&p);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -44,33 +44,42 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
 typedef struct
-{   // used inside the public functions of hal_switch to communicate to the chip, but defined inside brdcfg
-    hal_res_fp_voidp_t                      init;       // init(chosendevice_cfg_t* initpar)
-    void*                                   initpar;
-    hal_res_fp_voidp_t                      config;     // config(hal_ethtransceiver_phymode_t* usedphymode)
-} hal_switch_hid_chip_interface_t;
+{
+    uint8_t                             numofphysicals;
+    hal_ethtransceiver_phymode_t        targetphymode;       
+    void*                               initpar; 
+} hal_switch_driver_cfg_t;
 
 
 typedef struct
 {   
-    hal_ethtransceiver_phymode_t            targetphymode;
-    hal_switch_hid_chip_interface_t         chipif;
-} hal_switch_hid_dev_cfg_t;
+    hal_res_fp_int32_voidp_t            init;           // init(id, void* initpar)
+    hal_res_fp_int32_voidp_t            start;          // start(id, hal_ethtransceiver_phymode_t* usedmiiphymode)
+//     hal_res_fp_int32_voidp_t            getmiiphymode;  // getmiiphymode(id, hal_ethtransceiver_phymode_t* usedmiiphymode)
+//     hal_res_fp_int32_voidp_t            phylinkupmask;  // phylinkareup(id, uint8_t *mask);
+//     hal_res_fp_int32_voidp_uint8_t      phystatus;      // phystatus(id, hal_ethtransceiver_phy_status_t *array, uint8_t sizeofarray)
+//     hal_res_fp_int32_uint8_uint32_voidp_t phyerrorinfo;   // phyerrorinfo() see hal_ethtransceiver_phy_errorinfo(). 
+} hal_switch_driver_fun_t;
+
+
+typedef struct
+{ 
+    hal_switch_driver_cfg_t             cfg;    
+    hal_switch_driver_fun_t             fun;
+} hal_switch_driver_t;   
 
 
 typedef struct
 {
-    hal_bool_t                              supported;
-    hal_switch_hid_dev_cfg_t                devcfg;
-} hal_switch_hid_brdcfg_t;
-
+    uint32_t                            supportedmask;
+    hal_switch_driver_t                 driver[hal_switches_number];
+} hal_switch_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_switch_hid_brdcfg_t hal_brdcfg_switch__theconfig;
+extern const hal_switch_boardconfig_t hal_switch__theboardconfig;
 
 
 // - declaration of extern hidden macros ------------------------------------------------------------------------------    

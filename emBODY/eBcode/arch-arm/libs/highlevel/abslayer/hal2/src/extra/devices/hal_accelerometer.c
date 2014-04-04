@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_ACCELEROMETER
 
@@ -33,12 +35,9 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_base_hid.h" 
-#include "hal_brdcfg.h"
-
-
 #include "stdio.h"
 
+#include "hal_heap.h"
 #include "hl_bits.h"
 
  
@@ -80,12 +79,12 @@ extern const hal_accelerometer_cfg_t hal_accelerometer_cfg_default  =
 
 typedef struct
 {
-    hal_accelerometer_cfg_t         config;
+    hal_accelerometer_cfg_t                     config;
 } hal_accelerometer_internal_item_t;
 
 typedef struct
 {
-    uint8_t                                     initted;
+    uint32_t                                    inittedmask;
     hal_accelerometer_internal_item_t*          items[hal_accelerometers_number];   
 } hal_accelerometer_theinternals_t;
 
@@ -112,7 +111,7 @@ static hal_result_t s_hal_accelerometer_hw_init(hal_accelerometer_t id, const ha
 
 static hal_accelerometer_theinternals_t s_hal_accelerometer_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -125,8 +124,7 @@ static hal_accelerometer_theinternals_t s_hal_accelerometer_theinternals =
 
 extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_accelerometer_cfg_t *cfg)
 {
-//     hal_result_t res = hal_res_NOK_generic; // dont remove ...
-//     hal_accelerometer_internal_item_t *intitem = s_hal_accelerometer_theinternals.items[0];
+    hal_accelerometer_internal_item_t *intitem = s_hal_accelerometer_theinternals.items[HAL_accelerometer_id2index(id)];
 
     if(hal_false == s_hal_accelerometer_supported_is(id))
     {
@@ -137,11 +135,27 @@ extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_acc
     {
         cfg  = &hal_accelerometer_cfg_default;
     }
-
+    
     if(hal_true == s_hal_accelerometer_initted_is(id))
     {
-        return(hal_res_OK);
-    } 
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_accelerometer_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }  
+
+    if(NULL == intitem)
+    {
+        intitem = s_hal_accelerometer_theinternals.items[HAL_accelerometer_id2index(id)] = hal_heap_new(sizeof(hal_accelerometer_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }    
+    memcpy(&intitem->config, cfg, sizeof(hal_accelerometer_cfg_t));
+    
     
     if(hal_res_OK != s_hal_accelerometer_hw_init(id, cfg))
     {
@@ -183,11 +197,20 @@ extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_acc
 extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerometer_acceleration_t* acceler)
 {
     hal_result_t res = hal_res_NOK_generic; 
- 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
+    if(hal_true != s_hal_accelerometer_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if(NULL == acceler)
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
     acceler->xac = 0;
     acceler->yac = 0;
@@ -197,7 +220,7 @@ extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerom
     int32_t zac = 0;
 
     
-    res = hal_brdcfg_accelerometer__theconfig.devcfg[HAL_accelerometer_id2index(id)].chipif.read(&xac, &yac, &zac);
+    res = hal_accelerometer__theboardconfig.driver[HAL_accelerometer_id2index(id)].fun.read(id, &xac, &yac, &zac);
     
     if(hal_res_OK == res)
     {
@@ -228,25 +251,25 @@ extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerom
 
 static hal_boolval_t s_hal_accelerometer_supported_is(hal_accelerometer_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_accelerometer__theconfig.supported_mask, HAL_accelerometer_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_accelerometer__theboardconfig.supportedmask, HAL_accelerometer_id2index(id)) );
 }
 
 static void s_hal_accelerometer_initted_set(hal_accelerometer_t id)
 {
-    hl_bits_byte_bitset(&s_hal_accelerometer_theinternals.initted, HAL_accelerometer_id2index(id));
+    hl_bits_word_bitset(&s_hal_accelerometer_theinternals.inittedmask, HAL_accelerometer_id2index(id));
 }
 
 static hal_boolval_t s_hal_accelerometer_initted_is(hal_accelerometer_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_accelerometer_theinternals.initted, HAL_accelerometer_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_accelerometer_theinternals.inittedmask, HAL_accelerometer_id2index(id)));
 }
 
 
 static hal_result_t s_hal_accelerometer_hw_init(hal_accelerometer_t id, const hal_accelerometer_cfg_t *cfg)
 {
-    if((NULL != hal_brdcfg_accelerometer__theconfig.devcfg[HAL_accelerometer_id2index(id)].chipif.init) && (NULL != hal_brdcfg_accelerometer__theconfig.devcfg[HAL_accelerometer_id2index(id)].chipif.read))
+    if((NULL != hal_accelerometer__theboardconfig.driver[HAL_accelerometer_id2index(id)].fun.init) && (NULL != hal_accelerometer__theboardconfig.driver[HAL_accelerometer_id2index(id)].fun.read))
     {
-        return(hal_brdcfg_accelerometer__theconfig.devcfg[HAL_accelerometer_id2index(id)].chipif.init(hal_brdcfg_accelerometer__theconfig.devcfg[HAL_accelerometer_id2index(id)].chipif.initpar));
+        return(hal_accelerometer__theboardconfig.driver[HAL_accelerometer_id2index(id)].fun.init(id, hal_accelerometer__theboardconfig.driver[HAL_accelerometer_id2index(id)].cfg.initpar));
     }
     else
     {

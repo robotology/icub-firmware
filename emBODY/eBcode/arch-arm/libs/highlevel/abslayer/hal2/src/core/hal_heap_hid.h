@@ -45,11 +45,11 @@
 typedef struct
 {
     uint8_t         nothingsofar;
-} hal_heap_hid_brdcfg_t;
+} hal_heap_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig;
+extern const hal_heap_boardconfig_t hal_heap__theboardconfig;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

@@ -25,11 +25,14 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 
 #ifdef HAL_USE_SPI
 
-#warning --> HAL_USE_SPI supports only master mode, rx only, isr-mode, no dma, prescaler only, one frame at a time
+
+//#warning --> BEWARE: HAL_USE_SPI supports only master mode, rx only, isr-mode, no dma, one frame at a time
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -37,8 +40,7 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_brdcfg.h"
-#include "hal_base_hid.h"
+#include "hal_sys.h"
 
 
 
@@ -115,7 +117,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                     initted;
+    uint32_t                    inittedmask;
     hal_spi_internal_item_t*    items[hal_spis_number];   
 } hal_spi_theinternals_t;
 
@@ -154,12 +156,9 @@ static void s_hal_spi_prepare_hl_spi_map(void);
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 
-
-   
+  
     
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -167,7 +166,7 @@ static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 
 static hal_spi_theinternals_t s_hal_spi_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -270,12 +269,14 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    uint8_t num2use = 1;
-    
+    const uint8_t num2use = 1;
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
-    }  
+    } 
+#endif    
 
 #if 0    
     if(hal_spi_act_framebased != intitem->config.activity)
@@ -314,7 +315,7 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 extern hal_bool_t hal_spi_active_is(hal_spi_t id)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
-    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+    //SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
     
     if(hal_false == hal_spi_initted_is(id))
     {
@@ -327,15 +328,19 @@ extern hal_bool_t hal_spi_active_is(hal_spi_t id)
 
 extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes)
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif    
     
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
     if(NULL == rxframe)
     {
         return(hal_res_NOK_nullpointer);
     }
+#endif
     
     return(s_hal_spi_get(id, rxframe, remainingrxframes));       
 }
@@ -366,11 +371,13 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
-    
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif
     
     intitem->config.onframereceiv       = onframereceiv;
     intitem->config.argonframereceiv    = arg;
@@ -479,19 +486,19 @@ static void s_hal_spi_read_isr(hal_spi_t id)
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_spi__theconfig.supported_mask, HAL_spi_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_spi__theboardconfig.supportedmask, HAL_spi_id2index(id)) );
 }
 
 
 static void s_hal_spi_initted_set(hal_spi_t id)
 {
-    hl_bits_byte_bitset(&s_hal_spi_theinternals.initted, HAL_spi_id2index(id));
+    hl_bits_word_bitset(&s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id));
 }
 
 
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 {   
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_spi_theinternals.initted, HAL_spi_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id)));
 }
 
 
@@ -508,11 +515,19 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     {
         return(hal_res_NOK_unsupported);
     }
-
+    
     if(hal_true == hal_spi_initted_is(id))
     {
-        return(hal_res_OK);
-    }   
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_spi_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }       
+ 
 
     // mild verification of the config:    
     if(hal_false == s_hal_spi_config_is_correct(id, cfg))
@@ -550,8 +565,12 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);
     
     
-    hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
-    hl_spi_enable((hl_spi_t)id);            // the SPI_Init(), but not the DMA ...
+    hl_result_t r = hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
+    if(hl_res_OK != r)
+    {
+        return((hal_result_t)r);
+    }
+    hl_spi_enable((hl_spi_t)id);            // the SPI_Init()
 
     
     // --------------------------------------------------------------------------------------
@@ -580,6 +599,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
     intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
 
+    #warning MUSTTTTTTTTTTTTTTTTTTTTTT redefine hl_sys_heap_new() etc....
  
     // - the id
     intitem->id = id;
@@ -595,8 +615,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // now ... init the isr (only for frame-based activity)
     s_hal_spi_isr_init(id, usedcfg);
 
-    
-           
+              
     // ok, it is initted
     s_hal_spi_initted_set(id);
          
@@ -614,7 +633,6 @@ static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t 
 //         return(hal_false);
 //     }
  
-
     if(hal_spi_ownership_master != cfg->ownership)
     {
         return(hal_false);
@@ -642,21 +660,6 @@ static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t 
 
     return(hal_true);
 }
-
-// static hal_bool_t s_hal_spi_is_speed_correct(hal_spi_prescaler_t prescaler, uint32_t speed)
-// {
-// //     if(hal_spi_prescaler_auto != prescaler)
-// //     {   
-//          return(hal_true);
-// //     }
-// //     else
-// //     {
-// //         #warning --> must search a speed 
-// //         return(hal_false);
-// //     }   
-// }
-
-
 
 
 static hl_spi_prescaler_t s_hal_spi_get_hl_prescaler(hal_spi_t id, const hal_spi_cfg_t* cfg)
@@ -768,9 +771,9 @@ static void s_hal_spi_rx_isr_disable(hal_spi_t id)
 static void s_hal_spi_prepare_hl_spi_map(void)
 {
     // we must initialise hl_spi_map w/ suited values. 
-    // we have built hal_brdcfg_spi__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_spi_mapping_t) == sizeof(hal_spi_hid_brdcfg_t));
-    hl_spi_map = (hl_spi_mapping_t*)&hal_brdcfg_spi__theconfig;
+    // we have built hal_spi__theboardconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_spi_mapping_t) == sizeof(hal_spi_boardconfig_t));
+    hl_spi_map = (hl_spi_mapping_t*)&hal_spi__theboardconfig;
 }
 
 #endif//HAL_USE_SPI

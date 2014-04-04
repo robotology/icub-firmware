@@ -31,7 +31,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 #include "hal_mux.h"
 #include "hal_spi.h"
@@ -59,15 +59,15 @@ typedef struct
 
 typedef struct
 {
-    uint16_t                    supported_mask;
+    uint32_t                    supportedmask;
     uint32_t                    spimaxspeed;                    // in hz
     hal_encoder_spimap_t        spimap[hal_encoders_number];
-} hal_encoder_hid_brdcfg_t;
+} hal_encoder_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_encoder_hid_brdcfg_t hal_brdcfg_encoder__theconfig;
+extern const hal_encoder_boardconfig_t hal_encoder__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

@@ -31,7 +31,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 #include "hal_gpio.h"
 
 
@@ -50,19 +50,19 @@
 
 typedef struct
 {
-    hal_gpio_maP_t      scl;       /**< gpio map used for scl pin */
-    hal_gpio_maP_t      sda;       /**< gpio map used for sda pin */ 
+    hal_gpio_map_t      scl;       /**< gpio map used for scl pin */
+    hal_gpio_map_t      sda;       /**< gpio map used for sda pin */ 
 } hal_i2c_gpiomap_t;
 
 typedef struct
 {
-    uint8_t             supported_mask;                     /**< bit in position hal_can_portx must be 1 if portx is supported */
-    hal_i2c_gpiomap_t   gpiomap[hal_i2cs_number];           /**< in position hal_i2cx there is mapping of gpio used for it */
-} hal_i2c_hid_brdcfg_t;
+    uint8_t             supportedmask;              /**< bit in position hal_can_portx must be 1 if portx is supported */
+    hal_i2c_gpiomap_t   gpiomap[hal_i2cs_number];   /**< in position hal_i2cx there is mapping of gpio used for it */
+} hal_i2c_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig;
+extern const hal_i2c_boardconfig_t hal_i2c__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

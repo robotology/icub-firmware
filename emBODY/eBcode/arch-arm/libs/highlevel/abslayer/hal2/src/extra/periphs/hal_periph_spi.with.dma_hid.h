@@ -49,9 +49,9 @@
 
 typedef struct
 {
-    hal_gpio_maP_t          sck;        /**<  */
-    hal_gpio_maP_t          miso;       /**<  */
-    hal_gpio_maP_t          mosi;       /**<  */
+    hal_gpio_map_t          sck;        /**<  */
+    hal_gpio_map_t          miso;       /**<  */
+    hal_gpio_map_t          mosi;       /**<  */
 } hal_spi_gpiomap_t;
 
 typedef struct

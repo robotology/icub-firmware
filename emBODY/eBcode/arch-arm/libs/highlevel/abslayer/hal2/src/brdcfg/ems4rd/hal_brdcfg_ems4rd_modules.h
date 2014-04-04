@@ -68,11 +68,10 @@
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
 #define     HAL_USE_SPI
-#undef          HAL_USE_SPI_DMA
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_UNIQUEID
-#define     HAL_USE_WATCHDOG
+#undef     HAL_USE_WATCHDOG
 
 
 // -- devices: define what you need (beware of cross dependencies)
@@ -90,8 +89,11 @@
 
 
 // -- behaviour: define how the code is shaped
+// validity check verifies if the module has been initted before executing something 
+// argument check verifies that the arguments are corrects
+//#define  HAL_BEH_REMOVE_RUNTIME_INITTED_CHECK
+//#define  HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK
 
-#undef  HAL_BEH_REMOVE_RUNTIME_PARAM_CHECK
 
 
 // # HAL section: end -------------------------------------------------------------------------------------------------
@@ -135,8 +137,6 @@
 
 // - hl_cfg_plus_modules.h --------------------------------------------------------------------------------------------
 
-//#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
-
 #define HL_USE_CORE_CMSIS
 
 #define HL_USE_CORE_STM32
@@ -163,7 +163,8 @@
 
 
 
-
+//#define HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK
+//#define HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK
 
 #endif  // include-guard
 

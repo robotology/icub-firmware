@@ -30,8 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
-
+#include "hal_common.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -47,29 +46,32 @@
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-typedef hal_result_t (*hal_accelerometer_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
+typedef struct
+{
+    void*                                   initpar; 
+} hal_accelerometer_driver_cfg_t;
 
 typedef struct
 {   
-    hal_res_fp_voidp_t                              init;       // init(initpar)
-    void*                                           initpar;    
-    hal_accelerometer_hid_fn_read_t                 read;       // read(accx, accy, accz)
-} hal_accelerometer_hid_chip_interface_t;
+    hal_res_fp_int32_voidp_t                init;       // init(id, void* initpar)
+    hal_res_fp_int32_voidp_voidp_voidp_t    read;       // read(id, int32_t* accx, int32_t* accy, int32_t* accz)
+} hal_accelerometer_driver_fun_t;
 
 typedef struct
-{   
-    hal_accelerometer_hid_chip_interface_t          chipif;
-} hal_accelerometer_hid_dev_cfg_t;
+{ 
+    hal_accelerometer_driver_cfg_t          cfg;    
+    hal_accelerometer_driver_fun_t          fun;
+} hal_accelerometer_driver_t;   
 
 typedef struct
 {
-    uint8_t                                         supported_mask;
-    hal_accelerometer_hid_dev_cfg_t                 devcfg[hal_accelerometers_number];
-} hal_accelerometer_hid_brdcfg_t;
+    uint32_t                                supportedmask;
+    hal_accelerometer_driver_t              driver[hal_accelerometers_number];
+} hal_accelerometer_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_accelerometer_hid_brdcfg_t hal_brdcfg_accelerometer__theconfig;
+extern const hal_accelerometer_boardconfig_t hal_accelerometer__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

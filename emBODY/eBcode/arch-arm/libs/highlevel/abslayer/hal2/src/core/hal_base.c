@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+//#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_BASE
 
@@ -34,9 +36,8 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_middleware_interface.h"
+#include "hal_sys.h"
 
-#include "hal_brdcfg.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,15 +77,13 @@ typedef enum
 } hal_base_status_t;
 
 
-typedef void (*hal_base_hid_fn_on_error) (hal_fatalerror_t, const char *);
-
 typedef struct
 {
     hal_base_status_t           status;
     hal_base_cfg_t              config;
     hal_void_fp_void_t          fn_osal_system_scheduling_suspend;
     hal_void_fp_void_t          fn_osal_system_scheduling_restart;
-    hal_base_hid_fn_on_error    fn_on_error; 
+    hal_errorhandler_t          fn_on_error; 
     hal_voidp_fp_uint32_t       fn_heap_new;
     hal_void_fp_voidp_t         fn_heap_delete;
 } hal_base_theinternals_t;
@@ -154,6 +153,10 @@ extern hal_result_t hal_base_init(const hal_base_cfg_t *cfg)
     return(hal_res_OK);
 }
 
+extern hal_bool_t hal_base_initted_is(void)
+{
+    return( (hal_base_status_initialised == s_hal_base_theinternals.status) ? (hal_true) : (hal_false) );    
+}
 
 extern void hal_base_osal_scheduling_suspend(void)
 {
@@ -253,10 +256,7 @@ extern void hal_base_heap_delete(void* mem)
 
 
 
-extern hal_bool_t hal_base_hid_initted_is(void)
-{
-    return( (hal_base_status_initialised == s_hal_base_theinternals.status) ? hal_true : hal_false );    
-}
+
 
 
 

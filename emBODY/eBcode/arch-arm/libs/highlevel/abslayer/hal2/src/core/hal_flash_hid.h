@@ -50,12 +50,12 @@ typedef struct
 {
     uint32_t            baseaddress;            /**< 0x08000000 on stm   */
     uint32_t            totalsize;              /**< 1m for stm32f4x, etc ...  */
-} hal_flash_hid_brdcfg_t;
+} hal_flash_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig;
+extern const hal_flash_boardconfig_t hal_flash__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

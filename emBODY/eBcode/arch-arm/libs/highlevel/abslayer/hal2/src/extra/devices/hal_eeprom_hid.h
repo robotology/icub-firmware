@@ -30,7 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 #include "hal_i2c.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -49,44 +49,50 @@ typedef struct
 {   
     uint32_t                            baseaddress;
     uint32_t                            totalsize;
-} hal_eeprom_hid_flashemul_cfg_t;
-
-typedef hal_result_t (*hal_eeprom_hid_fn_read_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
-typedef hal_result_t (*hal_eeprom_hid_fn_write_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
-///typedef hal_result_t (*hal_res_fp_uint32_uint32_uint8p_uint32p_t) (uint32_t, uint32_t, uint8_t*, uint32_t*);
-typedef struct
-{   // used inside the public functions of hal_eeprom to communicate to the chip, but defined inside brdcfg
-    hal_res_fp_voidp_t                  init;       // init(initpar)
-    void*                               initpar;
-    hal_eeprom_hid_fn_read_t            read;       // read(addr, size, data, readbytes)
-    hal_eeprom_hid_fn_write_t           write;      // write(addr, size, data, writtenbytes)
-} hal_eeprom_hid_chip_interface_t;
+} hal_eeprom_driver_cfg_fls_t;
 
 typedef struct
 {   
     uint32_t                            baseaddress;
     uint32_t                            totalsize;
     hal_i2c_t                           i2cid;
-    hal_eeprom_hid_chip_interface_t     chipif;
-} hal_eeprom_hid_i2cbased_cfg_t;
+    void*                               initpar;
+} hal_eeprom_driver_cfg_i2c_t;
+
 
 typedef union
 {
-    hal_eeprom_hid_flashemul_cfg_t      flashemul;
-    hal_eeprom_hid_i2cbased_cfg_t       i2cbased;
-} hal_eeprom_hid_dev_cfg_t; 
+    hal_eeprom_driver_cfg_fls_t         fls;
+    hal_eeprom_driver_cfg_i2c_t         i2c;
+} hal_eeprom_driver_cfg_t; 
+
+
+typedef struct
+{   // used inside the public functions of hal_eeprom to communicate to the chip, but defined inside brdcfg
+    hal_res_fp_int32_voidp_t                        init;   // init(id, initpar)
+    hal_res_fp_int32_uint32_uint32_voidp_voidp_t    read;   // read(id, addr, size, data, readbytes)
+    hal_res_fp_int32_uint32_uint32_voidp_voidp_t    write;  // write(id, addr, size, data, writtenbytes)
+} hal_eeprom_driver_fun_t;
+
+
+typedef struct
+{ 
+    hal_eeprom_driver_cfg_t             cfg;    
+    hal_eeprom_driver_fun_t             fun;
+} hal_eeprom_driver_t;   
+
 
 typedef struct
 {
-    uint8_t                             supported_mask;
-    hal_eeprom_hid_dev_cfg_t            devcfg[hal_eeproms_number];
-} hal_eeprom_hid_brdcfg_t;
+    uint32_t                            supportedmask;
+    hal_eeprom_driver_t                 driver[hal_eeproms_number];
+} hal_eeprom_boardconfig_t;
 
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_eeprom_hid_brdcfg_t hal_brdcfg_eeprom__theconfig; 
+extern const hal_eeprom_boardconfig_t hal_eeprom__theboardconfig; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section

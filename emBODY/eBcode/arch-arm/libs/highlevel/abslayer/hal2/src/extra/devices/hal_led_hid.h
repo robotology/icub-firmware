@@ -30,8 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
-
+#include "hal_common.h"
 #include "hal_gpio.h"
 
 
@@ -49,21 +48,28 @@
 
 typedef struct
 {
-    hal_gpio_maP_t      led;       
+    hal_gpio_map_t      led;       
 } hal_led_gpiomap_t;
+
 
 typedef struct
 {
-    uint16_t                supported_mask;
     hal_gpio_val_t          value_on;
     hal_gpio_val_t          value_off;
+} hal_led_boardcommon_t;
+
+
+typedef struct
+{
+    uint32_t                supportedmask;
+    hal_led_boardcommon_t   boardcommon;
     hal_led_gpiomap_t       gpiomap[hal_leds_number];
-} hal_led_hid_brdcfg_t;
+} hal_led_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_led_hid_brdcfg_t hal_brdcfg_led__theconfig;
+extern const hal_led_boardconfig_t hal_led__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

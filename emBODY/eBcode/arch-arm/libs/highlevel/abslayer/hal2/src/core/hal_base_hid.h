@@ -45,17 +45,16 @@
 typedef struct
 {
     uint8_t     dummy;
-} hal_base_hid_brdcfg_t;
+} hal_base_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_base_hid_brdcfg_t hal_brdcfg_base__theconfig;
+extern const hal_base_boardconfig_t hal_base__theboardconfig;
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-extern hal_bool_t hal_base_hid_initted_is(void);
 
 
 

@@ -7,7 +7,7 @@
  * under the terms of the GNU General Public License, version 2 or any
  * later version published by the Free Software Foundation.
  *
- * A copy of the license can be found at
+ * A copy /of the license can be found at
  * http://www.robotcub.org/icub/license/gpl.txt
  *
  * This program is distributed in the hope that it will be useful, but
@@ -24,6 +24,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_CAN
 
@@ -32,14 +34,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
-
-#include "hal_middleware_interface.h"
-
 #include "string.h"
 
-#include "hal_brdcfg.h"
-#include "hal_base_hid.h" 
-//#include "hal_periph_gpio_hid.h" 
 #include "hl_bits.h" 
 #include "hal_heap.h"
 #include "hal_cantransceiver.h"
@@ -68,11 +64,6 @@
 
 #define HAL_can_id2index(p)           ((uint8_t)((p)))
 
-#if     defined(HAL_USE_MPU_TYPE_STM32F1) || defined(HAL_USE_MPU_TYPE_STM32F4)
-#define HAL_can_port2peripheral(p)      ( ( hal_can1 == (p) ) ? (CAN1) : (CAN2) )
-#else //defined(HAL_USE_MPU_TYPE_*)
-    #error ERR --> choose a HAL_USE_MPU_TYPE_*
-#endif 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,7 +101,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                     initted;
+    uint32_t                    inittedmask;
     hal_can_internal_item_t*    items[hal_cans_number];   
 } hal_can_theinternals_t;
 
@@ -123,6 +114,7 @@ typedef struct
 static hal_boolval_t s_hal_can_supported_is(hal_can_t id);
 static void s_hal_can_initted_set(hal_can_t id);
 static hal_boolval_t s_hal_can_initted_is(hal_can_t id);
+
 
 static void s_hal_can_prepare_hl_can_map(void);
 
@@ -145,7 +137,7 @@ static const hal_cantransceiver_t s_hal_can_cantransceivers[] = {
 
 static hal_can_theinternals_t s_hal_can_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -164,15 +156,29 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
 {
     hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
 
+    hl_result_t r = hl_res_NOK_generic;
+    
     if(hal_false == s_hal_can_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
+    
     if(NULL == cfg)
     {
         cfg  = &hal_can_cfg_default;
     }
+
+    if(hal_true == s_hal_can_initted_is(id))
+    {
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_can_cfg_t)))
+        {   // ok only if the previously used config is the same as the current one
+            return(hal_res_OK);
+        }
+        else
+        {
+            return(hal_res_NOK_generic);
+        }
+    }    
     
     
     // give memory to can internal item for this id ...   
@@ -201,13 +207,18 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     hal_cantransceiver_enable(s_hal_can_cantransceivers[HAL_can_id2index(id)]); 
     
     hl_can_cfg_t cancfg;
-    cancfg.baudrate = (hal_can_baudrate_1mbps == cfg->baudrate) ? hl_can_baudrate_1mbps : hl_can_baudrate_500kbps;
+    cancfg.baudrate = (hal_can_baudrate_1mbps == cfg->baudrate) ? (hl_can_baudrate_1mbps) : (hl_can_baudrate_500kbps);
     cancfg.advcfg   = NULL;  
     
     // we must initialise hl_can_map w/ suited values.
     s_hal_can_prepare_hl_can_map();
     
-    hl_can_init((hl_can_t)id, &cancfg);
+    r = hl_can_init((hl_can_t)id, &cancfg);
+    
+    if(hl_res_OK != r)
+    {
+        return(hal_res_NOK_generic);
+    }
 
     
     hl_can_comm_cfg_t cancomcfg;
@@ -224,9 +235,13 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     cancomcfg.arg_cb_err                    = cfg->arg_cb_err;
     
 
-    hl_can_comm_init((hl_can_t)id, &cancomcfg);
+    r = hl_can_comm_init((hl_can_t)id, &cancomcfg);
 
-
+    if(hl_res_OK != r)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     s_hal_can_initted_set(id);
 
     return(hal_res_OK);
@@ -235,18 +250,13 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
 
 extern hal_result_t hal_can_enable(hal_can_t id)
 {
-    hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
-
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)   
     if(hal_false == s_hal_can_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
-    if(NULL == intitem)
-    {
-        return(hal_res_NOK_generic);
-    }
-
+#endif
+    
     // disable scheduling
     hal_base_osal_scheduling_suspend();
     
@@ -262,18 +272,13 @@ extern hal_result_t hal_can_enable(hal_can_t id)
 
 extern hal_result_t hal_can_disable(hal_can_t id) 
 {
-    hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];
-
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hal_false == s_hal_can_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-
-    if(NULL == intitem)
-    {
-        return(hal_res_NOK_generic);
-    }
-
+#endif
+    
     // disable scheduling
     hal_base_osal_scheduling_suspend();
 
@@ -289,6 +294,20 @@ extern hal_result_t hal_can_disable(hal_can_t id)
 // the function doesn't check hal_can_send_mode: the function will behave ok only if sm == hal_can_send_normprio_now
 extern hal_result_t hal_can_put(hal_can_t id, hal_can_frame_t *frame, hal_can_send_mode_t sm) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hal_false == s_hal_can_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if(NULL == frame)
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif    
+    
     hl_result_t r = hl_can_comm_put((hl_can_t)id, (hl_can_comm_frame_t*)frame, (hal_can_send_normprio_later == sm) ? (hl_can_comm_send_later) : (hl_can_comm_send_now));
     return((hal_result_t)r);
 }
@@ -297,6 +316,13 @@ extern hal_result_t hal_can_put(hal_can_t id, hal_can_frame_t *frame, hal_can_se
 
 extern hal_result_t hal_can_transmit(hal_can_t id)
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hal_false == s_hal_can_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
     hl_result_t r = hl_can_comm_transmit((hl_can_t)id);
     return((hal_result_t)r);
 }
@@ -304,6 +330,20 @@ extern hal_result_t hal_can_transmit(hal_can_t id)
 
 extern hal_result_t hal_can_received(hal_can_t id, uint8_t *numberof) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hal_false == s_hal_can_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
+    if(NULL == numberof)
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif  
+    
     hl_result_t r = hl_can_comm_received((hl_can_t)id, numberof);
     return((hal_result_t)r);
 }
@@ -311,6 +351,20 @@ extern hal_result_t hal_can_received(hal_can_t id, uint8_t *numberof)
 
 extern hal_result_t hal_can_get(hal_can_t id, hal_can_frame_t *frame, uint8_t *remaining) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hal_false == s_hal_can_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
+    if(NULL == frame)
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
     hl_result_t r = hl_can_comm_get((hl_can_t)id, (hl_can_comm_frame_t*)frame, remaining);
     return((hal_result_t)r);
 }
@@ -319,20 +373,31 @@ extern hal_result_t hal_can_get(hal_can_t id, hal_can_frame_t *frame, uint8_t *r
 extern hal_result_t hal_can_receptionfilter_set(hal_can_t id, uint8_t mask_num, uint32_t mask_val, uint8_t identifier_num,
                                                 uint32_t identifier_val, hal_can_frameID_format_t idformat)
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hal_false == s_hal_can_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
+#endif 
 
     return(hal_res_NOK_unsupported);
 }
 
 extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof) 
 {
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hal_false == s_hal_can_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
     if(NULL == numberof)
     {
         return(hal_res_NOK_generic);
     }
+#endif 
 
     hl_can_comm_outgoing((hl_can_t)id, numberof);
     
@@ -341,7 +406,21 @@ extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof)
 
 // VALE
 extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status)
-{    
+{  
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hal_false == s_hal_can_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if(NULL == status)
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
     hl_result_t r = hl_can_comm_getstatus((hl_can_t)id, (hl_can_comm_status_t*)status);
     return((hal_result_t)r);
 }
@@ -367,26 +446,26 @@ extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status)
 
 static hal_boolval_t s_hal_can_supported_is(hal_can_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(hal_brdcfg_can__theconfig.supported_mask, HAL_can_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_can__theboardconfig.supportedmask, HAL_can_id2index(id)));
 }
 
 static void s_hal_can_initted_set(hal_can_t id)
 {
-    hl_bits_byte_bitset(&s_hal_can_theinternals.initted, HAL_can_id2index(id));
+    hl_bits_word_bitset(&s_hal_can_theinternals.inittedmask, HAL_can_id2index(id));
 }
 
 static hal_boolval_t s_hal_can_initted_is(hal_can_t id)
 {
-    return((hal_boolval_t)hl_bits_byte_bitcheck(s_hal_can_theinternals.initted, HAL_can_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_can_theinternals.inittedmask, HAL_can_id2index(id)));
 }
 
 
 static void s_hal_can_prepare_hl_can_map(void)
 {
     // we must initialise hl_can_map w/ suited values. 
-    // we have built hal_brdcfg_can__theconfig to have the same layout, but we verify it anyway
-    hl_VERIFYproposition(xxx, sizeof(hl_can_mapping_t) == sizeof(hal_can_hid_brdcfg_t));
-    hl_can_map = (hl_can_mapping_t*)&hal_brdcfg_can__theconfig;
+    // we have built hal_can__theboardconfig to have the same layout, but we verify it anyway
+    hl_VERIFYproposition(xxx, sizeof(hl_can_mapping_t) == sizeof(hal_can_boardconfig_t));
+    hl_can_map = (hl_can_mapping_t*)&hal_can__theboardconfig;
 }
 
 #endif//HAL_USE_CAN

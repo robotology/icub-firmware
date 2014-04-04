@@ -25,6 +25,8 @@
 
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
+// - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
+#include "hal_middleware_interface.h"
 
 #ifdef HAL_USE_GPIO
 
@@ -34,15 +36,8 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_middleware_interface.h"
-
-
-#include "hal_base_hid.h" 
 
 #include "hl_bits.h" 
-
-#include "hal_brdcfg.h"
-
 #include "hl_gpio.h"
 #include "hl_arch.h"
  
@@ -86,8 +81,8 @@ const hal_gpio_cfg_t hal_gpio_cfg_default =
 
 typedef struct
 {
-    uint16_t    initted_mask[hal_gpio_ports_number];
-    uint16_t    output_mask[hal_gpio_ports_number];
+    uint16_t    inittedmask_byport[hal_gpio_ports_number];
+    uint16_t    outputmask_byport[hal_gpio_ports_number];
 } hal_gpio_theinternals_t;
 
 
@@ -100,7 +95,9 @@ static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_
 
 static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin);
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
 static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin);
+#endif
 
 static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin);
 
@@ -129,8 +126,8 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
 
 static hal_gpio_theinternals_t s_hal_gpio_theinternals =
 {
-    .initted_mask       = { 0 },
-    .output_mask        = { 0 }   
+    .inittedmask_byport     = { 0 },
+    .outputmask_byport      = { 0 }   
 };
 
 
@@ -157,11 +154,16 @@ extern hal_result_t hal_gpio_init(hal_gpio_t gpio, const hal_gpio_cfg_t* cfg)
 
 extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
 {
+    hl_gpio_t hlgpio = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE };
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK) 
     if((hal_gpio_portNONE == gpio.port) || (hal_gpio_pinNONE == gpio.pin) || (hal_gpio_valNONE == val))
     {
         return(hal_res_NOK_generic);
     }
+#endif
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     // can write only initted port-pin
     if(hal_true != s_hal_gpio_initted_is(gpio.port, gpio.pin))
     {
@@ -173,9 +175,10 @@ extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
     {
         return(hal_res_NOK_generic);
     }
-
+#endif
    
-    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gpio.port, .pin = (hl_gpio_pin_t)gpio.pin };
+    hlgpio.port = (hl_gpio_port_t)gpio.port;
+    hlgpio.pin = (hl_gpio_pin_t)gpio.pin;
     hl_gpio_pin_write(hlgpio, (hl_gpio_val_t)val);
     
     return(hal_res_OK);
@@ -183,18 +186,25 @@ extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val)
 
 extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio) 
 {
+    hl_gpio_t hlgpio = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE };
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK) 
     if((hal_gpio_portNONE == gpio.port) || (hal_gpio_pinNONE == gpio.pin))
     {
         return(hal_gpio_valNONE);
     }
-
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     // can write only initted port-pin
     if(hal_true != s_hal_gpio_initted_is(gpio.port, gpio.pin))
     {
         return(hal_gpio_valNONE);
     }
-
-    hl_gpio_t hlgpio = { .port = (hl_gpio_port_t)gpio.port, .pin = (hl_gpio_pin_t)gpio.pin };
+#endif
+    
+    hlgpio.port = (hl_gpio_port_t)gpio.port;
+    hlgpio.pin  = (hl_gpio_pin_t)gpio.pin;
     hl_gpio_val_t v;
     
     
@@ -229,38 +239,40 @@ extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio)
 
 static hal_boolval_t s_hal_gpio_supported_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t p = hal_brdcfg_gpio__theconfig.supported_mask_byport[HAL_gpio_port2index(port)];
+    uint16_t p = hal_gpio__theboardconfig.supportedmask_byport[HAL_gpio_port2index(port)];
     return((hal_boolval_t)hl_bits_hlfword_maskcheck(p, pin));
 }
 
 
 static void s_hal_gpio_initted_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
-    uint16_t *pp = &s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
+    uint16_t *pp = &s_hal_gpio_theinternals.inittedmask_byport[HAL_gpio_port2index(port)];
     hl_bits_hlfword_maskset(pp, pin);
 }
 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
 static hal_boolval_t s_hal_gpio_initted_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {   // cannot be called with port and pin of value NONE
-    uint16_t p = s_hal_gpio_theinternals.initted_mask[HAL_gpio_port2index(port)];
+    uint16_t p = s_hal_gpio_theinternals.inittedmask_byport[HAL_gpio_port2index(port)];
     return((hal_boolval_t)hl_bits_hlfword_maskcheck(p, pin));
 }
+#endif
 
 static void s_hal_gpio_output_set(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
+    uint16_t *pp = &s_hal_gpio_theinternals.outputmask_byport[HAL_gpio_port2index(port)];
     hl_bits_hlfword_maskset(pp, pin);
 }
 
 static void s_hal_gpio_output_clear(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t *pp = &s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
+    uint16_t *pp = &s_hal_gpio_theinternals.outputmask_byport[HAL_gpio_port2index(port)];
     hl_bits_hlfword_maskclear(pp, pin);
 }
 
 static hal_boolval_t s_hal_gpio_output_is(hal_gpio_port_t port, hal_gpio_pin_t pin)
 {
-    uint16_t p = s_hal_gpio_theinternals.output_mask[HAL_gpio_port2index(port)];
+    uint16_t p = s_hal_gpio_theinternals.outputmask_byport[HAL_gpio_port2index(port)];
     return((hal_boolval_t)hl_bits_hlfword_maskcheck(p, pin));
 }
 
@@ -276,7 +288,6 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
     {
         return(hal_res_NOK_unsupported);
     }
-
 
 
 #if     defined(HAL_USE_MPU_TYPE_STM32F1)

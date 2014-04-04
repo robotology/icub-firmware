@@ -36,25 +36,6 @@
 
 
 #include "hal_base.h"
-#include "hal_base_hid.h"
-
-#include "hal_mpu.h"
-#include "hal_mpu_hid.h"
-
-
-
-#include "hal_can_hid.h"
-#include "hal_spi_hid.h"
-#include "hal_eth_hid.h"
-#include "hal_trace_hid.h"
-#include "hal_eeprom.h"
-#include "hal_timer.h"
-#include "hal_i2c.h"
-#include "hal_watchdog.h"
-
-#include "hal_switch.h"
-
-
 
 #include "hl_cfg_plus_target.h"
 #include "hl_cfg_plus_modules.h"
@@ -91,7 +72,7 @@
 
 #if defined(HAL_USE_ETH) || defined(HAL_USE_ETHTRANSCEIVER) || defined(HAL_USE_SWITCH)
 
-    #include "hal_eth.h"
+    #include "hal_ethtransceiver.h"
 
 #if     !defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE) 
 
@@ -102,31 +83,46 @@
     #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
     #define HAL_ETH_PHYMODE_THEONEUSED                  hal_ethtransceiver_phymode_fullduplex100mbps
 
-    static hal_result_t s_switch_dummy_init(void* param)
+    static hal_result_t s_switch_dummy_init(int32_t id, void* param)
     {
         // the HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE mode is done in HW
         return(hal_res_OK);
     }   
-    static hal_result_t s_switch_dummy_configure(void* p)
+    static hal_result_t s_switch_dummy_start(int32_t id, void* p)
     {
         hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*)p;
         // the mode of the rmii is surely this one
         *usedphymode = HAL_ETH_PHYMODE_THEONEUSED;
         return(hal_res_OK);
     }   
-    static hal_result_t s_switch_dummy_getphymode(void* p)
+    static hal_result_t s_switch_dummy_getmiiphymode(int32_t id, void* p)
     {
         hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*)p;
         // the mode of the rmii is surely this one
         *usedphymode = HAL_ETH_PHYMODE_THEONEUSED;
         return(hal_res_OK);
     }  
+    static hal_result_t s_switch_dummy_getlinkupmask(int32_t id, void* p)
+    {
+        //uint8_t *mask = (uint8_t*)p;
+        return(hal_res_NOK_generic);
+    }
+    static hal_result_t s_switch_dummy_getphystatus(int32_t id, void* p, uint8_t n)
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    static hal_result_t s_switch_dummy_getphyerrorinfo(int32_t id, uint8_t n, uint32_t t, void* p)
+    {
+        return(hal_res_NOK_generic);
+    } 
     
 #else
     
     #warning --> using micrel as managed device w/ EMS4RD_USE_MICREL_AS_MANAGED_DEVICE
 
     #include "hl_chip_micrel_ks8893.h"
+    #include "hal_i2c.h"
     
     // the micrel must be sw configured. we set it in autonegotiation for its port1 and port2. 
     // the mode for the rmii is read via sw from the micrel
@@ -150,7 +146,7 @@
         .targetphymode      = HL_ETHTRANS_PHYMODE_THEONE2USE
     };    
     
-    static hal_result_t s_switch_micrel_init(void* param)
+    static hal_result_t s_switch_micrel_init(int32_t id, void* param)
     {
         // i2c3 must be initted.
         hal_i2c_init((hal_i2c_t)ks8893_config.i2cid, NULL);        
@@ -158,18 +154,34 @@
         return((hal_result_t)r);
     }  
 
-    static hal_result_t s_switch_micrel_configure(void* p)
+    static hal_result_t s_switch_micrel_start(int32_t id, void* p)
     {
         //hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*);
-        return((hal_result_t)hl_chip_micrel_ks8893_configure((hl_ethtrans_phymode_t*)p));
+        return((hal_result_t)hl_chip_micrel_ks8893_start((hl_ethtrans_phymode_t*)p));
     }
 
-    static hal_result_t s_switch_micrel_getphymode(void* p)
+    static hal_result_t s_switch_micrel_getmiiphymode(int32_t id, void* p)
     {
         //hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*)p;
         return((hal_result_t)hl_chip_micrel_ks8893_mii_getphymode((hl_ethtrans_phymode_t*)p));        
-    }    
- 
+    }  
+
+    static hal_result_t s_switch_micrel_getlinkupmask(int32_t id, void* p)
+    {
+        //uint8_t *mask = (uint8_t*)p;
+        return((hal_result_t)hl_chip_micrel_ks8893_linkupmask((uint8_t*)p));
+    }
+
+    static hal_result_t s_switch_micrel_getphystatus(int32_t id, void* p, uint8_t n)
+    {
+        return((hal_result_t)hl_chip_micrel_ks8893_phy_status((hl_ethtrans_phystatus_t*)p, (uint8_t)n));
+    }
+
+    static hal_result_t s_switch_micrel_getphyerrorinfo(int32_t id, uint8_t n, uint32_t t, void* p)
+    {
+        return((hal_result_t)hl_chip_micrel_ks8893_phy_errorinfo((uint8_t)n, (hl_ethtrans_phyerror_t)t, (hl_ethtrans_phyerrorinfo_t*)p));
+    } 
+    
     
 #endif
     
@@ -209,7 +221,9 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 #ifdef  HAL_USE_BASE
 
-    extern const hal_base_hid_brdcfg_t hal_brdcfg_base__theconfig  =
+    #include "hal_base_hid.h"
+    
+    extern const hal_base_boardconfig_t hal_base__theboardconfig  =
     {
         .dummy  = 0
     };  
@@ -219,7 +233,9 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef  HAL_USE_MPU
     
-    extern const hal_mpu_hid_brdcfg_t hal_brdcfg_mpu__theconfig  =
+    #include "hal_mpu_hid.h"
+    
+    extern const hal_mpu_boardconfig_t hal_mpu__theboardconfig  =
     {
         .architecture       = hal_mpu_arch_armcm4,
         .type               = hal_mpu_type_stm32f4,
@@ -238,7 +254,9 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef  HAL_USE_FLASH
     
-    extern const hal_flash_hid_brdcfg_t hal_brdcfg_flash__theconfig =
+    #include "hal_flash_hid.h"
+    
+    extern const hal_flash_boardconfig_t hal_flash__theboardconfig =
     {
         .baseaddress    =   0x08000000,                 // on every stm32
         .totalsize      =   
@@ -255,7 +273,9 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 #ifdef  HAL_USE_HEAP
     
-    extern const hal_heap_hid_brdcfg_t hal_brdcfg_heap__theconfig =
+    #include "hal_heap_hid.h"
+    
+    extern const hal_heap_boardconfig_t hal_heap__theboardconfig =
     {
         .nothingsofar   = 0
     };
@@ -265,7 +285,9 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef  HAL_USE_SYS
     
-    extern const hal_sys_hid_brdcfg_t hal_brdcfg_sys__theconfig  =
+    #include "hal_sys_hid.h"
+    
+    extern const hal_sys_boardconfig_t hal_sys__theboardconfig  =
     {
         .dummy             = 0
     };   
@@ -277,10 +299,12 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 #ifdef  HAL_USE_CAN
     
-    extern const hal_can_hid_brdcfg_t hal_brdcfg_can__theconfig =
+    #include "hal_can_hid.h"
+    
+    extern const hal_can_boardconfig_t hal_can__theboardconfig =
     {
-        .supported_mask     = (1 << hal_can1) | (1 << hal_can2),
-       .gpiomap            =
+        .supportedmask      = (1 << hal_can1) | (1 << hal_can2),
+        .gpiomap            =
         {   
             {   // hal_can1 
                 .rx = 
@@ -314,7 +338,8 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 #ifdef  HAL_USE_ETH
     
-    extern const hal_eth_hid_brdcfg_t hal_brdcfg_eth__theconfig     =
+    #include "hal_eth_hid.h"
+    extern const hal_eth_boardconfig_t hal_eth__theboardconfig =
     {
         .supported          = hal_true,
         .rxdmafifocapacity  = 4, //hal_NA08, //4, //hal_NA08
@@ -376,16 +401,17 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
         }
     };
     
-  
-
 #endif//HAL_USE_ETH
 
 
 
 #ifdef HAL_USE_GPIO
-    extern const hal_gpio_hid_brdcfg_t hal_brdcfg_gpio__theconfig =
+    
+    #include "hal_gpio_hid.h"
+    
+    extern const hal_gpio_boardconfig_t hal_gpio__theboardconfig =
     {
-        .supported_mask_byport    =
+        .supportedmask_byport    =
         {   // ok, i enable every pin of every port.
             hal_gpio_pinALL,     // port a
             hal_gpio_pinALL,     // port b
@@ -398,13 +424,17 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
             hal_gpio_pinALL      // port i
         }
     };
+    
 #endif//HAL_USE_GPIO
 
 
 #ifdef  HAL_USE_I2C
-    extern const hal_i2c_hid_brdcfg_t hal_brdcfg_i2c__theconfig =
+    
+    #include "hal_i2c_hid.h"
+    
+    extern const hal_i2c_boardconfig_t hal_i2c__theboardconfig =
     {
-        .supported_mask         = (1 << hal_i2c1) | (0 << hal_i2c2) | (1 << hal_i2c3),
+        .supportedmask          = (1 << hal_i2c1) | (0 << hal_i2c2) | (1 << hal_i2c3),
         .gpiomap                =
         {
             {   // hal_i2c1 
@@ -446,15 +476,18 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
                 },   
             }     
         }       
-    };   
+    }; 
+    
 #endif//HAL_USE_I2C
 
 
 #if     defined(HAL_USE_SPI) | defined(HAL_USE_SPI_DMA)
+    
+    #include "hal_spi_hid.h"
 
-    extern const hal_spi_hid_brdcfg_t hal_brdcfg_spi__theconfig =
+    extern const hal_spi_boardconfig_t hal_spi__theboardconfig =
     {
-        .supported_mask         = (0 << hal_spi1) | (1 << hal_spi2) | (1 << hal_spi3),
+        .supportedmask          = (0 << hal_spi1) | (1 << hal_spi2) | (1 << hal_spi3),
         .gpiomap                =
         {   
             {   // hal_spi1
@@ -516,42 +549,58 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
       
 #ifdef  HAL_USE_TIMER
-    extern const hal_timer_hid_brdcfg_t hal_brdcfg_timer__theconfig =
+    
+    #include "hal_timer_hid.h"
+    
+    extern const hal_timer_boardconfig_t hal_timer__theboardconfig =
     {
-        .supported_mask     = (1 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7) | (1 << hal_timer8)
-    };       
+        .supportedmask  = (1 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) | (1 << hal_timer6) | (1 << hal_timer7) | (1 << hal_timer8)
+    }; 
+    
 #endif//HAL_USE_TIMER
 
     
 #ifdef  HAL_USE_TRACE
-    extern const hal_trace_hid_brdcfg_t hal_brdcfg_trace__theconfig =
+    
+    #include "hal_trace_hid.h"
+    
+    extern const hal_trace_boardconfig_t hal_trace__theboardconfig =
     {
         .supported          = hal_true
-    };       
+    }; 
+    
 #endif//HAL_USE_TRACE
   
 
 #ifdef  HAL_USE_UNIQUEID
-    extern const hal_uniqueid_hid_brdcfg_t hal_brdcfg_uniqueid__theconfig =
+    
+    #include "hal_uniqueid_hid.h"
+    
+    extern const hal_uniqueid_boardconfig_t hal_uniqueid__theboardconfig =
     {
-        .supported_mask     = (1 << hal_uniqueid_id64bit) | (0 << hal_uniqueid_macaddr),
+        .supportedmask      = (1 << hal_uniqueid_id64bit) | (0 << hal_uniqueid_macaddr),
         .macoui             = 0
-    };       
+    };  
+    
 #endif//HAL_USE_UNIQUEID
     
 
 #ifdef  HAL_USE_WATCHDOG
-    extern const hal_watchdog_hid_brdcfg_t hal_brdcfg_watchdog__theconfig =
+    
+    #include "hal_watchdog_hid.h" 
+    
+    extern const hal_watchdog_boardconfig_t hal_watchdog__theboardconfig =
     {
-        .supported_mask     = (1 << hal_watchdog1_normal) | (1 << hal_watchdog2_window)
-    };       
+        .supportedmask      = (1 << hal_watchdog1_normal) | (1 << hal_watchdog2_window)
+    };   
+    
 #endif//HAL_USE_WATCHDOG
 
 
 // -- devices
 
 #ifdef  HAL_USE_ACCELEROMETER   
-    
+    #include "hal_accelerometer_hid.h"
     #include "hl_chip_st_lis3x.h"
     
     static const hl_chip_st_lis3x_cfg_t lis3xcfg =
@@ -561,17 +610,30 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
         .range      = hl_chip_st_lis3x_range_2g
     };
     
-    extern const hal_accelerometer_hid_brdcfg_t hal_brdcfg_accelerometer__theconfig =
+    static hal_result_t s_acce_init(int32_t id, void* p)
     {
-        .supported_mask         = (1 << hal_accelerometer1),
-        .devcfg         =
+        return((hal_result_t)hl_chip_st_lis3x_init((const hl_chip_st_lis3x_cfg_t*)p));
+    }
+
+    static hal_result_t s_acce_read(int32_t id, void* x, void* y, void* z)
+    {
+        return((hal_result_t)hl_chip_st_lis3x_accel_get((int32_t*)x, (int32_t*)y, (int32_t*)z));
+    }      
+    
+    extern const hal_accelerometer_boardconfig_t hal_accelerometer__theboardconfig =
+    {
+        .supportedmask      = (1 << hal_accelerometer1),
+        .driver             =
         {
-            {   // hal_accelerometer1
-                .chipif             =      
-                {   // use the lis3x chip by st
-                    .init       = (hal_res_fp_voidp_t)hl_chip_st_lis3x_init,
+            {   // hal_accelerometer1: use the lis3x chip by st
+                .cfg        = 
+                {
                     .initpar    = (void*)&lis3xcfg,
-                    .read       = (hal_accelerometer_hid_fn_read_t)hl_chip_st_lis3x_accel_get  
+                },
+                .fun            =      
+                {   
+                    .init       = s_acce_init,
+                    .read       = s_acce_read  
                 }                    
             }
          }
@@ -580,13 +642,16 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 #endif//HAL_USE_ACCELEROMETER
 
 
+    
 #ifdef  HAL_USE_CANTRANSCEIVER
+    
+    #include "hal_cantransceiver_hid.h" 
     
     static hal_result_t s_hal_cantransceiver_simple_init(hal_cantransceiver_t id, void* initpar);
     static hal_result_t s_hal_cantransceiver_simple_enable(hal_cantransceiver_t id);
     static hal_result_t s_hal_cantransceiver_simple_disable(hal_cantransceiver_t id);
     
-    static const hal_gpio_maP_t s_hal_cantransceiver__gpiomapof_enable[hal_cantransceivers_number] = 
+    static const hal_gpio_map_t s_hal_cantransceiver__gpiomapof_enable[hal_cantransceivers_number] = 
     {
         {   // hal_cantransceiver1 
             .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin14 }, 
@@ -607,7 +672,7 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     static hal_result_t s_hal_cantransceiver_simple_init(hal_cantransceiver_t id, void* initpar)
     {
         initpar = initpar;
-        const hal_gpio_maP_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];        
+        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];        
         const hal_gpio_cfg_t* cfg = &s_hal_cantransceiver__gpiocfgof_enable[(uint8_t)id];   
         hal_gpio_init(map->gpio, cfg);        
         s_hal_cantransceiver_simple_disable(id);     
@@ -618,32 +683,50 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
     static hal_result_t s_hal_cantransceiver_simple_enable(hal_cantransceiver_t id)
     {  
-        const hal_gpio_maP_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];          
+        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];          
         hal_gpio_setval(map->gpio, hal_gpio_valLOW);
         return(hal_res_OK);
     }
 
     static hal_result_t s_hal_cantransceiver_simple_disable(hal_cantransceiver_t id)
     {   
-        const hal_gpio_maP_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];         
+        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];         
         hal_gpio_setval(map->gpio, hal_gpio_valHIGH);
         return(hal_res_OK);
     }
     
-    extern const hal_cantransceiver_hid_brdcfg_t hal_brdcfg_cantransceiver__theconfig =
+    extern const hal_cantransceiver_boardconfig_t hal_cantransceiver__theboardconfig =
     {
-        .supported_mask     =  (1 << hal_cantransceiver1) | (1 << hal_cantransceiver2),
-        .devcfg             =
-        {            
-            .chipif             =
-            {
-                .init               = s_hal_cantransceiver_simple_init,
-                .initpar            = NULL,
-                .enable             = s_hal_cantransceiver_simple_enable,
-                .disable            = s_hal_cantransceiver_simple_disable
-            }
-        }   
-    };    
+        .supportedmask      =  (1 << hal_cantransceiver1) | (1 << hal_cantransceiver2),
+        .driver             =
+        {
+            {   // hal_cantransceiver1            
+                .cfg            =
+                {
+                    .initpar    = NULL
+                },
+                .fun            =
+                {
+                    .init               = (hal_res_fp_int32_voidp_t)s_hal_cantransceiver_simple_init,
+                    .enable             = (hal_res_fp_int32_t)s_hal_cantransceiver_simple_enable,
+                    .disable            = (hal_res_fp_int32_t)s_hal_cantransceiver_simple_disable
+                }
+            },
+            {   // hal_cantransceiver2            
+                .cfg            =
+                {
+                    .initpar    = NULL
+                },
+                .fun            =
+                {
+                    .init               = (hal_res_fp_int32_voidp_t)s_hal_cantransceiver_simple_init,
+                    .enable             = (hal_res_fp_int32_t)s_hal_cantransceiver_simple_enable,
+                    .disable            = (hal_res_fp_int32_t)s_hal_cantransceiver_simple_disable
+                }
+            }             
+        }        
+    }; 
+    
 #endif//HAL_USE_CANTRANSCEIVER     
     
 
@@ -652,6 +735,7 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 #ifdef  HAL_USE_EEPROM
     
+    #include "hal_eeprom_hid.h" 
     #include "hl_chip_xx_eeprom.h"
     
     const hl_chip_xx_eeprom_cfg_t hl_eepromcfg = 
@@ -662,94 +746,98 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
         .wp_val         = hl_gpio_valSET,
         .wp_gpio        = { .port = hl_gpio_portD, .pin = hl_gpio_pin10 }           
     };        
-    static hal_result_t s_chip_xx_eeprom_init(const hl_chip_xx_eeprom_cfg_t * cfg)
+    static hal_result_t s_chip_xx_eeprom_init(int32_t id, const hl_chip_xx_eeprom_cfg_t * cfg)
     {
         return((hal_result_t)hl_chip_xx_eeprom_init(cfg));
     }
-    static hal_result_t s_chip_xx_eeprom_write(uint32_t address, uint32_t size, uint8_t* buffer, uint32_t* writtenbytes)
-    {
-        return((hal_result_t)hl_chip_xx_eeprom_write(address, size, buffer, writtenbytes));        
-    }
-    static hal_result_t s_chip_xx_eeprom_read(uint32_t address, uint32_t size, uint8_t* buffer, uint32_t* writtenbytes)
+    static hal_result_t s_chip_xx_eeprom_read(int32_t id, uint32_t address, uint32_t size, uint8_t* buffer, uint32_t* writtenbytes)
     {
         return((hal_result_t)hl_chip_xx_eeprom_read(address, size, buffer, writtenbytes));        
     }   
+    static hal_result_t s_chip_xx_eeprom_write(int32_t id, uint32_t address, uint32_t size, uint8_t* buffer, uint32_t* writtenbytes)
+    {
+        return((hal_result_t)hl_chip_xx_eeprom_write(address, size, buffer, writtenbytes));        
+    } 
     
-    static const hal_gpio_val_t hal_brdcfg_eeprom__wp_gpio_enableval    = hal_gpio_valHIGH;      // write protection is on value high                          
-    static const hal_gpio_val_t hal_brdcfg_eeprom__wp_gpio_disableval   = hal_gpio_valLOW;       // write protection is on value high
-    
-    static const hal_gpio_maP_t hal_brdcfg_eeprom__gpiomapof_wp  = 
-    {    
-        .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin10 }, 
-        .af32   = hal_NA32
-    };
-    static const hal_gpio_cfg_t hal_brdcfg_eeprom__gpiocfgof_wp =
-    {
-        .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_high,       .altcfg = NULL
-    };
+//     static const hal_gpio_val_t hal_brdcfg_eeprom__wp_gpio_enableval    = hal_gpio_valHIGH;      // write protection is on value high                          
+//     static const hal_gpio_val_t hal_brdcfg_eeprom__wp_gpio_disableval   = hal_gpio_valLOW;       // write protection is on value high
+//     
+//     static const hal_gpio_map_t hal_brdcfg_eeprom__gpiomapof_wp  = 
+//     {    
+//         .gpio   = { .port = hal_gpio_portD,     .pin = hal_gpio_pin10 }, 
+//         .af32   = hal_NA32
+//     };
+//     static const hal_gpio_cfg_t hal_brdcfg_eeprom__gpiocfgof_wp =
+//     {
+//         .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_high,       .altcfg = NULL
+//     };
+//    
+//     static hal_result_t s_hal_brdcfg_eeprom__wp_init(void)
+//     {
+//         const hal_gpio_map_t* map = &hal_brdcfg_eeprom__gpiomapof_wp;
+//         return(hal_gpio_init(map->gpio, &hal_brdcfg_eeprom__gpiocfgof_wp));
+//     }
 
-    
+//     static hal_result_t s_hal_brdcfg_eeprom__wp_enable(void)
+//     {
+//         const hal_gpio_map_t* map = &hal_brdcfg_eeprom__gpiomapof_wp;
+//         return(hal_gpio_setval(map->gpio, hal_brdcfg_eeprom__wp_gpio_enableval));
+//     }
 
-    static hal_result_t s_hal_brdcfg_eeprom__wp_init(void)
-    {
-        const hal_gpio_maP_t* map = &hal_brdcfg_eeprom__gpiomapof_wp;
-        return(hal_gpio_init(map->gpio, &hal_brdcfg_eeprom__gpiocfgof_wp));
-    }
-
-    static hal_result_t s_hal_brdcfg_eeprom__wp_enable(void)
-    {
-        const hal_gpio_maP_t* map = &hal_brdcfg_eeprom__gpiomapof_wp;
-        return(hal_gpio_setval(map->gpio, hal_brdcfg_eeprom__wp_gpio_enableval));
-    }
-
-    static hal_result_t s_hal_brdcfg_eeprom__wp_disable(void)
-    {
-        const hal_gpio_maP_t* map = &hal_brdcfg_eeprom__gpiomapof_wp;
-        return(hal_gpio_setval(map->gpio, hal_brdcfg_eeprom__wp_gpio_disableval));
-    }
+//     static hal_result_t s_hal_brdcfg_eeprom__wp_disable(void)
+//     {
+//         const hal_gpio_map_t* map = &hal_brdcfg_eeprom__gpiomapof_wp;
+//         return(hal_gpio_setval(map->gpio, hal_brdcfg_eeprom__wp_gpio_disableval));
+//     }
    
 
-    extern const hal_eeprom_hid_brdcfg_t hal_brdcfg_eeprom__theconfig =
+    extern const hal_eeprom_boardconfig_t hal_eeprom__theboardconfig =
     {
-        .supported_mask     =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
-        .devcfg             =
+        .supportedmask      =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
+        .driver             =
         {            
             {   // hal_eeprom1_emulatedflash 
-                .flashemul  =
+                .cfg.fls    =
                 {
                     .baseaddress    = 0x08000000,
                     .totalsize      = 0
+                },
+                .fun        =
+                {   // emulated flash does not use user-defined functions
+                    .init           = NULL, 
+                    .read           = NULL,
+                    .write          = NULL                    
                 }
             },
             {   // hal_eeprom2_i2c_01
-                .i2cbased   =
+                .cfg.i2c    =
                 {
                     .baseaddress    = 0,
                     .totalsize      = 8*1024,
                     .i2cid          = hal_i2c1,
-                    .chipif         =
-                    {   // use the chip xx_eeprom
-                        .init           = (hal_res_fp_voidp_t)s_chip_xx_eeprom_init, //(hal_res_fp_voidp_t)hal_chip_xx_eeprom_init,
-                        .initpar        = (void*)&hl_eepromcfg, //(void*)&s_initpar_eeprom_i2c_01,
-                        .read           = s_chip_xx_eeprom_read, //hal_chip_xx_eeprom_read,
-                        .write          = s_chip_xx_eeprom_write, //hal_chip_xx_eeprom_write                               
-                    }                    
-                }           
+                    .initpar        = (void*)&hl_eepromcfg
+                },
+                .fun        =
+                {   // use the chip xx_eeprom
+                    .init           = (hal_res_fp_int32_voidp_t)s_chip_xx_eeprom_init,
+                    .read           = (hal_res_fp_int32_uint32_uint32_voidp_voidp_t)s_chip_xx_eeprom_read, 
+                    .write          = (hal_res_fp_int32_uint32_uint32_voidp_voidp_t)s_chip_xx_eeprom_write,                             
+                }                              
             },
             {   // hal_eeprom3_i2c_02
-                .i2cbased   =
+                .cfg.i2c    =
                 {
                     .baseaddress    = 0,
                     .totalsize      = 0,
                     .i2cid          = hal_i2c1,
-                    .chipif         =
-                    {   // dont use any chip
-                        .init           = NULL,
-                        .initpar        = NULL,
-                        .read           = NULL,
-                        .write          = NULL                               
-                    }                    
-                }           
+                    .initpar        = NULL
+                },
+                .fun        =
+                {   // use ... nothing
+                    .init           = NULL,
+                    .read           = NULL, 
+                    .write          = NULL,                             
+                }
             }                
         }
     
@@ -758,10 +846,12 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 
 #ifdef HAL_USE_ENCODER
+    
+    #include "hal_encoder_hid.h"
 
-    extern const hal_encoder_hid_brdcfg_t hal_brdcfg_encoder__theconfig =
+    extern const hal_encoder_boardconfig_t hal_encoder__theboardconfig =
     {
-        .supported_mask             = (1 << hal_encoder1) | (1 << hal_encoder2) | (1 << hal_encoder3) | (1 << hal_encoder4) | (1 << hal_encoder5) | (1 << hal_encoder6), 
+        .supportedmask              = (1 << hal_encoder1) | (1 << hal_encoder2) | (1 << hal_encoder3) | (1 << hal_encoder4) | (1 << hal_encoder5) | (1 << hal_encoder6), 
         .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
         .spimap                     =
         {
@@ -786,36 +876,43 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
         }
 
     };
+    
 #endif//HAL_USE_ENCODER  
   
   
 
 #ifdef  HAL_USE_ETHTRANSCEIVER
     
+    #include "hal_ethtransceiver_hid.h" 
+    
     
 #if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)      
-        
-       
-    //extern const hal_chip_micrel_ks8893_cfg_t s_micrel_ks8893_cfg;
-    extern const hal_ethtransceiver_hid_brdcfg_t hal_brdcfg_ethtransceiver__theconfig =
+            
+    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
     {
-        .supported      = hal_true,
-        .devcfg         =
+        .supportedmask          = (1 << hal_ethtransceiver1),
+        .driver                 =
         {
-            .numofphysicals     = 2,
-            .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,
-            .chipif             =
-            {   // use the micrel 
-                .init           = s_switch_micrel_init,
-                .initpar        = (void*)&ks8893_config,
-                .config         = s_switch_micrel_configure, 
-                .getphymode     = (hal_res_fp_voidp_t)hl_chip_micrel_ks8893_mii_getphymode,                
-                .phylinkupmask  = (hal_res_fp_voidp_t)hl_chip_micrel_ks8893_linkupmask,
-                .phystatus      = (hal_res_fp_voidp_uint8_t)hl_chip_micrel_ks8893_phy_status,
-                .phyerrorinfo   = (hal_res_fp_uint8_uint32_voidp_t)hl_chip_micrel_ks8893_phy_errorinfo
-            }
-         }
-    }; 
+            {   // hal_ethtransceiver1
+                .cfg    =
+                {
+                    .numofphysicals     = 2,
+                    .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,  
+                    .initpar            = (void*)&ks8893_config,                    
+                },
+                .fun    =
+                {
+                    .init           = s_switch_micrel_init,
+                    .start          = s_switch_micrel_start, 
+                    .getmiiphymode  = s_switch_micrel_getmiiphymode,                
+                    .phylinkupmask  = s_switch_micrel_getlinkupmask,
+                    .phystatus      = s_switch_micrel_getphystatus,
+                    .phyerrorinfo   = s_switch_micrel_getphyerrorinfo                    
+                }  
+            } 
+        }
+    };
+    
 
 #else
 
@@ -830,26 +927,34 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     static hal_result_t s_switch_dummy_phy_errorinfo(uint8_t num, uint32_t e, void* p)
     {
         return(hal_res_NOK_generic);        
-    }        
-    extern const hal_ethtransceiver_hid_brdcfg_t hal_brdcfg_ethtransceiver__theconfig =
+    } 
+
+
+    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
     {
-        .supported      = hal_true,
-        .devcfg         =
+        .supportedmask          = (1 << hal_ethtransceiver1),
+        .driver                 =
         {
-            .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,
-            .chipif             =
-            {   // use the micrel 
-                .init           = s_switch_dummy_init,
-                .initpar        = NULL,
-                .config         = s_switch_dummy_configure, 
-                .getphymode     = s_switch_dummy_getphymode,
-                .phylinkupmask  = s_switch_dummy_linkupmask,
-                .phystatus      = s_switch_dummy_phy_status,
-                .phyerrorinfo   = s_switch_dummy_phy_errorinfo                
-            }
-         }
-    }; 
-    
+            {   // hal_ethtransceiver1
+                .cfg    =
+                {
+                    .numofphysicals     = 2,
+                    .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,  
+                    .initpar            = NULL,                    
+                },
+                .fun    =
+                {
+                    .init           = s_switch_dummy_init,
+                    .start          = s_switch_dummy_start, 
+                    .getmiiphymode  = s_switch_dummy_getmiiphymode,                
+                    .phylinkupmask  = s_switch_dummy_getlinkupmask,
+                    .phystatus      = s_switch_dummy_getphystatus,
+                    .phyerrorinfo   = s_switch_dummy_getphyerrorinfo                    
+                }  
+            } 
+        }
+    };
+        
 #endif
     
 #endif//HAL_USE_ETHTRANSCEIVER
@@ -857,33 +962,55 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef  HAL_USE_GYROSCOPE   
     
-    extern const hal_gyroscope_hid_brdcfg_t hal_brdcfg_gyroscope__theconfig =
+    #include "hal_gyroscope_hid.h"
+    #include "hl_chip_st_l3g4200d.h"
+       
+    static hal_result_t s_gyro_init(int32_t id, void* p)
     {
-        .supported_mask         = (1 << hal_gyroscope1),
-        .devcfg         =
-        {
+        return((hal_result_t)hl_chip_st_l3g4200d_init((const hl_chip_st_l3g4200d_cfg_t*)p));
+    }
+
+    static hal_result_t s_gyro_read(int32_t id, void* x, void* y, void* z)
+    {
+        return((hal_result_t)hl_chip_st_l3g4200d_angrate_get((int32_t*)x, (int32_t*)y, (int32_t*)z));
+    }    
+    
+    extern const hal_gyroscope_boardconfig_t hal_gyroscope__theboardconfig =
+    {
+        .supportedmask          = (1 << hal_gyroscope1),
+        .driver                 =
+        {   
             {   // hal_gyroscope1
-                .chipif             =      
-                {   // use the l3g4200d chip by st
-                    .init       = (hal_res_fp_voidp_t)hl_chip_st_l3g4200d_init,
-                    .initpar    = (void*)&l3g4200dcfg,
-                    .read       = (hal_gyroscope_hid_fn_read_t)hl_chip_st_l3g4200d_angrate_get
-                }                    
+                .cfg    =
+                {
+                    .initpar    = (void*)&l3g4200dcfg                    
+                },
+                .fun    =
+                {
+                    .init       = s_gyro_init,
+                    .read       = s_gyro_read                    
+                }
             }
-         }
-    }; 
+        }
+    };
+
     
 #endif//HAL_USE_GYROSCOPE
  
 
 #ifdef HAL_USE_LED
     
-    extern const hal_led_hid_brdcfg_t hal_brdcfg_led__theconfig =
+    #include "hal_led_hid.h"
+    
+    extern const hal_led_boardconfig_t hal_led__theboardconfig =
     {
-        .supported_mask             = (1 << hal_led0) | (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) | (1 << hal_led4) | (1 << hal_led5), // = 0x3F: only first 6 leds ...
-        .value_on                   = hal_gpio_valLOW,
-        .value_off                  = hal_gpio_valHIGH,
-        .gpiomap                    =
+        .supportedmask      = (1 << hal_led0) | (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) | (1 << hal_led4) | (1 << hal_led5), // = 0x3F: only first 6 leds ...
+        .boardcommon        =
+        {
+            .value_on       = hal_gpio_valLOW,
+            .value_off      = hal_gpio_valHIGH
+        },    
+        .gpiomap            =
         {
             {   // hal_led0 
                 .led    = 
@@ -950,10 +1077,12 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef HAL_USE_MUX
     
-    extern const hal_mux_hid_brdcfg_t hal_brdcfg_mux__theconfig =
+    #include "hal_mux_hid.h"
+    
+    extern const hal_mux_boardconfig_t hal_mux__theboardconfig =
     {
-        .supported_mask             = (0 << hal_mux1) | (1 << hal_mux2) | (1 << hal_mux3) | (0 << hal_mux4), 
-        .gpiomap                    =
+        .supportedmask      = (0 << hal_mux1) | (1 << hal_mux2) | (1 << hal_mux3) | (0 << hal_mux4), 
+        .gpiomap            =
         {
             {   // hal_mux1   
                 .gpio_sel0              =                
@@ -1032,44 +1161,68 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef HAL_USE_SWITCH
     
+    #include "hal_switch_hid.h" 
+    
 
 #if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)   
 
     #include "hl_chip_micrel_ks8893.h"
     
 
-    extern const hal_switch_hid_brdcfg_t hal_brdcfg_switch__theconfig =
+    extern const hal_switch_boardconfig_t hal_switch__theboardconfig =
     {
-        .supported      = hal_true,
-        .devcfg         =
+        .supportedmask      = (1 << hal_switch1),
+        .driver                 =
         {
-            .targetphymode  = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,
-            .chipif         =
-            {
-                .init       = s_switch_micrel_init,
-                .initpar    = (void*)&ks8893_config,
-                .config     = s_switch_micrel_configure,          
-            }
-        }
+            {   // hal_switch1
+                .cfg    =
+                {
+                    .numofphysicals     = 2,
+                    .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,  
+                    .initpar            = (void*)&ks8893_config,                    
+                },
+                .fun    =
+                {
+                    .init           = s_switch_micrel_init,
+                    .start          = s_switch_micrel_start//, 
+ //                     .getmiiphymode  = s_switch_micrel_getmiiphymode,                
+//                     .phylinkupmask  = s_switch_micrel_getlinkupmask,
+//                     .phystatus      = s_switch_micrel_getphystatus,
+//                     .phyerrorinfo   = s_switch_micrel_getphyerrorinfo                 
+                }  
+            } 
+        }         
     };
-       
-    
+            
+   
 #else
     
-    extern const hal_switch_hid_brdcfg_t hal_brdcfg_switch__theconfig =
+    extern const hal_switch_boardconfig_t hal_switch__theboardconfig =
     {
-        .supported      = hal_true,
-        .devcfg         =
+        .supportedmask      = (1 << hal_switch1),
+        .driver                 =
         {
-            .targetphymode  = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,
-            .chipif         =
-            {
-                .init       = s_switch_dummy_init,
-                .initpar    = NULL,
-                .config     = s_switch_dummy_configure,          
-            }
-        }
-    };
+            {   // hal_switch1
+                .cfg    =
+                {
+                    .numofphysicals     = 2,
+                    .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,  
+                    .initpar            = NULL,                    
+                },
+                .fun    =
+                {
+                    .init           = s_switch_dummy_init,
+                    .start          = s_switch_dummy_start//, 
+//                     .getmiiphymode  = s_switch_dummy_getmiiphymode,                
+//                     .phylinkupmask  = s_switch_dummy_getlinkupmask,
+//                     .phystatus      = s_switch_dummy_getphystatus,
+//                     .phyerrorinfo   = s_switch_dummy_getphyerrorinfo  
+                 
+                }  
+            } 
+        }         
+    };    
+    
     
 #endif    
 
@@ -1079,22 +1232,40 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
     
 #ifdef  HAL_USE_TERMOMETER 
     
-    extern const hal_termometer_hid_brdcfg_t hal_brdcfg_termometer__theconfig =
+    #include "hal_termometer_hid.h" 
+    
+    #include "hl_chip_st_l3g4200d.h"
+       
+    static hal_result_t s_term_init(int32_t id, void* p)
     {
-        .supported_mask         = (1 << hal_termometer1),
-        .devcfg         =
+        return((hal_result_t)hl_chip_st_l3g4200d_init((const hl_chip_st_l3g4200d_cfg_t*)p));
+    }
+
+    static hal_result_t s_term_read(int32_t id, void* t)
+    {
+        return((hal_result_t)hl_chip_st_l3g4200d_temp_get((int8_t*)t));
+    }        
+        
+    extern const hal_termometer_boardconfig_t hal_termometer__theboardconfig =
+    {
+        .supportedmask      = (1 << hal_termometer1),
+        .driver             =
         {
-            {   // hal_termometer1
-                .chipif             =      
-                {   // use the l3g4200d chip by st
-                    .init       = (hal_res_fp_voidp_t)hl_chip_st_l3g4200d_init,
+            {   // hal_termometer1: use the l3g4200d chip by st (the same as the gyro)
+                .cfg    =
+                {
                     .initpar    = (void*)&l3g4200dcfg,
-                    .read       = (hal_termometer_hid_fn_read_t)hl_chip_st_l3g4200d_temp_get
+                },    
+                {   // use the l3g4200d chip by st
+                    .init       = s_term_init,
+                    .read       = s_term_read
                 }                    
             }
-         }
-    }; 
+
+        }        
+    };
     
+   
 #endif//HAL_USE_TERMOMETER
     
 
@@ -1187,7 +1358,7 @@ extern void hl_system_stm32fx_before_setsysclock(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static const hal_gpio_maP_t s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap = 
+static const hal_gpio_map_t s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap = 
 {
     .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin1 }, 
     .af32   = hal_NA32      

@@ -30,7 +30,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -46,30 +46,32 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef hal_result_t (*hal_gyroscope_hid_fn_read_t) (int32_t*, int32_t*, int32_t*);
+typedef struct
+{
+    void*                                   initpar; 
+} hal_gyroscope_driver_cfg_t;
 
 typedef struct
 {   
-    hal_res_fp_voidp_t                          init;       // init(initpar)
-    void*                                       initpar;
-    hal_gyroscope_hid_fn_read_t                 read;       // read(angratex, angratey, angratez)
-} hal_gyroscope_hid_chip_interface_t;
-
+    hal_res_fp_int32_voidp_t                init;   // init(id, void* initpar)
+    hal_res_fp_int32_voidp_voidp_voidp_t    read;   // read(id, int32_t* angratex, int32_t* angratey, int32_t* angratez)
+} hal_gyroscope_driver_fun_t;
 
 typedef struct
-{   
-    hal_gyroscope_hid_chip_interface_t          chipif;
-} hal_gyroscope_hid_dev_cfg_t;
+{ 
+    hal_gyroscope_driver_cfg_t              cfg;    
+    hal_gyroscope_driver_fun_t              fun;
+} hal_gyroscope_driver_t;   
 
 typedef struct
 {
-    uint8_t                                     supported_mask;
-    hal_gyroscope_hid_dev_cfg_t                 devcfg[hal_gyroscopes_number];
-} hal_gyroscope_hid_brdcfg_t;
+    uint32_t                                supportedmask;
+    hal_gyroscope_driver_t                  driver[hal_gyroscopes_number];
+} hal_gyroscope_boardconfig_t;
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_gyroscope_hid_brdcfg_t hal_brdcfg_gyroscope__theconfig;
+extern const hal_gyroscope_boardconfig_t hal_gyroscope__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
