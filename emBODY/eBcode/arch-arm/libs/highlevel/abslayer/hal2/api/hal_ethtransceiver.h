@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -138,13 +138,14 @@ extern const hal_ethtransceiver_cfg_t hal_ethtransceiver_cfg_default;   // = { .
     @brief  	This function initializes the ethtransceiver attached to the MPU
     @param  	cfg 	        The configuration of the ethtransceiver. It can be NULL.
     @return 	hal_res_NOK_generic in case the ethtransceiver cannot be configured, else hal_res_OK
-    @warning    The initialisation may temporarily stop the ethtransceiver, thus multiple calls to this function
-                should be avoided as they can corrupt network traffic.
+    @warning    the transceiver can be initted only once. The second call of hal_ethtransceiver_init(cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the device is not initted as wanted.
   */
 extern hal_result_t hal_ethtransceiver_init(const hal_ethtransceiver_cfg_t *cfg);
 
 
-extern hal_result_t hal_ethtransceiver_config(hal_ethtransceiver_phymode_t *usedmiiphymode);
+extern hal_result_t hal_ethtransceiver_start(hal_ethtransceiver_phymode_t *usedmiiphymode);
 
 
 /** @fn			extern hal_bool_t hal_ethtransceiver_initted_is(void)

@@ -25,13 +25,13 @@
 
 /** @file       hal_i2c.h
     @brief      This header file implements interface to a generic hal i2c module
-    @author     marco.accame@iit.it, valentina.gagegro@iit.it
+    @author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       10/23/2012
 **/
 
 /** @defgroup doxy_group_hal_i2c HAL I2C
 
-    The HAL I2C is a high level module whcih manages i2c communication
+    The HAL I2C is a high level module which manages i2c communication
  
     @todo acemor-facenda: review documentation.
     
@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -65,6 +65,9 @@ typedef enum
 enum { hal_i2cs_number = 3 };
 
 
+/** @typedef    typedef enum hal_i2c_speed_t 
+    @brief      contains the possible i2c speeds.
+ **/
 typedef enum
 {
     hal_i2c_speed_100kbps       = 1,
@@ -73,37 +76,46 @@ typedef enum
 } hal_i2c_speed_t;
 
 
+/** @typedef    typedef enum hal_i2c_mode_t 
+    @brief      contains the possible i2c modes: master or slave.
+ **/
 typedef enum
 {
-    hal_i2c_mode_master         = 0,
-    hal_i2c_mode_slave          = 1     // not supported yet
+    hal_i2c_mode_master         = 0,    /**< master mode */
+    hal_i2c_mode_slave          = 1     /**< slave mode: not supported yet */
 } hal_i2c_mode_t;
 
 
+
+/** @typedef    typedef hal_i2c_regaddr_t hal_i2c_regaddr_t 
+    @brief      specifies the address of a register with one, two, or three bytes.
+ **/
 typedef struct 
 {
-    uint8_t     numofbytes;         // only 1, 2, 3
+    uint8_t     numofbytes;         /**< tells how many are the bytes used for addressing the register: only 1, 2, or 3 */
     union
     {
         uint8_t     three[3];
         uint16_t    two;
         uint8_t     one;
-    } bytes;
+    } bytes;                        /**< the address of the register */
 } hal_i2c_regaddr_t;
 
+
+/** @typedef    typedef uint8_t hal_i2c_devaddr_t
+    @brief      specifies the address of a device.
+ **/
 typedef uint8_t hal_i2c_devaddr_t;
 
 
 /** @typedef    typedef enum hal_i2c_cfg_t 
     @brief      hal_i2c_cfg_t contains the configuration for i2c.
-                there are some hw configuration which are hidden: dutycycle mode is tlow/thigh = 2, the ack is enabled.
-                if slave mode (not supported yet) the ack address is 7 bit.
  **/
 typedef struct
 {
-    hal_i2c_mode_t          mode;
-    hal_i2c_speed_t         speed;  
-    hal_i2c_devaddr_t       ownaddress; // used only if slave mode
+    hal_i2c_mode_t          mode;       /**< the mode: master or slave */
+    hal_i2c_speed_t         speed;      /**< the speed */
+    hal_i2c_devaddr_t       ownaddress; /**< used only if slave mode. use 0 for master mode */
 } hal_i2c_cfg_t;
 
  
@@ -120,6 +132,8 @@ extern const hal_i2c_cfg_t hal_i2c_cfg_default; // = { .mode = hal_i2c_mode_mast
     @param  	id              the id of i2c
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
+    @warning    a given I2C id can be configured only once. The second call of hal_i2c_init() will just return hal_res_OK 
+                but will do nothing, even if the cfg is different.
   */
 extern hal_result_t hal_i2c_init(hal_i2c_t id, const hal_i2c_cfg_t *cfg);
 
@@ -144,7 +158,6 @@ extern hal_result_t hal_i2c_ping(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 /** @fn			extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
     @brief  	this function is a typical reading transaction, where the master wants to read @e size bytes from the register @e regaddr of the device with
                 address @e devaddr.
-    @details    this function can be sustituted with some transaction calls. See internals for details.    
     @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @param  	regaddr 	    the address of register
@@ -158,7 +171,6 @@ extern hal_result_t hal_i2c_read(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2
 /** @fn			extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
     @brief  	this function is a typical writing transaction, where the master wants to write @e size bytes inside the register @e regaddr of the device with
                 address @e devaddr.
-    @details    this function can be sustituted with some transaction calls. See internals for details.    
     @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @param  	regaddr 	    the address of register
@@ -170,8 +182,8 @@ extern hal_result_t hal_i2c_write(hal_i2c_t id, hal_i2c_devaddr_t devaddr, hal_i
 
 
 /** @fn			extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr)
-    @brief  	this function is used to put in standby a device after it has sent data to teh master. Basically, it sends a START followed by the address of the
-                device. Then it waits an ACK or NACK from it. It repeats this cycle until an ACK is received. This function is specific for EEPROM use.
+    @brief  	this function is used to put in standby a device after it has sent data to the master. Basically, it sends a START followed by the address of the
+                device. Then it waits an ACK or NACK from it. It repeats this cycle until an ACK is received.
     @param  	id              the id of i2c
     @param  	devaddr 	    the address of the device
     @return 	hal_res_NOK_generic on error else hal_res_OK

@@ -31,7 +31,7 @@
 
 /** @defgroup doxy_group_hal_gyroscope HAL GYROSCOPE
 
-    The HAL veth5 is a high level module whcih manages a angular rate sensor
+    The HAL veth5 is a high level module which manages a angular rate sensor
  
     @todo acemor-facenda: review documentation.
     
@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -96,6 +96,9 @@ extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default; // = { .dummy = 0 };
     @param  	sensor	        the sensor
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
+    @warning    a given gyroscope can be initted only once. The second call of hal_gyroscope_init(id, cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the device is not initted as wanted.
   */
 extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg);
 

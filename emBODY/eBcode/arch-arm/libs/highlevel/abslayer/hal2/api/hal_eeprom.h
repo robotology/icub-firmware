@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -73,7 +73,6 @@ typedef struct
     void*       flashpagebuffer;    /**< In case of hal_eeprom_emulatedflash, it keeps a buffer for the FLASH page */
     uint32_t    flashpagesize;      /**< In case of hal_eeprom_emulatedflash, it keeps the size of the flashpagebuffer */
 } hal_eeprom_cfg_t;
-
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
@@ -113,7 +112,7 @@ extern hal_result_t hal_eeprom_read(hal_eeprom_t id, uint32_t addr, uint32_t siz
     @return     hal_res_NOK_generic in case data is NULL or size is zero or page buffer is not big enough; 
                 else hal_res_OK.
     @warning    In case of hal_eeprom_emulatedflash, if the addresses in [addr, addr+size) are in pages
-                with size bigger than teh dimension of the buffer passed in hal_eeprom_int(), then an error
+                with size bigger than the dimension of the buffer passed in hal_eeprom_int(), then an error
                 is returned and the write operation is not done completely or is done in an incomplete way.
   */
 extern hal_result_t hal_eeprom_write(hal_eeprom_t id, uint32_t addr, uint32_t size, void *data);

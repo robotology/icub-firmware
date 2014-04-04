@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -102,6 +102,7 @@ typedef enum
 
 enum { hal_gpio_pins_number = 16 };
 
+
 /** @typedef    typedef struct hal_gpio_t 
     @brief      hal_gpio_t specifies a pair port-pin whcih identifies a gpio.
  **/    
@@ -111,21 +112,23 @@ typedef struct
     hal_gpio_pin_t      pin;    
 } hal_gpio_t;   
 
+
 /** @typedef    typedef enum hal_gpio_speed_t 
     @brief      hal_gpio_val_t contains speed values that an output pin can have. The values used inside HAL
                 depend on the micro. Typical values for a stm32f1xx micro are 2Mhz, 10MHz and 50Mhz respectively.
  **/
 typedef enum
 { 
-    hal_gpio_speed_default  = 0,        /**< in case we dont care about driving clock of the gpio */
-    hal_gpio_speed_low      = 1,        /**< use a driving clock with low speed */
-    hal_gpio_speed_medium   = 2,        /**< use a driving clock with medium speed */
-    hal_gpio_speed_high     = 3,        /**< use a driving clock with fast speed */
-    hal_gpio_speed_max      = 4,        /**< use a driving clock with maximum speed */
+    hal_gpio_speed_default  = 0,        /**< in case we don't care about the clock of the gpio */
+    hal_gpio_speed_low      = 1,        /**< use a clock with low speed */
+    hal_gpio_speed_medium   = 2,        /**< use a clock with medium speed */
+    hal_gpio_speed_high     = 3,        /**< use a clock with fast speed */
+    hal_gpio_speed_max      = 4,        /**< use a clock with maximum speed */
     hal_gpio_speed_NONE     = hal_NA08  /**< use when no speed can be specified. it does not count in hal_gpio_speeds_number */
 } hal_gpio_speed_t;
 
 enum { hal_gpio_speeds_number = 5 };
+
 
 /** @typedef    typedef enum hal_gpio_dir_t 
     @brief      hal_gpio_dir_t contains all possible directions that a silicon pin can have.
@@ -139,6 +142,7 @@ typedef enum
 } hal_gpio_dir_t;
 
 enum { hal_gpio_dirs_number = 3 };
+ 
  
 /** @typedef    typedef enum hal_gpio_val_t 
     @brief      hal_gpio_val_t contains the values that a silicon pin can have.
@@ -157,9 +161,9 @@ typedef enum
  **/
 typedef struct 
 {
-    hal_gpio_dir_t      dir;
-    hal_gpio_speed_t    speed;
-    void*               altcfg;
+    hal_gpio_dir_t      dir;        /**< the direction */
+    hal_gpio_speed_t    speed;      /**< the speed */
+    void*               altcfg;     /**< if .dir is hal_gpio_dirALT, then this field is internally used to tailor the gpio init. not supported yet */
 } hal_gpio_cfg_t;
 
 
@@ -170,13 +174,15 @@ typedef struct
  **/
 typedef struct 
 {
-    hal_gpio_t          gpio;
-    uint32_t            af32;
-} hal_gpio_maP_t;
+    hal_gpio_t          gpio;   /**< the port and pin */
+    uint32_t            af32;   /**< the alternate function to use. Use hal_NA32 if no alternate function is used, 
+                                     otherwise use the AF value of the chosen MPU.  For instance, for the definition of I2C's
+                                     SCL gpio in STM32F407 use: GPIO_AF_I2C1. */
+} hal_gpio_map_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_gpio_cfg_t hal_gpio_cfg_default; // = {.dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low};
+extern const hal_gpio_cfg_t hal_gpio_cfg_default; // = {.dir = hal_gpio_dirOUT, .speed = hal_gpio_speed_low, .altcfg = NULL };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -190,6 +196,7 @@ extern const hal_gpio_cfg_t hal_gpio_cfg_default; // = {.dir = hal_gpio_dirOUT, 
     @param      gpio            The gpio. 
     @param      cfg             The cfg. 
     @return     If successful hal_res_OK
+    @warning    a gpio can be initted multiple times with different configurations.
  **/
 extern hal_result_t hal_gpio_init(hal_gpio_t gpio, const hal_gpio_cfg_t* cfg);
 
@@ -210,19 +217,6 @@ extern hal_result_t hal_gpio_setval(hal_gpio_t gpio, hal_gpio_val_t val);
     @return     The value.
  **/
 extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio);
-
-
-// /** @fn         extern void hal_gpio_quickest_setval(hal_gpio_t gpio hal_gpio_val_t val)
-//     @brief      Sets the value of the given pin in the given port in the quickest possible mode. To pursue speed,
-//                 all safety checks which are available in hal_gpio_setval are here removed. Thus, pay particular
-//                 attention to manipulate gpios already initted as output. And never and never use hal_gpio_portNONE
-//                 or hal_gpio_pinNONE otherwise a SW crash is inevitable. needless to say don't ever use hal_gpio_valNONE. 
-//                 On STM32F107 @ 72MHz, the execution time is around 1 usec vs. about 1.7 usec of hal_gpio_setval().
-//                 On STM32F407 @ 168MHz, the execution time is around 0.2 usec vs. about 0.4 usec of hal_gpio_setval().
-//     @param      gpio            The gpio. 
-//     @param      value           The target value.
-//  **/
-// extern void hal_gpio_quickest_setval(hal_gpio_t gpio, hal_gpio_val_t val);
 
 
 

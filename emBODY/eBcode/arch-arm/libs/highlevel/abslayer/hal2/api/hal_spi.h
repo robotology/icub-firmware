@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -159,8 +159,11 @@ extern uint32_t hal_spi_speedofbus_get(hal_spi_t id);
 /** @fn			extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     @brief  	this function initializes an spi id
     @param  	id	        the id
-    @param  	cfg 	        pointer to configuration data
+    @param  	cfg 	    the configuration
     @return 	hal_res_OK or hal_res_NOK_generic on failure
+    @warning    a given SPI id can be configured only once. The second call of hal_spi_init(cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the CAN is not initted as wanted.    
   */
 extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg);
 

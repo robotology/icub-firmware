@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -94,17 +94,19 @@ extern const hal_watchdog_cfg_t hal_watchdog_cfg_default; //= { .countdown = 200
                                 The normal watchdog has a countdown range from 10 msec upto 10 seconds.
                                 The window watchdog has a countdown range from 5 ms upto 50 ms. The callback function has 
                                 up to 800 usec to be executed.
-    @return 	hal_res_NOK_generic in case the watchdog cannot be configured, hal_res_NOK_unsupported if it is not
+    @return 	hal_res_NOK_generic in case the watchdog cannot be initted, hal_res_NOK_unsupported if it is not
                 supported, hal_res_OK if successful
+    @warning    a given watchdog can be initted multiple times until it is started. After it has started it cannot be initted 
+                anymore and an attempt to init it will give a hal_res_NOK_generic.
   */
 extern hal_result_t hal_watchdog_init(hal_watchdog_t id, const hal_watchdog_cfg_t *cfg);
 
 
 /**
     @fn         extern hal_result_t hal_watchdog_start(hal_watchdog_t id)
-    @brief      starts the watchdog @e watchdog
+    @brief      starts the watchdog @e watchdog if it was already initted. if it was already started, the watchdog is refreshed.
     @param      id        The watchdog to start. It must be initted before.
-    @return     hal_res_NOK_generic in case the watchdog wasn't configured, else hal_res_OK
+    @return     hal_res_NOK_generic in case the watchdog wasn't initted, else hal_res_OK
  **/
 extern hal_result_t hal_watchdog_start(hal_watchdog_t id);
 
@@ -112,8 +114,8 @@ extern hal_result_t hal_watchdog_start(hal_watchdog_t id);
 /**
     @fn         extern hal_result_t hal_watchdog_refresh(hal_watchdog_t id)
     @brief      refreshes the watchdog @e watchdog
-    @param      id        The watchdog to start. It must be initted before.
-    @return     hal_res_NOK_generic in case the watchdog wasn't configured, else hal_res_OK
+    @param      id        The watchdog to refresh. It must be initted and started.
+    @return     hal_res_NOK_generic in case the watchdog wasn't initted or started, else hal_res_OK
  **/
 extern hal_result_t hal_watchdog_refresh(hal_watchdog_t id);
 

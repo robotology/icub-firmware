@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -139,7 +139,10 @@ enum { hal_eths_number = 1 };
                 the hal_initialise() function. If @e onrx is NULL or if anything goes wrong, 
                 the function calls hal_on_fatalerror() with proper error code.
     @param      cfg         Contains the eth configuration.
-    @warning    It is generally used by a TCP-IP stack.
+    @return     hal_res_OK only on success.
+    @warning    the ETH can be configured only once. The second call of hal_eth_init(cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the ETH is not initted as wanted.
  **/
 extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg);
 

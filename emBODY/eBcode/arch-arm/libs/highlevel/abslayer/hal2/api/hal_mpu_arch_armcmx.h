@@ -41,12 +41,12 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-//#warning --> maybe change it 
+// empty-section
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "stdint.h"
+#include "hal_common.h"
+
 #include "hal_mpu.h"
 
 

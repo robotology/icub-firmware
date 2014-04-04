@@ -40,7 +40,8 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "hal_base.h"
+
+#include "hal_common.h"
 #include "hal_ethtransceiver.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -48,6 +49,17 @@
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
+
+/** @typedef    typedef enum hal_switch_t 
+    @brief      contains ids of every possible eth switch.
+ **/ 
+typedef enum  
+{ 
+    hal_switch1         = 0             /**< the only one */
+} hal_switch_t;
+
+enum { hal_switches_number = 1 };
 
 
 /** @typedef    typedef struct hal_switch_cfg_t;
@@ -67,16 +79,19 @@ extern const hal_switch_cfg_t hal_switch_cfg_default;   // = { .dummy = 0};
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 /** @fn			extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg)
-    @brief  	This function initializes the switch attached to the MPU
+    @brief  	This function initializes the switch.
     @param  	cfg 	        The configuration of the switch. It can be NULL.
     @return 	hal_res_NOK_generic in case the switch cannot be configured, else hal_res_OK
-    @warning    The initialisation may temporarily stop the switch, thus multiple calls to this function
-                should be avoided as they can corrupt network traffic.
   */
 extern hal_result_t hal_switch_init(const hal_switch_cfg_t *cfg);
 
 
-extern hal_result_t hal_switch_configure(hal_ethtransceiver_phymode_t *usedmiiphymode);
+/** @fn			extern hal_result_t hal_switch_start(hal_ethtransceiver_phymode_t *usedmiiphymode)
+    @brief  	This function starts the switch 
+    @param  	usedmiiphymode      The used phy mode of the rmii
+    @return 	hal_res_NOK_generic in case the switch cannot be configured, else hal_res_OK
+  */
+extern hal_result_t hal_switch_start(hal_ethtransceiver_phymode_t *usedmiiphymode);
 
 
 /** @fn			extern hal_bool_t hal_switch_initted_is(void)
@@ -85,6 +100,12 @@ extern hal_result_t hal_switch_configure(hal_ethtransceiver_phymode_t *usedmiiph
   */
 extern hal_bool_t hal_switch_initted_is(void);
 
+
+/** @fn			extern hal_bool_t hal_switch_started_is(void)
+    @brief  	This function tells if the switch is already started.
+    @return 	hal_true or hal_false.
+  */
+extern hal_bool_t hal_switch_started_is(void);
 
 /** @}            
     end of group doxy_group_hal_switch  

@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -63,7 +63,7 @@ typedef enum
 enum { hal_termometers_number = 1 };
 
 
-/** @typedef    typedef int8_t hal_termometer_degrees_t 
+/** @typedef    typedef int16_t hal_termometer_degrees_t 
     @brief      expresses temperature in celsius degrees with range [-128, +127] and 1 degree resolution.
  **/
 typedef int16_t hal_termometer_degrees_t;
@@ -91,6 +91,9 @@ extern const hal_termometer_cfg_t hal_termometer_cfg_default; // = { .dummy = 0 
     @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
+    @warning    a given termometer can be initted only once. The second call of hal_termometer_init(id, cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the device is not initted as wanted.
   */
 extern hal_result_t hal_termometer_init(hal_termometer_t id, const hal_termometer_cfg_t *cfg);
 

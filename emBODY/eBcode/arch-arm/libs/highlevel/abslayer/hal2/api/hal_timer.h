@@ -51,7 +51,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -151,23 +151,24 @@ typedef struct
 /** @fn			extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error)
     @brief  	This function initializes a timer. It can be called more times. If called on a running timer, it
                 stops it first. If priority field of @e cfg has value different from hal_int_priorityNONE,
-                the function enable timer's ISR which is responsible of calling the associated callback function.
-                In case the prescaler field is set to hal_timer_prescalerAUTO, the internal counter is set in order to
-                satisfy the precisione required by the specified countdown. More accuracy means lower range. 
+                the function enables timer's ISR which is responsible of calling the associated callback function.
+                In case the prescaler field is hal_timer_prescalerAUTO, the internal counter is set in order to
+                satisfy the precision required by the specified countdown. More accuracy means lower range. 
     @details    On ARM-STM32 architecture, the registers of the timers are 16 bits, and holds bot the counter and the prescaler.
                 As a result, the precision and maximum range is chosen as follows: (prec, max) = (1000 us, 6400ms), 
                 (100 us, 640ms), (10 us, 64ms), (1 us, 8ms). 
-    @param      timer           The timer to initialise. 
+    @param      id              The timer to initialise. 
     @param      cfg             The configuration. It cannot be NULL.
     @param      error           Gives back the error in microseconds by using a period and a prescaler given the
-                                main frequency. This param can be NULL: in this case error is not calculated.
-    @return 	hal_res_NOK_generic in case the timer isn't configured or not supported by board.
+                                main frequency. This param can be NULL: in this case error is not returned.
+    @return 	hal_res_OK on success.
+                hal_res_NOK_generic in case the timer cannot be configured or is not supported.
                 hal_res_NOK_unsupported if the chosen prescaler is not supported
                 hal_res_NOK_wrongparam if timer is configured in hal_timer_mode_oneshot and its interrupt priority
                 has value hal_int_priorityNONE.
                 hal_res_NOK_wrongparam if coundown is zero.
                 hal_res_NOK_nullpointer if @e cfg is NULL
-                hal_res_OK otherwise
+    @warning    A given timer id can be initted multiple times with different configurations.
   */
 extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error);
 

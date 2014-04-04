@@ -42,6 +42,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "hal_common.h"
 
 // -- the core part of hal: base, cpu, and sys.
 #include "hal_core.h"
@@ -51,7 +52,6 @@
 #include "hal_accelerometer.h"
 #include "hal_can.h"
 #include "hal_cantransceiver.h"
-#include "hal_crc.h"
 #include "hal_eeprom.h"
 #include "hal_encoder.h"
 #include "hal_eth.h"

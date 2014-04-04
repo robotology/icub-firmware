@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -123,7 +123,6 @@ typedef enum
     hal_can_runmode_noisr_0q        = 0,    /**< No use of ISRs and no queues. It is for basic use, e.g., in a CAN-based bootloader */           
     hal_can_runmode_isr_1txq1rxq    = 1,    /**< ISRs but also queues in RX and TX */   
     hal_can_runmode_isr_2txq1rxq    = 2    /**< ISRs but also queues in RX and TX and a high priority queue in TX */   
-//    hal_can_runmode_isr_1txq1rxqram = 3     /**< ISRs but also queues in RX and TX which use dynamic ram */ 
 } hal_can_runmode_t;
 
 enum { hal_can_runmode_num = 3};
@@ -155,11 +154,11 @@ typedef struct
     void *arg_cb_rx;
     void (*callback_on_tx)(void *arg);
     void *arg_cb_tx;
-    void (*callback_on_err)(void *arg); //VALE added field
-    void *arg_cb_err; //VALE added field
+    void (*callback_on_err)(void *arg); 
+    void *arg_cb_err; 
 } hal_can_cfg_t;
 
-//VALE added type
+
 /** @typedef    typedef struct hal_can_status_t;
     @brief      contains status of can peripheral.
  **/
@@ -206,16 +205,19 @@ extern const hal_can_cfg_t hal_can_cfg_default;
 
 /** @fn         extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     @brief      This function configures CAN.
-    @param      port            identifies CAN port (CAN1 or CAN2)
-    @param      cfg             teh configuration of teh can peripheral
-    @return     hal_res_NOK_generic in case of error, else hal_res_OK
+    @param      id              identifies CAN id 
+    @param      cfg             the configuration of the can peripheral
+    @return     hal_res_OK in case of success, else hal_res_NOK_generic
+    @warning    a given CAN id can be configured only once. The second call of hal_can_init(cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the CAN is not initted as wanted.
   */
 extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg);
 
 
 /** @fn         extern hal_result_t hal_can_enable(hal_can_t id)
     @brief      This function starts CAN. It must be invoked after hal_can_init.
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id            identifies CAN id 
     @return     hal_res_NOK_generic in case of error, else hal_res_OK
   */
 extern hal_result_t hal_can_enable(hal_can_t id);
@@ -223,19 +225,19 @@ extern hal_result_t hal_can_enable(hal_can_t id);
 
 /** @fn         extern hal_result_t hal_can_disable(hal_can_t id)
     @brief      This function disable CAN.
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id              identifies CAN id 
     @return     hal_res_NOK_generic in case of error, else hal_res_OK
   */
 extern hal_result_t hal_can_disable(hal_can_t id);
 
 
 /** @fn         extern hal_result_t hal_can_put(hal_can_t id, hal_can_frame_t *frame, hal_can_send_mode_t sm)
-    @brief      This function puts frame in the trasmission queue.
-  *             If sm flag values "send_now", this functions invokes isr to trasmit frames in queue,
-                  even if return value is hal_res_NOK_generic.The frame in input is dicsarded.
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @brief      This function puts frame in the transmission queue.
+  *             If sm flag values "send_now", this functions invokes isr to transmit frames in queue,
+                  even if return value is hal_res_NOK_generic.The frame in input is discarded.
+    @param      id              identifies CAN id (CAN1 or CAN2)
     @param      frame           frame to put in queue
-    @param      sm              indicates if trasmit fames now or not.
+    @param      sm              indicates if transmit frames now or not.
     @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
   */
 extern hal_result_t hal_can_put(hal_can_t id, hal_can_frame_t *frame, hal_can_send_mode_t sm);
@@ -243,27 +245,27 @@ extern hal_result_t hal_can_put(hal_can_t id, hal_can_frame_t *frame, hal_can_se
 
 /** @fn         extern hal_result_t hal_can_transmit(hal_can_t id)
     @brief      This function trasmits all frames in queue.
-    @param      port        identifies CAN port (CAN1 or CAN2)
-    @return     hal_res_NOK_generic in case wrong port, else hal_res_OK
+    @param      id        identifies CAN id 
+    @return     hal_res_NOK_generic in case wrong id, else hal_res_OK
   */
 extern hal_result_t hal_can_transmit(hal_can_t id);
 
 
 /** @fn         extern hal_result_t hal_can_received(hal_can_t id, uint8_t *numberof)
     @brief      This function gets number of frames in rx queue (FIFO).
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id            identifies CAN id 
     @param      numberof        contains numbers of frames.
-    @return     hal_res_NOK_generic in case wrong port or NULL argument, else hal_res_OK.
+    @return     hal_res_NOK_generic in case wrong id or NULL argument, else hal_res_OK.
   */
 extern hal_result_t hal_can_received(hal_can_t id, uint8_t *numberof);
 
 
 /** @fn         extern hal_result_t hal_can_get(hal_can_t id, hal_can_frame_t *frame, uint8_t *remaining)
     @brief      This function gets first frame in queue (FIFO).
-    @param      port            identifies CAN port (CAN1 or CAN2)
-    @param      frame           ptr to memeory where functions put getted frame
+    @param      id            identifies CAN id
+    @param      frame           ptr to memory where functions put retrieved frame
     @param      remaining       in output contains numbers of remaining frames. (it can be NULL)
-    @return     hal_res_NOK_generic in case wrong port, hal_res_NOK_nodata in case of empty queue, else hal_res_OK.
+    @return     hal_res_NOK_generic in case wrong id, hal_res_NOK_nodata in case of empty queue, else hal_res_OK.
   */
 extern hal_result_t hal_can_get(hal_can_t id, hal_can_frame_t *frame, uint8_t *remaining); 
 
@@ -274,12 +276,12 @@ extern hal_result_t hal_can_get(hal_can_t id, hal_can_frame_t *frame, uint8_t *r
     @details    A reception filter behaves in this way: if rec_id is the identifier of the received id, the packet will be 
                 passed to software reception queue if and only if this equation is satisfied: 
                 (mask_val & rec_id) == (mask_val & identifier_val).
-                So a filter is composed by the couple mask and identifier: the mask says which bits must be examinated, 
+                So a filter is composed by the couple mask and identifier: the mask says which bits must be examined, 
                 while the identifier says the values of these bits.
                 In order to configure a filter correctly, you must know that there is a table containing the mask values 
                 and a table containing the identifier_val. Also, it is possible to associate to a mask more indentifier_val.
                 Pay attention: if you use the same mask_num with different mask_val, the last value overwrites the first.
-    @param      port            identifies CAN port
+    @param      id              identifies CAN id
     @param      mask_num        number of row in mask table. (Must start at 0)
     @param      mask_val        value of mask at @e mask_num row
     @param      identifier_num  number of row in identifier table. (Must start at 0)
@@ -293,14 +295,21 @@ extern hal_result_t hal_can_receptionfilter_set(hal_can_t id, uint8_t mask_num, 
 
 /** @fn         extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof)
     @brief      This function gets number of frames in tx queue (FIFO).
-    @param      port            identifies CAN port (CAN1 or CAN2)
+    @param      id              identifies CAN id (CAN1 or CAN2)
     @param      numberof        contains numbers of frames.
-    @return     hal_res_NOK_generic in case wrong port or NULL argument, else hal_res_OK.
+    @return     hal_res_NOK_generic in case wrong id or NULL argument, else hal_res_OK.
   */
 extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof);
 
 
+/** @fn         extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status)
+    @brief      retrieves the status of the can
+    @param      id              identifies CAN id 
+    @param      status          the returned status.
+    @return     hal_res_NOK_generic in case wrong id or NULL argument, else hal_res_OK.
+  */
 extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status);
+
 
 /** @}            
     end of group doxy_group_hal_can  

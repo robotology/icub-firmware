@@ -41,7 +41,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "hal_base.h"
+#include "hal_common.h"
 
 
 
@@ -92,16 +92,19 @@ extern const hal_accelerometer_cfg_t hal_accelerometer_cfg_default; // = { .dumm
 
 
 /** @fn			extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_accelerometer_cfg_t *cfg)
-    @brief  	this function initializes a given accel port 
+    @brief  	this function initializes a given accel id 
     @param  	port	        the port
     @param  	cfg 	        pointer to configuration data
     @return 	hal_res_NOK_generic on error else hal_res_OK
+    @warning    a given accelerometer can be initted only once. The second call of hal_accelerometer_init(id, cfg) will do nothing.
+                The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
+                otherwise it will be hal_res_NOK_generic to express the fact that the device is not initted as wanted.
   */
 extern hal_result_t hal_accelerometer_init(hal_accelerometer_t id, const hal_accelerometer_cfg_t *cfg);
 
 
 /** @fn			extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerometer_acceleration_t* acceler)
-    @brief  	this function reads temperatures on a given port.
+    @brief  	this function reads temperatures on a given id.
     @param  	port	        the port
     @param  	acceler 	    the read acceleration
     @return 	hal_res_NOK_generic on error else hal_res_OK

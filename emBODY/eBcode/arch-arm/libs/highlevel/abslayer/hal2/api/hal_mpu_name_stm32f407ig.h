@@ -46,7 +46,8 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "stdint.h"
+#include "hal_common.h"
+
 #include "hal_mpu.h"
 #include "hal_mpu_arch_armcmx.h"
 
