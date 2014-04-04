@@ -123,7 +123,7 @@ typedef enum
  **/
 typedef struct
 {
-    uint16_t            supported_mask;             /**< bit in position hl_timerx must be 1 if that timer is supported */
+    uint32_t            supportedmask;      /**< bit in position hl_timerx must be 1 if that timer is supported */
 } hl_timer_mapping_t;
 
 
@@ -181,6 +181,7 @@ extern const hl_timer_mapping_t* hl_timer_map;
                 hl_res_NOK_generic if countdown is zero.
                 hl_res_NOK_nullpointer if @e cfg is NULL
                 hl_res_OK otherwise
+    @warning    the timer can be inited multiple times with different configurations.
   */
 extern hl_result_t hl_timer_init(hl_timer_t id, const hl_timer_cfg_t *cfg, hl_reltime_t *error);
 

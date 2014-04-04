@@ -80,7 +80,7 @@ typedef struct
  **/
 typedef struct
 {
-    uint8_t             supported_mask;             /**< bit in position hl_canx must be 1 if portx is supported */
+    uint32_t            supportedmask;              /**< bit in position hl_canx must be 1 if portx is supported */
     hl_can_gpiomap_t    gpiomap[hl_cans_number];    /**< in position hl_canx there is gpio map of CANx */
 } hl_can_mapping_t;
 

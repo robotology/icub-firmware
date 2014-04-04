@@ -47,6 +47,8 @@
 
 #include "hl_arch.h"
 
+#include "hl_can_hid.h" 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,11 +68,9 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning --> put these things into hl_can_hid.h
 
-#define HL_can_id2index(p)              ((uint8_t)((p)))
-
-#define HL_can_port2peripheral(p)       ( ( hl_can1 == (p) ) ? (CAN1) : (CAN2) )
+// #define HL_can_id2index(p)              ((uint8_t)((p)))
+// #define HL_can_port2peripheral(p)       ( ( hl_can1 == (p) ) ? (CAN1) : (CAN2) )
 
 
 //VALE added following macro
@@ -108,7 +108,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                         initted;
+    uint32_t                        inittedmask;
     hl_can_comm_internal_item_t*    items[hl_cans_number];   
 } hl_can_comm_theinternals_t;
 
@@ -162,7 +162,7 @@ static const hl_can_comm_frame_t s_hl_can_comm_defcanframe =
 
 static hl_can_comm_theinternals_t s_hl_can_comm_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -174,7 +174,10 @@ static hl_can_comm_theinternals_t s_hl_can_comm_theinternals =
 
 extern hl_result_t hl_can_comm_deinit(hl_can_t id)
 {
-    #warning --> the deinit() is to be done yet. it must deallocate memory of item and of fifo. 
+    //#warning --> the deinit() is to be done yet. it must deallocate memory of item and of fifo. 
+    
+    
+    s_hl_can_comm_initted_clr(id);
 
     return(hl_res_OK);
 }
@@ -230,11 +233,9 @@ extern hl_result_t hl_can_comm_init(hl_can_t id, const hl_can_comm_cfg_t *cfg)
     intitem->enabled                = 0;
     intitem->txfifofull             = 0;
     intitem->rxfifofull             = 0;
-    intitem->txisrisenabled         = 0;
+    intitem->txisrisenabled         = 0;   
     
-    #warning --> see other things in internals
-    
-    #warning --> add can transceiver somewhere. may be as a hl_can_trans.h 
+    //#warning --> add can transceiver somewhere. may be as a hl_can_trans.h 
     
     // init nvic
     s_hl_can_comm_nvic_init(id); 
@@ -246,13 +247,11 @@ extern hl_result_t hl_can_comm_init(hl_can_t id, const hl_can_comm_cfg_t *cfg)
     return(hl_res_OK);
 }
 
-
-
 extern hl_result_t hl_can_comm_enable(hl_can_t id)
 {
-	//hl_result_t res;
     hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_can_comm_initted_is(id))
     {
         return(hl_res_NOK_generic);
@@ -262,6 +261,7 @@ extern hl_result_t hl_can_comm_enable(hl_can_t id)
     {
     	return(hl_res_NOK_generic);
     }
+#endif
     
     // disable scheduling
     //hl_base_osal_scheduling_suspend();
@@ -299,9 +299,9 @@ extern hl_result_t hl_can_comm_enable(hl_can_t id)
 
 extern hl_result_t hl_can_comm_disable(hl_can_t id) 
 {
-	//hl_result_t res;
     hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_can_comm_initted_is(id))
     {
         return(hl_res_NOK_generic);
@@ -311,6 +311,7 @@ extern hl_result_t hl_can_comm_disable(hl_can_t id)
     {
     	return(hl_res_NOK_generic);
     }
+#endif
     
     // disable scheduling
     //hl_base_osal_scheduling_suspend();
@@ -340,12 +341,29 @@ extern hl_result_t hl_can_comm_disable(hl_can_t id)
 
 extern hl_result_t hl_can_comm_put(hl_can_t id, hl_can_comm_frame_t *frame, hl_can_comm_send_mode_t sm)
 {
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hl_false == s_hl_can_comm_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+
+    if(NULL == frame)
+    {
+    	return(hl_res_NOK_generic);
+    }    
+#endif    
     return(s_hl_can_comm_addframe2fifotx(id, frame, sm));
 }
 
 
 extern hl_result_t hl_can_comm_transmit(hl_can_t id)
 {
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hl_false == s_hl_can_comm_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif       
     // trigger the tx. the trigger will completely empty the canframes_tx_norm.
     s_hl_can_comm_sendframes_canx(id);
     return(hl_res_OK);
@@ -355,6 +373,18 @@ extern hl_result_t hl_can_comm_transmit(hl_can_t id)
 extern hl_result_t hl_can_comm_received(hl_can_t id, uint8_t *numberof)
 {
     hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hl_false == s_hl_can_comm_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+    
+    if(NULL == numberof)
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif    
     
     // disable interrupt rx
     s_hl_can_comm_nvic_rx_disable(id);
@@ -371,7 +401,19 @@ extern hl_result_t hl_can_comm_outgoing(hl_can_t id, uint8_t *numberof)
 {
     hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
     uint8_t reenable_isrtx = 0;
- 
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hl_false == s_hl_can_comm_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+    
+    if(NULL == numberof)
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif 
+    
     if(1 == intitem->txisrisenabled)
     {
         s_hl_can_comm_nvic_tx_disable(id);
@@ -393,7 +435,19 @@ extern hl_result_t hl_can_comm_get(hl_can_t id, hl_can_comm_frame_t *frame, uint
 {
     hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
     hl_result_t res = hl_res_NOK_nodata;
-  
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hl_false == s_hl_can_comm_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+    
+    if(NULL == frame)
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif 
+    
     // disable interrupt rx
     s_hl_can_comm_nvic_rx_disable(id);
     
@@ -410,6 +464,7 @@ extern hl_result_t hl_can_comm_getstatus(hl_can_t id, hl_can_comm_status_t *stat
 {
 //    hl_can_comm_internal_item_t* intitem = s_hl_can_comm_theinternals.items[HL_can_id2index(id)];
 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_can_comm_initted_is(id))
     {
         return(hl_res_NOK_generic);
@@ -419,7 +474,7 @@ extern hl_result_t hl_can_comm_getstatus(hl_can_t id, hl_can_comm_status_t *stat
     {
         return(hl_res_NOK_nullpointer);
     }
-    
+#endif    
 
     CAN_TypeDef *stm32can =  HL_can_port2peripheral(id); 
        
@@ -528,17 +583,17 @@ extern void hl_can_comm_hid_txfifo_set(hl_can_t id)
 
 static void s_hl_can_comm_initted_set(hl_can_t id)
 {
-    hl_bits_byte_bitset(&s_hl_can_comm_theinternals.initted, HL_can_id2index(id));
+    hl_bits_word_bitset(&s_hl_can_comm_theinternals.inittedmask, HL_can_id2index(id));
 }
 
 static void s_hl_can_comm_initted_clr(hl_can_t id)
 {
-    hl_bits_byte_bitclear(&s_hl_can_comm_theinternals.initted, HL_can_id2index(id));
+    hl_bits_word_bitclear(&s_hl_can_comm_theinternals.inittedmask, HL_can_id2index(id));
 }
 
 static hl_boolval_t s_hl_can_comm_initted_is(hl_can_t id)
 {
-    return(hl_bits_byte_bitcheck(s_hl_can_comm_theinternals.initted, HL_can_id2index(id)));
+    return(hl_bits_word_bitcheck(s_hl_can_comm_theinternals.inittedmask, HL_can_id2index(id)));
 }
 
 

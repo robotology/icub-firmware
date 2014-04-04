@@ -39,7 +39,9 @@
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// empty-section
+
+#define HL_can_id2index(p)              ( (uint8_t)((p)) )
+#define HL_can_port2peripheral(p)       ( ( hl_can1 == (p) ) ? (CAN1) : (CAN2) )
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------

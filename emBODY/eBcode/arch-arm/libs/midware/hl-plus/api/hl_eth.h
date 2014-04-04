@@ -161,7 +161,7 @@ typedef struct
 } hl_eth_cfg_t;
 
 
-#warning --> it is to be modified later on with a more flexible data structure
+#warning --> TODO: for use with lwip we need to modify it
 typedef struct
 {
     uint16_t length;                /**< the length of the frame in bytes */

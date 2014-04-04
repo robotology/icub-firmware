@@ -201,7 +201,7 @@ extern hl_result_t hl_chip_st_lis3x_temp_get(int16_t* temp)
 
     *temp = 0;
 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     
     if(hl_false == s_hl_chip_st_lis3x_initted_is())
     {
@@ -242,7 +242,7 @@ extern hl_result_t hl_chip_st_lis3x_accel_get(int32_t* xac, int32_t* yac, int32_
     *yac = 0;
     *zac = 0;
     
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
  
     if(hl_false == s_hl_chip_st_lis3x_initted_is())
     {

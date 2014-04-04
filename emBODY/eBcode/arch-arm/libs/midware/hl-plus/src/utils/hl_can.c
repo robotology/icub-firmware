@@ -63,11 +63,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
-#define HL_can_id2index(p)              ((uint8_t)((p)))
-
-#define HL_can_port2peripheral(p)       ( ( hl_can1 == (p) ) ? (CAN1) : (CAN2) )
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,7 +109,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                     initted;
+    uint32_t                    inittedmask;
     hl_can_internal_item_t*     items[hl_cans_number];   
 } hl_can_theinternals_t;
 
@@ -168,7 +164,7 @@ static void s_hl_can_fill_gpio_init_altf(hl_can_t id, hl_gpio_init_t* rxinit, hl
 
 static hl_can_theinternals_t s_hl_can_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -235,12 +231,14 @@ extern hl_boolval_t hl_can_initted_is(hl_can_t id)
 extern hl_result_t hl_can_enable(hl_can_t id)
 {
 	hl_result_t res;
-
+    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_can_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-
+#endif
+    
     res = s_hl_can_hw_registers_init(id); // hardware setup
 
     if(res != hl_res_OK)
@@ -260,13 +258,13 @@ extern hl_result_t hl_can_disable(hl_can_t id)
 //    hl_can_internal_item_t* intitem = s_hl_can_theinternals.items[HL_can_id2index(id)];
     CAN_TypeDef* CANx = HL_can_port2peripheral(id); 
 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_can_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-
+#endif
    
-
     CAN_DeInit(CANx);
 
     return(hl_res_OK);
@@ -296,17 +294,17 @@ static hl_boolval_t s_hl_can_supported_is(hl_can_t id)
     {
         return(hl_false);
     }
-    return(hl_bits_byte_bitcheck(hl_can_map->supported_mask, HL_can_id2index(id)) );
+    return(hl_bits_word_bitcheck(hl_can_map->supportedmask, HL_can_id2index(id)) );
 }
 
 static void s_hl_can_initted_set(hl_can_t id)
 {
-    hl_bits_byte_bitset(&s_hl_can_theinternals.initted, HL_can_id2index(id));
+    hl_bits_word_bitset(&s_hl_can_theinternals.inittedmask, HL_can_id2index(id));
 }
 
 static hl_boolval_t s_hl_can_initted_is(hl_can_t id)
 {
-    return(hl_bits_byte_bitcheck(s_hl_can_theinternals.initted, HL_can_id2index(id)));
+    return(hl_bits_word_bitcheck(s_hl_can_theinternals.inittedmask, HL_can_id2index(id)));
 }
 
 

@@ -71,9 +71,9 @@ enum { hl_i2cs_number = 3 };
  **/
 typedef enum
 {
-    hl_i2c_speed_100kbps       = 1,
-    hl_i2c_speed_200kbps       = 2,
-    hl_i2c_speed_400kbps       = 4
+    hl_i2c_speed_100kbps        = 1,
+    hl_i2c_speed_200kbps        = 2,
+    hl_i2c_speed_400kbps        = 4
 } hl_i2c_speed_t;
 
 
@@ -82,8 +82,8 @@ typedef enum
  **/
 typedef enum
 {
-    hl_i2c_mode_master         = 0,     /**< the mode is master */
-    hl_i2c_mode_slave          = 1      /**< the mode is slave (not yet supported) */
+    hl_i2c_mode_master          = 0,     /**< the mode is master */
+    hl_i2c_mode_slave           = 1      /**< the mode is slave (not yet supported) */
 } hl_i2c_mode_t;
 
 
@@ -136,7 +136,7 @@ typedef struct
  **/
 typedef struct
 {
-    uint8_t             supported_mask;             /**< bit in position hl_i2cx must be 1 if portx is supported */
+    uint32_t            supportedmask;              /**< bit in position hl_i2cx must be 1 if portx is supported */
     hl_i2c_gpiomap_t    gpiomap[hl_i2cs_number];    /**< in position hl_i2cx there is gpio map of I2Cx */
 } hl_i2c_mapping_t;
 

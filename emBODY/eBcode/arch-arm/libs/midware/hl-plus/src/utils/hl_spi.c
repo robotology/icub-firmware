@@ -114,7 +114,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                     initted;
+    uint32_t                    inittedmask;
     hl_spi_internal_item_t*     items[hl_spis_number];   
 } hl_spi_theinternals_t;
 
@@ -157,7 +157,7 @@ static SPI_TypeDef* const s_hl_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 
 static hl_spi_theinternals_t s_hl_spi_theinternals =
 {
-    .initted            = 0,
+    .inittedmask        = 0,
     .items              = { NULL }   
 };
 
@@ -272,14 +272,14 @@ extern hl_boolval_t hl_spi_initted_is(hl_spi_t id)
 
 extern hl_result_t hl_spi_enable(hl_spi_t id)
 {
-	hl_result_t res;
-
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-
-    res = s_hl_spi_hw_registers_init(id); // hardware setup
+#endif
+    
+    hl_result_t res = s_hl_spi_hw_registers_init(id); // hardware setup
 
     if(res != hl_res_OK)
     {
@@ -295,14 +295,14 @@ extern hl_result_t hl_spi_enable(hl_spi_t id)
 
 extern hl_result_t hl_spi_disable(hl_spi_t id) 
 {
-//    hl_spi_internal_item_t* intitem = s_hl_spi_theinternals.items[HL_spi_id2index(id)];
     SPI_TypeDef* SPIx = HL_spi_port2peripheral(id); 
 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-
+#endif
    
     SPI_I2S_DeInit(SPIx);
 
@@ -333,17 +333,17 @@ static hl_boolval_t s_hl_spi_supported_is(hl_spi_t id)
     {
         return(hl_false);
     }
-    return(hl_bits_byte_bitcheck(hl_spi_map->supported_mask, HL_spi_id2index(id)) );
+    return(hl_bits_word_bitcheck(hl_spi_map->supportedmask, HL_spi_id2index(id)) );
 }
 
 static void s_hl_spi_initted_set(hl_spi_t id)
 {
-    hl_bits_byte_bitset(&s_hl_spi_theinternals.initted, HL_spi_id2index(id));
+    hl_bits_word_bitset(&s_hl_spi_theinternals.inittedmask, HL_spi_id2index(id));
 }
 
 static hl_boolval_t s_hl_spi_initted_is(hl_spi_t id)
 {
-    return(hl_bits_byte_bitcheck(s_hl_spi_theinternals.initted, HL_spi_id2index(id)));
+    return(hl_bits_word_bitcheck(s_hl_spi_theinternals.inittedmask, HL_spi_id2index(id)));
 }
 
 
@@ -459,7 +459,6 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
                                             hl_gpio_init_t* mosiinit, hl_gpio_altf_t* mosialtf
                                         )
 {
-    #warning --> verify for stm32f1 if to use GPIO_Mode_AF_OD or GPIO_Mode_AF_PP and if for stm32f4 use GPIO_PuPd_DOWN or GPIO_PuPd_UP
     static const hl_gpio_init_t s_hl_spi_sckmosi_master_gpio_init = 
     {
 #if     defined(HL_USE_MPU_ARCH_STM32F1)

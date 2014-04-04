@@ -188,7 +188,7 @@ extern hl_result_t hl_chip_micrel_ks8893_init(const hl_chip_micrel_ks8893_cfg_t 
 }
 
 
-extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmiiphymode)
+extern hl_result_t hl_chip_micrel_ks8893_start(hl_ethtrans_phymode_t* usedmiiphymode)
 {
     hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
     
@@ -212,7 +212,7 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmi
     regaddr.bytes.one = REG0x01;
     hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
     if((buff_read&0x01))
-    {   // already initted. to be initted again must pass through a reset
+    {   // already intted and started. to be initted again must pass through a reset
         if(NULL != usedmiiphymode)
         {
             s_hl_chip_micrel_ks8893_mii_phymode_get(usedmiiphymode);
@@ -249,12 +249,12 @@ extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmi
 
 extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedmiiphymode)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
     {
         return(hl_res_NOK_generic);
     }  
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#endif
     
     s_hl_chip_micrel_ks8893_mii_phymode_get(usedmiiphymode);
     return(hl_res_OK);
@@ -263,36 +263,36 @@ extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* u
 
 extern hl_result_t hl_chip_micrel_ks8893_linkupmask(uint8_t* linkmask)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
     {
         return(hl_res_NOK_generic);
     }  
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#endif
     
     return(s_hl_chip_micrel_ks8893_linkupmask(linkmask));     
 }
 
 extern hl_result_t hl_chip_micrel_ks8893_phy_status(hl_ethtrans_phystatus_t* phyarray, uint8_t arraysize)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
     {
         return(hl_res_NOK_generic);
     }  
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#endif
     
     return(s_hl_chip_micrel_ks8893_phy_status(phyarray, arraysize));  
 }
 
 extern hl_result_t hl_chip_micrel_ks8893_phy_errorinfo(uint8_t phynum, hl_ethtrans_phyerror_t errortype, hl_ethtrans_phyerrorinfo_t *result)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_chip_micrel_ks8893_initted_is())
     {
         return(hl_res_NOK_generic);
     }  
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#endif
     
     return(s_hl_chip_micrel_ks8893_phy_errorinfo(phynum, errortype, result));  
 }
@@ -744,7 +744,7 @@ static void s_hl_chip_micrel_ks8893_start(const hl_chip_micrel_ks8893_cfg_t *cfg
     hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
     if(!(buff_read&0x01))
     {
-        hl_sys_on_error(hl_error_runtimefault, "hl_chip_micrel_ks8893_configure(): SWITCH not configured");
+        hl_sys_on_error(hl_error_runtimefault, "s_hl_chip_micrel_ks8893_start(): SWITCH not configured");
     }
 }
 

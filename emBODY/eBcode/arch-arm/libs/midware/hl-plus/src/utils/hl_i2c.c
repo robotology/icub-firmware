@@ -106,7 +106,7 @@ const hl_i2c_advcfg_t hl_i2c_advcfg_default =
 
 typedef struct
 {
-    uint8_t         initted;
+    uint32_t        inittedmask;
 } hl_i2c_theinternals_t;
 
 
@@ -176,7 +176,7 @@ static const uint32_t s_hl_i2c_hw_rcc[] = { RCC_APB1Periph_I2C1, RCC_APB1Periph_
 
 static hl_i2c_theinternals_t s_hl_i2c_theinternals = 
 {
-    .initted = 0    
+    .inittedmask = 0    
 };
 
 
@@ -241,13 +241,14 @@ extern hl_bool_t hl_i2c_initted_is(hl_i2c_t id)
 extern hl_result_t hl_i2c_read(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
     
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)               
-
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)               
     if(hl_false == hl_i2c_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-    
+#endif
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)
     if(0 == devaddr)
     {
         return(hl_res_NOK_generic);
@@ -267,8 +268,7 @@ extern hl_result_t hl_i2c_read(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_reg
     {
         return(hl_res_OK);
     }
-
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
+#endif  
 
     // we make sure lsb is zero
     devaddr &= ~0x01;
@@ -283,13 +283,14 @@ extern hl_result_t hl_i2c_read(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_reg
 extern hl_result_t hl_i2c_write(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_regaddr_t regaddr, uint8_t* data, uint16_t size)
 {
  
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)              
- 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)               
     if(hl_false == hl_i2c_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-
+#endif
+    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if(0 == devaddr)
     {
         return(hl_res_NOK_generic);
@@ -309,9 +310,8 @@ extern hl_result_t hl_i2c_write(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_re
     if(0 == size)
     {
         return(hl_res_OK);
-    }
-    
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK) 
+    }   
+#endif 
 
     // we make sure lsb is zero 
     devaddr &= ~0x01;  
@@ -326,19 +326,19 @@ extern hl_result_t hl_i2c_write(hl_i2c_t id, hl_i2c_devaddr_t devaddr, hl_i2c_re
 extern hl_result_t hl_i2c_ping(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
 {
 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)               
-    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)                   
     if(hl_false == hl_i2c_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-    
+#endif
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)      
     if(0 == devaddr)
     {
         return(hl_res_NOK_generic);
-    }
-    
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+    }   
+#endif    
  
     // we make sure lsb is zero 
     devaddr &= ~0x01;
@@ -361,19 +361,19 @@ extern hl_result_t hl_i2c_ping(hl_i2c_t id, hl_i2c_devaddr_t devaddr)
 extern hl_result_t hl_i2c_is_device_ready(hl_i2c_t id, hl_i2c_devaddr_t devaddr)      
 {
  
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)               
- 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)               
     if(hl_false == hl_i2c_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-    
+#endif
+
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(0 == devaddr)
     {
         return(hl_res_NOK_generic);
-    }
-    
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)     
+    }    
+#endif     
        
     // we make sure lsb is zero 
     devaddr &= ~0x01;
@@ -407,17 +407,17 @@ static hl_boolval_t s_hl_i2c_supported_is(hl_i2c_t id)
     {
         return(hl_false);
     }
-    return(hl_bits_byte_bitcheck(hl_i2c_map->supported_mask, HL_i2c_id2index(id)) );
+    return(hl_bits_word_bitcheck(hl_i2c_map->supportedmask, HL_i2c_id2index(id)) );
 }
 
 static void s_hl_i2c_initted_set(hl_i2c_t id)
 {
-    hl_bits_byte_bitset(&s_hl_i2c_theinternals.initted, HL_i2c_id2index(id));
+    hl_bits_word_bitset(&s_hl_i2c_theinternals.inittedmask, HL_i2c_id2index(id));
 }
 
 static hl_boolval_t s_hl_i2c_initted_is(hl_i2c_t id)
 {
-    return(hl_bits_byte_bitcheck(s_hl_i2c_theinternals.initted, HL_i2c_id2index(id)));
+    return(hl_bits_word_bitcheck(s_hl_i2c_theinternals.inittedmask, HL_i2c_id2index(id)));
 }
 
 

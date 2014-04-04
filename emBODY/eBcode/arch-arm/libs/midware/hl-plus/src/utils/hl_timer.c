@@ -165,7 +165,7 @@ typedef struct
 
 typedef struct
 {
-    uint16_t                        initted;
+    uint32_t                        inittedmask;
     hl_timer_internal_item_t*       items[hl_timers_number];   
 } hl_timer_theinternals_t;
 
@@ -181,7 +181,8 @@ static void s_hl_timer_initted_set(hl_timer_t id);
 static hl_boolval_t s_hl_timer_initted_is(hl_timer_t id);
 static void s_hl_timer_status_set(hl_timer_t id, hl_timer_status_t status);
 static hl_timer_status_t s_hl_timer_status_get(hl_timer_t id);
-static hl_result_t s_hl_timer_prepare(hl_timer_t id, const hl_timer_cfg_t *cfg);
+static hl_result_t s_hl_timer_prepare(hl_timer_t id);
+static void s_hl_timer_compute_error(hl_timer_t id, uint32_t* er);
 static void s_hl_timer_stm32_start(hl_timer_t id);
 static void s_hl_timer_stm32_stop(hl_timer_t id);
 static hl_reltime_t s_hl_timer_get_period(hl_timer_t id);
@@ -354,7 +355,7 @@ static const hl_timer_stm32_properties_t * s_hl_timer_stm32_props[hl_timers_numb
 
 static hl_timer_theinternals_t s_hl_timer_theinternals = 
 {
-    .initted        = 0,
+    .inittedmask    = 0,
     .items          = { NULL }    
 };
 
@@ -389,6 +390,11 @@ extern hl_result_t hl_timer_init(hl_timer_t id, const hl_timer_cfg_t *cfg, hl_re
         return(hl_res_NOK_generic);
     }
     
+    // very important comment: a given hl_timer can be initted even if it was already initted. thus we DONT put any control such as:
+    //if(hl_true == hl_timer_initted_is(id)
+    //{
+    //    //return(hl_res_NOK_generic);
+    //}
     
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
@@ -397,38 +403,23 @@ extern hl_result_t hl_timer_init(hl_timer_t id, const hl_timer_cfg_t *cfg, hl_re
         // minimal initialisation of the internal item
         // initialise at least the status.
         intitem->status = hl_timer_status_none;        
-    }    
+    }
      
     // if it is running, then stop it.
     if(hl_timer_status_running == hl_timer_status_get(id))
     {
         hl_timer_stop(id);
     }
+    
+    // copy teh config
+    memcpy(&intitem->config, cfg, sizeof(hl_timer_cfg_t));
 
     // compute the values to be put in registers
-    s_hl_timer_prepare(id, cfg);
+    s_hl_timer_prepare(id);
     
-
-    // calculate error
-    if(NULL != error)
-    {
-        if(NULL != cfg->advcfg)
-        {
-            *error = hl_NA32;
-        }
-        else
-        {
-            hl_reltime_t period = s_hl_timer_get_period(id);
-            if(period > cfg->countdown)
-            {
-                *error = period - cfg->countdown; 
-            }
-            else
-            {
-                *error = cfg->countdown - period;
-            }
-        }
-    }
+    // compute the error
+    s_hl_timer_compute_error(id, error);
+    
     
     s_hl_timer_initted_set(id);
 
@@ -444,12 +435,12 @@ extern hl_bool_t hl_timer_initted_is(hl_timer_t id)
 
 extern hl_result_t hl_timer_start(hl_timer_t id)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_timer_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK) 
+#endif
 
     if(hl_timer_status_running == s_hl_timer_status_get(id))
     {
@@ -466,12 +457,12 @@ extern hl_result_t hl_timer_start(hl_timer_t id)
 
 extern hl_result_t hl_timer_stop(hl_timer_t id)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK) 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
     if(hl_false == s_hl_timer_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK) 
+#endif
 
     if(hl_timer_status_idle == s_hl_timer_status_get(id))
     {
@@ -502,22 +493,20 @@ extern hl_result_t hl_timer_remainingtime_get(hl_timer_t id, hl_reltime_t *remai
     hl_timer_internal_item_t *intitem = s_hl_timer_theinternals.items[HL_timer_id2index(id)];
     const hl_timer_stm32_properties_t* props = s_hl_timer_stm32_props[HL_timer_id2index(id)];
 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
-    if(NULL == props)
-    {
-        return(hl_res_NOK_unsupported);
-    }
-
-    if(NULL == remaining_time)
-    {
-        return(hl_res_NOK_nullpointer);
-    }    
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
-    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_timer_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
+#endif  
+    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if(NULL == remaining_time)
+    {
+        return(hl_res_NOK_nullpointer);
+    }    
+#endif
+    
     
     if(NULL != intitem->config.advcfg)
     {
@@ -643,17 +632,17 @@ static hl_boolval_t s_hl_timer_supported_is(hl_timer_t id)
     {
         return(hl_false);
     }
-    return(hl_bits_hlfword_bitcheck(hl_timer_map->supported_mask, HL_timer_id2index(id)) );
+    return(hl_bits_word_bitcheck(hl_timer_map->supportedmask, HL_timer_id2index(id)) );
 }
 
 static void s_hl_timer_initted_set(hl_timer_t id)
 {
-    hl_bits_hlfword_bitset(&s_hl_timer_theinternals.initted, HL_timer_id2index(id));
+    hl_bits_word_bitset(&s_hl_timer_theinternals.inittedmask, HL_timer_id2index(id));
 }
 
 static hl_boolval_t s_hl_timer_initted_is(hl_timer_t id)
 {
-    return(hl_bits_hlfword_bitcheck(s_hl_timer_theinternals.initted, HL_timer_id2index(id)));
+    return(hl_bits_word_bitcheck(s_hl_timer_theinternals.inittedmask, HL_timer_id2index(id)));
 }
 
 static void s_hl_timer_status_set(hl_timer_t id, hl_timer_status_t status)
@@ -667,7 +656,7 @@ static hl_timer_status_t s_hl_timer_status_get(hl_timer_t id)
     return( (NULL == intitem) ? (hl_timer_status_none) : (intitem->status) );
 }
 
-static hl_result_t s_hl_timer_prepare(hl_timer_t id, const hl_timer_cfg_t *cfg)
+static hl_result_t s_hl_timer_prepare(hl_timer_t id)
 {
     hl_timer_internal_item_t *intitem = s_hl_timer_theinternals.items[HL_timer_id2index(id)];
     const hl_timer_stm32_properties_t* props = s_hl_timer_stm32_props[HL_timer_id2index(id)];
@@ -677,12 +666,9 @@ static hl_result_t s_hl_timer_prepare(hl_timer_t id, const hl_timer_cfg_t *cfg)
         return(hl_res_NOK_unsupported);
     }
     
-    if(NULL != cfg->advcfg)
-    {
-        
-    }
-    else
-    {
+    
+    if(NULL == intitem->config.advcfg)
+    {   // if teh advcfg is NULL i use the normal parameters
         volatile uint32_t referencespeed = 0; 
         RCC_ClocksTypeDef clocks;
         RCC_GetClocksFreq(&clocks);  
@@ -699,9 +685,7 @@ static hl_result_t s_hl_timer_prepare(hl_timer_t id, const hl_timer_cfg_t *cfg)
         {
             return(hl_res_NOK_unsupported);
         }
-
         
-        memcpy(&intitem->config, cfg, sizeof(hl_timer_cfg_t));
 
         // use prescaler = ((referencespeed/a/1000) )
 
@@ -760,6 +744,33 @@ static hl_result_t s_hl_timer_prepare(hl_timer_t id, const hl_timer_cfg_t *cfg)
     return(hl_res_OK);
 }
 
+static void s_hl_timer_compute_error(hl_timer_t id, uint32_t* er)
+{   
+    hl_timer_internal_item_t *intitem = s_hl_timer_theinternals.items[HL_timer_id2index(id)];
+    
+    if(NULL == er)
+    {
+        return;
+    }
+    
+    if(NULL != intitem->config.advcfg)
+    {   // cannot compute the error because we have a specific advanced config which does not allow us to compute an exact countdown
+        *er = hl_NA32;
+        return;
+    }
+
+    hl_reltime_t period = s_hl_timer_get_period(id);
+    if(period > intitem->config.countdown)
+    {
+        *er = period - intitem->config.countdown; 
+    }
+    else
+    {
+        *er = intitem->config.countdown - period;
+    }
+    
+    return;
+}
 
 static void s_hl_timer_stm32_start(hl_timer_t id)
 {

@@ -123,7 +123,8 @@ extern const hl_ethtrans_mapping_t* hl_ethtrans_map;
 extern hl_result_t hl_ethtrans_init(const hl_ethtrans_cfg_t *cfg);
 
 
-extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t *usedmiiphymode);
+// usedmiiphymode can be NULL
+extern hl_result_t hl_ethtrans_start(hl_ethtrans_phymode_t *usedmiiphymode);
 
 extern hl_result_t hl_ethtrans_getmiiphymode(hl_ethtrans_phymode_t *usedphymode);
 
@@ -139,7 +140,7 @@ extern void* hl_ethtrans_chip_init_param;
 
 // weakly defined.
 extern hl_result_t hl_ethtrans_chip_init(void* param);
-extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode);
+extern hl_result_t hl_ethtrans_chip_start(hl_ethtrans_phymode_t *usedmiiphymode);
 extern hl_result_t hl_ethtrans_chip_getmiiphymode(hl_ethtrans_phymode_t *usedmiiphymode);
 
 /** @}            

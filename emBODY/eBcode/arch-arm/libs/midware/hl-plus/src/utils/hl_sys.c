@@ -303,7 +303,7 @@ extern void hl_sys_irqn_enable(hl_irqn_t irqn)
 
 extern void hl_sys_irqn_priority_set(hl_irqn_t irqn, hl_irqpriority_t prio) 
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)     
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
     if(hl_irqpriorityNONE == prio)
     {
         return;
@@ -321,7 +321,7 @@ extern hl_irqpriority_t hl_sys_irqn_priority_get(hl_irqn_t irqn)
 
 extern int hl_sys_itm_puts(const char* str) 
 {    
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)     
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)     
     if(NULL == str)
     {
         return(0);

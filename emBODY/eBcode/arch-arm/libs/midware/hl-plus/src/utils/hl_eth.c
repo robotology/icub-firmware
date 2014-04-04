@@ -570,9 +570,7 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     // in case of a phy accessed through the smi, this function must set the mode and the speed and return the result
     // instead in case of a switch accessed through i2c, this function must configure mode and speed and put the swicth operative. 
     
-    // hl_ethtrans_phymode_fullduplex100mbps or hl_ethtrans_phymode_auto
-    hl_ethtrans_config(&usedphymode);
-    //#warning --> using hl_ethtrans_phymode_fullduplex100mbps: VERIFY ITTTTTTTTTTTTTTTTTTTT
+    hl_ethtrans_start(&usedphymode);
     
     if(hl_ethtrans_phymode_none == usedphymode)
     {
@@ -710,12 +708,12 @@ extern void hl_eth_smi_init(void)
 // reads the 16 bits of register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
 extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
 {
-//#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+//#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_eth_theinternals.smi_initted)
     {
         return(0);
     } 
-//#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)   
+//#endif   
     
     uint32_t tout;
         
@@ -735,12 +733,12 @@ extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr)
 // writes the 16 bits of value in register REGaddr in the physical with address PHYaddr. both REGaddr and PHYaddr range is 0-31
 extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value)
 { 
-//#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+//#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_eth_theinternals.smi_initted)
     {
         return;
     } 
-//#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
+//#endif  
     
     uint32_t tout = 0;   
     
@@ -790,12 +788,12 @@ extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame)
     
     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)  
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)  
     if(hl_true != s_hl_eth_initted_is())
     {
         return(hl_res_NOK_generic);
     }
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)    
+#endif    
 
     j = intitem->txbufindex; 
     /* Wait until previous packet transmitted. */

@@ -122,7 +122,9 @@ static hl_result_t s_hl_chip_xx_eeprom_wrprcfg_disable(hl_chip_xx_eeprom_cfg_t* 
 
 
 
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
 static hl_result_t s_hl_chip_xx_eeprom_verify_rw_bounds(uint32_t address, uint32_t *size, uint8_t* buffer);
+#endif
 
 static hl_result_t s_hl_chip_xx_eeprom_writepage(uint8_t* pBuffer, uint16_t WriteAddr, uint16_t* NumByteToWrite);
 
@@ -293,7 +295,7 @@ extern hl_result_t hl_chip_xx_eeprom_read(uint32_t address, uint32_t size, uint8
     hl_result_t res = hl_res_NOK_generic;    
     hl_chip_xx_eeprom_internal_item_t *intitem = s_hl_chip_xx_eeprom_theinternals.items[0];
     
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     
     if(hl_false == s_hl_chip_xx_eeprom_initted_is())
     {
@@ -327,7 +329,7 @@ extern hl_result_t hl_chip_xx_eeprom_write(uint32_t address, uint32_t size, uint
     hl_result_t res = hl_res_NOK_generic;
     hl_chip_xx_eeprom_internal_item_t *intitem = s_hl_chip_xx_eeprom_theinternals.items[0];
 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
    
     if(hl_false == s_hl_chip_xx_eeprom_initted_is())
     {
@@ -442,7 +444,7 @@ static hl_result_t s_hl_chip_xx_eeprom_wrprcfg_disable(hl_chip_xx_eeprom_cfg_t* 
 
 
 // --- utility functions
-
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
 static hl_result_t s_hl_chip_xx_eeprom_verify_rw_bounds(uint32_t address, uint32_t *size, uint8_t* buffer)
 {  
     hl_chip_xx_eeprom_internal_item_t *intitem = s_hl_chip_xx_eeprom_theinternals.items[0];
@@ -475,7 +477,7 @@ static hl_result_t s_hl_chip_xx_eeprom_verify_rw_bounds(uint32_t address, uint32
     return(hl_res_OK);
     
 }
-
+#endif
    
 static hl_result_t s_hl_chip_xx_eeprom_writebuffer(uint8_t* pBuffer, uint16_t WriteAddr, uint16_t NumByteToWrite)
 {

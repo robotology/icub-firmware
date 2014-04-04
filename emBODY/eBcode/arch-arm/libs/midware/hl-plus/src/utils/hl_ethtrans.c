@@ -158,62 +158,65 @@ extern hl_result_t hl_ethtrans_init(const hl_ethtrans_cfg_t *cfg)
 }
 
 
-extern hl_result_t hl_ethtrans_config(hl_ethtrans_phymode_t *usedmiiphymode)
-{
-
+extern hl_result_t hl_ethtrans_start(hl_ethtrans_phymode_t *usedmiiphymode)
+{  
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_true != s_hl_ethtrans_supported_is())
     {
         return(hl_res_NOK_unsupported);
     }
 
-
     if(hl_false == s_hl_ethtrans_initted_is())
     {
         return(hl_res_NOK_generic);
     }
+#endif
     
-
     if(hl_true == s_hl_ethtrans_started_is())
     {
+        if(usedmiiphymode == NULL)
+        {
+            return(hl_res_OK);
+        }
         return(hl_ethtrans_getmiiphymode(usedmiiphymode));
     }    
  
-//    targetphymode = (hl_eth_phymode_auto == targetphymode) ? (hl_brdcfg_device_ethtrans__theconfig.devcfg.targetphymode) : (targetphymode);
- 
-//    hl_brdcfg_device_ethtrans__theconfig.devcfg.chipif.config(targetphymode, usedphymode);
+    hl_result_t res = hl_ethtrans_chip_start(usedmiiphymode);
+    
+    if(hl_res_OK == res)
+    {
+        s_hl_ethtrans_started_set();
+    }
 
-    hl_ethtrans_chip_config(usedmiiphymode);
-
-    s_hl_ethtrans_started_set();
-
-    return(hl_res_OK); 
+    return(res); 
 }
 
 
 extern hl_result_t hl_ethtrans_getmiiphymode(hl_ethtrans_phymode_t *usedmiiphymode)
 {
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(NULL == usedmiiphymode)
+    {
+        return(hl_res_NOK_nullpointer);
+    }
 
     if(hl_true != s_hl_ethtrans_supported_is())
     {
         return(hl_res_NOK_unsupported);
     }
 
-
     if(hl_false == s_hl_ethtrans_initted_is())
     {
         return(hl_res_NOK_generic);
     }
     
-
     if(hl_false == s_hl_ethtrans_started_is())
     {
         return(hl_res_NOK_generic);
     }    
- 
-
-    hl_ethtrans_chip_getmiiphymode(usedmiiphymode);
-
-    return(hl_res_OK); 
+#endif
+    
+    return(hl_ethtrans_chip_getmiiphymode(usedmiiphymode));
 }
 
 extern hl_bool_t hl_ethtrans_initted_is(void)
@@ -233,9 +236,12 @@ __weak extern hl_result_t hl_ethtrans_chip_init(void* param)
 }
 
 
-__weak extern hl_result_t hl_ethtrans_chip_config(hl_ethtrans_phymode_t *usedmiiphymode)
+__weak extern hl_result_t hl_ethtrans_chip_start(hl_ethtrans_phymode_t *usedmiiphymode)
 {
-    *usedmiiphymode = hl_ethtrans_phymode_none;
+    if(NULL != usedmiiphymode)
+    {
+        *usedmiiphymode = hl_ethtrans_phymode_none;
+    }
     
     return(hl_res_OK);
 }

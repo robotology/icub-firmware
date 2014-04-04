@@ -178,7 +178,7 @@ extern hl_result_t hl_chip_xx_ethphy_init(const hl_chip_xx_ethphy_cfg_t *cfg)
 }
 
 
-extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t* usedphymode)
+extern hl_result_t hl_chip_xx_ethphy_start(hl_ethtrans_phymode_t* usedphymode)
 {
     
     hl_chip_xx_ethphy_internal_item_t *intitem = s_hl_chip_xx_ethphy_theinternals.items[0];
@@ -196,21 +196,7 @@ extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t* usedphymod
         return(hl_res_NOK_generic);
     }    
     
-
-#if 0
-    // configure phy in full duplex and 100MB
-    hl_eth_smi_write(HL_CHIP_XX_ETHPHY__PHYDEV_ADR, HL_CHIP_XX_ETHPHY__REGADR_CNTRL, HL_CHIP_XX_ETHPHY__REGVAL_CNTRL_FULLDUPLEX | HL_CHIP_XX_ETHPHY__REGVAL_CNTRL_SPEED100M); 
-    
-    *phymode = hl_ethtrans_phymode_fullduplex100mbps;;
- 
-//     uint16_t regv;
-//     uint32_t tout;
-//     static uint16_t aaa = 0;    
-//     regv = hl_eth_smi_read(HL_CHIP_XX_ETHPHY__PHYDEV_ADR, 2);    
-//     aaa = regv;
-//     for(;;);
-#else
-    
+   
     hl_ethtrans_phymode_t targetphymode = intitem->config.targetphymode;
        
     #warning --> now we dont support the hl_ethtrans_phymode_auto: change it 
@@ -220,7 +206,7 @@ extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t* usedphymod
         {
             *usedphymode = hl_ethtrans_phymode_none;
         }  
-        hl_sys_on_error(hl_error_unsupportedbehaviour, "hl_chip_xx_ethphy_configure() does not support hl_ethtrans_phymode_auto");        
+        hl_sys_on_error(hl_error_unsupportedbehaviour, "hl_chip_xx_ethphy_start() does not support hl_ethtrans_phymode_auto");        
         return(hl_res_NOK_generic);        
     }
     
@@ -240,23 +226,19 @@ extern hl_result_t hl_chip_xx_ethphy_configure(hl_ethtrans_phymode_t* usedphymod
     
     // gives back the used mux and speed
     hl_chip_xx_ethphy_getphymode(usedphymode);
-
  
-    return(hl_res_OK);
-    
-#endif
-    
+    return(hl_res_OK);    
 }
 
 
 extern hl_result_t hl_chip_xx_ethphy_getphymode(hl_ethtrans_phymode_t* usedphymode)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(NULL == usedphymode)
     {
          return(hl_res_NOK_generic);
     }
-#endif//!defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#endif
     
     uint16_t val = 0;
     val = hl_eth_smi_read(HL_CHIP_XX_ETHPHY__PHYDEV_ADR, HL_CHIP_XX_ETHPHY__REGADR_CNTRL); 
@@ -308,7 +290,6 @@ static hl_result_t s_hl_chip_xx_ethphy_hw_init(const hl_chip_xx_ethphy_cfg_t *cf
     uint16_t regv;
     uint32_t tout;
     
-    #warning --> chi inizializza lo smi? chi ne ha bisogno? 
     // 1. initialises smi
     hl_eth_smi_init();
     

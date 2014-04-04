@@ -210,7 +210,7 @@ extern hl_result_t hl_gpio_altf(hl_gpio_altf_t* altf)
 
 extern hl_result_t hl_gpio_pin_write(hl_gpio_t gpio, hl_gpio_val_t val)
 {  
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if((hl_gpio_portNONE == gpio.port) || (hl_gpio_pinNONE == gpio.pin) || (hl_gpio_valUNDEF == val))
     {
         return(hl_res_NOK_generic);
@@ -223,6 +223,12 @@ extern hl_result_t hl_gpio_pin_write(hl_gpio_t gpio, hl_gpio_val_t val)
 
 extern hl_result_t hl_gpio_pin_toggle(hl_gpio_t gpio)
 {       
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((hl_gpio_portNONE == gpio.port) || (hl_gpio_pinNONE == gpio.pin))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
     
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
     
@@ -241,7 +247,7 @@ extern hl_result_t hl_gpio_pin_toggle(hl_gpio_t gpio)
 
 extern hl_gpio_val_t hl_gpio_pin_input_read(hl_gpio_t gpio) 
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if((hl_gpio_portNONE == gpio.port) || (hl_gpio_pinNONE == gpio.pin))
     {
         return(hl_gpio_valUNDEF);
@@ -253,7 +259,7 @@ extern hl_gpio_val_t hl_gpio_pin_input_read(hl_gpio_t gpio)
 
 extern hl_gpio_val_t hl_gpio_pin_output_read(hl_gpio_t gpio) 
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if((hl_gpio_portNONE == gpio.port) || (hl_gpio_pinNONE == gpio.pin))
     {
         return(hl_gpio_valUNDEF);
@@ -266,12 +272,13 @@ extern hl_gpio_val_t hl_gpio_pin_output_read(hl_gpio_t gpio)
 
 extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* gpiomap)
 {
-    
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
     if((NULL == gpiomap) || (NULL == init))
     {
         return(hl_res_NOK_generic);
     }    
-
+#endif
+    
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
     init->port                  = gpiomap->gpio.port;
@@ -292,11 +299,13 @@ extern hl_result_t hl_gpio_fill_init(hl_gpio_init_t* init, const hl_gpio_map_t* 
 
 extern hl_result_t hl_gpio_fill_altf(hl_gpio_altf_t* altf, const hl_gpio_map_t* gpiomap)
 {
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
     if((NULL == gpiomap) || (NULL == altf))
     {
         return(hl_res_NOK_generic);
     }    
-
+#endif
+    
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
 
     altf->gpio_remap    = gpiomap->af32;
@@ -344,7 +353,13 @@ extern hl_result_t hl_gpio_pin_output_init(hl_gpio_t gpio)
 #endif        
     };
     
-
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((hl_gpio_portNONE == gpio.port) || (hl_gpio_pinNONE == gpio.pin))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
+    
     hl_gpio_init_t gpioinit;
     hl_gpio_map_t gpiomap;
     memcpy(&gpioinit, &outgpioinit, sizeof(hl_gpio_init_t));

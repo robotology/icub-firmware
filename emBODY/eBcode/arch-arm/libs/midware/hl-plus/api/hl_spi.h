@@ -82,7 +82,7 @@ typedef struct
  **/
 typedef struct
 {
-    uint8_t             supported_mask;             /**< bit in position hl_spix must be 1 if portx is supported */
+    uint32_t            supportedmask;             /**< bit in position hl_spix must be 1 if portx is supported */
     hl_spi_gpiomap_t    gpiomap[hl_spis_number];    /**< in position hl_spix there is gpio map of SPIx */
 } hl_spi_mapping_t;
 

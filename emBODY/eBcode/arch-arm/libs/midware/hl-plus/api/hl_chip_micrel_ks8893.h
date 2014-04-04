@@ -85,11 +85,11 @@ typedef struct
 extern hl_result_t hl_chip_micrel_ks8893_init(const hl_chip_micrel_ks8893_cfg_t *cfg);
 
 
-/** @fn			extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t targetphymode, hl_ethtrans_phymode_t* usedphymode)
-    @brief  	this function configure the switch with a target phy mode.
+/** @fn			extern hl_result_t hl_chip_micrel_ks8893_start(hl_ethtrans_phymode_t* usedmiiphymode)
+    @brief  	this function starts the switch as previously initted and retrieve the used phy mode for mii.
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
-extern hl_result_t hl_chip_micrel_ks8893_configure(hl_ethtrans_phymode_t* usedmiiphymode);
+extern hl_result_t hl_chip_micrel_ks8893_start(hl_ethtrans_phymode_t* usedmiiphymode);
 
 
 /** @fn			extern hl_result_t hl_chip_micrel_ks8893_mii_getphymode(hl_ethtrans_phymode_t* usedphymode)

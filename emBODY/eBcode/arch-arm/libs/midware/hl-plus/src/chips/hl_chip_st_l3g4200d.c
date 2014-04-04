@@ -194,7 +194,7 @@ extern hl_result_t hl_chip_st_l3g4200d_temp_get(int8_t* temp)
     uint8_t data = 0;
 
     *temp = 0;
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_chip_st_l3g4200d_initted_is())
     {
         return(hl_res_NOK_generic);
@@ -227,7 +227,7 @@ extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, i
     *yar = 0;
     *zar = 0;
 
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_chip_st_l3g4200d_initted_is())
     {
         return(hl_res_NOK_generic);

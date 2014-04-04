@@ -216,7 +216,7 @@ extern hl_result_t hl_fifo_init(hl_fifo_t *fifo, uint8_t capacity, uint8_t sizeo
 
 extern void hl_fifo_reset(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo)
     {
         return;
@@ -231,7 +231,7 @@ extern void hl_fifo_reset(hl_fifo_t *fifo)
 
 extern void hl_fifo_clear(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo)
     {
         return;
@@ -248,8 +248,8 @@ extern void hl_fifo_clear(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_put(hl_fifo_t *fifo, uint8_t *data)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
-    if(NULL == fifo)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo) // dat can be NULL
     {
         return(hl_res_NOK_generic);
     }
@@ -289,7 +289,7 @@ extern hl_result_t hl_fifo_put(hl_fifo_t *fifo, uint8_t *data)
 
 extern uint8_t * hl_fifo_end(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo)
     {
         return(NULL);
@@ -309,7 +309,7 @@ extern uint8_t * hl_fifo_end(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_get(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if((NULL == fifo) || (NULL == data))
     {
         return(hl_res_NOK_generic);
@@ -356,7 +356,7 @@ extern hl_result_t hl_fifo_get(hl_fifo_t *fifo, uint8_t *data, uint8_t *remainin
 
 extern uint8_t * hl_fifo_front(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo)
     {
         return(NULL);
@@ -391,7 +391,7 @@ extern uint8_t * hl_fifo_front(hl_fifo_t *fifo)
 
 extern void hl_fifo_pop(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo)
     {
         return;
@@ -411,7 +411,7 @@ extern void hl_fifo_pop(hl_fifo_t *fifo)
 
 extern uint8_t hl_fifo_size(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo)
     {
         return(0);
@@ -424,7 +424,7 @@ extern uint8_t hl_fifo_size(hl_fifo_t *fifo)
 
 extern hl_bool_t hl_fifo_full(hl_fifo_t *fifo)
 {
-#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAM_CHECK)
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
     if(NULL == fifo) 
     {
         return(hl_true);
@@ -439,7 +439,12 @@ extern hl_bool_t hl_fifo_full(hl_fifo_t *fifo)
 
 extern uint8_t * hl_fifo_front16(hl_fifo_t *fifo)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo)
+    {
+        return(NULL);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -460,7 +465,12 @@ extern uint8_t * hl_fifo_front16(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_get16(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((NULL == fifo) || (NULL == data))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -491,15 +501,25 @@ extern hl_result_t hl_fifo_get16(hl_fifo_t *fifo, uint8_t *data, uint8_t *remain
 
 extern hl_result_t hl_fifo_put16(hl_fifo_t *fifo, uint8_t *data)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo) // data can be NULL
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif  
     
     if(fifo->size == fifo->capacity)
     {
         return(hl_res_NOK_generic);
     }
- 
-    s_hl_fifo_itemofsize16copy((uint64_t*)fifo->data, fifo->index, (uint64_t*)data, 0);
-   
+    
+    // cannot move up this control because it is legal to have data equal to NULL. in this case we dont copy. 
+    if(NULL != data)
+    {   // copy data inside ... 
+        s_hl_fifo_itemofsize16copy((uint64_t*)fifo->data, fifo->index, (uint64_t*)data, 0);
+    }
+    // else just advance the index and size
+    
     fifo->size ++;
     fifo->index ++;
     if(fifo->index == fifo->capacity)
@@ -515,7 +535,12 @@ extern hl_result_t hl_fifo_put16(hl_fifo_t *fifo, uint8_t *data)
 
 extern uint8_t * hl_fifo_front08(hl_fifo_t *fifo)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo)
+    {
+        return(NULL);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -536,7 +561,12 @@ extern uint8_t * hl_fifo_front08(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_get08(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((NULL == fifo) || (NULL == data))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -566,14 +596,24 @@ extern hl_result_t hl_fifo_get08(hl_fifo_t *fifo, uint8_t *data, uint8_t *remain
 
 extern hl_result_t hl_fifo_put08(hl_fifo_t *fifo, uint8_t *data)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo) // data can be NULL
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif  
     
     if(fifo->size == fifo->capacity)
     {
         return(hl_res_NOK_generic);
     }
- 
-    s_hl_fifo_itemofsize08copy((uint64_t*)fifo->data, fifo->index, (uint64_t*)data, 0);
+
+    // cannot move up this control because it is legal to have data equal to NULL. in this case we dont copy. 
+    if(NULL != data)
+    {   // copy data inside ...
+        s_hl_fifo_itemofsize08copy((uint64_t*)fifo->data, fifo->index, (uint64_t*)data, 0);
+    }
+    // else just advance the index and size
    
     fifo->size ++;
     fifo->index ++;
@@ -590,7 +630,12 @@ extern hl_result_t hl_fifo_put08(hl_fifo_t *fifo, uint8_t *data)
 
 extern uint8_t * hl_fifo_front04(hl_fifo_t *fifo)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo)
+    {
+        return(NULL);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -611,7 +656,12 @@ extern uint8_t * hl_fifo_front04(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_get04(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((NULL == fifo) || (NULL == data))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -642,15 +692,25 @@ extern hl_result_t hl_fifo_get04(hl_fifo_t *fifo, uint8_t *data, uint8_t *remain
 
 extern hl_result_t hl_fifo_put04(hl_fifo_t *fifo, uint8_t *data)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo) // data can be NULL
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif  
     
     if(fifo->size == fifo->capacity)
     {
         return(hl_res_NOK_generic);
     }
  
-    s_hl_fifo_itemofsize04copy((uint32_t*)fifo->data, fifo->index, (uint32_t*)data, 0);
-   
+    // cannot move up this control because it is legal to have data equal to NULL. in this case we dont copy. 
+    if(NULL != data)
+    {   // copy data inside ...
+        s_hl_fifo_itemofsize04copy((uint32_t*)fifo->data, fifo->index, (uint32_t*)data, 0);
+    }
+    // else just advance the index and size
+    
     fifo->size ++;
     fifo->index ++;
     if(fifo->index == fifo->capacity)
@@ -667,7 +727,12 @@ extern hl_result_t hl_fifo_put04(hl_fifo_t *fifo, uint8_t *data)
 
 extern uint8_t * hl_fifo_front02(hl_fifo_t *fifo)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo)
+    {
+        return(NULL);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -688,7 +753,12 @@ extern uint8_t * hl_fifo_front02(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_get02(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((NULL == fifo) || (NULL == data))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -719,14 +789,24 @@ extern hl_result_t hl_fifo_get02(hl_fifo_t *fifo, uint8_t *data, uint8_t *remain
 
 extern hl_result_t hl_fifo_put02(hl_fifo_t *fifo, uint8_t *data)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo) // data can be NULL
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif 
     
     if(fifo->size == fifo->capacity)
     {
         return(hl_res_NOK_generic);
     }
- 
-    s_hl_fifo_itemofsize02copy((uint16_t*)fifo->data, fifo->index, (uint16_t*)data, 0);
+
+    // cannot move up this control because it is legal to have data equal to NULL. in this case we dont copy. 
+    if(NULL != data)
+    {   // copy data inside ...    
+        s_hl_fifo_itemofsize02copy((uint16_t*)fifo->data, fifo->index, (uint16_t*)data, 0);
+    }
+    // else just advance the index and size
    
     fifo->size ++;
     fifo->index ++;
@@ -743,7 +823,12 @@ extern hl_result_t hl_fifo_put02(hl_fifo_t *fifo, uint8_t *data)
 
 extern uint8_t * hl_fifo_front01(hl_fifo_t *fifo)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo)
+    {
+        return(NULL);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -764,7 +849,12 @@ extern uint8_t * hl_fifo_front01(hl_fifo_t *fifo)
 
 extern hl_result_t hl_fifo_get01(hl_fifo_t *fifo, uint8_t *data, uint8_t *remaining)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((NULL == fifo) || (NULL == data))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
     
     uint32_t start = 0;
     
@@ -795,14 +885,24 @@ extern hl_result_t hl_fifo_get01(hl_fifo_t *fifo, uint8_t *data, uint8_t *remain
 
 extern hl_result_t hl_fifo_put01(hl_fifo_t *fifo, uint8_t *data)
 {
-    // avoid checks .... be careful in calling
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if(NULL == fifo) // data can be NULL
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif 
     
     if(fifo->size == fifo->capacity)
     {
         return(hl_res_NOK_generic);
     }
  
-    s_hl_fifo_itemofsize01copy((uint8_t*)fifo->data, fifo->index, (uint8_t*)data, 0);
+    // cannot move up this control because it is legal to have data equal to NULL. in this case we dont copy. 
+    if(NULL != data)
+    {   // copy data inside ...
+        s_hl_fifo_itemofsize01copy((uint8_t*)fifo->data, fifo->index, (uint8_t*)data, 0);
+    }
+    // else just advance the index and size
    
     fifo->size ++;
     fifo->index ++;

@@ -17,11 +17,11 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HL_CAN_HID_H_
-#define _HL_CAN_HID_H_
+#ifndef _HL_CAN_COMM_HID_H_
+#define _HL_CAN_COMM_HID_H_
 
 
-/* @file       hl_can_hid.h
+/* @file       hl_can_comm_hid.h
 	@brief      This file contains internals for hl can utilities.
 	@author     marco.accame@iit.it
     @date       11/11/2013

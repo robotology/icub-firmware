@@ -173,7 +173,11 @@ typedef struct
 extern hl_result_t hl_can_comm_init(hl_can_t id, const hl_can_comm_cfg_t *cfg);
 
 
-#warning --> think of it
+/** @fn         extern hl_result_t hl_can_comm_deinit(hl_can_t id)
+    @brief      This function de-inits communication over CAN and reverts what is done in hl_can_comm_init().
+    @param      id              identifies CAN id   (CAN1 or CAN2)
+    @return     hl_res_NOK_generic in case of error, else hl_res_OK
+  */
 extern hl_result_t hl_can_comm_deinit(hl_can_t id);
 
 
