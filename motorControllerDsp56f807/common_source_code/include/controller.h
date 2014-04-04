@@ -38,19 +38,26 @@
 
 
 
-
-#define MODE_IDLE						icubCanProto_controlmode_idle
-#define MODE_POSITION 					icubCanProto_controlmode_position
-#define MODE_VELOCITY					icubCanProto_controlmode_velocity
-#define MODE_TORQUE						icubCanProto_controlmode_torque
-#define MODE_IMPEDANCE_POS				icubCanProto_controlmode_impedance_pos
-#define MODE_IMPEDANCE_VEL				icubCanProto_controlmode_impedance_vel
-#define MODE_CALIB_ABS_POS_SENS			icubCanProto_controlmode_calib_abs_pos_sens
-#define MODE_CALIB_HARD_STOPS			icubCanProto_controlmode_calib_hard_stops
-#define MODE_HANDLE_HARD_STOPS			icubCanProto_controlmode_handle_hard_stops
-#define MODE_MARGIN_REACHED    			icubCanProto_controlmode_margin_reached
-#define MODE_CALIB_ABS_AND_INCREMENTAL	icubCanProto_controlmode_calib_abs_and_incremental
-#define MODE_OPENLOOP               	icubCanProto_controlmode_openloop
+// internal board statuses 
+#define MODE_IDLE						0x00
+#define MODE_POSITION 					0x01
+#define MODE_VELOCITY					0x02
+#define MODE_TORQUE						0x03
+#define MODE_IMPEDANCE_POS				0x04 //deprecated 
+#define MODE_IMPEDANCE_VEL				0x05 //deprecated
+#define MODE_CURRENT                    0x06
+#define MODE_MIXED                      0x07
+#define MODE_DIRECT                     0x08
+#define MODE_CALIB_ABS_POS_SENS			0x10 //internal calib status
+#define MODE_CALIB_HARD_STOPS			0x20 //internal calib status
+#define MODE_HANDLE_HARD_STOPS			0x30 //internal calib status
+#define MODE_MARGIN_REACHED    			0x40 //internal calib status
+#define MODE_CALIB_ABS_AND_INCREMENTAL	0x41 //internal calib status
+#define MODE_OPENLOOP               	0x50
+#define MODE_HW_FAULT                   0xA0 //internal status
+#define MODE_NOT_CONFIGURED             0xB0 //internal status
+#define MODE_CONFIGURED                 0xB1 //internal status
+#define MODE_UNKNOWN_ERROR              0xFF //internal status
 
 //   Calibration Type Messages 
 #define CALIB_HARD_STOPS            icubCanProto_calibration_type0_hard_stops 
