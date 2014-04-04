@@ -401,21 +401,6 @@
               <FileType>5</FileType>
               <FilePath>.\src\brdcfg\hl_cfg_plus_target.h</FilePath>
             </File>
-            <File>
-              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_overridden.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -632,6 +617,11 @@
           <GroupName>hal-brdcfg</GroupName>
           <Files>
             <File>
+              <FileName>hal_brdcfg_ems4rd_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\brdcfg\ems4rd\hal_brdcfg_ems4rd_modules.h</FilePath>
+            </File>
+            <File>
               <FileName>hal_brdcfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\brdcfg\hal_brdcfg.c</FilePath>
@@ -652,9 +642,9 @@
               <FilePath>.\src\core\hal_core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_cpu.c</FileName>
+              <FileName>hal_mpu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\core\hal_cpu.c</FilePath>
+              <FilePath>.\src\core\hal_mpu.c</FilePath>
             </File>
             <File>
               <FileName>hal_flash.c</FileName>
@@ -682,69 +672,54 @@
           <GroupName>hal-extra-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_device_accelerometer.c</FileName>
+              <FileName>hal_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_accelerometer.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_accelerometer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_cantransceiver.c</FileName>
+              <FileName>hal_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_cantransceiver.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_cantransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_display.c</FileName>
+              <FileName>hal_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_display.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_eeprom.c</FileName>
+              <FileName>hal_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_eeprom.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_encoder.c</FileName>
+              <FileName>hal_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_ethtransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileName>hal_gyroscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_ethtransceiver.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_gyroscope.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_gyroscope.c</FileName>
+              <FileName>hal_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_gyroscope.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_led.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_led.c</FileName>
+              <FileName>hal_mux.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_led.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_mux.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_mux.c</FileName>
+              <FileName>hal_switch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_mux.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_switch.c</FileName>
+              <FileName>hal_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_termometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_eeprom_dummy.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_eeprom_dummy.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_encoder_fake.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_encoder_fake.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -752,94 +727,49 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_periph_can.hl.only.c</FileName>
+              <FileName>hal_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_can.hl.only.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_crc.c</FileName>
+              <FileName>hal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_crc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_dma.c</FileName>
+              <FileName>hal_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_dma.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.hl.c</FileName>
+              <FileName>hal_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_eth.hl.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_gpio.c</FileName>
+              <FileName>hal_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_gpio.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_i2c.c</FileName>
+              <FileName>hal_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_i2c.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_timer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_spi.c</FileName>
+              <FileName>hal_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_spi.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_trace.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_timer.c</FileName>
+              <FileName>hal_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_timer.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_uniqueid.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_trace.c</FileName>
+              <FileName>hal_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_trace.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_uniqueid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_uniqueid.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_watchdog.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_watchdog.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_spi_minimal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-extra-utilities</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_utility_bits.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_bits.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc07.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc07.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc16.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc16.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc32.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc32.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_fifo.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -941,7 +871,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>hal-em4rd</TargetName>
+      <TargetName>hal-ems4rd</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -978,12 +908,12 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>hal.ems4rd.beta</OutputName>
+          <OutputName>hal2.ems4rd</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -1009,7 +939,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\hal.ems4rd.beta.lib .\lib\hal.ems4rd.beta.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\hal2.ems4rd.lib .\lib\hal2.ems4rd.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1268,8 +1198,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -1282,7 +1212,7 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_EMS4RD HL_USE_BRD_EMS4RD HL_CFG_PLUS_TARGET_BY_FILE</Define>
+              <Define>HAL_BOARD_EMS4RD HL_USE_BRD_EMS4RD HL_CFG_PLUS_TARGET_BY_FILE NOT_EMS4RD_ETHDBG</Define>
               <Undefine></Undefine>
               <IncludePath>.\api;.\src\core;.\src\brdcfg;.\src\extra\chips;.\src\extra\devices;.\src\extra\extbrds;.\src\extra\periphs;.\src\extra\utilities;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
@@ -1334,21 +1264,6 @@
               <FileName>hl_cfg_plus_target.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\src\brdcfg\hl_cfg_plus_target.h</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_overridden.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1526,6 +1441,11 @@
           <GroupName>hal-brdcfg</GroupName>
           <Files>
             <File>
+              <FileName>hal_brdcfg_ems4rd_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\brdcfg\ems4rd\hal_brdcfg_ems4rd_modules.h</FilePath>
+            </File>
+            <File>
               <FileName>hal_brdcfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\brdcfg\hal_brdcfg.c</FilePath>
@@ -1546,9 +1466,9 @@
               <FilePath>.\src\core\hal_core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_cpu.c</FileName>
+              <FileName>hal_mpu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\core\hal_cpu.c</FilePath>
+              <FilePath>.\src\core\hal_mpu.c</FilePath>
             </File>
             <File>
               <FileName>hal_flash.c</FileName>
@@ -1576,109 +1496,54 @@
           <GroupName>hal-extra-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_device_accelerometer.c</FileName>
+              <FileName>hal_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_accelerometer.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_accelerometer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_cantransceiver.c</FileName>
+              <FileName>hal_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_cantransceiver.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_cantransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_display.c</FileName>
+              <FileName>hal_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_display.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_eeprom.c</FileName>
+              <FileName>hal_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_eeprom.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_encoder.c</FileName>
+              <FileName>hal_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_ethtransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileName>hal_gyroscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_ethtransceiver.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_gyroscope.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_gyroscope.c</FileName>
+              <FileName>hal_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_gyroscope.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_led.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_led.c</FileName>
+              <FileName>hal_mux.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_led.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_mux.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_mux.c</FileName>
+              <FileName>hal_switch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_mux.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_switch.c</FileName>
+              <FileName>hal_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_termometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_eeprom_dummy.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_eeprom_dummy.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_encoder_fake.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_encoder_fake.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1686,174 +1551,49 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_periph_can.hl.only.c</FileName>
+              <FileName>hal_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_can.hl.only.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_crc.c</FileName>
+              <FileName>hal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_crc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_dma.c</FileName>
+              <FileName>hal_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_dma.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FilePath>.\src\extra\periphs\hal_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.hl.c</FileName>
+              <FileName>hal_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_eth.hl.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_gpio.c</FileName>
+              <FileName>hal_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_gpio.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_i2c.c</FileName>
+              <FileName>hal_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_i2c.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_timer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_spi.c</FileName>
+              <FileName>hal_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_spi.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FilePath>.\src\extra\periphs\hal_trace.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_timer.c</FileName>
+              <FileName>hal_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_timer.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_uniqueid.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_trace.c</FileName>
+              <FileName>hal_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_trace.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_uniqueid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_uniqueid.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_watchdog.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_watchdog.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_spi_minimal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-extra-utilities</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_utility_bits.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_bits.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc07.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc07.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc16.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc16.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc32.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc32.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_fifo.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1992,12 +1732,12 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>hal.ems4rd.beta.ethdbg</OutputName>
+          <OutputName>hal2.ems4rd.ethdbg</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -2023,7 +1763,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\hal.ems4rd.beta.ethdbg.lib ..\hal-lib\hal.ems4rd.beta.ethdbg.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\hal2.ems4rd.ethdbg.lib .\lib\hal2.ems4rd.ethdbg.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -2349,21 +2089,6 @@
               <FileType>5</FileType>
               <FilePath>.\src\brdcfg\hl_cfg_plus_target.h</FilePath>
             </File>
-            <File>
-              <FileName>hl_cfg_plus_board_stm32f4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_board_stm32f4.c</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_advancedcmsis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_advancedcmsis.c</FilePath>
-            </File>
-            <File>
-              <FileName>hl_cfg_plus_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\brdcfg\hl_cfg_plus_overridden.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2540,6 +2265,11 @@
           <GroupName>hal-brdcfg</GroupName>
           <Files>
             <File>
+              <FileName>hal_brdcfg_ems4rd_modules.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\brdcfg\ems4rd\hal_brdcfg_ems4rd_modules.h</FilePath>
+            </File>
+            <File>
               <FileName>hal_brdcfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\brdcfg\hal_brdcfg.c</FilePath>
@@ -2560,9 +2290,9 @@
               <FilePath>.\src\core\hal_core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_cpu.c</FileName>
+              <FileName>hal_mpu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\core\hal_cpu.c</FilePath>
+              <FilePath>.\src\core\hal_mpu.c</FilePath>
             </File>
             <File>
               <FileName>hal_flash.c</FileName>
@@ -2590,69 +2320,54 @@
           <GroupName>hal-extra-devices</GroupName>
           <Files>
             <File>
-              <FileName>hal_device_accelerometer.c</FileName>
+              <FileName>hal_accelerometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_accelerometer.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_accelerometer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_cantransceiver.c</FileName>
+              <FileName>hal_cantransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_cantransceiver.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_cantransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_display.c</FileName>
+              <FileName>hal_eeprom.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_display.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_eeprom.c</FileName>
+              <FileName>hal_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_eeprom.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_encoder.c</FileName>
+              <FileName>hal_ethtransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_ethtransceiver.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_ethtransceiver.c</FileName>
+              <FileName>hal_gyroscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_ethtransceiver.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_gyroscope.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_gyroscope.c</FileName>
+              <FileName>hal_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_gyroscope.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_led.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_led.c</FileName>
+              <FileName>hal_mux.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_led.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_mux.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_mux.c</FileName>
+              <FileName>hal_switch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_mux.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_switch.c</FilePath>
             </File>
             <File>
-              <FileName>hal_device_switch.c</FileName>
+              <FileName>hal_termometer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_switch.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_termometer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_termometer.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_eeprom_dummy.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_eeprom_dummy.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_device_encoder_fake.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_device_encoder_fake.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_termometer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2660,94 +2375,49 @@
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
             <File>
-              <FileName>hal_periph_can.hl.only.c</FileName>
+              <FileName>hal_can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_can.hl.only.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_can.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_crc.c</FileName>
+              <FileName>hal_eth.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_crc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_eth.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_dma.c</FileName>
+              <FileName>hal_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_dma.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_eth.hl.c</FileName>
+              <FileName>hal_i2c.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_eth.hl.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_i2c.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_gpio.c</FileName>
+              <FileName>hal_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_gpio.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_spi.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_i2c.c</FileName>
+              <FileName>hal_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_i2c.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_timer.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_spi.c</FileName>
+              <FileName>hal_trace.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_spi.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_trace.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_timer.c</FileName>
+              <FileName>hal_uniqueid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_timer.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_uniqueid.c</FilePath>
             </File>
             <File>
-              <FileName>hal_periph_trace.c</FileName>
+              <FileName>hal_watchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_trace.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_uniqueid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_uniqueid.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_watchdog.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_watchdog.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_periph_spi_minimal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_periph_spi_minimal.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>hal-extra-utilities</GroupName>
-          <Files>
-            <File>
-              <FileName>hal_utility_bits.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_bits.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc07.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc07.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc16.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc16.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_crc32.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_crc32.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_utility_fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\extra\utilities\hal_utility_fifo.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_watchdog.c</FilePath>
             </File>
           </Files>
         </Group>
