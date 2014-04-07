@@ -34,7 +34,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
-#include "hal_base_hid.h"
+//#include "hal_base_hid.h"
 
 #include "hal_mpu.h"
 #include "hal_mpu_name.h"
