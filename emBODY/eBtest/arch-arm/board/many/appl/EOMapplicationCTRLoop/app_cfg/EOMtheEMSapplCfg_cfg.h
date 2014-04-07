@@ -40,7 +40,7 @@ extern "C" {
 
 //  <o> host IP4 address <1-255>
 //  <i> default: 205
-#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            145
+#define EOMTHEEMSAPPLCFG_HOSTIPADDR4                            129
 
 
 //  </h>Remote Host

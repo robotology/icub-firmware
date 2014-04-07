@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2 HAL_USE_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems001like;..\..\..\..\..\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems001like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -402,24 +402,19 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
-            <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
-            </File>
-            <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal2.ems4rd.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -455,6 +450,11 @@
               <FileName>osal_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg-stm32f4\osal_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg-stm32f4\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1379,7 +1379,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EO_USE_EPROT_V2 HAL_USE_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems004like;..\..\..\..\..\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems004like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1431,24 +1431,19 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
-            </File>
-            <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
-            </File>
-            <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal2.ems4rd.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1484,6 +1479,11 @@
               <FileName>osal_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg-stm32f4\osal_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg-stm32f4\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>

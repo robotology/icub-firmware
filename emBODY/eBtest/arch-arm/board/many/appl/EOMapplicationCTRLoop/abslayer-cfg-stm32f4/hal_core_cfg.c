@@ -58,7 +58,7 @@ extern const hal_core_cfg_t hal_cfg =
             .ext_heap_delete                    = myheap_delete
         } 
     },
-    .cpucfg     =
+    .mpucfg     =
     {
         .dummy                  = 0
     },
