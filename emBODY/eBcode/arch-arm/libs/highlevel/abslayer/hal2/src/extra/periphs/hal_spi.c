@@ -599,7 +599,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
     intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
 
-    #warning MUSTTTTTTTTTTTTTTTTTTTTTT redefine hl_sys_heap_new() etc....
+
  
     // - the id
     intitem->id = id;

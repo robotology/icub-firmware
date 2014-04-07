@@ -231,7 +231,7 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     
     // now start the hal_ethtransceiver
     res = hal_ethtransceiver_start(NULL);
-    
+    res = res;
     s_hal_eth_initted_set(id);
     
     // also init smi
