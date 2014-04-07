@@ -417,9 +417,9 @@
           <GroupName>hal-startup</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
+              <FileName>hal_startup_mpu_name_stm32f407ig.template.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_mpu_name_stm32f407ig.template.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -457,14 +457,14 @@
           <GroupName>hal2</GroupName>
           <Files>
             <File>
-              <FileName>hal.ems4rd.beta.ethdbg.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.ems4rd.beta.ethdbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -881,9 +881,9 @@
           <GroupName>hal-startup</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
+              <FileName>hal_startup_mpu_name_stm32f407ig.template.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_mpu_name_stm32f407ig.template.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -921,9 +921,9 @@
           <GroupName>hal2</GroupName>
           <Files>
             <File>
-              <FileName>hal.ems4rd.beta.ethdbg.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.ems4rd.beta.ethdbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -944,9 +944,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
