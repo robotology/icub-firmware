@@ -417,9 +417,9 @@
           <GroupName>hal-startup</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
+              <FileName>hal_startup_mpu_name_stm32f407ig.template.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_mpu_name_stm32f407ig.template.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1346,9 +1346,9 @@
           <GroupName>hal-startup</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
+              <FileName>hal_startup_mpu_name_stm32f407ig.template.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_mpu_name_stm32f407ig.template.s</FilePath>
             </File>
           </Files>
         </Group>

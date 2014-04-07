@@ -300,276 +300,13 @@
   </Target>
 
   <Target>
-    <TargetName>ems004</TargetName>
-    <ToolsetNumber>0x4</ToolsetNumber>
-    <ToolsetName>ARM-ADS</ToolsetName>
-    <TargetOption>
-      <CLKADS>25000000</CLKADS>
-      <OPTTT>
-        <gFlags>1</gFlags>
-        <BeepAtEnd>1</BeepAtEnd>
-        <RunSim>1</RunSim>
-        <RunTarget>0</RunTarget>
-      </OPTTT>
-      <OPTHX>
-        <HexSelection>1</HexSelection>
-        <FlashByte>65535</FlashByte>
-        <HexRangeLowAddress>0</HexRangeLowAddress>
-        <HexRangeHighAddress>0</HexRangeHighAddress>
-        <HexOffset>0</HexOffset>
-      </OPTHX>
-      <OPTLEX>
-        <PageWidth>79</PageWidth>
-        <PageLength>66</PageLength>
-        <TabStop>8</TabStop>
-        <ListingPath>.\Lst\</ListingPath>
-      </OPTLEX>
-      <ListingPage>
-        <CreateCListing>1</CreateCListing>
-        <CreateAListing>1</CreateAListing>
-        <CreateLListing>1</CreateLListing>
-        <CreateIListing>0</CreateIListing>
-        <AsmCond>1</AsmCond>
-        <AsmSymb>1</AsmSymb>
-        <AsmXref>0</AsmXref>
-        <CCond>1</CCond>
-        <CCode>0</CCode>
-        <CListInc>0</CListInc>
-        <CSymb>0</CSymb>
-        <LinkerCodeListing>0</LinkerCodeListing>
-      </ListingPage>
-      <OPTXL>
-        <LMap>1</LMap>
-        <LComments>1</LComments>
-        <LGenerateSymbols>1</LGenerateSymbols>
-        <LLibSym>1</LLibSym>
-        <LLines>1</LLines>
-        <LLocSym>1</LLocSym>
-        <LPubSym>1</LPubSym>
-        <LXref>0</LXref>
-        <LExpSel>0</LExpSel>
-      </OPTXL>
-      <OPTFL>
-        <tvExp>1</tvExp>
-        <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
-      </OPTFL>
-      <CpuCode>255</CpuCode>
-      <Books>
-        <Book>
-          <Number>0</Number>
-          <Title>Reference Manual</Title>
-          <Path>DATASHTS\ST\STM32F4xx.PDF</Path>
-        </Book>
-        <Book>
-          <Number>1</Number>
-          <Title>Technical Reference Manual</Title>
-          <Path>datashts\arm\cortex_m4\r0p1\DDI0439C_CORTEX_M4_R0P1_TRM.PDF</Path>
-        </Book>
-        <Book>
-          <Number>2</Number>
-          <Title>Generic User Guide</Title>
-          <Path>datashts\arm\cortex_m4\r0p1\DUI0553A_CORTEX_M4_DGUG.PDF</Path>
-        </Book>
-      </Books>
-      <DllOpt>
-        <SimDllName>SARMCM3.DLL</SimDllName>
-        <SimDllArguments>-MPU -REMAP</SimDllArguments>
-        <SimDlgDllName>DCM.DLL</SimDlgDllName>
-        <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
-        <TargetDllName>SARMCM3.DLL</TargetDllName>
-        <TargetDllArguments>-MPU</TargetDllArguments>
-        <TargetDlgDllName>TCM.DLL</TargetDlgDllName>
-        <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
-      </DllOpt>
-      <DebugOpt>
-        <uSim>0</uSim>
-        <uTrg>1</uTrg>
-        <sLdApp>1</sLdApp>
-        <sGomain>1</sGomain>
-        <sRbreak>1</sRbreak>
-        <sRwatch>1</sRwatch>
-        <sRmem>1</sRmem>
-        <sRfunc>1</sRfunc>
-        <sRbox>1</sRbox>
-        <tLdApp>1</tLdApp>
-        <tGomain>1</tGomain>
-        <tRbreak>1</tRbreak>
-        <tRwatch>1</tRwatch>
-        <tRmem>1</tRmem>
-        <tRfunc>0</tRfunc>
-        <tRbox>1</tRbox>
-        <tRtrace>0</tRtrace>
-        <sRunDeb>0</sRunDeb>
-        <sLrtime>0</sLrtime>
-        <nTsel>9</nTsel>
-        <sDll></sDll>
-        <sDllPa></sDllPa>
-        <sDlgDll></sDlgDll>
-        <sDlgPa></sDlgPa>
-        <sIfile></sIfile>
-        <tDll></tDll>
-        <tDllPa></tDllPa>
-        <tDlgDll></tDlgDll>
-        <tDlgPa></tDlgPa>
-        <tIfile>.\eventviewer-stm32f1-cfg.ini</tIfile>
-        <pMon>BIN\ULP2CM3.DLL</pMon>
-      </DebugOpt>
-      <TargetDriverDllRegistry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O207 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO19 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGUARM</Key>
-          <Name>(107=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGARARM</Key>
-          <Name>(6000=626,372,1323,788,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGDARM</Key>
-          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(100=-1,-1,-1,-1,0)(110=-1,-1,-1,-1,0)(111=-1,-1,-1,-1,0)(180=-1,-1,-1,-1,0)(120=-1,-1,-1,-1,0)(121=-1,-1,-1,-1,0)(122=-1,-1,-1,-1,0)(123=-1,-1,-1,-1,0)(124=-1,-1,-1,-1,0)(140=-1,-1,-1,-1,0)(240=-1,-1,-1,-1,0)(190=-1,-1,-1,-1,0)(200=-1,-1,-1,-1,0)(170=-1,-1,-1,-1,0)(130=-1,-1,-1,-1,0)(131=-1,-1,-1,-1,0)(132=-1,-1,-1,-1,0)(133=-1,-1,-1,-1,0)(160=-1,-1,-1,-1,0)(161=-1,-1,-1,-1,0)(162=-1,-1,-1,-1,0)(210=-1,-1,-1,-1,0)(211=-1,-1,-1,-1,0)(220=-1,-1,-1,-1,0)(221=-1,-1,-1,-1,0)(230=-1,-1,-1,-1,0)(234=-1,-1,-1,-1,0)(231=-1,-1,-1,-1,0)(232=-1,-1,-1,-1,0)(233=-1,-1,-1,-1,0)(150=-1,-1,-1,-1,0)(151=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGTARM</Key>
-          <Name>(1010=-824,70,-458,616,0)(1007=-432,67,-255,331,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>ARMDBGFLAGS</Key>
-          <Name>-T0</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>UL2CM3</Key>
-          <Name>-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000)</Name>
-        </SetRegEntry>
-      </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>1745</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\acemor\acemorising\ccc\firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\hal2\test-hal\app-test\core-plus-stm32fx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>1746</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\acemor\acemorising\ccc\firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\hal2\test-hal\app-test\core-plus-stm32fx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1747</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\acemor\acemorising\ccc\firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\hal2\test-hal\app-test\core-plus-stm32fx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
-      <WatchWindow1>
-        <Ww>
-          <count>0</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_hal_can_theinternals</ItemText>
-        </Ww>
-        <Ww>
-          <count>1</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>hal_brdcfg_can__theconfig</ItemText>
-        </Ww>
-      </WatchWindow1>
-      <MemoryWindow1>
-        <Mm>
-          <WinNumber>1</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>CAN_FilterInitStructure</ItemText>
-        </Mm>
-      </MemoryWindow1>
-      <MemoryWindow2>
-        <Mm>
-          <WinNumber>2</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>&amp;tmp[256]</ItemText>
-        </Mm>
-      </MemoryWindow2>
-      <DebugFlag>
-        <trace>0</trace>
-        <periodic>0</periodic>
-        <aLwin>0</aLwin>
-        <aCover>0</aCover>
-        <aSer1>0</aSer1>
-        <aSer2>0</aSer2>
-        <aPa>0</aPa>
-        <viewmode>1</viewmode>
-        <vrSel>0</vrSel>
-        <aSym>0</aSym>
-        <aTbox>0</aTbox>
-        <AscS1>0</AscS1>
-        <AscS2>0</AscS2>
-        <AscS3>0</AscS3>
-        <aSer3>0</aSer3>
-        <eProf>0</eProf>
-        <aLa>0</aLa>
-        <aPa1>0</aPa1>
-        <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
-        <StkLoc>0</StkLoc>
-        <TrcWin>0</TrcWin>
-        <newCpu>0</newCpu>
-        <uProt>0</uProt>
-      </DebugFlag>
-      <Tracepoint>
-        <THDelay>0</THDelay>
-      </Tracepoint>
-      <LintExecutable></LintExecutable>
-      <LintConfigFile></LintConfigFile>
-    </TargetOption>
-  </Target>
-
-  <Target>
     <TargetName>ems4rD</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
       <CLKADS>25000000</CLKADS>
       <OPTTT>
-        <gFlags>1</gFlags>
+        <gFlags>0</gFlags>
         <BeepAtEnd>1</BeepAtEnd>
         <RunSim>1</RunSim>
         <RunTarget>0</RunTarget>
@@ -617,24 +354,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>255</CpuCode>
-      <Books>
-        <Book>
-          <Number>0</Number>
-          <Title>Reference Manual</Title>
-          <Path>DATASHTS\ST\STM32F4xx.PDF</Path>
-        </Book>
-        <Book>
-          <Number>1</Number>
-          <Title>Technical Reference Manual</Title>
-          <Path>datashts\arm\cortex_m4\r0p1\DDI0439C_CORTEX_M4_R0P1_TRM.PDF</Path>
-        </Book>
-        <Book>
-          <Number>2</Number>
-          <Title>Generic User Guide</Title>
-          <Path>datashts\arm\cortex_m4\r0p1\DUI0553A_CORTEX_M4_DGUG.PDF</Path>
-        </Book>
-      </Books>
+      <CpuCode>0</CpuCode>
       <DllOpt>
         <SimDllName>SARMCM3.DLL</SimDllName>
         <SimDllArguments>-MPU -REMAP</SimDllArguments>
@@ -678,119 +398,7 @@
         <tIfile>.\eventviewer-stm32f1-cfg.ini</tIfile>
         <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
-      <TargetDriverDllRegistry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O207 -S12 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO19 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGUARM</Key>
-          <Name>(107=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGARARM</Key>
-          <Name>(6000=626,372,1323,788,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGDARM</Key>
-          <Name>(1010=-1,-1,-1,-1,0)(1007=-1,-1,-1,-1,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(100=-1,-1,-1,-1,0)(110=-1,-1,-1,-1,0)(111=-1,-1,-1,-1,0)(180=-1,-1,-1,-1,0)(120=-1,-1,-1,-1,0)(121=-1,-1,-1,-1,0)(122=-1,-1,-1,-1,0)(123=-1,-1,-1,-1,0)(124=-1,-1,-1,-1,0)(140=-1,-1,-1,-1,0)(240=-1,-1,-1,-1,0)(190=-1,-1,-1,-1,0)(200=-1,-1,-1,-1,0)(170=-1,-1,-1,-1,0)(130=-1,-1,-1,-1,0)(131=-1,-1,-1,-1,0)(132=-1,-1,-1,-1,0)(133=-1,-1,-1,-1,0)(160=-1,-1,-1,-1,0)(161=-1,-1,-1,-1,0)(162=-1,-1,-1,-1,0)(210=-1,-1,-1,-1,0)(211=-1,-1,-1,-1,0)(220=-1,-1,-1,-1,0)(221=-1,-1,-1,-1,0)(230=-1,-1,-1,-1,0)(234=-1,-1,-1,-1,0)(231=-1,-1,-1,-1,0)(232=-1,-1,-1,-1,0)(233=-1,-1,-1,-1,0)(150=-1,-1,-1,-1,0)(151=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>DLGTARM</Key>
-          <Name>(1010=-824,70,-458,616,0)(1007=-432,67,-255,331,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>ARMDBGFLAGS</Key>
-          <Name>-T0</Name>
-        </SetRegEntry>
-        <SetRegEntry>
-          <Number>0</Number>
-          <Key>UL2CM3</Key>
-          <Name>-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000)</Name>
-        </SetRegEntry>
-      </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>1745</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\acemor\acemorising\ccc\firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\hal2\test-hal\app-test\core-plus-stm32fx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>1746</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\acemor\acemorising\ccc\firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\hal2\test-hal\app-test\core-plus-stm32fx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1747</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\acemor\acemorising\ccc\firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\hal2\test-hal\app-test\core-plus-stm32fx.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
-      <WatchWindow1>
-        <Ww>
-          <count>0</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>cfg</ItemText>
-        </Ww>
-        <Ww>
-          <count>1</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>hlcfg,0x0A</ItemText>
-        </Ww>
-      </WatchWindow1>
-      <MemoryWindow1>
-        <Mm>
-          <WinNumber>1</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>0x2000DD98</ItemText>
-        </Mm>
-      </MemoryWindow1>
-      <MemoryWindow2>
-        <Mm>
-          <WinNumber>2</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>rbuf</ItemText>
-        </Mm>
-      </MemoryWindow2>
+      <Breakpoint/>
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
@@ -799,7 +407,7 @@
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
         <aPa>0</aPa>
-        <viewmode>1</viewmode>
+        <viewmode>0</viewmode>
         <vrSel>0</vrSel>
         <aSym>0</aSym>
         <aTbox>0</aTbox>
@@ -811,7 +419,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
+        <aSer4>0</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -822,12 +430,6 @@
       </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
-      <SystemViewers>
-        <Entry>
-          <Name>OS Support\Event Viewer</Name>
-          <WinId>35905</WinId>
-        </Entry>
-      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -845,8 +447,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>418</TopLine>
+      <CurrentLine>419</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\app-test\core-plus-stm32fx.c</PathWithFileName>
       <FilenameWithoutPath>core-plus-stm32fx.c</FilenameWithoutPath>
@@ -857,7 +459,7 @@
 
   <Group>
     <GroupName>hal-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -912,8 +514,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_cpu_nam_stm32f407.s</PathWithFileName>
-      <FilenameWithoutPath>hal_startup_cpu_nam_stm32f407.s</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\stg\hal_startup_mpu_name_stm32f407ig.template.s</PathWithFileName>
+      <FilenameWithoutPath>hal_startup_mpu_name_stm32f407ig.template.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -961,7 +563,7 @@
 
   <Group>
     <GroupName>hal-core</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1035,10 +637,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>126</TopLine>
+      <CurrentLine>141</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\core\hal_heap.c</PathWithFileName>
       <FilenameWithoutPath>hal_heap.c</FilenameWithoutPath>
@@ -1155,10 +757,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>28</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>209</TopLine>
+      <CurrentLine>185</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_ethtransceiver.c</PathWithFileName>
       <FilenameWithoutPath>hal_ethtransceiver.c</FilenameWithoutPath>
@@ -1275,10 +877,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>47</ColumnNumber>
+      <ColumnNumber>14</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>221</TopLine>
+      <CurrentLine>234</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_eth.c</PathWithFileName>
       <FilenameWithoutPath>hal_eth.c</FilenameWithoutPath>
@@ -1323,10 +925,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>112</TopLine>
+      <CurrentLine>123</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_timer.c</PathWithFileName>
       <FilenameWithoutPath>hal_timer.c</FilenameWithoutPath>
@@ -1389,8 +991,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>268</TopLine>
-      <CurrentLine>313</CurrentLine>
+      <TopLine>552</TopLine>
+      <CurrentLine>602</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</PathWithFileName>
       <FilenameWithoutPath>hal_spi.c</FilenameWithoutPath>
@@ -2195,10 +1797,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>35</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>137</TopLine>
+      <CurrentLine>143</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_sys.c</PathWithFileName>
       <FilenameWithoutPath>hl_sys.c</FilenameWithoutPath>
