@@ -394,27 +394,7 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>s_sharserv_strg_info</ItemText>
-        </Ww>
-        <Ww>
-          <count>1</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_sharserv_moduleinfo_eeprom</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>ROMentity</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>STRentity</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_sharserv_moduleinfo</ItemText>
+          <ItemText>intitem-&gt;config</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -428,7 +408,7 @@
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>0x20004618</ItemText>
+          <ItemText>intitem-&gt;config</ItemText>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
@@ -448,7 +428,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -476,12 +456,6 @@
       </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
-      <SystemViewers>
-        <Entry>
-          <Name>OS Support\Event Viewer</Name>
-          <WinId>35905</WinId>
-        </Entry>
-      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -736,7 +710,7 @@
 
   <Group>
     <GroupName>app</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -748,8 +722,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>86</TopLine>
-      <CurrentLine>94</CurrentLine>
+      <TopLine>173</TopLine>
+      <CurrentLine>175</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\env\eUpdater\app\eom-eupdater-main.c</PathWithFileName>
       <FilenameWithoutPath>eom-eupdater-main.c</FilenameWithoutPath>
@@ -810,10 +784,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>38</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>117</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>150</TopLine>
+      <CurrentLine>168</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\env\eUpdater\app\eupdater-info.c</PathWithFileName>
       <FilenameWithoutPath>eupdater-info.c</FilenameWithoutPath>
@@ -840,29 +814,13 @@
 
   <Group>
     <GroupName>abslayer-lib</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>7</FileNumber>
-      <FileType>2</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>219</TopLine>
-      <CurrentLine>224</CurrentLine>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</PathWithFileName>
-      <FilenameWithoutPath>hal_startup_cpu_nam_stm32f407.s</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>8</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -878,7 +836,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>9</FileNumber>
+      <FileNumber>8</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -894,7 +852,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>10</FileNumber>
+      <FileNumber>9</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -910,7 +868,7 @@
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
-      <FileNumber>11</FileNumber>
+      <FileNumber>10</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -919,8 +877,8 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</PathWithFileName>
-      <FilenameWithoutPath>hal.ems4rd.beta.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</PathWithFileName>
+      <FilenameWithoutPath>hal2.ems4rd.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -934,7 +892,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>12</FileNumber>
+      <FileNumber>11</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -950,7 +908,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>13</FileNumber>
+      <FileNumber>12</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -966,7 +924,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>14</FileNumber>
+      <FileNumber>13</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -982,7 +940,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>15</FileNumber>
+      <FileNumber>14</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -998,14 +956,14 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>16</FileNumber>
+      <FileNumber>15</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>113</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>132</TopLine>
+      <CurrentLine>140</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\osal_cfg-open.c</PathWithFileName>
       <FilenameWithoutPath>osal_cfg-open.c</FilenameWithoutPath>
@@ -1014,17 +972,33 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>17</FileNumber>
+      <FileNumber>16</FileNumber>
       <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>17</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>42</TopLine>
+      <CurrentLine>60</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\abslayer-cfg\hal_core_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>hal_core_cfg.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>17</FileNumber>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>83</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg\hal_core_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>hal_core_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</PathWithFileName>
+      <FilenameWithoutPath>hal_startup_mpu_name_stm32f407ig.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1452,8 +1426,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>154</TopLine>
+      <CurrentLine>160</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</PathWithFileName>
       <FilenameWithoutPath>EOMtheSystem.c</FilenameWithoutPath>
