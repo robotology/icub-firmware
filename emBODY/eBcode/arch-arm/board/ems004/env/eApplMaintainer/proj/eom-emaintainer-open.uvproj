@@ -422,11 +422,6 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
               <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
@@ -442,27 +437,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -498,6 +475,11 @@
               <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -775,8 +757,8 @@
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -1077,7 +1059,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM BOARD_EMS004 _MAINTAINER_APPL_ HAL_USE_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\env\eApplMaintainer\app</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\env\eApplMaintainer\app;..\..\..\..\..\libs\highlevel\abslayer\hal2\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1149,11 +1131,6 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
               <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
@@ -1187,9 +1164,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1225,6 +1202,11 @@
               <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1876,11 +1858,6 @@
           <GroupName>abslayer-lib</GroupName>
           <Files>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
               <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
@@ -1914,9 +1891,9 @@
               <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1952,6 +1929,11 @@
               <FileName>osal_cfg-open.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\abslayer-cfg\osal_cfg-open.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
