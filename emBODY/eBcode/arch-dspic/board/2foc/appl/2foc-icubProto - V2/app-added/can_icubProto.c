@@ -84,7 +84,7 @@ void CanIcubProtoSetFilters(unsigned char bid)
 
 extern icubCanProto_controlmode_t CanIcubProtoGetcontrol_mode(void)
 {
-    if(1 != DS402_Controlword.Flags.EnableOperation)
+    if(!DS402_Controlword.Flags.EnableOperation)
     {
        return(icubCanProto_controlmode_idle);    
     }
@@ -93,25 +93,26 @@ extern icubCanProto_controlmode_t CanIcubProtoGetcontrol_mode(void)
     {
         return(icubCanProto_controlmode_openloop);
     }
-    else if(SysStatus.TorqueControl)
+
+    if(SysStatus.TorqueControl)
     {
         return(icubCanProto_controlmode_current);
     }
-    else if(SysStatus.SpeedControl)
+    
+    if(SysStatus.SpeedControl)
     {
        return(icubCanProto_controlmode_velocity);
     }
-    else if(SysStatus.PositionControl)
+    
+    if(SysStatus.PositionControl)
     {
        return(icubCanProto_controlmode_position);   
     }
-    else if(SysStatus.TorqueSensorLoop)
+    
+    if(SysStatus.TorqueSensorLoop)
     {
         return(icubCanProto_controlmode_torque);
     }
-    else
-    {
-        return(icubCanProto_controlmode_unknownError);
-    }
-
+    
+    return(icubCanProto_controlmode_unknownError);
 }
