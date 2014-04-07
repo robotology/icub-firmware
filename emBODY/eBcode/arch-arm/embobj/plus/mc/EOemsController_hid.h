@@ -21,7 +21,7 @@ extern "C" {
 #include "EOspeedmeter.h"
 #include "EOaxisController.h"
 #include "EOdecoupler.h"
-//#include "EOMtheEMSapplCfg.h"
+#include "EOemsControllerCfg.h"
     
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -30,8 +30,6 @@ extern "C" {
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
 #undef USE_DEBUG_THEEMSCONTROLLER
-
-#define MAX_JOINTS 4
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -50,9 +48,8 @@ typedef enum
  
 struct EOemsController_hid 
 {
-    emsBoardType_t boardType;
+    //emsBoardType_t boardType;
 
-    uint8_t n_joints;
     uint8_t n_calibrated;
     
     eObool_t limited_motors_mask_changed;
@@ -63,10 +60,10 @@ struct EOemsController_hid
     eObool_t cable_length_alarm;
     
     EOmotors         *motors;
-    EOspeedmeter     *enc_speedometer[MAX_JOINTS];
-    EOaxisController *axis_controller[MAX_JOINTS];
+    EOspeedmeter     *enc_speedometer[NAXLES];
+    EOaxisController *axis_controller[NAXLES];
    
-    //float torque_meas[MAX_MOTORS];
+    //float torque_meas[NJOINTS];
 }; 
 
 

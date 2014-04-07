@@ -16,6 +16,7 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
+#include "EOemsControllerCfg.h"
 
 extern const int32_t EMS_FREQUENCY_INT32;
 extern const int32_t TICKS_PER_REVOLUTION;
@@ -86,14 +87,12 @@ int32_t encoder_can_vel = 0;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOaxisController* eo_axisController_New(filter_cut_freq_t cf, uint8_t id) 
+extern EOaxisController* eo_axisController_New(uint8_t id) 
 {
     EOaxisController *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOaxisController), 1);
 
     if (o)
     {
-        o->filter_cut_freq = cf;
-        
         o->axisID = id;
         
         o->pidP = eo_pid_New();    
@@ -335,6 +334,7 @@ extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_
     case eomc_controlmode_velocity:
         o->control_mode = eomc_controlmode_position;
     case eomc_controlmode_position:
+        //eo_trajectory_SetPosRaw(o->trajectory, pos);
         eo_trajectory_SetPosReference(o->trajectory, GET_AXIS_POSITION(), pos, avg_vel);
         break;
         
@@ -523,7 +523,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_true;
 }
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_flag)
+extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff, eObool_t *big_error_flag)
 {
     if (!o) return 0;
     
@@ -546,6 +546,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 o->control_mode = eomc_controlmode_position;
             }
             
+            *stiff = eobool_true;
+            
             return 0;
         }
         
@@ -553,6 +555,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
         {
             eo_trajectory_Init(o->trajectory, pos, vel, 0);
             o->err = 0;
+            
+            *stiff = eobool_true;
+            
             return 0;
         }
 
@@ -560,6 +565,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
         {
             eo_trajectory_Init(o->trajectory, pos, vel, 0);
             o->err = 0;
+            
+            *stiff = eobool_true;
+            
             return o->openloop_out;
         }
 
@@ -579,8 +587,10 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
             
             o->err = pos_ref - pos;
 
-            int32_t pwm = eo_pid_PWM_piv(o->pidP, o->err, vel, vel_ref, acc_ref);
+            //int32_t pwm = eo_pid_PWM_piv(o->pidP, o->err, vel_ref-vel);
+            int32_t pwm = eo_pid_PWM_pid(o->pidP, o->err);
             
+            /*
             if (big_error_flag)
             {
                 if (OUT_OF_RANGE(o->err,1820)) // 10 deg
@@ -588,6 +598,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                     *big_error_flag = eobool_true;
                 }                
             }
+            */
+            
+            *stiff = eobool_true;
             
             return pwm;
         }
@@ -628,23 +641,15 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                 return 0;
             }
             
-            int32_t pwm = 0; // = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            #if defined(ANKLE_BOARD) || defined(WAIST_BOARD)
+                int32_t pwm = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            #elif defined(SHOULDER_BOARD) || defined(UPPERLEG_BOARD)
+                int32_t pwm = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            #else
+                #error undefined board type
+            #endif
             
-            switch (o->filter_cut_freq)
-            {
-            case NO_FILTER:
-                pwm = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas); 
-                break;
-            
-            case CUT_FREQ_1_1_Hz: 
-                pwm = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas); 
-                break;
-                
-            case CUT_FREQ_3_0_Hz: 
-                pwm = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas); 
-                break;
-            }
-            
+            /*
             if (big_error_flag)
             {
                 if ((pos <= o->pos_min && o->torque_ref < 0) || (pos >= o->pos_max && o->torque_ref > 0))
@@ -652,6 +657,9 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_fl
                     *big_error_flag = eobool_true;
                 }
             }
+            */
+            
+            *stiff = eobool_false;
             
             return pwm;
         }   
@@ -675,21 +683,21 @@ extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o)
     return o ? o->pidT : NULL;
 }
 
-extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_axisController_SetPosPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
     if (!o) return;
     
     SET_BIT(MASK_POS_PID);
 
-    eo_pid_SetPid(o->pidP, K, Kd, Ki, Imax, Ymax, Yoff);
+    eo_pid_SetPid(o->pidP, Kp, Kd, Ki, Imax, Ymax, Yoff);
 }
-extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
     if (!o) return;
     
     SET_BIT(MASK_TRQ_PID);
 
-    eo_pid_SetPid(o->pidT, K, Kd, Ki, Imax, Ymax, Yoff);
+    eo_pid_SetPid(o->pidT, Kp, Kd, Ki, Imax, Ymax, Yoff);
 }
 
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus)
@@ -700,7 +708,7 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
     jointStatus->position            = GET_AXIS_POSITION();           
     jointStatus->velocity            = GET_AXIS_VELOCITY();          
     
-    #warning (ALE) to be implemented
+    #warning to be implemented
     jointStatus->acceleration        = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     
     jointStatus->torque              = o->torque_meas;

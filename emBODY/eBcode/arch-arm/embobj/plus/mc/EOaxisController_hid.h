@@ -92,8 +92,6 @@ struct EOaxisController_hid
     uint8_t limits_mask;
     
     eObool_t calibrated;
-    
-    filter_cut_freq_t filter_cut_freq;
 }; 
 
 

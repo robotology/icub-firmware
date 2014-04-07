@@ -73,7 +73,7 @@ typedef struct EOaxisController_hid EOaxisController;
     @brief      Creates a new motor controller object 
     @return     The pointer to the required object.
  **/
-extern EOaxisController* eo_axisController_New(filter_cut_freq_t, uint8_t);
+extern EOaxisController* eo_axisController_New(uint8_t);
 
 extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
@@ -91,7 +91,7 @@ extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 extern void eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *big_error_flag);
+extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff, eObool_t *big_error_flag);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 

@@ -81,11 +81,7 @@ extern EOspeedmeter* eo_speedmeter_New(void)
 
     if (o)
     {        
-        o->time = 1000;
-        
-        o->window = 0;
-        o->distance_filt = 0;
-        o->distance_pred = 0;
+        o->time = 0;
         
         o->distance = 0;
         o->position_last = 0;
@@ -95,12 +91,11 @@ extern EOspeedmeter* eo_speedmeter_New(void)
         o->offset   = 0;
         o->enc_sign = 0;
         
-        o->speed_filt = 0;
-        o->speed = 0;
-        o->dir = 0;
+        o->odo_x_1000 = 0;
         
+        o->speed = 0;
+         
         o->delta = 0;
-        o->delta_filt = 0;
         
         //o->invalid_data_cnt = 0;
         o->first_valid_data = 0;
@@ -154,12 +149,16 @@ extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o)
 
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 {    
-    return o->speed_filt;
+    return o->enc_sign*o->speed;
 }
 
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
 {
-    return o->distance_pred;
+#ifdef USE_2FOC_FAST_ENCODER
+    return o->enc_sign*(o->distance + o->odo_x_1000 / 1000);
+#else
+    return o->enc_sign*o->distance;
+#endif
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -195,21 +194,17 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
     
     if (++o->first_valid_data >= 3)
     {
-        o->time = 1000;
+        o->time = 0;
         
         o->position_last = position;
         o->position_sure = position;
 
         o->distance = position;
         
-        o->distance_pred = position;
-        o->distance_filt = position;
+        o->odo_x_1000 = 0;
         
-        o->delta_filt = 0;
         o->delta = 0;
-        o->speed_filt = 0;
         o->speed = 0;
-        o->dir = 0;
 
         o->first_valid_data = 0;
         //o->invalid_data_cnt = 0;
@@ -226,63 +221,97 @@ static int32_t normalize_angle(int32_t a)
     return a;
 }
 
+#ifdef USE_2FOC_FAST_ENCODER
+extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed)
+{
+    o->speed = speed;
+
+    o->odo_x_1000 += speed;
+}
+#endif
+
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 {
     if (!o) return;
     
     if (!o->enc_sign) return;
     
-    ////////////////////////////////
-    //ENC_FILTER
-    /*
-    position -= o->offset;
-        
-    if (position < 0)
+    if (position != ENC_INVALID)
     {
-        position += IMPULSE_x_REVOLUTION;
-    }
-    else if (position >= IMPULSE_x_REVOLUTION)
-    {
-        position -= IMPULSE_x_REVOLUTION;
-    }
+        position -= o->offset;
         
-    position *= o->enc_sign;
+        if (position < 0)
+        {
+            position += IMPULSE_x_REVOLUTION;
+        }
+        else if (position >= IMPULSE_x_REVOLUTION)
+        {
+            position -= IMPULSE_x_REVOLUTION;
+        }
+    }
     
     if (!o->is_started)
     {
-        o->time = 1000;
+        encoder_init(o, position);
+        
+        return;
+    }
+    
+    if (position != ENC_INVALID)
+    {        
+        int32_t check = normalize_angle(position - o->position_last);
         
         o->position_last = position;
-        o->position_sure = position;
 
-        o->distance = position;
-        
-        o->distance_pred = position;
-        o->distance_filt = position;
-        
-        o->delta_filt = 0;
-        o->delta = 0;
-        o->speed_filt = 0;
-        o->speed = 0;
-        o->dir = 0;
-
-        o->first_valid_data = 0;
-        //o->invalid_data_cnt = 0;
-        
-        o->is_started = eobool_true;
+        if (-48 <= check && check <= 48)
+        {
+            int32_t delta = normalize_angle(position - o->position_sure);
+            
+            if (delta || o->delta)
+            {
+                o->position_sure = position;
+                
+                int32_t inc = (o->delta + delta) >> 1;
+                
+                o->delta = delta;
+                
+                if (inc)
+                {
+                    o->distance += inc;
+#ifdef USE_2FOC_FAST_ENCODER
+                    o->odo_x_1000 -= inc*1000;
+#endif
+                }
+                
+                //o->time = 0;
+            }
+            /*
+            else
+            {    
+                if (o->time != 1000)
+                {
+                    ++o->time;
+                }
+                else
+                {
+                    if (o->odo_x_1000 > 0) 
+                        --o->odo_x_1000;
+                    else if (o->odo_x_1000 < 0) 
+                        ++o->odo_x_1000;
+                }
+            }
+            */
+        }
     }
+}
 
-    int32_t delta = normalize_angle(position - o->position_last);
-    o->position_last = position;
-
-    o->distance += delta;
-
-    o->distance_pred = o->distance;
+#if 0
+extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
+{
+    if (!o) return;
     
-    return;
-    */
-    ////////////////////////////////
-    
+    if (!o->enc_sign) return;
+        
     //if (o->hard_fault) return;
     
     if (position != ENC_INVALID)
@@ -396,6 +425,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         o->dir = 0;
     }
 }
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -29,6 +29,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+/*
  typedef enum {
     EMS_NULL     = 0,
     EMS_GENERIC  = 1,
@@ -37,6 +38,7 @@ extern "C" {
     EMS_ANKLE    = 4,
     EMS_UPPERLEG = 5
 } emsBoardType_t;
+*/
 
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory
     @brief      EOtrajectory is an opaque struct. It is used to implement data abstraction for the 
@@ -59,12 +61,12 @@ typedef struct EOmotors_hid EOmotors;
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors);
 
-extern uint8_t eo_motors_PWM(EOmotors *o, emsBoardType_t board_type, int32_t *pwm_joint, int16_t *pwm_motor, uint8_t* alarm_mask);
+extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t *stiff/*, uint8_t* alarm_mask*/);
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 
 //extern eObool_t eo_motors_is_motorON(EOmotors *o, uint8_t m);
-extern void eo_motor_set_motor_error_status(EOmotors *o, uint8_t m, eObool_t on_off);
+extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t on_off, eOmc_controlmode_t control_mode);
 
 
 /** @}            

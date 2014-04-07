@@ -43,24 +43,20 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define JOINTS(j)   for (uint8_t j=0; j<s_emsc->n_joints; ++j)
-#define MOTORS(m)   for (uint8_t m=0; m<s_emsc->n_joints; ++m)
-#define ENCODERS(e) for (uint8_t e=0; e<s_emsc->n_joints; ++e)
+#define JOINTS(j)   for (uint8_t j=0; j<NAXLES; ++j)
+#define MOTORS(m)   for (uint8_t m=0; m<NAXLES; ++m)
+#define ENCODERS(e) for (uint8_t e=0; e<NAXLES; ++e)
 
 //#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
 const float   EMS_PERIOD           = 0.001f;
 const int32_t EMS_FREQUENCY_INT32  = 1000;
 const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
 const int32_t TICKS_PER_REVOLUTION = 65536;
-
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -80,26 +76,22 @@ void set_2FOC_running(uint8_t joint, eOmc_controlmode_command_t mode);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOemsController";
-
 static EOemsController *s_emsc = NULL;
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOemsController* eo_emsController_Init(emsBoardType_t board_type) 
+extern EOemsController* eo_emsController_Init() 
 {    
-    if (board_type == EMS_NULL) return NULL;
+    //if (board_type == EMS_NULL) return NULL;
 
     s_emsc = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
 
     if (s_emsc)
     {
-        s_emsc->boardType  = board_type;
+        //s_emsc->boardType  = board_type;
         s_emsc->defcon     = EMS_PRUDENT;
-        s_emsc->n_joints   = MAX_JOINTS;
         s_emsc->motors     = NULL;
         
         s_emsc->limited_motors_mask_changed = eobool_false;
@@ -111,51 +103,11 @@ extern EOemsController* eo_emsController_Init(emsBoardType_t board_type)
         
         JOINTS(j)
         {
-            s_emsc->axis_controller[j] = NULL;
-            s_emsc->enc_speedometer[j] = NULL;
-        }
-        
-        switch (s_emsc->boardType)
-        {
-            case EMS_SHOULDER:
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_1_1_Hz, 0);
-                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_1_1_Hz, 1);
-                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_1_1_Hz, 2);
-                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_1_1_Hz, 3);
-                s_emsc->n_joints = 4;
-                break;
-            
-            case EMS_WAIST:    
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz, 0);
-                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz, 1);
-                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_3_0_Hz, 2);
-                s_emsc->n_joints = 3;          
-                break;
-
-            case EMS_UPPERLEG:
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_1_1_Hz, 0);
-                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_1_1_Hz, 1);
-                s_emsc->axis_controller[2] = eo_axisController_New(CUT_FREQ_1_1_Hz, 2);
-                s_emsc->axis_controller[3] = eo_axisController_New(CUT_FREQ_1_1_Hz, 3);
-                s_emsc->n_joints = 4;          
-                break;
-            
-            case EMS_ANKLE:
-                s_emsc->axis_controller[0] = eo_axisController_New(CUT_FREQ_3_0_Hz, 0);
-                s_emsc->axis_controller[1] = eo_axisController_New(CUT_FREQ_3_0_Hz, 1);
-                s_emsc->n_joints = 2;          
-                break;
-            
-            default:           
-                s_emsc->n_joints = 0;
-        }
-        
-        s_emsc->motors = eo_motors_New(s_emsc->n_joints);
-        
-        JOINTS(j)
-        {
+            s_emsc->axis_controller[j] = eo_axisController_New(j);
             s_emsc->enc_speedometer[j] = eo_speedmeter_New();
         }
+        
+        s_emsc->motors = eo_motors_New(NAXLES);
     }
     
     return s_emsc;
@@ -168,11 +120,26 @@ extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign)
     eo_speedometer_SetEncSign(s_emsc->enc_speedometer[jxx], enc_sign);
 }
 
+//             | 1     0       0   |
+// J = dq/dm = | 1   40/65     0   |
+//             | 0  -40/65   40/65 | 
+
+//        |    1       0       0   |
+// J^-1 = | -65/40   65/40     0   |
+//        | -65/40   65/40   65/40 |
+
+//      | 1     1       0   |
+// Jt = | 0   40/65  -40/65 |
+//      | 0     0     40/65 | 
+
+// speed_motor  = J^-1 * speed_axis
+// torque_motor = Jt   * torque_axis
+
 extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
 {
     if (!s_emsc) return;
     
-    int32_t enc_vel[MAX_JOINTS];
+    int32_t enc_vel[NAXLES];
     
     ENCODERS(e)
     {
@@ -182,67 +149,38 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
         enc_vel[e] = eo_speedometer_GetVelocity(s_emsc->enc_speedometer[e]);
     }
 
-    switch (s_emsc->boardType)
-    {
-    case EMS_SHOULDER:
-    {
-        
+    #if defined(SHOULDER_BOARD)
         // |J0|   |  1     0    0   |   |E0|     
-		// |J1| = |  0     1    0   | * |E1|     with a=40/65
-		// |J2|   |  1    -1    a   |   |E2|
-    
-        //int32_t jnt_pos_2_ = eo_axisController_EncRangeAdj(s_emsc->axis_controller[2], enc_pos);
-
+		// |J1| = |  0     1    0   | * |E1|
+		// |J2|   |  1    -1  40/65 |   |E2|
+        
         int32_t jnt_pos_2_ = enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65;
-        
-//         static uint8_t led = 0;        
-//         s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_);
-//         
-//         if (s_emsc->cable_length_alarm)
-//         {
-//             if (!led)
-//             {
-//                 led = 1;
-//                 hal_led_on(hal_led0);
-//             }
-//         }
-//         else
-//         {
-//             if (led)
-//             {
-//                 led = 0;
-//                 hal_led_off(hal_led0);
-//             }
-//         }
-        
+        //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_);
         eo_axisController_SetEncPos(s_emsc->axis_controller[0], enc_pos[0]);
         eo_axisController_SetEncPos(s_emsc->axis_controller[1], enc_pos[1]);
         eo_axisController_SetEncPos(s_emsc->axis_controller[2], jnt_pos_2_);
         eo_axisController_SetEncPos(s_emsc->axis_controller[3], enc_pos[3]);
-
-        #ifdef USE_2FOC_FAST_ENCODER
-        ERROR: fast encoder shoulder geometry TBD!!!
-        #else
-        eo_axisController_SetEncVel(s_emsc->axis_controller[0], enc_vel[0]);
-        eo_axisController_SetEncVel(s_emsc->axis_controller[1], enc_vel[1]);
-        eo_axisController_SetEncVel(s_emsc->axis_controller[2], enc_vel[0]-enc_vel[1]+(40*enc_vel[2])/65);
-        eo_axisController_SetEncVel(s_emsc->axis_controller[3], enc_vel[3]);
-        #endif
     
-        break;
-    }
-    case EMS_UPPERLEG:
-    case EMS_WAIST:
-    case EMS_ANKLE:
-    default:
+        #ifdef USE_2FOC_FAST_ENCODER
+            eo_axisController_SetEncVel(s_emsc->axis_controller[0], enc_vel[0]);
+            eo_axisController_SetEncVel(s_emsc->axis_controller[1], enc_vel[0] + (40*enc_vel[1])/65);
+            eo_axisController_SetEncVel(s_emsc->axis_controller[2], (40*(enc_vel[2]-enc_vel[1]))/65);
+            eo_axisController_SetEncVel(s_emsc->axis_controller[3], enc_vel[3]);
+        #else
+            eo_axisController_SetEncVel(s_emsc->axis_controller[0], enc_vel[0]);
+            eo_axisController_SetEncVel(s_emsc->axis_controller[1], enc_vel[1]);
+            eo_axisController_SetEncVel(s_emsc->axis_controller[2], enc_vel[0]-enc_vel[1]+(40*enc_vel[2])/65);
+            eo_axisController_SetEncVel(s_emsc->axis_controller[3], enc_vel[3]);
+        #endif
+    #else
         JOINTS(j)
         {
             eo_axisController_SetEncPos(s_emsc->axis_controller[j], enc_pos[j]);
             eo_axisController_SetEncVel(s_emsc->axis_controller[j], enc_vel[j]);
         }
-    }
+    #endif
     
-    if (s_emsc->n_joints != s_emsc->n_calibrated)
+    if (s_emsc->n_calibrated != NAXLES)
     {
         eo_emsController_CheckCalibrations();
     }
@@ -273,17 +211,9 @@ extern eObool_t eo_emsController_GetLimitedCurrentMask(uint8_t* mask)
 
 extern void eo_emsController_PWM(int16_t* pwm_motor)
 {
-    if (!s_emsc)
+    if (!s_emsc || s_emsc->defcon == EMS_ALARM)
     {
-        for (uint8_t m=0; m<MAX_JOINTS; ++m) pwm_motor[m] = 0;
-        
-        return;
-    }
-    
-    if (s_emsc->defcon == EMS_ALARM)
-    {   
         MOTORS(m) pwm_motor[m] = 0;
-        
         return;
     }
     
@@ -320,18 +250,20 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         s_emsc->defcon = EMS_ALL_OK;
     }
        
-    int32_t pwm_joint[MAX_JOINTS];
+    int32_t pwm_joint[NAXLES];
 
+    eObool_t stiffness[NAXLES];
+    
     JOINTS(j)
     {
         eObool_t big_error_flag = eobool_false;
         
-        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &big_error_flag);
+        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &stiffness[j], &big_error_flag);
         
         if (big_error_flag) alarm_mask |= 1<<j;
     }
     
-    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, s_emsc->boardType, pwm_joint, pwm_motor, &alarm_mask);
+    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, pwm_joint, pwm_motor, stiffness/*, &alarm_mask*/);
     
     // alarm mask is now the mask of current-limited motors
     
@@ -374,18 +306,12 @@ extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel)
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
-    if (s_emsc) 
-    {        
-        eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);       
-    }
+    if (s_emsc) eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);       
 }
 
 extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos)
 {
-    if (s_emsc) 
-    {        
-        eo_axisController_SetPosRaw(s_emsc->axis_controller[joint], pos);       
-    }
+    if (s_emsc) eo_axisController_SetPosRaw(s_emsc->axis_controller[joint], pos);       
 }
 
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc)
@@ -398,7 +324,7 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
     if (s_emsc) eo_axisController_SetTrqRef(s_emsc->axis_controller[joint], trq);
 }
 
-extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t twoFOC_off)
+extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t b2FOC_off)
 {
     if (!s_emsc) return;
     
@@ -414,61 +340,45 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     if (mode == eomc_controlmode_cmd_switch_everything_off)
     {
-        if (twoFOC_off)
+        if (b2FOC_off)
         {
-            switch (s_emsc->boardType)
-            {
-            case EMS_GENERIC: return;
-        
-            case EMS_UPPERLEG:
-            case EMS_ANKLE:
+            #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
                 set_2FOC_idle(joint);
-                break;
-    
-            case EMS_SHOULDER:
-                if (joint == 3)
+            #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+                if (joint < 3)
                 {
-                    set_2FOC_idle(3);
-                    break;
+                    if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
+                        eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
+                        eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
+                    {
+                        set_2FOC_idle(0);
+                        set_2FOC_idle(1);
+                        set_2FOC_idle(2);
+                    }
                 }
-        
-            case EMS_WAIST:
-                if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
-                    eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
-                    eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
-                {
-                    set_2FOC_idle(0);
-                    set_2FOC_idle(1);
-                    set_2FOC_idle(2);
-                }
-                break;
-            }
+            #endif
+                
+            #if defined(SHOULDER_BOARD)
+                if (joint == 3) set_2FOC_idle(3);
+            #endif
         }
     }
     else
     {
-        switch (s_emsc->boardType)
-        {
-        case EMS_GENERIC: return;
-        
-        case EMS_UPPERLEG:
-        case EMS_ANKLE:
+        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
             set_2FOC_running(joint, mode);
-            break;
-
-        case EMS_SHOULDER:
-            if (joint == 3)
+        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+            if (joint < 3)
             {
-                set_2FOC_running(3, mode);
-                break;
+                set_2FOC_running(0, mode);
+                set_2FOC_running(1, mode);
+                set_2FOC_running(2, mode);
             }
-    
-        case EMS_WAIST:
-            set_2FOC_running(0, mode);
-            set_2FOC_running(1, mode);
-            set_2FOC_running(2, mode);
-            break;
-        }
+        #endif
+        
+        #if defined(SHOULDER_BOARD)
+            if (joint == 3) set_2FOC_running(3, mode);
+        #endif
     }
 }
 
@@ -501,10 +411,7 @@ extern void eo_emsController_CheckCalibrations(void)
     
     s_emsc->n_calibrated = 0;
     
-    switch (s_emsc->boardType)
-    {    
-    case EMS_UPPERLEG:
-    case EMS_ANKLE:
+    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         JOINTS(j)
         {
             if (eo_axisController_IsCalibrated(s_emsc->axis_controller[j]))
@@ -514,24 +421,10 @@ extern void eo_emsController_CheckCalibrations(void)
             else if (eo_speedometer_IsOk(s_emsc->enc_speedometer[j]))
             {    
                 s_emsc->n_calibrated++;
-                
                 eo_axisController_SetCalibrated(s_emsc->axis_controller[j]);
             }
         }
-        return;
-   
-    case EMS_SHOULDER:
-        if (eo_axisController_IsCalibrated(s_emsc->axis_controller[3]))
-        {
-            s_emsc->n_calibrated++;
-        }
-        else if (eo_speedometer_IsOk(s_emsc->enc_speedometer[3]))
-        {    
-            s_emsc->n_calibrated++;
-            
-            eo_axisController_SetCalibrated(s_emsc->axis_controller[3]);
-        }
-    case EMS_WAIST:
+    #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
         if (eo_axisController_IsCalibrated(s_emsc->axis_controller[0]) &&
             eo_axisController_IsCalibrated(s_emsc->axis_controller[1]) &&
             eo_axisController_IsCalibrated(s_emsc->axis_controller[2]))
@@ -543,12 +436,23 @@ extern void eo_emsController_CheckCalibrations(void)
                  eo_speedometer_IsOk(s_emsc->enc_speedometer[2]))
         {
             s_emsc->n_calibrated+=3;
-            
             eo_axisController_SetCalibrated(s_emsc->axis_controller[0]);
             eo_axisController_SetCalibrated(s_emsc->axis_controller[1]);
             eo_axisController_SetCalibrated(s_emsc->axis_controller[2]);
         }
-    }    
+    #endif
+        
+    #if defined(SHOULDER_BOARD)
+        if (eo_axisController_IsCalibrated(s_emsc->axis_controller[3]))
+        {
+            s_emsc->n_calibrated++;
+        }
+        else if (eo_speedometer_IsOk(s_emsc->enc_speedometer[3]))
+        {    
+            s_emsc->n_calibrated++;
+            eo_axisController_SetCalibrated(s_emsc->axis_controller[3]);
+        }
+    #endif  
 }
 
 extern void eo_emsController_Stop(uint8_t joint)
@@ -606,14 +510,13 @@ extern eObool_t eo_emsController_GetMotionDone(uint8_t joint)
 
 ///////////////////////
 // PID configurations
-extern void eo_emsController_SetPosPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
-    if (s_emsc) eo_axisController_SetPosPid(s_emsc->axis_controller[joint], K, Kd, Ki, Imax, Ymax, 0);    
+    if (s_emsc) eo_axisController_SetPosPid(s_emsc->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff);    
 }   
-extern void eo_emsController_SetTrqPid(uint8_t joint, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
-  //if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], K, Kd,  Ki,  Imax, Ymax, Yoff); 
-    if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], K, 0.f, 0.f, 0.0f, Ymax, Yoff);
+    if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], Kp, Kd,  Ki, Imax, Ymax, Yoff); 
 }   
 // PID configurations
 ///////////////////////
@@ -655,7 +558,7 @@ extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode)
 {
-    if (s_emsc) eo_motor_set_motor_error_status(s_emsc->motors, motor, motorerror || canerror);
+    if (s_emsc) eo_motor_set_motor_status(s_emsc->motors, motor, motorerror || canerror, controlmode);
 }
 
 extern void eo_emsMotorController_GoIdle(void)
@@ -666,6 +569,8 @@ extern void eo_emsMotorController_GoIdle(void)
         {
             eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off, eobool_true);
         }
+        
+        MOTORS(m) set_2FOC_idle(m);
     }
 }
 

@@ -31,7 +31,7 @@ extern "C" {
 
 //#define USE_2FOC_FAST_ENCODER
 
-#define SPEED_2FOC_TO_EMS(speed) (5*((int32_t)(speed)))
+#define SPEED_2FOC_TO_EMS(speed) (-10*((int32_t)(speed))) // 2FOC speed is tick x ms, but with 1/100 reduction => 1000/100 
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -63,7 +63,7 @@ extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign);
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position);
 
 #ifdef USE_2FOC_FAST_ENCODER
-extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t velocity);
+extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed);
 #endif
 
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o);

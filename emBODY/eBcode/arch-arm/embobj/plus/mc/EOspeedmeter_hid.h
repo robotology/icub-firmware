@@ -46,9 +46,9 @@ struct EOspeedmeter_hid
     int32_t enc_sign;
     int32_t offset;
 
-    int32_t speed_filt;
+    int32_t odo_x_1000;
+    
     int32_t speed;
-    int32_t dir;
 
     eObool_t is_started;
     eObool_t hard_fault;
@@ -56,12 +56,7 @@ struct EOspeedmeter_hid
     uint8_t  first_valid_data;
     //uint16_t invalid_data_cnt;
 
-    int32_t window;
-    int32_t distance_filt;
-    int32_t distance_pred;
-
     int32_t delta;
-    int32_t delta_filt;
 };
 
 

@@ -40,8 +40,6 @@ extern "C" {
  **/  
 typedef struct EOpid_hid EOpid;
 
-typedef enum { NO_FILTER = 0, CUT_FREQ_1_1_Hz = 11, CUT_FREQ_3_0_Hz = 30 } filter_cut_freq_t;
-
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
@@ -66,7 +64,7 @@ extern EOpid* eo_pid_New(void);
     @param      Ymax  The output maximum value.
  **/
 
-extern void eo_pid_SetPid(EOpid *o, float K, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset);
+extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset);
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err);
 
@@ -79,14 +77,17 @@ extern void eo_pid_Reset(EOpid *o);
     @return     The actual PWM output value.
  **/
 
+// position
+extern int32_t eo_pid_PWM_pid(EOpid *o, float En);
+extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn);
+
+// torque
 extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm);
 extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm);
-extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm);
-extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm);
-extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Venc, float Vref, float Aref);
-//extern int32_t eo_pid_PWM_pid(EOpid *o, float En);
-extern int32_t eo_pid_PWM_pid(EOpid *o, float En, float Vref);
+//extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm);
+//extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm);
+
 
 /** @}            
     end of group eo_pid  
