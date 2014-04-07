@@ -410,7 +410,7 @@ static hl_boolval_t s_hl_i2c_supported_is(hl_i2c_t id)
     {
         return(hl_false);
     }
-    return(hl_bits_byte_bitcheck(hl_i2c_map->supported_mask, HL_i2c_id2index(id)) );
+    return(hl_bits_word_bitcheck(hl_i2c_map->supportedmask , HL_i2c_id2index(id)) );
 }
 
 static void s_hl_i2c_initted_set(hl_i2c_t id)

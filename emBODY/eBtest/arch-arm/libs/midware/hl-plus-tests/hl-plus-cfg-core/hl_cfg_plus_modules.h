@@ -49,7 +49,8 @@
 
 // HL_BEH_* contain behaviours to be applied to every module
 
-//#define HL_BEH_REMOVE_RUNTIME_PARAM_CHECK
+//#define HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK
+//#define HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK
 
 
 

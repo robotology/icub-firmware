@@ -90,7 +90,7 @@
 
 static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
-    .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
+    .supportedmask      = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
     .gpiomap            =
     {   
         {   // hl_i2c1 
@@ -139,7 +139,7 @@ extern const hl_i2c_mapping_t* hl_i2c_map = &s_hl_i2c_mapping;
 
 static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
-    .supported_mask     = (0 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
+    .supportedmask      = (0 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
     .gpiomap            =
     {   
         {   // hl_i2c1 
@@ -187,7 +187,7 @@ extern const hl_i2c_mapping_t* hl_i2c_map = &s_hl_i2c_mapping;
 
 static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
-    .supported_mask     = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
+    .supportedmask      = (1 << hl_i2c1) | (0 << hl_i2c2) | (0 << hl_i2c3),
     .gpiomap            =
     {   
         {   // hl_i2c1 
@@ -353,7 +353,7 @@ extern hl_result_t hl_ethtrans_chip_init(void* param)
 
 static const hl_can_mapping_t s_hl_can_mapping =
 {
-    .supported_mask     = (1 << hl_can1) | (1 << hl_can2),
+    .supportedmask      = (1 << hl_can1) | (1 << hl_can2),
     .gpiomap            =
     {   
         {   // hl_can1 
@@ -399,7 +399,7 @@ extern const hl_can_mapping_t* hl_can_map = &s_hl_can_mapping;
 
 static const hl_timer_mapping_t s_hl_timer_mapping =
 {
-    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4)
+    .supportedmask      = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4)
 };
 
 extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
@@ -410,7 +410,7 @@ extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 static const hl_timer_mapping_t s_hl_timer_mapping =
 {
-    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
+    .supportedmask      = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
 };
 
 extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
@@ -419,7 +419,7 @@ extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 static const hl_timer_mapping_t s_hl_timer_mapping =
 {
-    .supported_mask     = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
+    .supportedmask      = (1 << hl_timer1) | (1 << hl_timer2) | (1 << hl_timer3) | (1 << hl_timer4) | (1 << hl_timer5) | (1 << hl_timer6) | (1 << hl_timer7)
 };
 
 extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
