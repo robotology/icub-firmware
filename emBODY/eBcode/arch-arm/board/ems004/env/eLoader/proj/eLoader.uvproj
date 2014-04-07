@@ -404,22 +404,22 @@
             <File>
               <FileName>hal_core_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app\hal_core_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\hal_core_cfg.h</FilePath>
             </File>
             <File>
               <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\hal_core_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\hal_core_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -799,7 +799,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_BOARD_EMS004 BOARD_EMS004 HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\services\embenv\api;..\..\cfg;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -853,22 +853,22 @@
             <File>
               <FileName>hal_core_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app\hal_core_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\hal_core_cfg.h</FilePath>
             </File>
             <File>
               <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\hal_core_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\hal_core_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1302,22 +1302,22 @@
             <File>
               <FileName>hal_core_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\app\hal_core_cfg.h</FilePath>
+              <FilePath>..\abslayer-cfg\hal_core_cfg.h</FilePath>
             </File>
             <File>
               <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\hal_core_cfg.c</FilePath>
+              <FilePath>..\abslayer-cfg\hal_core_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
+              <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
