@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>ctrloop-v2-mcbstm32c-zerooffset</TargetName>
+      <TargetName>ctrloop-v2-mcbstm32c-zero</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1059,7 +1059,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>ctrloop-v2-mcbstm32c-normoffset</TargetName>
+      <TargetName>ctrloop-v2-mcbstm32c-norm</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -2111,7 +2111,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>ctrloop-v2-ems001brd-normoffset</TargetName>
+      <TargetName>ctrloop-v2-ems001-norm</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -3145,7 +3145,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>ctrloop-v2-ems001brd-zerooffset</TargetName>
+      <TargetName>ctrloop-v2-ems001-zero</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>

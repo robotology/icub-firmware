@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>ctrloop-v2-ems4-zero</TargetName>
+      <TargetName>ctrloop-v2-ems4rd-zero</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -1036,7 +1036,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>ctrloop-v2-ems4-norm</TargetName>
+      <TargetName>ctrloop-v2-ems4rd-norm</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
