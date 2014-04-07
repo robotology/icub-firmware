@@ -46,6 +46,10 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#if     !defined(HAL_IS_VERSION_2)
+    #define HAL_IS_VERSION_2
+#endif
+
 #define hal_NA08                                    ((uint8_t)(0xFF))
 #define hal_NA16                                    ((uint16_t)(0xFFFF))
 #define hal_NA32                                    ((uint32_t)(0xFFFFFFFF)) 
