@@ -70,10 +70,6 @@ typedef struct
     eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
     eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
     uint16_t                            connectedEncodersMask;
-    struct
-    {
-        emsBoardType_t                  emsboard_type;
-    } emsControllerCfg;
 //     struct
 //     {
 //         eOnvEP8_t                        mc_endpoint;  /**<  motion control endopoint managed by the application    */

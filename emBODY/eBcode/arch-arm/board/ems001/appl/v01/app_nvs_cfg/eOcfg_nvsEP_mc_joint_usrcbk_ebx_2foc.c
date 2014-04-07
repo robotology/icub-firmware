@@ -156,8 +156,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     
     // 1) set pid position 
     rescaler_pos = 1.0f/(float)(1<<cfg->pidposition.scale);
-    eo_emsController_SetPosPid(jxx, cfg->pidposition.kp,//*rescaler_pos, 
-	                                cfg->pidposition.kd,//*rescaler_pos, 
+    eo_emsController_SetPosPid(jxx, cfg->pidposition.kp*rescaler_pos, 
+	                                cfg->pidposition.kd*rescaler_pos, 
 	                                cfg->pidposition.ki*rescaler_pos, 
 	                                cfg->pidposition.limitonintegral,
                                     cfg->pidposition.limitonoutput,
@@ -213,8 +213,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
 	
-    eo_emsController_SetPosPid(jxx, pid_ptr->kp,//*rescaler, 
-	                                pid_ptr->kd,//*rescaler, 
+    eo_emsController_SetPosPid(jxx, pid_ptr->kp*rescaler, 
+	                                pid_ptr->kd*rescaler, 
 	                                pid_ptr->ki*rescaler,
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 

@@ -141,29 +141,6 @@
     #error --> you must define an EBx
 #endif
 
-
-//ems controller configuration
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_SHOULDER
-        
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_UPPERLEG
-        
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_ANKLE
-        
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_WAIST
-
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)  || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-        #define EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE          EMS_GENERIC
-
-
-#else
-    #error --> you must define an EBx
-#endif
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -180,10 +157,6 @@ extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default =
         .minor                  = 1
     },
     .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
-    .emsControllerCfg           =
-    {
-        .emsboard_type          = EOMTHEEMSAPPLCFG_EBX_emscontroller_EMSTYPE
-    },
 //     .endpoints                  =
 //     {
 //         .mc_endpoint            = EOMTHEEMSAPPLCFG_EBX_endpoint_mc,   
@@ -706,7 +679,7 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 {
     //uint16_t i, numofjoint = 0;
     
-    p->bodyobjs.emsController = eo_emsController_Init(p->cfg_ptr->emsControllerCfg.emsboard_type);
+    p->bodyobjs.emsController = eo_emsController_Init();
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
                      s_eobj_ownname, "error in emsController_init");
@@ -806,7 +779,7 @@ static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p)
 
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
-    eOresult_t                              res;
+    //eOresult_t                              res;
     uint16_t                                numofjoint, i;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
     eOicubCanProto_estimShift_t             estimshift;
