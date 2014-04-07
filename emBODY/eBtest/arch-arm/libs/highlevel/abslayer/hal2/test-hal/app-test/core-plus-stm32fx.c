@@ -30,7 +30,6 @@
 
 #if     !defined(HAL_USE_LIB)
 #include "hal_brdcfg_modules.h"
-//#include "hal_brdcfg.h"
 #else
 
 #define HAL_USE_GPIO
@@ -77,67 +76,69 @@
 // #define DONT_USE_TRACE
 // #endif
 
+
+#undef  USE_EVENTVIEWER
 #define USE_EVENTVIEWER
-//#undef  USE_EVENTVIEWER
+
 
 #undef  EXECUTE_TEST_FLASH
-//#define EXECUTE_TEST_FLASH
+#define EXECUTE_TEST_FLASH
 
 
 
 #undef  EXECUTE_TEST_SYS_DELAY
-//#define EXECUTE_TEST_SYS_DELAY
+#define EXECUTE_TEST_SYS_DELAY
 
-#undef EXECUTE_TEST_PERIPH_I2C
-//#define EXECUTE_TEST_PERIPH_I2C
+#undef EXECUTE_TEST_I2C
+#define EXECUTE_TEST_I2C
 
 #undef  EXECUTE_TEST_EEPROM
 #define EXECUTE_TEST_EEPROM
 
 
-#undef  EXECUTE_TEST_PERIPH_TIMER
-//#define EXECUTE_TEST_PERIPH_TIMER
+#undef  EXECUTE_TEST_TIMER
+#define EXECUTE_TEST_TIMER
 
-#undef  EXECUTE_TEST_PERIPH_WATCHDOG
-//#define EXECUTE_TEST_PERIPH_WATCHDOG
+#undef  EXECUTE_TEST_WATCHDOG
+//#define EXECUTE_TEST_WATCHDOG
 
-#undef EXECUTE_TEST_PERIPH_UNIQUEID
-#define EXECUTE_TEST_PERIPH_UNIQUEID
+#undef EXECUTE_TEST_UNIQUEID
+#define EXECUTE_TEST_UNIQUEID
 
 
 #undef EXECUTE_TEST_ENCODER
-#define EXECUTE_TEST_ENCODER
+//#define EXECUTE_TEST_ENCODER
 
 
-#undef EXECUTE_TEST_PERIPH_CAN
-//#define EXECUTE_TEST_PERIPH_CAN
+#undef EXECUTE_TEST_CAN
+//#define EXECUTE_TEST_CAN
 
 #define haLcAn1    hal_can1
 #define haLcAn2    hal_can2
 
-#ifdef EXECUTE_TEST_PERIPH_CAN
+#ifdef EXECUTE_TEST_CAN
 #define BURSTLEN 5
-//#define EXECUTE_TEST_PERIPH_CAN_TX1_REGULAR
- #define EXECUTE_TEST_PERIPH_CAN_TX1_BURST
-// #define EXECUTE_TEST_PERIPH_CAN_TX1_MIXED
+//#define EXECUTE_TEST_CAN_TX1_REGULAR
+ #define EXECUTE_TEST_CAN_TX1_BURST
+// #define EXECUTE_TEST_CAN_TX1_MIXED
 
-#define EXECUTE_TEST_PERIPH_CAN_TX1
+#define EXECUTE_TEST_CAN_TX1
 
-#define EXECUTE_TEST_PERIPH_CAN_TX1_RX2
-//#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
+#define EXECUTE_TEST_CAN_TX1_RX2
+//#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
 
 #undef EXECUTE_TEST_SWITCH
 //#define EXECUTE_TEST_SWITCH
 
-#undef EXECUTE_TEST_PERIPH_ETH
-#define EXECUTE_TEST_PERIPH_ETH
+#undef EXECUTE_TEST_ETH
+#define EXECUTE_TEST_ETH
 
 
-#ifdef EXECUTE_TEST_PERIPH_ETH
-#define EXECUTE_TEST_PERIPH_ETH_PING
-#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
-//#define EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY
+#ifdef EXECUTE_TEST_ETH
+#define EXECUTE_TEST_ETH_PING
+#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
+//#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -193,36 +194,36 @@ static void test_flash(void);
 static void test_sys_delay(void);
 #endif//defined(EXECUTE_TEST_SYS_DELAY)    
 
-#if     defined(EXECUTE_TEST_PERIPH_I2C)    
+#if     defined(EXECUTE_TEST_I2C)    
 static void test_periph_i2c(void);
-#endif//defined(EXECUTE_TEST_PERIPH_I2C)  
+#endif//defined(EXECUTE_TEST_I2C)  
 
 #if     defined(EXECUTE_TEST_EEPROM)
 static void test_device_eeprom(void);
 #endif//defined(EXECUTE_TEST_EEPROM)
 
 
-#if     defined(EXECUTE_TEST_PERIPH_TIMER)    
+#if     defined(EXECUTE_TEST_TIMER)    
 static void test_periph_timer(void);
-#endif//defined(EXECUTE_TEST_PERIPH_TIMER)    
+#endif//defined(EXECUTE_TEST_TIMER)    
 
 
-#if     defined(EXECUTE_TEST_PERIPH_WATCHDOG)    
+#if     defined(EXECUTE_TEST_WATCHDOG)    
 static void test_periph_watchdog(void);
-#endif//defined(EXECUTE_TEST_PERIPH_WATCHDOG)    
+#endif//defined(EXECUTE_TEST_WATCHDOG)    
 
-#if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
+#if     defined(EXECUTE_TEST_UNIQUEID)    
 static void test_periph_uniqueid(void);
-#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
+#endif//defined(EXECUTE_TEST_UNIQUEID)   
 
 
-#if     defined(EXECUTE_TEST_PERIPH_CAN)    
+#if     defined(EXECUTE_TEST_CAN)    
 static void test_periph_can(void);
-#endif//defined(EXECUTE_TEST_PERIPH_CAN)  
+#endif//defined(EXECUTE_TEST_CAN)  
 
-#if     defined(EXECUTE_TEST_PERIPH_ETH)    
+#if     defined(EXECUTE_TEST_ETH)    
 static void test_periph_eth(void);
-#endif//defined(EXECUTE_TEST_PERIPH_ETH)   
+#endif//defined(EXECUTE_TEST_ETH)   
 
 
 #if     defined(EXECUTE_TEST_SWITCH)    
@@ -250,7 +251,7 @@ static const uint32_t s_tick_slower_rate_ms = 100;
 
 #if     defined(HAL_USE_GPIO)
 
-static const hal_gpio_maP_t user_button_map = 
+static const hal_gpio_map_t user_button_map = 
 {
 #if     defined(HAL_BOARD_MCBSTM32F400)       
     .gpio       =
@@ -365,26 +366,26 @@ int main(void)
     test_sys_delay();
 #endif//defined(EXECUTE_TEST_SYS_DELAY)      
  
-#if     defined(EXECUTE_TEST_PERIPH_I2C)    
+#if     defined(EXECUTE_TEST_I2C)    
     test_periph_i2c();
-#endif//defined(EXECUTE_TEST_PERIPH_I2C)  
+#endif//defined(EXECUTE_TEST_I2C)  
 
 #if     defined(EXECUTE_TEST_EEPROM)    
     test_device_eeprom();
 #endif//defined(EXECUTE_TEST_EEPROM)  
 
     
-#if     defined(EXECUTE_TEST_PERIPH_TIMER)    
+#if     defined(EXECUTE_TEST_TIMER)    
     test_periph_timer();
-#endif//defined(EXECUTE_TEST_PERIPH_TIMER)    
+#endif//defined(EXECUTE_TEST_TIMER)    
 
-#if     defined(EXECUTE_TEST_PERIPH_WATCHDOG)    
+#if     defined(EXECUTE_TEST_WATCHDOG)    
     test_periph_watchdog();
-#endif//defined(EXECUTE_TEST_PERIPH_WATCHDOG)   
+#endif//defined(EXECUTE_TEST_WATCHDOG)   
 
-#if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
+#if     defined(EXECUTE_TEST_UNIQUEID)    
     test_periph_uniqueid();
-#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)  
+#endif//defined(EXECUTE_TEST_UNIQUEID)  
 
 
 #if     defined(EXECUTE_TEST_ENCODER)    
@@ -393,9 +394,9 @@ int main(void)
 
 // keep it last, as it contains a forever loop
 
-#if     defined(EXECUTE_TEST_PERIPH_CAN)    
+#if     defined(EXECUTE_TEST_CAN)    
     test_periph_can();
-#endif//defined(EXECUTE_TEST_PERIPH_CAN)
+#endif//defined(EXECUTE_TEST_CAN)
      
 
 // it also contains a forever loop. you cannot ping it. just use the two ports
@@ -406,9 +407,9 @@ int main(void)
 
 // keep it last, as it contains a forever loop
 
-#if     defined(EXECUTE_TEST_PERIPH_ETH)    
+#if     defined(EXECUTE_TEST_ETH)    
     test_periph_eth();
-#endif//defined(EXECUTE_TEST_PERIPH_ETH)
+#endif//defined(EXECUTE_TEST_ETH)
      
  
     test_message("");
@@ -599,17 +600,17 @@ extern void onsystick(void)
 
 static void button_init(void)
 {
-#if     defined(HAL_USE_PERIPH_GPIO)
+#if     defined(HAL_USE_GPIO)
  
     hal_gpio_init(user_button_map.gpio, &user_button_config);
     button_ispushed();
     
-#endif//defined(HAL_USE_PERIPH_GPIO)    
+#endif//defined(HAL_USE_GPIO)    
 }
 
 static uint8_t button_ispushed(void)
 {
-#if     defined(HAL_USE_PERIPH_GPIO)
+#if     defined(HAL_USE_GPIO)
     
     hal_gpio_val_t v = user_notpushed_value;
     
@@ -622,9 +623,9 @@ static uint8_t button_ispushed(void)
     {
         return(0);
     }
-#else //defined(HAL_USE_PERIPH_GPIO) 
+#else //defined(HAL_USE_GPIO) 
     return(0);
-#endif//defined(HAL_USE_PERIPH_GPIO)    
+#endif//defined(HAL_USE_GPIO)    
 }
 
 
@@ -652,6 +653,7 @@ static void test_is_beginning(const char* msg)
 #endif
 }
 
+
 static void test_was_successful(const char* msg)
 {  
     char okmsg[128] =  {0};    
@@ -675,7 +677,7 @@ static void info_about_core_plus_led(void)
     char msg[256] =  {0};  
     const char arcstrs[][32]= {"ARM CM3", "ARM CM4", "NONE"};
     const char famstrs[][32] = {"STM32F1", "STM32F4", "NONE"};
-    const char namstrs[][32] = {"STM32F103", "STM32F107", "STM32F207", "STM32F407", "DSPIC33", "NONE"};
+    const char namstrs[][32] = {"STM32F103", "STM32F107", "STM32F407", "NONE"};
 
     hal_mpu_arch_t          arc     = hal_mpu_arch_get();
     hal_mpu_type_t          fam     = hal_mpu_type_get();
@@ -717,7 +719,7 @@ static void info_about_core_plus_led(void)
     hal_trace_puts(" TRACE:             enabled and used (otherwise you would not read this print)");         
         
 #ifdef HAL_USE_LED
-    hal_trace_puts(" DEVICE LED:        enabled and used");  
+    hal_trace_puts(" LED:        enabled and used");  
 #endif
         
     hal_trace_puts(" PLUS OTHERS");
@@ -737,6 +739,7 @@ static void test_flash(void)
     test_is_beginning("flash: erasing a bank, writing, reading it back");
 
     static uint32_t address = 0;
+    uint32_t i;
     
     static const uint32_t size = 128*1024;
     static uint8_t wbuf[256] = {0};
@@ -759,9 +762,27 @@ static void test_flash(void)
     res = hal_flash_write(address+sizeof(wbuf), sizeof(wbuf), wbuf);
 
     res = hal_flash_read(address, sizeof(rbuf), rbuf);
+
+    for(i=0; i<256; i++)
+    {
+        if(rbuf[i] != 5)
+        {
+             test_has_failed("flash");
+        }
+    }
+    
+    for(i=256; i<512; i++)
+    {
+        if(rbuf[i] != 10)
+        {
+             test_has_failed("flash");
+        }
+    }
+    
+    test_was_successful("flash");
+    
     res = res;
-
-
+    
     hal_sys_irq_enable();        
 
 }
@@ -869,7 +890,7 @@ static void test_sys_delay(void)
 #endif//defined(EXECUTE_TEST_SYS_DELAY)  
 
 
-#if     defined(EXECUTE_TEST_PERIPH_I2C)    
+#if     defined(EXECUTE_TEST_I2C)    
 static void test_periph_i2c(void)
 {
     hal_result_t res;
@@ -879,14 +900,14 @@ static void test_periph_i2c(void)
     test_is_beginning("i2c: if test eeprom is OK then i2c works fine. if test eeprom fails ... i2c may work or not");
     
 }
-#endif//defined(EXECUTE_TEST_PERIPH_I2C)  
+#endif//defined(EXECUTE_TEST_I2C)  
 
 
 #if     defined(EXECUTE_TEST_EEPROM)
 
 static void test_device_eeprom(void)
 {
-#if     defined(HAL_USE_EEPROM) || defined(HAL_USE_EEPROM_dummy)
+#if     defined(HAL_USE_EEPROM)
     
     test_is_beginning("eeprom");
     int i;
@@ -951,7 +972,7 @@ static void test_device_eeprom(void)
 
 
 
-#if     defined(EXECUTE_TEST_PERIPH_TIMER)
+#if     defined(EXECUTE_TEST_TIMER)
 
 static volatile uint8_t test_timer_count = 0;
 
@@ -989,7 +1010,7 @@ static const hal_timer_cfg_t test_timer_config =
 
 static void test_periph_timer(void)
 {
-#if     defined(HAL_USE_PERIPH_TIMER)
+#if     defined(HAL_USE_TIMER)
     
     test_is_beginning("timer");
     
@@ -1024,13 +1045,13 @@ static void test_periph_timer(void)
 
     
 
-#endif//defined(HAL_USE_PERIPH_TIMER)
+#endif//defined(HAL_USE_TIMER)
 }
 
-#endif//defined(EXECUTE_TEST_PERIPH_TIMER)
+#endif//defined(EXECUTE_TEST_TIMER)
 
 
-#if     defined(EXECUTE_TEST_PERIPH_WATCHDOG)   
+#if     defined(EXECUTE_TEST_WATCHDOG)   
 
 #define WDT_NORMAL
 //#define WDT_WINDOW
@@ -1108,14 +1129,14 @@ static void test_periph_watchdog(void)
     for(;;);
         
 }
-#endif//defined(EXECUTE_TEST_PERIPH_WATCHDOG)   
+#endif//defined(EXECUTE_TEST_WATCHDOG)   
 
 
 
-#if     defined(EXECUTE_TEST_PERIPH_UNIQUEID)    
+#if     defined(EXECUTE_TEST_UNIQUEID)    
 static void test_periph_uniqueid(void)
 {
-#ifdef HAL_USE_PERIPH_UNIQUEID
+#ifdef HAL_USE_UNIQUEID
     
     test_is_beginning("unique id");
     
@@ -1128,13 +1149,13 @@ static void test_periph_uniqueid(void)
     test_message(msg);
 
 
-#endif//HAL_USE_PERIPH_UNIQUEID
+#endif//HAL_USE_UNIQUEID
     
 }
-#endif//defined(EXECUTE_TEST_PERIPH_UNIQUEID)   
+#endif//defined(EXECUTE_TEST_UNIQUEID)   
 
 
-#if     defined(EXECUTE_TEST_PERIPH_CAN)    
+#if     defined(EXECUTE_TEST_CAN)    
 
 static const hal_can_cfg_t canconfigbase =
 {
@@ -1161,7 +1182,7 @@ typedef struct
     uint32_t    sequencenumber;  
 } can_message_format_t;
 
-#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_REGULAR)
+#if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
 static void can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
 {   
     ((can_message_format_t*)frametx->data)->sequencenumber = cnt;
@@ -1172,7 +1193,7 @@ static void can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
     hal_can_put(haLcAn1, frametx, hal_can_send_normprio_now);
     
 }
-#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_BURST)
+#elif   defined(EXECUTE_TEST_CAN_TX1_BURST)
 static void can_transmit_burst(hal_can_frame_t* frametx, uint8_t burstlen, uint32_t cnt)
 {           
     static uint8_t accumulate = 0;
@@ -1191,7 +1212,7 @@ static void can_transmit_burst(hal_can_frame_t* frametx, uint8_t burstlen, uint3
         hal_can_transmit(haLcAn1);
     }
 }
-#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_MIXED)
+#elif   defined(EXECUTE_TEST_CAN_TX1_MIXED)
 static void can_transmit_mixed(hal_can_frame_t* frametx, uint8_t burstlen, uint32_t cnt)
 {           
     static uint8_t accumulate = 0;
@@ -1225,7 +1246,7 @@ static void test_periph_can1_on_rx(void* p)
     can1_received = 1;
 }
 
-#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2) 
+#if     defined(EXECUTE_TEST_CAN_TX1_RX2) 
 
 static volatile uint8_t can2_received = 0;
 static void test_periph_can2_on_rx(void* p)
@@ -1271,12 +1292,12 @@ static void can_process_reception(hal_can_t canid, uint32_t count)
     } while((remaining > 0) && (hal_res_OK == res));
     
 }
-#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2) 
+#endif//defined(EXECUTE_TEST_CAN_TX1_RX2) 
 
 static void test_periph_can(void)
 {    
     
-//#if defined(EXECUTE_TEST_PERIPH_CAN_TX1)||defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)    
+//#if defined(EXECUTE_TEST_CAN_TX1)||defined(EXECUTE_TEST_CAN_TX1_RX2)    
     
     test_is_beginning("can");   
     char msg[128] =  {0};
@@ -1294,7 +1315,7 @@ static void test_periph_can(void)
 
 
     
-#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)  
+#if     defined(EXECUTE_TEST_CAN_TX1_RX2)  
     // init can 2
     memcpy(&canxconfig, &canconfigbase, sizeof(hal_can_cfg_t));
     canxconfig.priorx = hal_int_priority10;
@@ -1304,7 +1325,7 @@ static void test_periph_can(void)
     hal_can_init(haLcAn2, &canxconfig);
     hal_can_enable(haLcAn2);
     //hal_can_put(haLcAn2, &canframetx, hal_can_send_normprio_now);
-#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)          
+#endif//defined(EXECUTE_TEST_CAN_TX1_RX2)          
     
     
     // init can 1 
@@ -1320,7 +1341,7 @@ static void test_periph_can(void)
  
     
     
-// #if     !defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+// #if     !defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
 //     snprintf(msg, sizeof(msg)-1, "eth: successful if led3 blinks at 1Hz and the board responds to ping to %d.%d.%d.%d", 
 //                                  ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
 //     
@@ -1333,7 +1354,7 @@ static void test_periph_can(void)
 //     snprintf(msg, sizeof(msg)-1, "     and if a small udp packet to port %d is replied w/ its first 4 bytes", udpport);
 //     
 //     test_message(msg);
-// #endif//!defined(EXECUTE_TEST_PERIPH_CAN) 
+// #endif//!defined(EXECUTE_TEST_CAN) 
     
     // 2. run forever loop
     for(;;)
@@ -1344,11 +1365,11 @@ static void test_periph_can(void)
             s_tick_slower = 0;
             count++;
             
-#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_REGULAR)
+#if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
             can_transmit_regular(&canframetx, count); 
-#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_BURST)
+#elif   defined(EXECUTE_TEST_CAN_TX1_BURST)
             can_transmit_burst(&canframetx, BURSTLEN, count); 
-#elif   defined(EXECUTE_TEST_PERIPH_CAN_TX1_MIXED)
+#elif   defined(EXECUTE_TEST_CAN_TX1_MIXED)
             can_transmit_mixed(&canframetx, BURSTLEN, count); 
 #endif
             
@@ -1360,19 +1381,19 @@ static void test_periph_can(void)
             can_process_reception(haLcAn1, count);           
         }
         
-#if     defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)         
+#if     defined(EXECUTE_TEST_CAN_TX1_RX2)         
         if(1 == can2_received)
         {
             can2_received = 0;
             can_process_reception(haLcAn2, count);           
         }
-#endif//defined(EXECUTE_TEST_PERIPH_CAN_TX1_RX2)           
+#endif//defined(EXECUTE_TEST_CAN_TX1_RX2)           
     } 
       
     
 }
 
-#endif//defined(EXECUTE_TEST_PERIPH_CAN)
+#endif//defined(EXECUTE_TEST_CAN)
 
 
 #if     defined(EXECUTE_TEST_SWITCH)   
@@ -1394,7 +1415,7 @@ static void test_device_switch(void)
 #endif//defined(EXECUTE_TEST_SWITCH)   
 
 
-#if     defined(EXECUTE_TEST_PERIPH_ETH)    
+#if     defined(EXECUTE_TEST_ETH)    
 #include "ipal.h"
 static uint8_t s_blink_ipal_led3 = 0;
 static uint8_t s_blink_ipal_led4 = 0;
@@ -1418,7 +1439,7 @@ static void test_periph_eth_tick_ipal(void)
     }
 }
 
-#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)   
+#if     defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)   
 static void s_udp_onreception(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *pkt, ipal_ipv4addr_t adr, ipal_port_t por)
 {
     char msg[128] =  {0};
@@ -1471,9 +1492,9 @@ static void test_periph_eth_udp_init(void)
     }
     hal_trace_puts(msg);    
 }
-#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+#endif//defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY) 
 
-#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+#if     defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
 static void test_periph_eth_udp_reply(void)
 {
     char msg[128] =  {0};
@@ -1524,18 +1545,20 @@ static void test_periph_eth_udp_reply(void)
     
     
 }
-#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+#endif//defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY) 
 
 #include "hal_ethtransceiver.h"
 
 static void test_periph_ethtransceiver_links(void)
 {
-    hal_result_t res;
+    hal_result_t res = hal_res_NOK_generic;
     char msg[128] =  {0};
     uint8_t i;
     
     uint8_t linkupmask = 0;
     uint8_t num = 0;
+
+    res = res;
 
     res = hal_ethtransceiver_phy_numberof(&num);
     res = hal_ethtransceiver_phy_linkupmask(&linkupmask);
@@ -1547,11 +1570,12 @@ static void test_periph_ethtransceiver_links(void)
     snprintf(msg, sizeof(msg), "eth: %d links = 0x%x", num, linkupmask);
     hal_trace_puts(msg);
 
-    hal_ethtransceiver_phystatus_t status[3];
+    hal_ethtransceiver_phystatus_t status[3] = {0};
     res = hal_ethtransceiver_phy_status(status, 3);
     for(i=0; i<3; i++)
     {
-        snprintf(msg, sizeof(msg), "ethtrans: status[%d] = up %d + autoneg %d + linkok %d + 100m %d + duplex %d", 
+        snprintf(msg, sizeof(msg), "ethtrans: res = %s, status[%d] = up %d + autoneg %d + linkok %d + 100m %d + duplex %d", 
+                                    (hal_res_OK == res) ? "OK" : "NOK",
                                     i, 
                                     status[i].linkisup,
                                     status[i].autoNeg_done,
@@ -1564,11 +1588,12 @@ static void test_periph_ethtransceiver_links(void)
     }
     
     
-    hal_eth_phy_status_t ethstatus[3];
+    hal_eth_phy_status_t ethstatus[3] = {0};
     res = hal_eth_get_links_status(ethstatus, 3);
     for(i=0; i<3; i++)
     {
-        snprintf(msg, sizeof(msg), "eth: ethstatus[%d] = up %d + autoneg %d + linkok %d + 100m %d + duplex %d", 
+        snprintf(msg, sizeof(msg), "eth: res = %s, ethstatus[%d] = up %d + autoneg %d + linkok %d + 100m %d + duplex %d", 
+                                    (hal_res_OK == res) ? "OK" : "NOK",
                                     i, 
                                     ethstatus[i].linkisup,
                                     ethstatus[i].autoNeg_done,
@@ -1580,27 +1605,27 @@ static void test_periph_ethtransceiver_links(void)
         hal_trace_puts(msg);
     }  
 
-
+    #define RES(res)      (hal_res_OK == res) ? "OK" : "NOK"
 
     hal_trace_puts("\n-------------- eth errors ---------------------------");
     hal_eth_phy_errorsinfo_t einfo;
     for(i=0; i<2; i++)
     {
             
-        hal_eth_get_errors_info(i, rxCrcError, &einfo);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: crc = %d (valid = %d)", i, einfo.value, einfo.validvalue);
+        res = hal_eth_get_errors_info(i, rxCrcError, &einfo);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, crc = %d (valid = %d)", i, RES(res), einfo.value, einfo.validvalue);
         hal_trace_puts(msg);
         
-        hal_eth_get_errors_info(i, rxUnicast, &einfo);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: unirx = %d (valid = %d)", i, einfo.value, einfo.validvalue);
+        res =hal_eth_get_errors_info(i, rxUnicast, &einfo);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, unirx = %d (valid = %d)", i, RES(res), einfo.value, einfo.validvalue);
         hal_trace_puts(msg); 
 
-        hal_eth_get_errors_info(i, txUnicast, &einfo);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: unitx = %d (valid = %d)", i, einfo.value, einfo.validvalue);
+        res = hal_eth_get_errors_info(i, txUnicast, &einfo);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, unitx = %d (valid = %d)", i, RES(res), einfo.value, einfo.validvalue);
         hal_trace_puts(msg);     
 
-        hal_eth_get_errors_info(i, txUnicast, &einfo);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: rx64 = %d (valid = %d)", i, einfo.value, einfo.validvalue);
+        res = hal_eth_get_errors_info(i, txUnicast, &einfo);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, rx64 = %d (valid = %d)", i, RES(res), einfo.value, einfo.validvalue);
         hal_trace_puts(msg); 
     }    
     
@@ -1611,20 +1636,20 @@ static void test_periph_ethtransceiver_links(void)
     for(i=0; i<2; i++)
     {
             
-        hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rxCrc, &info);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: crc = %d (valid = %d)", i, info.value, info.validvalue);
+        res = hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rxCrc, &info);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, crc = %d (valid = %d)", i, RES(res), info.value, info.validvalue);
         hal_trace_puts(msg);
         
-        hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rxUnicast, &info);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: unirx = %d (valid = %d)", i, info.value, info.validvalue);
+        res = hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rxUnicast, &info);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, unirx = %d (valid = %d)", i, RES(res), info.value, info.validvalue);
         hal_trace_puts(msg); 
 
-        hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_txUnicast, &info);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: unitx = %d (valid = %d)", i, info.value, info.validvalue);
+        res = hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_txUnicast, &info);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, unitx = %d (valid = %d)", i, RES(res), info.value, info.validvalue);
         hal_trace_puts(msg);     
 
-        hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rx64Octets, &info);
-        snprintf(msg, sizeof(msg), "ethtrans[%d]: rx64 = %d (valid = %d)", i, info.value, info.validvalue);
+        res = hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rx64Octets, &info);
+        snprintf(msg, sizeof(msg), "ethtrans[%d]: res = %s, rx64 = %d (valid = %d)", i, RES(res), info.value, info.validvalue);
         hal_trace_puts(msg); 
     }
 
@@ -1636,7 +1661,7 @@ static void test_periph_ethtransceiver_links(void)
 static void test_periph_eth(void)
 {    
     
-#if defined(EXECUTE_TEST_PERIPH_ETH_PING)||defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+#if defined(EXECUTE_TEST_ETH_PING)||defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
     
     test_is_beginning("eth");   
     char msg[128] =  {0};
@@ -1656,12 +1681,12 @@ static void test_periph_eth(void)
     
        
     
-#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+#if     defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
     test_periph_eth_udp_init();
-#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+#endif//defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY) 
     
     
-#if     !defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+#if     !defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
     snprintf(msg, sizeof(msg)-1, "eth: successful if led3 blinks at 1Hz and the board responds to ping to %d.%d.%d.%d", 
                                  ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
     
@@ -1674,7 +1699,7 @@ static void test_periph_eth(void)
     snprintf(msg, sizeof(msg)-1, "     and if a small udp packet to port %d is replied w/ its first 4 bytes", udpport);
     
     test_message(msg);
-#endif//!defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY) 
+#endif//!defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY) 
     
     // 2. run ipal
     for(;;)
@@ -1683,14 +1708,14 @@ static void test_periph_eth(void)
         test_periph_eth_tick_ipal();
         ipal_sys_process_communication();
         
-#if     defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+#if     defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
         if(1 == s_reply_udp_msg)
         {
             s_reply_udp_msg = 0;
             test_periph_eth_udp_reply();
             test_periph_ethtransceiver_links();
         }
-#endif//defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)            
+#endif//defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)            
         
         if(1 == s_blink_ipal_led3)
         {        
@@ -1709,10 +1734,10 @@ static void test_periph_eth(void)
     
     } 
     
-#endif//defined(EXECUTE_TEST_PERIPH_ETH_PING)||defined(EXECUTE_TEST_PERIPH_ETH_UDP_RECEIVEANDREPLY)    
+#endif//defined(EXECUTE_TEST_ETH_PING)||defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
     
 }
-#endif//defined(EXECUTE_TEST_PERIPH_ETH)
+#endif//defined(EXECUTE_TEST_ETH)
 
 
 
