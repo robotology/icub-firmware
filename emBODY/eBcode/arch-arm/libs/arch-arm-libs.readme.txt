@@ -27,7 +27,7 @@ It also contains projects for the libraries.
     simpler calls to those services.
     They are:
     - hal:            offers simplified HW services to the application.
-    - haal:           the new HArdware Abstraction Layer
+    - hal2:           the new Hardware Abstraction Layer
     - ipal:           offers TCP/IP services.
     - osal:           offers RTOS services with APIs which depends on the midware RTOS (which may be free or commercial)
 
@@ -38,8 +38,5 @@ It also contains projects for the libraries.
     - sharserv:       Library based upon the abslayer which offers storage, inter-process communication, application info, partition 
                       table for the e-processes inside the MPU: eLoader, eUpdater, eApplication (see eBODY\eB\arch-arm\apps folder). 
   
-  - embobj
-    contains embedded objects which are specific of ARM architecture (not of a simple MEE type)
-    SHALL I USE IT ??
     
                      
