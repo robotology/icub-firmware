@@ -814,7 +814,7 @@
 
   <Group>
     <GroupName>abslayer-lib</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -829,7 +829,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.cm4.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</PathWithFileName>
       <FilenameWithoutPath>ipal.base.medium.cm4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -845,7 +845,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</PathWithFileName>
       <FilenameWithoutPath>osal.cm4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -861,7 +861,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm4.dbg.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</PathWithFileName>
       <FilenameWithoutPath>osal.cm4.dbg.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -886,7 +886,7 @@
 
   <Group>
     <GroupName>abslayer-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -976,9 +976,9 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>17</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>42</TopLine>
+      <TopLine>46</TopLine>
       <CurrentLine>60</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\hal_core_cfg.c</PathWithFileName>
@@ -1566,7 +1566,7 @@
 
   <Group>
     <GroupName>arm-services-embenv</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1581,7 +1581,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</PathWithFileName>
       <FilenameWithoutPath>eEcommon.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1592,12 +1592,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>37</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</PathWithFileName>
       <FilenameWithoutPath>eEsharedServices.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1613,7 +1613,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</PathWithFileName>
       <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1624,12 +1624,12 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>51</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</PathWithFileName>
       <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1645,7 +1645,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalPART.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</PathWithFileName>
       <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
