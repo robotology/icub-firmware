@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\abslayer\hal\api;..\..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\..\libs\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\robotconfig\v1\eprotocol</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\robotconfig\v1\eprotocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -404,7 +404,7 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -427,22 +427,22 @@
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -465,7 +465,7 @@
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -710,27 +710,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1423,9 +1423,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC _FORCE_NETWORK_FROM_IPAL_CFG</Define>
+              <Define>HAL_USE_ARCH_ARM EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_main;..\app_cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\robotconfig\v1\eprotocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1479,32 +1479,32 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1749,27 +1749,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2462,9 +2462,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC</Define>
+              <Define>HAL_USE_ARCH_ARM EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\abslayer-cfg;..\app_main;..\app_cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;.;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\robotconfig\v1\eprotocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2518,32 +2518,32 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2788,27 +2788,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3501,9 +3501,9 @@
             <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>EMSAPPL_USE_CORE HAL_USE_ARCH_ARM SHALS_MODE_STATIC EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
+              <Define>HAL_USE_ARCH_ARM EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\sys\abs\api;..\..\..\..\sys\env\api;..\..\..\..\sys\mid\api;..\..\..\..\..\porting;..\..\..\..\..\any-arch\body\embenv\envcom;..\..\..\..\..\any-arch\sys\embobj\core\api;..\..\..\..\..\any-arch\sys\embobj\core\src;..\..\..\..\..\any-arch\sys\embobj\core-mee\api;..\..\..\..\..\any-arch\sys\embobj\core-mee\src;..\..\..\..\..\any-arch\sys\embobj\env\api;..\..\..\..\..\any-arch\sys\embobj\env\src;..\..\..\..\..\any-arch\sys\embobj\ipnet\api;..\..\..\..\..\any-arch\sys\embobj\ipnet\src;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\api;..\..\..\..\..\any-arch\sys\embobj\ipnet-mee\src;..\..\..\..\..\any-arch\sys\embobj\core-vee\api;..\..\..\..\..\any-arch\sys\embobj\core-vee\src;..\..\..\..\..\any-arch\sys\embobj\prot\src;..\..\..\..\..\any-arch\sys\embobj\prot\api;..\..\..\..\..\any-arch\sys\embobj\icub\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\board-eps;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-management\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-motioncontrol\src;..\..\..\..\..\any-arch\sys\embobj\utils\api;..\..\..\..\..\any-arch\sys\embobj\utils\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-analogsensors\src;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\api;..\..\..\..\..\any-arch\sys\embobj\icub-nvscfg\ep-skin\src;..\..\..\..\..\any-arch\sys\embobj\icub-app\api;..\..\..\..\..\any-arch\sys\embobj\icub-app\cfg;..\..\..\..\..\any-arch\sys\embobj\icub-app\src</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\env\cfg;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\robotconfig\v1\eprotocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3557,32 +3557,32 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>ipal.base.medium.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -3827,27 +3827,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
