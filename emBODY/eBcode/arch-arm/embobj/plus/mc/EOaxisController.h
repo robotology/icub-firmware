@@ -68,6 +68,8 @@ typedef struct EOaxisController_hid EOaxisController;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
+//#define CONTROL_II
+ 
  
 /** @fn         extern EOaxisController* eo_axisController_New(void)
     @brief      Creates a new motor controller object 
@@ -85,11 +87,24 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
 
 //extern void eo_axisController_GetPosRef(EOaxisController *o, int32_t *pos, int32_t *avg_vel);
 
-extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out);
+#ifdef CONTROL_II
+#warning temporary defines waiting for new protocol enums
+#define eomc_controlmode_position_direct 0x08
+#define eomc_controlmode_mixed           0x09
+#define eomc_controlmode_cmd_position_direct 0x08
+#define eomc_controlmode_cmd_mixed           0x09
+extern eObool_t eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
+extern eObool_t eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
+extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
+extern eObool_t eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
+extern eObool_t eo_axisController_SetOutput(EOaxisController *o, int16_t out);
+#else
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
 extern void eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern void eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 extern void eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
+extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out);
+#endif
 
 extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff, eObool_t *big_error_flag);
 
@@ -97,6 +112,9 @@ extern void eo_axisController_Stop(EOaxisController *o);
 
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc);
 extern eOmc_controlmode_t eo_axisController_GetControlMode(EOaxisController *o);
+
+extern eObool_t eo_axisController_SetStiff(EOaxisController *o, eObool_t stiff);
+extern eObool_t eo_axisController_IsStiff(EOaxisController *o);
 
 extern void eo_axisController_SetImpedance(EOaxisController *o, int32_t  stiffness, int32_t  damping, int32_t  offset);
 extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffness, int32_t *damping, int32_t *offset);

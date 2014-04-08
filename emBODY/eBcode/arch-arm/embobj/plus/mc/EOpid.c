@@ -121,11 +121,12 @@ extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, in
     
     o->Dn = 0.f;
     o->In = 0.f;
+    o->En = 0.f;
     
     o->Kp = Kp;
     o->Kd = Kd;
     //o->Ki = Ki;
-    o->Ki = Ki*EMS_PERIOD;
+    o->Ki = 0.5f*Ki*EMS_PERIOD;
     
     //o->A = 0.9f;
     //o->B = (1.f - o->A)*Kd;
@@ -142,15 +143,14 @@ extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
     o->Dn *= o->A;
     o->Dn += o->B*(En - o->En);
     
-    o->In += o->Ki*En;
-    
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
     LIMIT(o->In, o->Imax);
     
-    o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In + o->Dn);
-    
-    LIMIT(o->pwm, o->pwm_max);
-  
     o->En = En;
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In + o->Dn);
+    LIMIT(o->pwm, o->pwm_max);
 
     return o->pwm;
 }
@@ -161,15 +161,14 @@ extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn)
     
     if (!o) return 0;
        
-    o->In += o->Ki*En;
-    
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
     LIMIT(o->In, o->Imax);
     
-    o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In + o->Kd*Vn);
-    
-    LIMIT(o->pwm, o->pwm_max);
-    
     o->En = En;
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In + o->Kd*Vn);
+    LIMIT(o->pwm, o->pwm_max);
     
     return o->pwm;
 }
@@ -210,14 +209,14 @@ extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm)
     if (!o) return 0;
     
     float En = Tr - Tm;
+
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
+    LIMIT(o->In, o->Imax);   
     
     o->En = En;
-
-    o->In += o->Ki*En;
-    LIMIT(o->In, o->Imax);    
     
     o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In /*+ o->Kff*Tr*/);
-    
     LIMIT(o->pwm, o->pwm_max);
 
     return o->pwm;
@@ -231,10 +230,11 @@ extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm)
     
     float En = Tr - Tm;
     
-    o->En = En;
-    
-    o->In += o->Ki*En;
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
     LIMIT(o->In, o->Imax);
+    
+    o->En = En;
     
     En *= o->Kp;
     En += o->In;
@@ -257,10 +257,12 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm)
     
     float En = Tr - Tm;
     
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
+    LIMIT(o->In, o->Imax);
+    
     o->En = En;
     
-    o->In += o->Ki*En;
-    LIMIT(o->In, o->Imax);
     En *= o->Kp;
     En += o->In;
     

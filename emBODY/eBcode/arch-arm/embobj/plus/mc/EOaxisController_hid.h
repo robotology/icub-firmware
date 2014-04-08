@@ -75,6 +75,7 @@ struct EOaxisController_hid
     uint8_t torque_wdog;
 
     int32_t velocity_timer;
+    int32_t torque_timer;
 
     // torque control
     int32_t torque_ref;
@@ -88,6 +89,8 @@ struct EOaxisController_hid
     int16_t openloop_out;
 
     eOmc_controlmode_t control_mode;
+    
+    eObool_t stiff;
 
     uint8_t limits_mask;
     
