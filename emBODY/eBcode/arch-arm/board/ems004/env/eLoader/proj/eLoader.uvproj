@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_BOARD_MCBSTM32F400 BOARD_MCBSTM32F400</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\services\embenv\api;..\..\cfg;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -429,27 +429,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -799,7 +799,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_BOARD_EMS004 BOARD_EMS004 HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -878,27 +878,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1248,7 +1248,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_BOARD_EMS004 BOARD_EMS004 HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\services\embenv\api;..\..\cfg;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1327,27 +1327,27 @@
             <File>
               <FileName>eEcommon.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
             </File>
             <File>
               <FileName>eEsharedServices.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
             </File>
             <File>
               <FileName>shalBASE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
             </File>
             <File>
               <FileName>shalINFO.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
             </File>
             <File>
               <FileName>shalPART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\services\embenv\src\shalPART.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
             </File>
           </Files>
         </Group>

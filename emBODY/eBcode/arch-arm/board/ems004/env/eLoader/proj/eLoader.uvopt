@@ -675,10 +675,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>330</TopLine>
-      <CurrentLine>344</CurrentLine>
+      <TopLine>85</TopLine>
+      <CurrentLine>95</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\ems001\env\eLoader\app\loader_updt.c</PathWithFileName>
       <FilenameWithoutPath>loader_updt.c</FilenameWithoutPath>
@@ -689,7 +689,7 @@
 
   <Group>
     <GroupName>hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -747,10 +747,10 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>25</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>39</TopLine>
-      <CurrentLine>61</CurrentLine>
+      <TopLine>202</TopLine>
+      <CurrentLine>209</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\abslayer-cfg\hal_startup_mpu_name_stm32f407ig.s</PathWithFileName>
       <FilenameWithoutPath>hal_startup_mpu_name_stm32f407ig.s</FilenameWithoutPath>
@@ -776,7 +776,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEcommon.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</PathWithFileName>
       <FilenameWithoutPath>eEcommon.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -792,7 +792,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\eEsharedServices.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</PathWithFileName>
       <FilenameWithoutPath>eEsharedServices.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -808,7 +808,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalBASE.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</PathWithFileName>
       <FilenameWithoutPath>shalBASE.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -824,7 +824,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalINFO.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</PathWithFileName>
       <FilenameWithoutPath>shalINFO.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -840,7 +840,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\services\embenv\src\shalPART.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</PathWithFileName>
       <FilenameWithoutPath>shalPART.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
