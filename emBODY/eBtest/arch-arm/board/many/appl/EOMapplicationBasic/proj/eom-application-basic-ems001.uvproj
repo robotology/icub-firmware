@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\cfg;..\app_extra;..\app_basic;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\..\cfg;..\app_extra;..\app_basic;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -409,17 +409,17 @@
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
             </File>
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -442,7 +442,7 @@
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1002,7 +1002,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\cfg;..\app_extra;..\app_basic;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\..\cfg;..\app_extra;..\app_basic;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1061,12 +1061,12 @@
             <File>
               <FileName>hal_startup_stm32f107.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</FilePath>
             </File>
             <File>
               <FileName>hal.mcbstm32c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1089,12 +1089,12 @@
             <File>
               <FileName>hal.ems001.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</FilePath>
             </File>
             <File>
               <FileName>osal.cm3.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</FilePath>
             </File>
           </Files>
         </Group>

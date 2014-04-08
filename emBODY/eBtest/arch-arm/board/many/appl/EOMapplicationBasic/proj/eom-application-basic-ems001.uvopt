@@ -537,10 +537,10 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\stg\hal_startup_stm32f107.s</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\stg\hal_startup_stm32f107.s</PathWithFileName>
       <FilenameWithoutPath>hal_startup_stm32f107.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -556,7 +556,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.mcbstm32c.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\lib\hal.mcbstm32c.lib</PathWithFileName>
       <FilenameWithoutPath>hal.mcbstm32c.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -572,7 +572,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\hal\lib\hal.ems001.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal\lib\hal.ems001.lib</PathWithFileName>
       <FilenameWithoutPath>hal.ems001.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -588,7 +588,7 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\abslayer\osal\lib\osal.cm3.dbg.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\lib\osal.cm3.dbg.lib</PathWithFileName>
       <FilenameWithoutPath>osal.cm3.dbg.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
