@@ -74,7 +74,7 @@ static uint8_t s_SIXsg_config_ee_data_is_valid(SIXsg_ee_config_data_t *ee_data);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning --> asfidanken says: i dati della 6sg vanno salvati in eeprom e riletti. TOBEDONE
+//#warning --> asfidanken says: i dati della 6sg vanno salvati in eeprom e riletti. TOBEDONE
 #if 0
 hal_arch_dspic_eeprom_emfl_DECLARE_VAR_IN_EE(ee_6sg_cfg, SIXsg_ee_config_data_t, ".edata") = 
 {
