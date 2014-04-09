@@ -89,7 +89,7 @@ extern uint8_t sendBmsg;
 #define led_yellow                  hal_led0
 #define led_red                     hal_led1 
 
-#warning -> acemor: dont use 0b0000 etc because it is not standard c
+//#warning -> acemor: dont use 0b0000 etc because it is not standard c
 
 //events: defined in order by priority (high --> low)
 //#define EVT_SENDERTMR_TIMEOUT     (0x1<<0)  // evt pos is 1 //defined in trasmitter_outMsg.c 
@@ -121,6 +121,7 @@ static void s_can_callBkp_onRec(void *arg);
 static void s_send_outgoing_msg(void);
 static void s_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
 static void s_appl_init(void); //init application's modules
+static void s_hal_start(void);
 static void s_hal_init(void);  //init hal by allocating memory and by init hw if it is necessary.
 static void s_hal_sys_init(void);// init system
 
@@ -135,7 +136,7 @@ static void s_send_outgoing_msg_TEST(void);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-#warning Removed const from declaration of  eOssystem_cfg_t s_syscfg
+//#warning Removed const from declaration of  eOssystem_cfg_t s_syscfg
 
 /*
     Note: I removed const from declaration of  eOssystem_cfg_t s_syscfg
@@ -146,8 +147,7 @@ static /*const*/ eOssystem_cfg_t s_syscfg =
 {
     .hal_fns                                =
     {
-        .hal_base_init                      = s_hal_init, //s_eos_test_initialise_hal,
-        .hal_sys_systeminit                 = s_hal_sys_init, // (eOvoid_fp_void_t)hal_sys_systeminit,
+        .hal_start                          = s_hal_start,
         .hal_sys_systick_sethandler         = (eOvoid_fp_voidfpvoiduint32uint8_t)hal_sys_systick_sethandler,
         .hal_sys_atomic_bitwiseAND          = hal_sys_atomic_bitwiseAND,
         .hal_sys_atomic_bitwiseOR           = hal_sys_atomic_bitwiseOR,
@@ -155,11 +155,7 @@ static /*const*/ eOssystem_cfg_t s_syscfg =
         .hal_sys_criticalsection_release    = (eOres_fp_voidp_t)hal_sys_criticalsection_release,
         .hal_sys_irq_disable                = hal_sys_irq_disable,
         .hal_sys_irq_enable                 = hal_sys_irq_enable     
-    }, 
-    .fsal_fns                               =
-    {
-        .fsal_init                          = NULL
-    }, 
+    },
     .userdef                                =
     {
         .systickperiod                      = 500,
@@ -168,7 +164,7 @@ static /*const*/ eOssystem_cfg_t s_syscfg =
     }
 };
 
-#warning -> acemor: mettere const in eOerrman_cfg_t
+//#warning -> acemor: mettere const in eOerrman_cfg_t
 static eOerrman_cfg_t errman_cfg =
 {
     .extfn              =
@@ -238,7 +234,7 @@ static const uint8_t s_hello_str[] = "HELLO";
 static const uint8_t s_error_str[] = "ERROR";
 //questa var globale si potrebbe mettere locale in tutti i metodi che la usano chimando la funzione 
 //SIXsg_config_get, ma per ora non voglio alterare troppo il codice
-#warning VALE-->remove global var
+//#warning VALE-->remove global var
 SIXsg_config_data_t *cfg_ptr = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -309,6 +305,12 @@ static void s_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const
 
 }
 
+static void s_hal_start(void)
+{   // added by marco.accame on 09 apr 2014 because the api of EOStheFOOP.h changed to be more general and allow a possible use of hal2
+    s_hal_init();
+    s_hal_sys_init();
+}
+
 static void s_hal_init(void)
 {
     extern const hal_cfg_t* hal_cfgAPP;
@@ -361,7 +363,7 @@ static void s_appl_init(void)
     if(NULL == cfg_ptr)
     {
         s_check_fault_error(hal_res_NOK_generic);
-        #warning: migliora gestione errore grave!!!!
+        //#warning: migliora gestione errore grave!!!!
     }
 
  //   hal_led_on(led_red);
@@ -395,7 +397,7 @@ static void s_appl_init(void)
 
     s_led_flash();
     
-    #warning acemor -> LATBbits.LATB9 ?? da togliere assolutamente 
+    //#warning acemor -> LATBbits.LATB9 ?? da togliere assolutamente 
     LATBbits.LATB9 = 0x0;
 }
 
@@ -405,7 +407,7 @@ static void s_resetCause_send(void)
 {
     hal_can_frame_t frame;
 
-    #warning VALE-> add this function to HAL??
+    //#warning VALE-> add this function to HAL??
 
     frame.id = cfg_ptr->gen_ee_data.board_address;
     frame.id_type = hal_can_frameID_std;
@@ -413,7 +415,7 @@ static void s_resetCause_send(void)
     frame.size = 8;
     memset(frame.data, 0, 8);
 
-    #warning acemor -> RCONbits.POR etc ?? da togliere assolutamente 
+    //#warning acemor -> RCONbits.POR etc ?? da togliere assolutamente 
     if(RCONbits.POR!=0)
     {
         frame.data[0] = 1;
