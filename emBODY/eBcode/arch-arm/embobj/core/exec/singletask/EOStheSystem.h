@@ -77,8 +77,7 @@ typedef struct
  **/  
 typedef struct
 {
-    eObasicabstr_hal_sys_fn_t   hal_fns;                        /**< gives to the system access to required hal functions */
-    eObasicabstr_fsal_fn_t      fsal_fns;                       /**< gives to the system access to required fsal functions */
+    eOsfoop_hal_fn_t            hal_fns;                        /**< gives to the system access to required hal functions */
     eOssystem_userdef_cfg_t     userdef;
 } eOssystem_cfg_t;
 

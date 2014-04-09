@@ -63,7 +63,7 @@ struct EOStheFOOP_hid
 
     // other stuff
     eOsfoop_cfg_t                   cfg;
-    eObasicabstr_hal_sys_fn_t       hfn;
+    eOsfoop_hal_fn_t                hfn;
     eOvoid_fp_void_t                ontick;
     volatile uint32_t               flags;
     volatile uint32_t               events_mask;

@@ -77,6 +77,23 @@ typedef struct
     eOsfoop_userdef_fn_t            usrfn;
 } eOsfoop_cfg_t;
 
+/** @typedef    typedef struct eOsfoop_hal_fn_t
+    @brief      contains the basic system functions typically given by a HAL which are be used for instance
+                by the objects of the single-task execution environment (or SEE) to run. They have similar name and APIs as the
+                ones in the HAL.
+ **/  
+typedef struct
+{
+    eOvoid_fp_void_t                    hal_start;                      /**< initialise and start the hal. it may also relocate the sys vector. */
+    eOvoid_fp_voidfpvoiduint32uint8_t   hal_sys_systick_sethandler;     /**< starts a tick function w/ a given period at a given priority**/
+    eOvoid_fp_vuint32p_uint32_t         hal_sys_atomic_bitwiseAND;      /**< performs atomic bitwise AND on a uint32_t passed as volatile pointer **/
+    eOvoid_fp_vuint32p_uint32_t         hal_sys_atomic_bitwiseOR;       /**< performs atomic bitwise OR on a uint32_t passed as volatile pointer **/
+    eOres_fp_voidp_uint32_t             hal_sys_criticalsection_take;   /**< takes a critical section on a dummy object (also for ISRs) with a dummy timeout**/
+    eOres_fp_voidp_t                    hal_sys_criticalsection_release;/**< releases the critical section on the dummy object **/
+    eOvoid_fp_void_t                    hal_sys_irq_disable;            /**< disable all irqs **/
+    eOvoid_fp_void_t                    hal_sys_irq_enable;             /**< enable all irqs **/
+} eOsfoop_hal_fn_t;
+
 
 /** @typedef    typedef struct EOStheFOOP_hid EOStheFOOP
     @brief      EOStheFOOP is an opaque struct. It is used to implement data abstraction for  
@@ -100,7 +117,7 @@ extern const eOsfoop_cfg_t eos_foop_DefaultCfg; // = {0, 0, {NULL, NULL, NULL}};
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eObasicabstr_hal_sys_fn_t *hfn)
+/** @fn         extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eOsfoop_hal_fn_t *hfn)
     @brief      Initialises the singleton EOStheFOOP.
     @param      cfg             The configuratio for the object.
     @param      hfn             The functions required to manage the basic hardware-related issues. We pass it
@@ -108,7 +125,7 @@ extern const eOsfoop_cfg_t eos_foop_DefaultCfg; // = {0, 0, {NULL, NULL, NULL}};
     @return     The handle to the singleton.
     @warning    The function calls the EOtheErrorManager with a fatal error in case of incorrect settings
  **/
-extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eObasicabstr_hal_sys_fn_t *hfn);
+extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eOsfoop_hal_fn_t *hfn);
 
 
 /** @fn         extern EOStheFOOP* eos_foop_GetHandle(void)

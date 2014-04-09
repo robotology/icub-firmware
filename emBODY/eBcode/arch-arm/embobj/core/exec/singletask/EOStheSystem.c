@@ -137,8 +137,7 @@ extern EOStheSystem * eos_sys_Initialise(const eOssystem_cfg_t *syscfg,
                                                   
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg), s_eobj_ownname, "eos_sys_Start() uses a NULL syscfg"); 
     
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_base_init), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_init()"); 
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_systeminit), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_systeminit()");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_start), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_start()"); 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_systick_sethandler), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_systick_sethandler()");
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_atomic_bitwiseAND), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_atomic_bitwiseAND()");
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_atomic_bitwiseOR), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_atomic_bitwiseOR()");
@@ -147,8 +146,6 @@ extern EOStheSystem * eos_sys_Initialise(const eOssystem_cfg_t *syscfg,
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_irq_disable), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_irq_disable()");
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_irq_enable), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_irq_enable()");
     
-    // we can have a null fsal_init
-    // eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->fsal_fns.fsal_init), s_eobj_ownname, "eos_sys_Start() uses a NULL fsal_init()");
 
    
     eo_errman_Assert(eo_errman_GetHandle(), (syscfg->userdef.systickperiod >= EOSSYS_min_systickperiod), s_eobj_ownname, "eos_sys_Start() uses systickperiod too small");
@@ -182,7 +179,7 @@ extern EOStheSystem * eos_sys_Initialise(const eOssystem_cfg_t *syscfg,
     localfoopcfg.callbackfifosize = cbkmancfg->queuesize;
   
     // we always initialise the foop.                                                  
-    s_eos_the_system.thefoop = eos_foop_Initialise(&localfoopcfg, (eObasicabstr_hal_sys_fn_t*)&s_eos_the_system.syscfg->hal_fns);
+    s_eos_the_system.thefoop = eos_foop_Initialise(&localfoopcfg, (eOsfoop_hal_fn_t*)&s_eos_the_system.syscfg->hal_fns);
 
     // and reset the tickoflife
     s_eos_the_system.tickoflife = 0;
@@ -205,16 +202,8 @@ extern EOStheSystem * eos_sys_Initialise(const eOssystem_cfg_t *syscfg,
 
     
     
-    // init hal using external references
-    s_eos_the_system.syscfg->hal_fns.hal_base_init();
-    s_eos_the_system.syscfg->hal_fns.hal_sys_systeminit();
-
-    // init fsal using external references
-    if(NULL != s_eos_the_system.syscfg->fsal_fns.fsal_init)
-    {
-        s_eos_the_system.syscfg->fsal_fns.fsal_init();  
-    }
-
+    // start hal using externally provided function
+    s_eos_the_system.syscfg->hal_fns.hal_start();
 
 
     return(&s_eos_the_system);

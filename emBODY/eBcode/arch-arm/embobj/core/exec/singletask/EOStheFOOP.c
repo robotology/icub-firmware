@@ -131,7 +131,7 @@ static EOStheFOOP s_eos_the_foop =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eObasicabstr_hal_sys_fn_t *hfn) 
+extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eOsfoop_hal_fn_t *hfn) 
 {
     if(NULL != s_eos_the_foop.tsk) 
     {
@@ -149,7 +149,7 @@ extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eObasicabstr_hal_sys
     
     s_eos_the_foop.tsk = eov_task_hid_New();    
     memcpy(&s_eos_the_foop.cfg, cfg, sizeof(eOsfoop_cfg_t));
-    memcpy(&s_eos_the_foop.hfn, hfn, sizeof(eObasicabstr_hal_sys_fn_t));
+    memcpy(&s_eos_the_foop.hfn, hfn, sizeof(eOsfoop_hal_fn_t));
 
     s_eos_the_foop.ontick       = s_eos_foop_dummy_ontick;
     s_eos_the_foop.flags        = 0;
