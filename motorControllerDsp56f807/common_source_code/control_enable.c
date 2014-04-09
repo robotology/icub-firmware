@@ -604,10 +604,10 @@ void set_control_mode(char axis)
 		{
 			can_printf("CTRLMODE SET COUPLED 012:%d",value);
 			if (value>=0 && value <=0x50)
-				{
-					_control_mode[0] = value;
-					_control_mode[1] = value;
-				}
+			{
+				_control_mode[0] = value;
+				_control_mode[1] = value;
+			}
 			_desired[0] = _position[0];
 			_desired[1] = _position[1];
 			_desired_vel[0] = 0;
@@ -632,9 +632,9 @@ void set_control_mode(char axis)
 		{ 
 			can_printf("CTRLMODE SET COUPLED 012:%d",value);
 			if (value>=0 && value <=0x50)
-				{ 
-					_control_mode[0] = value; 
-				} 
+			{ 
+				_control_mode[0] = value; 
+			} 
 			_desired[0] = _position[0]; 
 			_desired_vel[0] = 0; 
 			_integral[0] = 0; 
@@ -648,5 +648,6 @@ void set_control_mode(char axis)
 				 CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
 			} 
 		} 
+	}
 #endif
 }
