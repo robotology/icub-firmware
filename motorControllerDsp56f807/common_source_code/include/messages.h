@@ -62,7 +62,7 @@
 			} \
 			else \
 			{ \
-			  can_printf("WARNING:PID IS NOT SET");\
+			  can_printf("WARNING:PID NOT SET %d %d", _received_pid[0].rec_pid, _received_pid[1].rec_pid);\
 			} \
 		} \
 		else \
@@ -96,7 +96,7 @@
 				} \
 				else \
 				{ \
-				  can_printf("WARNING:PID IS NOT SET");\
+				  can_printf("WARNING:PID NOT SET %d %d", _received_pid[2].rec_pid, _received_pid[3].rec_pid);\
 				} \
 			} \
 			else \
@@ -121,7 +121,7 @@
 				}\
 				else\
 				{ \
-					can_printf("WARNING:PID IS NOT SET"); \
+					can_printf("WARNING:PID NOT SET %d", _received_pid[axis].rec_pid);\
 				} \
 			} \
 			else \
@@ -201,7 +201,7 @@
 				} \
 				else \
 				{ \
-				  can_printf("WARNING:PID IS NOT SET");\
+					can_printf("WARNING:PID NOT SET %d %d ", _received_pid[1].rec_pid, _received_pid[2].rec_pid);\
 				} \
 			} \
 			else \
@@ -226,7 +226,7 @@
 				}\
 				else\
 				{ \
-					can_printf("WARNING:PID IS NOT SET"); \
+					can_printf("WARNING:PID NOT SET %d", _received_pid[axis].rec_pid);\
 				} \
 			} \
 			else \
@@ -252,7 +252,7 @@
 			} \
 			else \
 			{ \
-				can_printf("WARNING:PID IS NOT SET"); \
+				can_printf("WARNING:PID NOT SET %d", _received_pid[axis].rec_pid);\
 			} \
 		} \
 		else \
