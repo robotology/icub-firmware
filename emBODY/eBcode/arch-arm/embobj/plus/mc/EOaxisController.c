@@ -735,6 +735,18 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_false;
 }
 
+extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
+{
+    //if (!o) return eobool_false;
+    
+    if (o->control_mode == eomc_controlmode_position || o->control_mode == eomc_controlmode_mixed)
+    {
+        return eo_trajectory_IsDone(o->trajectory);
+    }
+    
+    return eobool_false;
+}
+
 #else
 
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc)
@@ -964,6 +976,27 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff, eOboo
     return 0;   
 }
 
+extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
+{
+    if (!o) return eobool_false;
+    
+    switch (o->control_mode)
+    {
+        case eomc_controlmode_idle:
+        case eomc_controlmode_torque:
+        case eomc_controlmode_openloop:
+            return eobool_false;
+        
+        case eomc_controlmode_position:
+        case eomc_controlmode_velocity:
+        case eomc_controlmode_impedance_pos:
+        case eomc_controlmode_impedance_vel:
+            return eo_trajectory_IsDone(o->trajectory);
+    }
+    
+    return eobool_false;
+}
+
 #endif
 
 extern void eo_axisController_Stop(EOaxisController *o)
@@ -1011,28 +1044,6 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
     
     jointStatus->torque              = o->torque_meas;
 }
-
-extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
-{
-    if (!o) return eobool_false;
-    
-    switch (o->control_mode)
-    {
-        case eomc_controlmode_idle:
-        case eomc_controlmode_torque:
-        case eomc_controlmode_openloop:
-            return eobool_false;
-        
-        case eomc_controlmode_position:
-        case eomc_controlmode_velocity:
-        case eomc_controlmode_impedance_pos:
-        case eomc_controlmode_impedance_vel:
-            return eo_trajectory_IsDone(o->trajectory);
-    }
-    
-    return eobool_false;
-}
-
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
 {

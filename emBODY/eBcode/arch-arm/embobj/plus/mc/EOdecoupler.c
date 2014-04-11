@@ -111,7 +111,7 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t bError, e
 {
     if (!o) return;
     
-    if (bError || (control_mode == eomc_ctrlmval_idle))
+    if (bError /*|| (control_mode == eomc_ctrlmval_idle)*/)
     {
         o->motor_idle_mask |=  (1<<m);
     }
