@@ -129,7 +129,7 @@ _FOSC(CSW_FSCM_OFF & EC_PLL8);
 _FWDT(WDT_OFF);      // WD disabled
 //
  
- _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
+ _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
 
 
@@ -137,7 +137,8 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 enum Errors
     {
       error_ok,
-      error_noack
+      error_noack,
+      error_notconnected
     };
 
 // static unsigned int value=0;
@@ -151,11 +152,8 @@ void ServiceAD7147Isr_all(unsigned char Channel);
 void Wait(unsigned int value);
 static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN);
-static void FillCanMessages8bit_fingertip(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN);
-void FillCanMessages16bit(unsigned char Channel,unsigned char triangleN);
-void FillCanMessages16bit_all(unsigned char Channel,unsigned char triangleN);
-void FillCanMessagesTest(unsigned char Channel,unsigned int i); 	
+	
 void TrianglesInit(unsigned char Channel);
 void TrianglesInit_all(unsigned char Channel);
        
@@ -186,7 +184,7 @@ typedef struct error_cap
     unsigned int error;
 } error_cap;
 
-struct error_cap err;
+static struct error_cap err[12];
 
 
 volatile char flag;
@@ -388,11 +386,11 @@ if (DIG_GYRO || DIG_ACC)
   
 }    
     
-    //Read Silicon versions to check communication, It should read 0xE622
+    //Read Silicon versions to check communication, It should read 0x147X where X is the revision code
 
     for (i=0;i<4;i++)
     {
-        ReadViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], DEVID);  
+        ReadViaI2C(CH0,AD7147_ADD[i],DEVID, 1, AD7147Registers[0],AD7147Registers[4],AD7147Registers[8],AD7147Registers[12], i);
     } 
     
        //............................Configure AD7147
@@ -494,236 +492,178 @@ if (DIG_GYRO || DIG_ACC)
 
     for (;;)
     {
-	    if ((DIG_GYRO || DIG_ACC) && (flag2))
-		{	  
-		flag2=0;  
-		if (DIG_GYRO)
-		{
-	    	L3GAxisBurst(&gx, &gy, &gz);  
-	    	gyro[0]=((gx &0xFF00) >>0x8); // axis X
-        	gyro[1]=(gx & 0xFF);
-        	gyro[2]=((gy &0xFF00) >>0x8); // axis Y
-        	gyro[3]=(gy & 0xFF);
-        	gyro[4]=((gz &0xFF00) >>0x8); // axis Z
-        	gyro[5]=(gz & 0xFF);
-        	while (!CAN1IsTXReady(2));   
-        	PMsgID=CAN_MSG_CLASS_ACC_GYRO | MSG_TYPE_GYRO;
-		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4 ;
-        	CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+        if ((DIG_GYRO || DIG_ACC) && (flag2))
+        {
+            flag2=0;
+            if (DIG_GYRO)
+                {
+                L3GAxisBurst(&gx, &gy, &gz);
+                gyro[0]=((gx &0xFF00) >>0x8); // axis X
+                gyro[1]=(gx & 0xFF);
+                gyro[2]=((gy &0xFF00) >>0x8); // axis Y
+                gyro[3]=(gy & 0xFF);
+                gyro[4]=((gz &0xFF00) >>0x8); // axis Z
+                gyro[5]=(gz & 0xFF);
+                while (!CAN1IsTXReady(2));
+                PMsgID=CAN_MSG_CLASS_ACC_GYRO | MSG_TYPE_GYRO;
+                    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4 ;
+                CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, gyro, 6,2);
-  		}
-  		if (DIG_ACC)
-		{    	
-      		LISAxisBurst(&ax, &ay, &az);  
-		acc[0]=((ax &0xFF00) >>0x8); // axis X
-	        acc[1]=(ax & 0xFF);
-	        acc[2]=((ay &0xFF00) >>0x8); // axis Y
-	        acc[3]=(ay & 0xFF);
-	        acc[4]=((az &0xFF00) >>0x8); // axis Z
-	        acc[5]=(az & 0xFF);
-	       	PMsgID=CAN_MSG_CLASS_ACC_GYRO | MSG_TYPE_ACC;
-		    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4; 
-	        while (!CAN1IsTXReady(1));    
-        	CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
+            }
+            if (DIG_ACC)
+            {
+                LISAxisBurst(&ax, &ay, &az);
+                acc[0]=((ax &0xFF00) >>0x8); // axis X
+                acc[1]=(ax & 0xFF);
+                acc[2]=((ay &0xFF00) >>0x8); // axis Y
+                acc[3]=(ay & 0xFF);
+                acc[4]=((az &0xFF00) >>0x8); // axis Z
+                acc[5]=(az & 0xFF);
+                PMsgID=CAN_MSG_CLASS_ACC_GYRO | MSG_TYPE_ACC;
+                    PMsgID |= BoardConfig.EE_CAN_BoardAddress<<4;
+                while (!CAN1IsTXReady(1));
+                CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, acc, 6,1);
-	    }       
-       
-       
-		}     
-		
+            }
+        }
         if (flag==1)
         {
-        	flag=0;
-           	i = 0;
-			if (led_counter==20)
-			{
-                            if (led0==1) led0=0;
-                            else led0=1;
-				
-				led_counter=0;
-			}	
-			led_counter++;
-			
+            flag=0;
+            i = 0;
+            if (led_counter==20)
+            {
+                if (led0==1) led0=0;
+                else led0=1;
 
-
- ////////////////////////////////////////////////////////				
-            //debug
-				// Filling the can messages with the CapSensorData
-				switch (board_MODE)
-				{
-					case  (EIGHT_BITS):
-				 	{
-					 	switch(CONFIG_TYPE)
-					 	{
-						case CONFIG_SINGLE :
-						 	{
-							 	// Service routine for the triangles 
-	            				 ServiceAD7147Isr(CH0);
-					    	 	 for (i=0;i<16;i++)
-	            				 {
-		            				if (TRIANGLE_MASK & (0x1<<i))
-		            				{   
-		 							FillCanMessages8bit(CH0,i);
-		 							}
-		      					 }
-		      		
-		      				}
-		      				break;
-		      			        case CONFIG_THREE:
-		      				{
-			      				ServiceAD7147Isr_three(CH0);
-			      				for (i=0;i<16;i++)					
-		            			{
-		 						    FillCanMessages8bit_three(CH0,i); 	
-			      				}
-		      				}
-		      				break;
-		      				case CONFIG_FINGERTIP:
-		      				{
-			      				ServiceAD7147Isr_fingertip(CH0);
-			      				for (i=0;i<16;i++)					
-		            			{
-		 						    FillCanMessages8bit_fingertip(CH0,i); 	
-			      				}
-		      				}
-		      				break;
-		      			        case CONFIG_ALL:
-		      				{
-						     	ServiceAD7147Isr_all(CH0);
-		      					for (i=0;i<16;i++)					
-	            				{
-	 								FillCanMessages8bit_all(CH0,i); 	
-		      					}
-		      				}
-		      				break;	
-	      					}										
-					}
-					break;
-					case (SIXTEEN_BITS):
-					{
-						switch (CONFIG_TYPE)
-						{
-							case CONFIG_SINGLE:
-							{
-						        ServiceAD7147Isr(CH0);	
-							    for (i=0;i<16;i++)					
-		            			{
-									FillCanMessages16bit(CH0,i);
-								}
-							}
-							break;
-					        case CONFIG_THREE:
-		      				{
-			      				ServiceAD7147Isr_three(CH0);
-			      				for (i=0;i<16;i++)					
-		            			{
-		 						    FillCanMessages16bit_all(CH0,i); 	
-			      				}
-		      				}
-		      				break;
-							case CONFIG_ALL:
-							{
-								ServiceAD7147Isr_all(CH0);
-								for (i=0;i<16;i++)
-	            				{
-									FillCanMessages16bit_all(CH0,i);
-								}	
-							}
-							break;	
-							default: break;
-						}
-					}
-					break;		
-					case  (CALIB):
-					{ 
-
-						
-						
-						board_MODE=new_board_MODE;
-						switch (CONFIG_TYPE)
-						{
-							case CONFIG_SINGLE:
-							{
-								  for (i=0;i<4;i++)
-					    			 {
-					        	    	ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device	
-					    		   	 }
-					  		       	flag=0;
-					    			init=0;
-					  			    WriteTimer1(0);
-					    			counter=0;
-							        while (flag==0);
-							        // Calibration
-							        ServiceAD7147Isr(CH0);
-							        flag=0;
-							       	WriteTimer1(0);
-					                while (flag==0);
-							        TrianglesInit(CH0);
-
-							}
-							break;	
-							case CONFIG_THREE:
-							{
-								  for (i=0;i<4;i++)
-					    		    {
-					        	 		ConfigAD7147_THREE(CH0,i,PW_CONTROL,ConValue); 
-					  		       	}
-					  		     	flag=0;
-					    			init=0;
-					  		     	WriteTimer1(0);
-					    			counter=0;
-							        while (flag==0); 
-							        // Calibration
-							        ServiceAD7147Isr_three(CH0);
-							        flag=0;
-							       	WriteTimer1(0);
-					                while (flag==0);
-							        TrianglesInit_all(CH0);
-							}
-							break;
-							case CONFIG_FINGERTIP:
-							{
-								  for (i=0;i<4;i++)
-					    		    {
-					        	 		ConfigAD7147_FINGERTIP(CH0,i,PW_CONTROL,ConValue); 
-					  		       	}
-					  		     	flag=0;
-					    			init=0;
-					  		     	WriteTimer1(0);
-					    			counter=0;
-							        while (flag==0); 
-							        // Calibration
-							        ServiceAD7147Isr_fingertip(CH0);
-							        flag=0;
-							       	WriteTimer1(0);
-					                while (flag==0);
-							        TrianglesInit_all(CH0);
-							}
-							break;
-							case CONFIG_ALL:
-							{
-							    for (i=0;i<4;i++)
-					   		    {
-					       			ConfigAD7147_ALL(CH0,i,PW_CONTROL,ConValue); 
-					 		       	}
-					 		     	flag=0;
-					   			init=0;
-					 		    	WriteTimer1(0);
-					   			counter=0;
-						        while (flag==0);
-						        // Calibration
-						        ServiceAD7147Isr_all(CH0);   
-						        flag=0;
-						       	WriteTimer1(0);
-					               while (flag==0);
-						        TrianglesInit_all(CH0);
-							}
-							break;
-						}
-					}
-					break;	
-					default: break;
-				} //switch
+                    led_counter=0;
+            }
+            led_counter++;
+            switch (board_MODE)
+            {
+            case  (EIGHT_BITS):
+            {
+                switch(CONFIG_TYPE)
+                {
+                case CONFIG_SINGLE :
+                {
+                    // Service routine for the triangles
+                    ServiceAD7147Isr(CH0);
+                    for (i=0;i<16;i++)
+                    {
+                        if (TRIANGLE_MASK & (0x1<<i))
+                        {
+                            FillCanMessages8bit(CH0,i);
+                        }
+                    }
+                }
+                break;
+                case CONFIG_THREE:
+                {
+                    ServiceAD7147Isr_three(CH0);
+                    for (i=0;i<16;i++)
+                    {
+                        FillCanMessages8bit_three(CH0,i);
+                    }
+                }
+                break;
+                case CONFIG_ALL:
+                {
+                    ServiceAD7147Isr_all(CH0);
+                    for (i=0;i<16;i++)
+                    {
+                        FillCanMessages8bit_all(CH0,i);
+                    }
+                }
+                break;
+                }
+            }
+            break;
+            case  (CALIB):
+            {
+                board_MODE=new_board_MODE;
+                switch (CONFIG_TYPE)
+                {
+                case CONFIG_SINGLE:
+                {
+                    for (i=0;i<4;i++)
+                    {
+                        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device
+                    }
+                    flag=0;
+                    init=0;
+                    WriteTimer1(0);
+                    counter=0;
+                    while (flag==0);
+                    // Calibration
+                    ServiceAD7147Isr(CH0);
+                    flag=0;
+                    WriteTimer1(0);
+                    while (flag==0);
+                    TrianglesInit(CH0);
+                }
+                break;
+                case CONFIG_THREE:
+                {
+                    for (i=0;i<4;i++)
+                    {
+                        ConfigAD7147_THREE(CH0,i,PW_CONTROL,ConValue);
+                    }
+                    flag=0;
+                    init=0;
+                    WriteTimer1(0);
+                    counter=0;
+                    while (flag==0);
+                    // Calibration
+                    ServiceAD7147Isr_three(CH0);
+                    flag=0;
+                    WriteTimer1(0);
+                    while (flag==0);
+                    TrianglesInit_all(CH0);
+                }
+                break;
+                case CONFIG_FINGERTIP:
+                {
+                    for (i=0;i<4;i++)
+                    {
+                        ConfigAD7147_FINGERTIP(CH0,i,PW_CONTROL,ConValue);
+                    }
+                    flag=0;
+                    init=0;
+                    WriteTimer1(0);
+                    counter=0;
+                    while (flag==0);
+                    // Calibration
+                    ServiceAD7147Isr_fingertip(CH0);
+                    flag=0;
+                    WriteTimer1(0);
+                    while (flag==0);
+                    TrianglesInit_all(CH0);
+                }
+                break;
+                case CONFIG_ALL:
+                {
+                    for (i=0;i<4;i++)
+                    {
+                        ConfigAD7147_ALL(CH0,i,PW_CONTROL,ConValue);
+                    }
+                    flag=0;
+                    init=0;
+                    WriteTimer1(0);
+                    counter=0;
+                    while (flag==0);
+                    // Calibration
+                    ServiceAD7147Isr_all(CH0);
+                    flag=0;
+                    WriteTimer1(0);
+                    while (flag==0);
+                    TrianglesInit_all(CH0);
+                }
+                break;
+                }
+            }
+            break;
+            default: break;
+            } //switch
         }//if (flag==1)
         CAN1_handleRx(_board_ID);
     	  
@@ -819,6 +759,7 @@ void TrianglesInit(unsigned char Channel)
 {
     int i,j,k;
 	_prog_addressT p;
+    int unconnect=0;
     int  source[_FLASH_ROW];
 
 		_init_prog_address(p, CapOffset);  /* get address in program space */	
@@ -832,18 +773,28 @@ void TrianglesInit(unsigned char Channel)
 		_init_prog_address(p, CapOffset);  /* get address in program space */		
     	for (i=0;i<16;i++)
     	{
-        	for (k=0;k<12;k++)
-        	{
-				source[j]=AD7147Registers[i][ADCRESULT_S0+k];
-				j++;
-				if (j==_FLASH_ROW)
-				{
-					_write_flash16(p,source);
-					p += (_FLASH_ROW * 2);	
-					j=0;	
-				}		
-        	
-			}
+            err[i].error=error_ok;
+            for (k=0;k<12;k++)
+            {
+                source[j]=AD7147Registers[i][ADCRESULT_S0+k];
+                j++;
+                if (j==_FLASH_ROW)
+                {
+                    _write_flash16(p,source);
+                    p += (_FLASH_ROW * 2);
+                    j=0;
+                }
+                if (AD7147Registers[i][ADCRESULT_S0+k]==0xFFFF)
+                {
+                    unconnect +=1;
+                }
+            }
+            if (unconnect==12) // no answer from the chip at startup
+            {
+                err[i].error |=error_notconnected;
+               
+            }
+            unconnect=0;
     	}
 }
 void TrianglesInit_all(unsigned char Channel)
@@ -889,214 +840,123 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     unsigned int i,j;
     int value; //difference of the current measurement and the initial value (_pCapOffset)
     unsigned int txdata[12];
-
+    int unconnected=0;
     unsigned int GAIN[12]={70,96,83,38,38,70, 0,45,77,164,0,77}; //this gains are moltiplied by 128 with respect to matlab
     unsigned int GAIN_PALM[12]={0,0,0,0,0,0,0,0,0,0,0,0}; //this gains are moltiplied by 128 with respect to matlab
+    int UP_LIMIT, BOT_LIMIT;
 
-	int UP_LIMIT, BOT_LIMIT;	
-        err.error=error_ok;
+    UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
+    BOT_LIMIT=(NOLOAD)<<SHIFT;
 
-		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
-		BOT_LIMIT=(NOLOAD)<<SHIFT;
-		
-		Tpad_base=_pCapOffset[triangleN][ADCRESULT_S6];
-		Tpad=AD7147Registers[triangleN][ADCRESULT_S6];	
-		
-		Tpad_palm_base=_pCapOffset[triangleN][ADCRESULT_S11];
-		Tpad_palm=AD7147Registers[triangleN][ADCRESULT_S11];
-		
-	    for (i=0;i<12;i++)
-	    {
-		    if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0))))
-		    {
-			    err.error=error_noack;
+    Tpad_base=_pCapOffset[triangleN][ADCRESULT_S6];
+    Tpad=AD7147Registers[triangleN][ADCRESULT_S6];
+
+    Tpad_palm_base=_pCapOffset[triangleN][ADCRESULT_S11];
+    Tpad_palm=AD7147Registers[triangleN][ADCRESULT_S11];
+    err[triangleN].error=error_ok;
+    err[triangleN].error_outofrange=0;
+    for (i=0;i<12;i++)
+    {
+        if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0)))) //reading error
+        {
+            err[triangleN].error |=error_noack;
 //			    ERROR_COUNTER++;
-			}
-			if (TEMP_COMPENSATION==1)
-			{
-				switch (TYPE)
-				{
-				case new_skin:
-				{
-					if (Tpad>Tpad_base)
-					{
-					drift=(((Tpad-Tpad_base)>>2)*GAIN[i])>>5;
-					}
-					else
-					{
-					drift=-((((Tpad_base-Tpad)>>2)*GAIN[i])>>5);	
-					}				
-					test=drift;
-				}
-				break;
-				
-				case palm_fingertips:
-				{
-					if (Tpad_palm>Tpad_palm_base)
-					{
-					drift=(((Tpad_palm-Tpad_palm_base)>>2)*GAIN_PALM[i])>>5;
-					}
-					else
-					{
-					drift=-((((Tpad_palm_base-Tpad_palm)>>2)*GAIN_PALM[i])>>5);	
-					}				
-					test=drift;
-				}
-				break;
-				default: 
-				{
-					drift=0;
-				}
-				break;
-				}
-			}	
-			else drift=0;
-			
-			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i])-drift;    
-		    
-		    if (value<=-UP_LIMIT) 
-		    {
-		    	txdata[i]=MAXVAL; // out of range, pressure too low
-                    }
-		    if (value>=BOT_LIMIT) 
-		    {
-		    	txdata[i]=MINVAL; // out of range, pressure too high    	
-		    }
-		    if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
-		    {   
-		            txdata[i]=NOLOAD-(value>>SHIFT);
-		    }
-            //check if the sensor is far from the limits -> taxel could be broken;
-                    if ((value<=-(UP_LIMIT<<1)) || (value>=(BOT_LIMIT<<1)))
+        }
+        if (TEMP_COMPENSATION==1)
+        {
+            switch (TYPE)
+            {
+            case new_skin:
+            {
+                    if (Tpad>Tpad_base)
                     {
-                        err.error_outofrange += 1<<i;
-                    }    
-	    }
-	    	
-		    PMsgID=0x300;   
-		    PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
-		    //First message	
-		    data[0]=0x40;       
-			for (i=1;i<8;i++)
-			{
-			    data[i]    = (unsigned char)   (txdata[i-1] & 0xFF); //the last 6 bits	
-		 	}  	
-#ifdef DEBUG_EMS
-			if (0==triangleN)
-			{
-				data[1]=counter;
-				if (counter==255)
-				{
-					counter=0;
-					data[2]=100;
-				}
-				else
-				{
-					data[2]=0;
-					counter=counter+1;
-				}
-			}
-#endif 
-		    CAN1_send(PMsgID,1,8,data); 
-		    //Second message	
-		    data[0]=0xC0;       
-		   	for (i=1;i<6;i++)
-			{
-			    data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits	
-		 	}
-		 	#warning "debug"
-		 	
-	//	 	data[6]=(unsigned char) (ERROR_COUNTER &0xFF);//stagecomplete0[0][0];
-		 	data[6]=(unsigned char) ((err.error_outofrange &0x0ff0)>>4);
-                        data[7]=(unsigned char) ((err.error_outofrange &0xf)<<4)+err.error;
-
-		    CAN1_send(PMsgID,1,8,data);
-
-            if (err.error==error_noack) //do again the configuration since an error has occured
-	    {
-		j=(triangleN/4);
-		ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
-                return;
+                    drift=(((Tpad-Tpad_base)>>2)*GAIN[i])>>5;
+                    }
+                    else
+                    {
+                    drift=-((((Tpad_base-Tpad)>>2)*GAIN[i])>>5);
+                    }
+                    test=drift;
             }
-}
-static void FillCanMessages8bit_fingertip(unsigned char Channel,unsigned char triangleN)
-{
-    unsigned char data[8];
-    unsigned int i,j,error;
-    int value; //difference of the current measurement and the initial value (_pCapOffset)
-    unsigned int txdata[12]={0,0,0,0,0,0,0,0,0,0,0,0};
-	int UP_LIMIT, BOT_LIMIT;	
-		error=0;
-		UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
-		BOT_LIMIT=(NOLOAD)<<SHIFT;
-	
-	    for (i=0;i<2;i++)
-	    {
-		    if (((_pCapOffset_all[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0))))
-		    {
-			    error=1;
-			    ERROR_COUNTER++; 
-			}
-			value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset_all[triangleN][i]);    
-			
-		    if (value<=-UP_LIMIT) 
-		    {
-		    	txdata[i]=MAXVAL; // out of range, pressure too low
-		    }
-		    if (value>=BOT_LIMIT) 
-		    {
-		    	txdata[i]=MINVAL; // out of range, pressure too high    	
-		    }
-		    if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
-		    {   
-		            txdata[i]=NOLOAD-(value>>SHIFT);
-		    } 
-	    }
-	    //copy the same value to the other pads
-	    txdata[0]=txdata[0];
-	    txdata[2]=txdata[0];
-	    txdata[8]=txdata[0];
-	    txdata[9]=txdata[0];
-	    txdata[10]=txdata[0];
-	    txdata[11]=txdata[0];
-	    
-	    txdata[3]=txdata[1];
-	    txdata[4]=txdata[1];
-	    txdata[5]=txdata[1];
-	    txdata[6]=txdata[1];
-	    txdata[7]=txdata[1];
-	    txdata[1]=txdata[0];
-	    
-	    if (error==1)
-	    {
-	//	      for (j=0;j<4;j++)
-			  
-				j=(triangleN/4);
-				ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
-	    
-			  	
-			  return;
-			   }
-		else 
-		{
-		    PMsgID=0x300;   
-		    PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
-		    //First message	
-		    data[0]=0x40;       
-			for (i=1;i<8;i++)
-			{
-			    data[i]    = (unsigned char)   (txdata[i-1] & 0xFF); //the last 6 bits	
-		 	}  	
-		    CAN1_send(PMsgID,1,8,data); 
-		    //Second message	
-		    data[0]=0xC0;       
-		   	for (i=1;i<6;i++)
-			{
-			    data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits	
-		 	}
-		
-		    CAN1_send(PMsgID,1,6,data);
-		}
+            break;
+
+            case palm_fingertips:
+            {
+                    if (Tpad_palm>Tpad_palm_base)
+                    {
+                    drift=(((Tpad_palm-Tpad_palm_base)>>2)*GAIN_PALM[i])>>5;
+                    }
+                    else
+                    {
+                    drift=-((((Tpad_palm_base-Tpad_palm)>>2)*GAIN_PALM[i])>>5);
+                    }
+                    test=drift;
+            }
+            break;
+            default:
+            {
+                    drift=0;
+            }
+            break;
+            }
+        }
+        else drift=0;
+
+        value=(AD7147Registers[triangleN][ADCRESULT_S0+i]-_pCapOffset[triangleN][i])-drift;
+
+        if (value<=-UP_LIMIT)
+        {
+            txdata[i]=MAXVAL; // out of range, pressure too low
+        }
+        if (value>=BOT_LIMIT)
+        {
+            txdata[i]=MINVAL; // out of range, pressure too high
+        }
+        if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
+        {
+                txdata[i]=NOLOAD-(value>>SHIFT);
+        }
+//check if the sensor is far from the limits -> taxel could be broken;
+        if ((value<=-(UP_LIMIT<<1)) || (value>=(BOT_LIMIT<<1)))
+        {
+            err[triangleN].error_outofrange |= 1<<i;
+        }
+        if (AD7147Registers[triangleN][ADCRESULT_S0+i]==0xffff)
+        {
+            unconnected +=1; //if all the taxels has a 0xFFFF the triangle is most probably unconnected
+        }
+    }
+
+    if (unconnected==12) //if all the taxels has a 0xFFFF the triangle is most probably unconnected
+    {
+        err[triangleN].error=error_notconnected;
+    }
+
+    PMsgID=0x300;
+    PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
+    //First message
+    data[0]=0x40;
+        for (i=1;i<8;i++)
+        {
+            data[i]    = (unsigned char)   (txdata[i-1] & 0xFF); //the last 6 bits
+        }
+    CAN1_send(PMsgID,1,8,data);
+    //Second message
+    data[0]=0xC0;
+    for (i=1;i<6;i++)
+    {
+        data[i]    = (unsigned char)   (txdata[i+6] & 0xFF); //the last 6 bits
+    }
+    data[6]=(unsigned char) ((err[triangleN].error_outofrange &0x0ff0)>>4);
+    data[7]=(unsigned char) ((err[triangleN].error_outofrange &0xf)<<4) | err[triangleN].error;
+    CAN1_send(PMsgID,1,8,data);
+
+    if (err[triangleN].error!=error_ok) //do again the configuration since an error has occured
+    {
+        j=(triangleN/4);
+        ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
+        return;
+    }
 }
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN)
 {
@@ -1159,56 +1019,4 @@ void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN)
 	    CAN1_send(PMsgID,1,4,data); 
 }
 
-void FillCanMessages16bit(unsigned char Channel,unsigned char triangleN)
 
-{
-	unsigned char data[8];
-	unsigned int i,val,l;
-	PMsgID=0x300;
-    PMsgID |= (triangleN*3+TRIANGLE_OFFSET);
-	l=0;
-	 for (i=0;i<8;i=i+2)
-  	 {
-        	val=AD7147Registers[triangleN][ADCRESULT_S0+l];
-        	data[i]= val & 0x00FF;  ; //16bit
-        	data[i+1]=(val>>8) & 0x00FF; //16bit
-        	l=l+1;
-    	 } 
-	 CAN1_send(PMsgID,1,8,data);	
-	 PMsgID=0x300;
-	 PMsgID |= (triangleN*3+TRIANGLE_OFFSET)+1;
-	 for (i=0;i<8;i=i+2)
-  	 {
-        	val=AD7147Registers[triangleN][ADCRESULT_S0+l];
-        	data[i]= val & 0x00FF;  ; //16bit
-        	data[i+1]=(val>>8) & 0x00FF; //16bit
-        	l=l+1;
-    	 } 
-	 CAN1_send(PMsgID,1,8,data);
-	  PMsgID=0x300;
-	  PMsgID |= (triangleN*3+TRIANGLE_OFFSET)+2;
-	  for (i=0;i<8;i=i+2)
-  	 {
-        	val=AD7147Registers[triangleN][ADCRESULT_S0+l];
-        	data[i]= val & 0x00FF;  ; //16bit
-        	data[i+1]=(val>>8) & 0x00FF; //16bit
-        	l=l+1;
-    	 } 
-	 CAN1_send(PMsgID,1,8,data);	
-	  	
-}
-void FillCanMessages16bit_all(unsigned char Channel,unsigned char triangleN)
-{
-	unsigned char data[8];
-	unsigned int i,val,l;
-	PMsgID=0x300+triangleN; 
-	l=0;
-	 for (i=0;i<8;i=i+2)
-  	 {
-        	val=AD7147Registers[triangleN][ADCRESULT_S0+l];
-        	data[i]= val & 0x00FF;  ; //16bit
-        	data[i+1]=(val>>8) & 0x00FF; //16bit
-        	l=l+1;
-    	 } 
-	 CAN1_send(PMsgID,1,6,data);		  	
-}

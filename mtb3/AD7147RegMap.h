@@ -42,7 +42,7 @@
 #define	ADCRESULT_S10				 0x0A //0x248//	// R	ADC stage 10 result (uncompensated) actually located in SRAM
 #define	ADCRESULT_S11				 0x0B //0x26C//	// R	ADC stage 11 result (uncompensated) actually located in SRAM
 
-#define	DEVID					   	0x17	// R	I.D. Register
+#define	DEVID					0x17	// R	I.D. Register
 
 #define	THRES_STAT_REG0				0x40	// R	Current threshold status register 0
 #define	THRES_STAT_REG1				0x41	// R	Current threshold status register 1

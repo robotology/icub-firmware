@@ -56,8 +56,8 @@
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>ICD3PlatformTool</platformTool>
-        <languageToolchain>dsPIC</languageToolchain>
-        <languageToolchainVersion>3_20b</languageToolchainVersion>
+        <languageToolchain>C30</languageToolchain>
+        <languageToolchainVersion>3_30b</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -177,11 +177,12 @@
         <property key="TIMER4" value="true"/>
         <property key="TIMER5" value="true"/>
         <property key="ToolFirmwareFilePath"
-                  value="Press to browse for a specific firmware version"/>
+                  value="C:\Program Files (x86)/Microchip/MPLABX/mplab_ide/mplablibs/modules/ext/ICD3.jar/ICD3FW_012908.jam"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="UART 1" value="true"/>
         <property key="UART 2" value="true"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
