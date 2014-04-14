@@ -273,7 +273,7 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
             pwm_motor[1] = pwm_joint[1];
         }
     #else
-        #error undefined board type
+        MOTORS(m) pwm_motor[m] = 0;
     #endif
         
 //     if (alarm_mask)

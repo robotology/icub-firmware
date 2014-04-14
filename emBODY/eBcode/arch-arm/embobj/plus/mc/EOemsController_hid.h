@@ -29,7 +29,6 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#undef USE_DEBUG_THEEMSCONTROLLER
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -45,7 +44,7 @@ typedef enum
                 public or private (static) functions of the object and protected data
                 used also by its derived objects.
  **/  
- 
+
 struct EOemsController_hid 
 {
     //emsBoardType_t boardType;
@@ -65,7 +64,6 @@ struct EOemsController_hid
    
     //float torque_meas[NJOINTS];
 }; 
-
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

@@ -954,7 +954,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff, eOboo
             #elif defined(SHOULDER_BOARD) || defined(UPPERLEG_BOARD)
                 int32_t pwm = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
             #else
-                #error undefined board type
+                int32_t pwm = 0;
             #endif
             
             /*

@@ -84,10 +84,10 @@ static EOemsController *s_emsc = NULL;
 
 extern EOemsController* eo_emsController_Init() 
 {    
-    //if (board_type == EMS_NULL) return NULL;
-
+#ifndef NO_2FOC_BOARD
     s_emsc = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
-
+#endif
+    
     if (s_emsc)
     {
         //s_emsc->boardType  = board_type;

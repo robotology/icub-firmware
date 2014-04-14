@@ -136,7 +136,7 @@ extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, in
 
 extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
 {
-    //return 0;
+    return 0;
     
     //if (!o) return 0;
     
