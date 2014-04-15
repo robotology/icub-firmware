@@ -22,14 +22,16 @@
  * define __ONLY_DEF before inclusion on Linux/Winnt/Qnx
  */
 #include "iCubCanProto_types.h"
-//board_types
-#define BOARD_TYPE_DSP    icubCanProto_boardType__dsp
-#define BOARD_TYPE_PIC    icubCanProto_boardType__pic
-#define BOARD_TYPE_2DC    icubCanProto_boardType__2dc
-#define BOARD_TYPE_4DC    icubCanProto_boardType__4dc
-#define BOARD_TYPE_BLL    icubCanProto_boardType__bll
-#define BOARD_TYPE_2BLLDC icubCanProto_boardType__bll
 
+
+
+//board_types
+#define BOARD_TYPE_DSP    ICUBCANPROTO_BOARDTYPE__DSP
+#define BOARD_TYPE_PIC    ICUBCANPROTO_BOARDTYPE__PIC
+#define BOARD_TYPE_2DC    ICUBCANPROTO_BOARDTYPE__2DC
+#define BOARD_TYPE_4DC    ICUBCANPROTO_BOARDTYPE__4DC
+#define BOARD_TYPE_BLL    ICUBCANPROTO_BOARDTYPE__BLL
+#define BOARD_TYPE_2BLLDC ICUBCANPROTO_BOARDTYPE__BLL
 
 
 #define DEFAULT_BOARD_ID    15
