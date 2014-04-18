@@ -315,14 +315,14 @@ extern EOappEncReader* eo_emsapplBody_GetEncoderReaderHandle(EOtheEMSapplBody *p
 }
 
 
-extern EOemsController* eo_emsapplBody_GetEmsControllerHandle(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(NULL);
-    }
-    return(p->bodyobjs.emsController);
-}
+// extern EOemsController* eo_emsapplBody_GetEmsControllerHandle(EOtheEMSapplBody *p)
+// {
+//     if(NULL == p)
+//     {
+//         return(NULL);
+//     }
+//     return(p->bodyobjs.emsController);
+// }
 
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p)
 {
@@ -681,8 +681,9 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
     
     p->bodyobjs.emsController = eo_emsController_Init();
 
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
-                     s_eobj_ownname, "error in emsController_init");
+//NOTE: removed check because eo_emsController_Init returns NULL if any 2foc board is connected to ems. (i.e, eb2, eb4, eb10, eb11)
+//     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
+//                      s_eobj_ownname, "error in emsController_init");
     
     /*
     numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
