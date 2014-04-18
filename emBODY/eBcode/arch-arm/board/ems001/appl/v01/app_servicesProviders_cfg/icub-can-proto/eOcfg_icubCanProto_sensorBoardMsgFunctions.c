@@ -651,6 +651,47 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup2(EOicubCanProto* 
     return(eores_OK);
 }
 
+
+extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setBrdCfg(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_SK_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 4;
+    icubCanProto_skinboard_config_t* bcfg = (icubCanProto_skinboard_config_t *)val_ptr;
+
+    /* 2) set can command (see SkinPrototype::calibrateSensor)*/
+
+    canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;  
+    canFrame->data[1] = (bcfg->skintype &0x07);
+    canFrame->data[2] = bcfg->period;
+    canFrame->data[3] = bcfg->noload;
+
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setTriangCfg(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_SK_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard idicubCanProto_board_config_t
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 7;
+    icubCanProto_skintriangles_config_t * tcfg = (icubCanProto_skintriangles_config_t *)val_ptr;
+
+    /* 2) set can command (see SkinPrototype::calibrateSensor)*/
+
+    canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;  
+    canFrame->data[1] = tcfg->idstart;
+    canFrame->data[2] = tcfg->idend;
+    canFrame->data[3] = tcfg->shift;
+    canFrame->data[4] = tcfg->flags;
+    *((uint16_t*)(&canFrame->data[5])) = tcfg->CDCoffset;
+
+    return(eores_OK);
+}
 //unused
 //extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to3(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 //{

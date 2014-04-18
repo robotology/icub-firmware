@@ -116,7 +116,7 @@ extern EOappCanSP* eo_emsapplBody_GetCanServiceHandle(EOtheEMSapplBody *p);
     
 extern EOappEncReader* eo_emsapplBody_GetEncoderReaderHandle(EOtheEMSapplBody *p);
 
-extern EOemsController* eo_emsapplBody_GetEmsControllerHandle(EOtheEMSapplBody *p);
+//extern EOemsController* eo_emsapplBody_GetEmsControllerHandle(EOtheEMSapplBody *p);
 
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 

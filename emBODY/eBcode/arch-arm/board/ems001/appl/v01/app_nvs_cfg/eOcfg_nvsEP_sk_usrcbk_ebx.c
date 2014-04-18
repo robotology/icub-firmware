@@ -126,57 +126,202 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
     EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
     uint8_t                         boardEndAddr;
+    eOicubCanProto_msgDestination_t msgdest;
     
-    /* NOTE: corrently any skin board starts to send can frame when it finishes its initilisation
-            and pc104 configures only signal mode and not skin boards. (how many triangulars, resolution bits, etc).
-            so here i don't send commnad to start to skin boards (because they start automatically),
-            but i sent default configurations
-    */
-    if(eosk_sigmode_signal == *sigmode)
+    
+    
+    res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
+    if(eores_OK != res)
     {
-        eOicubCanProto_msgCommand_t msgCmd = 
-        {
-            EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
-            EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP
-        };
-        
-        res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
-        if(eores_OK != res)
-        {
-            return;
-        }
-        
-        boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
-        
-        for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
-        {
-            eOicubCanProto_msgDestination_t msgdest;
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-            res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd, NULL);
-            if(eores_OK != res)
-            {
-                return;
-            }
+        return;
+    }
             
-            if(i == 0xE)
+    boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
+    
+    
+    
+    switch(*sigmode)
+    {
+        case eosk_sigmode_dontsignal:
+        {
+            //in old way it not exist
+            //in new way:
+           icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
+            
+            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
             {
-                eOicubCanProto_msgCommand_t msgCmd2 = 
+                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+                eOicubCanProto_msgCommand_t   msgCmd = 
                 {
-                    EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
-                    EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2
+                    EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+                    EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
                 };
-                
-                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd2, NULL);
+                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
                 if(eores_OK != res)
                 {
                     return;
                 }
             }
-        }
+        }break;
+        
+        case eosk_sigmode_signal:
+        {
+            icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_signal;
+            
+            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
+            {
+                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+                eOicubCanProto_msgCommand_t   msgCmd = 
+                {
+                    EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+                    EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+                };
+                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
+                if(eores_OK != res)
+                {
+                    return;
+                }
+            }
+        }break;
 
-    }// end if
+        case eosk_sigmode_signal_oldway:
+        {
+
+            eOicubCanProto_msgCommand_t msgCmd = 
+            {
+                EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
+                EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP
+            };
+            
+            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+            
+            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
+            {
+                
+                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd, NULL);
+                if(eores_OK != res)
+                {
+                    return;
+                }
+                
+                if(i == 0xE)
+                {
+                    eOicubCanProto_msgCommand_t msgCmd2 = 
+                    {
+                        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
+                        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2
+                    };
+                    
+                    res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd2, NULL);
+                    if(eores_OK != res)
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+        break;
+    };
+
 }
 
+
+
+extern void eoprot_fun_UPDT_sk_skin_commands_boardscfg(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOresult_t                      res;
+    uint8_t                         i;
+    eOsk_skinId_t                   skId = eoprot_ID2index(rd->id32);
+    eOsk_cmd_boardsCfg_t            *brdCfg = (eOsk_cmd_boardsCfg_t*)nv->ram;
+    EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
+    eOicubCanProto_msgDestination_t msgdest;
+    icubCanProto_skinboard_config_t canProto_skcfg;
+    
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG
+    };
+    
+    res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+    // I add this check at compile time to be sure i can assign values of eosk to icubcanProto
+    #if (!(ICUBCANPROTO_SKINTYPE__WITHTEMPCOMP == EOSK_SKINTYPE_WITHTEMPCOMP))
+        #error _skinType__withtempcomp has change value in eth proto or can proto
+    #endif
+    
+    #if (!(ICUBCANPROTO_SKINTYPE__PALMFINGERTIP == EOSK_SKINTYPE_PALMFINGERTIP))
+        #error _skinType__palmfingertip has change value in eth proto or can proto
+    #endif
+    #if (!(ICUBCANPROTO_SKINTYPE__WITHOUTTEMPCOMP == EOSK_SKINTYPE_WITHOUTTEMPCOMP))
+        #error _skinType__withouttempcomp has change value in eth proto or can proto
+    #endif
+    
+    canProto_skcfg.skintype = brdCfg->cfg.skintype;
+    canProto_skcfg.period   = brdCfg->cfg.period;
+    canProto_skcfg.noload   = brdCfg->cfg.noload;
+    
+    for(i = brdCfg->addrstart; i<=brdCfg->addrend; i++ )
+    {
+        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+        res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &canProto_skcfg);
+        if(eores_OK != res)
+        {
+            return;
+        }
+    }
+
+}
+
+
+extern void eoprot_fun_UPDT_sk_skin_commands_trianglescfg(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOresult_t                          res;
+    eOsk_skinId_t                       skId = eoprot_ID2index(rd->id32);
+    eOsk_cmd_trianglesCfg_t             *trgsCfg = (eOsk_cmd_trianglesCfg_t*)nv->ram;
+    EOappCanSP                          *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOappTheDB_cfg_skinInfo_t           *skconfig_ptr = NULL;
+    eOappTheDB_cfg_skinInfo_t           **prova = NULL;
+    eOicubCanProto_msgDestination_t     msgdest;
+    icubCanProto_skintriangles_config_t canProto_trgscfg;
+    
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG
+    };
+
+    prova = &skconfig_ptr;
+    prova = prova;
+    res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+    
+    
+    canProto_trgscfg.idstart   = trgsCfg->idstart;
+    canProto_trgscfg.idend     = trgsCfg->idend;
+    canProto_trgscfg.flags     = trgsCfg->cfg.enable;
+    canProto_trgscfg.shift     = trgsCfg->cfg.shift;
+    canProto_trgscfg.CDCoffset = trgsCfg->cfg.CDCoffset;
+
+    
+
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, trgsCfg->boardaddr);
+
+    res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &canProto_trgscfg);
+    if(eores_OK != res)
+    {
+        return;
+    }
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
