@@ -27,6 +27,7 @@ bool _in_position[JN] = INIT_ARRAY (true);
 
 
 // GENERAL VARIABLES
+byte    _interaction_mode[JN] = INIT_ARRAY (icubCanProto_interactionmode_stiff);
 byte    _control_mode[JN] = INIT_ARRAY (MODE_IDLE); // control mode (e.g. position, velocity, etc.) 
 Int16   _fault[JN] = INIT_ARRAY (0);				// amp fault memory 
 Int16   _counter = 0;								// used to count cycles, it resets now and then to generate periodic events 

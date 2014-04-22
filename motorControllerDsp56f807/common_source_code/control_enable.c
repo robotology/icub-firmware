@@ -18,6 +18,9 @@ extern  byte	_board_ID ;
 #define CAN_ID _canmsg.CAN_messID
 #define CAN_SRC _canmsg.CAN_ID_src
 
+byte controlmode_api_to_fw(byte mode);
+byte controlmode_fw_to_api(byte mode);
+
 //-----------------------------------------------------------------------------------------------------------------------
 byte controlmode_api_to_fw(byte mode)
 {
@@ -650,4 +653,27 @@ void set_control_mode(char axis)
 		} 
 	}
 #endif
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+void set_interaction_mode(char axis)
+{
+	byte value = 0; 
+	value = (CAN_DATA[1]);
+	if (value!=_interaction_mode[axis])
+	{
+		_interaction_mode[axis]=value;
+	}
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+void get_interaction_mode(char axis)
+{
+    byte m=_interaction_mode[axis];
+    
+	PREPARE_HEADER; 
+	CAN_LEN = 3; 
+	CAN_DATA[1] = m; 
+	CAN_DATA[2] = 0; 
+	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA);	
 }

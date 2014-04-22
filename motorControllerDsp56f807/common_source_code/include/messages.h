@@ -558,6 +558,18 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_GET_INTERACTION_MODE_HANDLER(x) \
+{ \
+	get_interaction_mode(axis); \
+}
+
+//-------------------------------------------------------------------
+#define CAN_SET_INTERACTION_MODE_HANDLER(x) \
+{ \
+	set_interaction_mode(axis); \
+}
+
+//-------------------------------------------------------------------
 #define CAN_SET_VEL_SHIFT_HANDLER(x) \
 { \
 	byte value = 0; \

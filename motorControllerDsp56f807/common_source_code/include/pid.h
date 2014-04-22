@@ -67,6 +67,7 @@ typedef union {
 
 
 // GENERAL VARIABLES
+extern byte    _interaction_mode[JN];
 extern byte    _control_mode[JN] ;		// control mode (e.g. position, velocity, etc.) 
 extern Int16   _fault[JN] ;				// amp fault memory 
 extern bool    _pad_enabled[JN] ;

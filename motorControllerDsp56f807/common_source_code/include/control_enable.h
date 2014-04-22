@@ -12,5 +12,6 @@ void set_control_mode(char axis);
 void get_control_mode(char axis);
 void set_control_mode_new(char axis);
 void get_control_mode_new(char axis);
-
+void set_interaction_mode(char axis);
+void get_interaction_mode(char axis);
 #endif
