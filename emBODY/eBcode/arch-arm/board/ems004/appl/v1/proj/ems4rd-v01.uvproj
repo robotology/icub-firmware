@@ -350,7 +350,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>HAL_USE_ARCH_ARM EO_USE_EPROT_V2 HAL_USE_VERSION_2 USE_EMS4RD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\appl\v01\app_main;..\..\..\..\ems001\appl\v01\app_cfg-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\..\..\..\ems001\appl\v01\app_nvs_cfg;..\..\..\..\ems001\appl\v01\app_servicesProviders_obj;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\..\canProtocolLib;..\..\..\..\..\..\robotconfig\v1\eprotocol;..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-api;..\..\..\..\ems004\env\cfg;..\app_cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\appl\v01\app_main;..\..\..\..\ems001\appl\v01\app_cfg-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\..\..\..\ems001\appl\v01\app_nvs_cfg;..\..\..\..\ems001\appl\v01\app_servicesProviders_obj;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\..\canProtocolLib;..\..\..\..\..\..\robotconfig\v1\eprotocol;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\app_cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -412,14 +412,14 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
-            </File>
-            <File>
               <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+            </File>
+            <File>
+              <FileName>hal2.ems4rd.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1591,14 +1591,14 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal.ems4rd.beta.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-lib\hal.ems4rd.beta.lib</FilePath>
-            </File>
-            <File>
               <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
+            </File>
+            <File>
+              <FileName>hal2.ems4rd.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
             </File>
           </Files>
         </Group>
