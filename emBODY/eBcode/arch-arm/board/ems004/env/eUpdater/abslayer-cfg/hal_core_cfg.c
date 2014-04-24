@@ -105,7 +105,7 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
 
     for(;;)
     {
-        hal_sys_delay(250*1000);
+        hal_sys_delay(100*1000);
         hal_led_toggle(hal_led2);
     }
 }

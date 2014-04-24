@@ -128,7 +128,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     for(;;)
     {
         hal_led_toggle(hal_led5);
-        hal_sys_delay(250*1000);        
+        hal_sys_delay(100*1000);        
     }
 }
 
