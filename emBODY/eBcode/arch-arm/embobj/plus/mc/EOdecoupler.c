@@ -40,10 +40,7 @@
 
 #define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
 
-#define SAFE_MAX_CURRENT    10000
-#define NOMINAL_CURRENT     10000
 
-#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -67,8 +64,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
-//static const char s_eobj_ownname[] = "EOdecoupler";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -97,15 +92,6 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
 
     return o;
 }
-
-/*
-extern eObool_t eo_motors_is_motorON(EOmotors *o, uint8_t m)
-{
-    if (o) return 0 != (o->active_motors_mask & (1<<m));
-    
-    return eobool_false;
-}
-*/
 
 extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t bError, eOmc_controlmode_t control_mode)
 {
@@ -136,7 +122,7 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t bError, e
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
-extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff/*, uint8_t* alarm_mask*/)
+extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff)
 {
     if (!o) return 0xFF;
     
@@ -275,57 +261,7 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
     #else
         MOTORS(m) pwm_motor[m] = 0;
     #endif
-        
-//     if (alarm_mask)
-//     {
-//         switch (board_type)
-//         {
-//         case EMS_SHOULDER:
-//             if (*alarm_mask & 0x08)
-//             {
-//                 LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);
-//             }
-//             if (*alarm_mask & 0x07)
-//             {
-//                 *alarm_mask |= 0x07;
-//                 LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-//                 LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
-//                 LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
-//             }
-//             break;
-//       
-//         case EMS_WAIST:
-//             if (*alarm_mask & 0x07)
-//             {
-//                 *alarm_mask |= 0x07;
-//                 //LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-//                 //LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
-//                 //LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
-//             }
-//             break;
-
-//         case EMS_UPPERLEG:
-//             if (*alarm_mask & 0x04)
-//             {
-//                 LIMIT(pwm_motor[2], SAFE_MAX_CURRENT);
-//             }
-//             if (*alarm_mask & 0x08)
-//             {
-//                 LIMIT(pwm_motor[3], SAFE_MAX_CURRENT);
-//             }
-//             
-//         case EMS_ANKLE:
-//             if (*alarm_mask & 0x01)
-//             {
-//                 LIMIT(pwm_motor[0], SAFE_MAX_CURRENT);
-//             }
-//             if (*alarm_mask & 0x02)
-//             {
-//                 LIMIT(pwm_motor[1], SAFE_MAX_CURRENT);
-//             }
-//         }
-//     }
-    
+            
     MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
     
     return stop_mask;

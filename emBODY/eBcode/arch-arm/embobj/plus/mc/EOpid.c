@@ -17,10 +17,10 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
+#include "EOemsControllerCfg.h"
+
 #include "EOspeedmeter.h"
 
-extern const float   EMS_PERIOD;
-extern const float   EMS_FREQUENCY_FLOAT;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -40,8 +40,7 @@ extern const float   EMS_FREQUENCY_FLOAT;
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
-#define ABS(x) (((x)>0.f)?(x):-(x))
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -136,7 +135,9 @@ extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, in
 
 extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
 {
+#ifdef FORCE_ZERO_PWM_OUT
     return 0;
+#endif
     
     //if (!o) return 0;
     
@@ -157,7 +158,9 @@ extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
 
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn)
 {
+#ifdef FORCE_ZERO_PWM_OUT
     return 0;
+#endif
     
     //if (!o) return 0;
        
@@ -175,7 +178,11 @@ extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn)
 
 extern void eo_pid_Reset(EOpid *o)
 {
-    if (!o) return;
+#ifdef FORCE_ZERO_PWM_OUT
+    return;
+#endif
+    
+    //if (!o) return;
 	
     //o->moving = eobool_false;
     
@@ -204,9 +211,11 @@ extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
 
 extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm)
 {
+#ifdef FORCE_ZERO_PWM_OUT
     return 0;
+#endif
     
-    if (!o) return 0;
+    //if (!o) return 0;
     
     float En = Tr - Tm;
 
@@ -224,9 +233,11 @@ extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm)
 
 extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm)
 {
+#ifdef FORCE_ZERO_PWM_OUT
     return 0;
+#endif
     
-    if (!o) return 0;
+    //if (!o) return 0;
     
     float En = Tr - Tm;
     
@@ -251,9 +262,11 @@ extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm)
 
 extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm)
 {
+#ifdef FORCE_ZERO_PWM_OUT
     return 0;
+#endif
     
-    if (!o) return 0;
+    //if (!o) return 0;
     
     float En = Tr - Tm;
     

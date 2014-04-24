@@ -30,18 +30,18 @@ extern "C" {
 
 // required
 
-#define MASK_MIN_POS           0x01
-#define MASK_MAX_POS           0x02
-#define MASK_VEL_TOUT          0x04
-#define MASK_MAX_VEL           0x08
+//#define MASK_MIN_POS           0x01
+//#define MASK_MAX_POS           0x02
+//#define MASK_VEL_TOUT          0x04
+//#define MASK_MAX_VEL           0x08
 
-#define MASK_POS_PID           0x10
-#define MASK_TRQ_PID           0x20
+//#define MASK_POS_PID           0x10
+//#define MASK_TRQ_PID           0x20
 
-#define MASK_HAS_LIMITS        0x03
+//#define MASK_HAS_LIMITS        0x03
 
-#define MASK_POS_READY         0x13
-#define MASK_TRQ_READY         0x23
+//#define MASK_POS_READY         0x13
+//#define MASK_TRQ_READY         0x23
  
 #define eo_axisController_ReadTorque_hid(axis_controller, torque) axis_controller->torque_meas = torque
 
@@ -53,6 +53,22 @@ extern "C" {
                 used also by its derived objects.
  **/  
  
+#define AC_OK                  0x0000
+
+#define AC_NOT_CALIBRATED      0x0001
+#define AC_NO_MIN_LIMIT        0x0002
+#define AC_NO_MAX_LIMIT        0x0004
+#define AC_NO_VEL_LIMIT        0x0008
+#define AC_NO_VEL_TOUT         0x0010
+#define AC_NO_POS_PID          0x0020
+#define AC_NO_TRQ_PID          0x0040
+
+#define AC_NOT_READY           (AC_NOT_CALIBRATED|AC_NO_MIN_LIMIT|AC_NO_MAX_LIMIT|AC_NO_POS_PID|AC_NO_TRQ_PID/*|AC_NO_VEL_LIMIT|AC_NO_VEL_TOUT*/)
+
+#define AC_ENCODER_FAULT       0x2000
+#define AC_TORQUE_SENS_FAULT   0x4000
+#define AC_INVALID_STATE       0x8000
+
 struct EOaxisController_hid 
 {
     EOpid *pidP;
@@ -92,9 +108,11 @@ struct EOaxisController_hid
     
     eObool_t stiff;
 
-    uint8_t limits_mask;
+    //uint8_t limits_mask;
     
-    eObool_t calibrated;
+    //eObool_t calibrated;
+    
+    uint16_t state_mask;
 }; 
 
 

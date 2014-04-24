@@ -23,13 +23,11 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-
+#include "EOemsControllerCfg.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
 #define ENC_INVALID 0x7FFFFFFF
-
-//#define USE_2FOC_FAST_ENCODER
 
 #define SPEED_2FOC_TO_EMS(speed) (-10*((int32_t)(speed))) // 2FOC speed is tick x ms, but with 1/100 reduction => 1000/100 
 
@@ -57,13 +55,12 @@ extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset);
 extern eObool_t eo_speedometer_IsOk(EOspeedmeter* o);
 //extern void eo_speedometer_Reset(EOspeedmeter* o);
 extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o);
-//extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o);
 extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign);
 
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position);
 
 #ifdef USE_2FOC_FAST_ENCODER
-extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed);
+extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed, int32_t fast_enc_pos);
 #endif
 
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o);

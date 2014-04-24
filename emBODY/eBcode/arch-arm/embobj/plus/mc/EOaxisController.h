@@ -27,6 +27,8 @@ extern "C" {
 #include "EOpid.h"
 #include "EOaxisController_hid.h"
 
+#include "EOemsControllerCfg.h"
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
 //#define MC_CAN_DEBUG
@@ -67,8 +69,7 @@ typedef struct EOaxisController_hid EOaxisController;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
- 
-//#define CONTROL_II
+
  
  
 /** @fn         extern EOaxisController* eo_axisController_New(void)
@@ -77,7 +78,7 @@ typedef struct EOaxisController_hid EOaxisController;
  **/
 extern EOaxisController* eo_axisController_New(uint8_t);
 
-extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
+//extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
@@ -88,11 +89,6 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
 //extern void eo_axisController_GetPosRef(EOaxisController *o, int32_t *pos, int32_t *avg_vel);
 
 #ifdef CONTROL_II
-#warning temporary defines waiting for new protocol enums
-#define eomc_controlmode_position_direct 0x08
-#define eomc_controlmode_mixed           0x09
-#define eomc_controlmode_cmd_position_direct 0x08
-#define eomc_controlmode_cmd_mixed           0x09
 extern eObool_t eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
 extern eObool_t eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
 extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
@@ -106,7 +102,7 @@ extern void eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
 extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out);
 #endif
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff, eObool_t *big_error_flag);
+extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 

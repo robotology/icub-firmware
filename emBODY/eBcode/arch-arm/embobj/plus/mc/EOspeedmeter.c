@@ -17,11 +17,6 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-//#include "hal_led.h"
-
-extern const int32_t EMS_FREQUENCY_INT32;
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -40,10 +35,7 @@ extern const int32_t EMS_FREQUENCY_INT32;
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define IMPULSE_x_REVOLUTION      65536
-#define IMPULSE_x_REVOLUTION_by_2 32768
-
-#define LIMIT(min,x,max) if (x>(max)) x=(max); else if (x<(min)) x=(min)
+#define FAST_ENC_UNINIT 0x80000000
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -81,17 +73,17 @@ extern EOspeedmeter* eo_speedmeter_New(void)
 
     if (o)
     {        
-        o->time = 0;
+        //o->time = 0;
         
         o->distance = 0;
         o->position_last = 0;
         o->position_sure = 0;
         
-        o->calibrated = eobool_false;
         o->offset   = 0;
         o->enc_sign = 0;
         
-        o->odo_x_1000 = 0;
+        o->distance_x_reduction = 0;
+        o->fast_enc_pos = FAST_ENC_UNINIT;
         
         o->speed = 0;
          
@@ -100,8 +92,7 @@ extern EOspeedmeter* eo_speedmeter_New(void)
         //o->invalid_data_cnt = 0;
         o->first_valid_data = 0;
         
-        o->hard_fault = eobool_false;
-        o->is_started = eobool_false;
+        o->state_mask = SM_NOT_READY;
     }
 
     return o;
@@ -110,13 +101,15 @@ extern EOspeedmeter* eo_speedmeter_New(void)
 extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign)
 {
     o->enc_sign = (enc_sign > 0) ? 1 : -1;
+    RST_BITS(o->state_mask, SM_ENC_SIGN_NOT_SET);
 }
 
 extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset)
 {
     o->offset = offset;
-    o->calibrated = eobool_true;
-    o->is_started = eobool_false;
+    o->distance_x_reduction = 0;
+    RST_BITS(o->state_mask, SM_NOT_CALIBRATED);
+    SET_BITS(o->state_mask, SM_NOT_INITIALIZED);
 }
 
 /*
@@ -132,20 +125,13 @@ extern void eo_speedometer_Reset(EOspeedmeter* o)
 
 extern eObool_t eo_speedometer_IsOk(EOspeedmeter* o)
 {
-    return o->is_started && o->calibrated && o->enc_sign; // && !o->hard_fault;
+    return o->state_mask == SM_OK;
 }
 
 extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o)
 {
-    return o->hard_fault;
+    return o->state_mask & SM_HARDWARE_FAULT;
 }
-
-/*
-extern eObool_t eo_speedometer_IsStarted(EOspeedmeter* o)
-{
-    return o->is_started;
-}
-*/
 
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 {    
@@ -155,7 +141,7 @@ extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
 {
 #ifdef USE_2FOC_FAST_ENCODER
-    return o->enc_sign*(o->distance + o->odo_x_1000 / 1000);
+    return o->enc_sign*(o->distance + o->distance_x_reduction/GEARBOX_REDUCTION);
 #else
     return o->enc_sign*o->distance;
 #endif
@@ -194,44 +180,49 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
     
     if (++o->first_valid_data >= 3)
     {
-        o->time = 0;
+        //o->time = 0;
         
         o->position_last = position;
         o->position_sure = position;
 
         o->distance = position;
         
-        o->odo_x_1000 = 0;
+        o->distance_x_reduction = 0;
         
         o->delta = 0;
         o->speed = 0;
 
         o->first_valid_data = 0;
         //o->invalid_data_cnt = 0;
-        
-        o->is_started = eobool_true;
+        RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
     }
 }
 
 static int32_t normalize_angle(int32_t a)
 {
-    while (a < -IMPULSE_x_REVOLUTION_by_2) a += IMPULSE_x_REVOLUTION;
-    while (a >  IMPULSE_x_REVOLUTION_by_2) a -= IMPULSE_x_REVOLUTION;
+    while (a < -TICKS_PER_HALF_REVOLUTION) a += TICKS_PER_REVOLUTION;
+    while (a >  TICKS_PER_HALF_REVOLUTION) a -= TICKS_PER_REVOLUTION;
 
     return a;
 }
 
 #ifdef USE_2FOC_FAST_ENCODER
-extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed)
+extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed, int32_t fast_enc_pos)
 {
     o->speed = speed;
 
-    o->odo_x_1000 += speed;
+    if (o->fast_enc_pos == FAST_ENC_UNINIT) o->fast_enc_pos = fast_enc_pos;
+    
+    o->distance_x_reduction += fast_enc_pos - o->fast_enc_pos;
+    
+    o->fast_enc_pos = fast_enc_pos;
 }
 #endif
 
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
 {
+    static const int16_t MAX_ENC_CHANGE = 3*ENCODER_QUANTIZATION;
+    
     if (!o) return;
     
     if (!o->enc_sign) return;
@@ -242,15 +233,15 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         
         if (position < 0)
         {
-            position += IMPULSE_x_REVOLUTION;
+            position += TICKS_PER_REVOLUTION;
         }
-        else if (position >= IMPULSE_x_REVOLUTION)
+        else if (position >= TICKS_PER_REVOLUTION)
         {
-            position -= IMPULSE_x_REVOLUTION;
+            position -= TICKS_PER_REVOLUTION;
         }
     }
     
-    if (!o->is_started)
+    if (o->state_mask & SM_NOT_INITIALIZED)
     {
         encoder_init(o, position);
         
@@ -263,7 +254,7 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
         
         o->position_last = position;
 
-        if (-48 <= check && check <= 48)
+        if (-MAX_ENC_CHANGE <= check && check <= MAX_ENC_CHANGE)
         {
             int32_t delta = normalize_angle(position - o->position_sure);
             
@@ -278,29 +269,18 @@ extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
                 if (inc)
                 {
                     o->distance += inc;
+                    
 #ifdef USE_2FOC_FAST_ENCODER
-                    o->odo_x_1000 -= inc*1000;
+                    {
+                        static const int32_t N_BITS_PRECISION_BOUND = GEARBOX_REDUCTION * ENCODER_QUANTIZATION;
+                        
+                        o->distance_x_reduction -= inc*GEARBOX_REDUCTION;
+                        
+                        LIMIT(o->distance_x_reduction, N_BITS_PRECISION_BOUND);
+                    }
 #endif
                 }
-                
-                //o->time = 0;
             }
-            /*
-            else
-            {    
-                if (o->time != 1000)
-                {
-                    ++o->time;
-                }
-                else
-                {
-                    if (o->odo_x_1000 > 0) 
-                        --o->odo_x_1000;
-                    else if (o->odo_x_1000 < 0) 
-                        ++o->odo_x_1000;
-                }
-            }
-            */
         }
     }
 }

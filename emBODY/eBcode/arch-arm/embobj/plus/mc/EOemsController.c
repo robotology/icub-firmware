@@ -43,20 +43,15 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define JOINTS(j)   for (uint8_t j=0; j<NAXLES; ++j)
-#define MOTORS(m)   for (uint8_t m=0; m<NAXLES; ++m)
-#define ENCODERS(e) for (uint8_t e=0; e<NAXLES; ++e)
-
-//#define LIMIT(x,L) if (x>(L)) x=(L); else if (x<-(L)) x=-(L)
+#define SCAN(s)     for (uint8_t s=0; s<NAXLES; ++s)
+#define JOINTS(j)   SCAN(j)
+#define MOTORS(m)   SCAN(m)
+#define ENCODERS(e) SCAN(e)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const float   EMS_PERIOD           = 0.001f;
-const int32_t EMS_FREQUENCY_INT32  = 1000;
-const float   EMS_FREQUENCY_FLOAT  = 1000.0f;
-const int32_t TICKS_PER_REVOLUTION = 65536;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -89,17 +84,9 @@ extern EOemsController* eo_emsController_Init()
 #endif
     
     if (s_emsc)
-    {
-        //s_emsc->boardType  = board_type;
-        s_emsc->defcon     = EMS_PRUDENT;
-        s_emsc->motors     = NULL;
-        
-        s_emsc->limited_motors_mask_changed = eobool_false;
-        s_emsc->limited_motors_mask = 0;
-        
+    {        
         s_emsc->n_calibrated = 0;
-        
-        s_emsc->cable_length_alarm = eobool_false;
+        s_emsc->state_mask = EMS_OK;
         
         JOINTS(j)
         {
@@ -135,6 +122,10 @@ extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign)
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
+#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
+#error mechanics is undefined
+#endif
+
 extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
 {
     if (!s_emsc) return;
@@ -149,7 +140,7 @@ extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
         enc_vel[e] = eo_speedometer_GetVelocity(s_emsc->enc_speedometer[e]);
     }
 
-    #if defined(SHOULDER_BOARD)
+    #if defined(SHOULDER_BOARD) && defined(V1_MECHANICS)
         // |J0|   |  1     0    0   |   |E0|     
 		// |J1| = |  0     1    0   | * |E1|
 		// |J2|   |  1    -1  40/65 |   |E2|
@@ -194,60 +185,28 @@ extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measu
 }
 
 #ifdef USE_2FOC_FAST_ENCODER
-extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed)
+extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed, int32_t pos)
 {
-    if (s_emsc) eo_speedometer_FastEncoderRead(s_emsc->enc_speedometer[axis], speed);
+    if (s_emsc) eo_speedometer_FastEncoderRead(s_emsc->enc_speedometer[axis], speed, pos);
 }
 #endif
 
-extern eObool_t eo_emsController_GetLimitedCurrentMask(uint8_t* mask)
-{
-    if (!s_emsc || !s_emsc->limited_motors_mask_changed) return eobool_false; 
-        
-    *mask = s_emsc->limited_motors_mask;
-    
-    return eobool_true;
-}
-
 extern void eo_emsController_PWM(int16_t* pwm_motor)
 {
-    if (!s_emsc || s_emsc->defcon == EMS_ALARM)
+    if ((!s_emsc) || (s_emsc->state_mask != EMS_OK) /*|| (s_emsc->n_calibrated != NAXLES)*/)
     {
         MOTORS(m) pwm_motor[m] = 0;
         return;
     }
     
-    EMSdefcon_t defcon = EMS_ALL_OK;
-    
-    uint8_t alarm_mask = s_emsc->cable_length_alarm ?  0x07 : 0x00;
-    
-    JOINTS(j)
+    ENCODERS(e)
     {
-        /*
-        if (eo_speedometer_IsHardFault(s_emsc->enc_speedometer[j]))
+        if (eo_speedometer_IsHardFault(s_emsc->enc_speedometer[e]))
         {
-            //static uint8_t time=0;
-            
-            //if (!++time) hal_led_toggle(hal_led2);
-            
-            //s_emsc->defcon = EMS_ALARM;
-            //MOTORS(m) pwm_motor[m] = 0;
-            //return;
+            //o->state_mask |= ...
+            MOTORS(m) pwm_motor[m] = 0;
+            return;
         }
-        */
-           
-        if (!eo_speedometer_IsOk(s_emsc->enc_speedometer[j]) || !eo_axisController_HasLimits(s_emsc->axis_controller[j]))
-        {            
-            alarm_mask |= 1<<j;
-            s_emsc->defcon = defcon = EMS_PRUDENT;
-        }
-    }
-    
-    if (s_emsc->defcon == EMS_PRUDENT && defcon == EMS_ALL_OK)
-    {
-        JOINTS(j) eo_axisController_Stop(s_emsc->axis_controller[j]);
-        
-        s_emsc->defcon = EMS_ALL_OK;
     }
        
     int32_t pwm_joint[NAXLES];
@@ -256,26 +215,16 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     
     JOINTS(j)
     {
-        eObool_t big_error_flag = eobool_false;
-        
-        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &stiffness[j], &big_error_flag);
-        
-        if (big_error_flag) alarm_mask |= 1<<j;
+        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &stiffness[j]);
     }
     
-    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, pwm_joint, pwm_motor, stiffness/*, &alarm_mask*/);
-    
-    // alarm mask is now the mask of current-limited motors
-    
-    s_emsc->limited_motors_mask_changed = (s_emsc->limited_motors_mask != alarm_mask);
-    
-    s_emsc->limited_motors_mask = alarm_mask;
+    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, pwm_joint, pwm_motor, stiffness);
     
     JOINTS(j)
     {
         if (stop_mask & (1<<j))
         {
-            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off, eobool_false);
+            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_idle, eobool_false);
         }
     }
 }
@@ -294,15 +243,6 @@ extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 {
     if (s_emsc) eo_axisController_SetOutput(s_emsc->axis_controller[joint], out);    
 }
-
-/*
-extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel)
-{
-    if (!s_emsc) return;
-    
-    JOINTS(j) eo_axisController_GetPosRef(s_emsc->axis_controller[j], &(pos[j]), &(avg_vel[j])); 
-}
-*/
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
@@ -338,7 +278,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
     
-    if (mode == eomc_controlmode_cmd_switch_everything_off)
+    if (mode == eomc_controlmode_cmd_idle)
     {
         if (b2FOC_off)
         {
@@ -411,7 +351,7 @@ extern void eo_emsController_CheckCalibrations(void)
     
     s_emsc->n_calibrated = 0;
     
-    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) || defined(WAIST_BOARD) || defined(V2_MECHANICS)
         JOINTS(j)
         {
             if (eo_axisController_IsCalibrated(s_emsc->axis_controller[j]))
@@ -424,7 +364,7 @@ extern void eo_emsController_CheckCalibrations(void)
                 eo_axisController_SetCalibrated(s_emsc->axis_controller[j]);
             }
         }
-    #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+    #elif defined(SHOULDER_BOARD) 
         if (eo_axisController_IsCalibrated(s_emsc->axis_controller[0]) &&
             eo_axisController_IsCalibrated(s_emsc->axis_controller[1]) &&
             eo_axisController_IsCalibrated(s_emsc->axis_controller[2]))
@@ -440,9 +380,7 @@ extern void eo_emsController_CheckCalibrations(void)
             eo_axisController_SetCalibrated(s_emsc->axis_controller[1]);
             eo_axisController_SetCalibrated(s_emsc->axis_controller[2]);
         }
-    #endif
-        
-    #if defined(SHOULDER_BOARD)
+
         if (eo_axisController_IsCalibrated(s_emsc->axis_controller[3]))
         {
             s_emsc->n_calibrated++;
@@ -567,7 +505,7 @@ extern void eo_emsMotorController_GoIdle(void)
     {
         JOINTS(j)
         {
-            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_switch_everything_off, eobool_true);
+            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_idle, eobool_true);
         }
         
         MOTORS(m) set_2FOC_idle(m);

@@ -70,7 +70,7 @@ extern EOemsController* eo_emsController_Init(void);
 extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure);
 extern void eo_emsController_ReadEncoders(int32_t *pos);
 #ifdef USE_2FOC_FAST_ENCODER
-extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed);
+extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed, int32_t pos);
 #endif
 extern void eo_emsController_PWM(int16_t* pwm);
 extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign);
@@ -81,14 +81,15 @@ extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_a
 extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos);
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
-//extern void eo_emsController_GetPosRef(int32_t* pos, int32_t* avg_vel);
-extern eObool_t eo_emsController_GetLimitedCurrentMask(uint8_t* mask);
-
 // asynchronous
-extern void eo_emsController_CheckCalibrations(void);
-extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
+
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t twoFOC_off);
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
+
+extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
+extern void eo_emsController_CheckCalibrations(void);
+extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
+
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
@@ -108,11 +109,7 @@ extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t p
 extern void eo_emsController_SetPosMin(uint8_t joint, int32_t pos_min);
 extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max);
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
-
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
-
-extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
-
 extern void eo_emsMotorController_GoIdle(void);
 
 /** @}            

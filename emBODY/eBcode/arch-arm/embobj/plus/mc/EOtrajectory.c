@@ -17,8 +17,7 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
-extern const float   EMS_PERIOD;
-extern const int32_t TICKS_PER_REVOLUTION;
+#include "EOemsControllerCfg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -38,7 +37,6 @@ extern const int32_t TICKS_PER_REVOLUTION;
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define LIMIT(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -126,7 +124,7 @@ extern void eo_trajectory_SetPosRaw(EOtrajectory *o, int32_t p0)
 {
     if (!o) return;
     
-    LIMIT(o->pos_min, p0, o->pos_max)
+    LIMIT2(o->pos_min, p0, o->pos_max)
     
     o->xX = p0;
     o->xV = 0.0f;
@@ -160,11 +158,11 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t x0, int32_t x
     
     if (o->bVelocityMove || (o->vTimer < o->vT)) eo_trajectory_VelocityStop(o);
 
-    LIMIT(o->pos_min, xStar, o->pos_max)
+    LIMIT2(o->pos_min, xStar, o->pos_max)
 
     if (!velAvg) velAvg = o->vel_max;
     
-    LIMIT(-o->vel_max, velAvg, o->vel_max)
+    LIMIT(velAvg, o->vel_max)
     
     ///////////
     o->xX = x0;
@@ -211,11 +209,11 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t vStar, int32_
     
     o->bVelocityMove = eobool_true;
 
-    LIMIT(-o->vel_max, vStar, o->vel_max)
+    LIMIT(vStar, o->vel_max)
     
     if (!accAvg) accAvg = o->acc_max;
     
-    LIMIT(-o->acc_max, accAvg, o->acc_max)
+    LIMIT(accAvg, o->acc_max)
 
     float D = (float)vStar - o->vV;
     
@@ -255,7 +253,7 @@ extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc)
 
     o->xX = (float)pos;
     
-    LIMIT(o->pos_min, o->xX, o->pos_max)
+    LIMIT2(o->pos_min, o->xX, o->pos_max)
     
     if (!stop_acc) stop_acc = o->acc_max;
 

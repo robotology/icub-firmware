@@ -11,13 +11,38 @@ extern "C" {
     @author     alessandro.scalzo@iit.it
     @date       07/05/2012
  **/
- 
+        
  // - external dependencies --------------------------------------------------------------------------------------------
  
  #include "EOMtheEMSapplCfg_cfg.h"
  
  // - public #define  --------------------------------------------------------------------------------------------------
  
+#define FORCE_ZERO_PWM_OUT
+    
+//#define CONTROL_II
+//#define USE_2FOC_FAST_ENCODER
+    
+//#define V1_MECHANICS
+#define V2_MECHANICS
+    
+#define EMS_PERIOD           0.001f
+#define EMS_FREQUENCY_INT32  1000
+#define EMS_FREQUENCY_FLOAT  1000.0f
+
+#define TICKS_PER_REVOLUTION      65536
+#define TICKS_PER_HALF_REVOLUTION 32768
+#define ENCODER_QUANTIZATION      16
+#define GEARBOX_REDUCTION         100
+    
+#define VELOCITY_CMD_TIMEOUT      100 // cycles
+#define TORQUE_CMD_TIMEOUT        100 // cycles
+#define TORQUE_SENSOR_TIMEOUT     100 // cycles
+#define ENCODER_TIMEOUT            10 // cycles
+
+#define SAFE_MAX_CURRENT    10000
+#define NOMINAL_CURRENT     10000
+    
  #if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (9==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
     #define ANKLE_BOARD
     #define NAXLES 2
@@ -37,6 +62,13 @@ extern "C" {
     #error invalid board
 #endif
  
+// utilities
+    
+#define SET_BITS(mask,bits) mask |=  (bits)
+#define RST_BITS(mask,bits) mask &= ~(bits)
+#define CHK_BITS(mask,bits) (((mask) & (bits)) == (bits))
+#define LIMIT(x,L) { if (x>(L)) x=(L); else if (x<-(L)) x=-(L); }
+#define LIMIT2(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
  
  #ifdef __cplusplus
 }       // closing brace for extern "C"

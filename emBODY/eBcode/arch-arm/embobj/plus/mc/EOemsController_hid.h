@@ -29,15 +29,10 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+#define EMS_OK       0x0000
+#define EMS_FAULT    0x8000
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-
-typedef enum 
-{
-    EMS_ALL_OK  = 0,
-    EMS_PRUDENT = 1,
-    EMS_ALARM   = 2
-} EMSdefcon_t;
 
 /*  @struct     EOemsController_hid
     @brief      Hidden definition. Implements private data used only internally by the 
@@ -47,16 +42,9 @@ typedef enum
 
 struct EOemsController_hid 
 {
-    //emsBoardType_t boardType;
-
     uint8_t n_calibrated;
     
-    eObool_t limited_motors_mask_changed;
-    uint8_t limited_motors_mask;
-    
-    EMSdefcon_t defcon;
-    
-    eObool_t cable_length_alarm;
+    uint16_t state_mask;
     
     EOmotors         *motors;
     EOspeedmeter     *enc_speedometer[NAXLES];
