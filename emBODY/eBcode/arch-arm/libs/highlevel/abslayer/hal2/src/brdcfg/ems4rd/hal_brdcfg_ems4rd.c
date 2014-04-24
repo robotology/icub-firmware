@@ -1368,26 +1368,66 @@ static const hal_gpio_cfg_t s_hal_brdcfg_ems4rd_vaux_5v0_gpiocfg =
 {
     .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,        .altcfg = NULL
 };
-    
+
+#define NNNEW
+//#undef NNNEW
+
+#if defined(NNNEW)
+static uint8_t vaux_5v0_initted = 0; 
+static uint8_t vaux_5v0_status = 0; // 0 off, 1 on
+#endif
+
 static void s_hal_brdcfg_ems4rd_vaux_5v0_init(void)
 {
+#if !defined(NNNEW)    
     static uint8_t initted = 0;
     if(1 == initted)
     {
         return;
     }
+#else
+    if(1 == vaux_5v0_initted)
+    {
+        return;
+    }    
+#endif    
     hal_gpio_init(s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap.gpio, &s_hal_brdcfg_ems4rd_vaux_5v0_gpiocfg); 
+#if !defined(NNNEW)    
     initted = 1;
+#else
+    vaux_5v0_initted = 1;
+#endif    
     s_hal_brdcfg_ems4rd_vaux_5v0_on();    
 }
 
+
 static void s_hal_brdcfg_ems4rd_vaux_5v0_on(void)
 {
+#if defined(NNNEW) 
+    if(0 == vaux_5v0_initted)
+    {
+        return;
+    }
+    if(hal_gpio_valHIGH == hal_gpio_getval(s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap.gpio))
+    {
+        return;
+    }
+#endif    
     hal_gpio_setval(s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap.gpio, hal_gpio_valHIGH);   
 }
 
 static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void)
 {
+#if defined(NNNEW) 
+    if(0 == vaux_5v0_initted)
+    {
+        return;
+    }    
+    if(hal_gpio_valLOW == hal_gpio_getval(s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap.gpio))
+    {
+        return;
+    }
+#endif    
     hal_gpio_setval(s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap.gpio, hal_gpio_valLOW);
 }  
 
