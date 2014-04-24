@@ -107,7 +107,7 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
     {
         uint32_t volatile i = 0x100000;
         for(;i--; i>0);
-        hal_led_toggle(hal_led2);
+        hal_led_toggle(hal_led3);
     }
 }
 
