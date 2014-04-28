@@ -310,7 +310,7 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         .gpio_mode  = GPIO_Mode_OUT,
         .gpio_speed = GPIO_Speed_2MHz,
         .gpio_otype = GPIO_OType_PP,
-        .gpio_pupd  = GPIO_PuPd_UP        
+        .gpio_pupd  = GPIO_PuPd_NOPULL        
     };
     const hl_gpio_initmode_fx_t gpiomodeINP =
     {
