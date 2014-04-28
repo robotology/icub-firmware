@@ -101,8 +101,6 @@ extern eOresult_t eo_theEMSdgn_checkEthLinksStatus_quickly(EOTheEMSdiagnostics_t
 
 extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p);
 
-extern eOresult_t eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(EOTheEMSdiagnostics_t* p, uint32_t data);
-
 extern eOresult_t eo_theEMSdgn_UpdateCanQueuesStatistics(EOTheEMSdiagnostics_t* p, eOcanport_t canport, uint8_t numofRXcanframe, uint8_t numofXcanframe);
 
 extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport_t canport, uint8_t numofRXcanframe);

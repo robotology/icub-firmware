@@ -213,13 +213,6 @@ extern eOresult_t eo_theEMSdgn_UpdateApplWithMc(EOTheEMSdiagnostics_t* p, EOappE
     return(eores_OK);
 }
 
-extern eOresult_t eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(EOTheEMSdiagnostics_t* p, uint32_t data)
-{
-
-    eo_dgn_emsappmc.encreads.dummy = data;
-    return(eores_OK);
-}
-
 
 
 extern eOresult_t eo_theEMSdgn_UpdateMotorStFlags(EOTheEMSdiagnostics_t* p, eOmc_motorId_t mId, uint8_t flags)
