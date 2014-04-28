@@ -341,14 +341,14 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
             .version    = 
             { 
                 .major = 2, 
-                .minor = 5
+                .minor = 7
             },  
             .builddate  = 
             {
                 .year  = 2014,
                 .month = 4,
-                .day   = 7,
-                .hour  = 16,
+                .day   = 28,
+                .hour  = 13,
                 .min   = 0
             }
         },

@@ -136,14 +136,14 @@ extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 4
+                .minor = 5
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 3,
-                .day   = 13,
-                .hour  = 15,
+                .month = 4,
+                .day   = 28,
+                .hour  = 12,
                 .min   = 0
             }
         },
