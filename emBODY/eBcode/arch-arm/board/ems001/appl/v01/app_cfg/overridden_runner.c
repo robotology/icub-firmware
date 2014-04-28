@@ -461,15 +461,6 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     /* 4) update joint status */
     s_eom_emsrunner_hid_UpdateJointstatus(p);
     /*Note: motor status is updated with data sent by 2foc by can */
-    
-    /* 5) update */
-    /*
-    if(eo_emsController_GetLimitedCurrentMask(&mask))
-    {
-        eo_theEMSdgn_UpdateDummyFieldOfApplWithMc(eo_theEMSdgn_GetHandle(), (uint32_t)mask);
-        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
-    }
-    */
 
     s_checkEthLinks();
 
