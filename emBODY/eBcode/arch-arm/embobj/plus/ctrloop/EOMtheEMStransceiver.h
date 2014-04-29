@@ -145,6 +145,9 @@ extern eOresult_t eom_emstransceiver_GetDiagnosticsInfo(EOMtheEMStransceiver* p,
 
 extern eOemstransceiver_diagnosticsinfo_t* eom_emstransceiver_GetDiagnosticsInfoHandle(EOMtheEMStransceiver* p);
 
+// this function can be overridden
+extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum);
+
 /** @}            
     end of group eom_theemstransceiver  
  **/
