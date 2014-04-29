@@ -429,7 +429,7 @@ extern "C" {
 //  <i> default: 2 
 #define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  4
 
-//  <o> max size of output datagrams <16-200>
+//  <o> max size of output datagrams <16-256>
 //  <i> default: 32
 #define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  150
 
@@ -772,6 +772,14 @@ extern "C" {
     
     
 //  <h> Overridable functions
+    
+    
+//  <h> EOMtheEMStransceiver    
+ 
+//  <o> eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum) <0=> called when the EOreceiver detects a wrong sequence number
+#define cercervced12345cevr4vr3bvrte 0
+    
+// </h>EOMtheEMStransceiver        
  
 
 //  <h> EOMtheEMSappl    
