@@ -607,7 +607,7 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	}
 
     /* Feed-forward */
-    FeedforwardPortion = (Int32)strain_val * ((Int32)_kff_torque[j]);
+    FeedforwardPortion = (Int32)_desired_torque[j] * ((Int32)_kff_torque[j]);
 	if (FeedforwardPortion>=0) 
 	{
 		FeedforwardPortion = FeedforwardPortion >> _kr_torque[j]; 
