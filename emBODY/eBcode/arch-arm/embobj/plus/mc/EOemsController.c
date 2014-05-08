@@ -91,7 +91,7 @@ extern EOemsController* eo_emsController_Init()
         JOINTS(j)
         {
             s_emsc->axis_controller[j] = eo_axisController_New(j);
-            s_emsc->enc_speedometer[j] = eo_speedmeter_New();
+            s_emsc->enc_speedometer[j] = eo_speedmeter_New(0);
         }
         
         s_emsc->motors = eo_motors_New(NAXLES);

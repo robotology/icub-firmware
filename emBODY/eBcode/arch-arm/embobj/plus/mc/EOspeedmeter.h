@@ -49,8 +49,8 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
- 
-extern EOspeedmeter* eo_speedmeter_New(void);
+extern EOspeedmeter* eo_speedmeter_New(uint16_t fast_enc_divisor);
+
 extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset);
 extern eObool_t eo_speedometer_IsOk(EOspeedmeter* o);
 //extern void eo_speedometer_Reset(EOspeedmeter* o);

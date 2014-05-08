@@ -752,7 +752,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     
     if (o->control_mode == eomc_controlmode_calib)
     {
-        if (cmc == eomc_controlmode_cmd_idle)
+        if (cmc == eomc_controlmode_cmd_idle || cmc == eomc_controlmode_cmd_switch_everything_off)
         {
             o->control_mode = eomc_controlmode_idle;
             
@@ -785,6 +785,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         break;
 
     case eomc_controlmode_cmd_idle:
+    case eomc_controlmode_cmd_switch_everything_off:
         eo_pid_Reset(o->pidP);
         eo_pid_Reset(o->pidT);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION(), CHANGE_MODE_STOP_ACC);

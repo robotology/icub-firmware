@@ -18,7 +18,7 @@ extern "C" {
  
  // - public #define  --------------------------------------------------------------------------------------------------
  
-#define FORCE_ZERO_PWM_OUT
+//#define FORCE_ZERO_PWM_OUT
     
 //#define CONTROL_II
 //#define USE_2FOC_FAST_ENCODER

@@ -57,6 +57,8 @@ struct EOspeedmeter_hid
     int32_t distance_x_reduction;
     int32_t fast_enc_pos;
     
+    int32_t fast_enc_divisor;
+    
     int32_t speed;
     int32_t delta;
 

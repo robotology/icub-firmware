@@ -67,13 +67,15 @@ static int32_t normalize_angle(int32_t a);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOspeedmeter* eo_speedmeter_New(void)
+extern EOspeedmeter* eo_speedmeter_New(uint16_t fast_enc_divisor)
 {
     EOspeedmeter *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOspeedmeter), 1);
 
     if (o)
     {        
         //o->time = 0;
+        
+        o->fast_enc_divisor = fast_enc_divisor;
         
         o->distance = 0;
         o->position_last = 0;
