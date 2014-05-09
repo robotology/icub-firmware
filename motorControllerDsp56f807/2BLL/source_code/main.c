@@ -560,7 +560,16 @@ led0_off
 				PWMoutput[i]+=_debug_out2[i];
 				_debug_out3[i]=PWMoutput[i];			
 				*/
-				PWMoutput[i]+=compensate_bemf(i, _comm_speed[i]);
+				
+				//add the bemf compensation term
+				//PWMoutput[i]+=compensate_bemf(i, _comm_speed[i]); //use the motor speed
+				PWMoutput[i]+=compensate_bemf(i, _speed[i]); //use the joint speed
+				
+				//add the coulomb friction compensation term
+				//PWMoutput[i]+=compensate_friction(i, _comm_speed[i]); //use the motor speed
+				//PWMoutput[i]+=compensate_friction(i, _speed[i]); //use the joint speed
+				
+				
 				// Protection for joints out of the admissible range during force control
 				check_range_torque(i, _safeband[i], PWMoutput);
 				// PWM saturation

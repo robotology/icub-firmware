@@ -5,6 +5,7 @@
 #include "dsp56f807.h"
 #include "controller.h"
 #include "options.h"
+#include "can1.h"
 
 #ifndef VERSION
 #	error "No valid version specified"
@@ -423,6 +424,46 @@ inline Int32 compensate_bemf(byte j, Int16 motor_speed)
 		PWM_bemf = -(-PWM_bemf >> (_backemf_shift[j]+_jntVel_est_shift[j]));
 	}
 	return PWM_bemf;
+}
+
+
+/***************************************************************************/
+/**
+ * This function calculates additional PWM required for friction compensation
+ ***************************************************************************/
+inline Int32 compensate_friction(byte j, Int16 motor_speed)
+{
+	Int32 PWM_frict;
+	float f_kc;
+	float f_motor_speed;
+	float f_pwm;
+	float shift;
+	
+	if (motor_speed > 0) f_kc = (float)(_kstp_torque[j]);
+	else                 f_kc = (float)(_kstn_torque[j]);
+	
+	shift = (float)(1<<_jntVel_est_shift[j]);
+	
+	f_motor_speed =  (float)(motor_speed);
+	f_motor_speed /= (shift * 0.056888889); //this value corresponds is computed as: 5deg/s * 4096/360/1000
+	f_motor_speed *= f_motor_speed; 
+	f_motor_speed *= f_motor_speed;
+	f_motor_speed *= f_motor_speed;
+	f_pwm         =  f_motor_speed * f_kc;
+	
+    PWM_frict = (Int32)(f_pwm);
+    
+    //saturation
+    if (PWM_frict > +_kstp_torque[j]) PWM_frict = +_kstp_torque[j];
+    if (PWM_frict < -_kstn_torque[j]) PWM_frict = -_kstn_torque[j];
+    
+    //eventually change the sign
+    if (_kp[j]<0) PWM_frict = -PWM_frict;
+    
+    if (j==1) can_printf("%f", PWM_frict); // int32
+    
+    return 0;
+	//return PWM_frict;
 }
 
 #endif //__pidh__
