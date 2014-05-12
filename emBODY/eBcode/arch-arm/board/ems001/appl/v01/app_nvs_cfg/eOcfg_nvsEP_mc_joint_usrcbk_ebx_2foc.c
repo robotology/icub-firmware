@@ -598,6 +598,15 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 }
 
 
+extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_interactionmode_t* interaction = (eOmc_interactionmode_t*)rd->data;
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    
+    #warning --> mettere qui codice per eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode() 2foc
+}
+
+
 // __ALE__
 extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
