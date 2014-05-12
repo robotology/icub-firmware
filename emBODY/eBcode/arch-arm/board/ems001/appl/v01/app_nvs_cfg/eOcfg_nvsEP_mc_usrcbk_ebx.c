@@ -87,6 +87,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
 const eOmc_joint_t joint_default_value =
 {
     EO_INIT(.config)             
@@ -165,7 +166,8 @@ const eOmc_joint_t joint_default_value =
 		EO_INIT(.setpoint)                  {0},
 		EO_INIT(.stoptrajectory)            0,
 		EO_INIT(.controlmode)				eomc_controlmode_cmd_switch_everything_off,
-        EO_INIT(.filler02)                  {0}
+        EO_INIT(.interactionmode)           eomc_imodeval_stiff,
+        EO_INIT(.filler01)                  0        
 	}
 }; 
 
