@@ -157,7 +157,8 @@ const eOmc_joint_t joint_default_value =
             EO_INIT(.controlmodestatus)      eomc_controlmode_idle,
         },
         EO_INIT(.ofpid)                     {0},
-        EO_INIT(.chamaleon04)               {0} //{0xd1, 0xd2, 0xd3, 0xd4}
+        EO_INIT(.interactionmodestatus)     eomc_imodeval_stiff,
+        EO_INIT(.chamaleon03)               {0} //{0xd1, 0xd2, 0xd3}
     },
     EO_INIT(.inputs)                       {0},
     EO_INIT(.cmmnds)                       
