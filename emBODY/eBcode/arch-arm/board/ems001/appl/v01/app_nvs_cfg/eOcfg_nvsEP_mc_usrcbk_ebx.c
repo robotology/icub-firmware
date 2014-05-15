@@ -154,7 +154,7 @@ const eOmc_joint_t joint_default_value =
             EO_INIT(.acceleration)          0,     
             EO_INIT(.torque)                0,
             EO_INIT(.motionmonitorstatus)   eomc_motionmonitorstatus_notmonitored,
-            EO_INIT(.controlmodestatus)      eomc_controlmode_idle,
+            EO_INIT(.controlmodestatus)     eomc_controlmode_idle,
         },
         EO_INIT(.ofpid)                     {0},
         EO_INIT(.interactionmodestatus)     eomc_imodeval_stiff,
