@@ -625,7 +625,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
     canFrame->data[4]=0;
     canFrame->data[5]=0x20;
     canFrame->data[6]=0;
-    canFrame->data[7]=35;
+    canFrame->data[7]=0x35;
 
     return(eores_OK);
 }
