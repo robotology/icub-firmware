@@ -91,7 +91,7 @@ extern EOemsController* eo_emsController_Init()
         JOINTS(j)
         {
             s_emsc->axis_controller[j] = eo_axisController_New(j);
-            s_emsc->enc_speedometer[j] = eo_speedmeter_New(0);
+            s_emsc->enc_speedometer[j] = eo_speedmeter_New();
         }
         
         s_emsc->motors = eo_motors_New(NAXLES);
@@ -329,6 +329,18 @@ extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint)
     return eo_axisController_GetControlMode(s_emsc->axis_controller[joint]);
 }
 
+extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode)
+{
+    return eo_axisController_SetInteractionMode(s_emsc->axis_controller[joint], mode);
+}
+
+/*
+extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint)
+{
+    return eo_axisController_GetInteractionMode(s_emsc->axis_controller[joint]);
+}
+*/
+
 extern void eo_emsController_ResetPosPid(uint8_t joint)
 {
     if (s_emsc) eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
@@ -417,7 +429,7 @@ extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status
     }
 }
 
-extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus)
+extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* jointStatus)
 {
     if (s_emsc && s_emsc->axis_controller[joint])
     {
@@ -425,12 +437,12 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_bas
     }
     else
     {
-        jointStatus->position            = 0;  // the position of the joint           
-        jointStatus->velocity            = 0;  // the velocity of the joint          
-        jointStatus->acceleration        = 0;  // the acceleration of the joint       
-        jointStatus->torque              = 0;  // the torque of the joint when locally measured
-        jointStatus->motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  // use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode  
-        jointStatus->controlmodestatus   = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
+        jointStatus->basic.position            = 0;  // the position of the joint           
+        jointStatus->basic.velocity            = 0;  // the velocity of the joint          
+        jointStatus->basic.acceleration        = 0;  // the acceleration of the joint       
+        jointStatus->basic.torque              = 0;  // the torque of the joint when locally measured
+        jointStatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  // use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode  
+        jointStatus->basic.controlmodestatus   = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
     }
 }
 

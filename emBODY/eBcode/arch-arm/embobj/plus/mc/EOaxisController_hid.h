@@ -105,8 +105,8 @@ struct EOaxisController_hid
     int16_t openloop_out;
 
     eOmc_controlmode_t control_mode;
-    
-    eObool_t stiff;
+    eOmc_interactionmode_t interact_mode;
+    //eObool_t stiff;
 
     //uint8_t limits_mask;
     

@@ -109,8 +109,8 @@ extern void eo_axisController_Stop(EOaxisController *o);
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc);
 extern eOmc_controlmode_t eo_axisController_GetControlMode(EOaxisController *o);
 
-extern eObool_t eo_axisController_SetStiff(EOaxisController *o, eObool_t stiff);
-extern eObool_t eo_axisController_IsStiff(EOaxisController *o);
+extern eObool_t eo_axisController_SetInteractionMode(EOaxisController *o, eOmc_interactionmode_t mode);
+//extern eOmc_interactionmode_t eo_axisController_GetInteractionMode(EOaxisController *o);
 
 extern void eo_axisController_SetImpedance(EOaxisController *o, int32_t  stiffness, int32_t  damping, int32_t  offset);
 extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffness, int32_t *damping, int32_t *offset);
@@ -122,7 +122,7 @@ extern void eo_axisController_SetPosMax(EOaxisController *o, int32_t pos_max);
 extern void eo_axisController_SetVelMax(EOaxisController *o, int32_t vel_max);
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus);
-extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus);
+extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_t* jointStatus);
 extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);

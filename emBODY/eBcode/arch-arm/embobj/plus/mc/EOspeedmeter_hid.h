@@ -43,6 +43,8 @@ extern "C" {
 
 #define SM_HARDWARE_FAULT      0x8000
 
+#ifdef OLD_STYLE_ENCODER
+
 struct EOspeedmeter_hid
 {
     //int32_t time;
@@ -57,8 +59,6 @@ struct EOspeedmeter_hid
     int32_t distance_x_reduction;
     int32_t fast_enc_pos;
     
-    int32_t fast_enc_divisor;
-    
     int32_t speed;
     int32_t delta;
 
@@ -67,6 +67,35 @@ struct EOspeedmeter_hid
     //uint16_t invalid_data_cnt;
 };
 
+#else
+
+struct EOslowenc_hid
+{
+    int32_t distance;
+    int32_t position_last;
+    int32_t position_sure;
+
+    int32_t enc_sign;
+    int32_t offset;
+    
+    int32_t speed;
+    int32_t delta;
+
+    uint16_t state_mask;
+    uint8_t  first_valid_data;
+};
+
+struct EOfastenc_hid
+{
+    int32_t distance;
+    int32_t position;
+    
+    int32_t speed;
+
+    uint16_t state_mask;
+};
+
+#endif
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

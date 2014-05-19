@@ -48,23 +48,39 @@ typedef struct EOspeedmeter_hid EOspeedmeter;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
- 
-extern EOspeedmeter* eo_speedmeter_New(uint16_t fast_enc_divisor);
 
+#define OLD_STYLE_ENCODER
+
+#ifdef OLD_STYLE_ENCODER
+extern EOspeedmeter* eo_speedmeter_New(void);
 extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset);
 extern eObool_t eo_speedometer_IsOk(EOspeedmeter* o);
 //extern void eo_speedometer_Reset(EOspeedmeter* o);
 extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o);
 extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign);
-
 extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position);
-
 #ifdef USE_2FOC_FAST_ENCODER
 extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed, int32_t fast_enc_pos);
 #endif
-
 extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o);
 extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o);
+#else
+
+extern EOslowenc* eo_slowenc_New(void);
+extern void eo_slowenc_Calibrate(EOslowenc* o, int32_t offset);
+extern eObool_t eo_slowenc_IsReady(EOslowenc* o);
+extern eObool_t eo_slowenc_IsHardFault(EOslowenc* o);
+extern void eo_slowenc_SetDirection(EOslowenc* o, int32_t sign);
+extern void eo_slowenc_Acquire(EOslowenc* o, int32_t position);
+extern int32_t eo_slowenc_GetPosition(EOspeedmeter* o);
+
+extern EOfastenc* eo_fastenc_New(void);
+extern eObool_t eo_fastenc_IsHardFault(EOfastenc* o);
+extern void eo_fastenc_Acquire(EOfastenc* o, int32_t position, int32_t velocity);
+extern int32_t eo_fastenc_GetPosition(EOfastenc* o);
+extern int32_t eo_fastenc_GetVelocity(EOfastenc* o);
+
+#endif
 
 /** @}            
     end of group eo_pid  

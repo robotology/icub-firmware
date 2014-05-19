@@ -86,6 +86,9 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t twoFOC_off);
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
 
+extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode);
+//extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint);
+
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
 extern void eo_emsController_CheckCalibrations(void);
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
@@ -95,7 +98,7 @@ extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
-extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_basic_t* jointStatus);
+extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* jointStatus);
 extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 
 // configuration

@@ -105,7 +105,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->openloop_out = 0;
 
         o->control_mode = eomc_controlmode_idle;
-        o->stiff = eobool_true;
+        o->interact_mode = eOmc_interactionmode_stiff;
 
         o->err = 0;
         
@@ -296,11 +296,11 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq)
     }
 }
 
-extern eObool_t eo_axisController_SetStiff(EOaxisController *o, eObool_t stiff)
+extern eObool_t eo_axisController_SetInteractionMode(EOaxisController *o, eOmc_interactionmode_t mode)
 {
-    o->stiff = stiff;
+    o->interact_mode = mode;
  
-    if (stiff)
+    if (mode == eOmc_interactionmode_stiff)
     {
         axisMotionReset(o);
     }
@@ -308,10 +308,12 @@ extern eObool_t eo_axisController_SetStiff(EOaxisController *o, eObool_t stiff)
     return eobool_true;
 }
 
-extern eObool_t eo_axisController_IsStiff(EOaxisController *o)
+/*
+extern eOmc_interactionmode_t eo_axisController_GetInteractionMode(EOaxisController *o)
 {
-    return o->stiff;
+    return o->interact_mode;
 }
+*/
 
 extern eOmc_controlmode_t eo_axisController_GetControlMode(EOaxisController *o)
 {
@@ -543,7 +545,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 o->control_mode = eomc_controlmode_position;
             }
             
-            o->stiff = eobool_true;
+            o->interact_mode = eOmc_interactionmode_stiff;
             *stiff = eobool_true;
             o->err = 0;
             return 0;
@@ -551,7 +553,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         case eomc_controlmode_idle:
         {
             eo_trajectory_Init(o->trajectory, pos, vel, 0);
-            *stiff = o->stiff;
+            *stiff = o->interact_mode == eOmc_interactionmode_stiff;
             o->err = 0;
             return 0;
         }
@@ -588,7 +590,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             
             int32_t err = pos_ref - pos;
 
-            if (o->stiff)
+            if (o->interact_mode == eOmc_interactionmode_stiff)
             {
                 *stiff = eobool_true;
                 
@@ -1006,18 +1008,20 @@ extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd,
     eo_pid_SetPid(o->pidT, Kp, Kd, Ki, Imax, Ymax, Yoff);
 }
 
-extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_basic_t* jointStatus)
+extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_t* jointStatus)
 {
     if (!o) return;
     
-    jointStatus->controlmodestatus   = o->control_mode;
-    jointStatus->position            = GET_AXIS_POSITION();           
-    jointStatus->velocity            = GET_AXIS_VELOCITY();          
+    jointStatus->interactionmodestatus =  o->interact_mode;
+    
+    jointStatus->basic.controlmodestatus   = o->control_mode;
+    jointStatus->basic.position            = GET_AXIS_POSITION();           
+    jointStatus->basic.velocity            = GET_AXIS_VELOCITY();          
     
     #warning to be implemented
-    jointStatus->acceleration        = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
+    jointStatus->basic.acceleration        = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     
-    jointStatus->torque              = o->torque_meas;
+    jointStatus->basic.torque              = o->torque_meas;
 }
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
