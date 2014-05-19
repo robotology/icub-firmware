@@ -69,6 +69,10 @@
 #define FOC_ADDRCAN_1_BID       0
 #define FOC_ADDRCAN_2_BID       1
 
+#if     defined(ICUB_DARMSTADT01) 
+    #define STRAIN_ADDRCAN_13_BID   2
+#endif
+
 static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] = 
 {
     { // 0 == FOC_ADDRCAN_1_BID
@@ -88,6 +92,19 @@ static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] =
         },
         EO_INIT(.type)                        eobrd_1foc,
      }
+     
+#if     defined(ICUB_DARMSTADT01)     
+     ,
+     
+     { // 2 == STRAIN_ADDRCAN_13_BID
+        EO_INIT(.canLoc)
+        {
+            EO_INIT(.emscanport)              eOcanport2,
+            EO_INIT(.addr)                    13,
+        },
+        EO_INIT(.type)                        eobrd_strain,
+     }
+#endif
 };
 
 const EOconstvector  s_eo_cfg_appDB_constvec_boards = 
@@ -169,6 +186,23 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cf
 
 
 
+#if     defined(ICUB_DARMSTADT01)
+static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] =
+{
+    {// 0
+       EO_INIT(.belong2board)                       STRAIN_ADDRCAN_13_BID,
+    }
+};
+
+const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
+{
+    EO_INIT(.size)              sizeof(s_cfg_appDB_snsrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
+    EO_INIT(.item_size)         sizeof(eOappTheDB_cfg_snsrStrainInfo_t),
+    EO_INIT(.item_array_data)  s_cfg_appDB_snsrStrain
+};
+
+#else
+
 //static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] = 
 //{
 //    {// 0
@@ -176,13 +210,16 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cf
 //    }
 //};
 
-//No strain boards are coccented to eb9
-const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
+//No strain boards are coccented to eb7
+const EOconstvector s_eo_cfg_appDB_constvec_snsrStrain = 
 {
     EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrStrain)/sizeof(eOappTheDB_cfg_snsrStrainInfo_t), 
     EO_INIT(.item_size)         0, //sizeof(eOappTheDB_cfg_snsrStrainInfo_t),
     EO_INIT(.item_array_data)   NULL, //s_cfg_appDB_snsrStrain
 };
+
+
+#endif
 
 
 extern const EOconstvector* const eo_cfg_appDB_constvec_snsrStrain__ptr = &s_eo_cfg_appDB_constvec_snsrStrain;
