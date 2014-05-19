@@ -603,7 +603,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
     eOmc_interactionmode_t* interaction = (eOmc_interactionmode_t*)rd->data;
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     
-    #warning --> mettere qui codice per eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode() 2foc
+    eo_emsController_SetInteractionMode(jxx, *interaction);
 }
 
 

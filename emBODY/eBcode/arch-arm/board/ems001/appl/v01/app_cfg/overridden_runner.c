@@ -483,7 +483,8 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
             return; //error
         }
         
-        eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
+        //eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
+        eo_emsController_GetJointStatus(jId, jstatus_ptr);
         
         eo_emsController_GetActivePidStatus(jId, &jstatus_ptr->ofpid);
         
