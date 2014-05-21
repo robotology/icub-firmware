@@ -65,7 +65,7 @@ and with id not continuos. */
 #define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_AS_MSG_MAXNUM
 
 /*currently only one message per class is managed (test porpouse)*/
-#define eo_icubCanProto_pollingSkinMsg_inTbl_max               4//ICUBCANPROTO_POL_AS_CMD_MAXNUM
+#define eo_icubCanProto_pollingSkinMsg_inTbl_max               5//ICUBCANPROTO_POL_AS_CMD_MAXNUM
 //#define eo_icubCanProto_pollingSkinMsgClass_maxNum             ICUBCANPROTO_POL_SK_CMD_MAXNUM commented because unused
 
 /*currently only one message per class is managed (test porpouse)*/
@@ -234,7 +234,10 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingSkinMsg
     {   // 78 ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2
         EO_INIT(.former)    eo_icubCanProto_former_pol_sk_cmd__tactSetup2
     },
-    {   // 79 ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG
+    {    // 79 ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP
+        EO_INIT(.former)    eo_icubCanProto_former_pol_sk_cmd__accGyroSetup
+    },
+    {   // 80 ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG
         EO_INIT(.former)    eo_icubCanProto_former_pol_sk_cmd__setTriangCfg
     }
 };        

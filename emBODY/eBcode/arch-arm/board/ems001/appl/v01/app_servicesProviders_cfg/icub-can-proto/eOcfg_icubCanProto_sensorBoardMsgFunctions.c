@@ -672,6 +672,11 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setBrdCfg(EOicubCanProto* p
 }
 
 
+extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__accGyroSetup(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
 extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setTriangCfg(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     /* 1) prepare base information*/
