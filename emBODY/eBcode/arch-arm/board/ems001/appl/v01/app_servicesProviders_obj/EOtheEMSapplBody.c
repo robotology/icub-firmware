@@ -491,6 +491,58 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     return(res);
 }
 
+
+
+
+extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
+{
+    eOresult_t                      res;
+    uint8_t                         i, j;
+    EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
+    uint8_t                         boardEndAddr;
+    eOicubCanProto_msgDestination_t msgdest;
+    
+    uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+    
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+    };
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    for(j=0; j<numofskin; j++) //for each skid
+    {
+        res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
+        if(eores_OK != res)
+        {
+            return(eores_NOK_generic);
+        }
+            
+        boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
+    
+        icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
+            
+        for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) //for each skid 
+        {
+            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+            
+            res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
+            if(eores_OK != res)
+            {
+                return(eores_NOK_generic);
+            }
+        }
+    }
+    return(eores_OK);
+
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
