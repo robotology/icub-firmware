@@ -81,7 +81,7 @@ typedef const struct
     eObool_t                        getipaddrFROMenvironment;   /**< if true gets IP address from shared-services */   
     eObool_t                        errmng_haltrace_enabled;    /**< if true enable hal trace in error manager to write to debug window */
     uint8_t                         boardid;                    /**< a number from 1 to max number. use 255 for none */
-    eOemsdiscoverylistener_cfg_t    disclistcfg;                /** configuration of the discovery listener */
+    eOemsdiscoverylistener_cfg_t    disclistcfg;                /**< configuration of the discovery listener */
     eOemsbackdoor_cfg_t             backdoorcfg;                /**< configuration of the backdoor */
     eOemssocket_cfg_t               socketcfg;                  /**< the cfg used by the object EOMtheEMSsocket launched by the EOMtheEMSappl */
     eOemstransceiver_cfg_t          transcfg;                   /**< the cfg used by the object EOMtheEMStransceiver launched by the EOMtheEMSappl */
