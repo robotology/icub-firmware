@@ -278,7 +278,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
     
-    if (mode == eomc_controlmode_cmd_idle)
+    if ((mode == eomc_controlmode_cmd_idle) || (mode == eomc_controlmode_cmd_switch_everything_off))
     {
         if (b2FOC_off)
         {
