@@ -427,7 +427,6 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
         {
             res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy.val2bcastList[0]));
         }
-        #warning disabilita la pelle come si fa?
         
         // 3) disable tx on mais
         res = s_eo_emsapplBody_DisableTxMais(p);
