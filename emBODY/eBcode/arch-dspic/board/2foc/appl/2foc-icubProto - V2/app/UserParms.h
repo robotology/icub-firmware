@@ -368,7 +368,7 @@
 
   #ifdef QE_CE300_4_PARAMS
     // PPR (number of pulses in one phase) for ChipEncoder CE300-4 encoder
-    #define QE_PPR                   1970
+    #define QE_PPR                   2000 //1970
     // CE300 do not need to swap A and B
     #define QE_SWAPAB                1
     // the index pulse occours every x pulses
