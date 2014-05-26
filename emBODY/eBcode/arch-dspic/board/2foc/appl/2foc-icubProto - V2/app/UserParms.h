@@ -847,7 +847,8 @@
 // PWM Frequency in Hertz
 #ifdef ENCODER_DHES
  // DHES can run up to 40KHz
- #define PWMFREQUENCY   40000     
+ //#define PWMFREQUENCY   40000     
+  #define PWMFREQUENCY  20000
 #else
  // Higer resolution encoders
  #define PWMFREQUENCY   20000     
@@ -862,7 +863,8 @@
 #else
  // hi-res encoders try to minimize zero cross distortion
  //#define DEADTIMESEC	 0.00000100
- #define DEADTIMESEC	   0.00000020 
+ //#define DEADTIMESEC	   0.00000020
+  #define DEADTIMESEC	   0.00000025 
 #endif
 
 // this forces the 2foc interrupt to delay PWM registers update when it is 

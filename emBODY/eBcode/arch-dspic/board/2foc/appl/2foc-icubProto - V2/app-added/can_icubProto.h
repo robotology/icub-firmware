@@ -29,7 +29,7 @@
 /************ FIRMWARE AND CAN PROTOCOL VERSION DEFINITION *******************************************/
 #define FW_VERSION_MAJOR          1
 #define FW_VERSION_MINOR          2
-#define FW_VERSION_BUILD          1
+#define FW_VERSION_BUILD          2
 
 #define CAN_PROTOCOL_VERSION_MAJOR      1
 #define CAN_PROTOCOL_VERSION_MINOR      1

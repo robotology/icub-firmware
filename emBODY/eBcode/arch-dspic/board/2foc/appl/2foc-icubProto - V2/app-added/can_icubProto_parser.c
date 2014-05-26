@@ -589,17 +589,17 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
 #endif
            // Torque control references
-	   IqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
-	   if (IqRef>ApplicationData.CurLimit)
+	         IqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
+	         if (IqRef>ApplicationData.CurLimit)
                IqRef=ApplicationData.CurLimit;
            else if (IqRef<-ApplicationData.CurLimit)
                IqRef=-ApplicationData.CurLimit;
-	    CtrlReferences.qIqRef=IqRef;
-            // set reference value for toggling torque
-            TorqueTogglingReference = CtrlReferences.qIqRef;
+	         CtrlReferences.qIqRef=IqRef;
+           // set reference value for toggling torque
+           TorqueTogglingReference = CtrlReferences.qIqRef;
 
-            // Flux control references
-            CtrlReferences.qIdRef = (rxpayload->b[4] << 8 | rxpayload->b[3]);  
+           // Flux control references
+           CtrlReferences.qIdRef = (rxpayload->b[4] << 8 | rxpayload->b[3]);  
 
 #ifdef SYNC_2FOC_TO_EMS
             CanIcubProtoTrasmitterSendPeriodicData();          
@@ -718,15 +718,16 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
             }
              
             // Torque control references
-            
+            CtrlReferences.qIdRef = 0;
             CtrlReferences.qIqRef = -rxpayload->w[canprotoparser_bid-1];
 
+            /*
             if (CtrlReferences.qIqRef>ApplicationData.CurLimit)
                CtrlReferences.qIqRef= ApplicationData.CurLimit;
             else if (CtrlReferences.qIqRef<-ApplicationData.CurLimit)
                CtrlReferences.qIqRef=-ApplicationData.CurLimit;
-
-            CtrlReferences.qIdRef = 0;
+            */
+            
             // set reference value for toggling torque
             TorqueTogglingReference = CtrlReferences.qIqRef;
 #ifdef SYNC_2FOC_TO_EMS
