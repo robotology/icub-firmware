@@ -236,6 +236,13 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
+            uint32_t canBoardsReady;
+            char str[60];
+            if(!eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady))
+            {
+                snprintf(str, sizeof(str), "not all boards are ready mask=%u", canBoardsReady);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "on rec go2run cmd", str);
+            }
             eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
         } break;
         
@@ -583,8 +590,8 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
                 }
             }        
         } break;
@@ -607,6 +614,11 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 ropdesc.signature               = cmdconfig->opcpar.signature;
                 res = eo_transceiver_RegularROP_Load(theems00transceiver, &ropdesc);
                 res = res;
+                if(eores_OK != res)
+                {
+                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                }
             }         
         } break;        
 
