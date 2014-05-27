@@ -38,7 +38,11 @@
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
 
-
+// - for ems 
+#include "EOMtheEMSappl.h"
+#include "EOtheEMSapplBody.h"
+#include "EOtheEMSapplDiagnostics.h"
+#include "EOtheErrorManager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

@@ -22,6 +22,18 @@
     @date       09/06/2011
 **/
 
+#if !defined(EOPROT_USE_MN_VERSION_1_0) & !defined(EOPROT_USE_MN_VERSION_2_0)
+    #define EOPROT_USE_MN_VERSION_1_0
+#endif
+
+#if     !defined(EOPROT_USE_MN_VERSION_1_0)
+        // marco.accame:    keep the double mode just for some days, until the blue robot is done.
+        //                  forgive me for the double code block in the file 
+        
+        #include "EoProtocolEPmn_fun_overridden.c"
+
+        
+#else//!defined(EOPROT_USE_MN_VERSION_1_0)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -284,7 +296,7 @@ static void s_eo_cfg_nvsEP_mngmnt_usr_ebx_generic_ropsigcfgcommand(eOmn_ropsigcf
 }
 
 
-
+#endif//!defined(EOPROT_USE_MN_VERSION_1_0)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
