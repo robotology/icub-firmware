@@ -221,59 +221,6 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
-// extern void eoprot_fun_UPDT_mn_comm_cmmnds_command(const EOnv* nv, const eOropdescriptor_t* rd) 
-// {
-//     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
-//     
-//     eOmn_command_t* command = (eOmn_command_t*)nv->ram;
-//     
-//     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
-//     
-//     
-//     if(eobool_true == eo_nv_hid_isLocal(nv))
-//     {   // function is called from within the local board
-//            
-//         switch(opc)
-//         {
-//             case eomn_opc_config_REGROPs_clear:
-//             case eomn_opc_config_REGROPs_assign:
-//             case eomn_opc_config_REGROPs_append:
-//             case eomn_opc_config_REGROPs_remove:
-//             {
-//                 s_eoprot_ep_mn_fun_configcommand(command);                  
-//             } break;
-//             
-//             case eomn_opc_query_numof_EPs:
-//             case eomn_opc_query_numof_ENs:
-//             case eomn_opc_query_numof_REGROPs:          
-//             {
-//                 s_eoprot_ep_mn_fun_querynumofcommand(command); 
-//             } break;
-//             
-//             case eomn_opc_query_array_EPs:              
-//             case eomn_opc_query_array_EPdes:  
-//             case eomn_opc_query_array_ENdes:
-//             case eomn_opc_query_array_REGROPs:                
-//             {
-//                 s_eoprot_ep_mn_fun_queryarraycommand(command); 
-//             } break;            
-//             
-//             default:
-//             {
-//             } break;
-//             
-//         }        
-//     }
-//     else
-//     {   // function is called from within the remote host because it has received a say or a sig
-
-//     }    
-
-// }
-
-
-
-
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
@@ -592,7 +539,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
     eOmn_cmd_config_t* cmdconfig = (eOmn_cmd_config_t*)&command->cmd;
     EOarray *array = (EOarray*)cmdconfig->array;
     
-    uint16_t targetcapacity = EOMANAGEMENT_COMMAND_DATA_SIZE / sizeof(eOropSIGcfg_t);
+    uint16_t targetcapacity = (sizeof(cmdconfig->array) - sizeof(eOarray_head_t))  / sizeof(eOropSIGcfg_t);
     
     
     eOmn_opc_t opc = (eOmn_opc_t) cmdconfig->opcpar.opc;
@@ -694,103 +641,6 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
 
 }
 
-
-// static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd)
-// {
-//     uint8_t size, i;
-//     eOropSIGcfg_t *sigcfg;
-//     eOropdescriptor_t ropdesc;
-//     EOtransceiver* theems00transceiver; 
-//     EOarray *array = (EOarray*)&ropsigcfgcmd->array;
-//     eOmn_ropsigcfg_commandtype_t cmmnd = (eOmn_ropsigcfg_commandtype_t)ropsigcfgcmd->cmmnd;
-
-//     eOresult_t res;
-//     
-//     if(NULL == (theems00transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle())))
-//     {
-//         return;
-//     }
-//     
-//     
-//     if((eo_array_ItemSize(array) != sizeof(eOropSIGcfg_t)) || (NUMOFROPSIGCFG != eo_array_Capacity(array)) || ((size = eo_array_Size(array)) > NUMOFROPSIGCFG))
-//     {
-//         return;
-//     }
-//     
-//     
-//     
-//     switch(cmmnd)
-//     {
-//     
-//         case ropsigcfg_cmd_clear:
-//         {   // just clear
-//             eo_transceiver_RegularROPs_Clear(theems00transceiver);
-//         } break;
-//         
-//         case ropsigcfg_cmd_assign:
-//         {   // clear and load all the sigcfg in the array
-//             eo_transceiver_RegularROPs_Clear(theems00transceiver);
-
-//             for(i=0; i<size; i++)
-//             {
-//                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-//                 memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-//                 ropdesc.control.plustime        = (eobool_true == ropsigcfgcmd->plustime) ? (1) : (0);
-//                 ropdesc.control.plussign        = (eobool_true == ropsigcfgcmd->plussign) ? (1) : (0);
-//                 ropdesc.ropcode                 = eo_ropcode_sig;
-//                 ropdesc.id32                    = sigcfg->id32;    
-//                 ropdesc.signature               = ropsigcfgcmd->signature;   
-//                 res = eo_transceiver_RegularROP_Load(theems00transceiver, &ropdesc);
-//                 res = res;
-//                 if(eores_OK != res)
-//                 {
-// //                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-// //                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
-//                 }
-//             }        
-//         } break;
-//         
-//         case ropsigcfg_cmd_append:
-//         {   // dont clear and load all the sigcfg in the array
-//             for(i=0; i<size; i++)
-//             {
-//                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-//                 memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-//                 ropdesc.control.plustime        = (eobool_true == ropsigcfgcmd->plustime) ? (1) : (0);
-//                 ropdesc.control.plussign        = (eobool_true == ropsigcfgcmd->plussign) ? (1) : (0);
-//                 ropdesc.ropcode                 = eo_ropcode_sig;
-//                 ropdesc.id32                    = sigcfg->id32;
-//                 ropdesc.signature               = ropsigcfgcmd->signature;
-//                 res = eo_transceiver_RegularROP_Load(theems00transceiver, &ropdesc);
-//                 res = res;
-//             }         
-//         } break;        
-
-//         case ropsigcfg_cmd_remove:
-//         {   // remove all the sigcfg in the array
-//             for(i=0; i<size; i++)
-//             {
-//                 sigcfg = (eOropSIGcfg_t*)eo_array_At(array, i);
-//                 memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-//                 ropdesc.control.plustime        = (eobool_true == ropsigcfgcmd->plustime) ? (1) : (0);
-//                 ropdesc.control.plussign        = (eobool_true == ropsigcfgcmd->plussign) ? (1) : (0);
-//                 ropdesc.ropcode                 = eo_ropcode_sig;
-//                 ropdesc.id32                    = sigcfg->id32;
-//                 ropdesc.signature               = ropsigcfgcmd->signature;
-//                 res = eo_transceiver_RegularROP_Unload(theems00transceiver, &ropdesc);
-//                 res = res;
-//             }         
-//         } break;                
-
-//         
-//         default:
-//         {
-//             
-//         } break;
-//     }
-
-
-// }
 
 
 
