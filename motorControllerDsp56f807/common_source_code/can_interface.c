@@ -590,10 +590,13 @@ void can_send_broadcast(void)
 {
 	int iretval,k; 
 	
-	static byte old_control_mode[JN] = INIT_ARRAY (MODE_IDLE);
+	static byte old_control_mode[JN]     = INIT_ARRAY (MODE_IDLE);
+	static byte old_interaction_mode[JN] = INIT_ARRAY (icubCanProto_interactionmode_stiff);
 	
 	bool sendA      = false;
 	bool sendB      = false;
+	bool sendA2     = false;
+	bool sendB2     = false;
 	unsigned char FAULT0     = 0;
 	unsigned char  FAULT1     = 0;
 	unsigned char  FAULT2     = 0;
@@ -805,8 +808,8 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 			_canmsg.CAN_data[k] = 0;
 		}
 		/* if a new fault is detected then sends a message */
-		sendA = false;
-		
+		sendA  = false;
+		sendA2 = false;
 		//  --- undervoltage overload external fault axis 0 ---
 		_canmsg.CAN_data[0]= FAULT0;
 
@@ -841,12 +844,17 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 	
 		//  --- Control Mode axes 0 ---
 		_canmsg.CAN_data[1]= _control_mode[0];	
-		if (_control_mode[0] != old_control_mode[0])
+		if (_control_mode[0] != old_control_mode[0] )
 		{
 			old_control_mode[0]=_control_mode[0];
 			sendA = true;
 		}
-		
+		if (_interaction_mode[0] != old_interaction_mode[0])
+		{
+			old_interaction_mode[0]=_interaction_mode[0];
+			sendA2 = true;
+		}
+				
 		//  --- undervoltage overload external fault axis 1 ---		
 		_canmsg.CAN_data[2]= FAULT1;
 
@@ -886,6 +894,11 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 		{
 			old_control_mode[1]=_control_mode[1];
 			sendA = true;
+		}
+		if (_interaction_mode[1] != old_interaction_mode[1])
+		{
+			old_interaction_mode[1]=_interaction_mode[1];
+			sendA2 = true;
 		}
 				
 		//CANBUS ERRORS
@@ -938,6 +951,7 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 		{
 			_countBoardStatus[0]=0;
 			sendA=true;
+			sendA2=true;
 			_canmsg.CAN_data[6]=getTxError();
    			_canmsg.CAN_data[7]=getRxError();
 			setTxError();
@@ -954,11 +968,25 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 			_canmsg.CAN_frameType = DATA_FRAME;
 			CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 		}
+		if (sendA2)
+		{
+			// part2
+			_canmsg.CAN_messID = 0x100;
+			_canmsg.CAN_messID |= (_board_ID) << 4;
+			_canmsg.CAN_messID |= ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS;
+			
+			_canmsg.CAN_length = 1;
+			_canmsg.CAN_frameType = DATA_FRAME;
+			_canmsg.CAN_data[0]  =   _interaction_mode[0] & 0x0F;
+		    _canmsg.CAN_data[0] |= ((_interaction_mode[1] & 0x0F)<< 4);
+			CAN1_send(_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
+		}
 	}
 	if ((JN == 4) && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__STATUS-1))) && _counter == 2)
 	{
 		/* if a new fault is detected then sends a message */
-		sendB = false;
+		sendB  = false;
+		sendB2 = false;
 		for (k=0;k<8;k++)
 		{
 			_canmsg.CAN_data[k] = 0;
@@ -987,7 +1015,12 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 			sendB = true;
 			old_control_mode[2]=_control_mode[2];
 		}
-		
+		if (_interaction_mode[2] != old_interaction_mode[2])
+		{
+			old_interaction_mode[2]=_interaction_mode[2];
+			sendB2 = true;
+		}
+				
 		//  --- Control Mode axes 3 ---
 		_canmsg.CAN_data[3]= _control_mode[3]; 		
 		if (_control_mode[3] != old_control_mode[3])
@@ -995,7 +1028,12 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 			sendB = true;
 			old_control_mode[3]=_control_mode[3];
 		}
-
+		if (_interaction_mode[3] != old_interaction_mode[3])
+		{
+			old_interaction_mode[3]=_interaction_mode[3];
+			sendB2 = true;
+		}
+		
 		//CANBUS ERRORS
 		_canmsg.CAN_data[4] = getCanStatus();
 		//MAIN LOOP overflow
@@ -1040,10 +1078,12 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 			setTxError();
 			setRxError();	
 			sendB=true;   
+			sendB2 = true;
 		}
 		
 		if (sendB)
 		{
+			// part 1
 			_canmsg.CAN_messID = 0x100;
 			_canmsg.CAN_messID |= (_board_ID+1) << 4;
 			_canmsg.CAN_messID |= ICUBCANPROTO_PER_MC_MSG__STATUS;
@@ -1051,7 +1091,19 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 			_canmsg.CAN_length = 8;
 			_canmsg.CAN_frameType = DATA_FRAME;
 			CAN1_send(_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-
+		}
+		if (sendB2)
+		{
+			// part2
+			_canmsg.CAN_messID = 0x100;
+			_canmsg.CAN_messID |= (_board_ID+1) << 4;
+			_canmsg.CAN_messID |= ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS;
+			
+			_canmsg.CAN_length = 1;
+			_canmsg.CAN_frameType = DATA_FRAME;
+			_canmsg.CAN_data[0]  =   _interaction_mode[2] & 0x0F;
+		    _canmsg.CAN_data[0] |= ((_interaction_mode[3] & 0x0F)<< 4);
+			CAN1_send(_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
 		}
 	}	
 	
@@ -1170,7 +1222,6 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 	// **************************************************************************/
 	
 //  @@@RANDAZ: important: CAN_SYNCHRO_STEP has been reduced from 5 to 4 because of CAN_SET_ACTIVE_PID_HANDLER()	
-//	if ((broadcast_mask[0] & (1<<(ICUBCANPROTO_PER_MC_MSG__VELOCITY-1))) && _counter == 4) 
 	if ((broadcast_mask[0] & (1<<(ICUBCANPROTO_PER_MC_MSG__VELOCITY-1))) && _counter == 3)
 	{
 		_canmsg.CAN_messID = 0x100;
@@ -1192,7 +1243,7 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);	
 
 	}
-	if (JN == 4 && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__VELOCITY-1))) && _counter == 4)
+	if (JN == 4 && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__VELOCITY-1))) && _counter == 3)
 	{
 		_canmsg.CAN_messID = 0x100;
 		_canmsg.CAN_messID |= (_board_ID+1) << 4;
@@ -1242,7 +1293,7 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);	
 
 	}
-	if (JN == 4 && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__MOTOR_POSITION-1))) && _counter == 4)
+	if (JN == 4 && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__MOTOR_POSITION-1))) && _counter == 3)
 	{
 		_canmsg.CAN_messID = 0x100;
 		_canmsg.CAN_messID |= (_board_ID+1) << 4;
@@ -1293,7 +1344,7 @@ if ((VERSION !=0x0258) && (CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOA
 		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);	
 
 	}
-	if (JN == 4 && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__MOTOR_SPEED-1))) && _counter == 4)
+	if (JN == 4 && (broadcast_mask[1] & (1<<(ICUBCANPROTO_PER_MC_MSG__MOTOR_SPEED-1))) && _counter == 3)
 	{
 		Int16 casted_motor_speed2 = (Int16)(_motor_speed[2]);
 		Int16 casted_motor_speed3 = (Int16)(_motor_speed[3]);
