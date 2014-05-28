@@ -14,6 +14,7 @@
 #include "encoders_interface.h"
 #include "controller.h"
 #include "abs_ssi_interface.h"
+#include "control_enable.h"
 
 #ifndef VERSION   
 #	error "No valid version specified"
@@ -81,7 +82,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	#ifdef DEBUG_CALIBRATION    
 		can_printf("Calibration Encoder started \r\n");
 	#endif		
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;

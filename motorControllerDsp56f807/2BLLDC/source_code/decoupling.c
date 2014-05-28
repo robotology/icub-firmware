@@ -3,6 +3,7 @@
 #include "pwm_interface.h"
 #include "pid.h"
 #include "can1.h" 
+#include "control_enable.h"
 
 /***************************************************************************/
 /**
@@ -107,7 +108,7 @@ void decouple_dutycycle_new_motor(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[1] = MODE_IDLE;	
+		_control_mode[1] = MODE_HW_FAULT;	
 		_pad_enabled[1] = false;
 		PWM_outputPadDisable(0);
 
@@ -130,8 +131,7 @@ void decouple_dutycycle_new_motor(Int32 *pwm)
 	pwm[0] = (pwm[0] - pwm[1])>>1;
 	pwm[1] = (temp32         + pwm[1])>>1;	
 				
-	if (_control_mode[0] == MODE_IDLE || 
-		_control_mode[1] == MODE_IDLE)
+	if (mode_is_idle(0) ||mode_is_idle(1))
 	{
 		pwm[0] = 0;
 		pwm[1] = 0;
@@ -175,7 +175,7 @@ void decouple_dutycycle_new_motor(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[0] = MODE_IDLE;	
+		_control_mode[0] = MODE_HW_FAULT;	
 		_pad_enabled[0] = false;
 		PWM_outputPadDisable(0);
 
@@ -235,8 +235,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	pd_out[0] = (_pd[0] - _pd[1])>>1;
 	pd_out[1] = (_pd[0] + _pd[1])>>1;
 					
-	if (_control_mode[0] == MODE_IDLE || 
-		_control_mode[1] == MODE_IDLE)
+	if (mode_is_idle(0) || mode_is_idle(1))
 	{
 		pwm_out[0] = 0;
 		pwm_out[1] = 0;
