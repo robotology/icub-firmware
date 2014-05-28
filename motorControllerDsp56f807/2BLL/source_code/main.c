@@ -32,6 +32,7 @@
 
 #include "phase_hall_sens.h"
 #include "brushless_comm.h"
+#include "control_enable.h"
 
 #include "pwm_a.h"
 #include "pwm_b.h"
@@ -345,7 +346,7 @@ void main(void)
 			#ifdef DEBUG_CAN_MSG
 				can_printf("DIASBLE BUS OFF");
 			#endif	
-			for (i=0; i<JN; i++) _control_mode[i]=MODE_IDLE;
+			for (i=0; i<JN; i++) _control_mode[i]=MODE_HW_FAULT;
 			led1_off
 		}
 		else
@@ -424,7 +425,7 @@ void main(void)
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
-					_control_mode[i] = MODE_IDLE;	
+					_control_mode[i] = MODE_HW_FAULT;	
 					_pad_enabled[i] = false;
 					PWM_outputPadDisable(i);
 			#ifdef DEBUG_CAN_MSG
@@ -440,7 +441,7 @@ void main(void)
 
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
-					_control_mode[0] = MODE_IDLE;	
+					_control_mode[0] = MODE_HW_FAULT;	
 					_pad_enabled[0] = false;
 					PWM_outputPadDisable(0);
 			#ifdef DEBUG_CAN_MSG
@@ -517,8 +518,8 @@ led0_on
 			// PWM filtering in torque control if there is no bemf compensation
 			#if (VERSION != 0x0351)
 			if (_control_mode[i] == MODE_TORQUE ||
-			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
-			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
+			 	mode_is_impedance_position(i) ||
+			 	mode_is_impedance_velocity(i))
 				{
 					if (_kff_torque[i] == 0) PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
 				}	
@@ -550,8 +551,8 @@ led0_off
 		for (i=0; i<JN; i++)
 		{
 			if (_control_mode[i] == MODE_TORQUE ||
-				_control_mode[i] == MODE_IMPEDANCE_POS ||
-				_control_mode[i] == MODE_IMPEDANCE_VEL)
+				mode_is_impedance_position(i) ||
+				mode_is_impedance_velocity(i))
 			{
 				#if (VERSION != 0x0351)
 				// Back emf compensation
@@ -589,7 +590,7 @@ led0_off
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{
-			if (_pad_enabled[i] == false) 
+			if (_pad_enabled[i] == false && !mode_is_idle(i)) 
 			{
 				_control_mode[i] = MODE_IDLE;
 			}
@@ -685,7 +686,7 @@ led0_off
 			overtemp[i]=false;
 			if ((TempSens[i] > 75) && _pad_enabled[i] == true)
 			{
-				_control_mode[i] = MODE_IDLE;	
+				_control_mode[i] = MODE_HW_FAULT;	
 				_pad_enabled[i] = false;
 				
 				overtemp[i]=true;
@@ -707,7 +708,7 @@ led0_off
 		{
 			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
 			{
-				_control_mode[i] = MODE_IDLE;	
+				_control_mode[i] = MODE_HW_FAULT;	
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
@@ -719,7 +720,7 @@ led0_off
 			compute_i2t(i);
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
-				_control_mode[i] = MODE_IDLE;	
+				_control_mode[i] = MODE_HW_FAULT;	
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);

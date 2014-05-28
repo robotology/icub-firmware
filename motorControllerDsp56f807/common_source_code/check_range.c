@@ -1,4 +1,5 @@
 #include "check_range.h"
+#include "control_enable.h"
 #include "controller.h"
 #include "pid.h"
 #include "trajectory.h"
@@ -53,8 +54,8 @@ void check_range_torque(byte i, Int16 band, Int32 *PWM)
  	int    PWMb   = PWM[i];
  	Int32  PWMc   = 0;
  	if (_control_mode[i] == MODE_TORQUE ||
-	  	_control_mode[i] == MODE_IMPEDANCE_POS ||
-	  	_control_mode[i] == MODE_IMPEDANCE_VEL)
+	  	mode_is_impedance_position(i) ||
+	  	mode_is_impedance_velocity(i) )
  		{
 	 		if  (_position[i] > _max_position[i])
 	 		{

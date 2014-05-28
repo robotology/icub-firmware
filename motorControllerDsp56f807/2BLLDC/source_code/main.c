@@ -28,7 +28,7 @@
 #include "check_range.h"
 #include "pwm_a.h"
 #include "pwm_b.h"
-
+#include "control_enable.h"
 
 byte	_board_ID = 15;	
 char    _additional_info [32];
@@ -231,7 +231,7 @@ void main(void)
 	// BUS_OFF check
 		if (getCanBusOffstatus() )
 		{
-			for (i=0; i<JN; i++) _control_mode[i]=MODE_IDLE;
+			for (i=0; i<JN; i++) _control_mode[i]=MODE_HW_FAULT;
 			led1_off
 		}
 		else
@@ -312,7 +312,7 @@ void main(void)
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
-					_control_mode[i] = MODE_IDLE;	
+					_control_mode[i] = MODE_HW_FAULT;	
 					_pad_enabled[0] = false;
 					_pad_enabled[1] = false;
 					PWM_outputPadDisable(0);
@@ -359,7 +359,7 @@ void main(void)
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{ 
-			if (_pad_enabled[i] == false) 
+			if (_pad_enabled[i] == false && !mode_is_idle(i)) 
 			{
 				_control_mode[i] = MODE_IDLE;
 			}

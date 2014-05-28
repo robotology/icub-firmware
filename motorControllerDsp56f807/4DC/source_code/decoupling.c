@@ -261,8 +261,7 @@ void decouple_dutycycle(Int32 *pwm)
 	pwm[0] = (pwm[0] - pwm[1])>>1;
 	pwm[1] = (temp32         + pwm[1])>>1;	
 				
-	if (_control_mode[0] == MODE_IDLE || 
-		_control_mode[1] == MODE_IDLE)
+	if (mode_is_idle(0) || mode_is_idle(1))
 	{
 		pwm[0] = 0;
 		pwm[1] = 0;

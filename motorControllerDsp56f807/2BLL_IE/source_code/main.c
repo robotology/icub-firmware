@@ -30,7 +30,7 @@
 #include "phase_hall_sens.h"
 #include "pwm_a.h"
 #include "pwm_b.h"
-
+#include "control_enable.h"
 
 byte	_board_ID = 16;	
 char    _additional_info [32];
@@ -348,7 +348,7 @@ void main(void)
 			#ifdef DEBUG_CAN_MSG
 				can_printf("DISABLE BUS OFF");
 			#endif	
-			for (i=0; i<JN; i++) _control_mode[i]=MODE_IDLE;
+			for (i=0; i<JN; i++) _control_mode[i]=MODE_HW_FAULT;
 			led1_off
 		}
 		else
@@ -410,7 +410,7 @@ void main(void)
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
-					_control_mode[i] = MODE_IDLE;	
+					_control_mode[i] = MODE_HW_FAULT;	
 					_pad_enabled[i] = false;
 					PWM_outputPadDisable(i);
 			#ifdef DEBUG_CAN_MSG
@@ -424,7 +424,7 @@ void main(void)
 #if (VERSION ==0x0254) || (VERSION ==0x0255)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
-					_control_mode[0] = MODE_IDLE;	
+					_control_mode[0] = MODE_HW_FAULT;	
 					_pad_enabled[0] = false;
 					PWM_outputPadDisable(0);
 			#ifdef DEBUG_CAN_MSG
@@ -565,7 +565,7 @@ void main(void)
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{
-			if (_pad_enabled[i] == false) 
+			if (_pad_enabled[i] == false && !mode_is_idle(i)) 
 			{
 				_control_mode[i] = MODE_IDLE;
 			}
@@ -598,7 +598,7 @@ void main(void)
 		{
 			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
 			{
-				_control_mode[i] = MODE_IDLE;	
+				_control_mode[i] = MODE_HW_FAULT;	
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
@@ -610,7 +610,7 @@ void main(void)
 			compute_i2t(i);
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
-				_control_mode[i] = MODE_IDLE;	
+				_control_mode[i] = MODE_HW_FAULT;	
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);

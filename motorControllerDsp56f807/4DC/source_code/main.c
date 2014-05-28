@@ -30,6 +30,7 @@
 #include "strain_board.h"
 #include "check_range.h"
 #include "decoupling.h"
+#include "control_enable.h"
 	
 byte	_board_ID = 15;	
 char    _additional_info [32];
@@ -296,7 +297,7 @@ void main(void)
 			{
 				turn_led_on(0);
 				turn_led_on(1);
-				_control_mode[i]=MODE_IDLE; 
+				_control_mode[i]=MODE_HW_FAULT; 
 			}
 		}
 //-------------------------------------------------------------------------------------------
@@ -339,7 +340,7 @@ void main(void)
 		{
 			for (i=0; i<JN; i++)
 			{
-				_control_mode[i] = MODE_IDLE;
+				_control_mode[i] = MODE_HW_FAULT;
 			}
 			if (msec==0) can_printf("MAIS error");	
 		}
@@ -623,7 +624,7 @@ void main(void)
 //******************************************************************************************/ 				
 		for (i=0; i<JN; i++)
 		{
-			if (_pad_enabled[i] == false) _control_mode[i] = MODE_IDLE;
+			if (_pad_enabled[i] == false && !mode_is_idle(i)) _control_mode[i] = MODE_IDLE;
 			else
 			PWM_generate(i,_pid[i]);
 		}
@@ -650,7 +651,7 @@ void main(void)
 			if ((_filt_current[i] > (_max_allowed_current[i]*1000)))
 #endif			
 			{
-				_control_mode[i] = MODE_IDLE;	
+				_control_mode[i] = MODE_HW_FAULT;	
 				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);

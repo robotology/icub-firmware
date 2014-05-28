@@ -8,6 +8,7 @@
 #include "can1.h"
 #include "identification.h"
 #include "check_range.h"
+#include "control_enable.h"
 
 /* stable global data */
 #ifndef VERSION
@@ -493,6 +494,7 @@ Int32 compute_pwm(byte j)
 		break;
 		
 	case MODE_IDLE:
+	case MODE_HW_FAULT:
 	#ifdef IDENTIF 
 		//parameters: j,  amp,  start_freq,  step_freq
 		reset_identif(j,_debug_in0[j],1,_debug_in1[j]);
@@ -1121,7 +1123,7 @@ void compute_desired(byte i)
 {		
  	Int32 previous_desired;
 	
-	if (_control_mode[i] != MODE_IDLE)
+	if (!mode_is_idle(i))
 	{
 		previous_desired = _desired[i];
 		
@@ -1315,7 +1317,7 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 		{
 			if (strain_num==-1)
 			{
-				_control_mode[jnt] = MODE_IDLE;	
+				_control_mode[jnt] = MODE_HW_FAULT;	
 				_pad_enabled[jnt] = false;
 
 				#ifdef DEBUG_CAN_MSG					
@@ -1328,7 +1330,7 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 			}
 			if (_strain_wtd[strain_num]==0)
 			{
-				_control_mode[jnt] = MODE_IDLE;	
+				_control_mode[jnt] = MODE_HW_FAULT;	
 				_pad_enabled[jnt] = false;
 					
 				#ifdef DEBUG_CAN_MSG
