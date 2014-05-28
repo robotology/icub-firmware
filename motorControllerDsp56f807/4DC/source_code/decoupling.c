@@ -3,6 +3,7 @@
 #include "pwm_interface.h"
 #include "pid.h"
 #include "can1.h" 
+#include "control_enable.h"
 
 /***************************************************************************/
 /**
@@ -68,8 +69,7 @@ void decouple_dutycycle(Int32 *pwm)
 			pwm[0] = (pwm[0] + pwm[1]) >> 1;
 			pwm[1] = (temp32    - pwm[1]) >> 1;	
 			
-				if (_control_mode[0] == MODE_IDLE || 
-				_control_mode[1] == MODE_IDLE)
+			if (mode_is_idle(0) || mode_is_idle(1))
 			{
 				pwm[0] = 0;
 				pwm[1] = 0;
@@ -97,8 +97,7 @@ void decouple_dutycycle(Int32 *pwm)
 			temp32 	 = pwm[2];
 			pwm[2] = (pwm[2] + pwm[3]) >> 1;
 			pwm[3] = (temp32    - pwm[3]) >> 1;			
-				if (_control_mode[2] == MODE_IDLE || 
-				_control_mode[3] == MODE_IDLE)
+			if (mode_is_idle(2) || mode_is_idle(3))
 			{
 				pwm[2] = 0;
 				pwm[3] = 0;
@@ -115,7 +114,7 @@ void decouple_dutycycle(Int32 *pwm)
 #if VERSION == 0x0119 || VERSION == 0x0219 
 			//pwm[1] = pwm[1];	//omitted
 			pwm[2] = (pwm[2] - pwm[1]);
-			if (_control_mode[1] == MODE_IDLE || _control_mode[2] == MODE_IDLE)
+			if (mode_is_idle(1) || mode_is_idle(2))
 			{
 				pwm[1] = 0;
 	 			pwm[2] = 0;

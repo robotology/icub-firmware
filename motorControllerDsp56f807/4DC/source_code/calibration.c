@@ -16,6 +16,7 @@
 
 #include "encoders_interface.h"
 #include "calibration.h"
+#include "control_enable.h"
 
 #ifndef VERSION
 #	error "No valid version specified"
@@ -173,7 +174,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 	if (type==CALIB_HARD_STOPS)
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -197,7 +198,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif VERSION == 0x0112
 	if (type==CALIB_ABS_POS_SENS)
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_ABS_POS_SENS;
 			_abs_pos_calibration[channel] = param1;		
@@ -247,7 +248,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 	if (type==CALIB_HARD_STOPS)
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -268,7 +269,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 	if ((type==CALIB_HARD_STOPS) && (channel<=2))
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -340,7 +341,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 	if ((type==CALIB_HARD_STOPS) && (channel>=2))
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -419,7 +420,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 	if (type==CALIB_HARD_STOPS)
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -463,7 +464,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	#endif
 	if ((type==CALIB_HARD_STOPS) && (channel!=0))
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -520,7 +521,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	byte channel2; 
 	if ((type==CALIB_HARD_STOPS) && (channel==0))
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -556,8 +557,8 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			channel1=2; //maybe it could be change somehow 
 			channel2=1;
 		}
-		if ((_control_mode[channel1] != MODE_IDLE && IS_DONE(channel1)) && 
-		   (_control_mode[channel2] != MODE_IDLE && IS_DONE(channel2)))
+		if ((!mode_is_idle(channel1) && IS_DONE(channel1)) && 
+		    (!mode_is_idle(channel2) && IS_DONE(channel2)))
 		{
 			_control_mode[channel1] = MODE_CALIB_HARD_STOPS;
 			_counter_calib = 0;
@@ -618,7 +619,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 	if ((type==CALIB_HARD_STOPS) && (channel==0))
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
@@ -740,7 +741,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	}
 	if ((type==CALIB_HARD_STOPS) && (channel!=3))
 	{
-		if (_control_mode[channel] != MODE_IDLE && IS_DONE(channel))
+		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
 			_counter_calib = 0;
