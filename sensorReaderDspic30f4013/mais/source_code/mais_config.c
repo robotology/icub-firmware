@@ -64,7 +64,7 @@ const version_srcCode_info_t mais_srcCode_info =
 	{
 	0x03, //version
 	0x00, //release
-	0x01  //build
+	0x02  //build
 	},
 	//canProtocol
 	{

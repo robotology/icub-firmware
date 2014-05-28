@@ -414,7 +414,10 @@ static void s_parse_can_msg(void)
 		default:
 		{
 			// UNKNOWN COMMAND FOR THIS CLASS
-			hal_error_canMsg_set(Txdata, &datalen, msg->CAN_Per_Msg_PayLoad[0]);
+			
+			//ATTENTION: removed send error message because it creates problem in case board mais mounts chip
+			//with hw bug in can filter (it doesn't work)
+			//hal_error_canMsg_set(Txdata, &datalen, msg->CAN_Per_Msg_PayLoad[0]);
 			break;
 		}
 		
@@ -437,7 +440,11 @@ static void s_parse_can_msg(void)
 static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *datalen)
 {
 	uint16_t match_value;
-
+    
+    if((msg->CAN_Poll_Msg_Dest != mais_cfg.ee_data.CAN_BoardAddress) && (msg->CAN_Poll_Msg_Dest != 0xf))
+    {
+        return;
+    } 
 	
 	switch (msg->CAN_Per_Msg_PayLoad[0])
 	{
@@ -620,7 +627,10 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		default:
 		{
 			// UNKNOWN COMMAND FOR THIS CLASS
-			hal_error_canMsg_set(Txdata, datalen, msg->CAN_Per_Msg_PayLoad[0]);
+			
+			//ATTENTION: removed send error message because it creates problem in case board mais mounts chip
+			//with hw bug in can filter (it doesn't work)
+			//hal_error_canMsg_set(Txdata, datalen, msg->CAN_Per_Msg_PayLoad[0]);
 			break;
 		}
 		
@@ -634,6 +644,14 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 	int8_t j;
 	uint8_t tmp;
 
+    //adding this check in order to avoid to parse message not addressing to this board.
+    //In some boards are mounted dspic with hw bug about can filter, so it doesn't work,
+    //so i need to check by sw
+    if((msg->CAN_Poll_Msg_Dest != mais_cfg.ee_data.CAN_BoardAddress) && (msg->CAN_Poll_Msg_Dest != 0xf))
+    {
+        return;
+    }
+    
 	hal_timer_interrupt_disa(hal_timerT2); 
 	
 	switch (msg->CAN_Per_Msg_PayLoad[0])
@@ -720,7 +738,9 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 		default:
 		{
 			// UNKNOWN COMMAND FOR THIS CLASS
-			hal_error_canMsg_set(Txdata, datalen, msg->CAN_Per_Msg_PayLoad[0]);
+			//ATTENTION: removed send error message because it creates problem in case board mais mounts chip
+			//with hw bug in can filter (it doesn't work)
+			//hal_error_canMsg_set(Txdata, datalen, msg->CAN_Per_Msg_PayLoad[0]);
 			break;
 		}
 		
