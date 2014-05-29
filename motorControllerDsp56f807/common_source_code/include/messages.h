@@ -32,7 +32,6 @@
 //-------------------------------------------------------------------
 #define CAN_NO_MESSAGE_HANDLER(x) \
 { \
-	_general_board_error = ERROR_UNSPECIFIED; \
 }
 
 //-------------------------------------------------------------------
@@ -47,7 +46,6 @@
 	calibrate (axis, CAN_DATA[1], BYTE_W(CAN_DATA[2], CAN_DATA[3]), \
 								  BYTE_W(CAN_DATA[4], CAN_DATA[5]), \
    								  BYTE_W(CAN_DATA[6], CAN_DATA[7])); \
-	_general_board_error = ERROR_NONE; \
 }
 
 #define USE_NEW_CONTROL_MODES  //USE NEW CONTROL MODES!!
@@ -97,10 +95,7 @@
 	{ \
 		value = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		if (value>=0 && value <=16) _vel_shift[axis] = value; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -111,36 +106,30 @@
 	{ \
 		value = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		if (value>=0) _vel_timeout[axis] = value; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
 #define CAN_MOTION_DONE_HANDLER(x) \
 { \
 	PREPARE_HEADER; \
-		CAN_LEN = 3; \
-		/* CAN_DATA[1] untouched */ \
-		CAN_DATA[1] = BYTE_H(_in_position[axis]); \
-		CAN_DATA[2] = BYTE_L(_in_position[axis]); \
-		CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
+	CAN_LEN = 3; \
+	/* CAN_DATA[1] untouched */ \
+	CAN_DATA[1] = BYTE_H(_in_position[axis]); \
+	CAN_DATA[2] = BYTE_L(_in_position[axis]); \
+	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
 
 //-------------------------------------------------------------------
 #define CAN_WRITE_FLASH_MEM_HANDLER(x) \
 { \
 	writeToFlash (_flash_addr); \
-	_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
 #define CAN_READ_FLASH_MEM_HANDLER(x) \
 { \
 	readFromFlash (_flash_addr); \
-	_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -159,7 +148,6 @@
 		CAN_DATA[6] = BYTE_2(_position[1]); \
 		CAN_DATA[7] = BYTE_1(_position[1]); \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 #endif
 
@@ -186,10 +174,7 @@
 		\
 		_pending_request = false; \
 		_timeout = 0; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 #elif VERSION == 0x0113
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
@@ -211,10 +196,7 @@
 		\
 		_pending_request = false; \
 		_timeout = 0; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 #elif VERSION == 0x0121
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
@@ -228,10 +210,7 @@
 		_adjustment[3] = HES11+HES12+HES13; \
 		_pending_request = false; \
 		_timeout = 0; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 #elif ((VERSION == 0x0130 || VERSION==0x0230))
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
@@ -246,7 +225,6 @@
 		_adjustment[1] = HES06; \
 		_pending_request = false; \
 		_timeout = 0; \
-		_general_board_error = ERROR_NONE; \
 	} \
 	if (CAN_ID==MAIS_8bit_D_MSG) \
 	{ \
@@ -259,7 +237,6 @@
 		_adjustment[3] = HES11+HES12+HES13; \
 		_pending_request = false; \
 		_timeout = 0; \
-		_general_board_error = ERROR_NONE; \
 	} \
 }
 #elif ((VERSION == 0x0128) || (VERSION == 0x0228))
@@ -277,10 +254,7 @@
 		_adjustment[3] = HES03; \
 		_pending_request = false; \
 		_timeout = 0; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 #endif
 
@@ -304,10 +278,7 @@
 		_cpl_pid_prediction[1] = value; \
 		_cpl_pid_received[1] = value; \
 		\
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 #endif
 
@@ -324,10 +295,7 @@
 		value = BYTE_W(CAN_DATA[6], CAN_DATA[7]); \
 		_cpl_err[1] = value; \
 		\
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 #endif
 
@@ -344,7 +312,6 @@
 		CAN_DATA[6] = BYTE_1(_speed[axis]); \
 		if (CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA) != ERR_OK) \
 			AS1_printStringEx ("err 20\r\n"); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -359,10 +326,7 @@
 			_position[axis] = value; \
 			_position_old[axis] = value; \
 			_integral[axis] = 0; \
-			_general_board_error = ERROR_NONE; \
 		} \
-		else \
-			_general_board_error = ERROR_FMT; \
 	}
 #else
 	#define CAN_SET_ENCODER_POSITION_HANDLER(x) \
@@ -382,11 +346,6 @@
 	{ \
 		_desired[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
 		abort_trajectory (axis, _desired[axis]); \
-		_general_board_error = ERROR_NONE; \
-	} \
-	else \
-	{ \
-		_general_board_error = ERROR_FMT; \
 	} \
 } 
 
@@ -396,10 +355,7 @@
 	if (CAN_LEN == 5) \
 	{ \
 		_set_point[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -412,7 +368,6 @@
 		CAN_DATA[3] = BYTE_2(_desired[axis]); \
 		CAN_DATA[4] = BYTE_1(_desired[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -421,10 +376,7 @@
 	if (CAN_LEN == 5) \
 	{ \
 		_min_position[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -437,7 +389,6 @@
 	CAN_DATA[3] = BYTE_2(_min_position[axis]); \
 	CAN_DATA[4] = BYTE_1(_min_position[axis]); \
 	CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-	_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -446,10 +397,7 @@
 	if (CAN_LEN == 5) \
 	{ \
 		_max_position[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -462,7 +410,6 @@
 		CAN_DATA[3] = BYTE_2(_max_position[axis]); \
 		CAN_DATA[4] = BYTE_1(_max_position[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -472,10 +419,7 @@
 	{ \
 		Int32  value = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
 		if (value >=0 && value <=4095) set_max_position(axis, value); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -484,10 +428,7 @@
 	if (CAN_LEN == 3) \
 	{ \
 		_optical_ratio[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -501,7 +442,6 @@
 		CAN_DATA[3] = BYTE_2(value); \
 		CAN_DATA[4] = BYTE_1(value); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -510,10 +450,7 @@
 	if (CAN_LEN == 3) \
 	{ \
 		_max_vel[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -524,7 +461,6 @@
 		CAN_DATA[1] = BYTE_H(_max_vel[axis]); \
 		CAN_DATA[2] = BYTE_L(_max_vel[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -619,10 +555,7 @@
 	if (CAN_LEN == 3) \
 	{ \
 		_set_vel[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -633,7 +566,6 @@
 		CAN_DATA[1] = BYTE_H(_set_vel[axis]); \
 		CAN_DATA[2] = BYTE_L(_set_vel[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -644,7 +576,6 @@
 		CAN_DATA[1] = BYTE_H(_speed[axis]); \
 		CAN_DATA[2] = BYTE_L(_speed[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -653,10 +584,7 @@
 	if (CAN_LEN == 3) \
 	{ \
 		_set_acc[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -667,7 +595,6 @@
 		CAN_DATA[1] = BYTE_H(_set_acc[axis]); \
 		CAN_DATA[2] = BYTE_L(_set_acc[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -676,10 +603,7 @@
 	if (CAN_LEN == 5) \
 	{ \
 		_desired_torque[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -692,7 +616,6 @@
 		CAN_DATA[3] = BYTE_2(_desired_torque[axis]); \
 		CAN_DATA[4] = BYTE_1(_desired_torque[axis]); \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -738,7 +661,6 @@ if (CAN_LEN == 4) \
 	word tmp; \
 	tmp = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 	_t1c = CAN_DATA[3]; \
-	_general_board_error = ERROR_NONE; \
 	setReg (TMRA3_CMP1, tmp); \
 } \
 else if (CAN_LEN == 3) \
@@ -746,12 +668,10 @@ else if (CAN_LEN == 3) \
 	word tmp; \
 	tmp = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 	_t1c = 0; \
-	_general_board_error = ERROR_NONE; \
 	setReg (TMRA3_CMP1, tmp); \
 } \
 else \
 { \
-	_general_board_error = ERROR_FMT; \
 	setReg (TMRA3_CMP1, 39999); \
 } \
 */
@@ -792,7 +712,6 @@ else \
         	CAN_DATA[6] = BYTE_L(_sacc2[axis]); \
         } \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -803,7 +722,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_pid[axis]); \
 		CAN_DATA[2] = BYTE_L(_pid[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -814,7 +732,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_error_position[axis]); \
 		CAN_DATA[2] = BYTE_L(_error_position[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -826,10 +743,7 @@ else \
 		_ki_torque[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 		_kd_torque[axis] = BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
 		_kr_torque[axis] = (CAN_DATA[7]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 //-------------------------------------------------------------------
 #define CAN_GET_TORQUE_PID_HANDLER(x) \
@@ -844,7 +758,6 @@ else \
 		CAN_DATA[6] = BYTE_L(_kd_torque[axis]); \
 		CAN_DATA[7] = BYTE_H(_kr_torque[axis]); \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -854,10 +767,7 @@ else \
 	{ \
 		_ks_imp[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_kd_imp[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 	//_ko_imp[axis] = BYTE_W(CAN_DATA[5], CAN_DATA[6]); \ //commented out for testing
 //-------------------------------------------------------------------
@@ -873,7 +783,6 @@ else \
 		CAN_DATA[6] = BYTE_L(_ko_imp[axis]); \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -883,10 +792,7 @@ else \
 	{ \
 		_backemf_gain[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_backemf_shift[axis] = CAN_DATA[3]; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -902,7 +808,6 @@ else \
 		CAN_DATA[6] = 0; \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -911,10 +816,7 @@ else \
 	if (CAN_LEN == 3) \
 	{ \
 		_ko_openloop[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -925,7 +827,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_ko_openloop[axis]); \
 		CAN_DATA[2] = BYTE_L(_ko_openloop[axis]); \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 //-------------------------------------------------------------------
 #define CAN_SET_MODEL_PARAMS_HANDLER(x) \
@@ -933,10 +834,7 @@ else \
 	if (CAN_LEN == 8) \
 	{ \
 		_kff_torque[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -952,7 +850,6 @@ else \
 		CAN_DATA[6] = 0; \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -961,10 +858,7 @@ else \
 	if (CAN_LEN == 3) \
 	{ \
 		_ko_imp[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 //-------------------------------------------------------------------
 #define CAN_GET_IMPEDANCE_OFFSET_HANDLER(x) \
@@ -974,7 +868,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_ko_imp[axis]); \
 		CAN_DATA[2] = BYTE_L(_ko_imp[axis]); \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -985,10 +878,7 @@ else \
 		_ko_torque[axis] 				= BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_pid_limit_torque[axis] 		= BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 		_integral_limit_torque[axis] 	= BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 //-------------------------------------------------------------------
 #define CAN_GET_TORQUE_PIDLIMITS_HANDLER(x) \
@@ -1003,7 +893,6 @@ else \
 		CAN_DATA[6] = BYTE_L(_integral_limit_torque[axis]); \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1015,11 +904,8 @@ else \
 		_ki[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 		_kd[axis] = BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
 		_kr[axis] = (CAN_DATA[7]); \
-		_general_board_error = ERROR_NONE; \
 		_received_pid[axis].rec_pid |=0x4F; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1035,7 +921,6 @@ else \
 		CAN_DATA[6] = BYTE_L(_kd[axis]); \
 		CAN_DATA[7] = BYTE_H(_kr[axis]); \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1046,11 +931,8 @@ else \
 		_ko[axis] 				= BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_pid_limit[axis] 		= BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 		_integral_limit[axis] 	= BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
-		_general_board_error = ERROR_NONE; \
 		_received_pid[axis].rec_pid |=0x30; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 //-------------------------------------------------------------------
 #define CAN_GET_POS_PIDLIMITS_HANDLER(x) \
@@ -1065,7 +947,6 @@ else \
 		CAN_DATA[6] = BYTE_L(_integral_limit[axis]); \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1075,10 +956,7 @@ else \
 	{ \
 		_kp[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_received_pid[axis].rec_pid_bits.kp =true; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1089,7 +967,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_kp[axis]); \
 		CAN_DATA[2] = BYTE_L(_kp[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1099,10 +976,7 @@ else \
 	{ \
 		_kd[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_received_pid[axis].rec_pid_bits.kd =true; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1113,7 +987,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_kd[axis]); \
 		CAN_DATA[2] = BYTE_L(_kd[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1124,10 +997,7 @@ else \
 		_ki[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_integral[axis] = 0; \
 		_received_pid[axis].rec_pid_bits.ki =true; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1138,7 +1008,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_ki[axis]); \
 		CAN_DATA[2] = BYTE_L(_ki[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1147,11 +1016,8 @@ else \
 	if (CAN_LEN == 3) \
 	{ \
 		_integral_limit[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 		_received_pid[axis].rec_pid_bits.ilim =true; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1162,7 +1028,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_integral_limit[axis]); \
 		CAN_DATA[2] = BYTE_L(_integral_limit[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1171,11 +1036,8 @@ else \
 	if (CAN_LEN == 3) \
 	{ \
 		_ko[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 		_received_pid[axis].rec_pid_bits.ko =true; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1186,7 +1048,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_ko[axis]); \
 		CAN_DATA[2] = BYTE_L(_ko[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1196,10 +1057,7 @@ else \
 	{ \
 		_kstp[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_kstn[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1212,7 +1070,6 @@ else \
 		CAN_DATA[3] = BYTE_H(_kstn[axis]); \
 		CAN_DATA[4] = BYTE_L(_kstn[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1222,10 +1079,7 @@ else \
 	{ \
 		_kstp_torque[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_kstn_torque[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1238,7 +1092,6 @@ else \
 		CAN_DATA[3] = BYTE_H(_kstn_torque[axis]); \
 		CAN_DATA[4] = BYTE_L(_kstn_torque[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1248,10 +1101,7 @@ else \
 	{ \
 		_kr[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_received_pid[axis].rec_pid_bits.kr =true; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1262,7 +1112,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_kr[axis]); \
 		CAN_DATA[2] = BYTE_L(_kr[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1271,11 +1120,8 @@ else \
 	if (CAN_LEN == 3) \
 	{ \
 		_pid_limit[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
-		_general_board_error = ERROR_NONE; \
 		_received_pid[axis].rec_pid_bits.tlim =true; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1286,7 +1132,6 @@ else \
 		CAN_DATA[1] = BYTE_H(_pid_limit[axis]); \
 		CAN_DATA[2] = BYTE_L(_pid_limit[axis]); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1298,10 +1143,7 @@ else \
 		tmp = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
 		if (tmp<=MAX_CURRENT) _max_allowed_current[axis]=tmp;\
 		else can_printf("MAX CURRENT BIGGER THEN MAX:%d",axis);\
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //	_conversion_factor[axis] = (tmp * 3.3) / 32760.0f; \
@@ -1312,9 +1154,7 @@ else \
 	PREPARE_HEADER; \
 		CAN_LEN = 3; \
 		CAN_DATA[1] = 0x00; \
-		CAN_DATA[2] = _general_board_error; \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1324,10 +1164,7 @@ else \
 	{ \
 		_selected_strain_id[axis]=CAN_DATA[1]; \
 		_selected_strain_chan[axis]=CAN_DATA[2]; \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1341,10 +1178,7 @@ else \
 		CAN1_init (_board_ID); \
 		set_can_masks(); \
 		writeToFlash (_flash_addr); \
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
@@ -1354,7 +1188,6 @@ else \
 		CAN_LEN = 2; \
 		CAN_DATA[1] = _board_ID; \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 //-------------------------------------------------------------------
@@ -1384,10 +1217,7 @@ else \
 			enable_can_print(); \
 		else \
 			disable_can_print();\
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 //-------------------------------------------------------------------
 #define CAN_SET_SMOOTH_PID_HANDLER(x) \
@@ -1395,10 +1225,7 @@ else \
 	if (CAN_LEN == 8) \
 	{ \
 		init_smooth_pid(axis,BYTE_W(CAN_DATA[1],CAN_DATA[2]),BYTE_W(CAN_DATA[3], CAN_DATA[4]),CAN_DATA[5],BYTE_W(CAN_DATA[6], CAN_DATA[7]));\
-		_general_board_error = ERROR_NONE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 //-------------------------------------------------------------------
 #define CAN_GET_FIRMWARE_VERSION_HANDLER(x) \
@@ -1417,7 +1244,6 @@ else \
 		_canmsg.CAN_data[6] = _my_can_protocol_minor; \
 		_canmsg.CAN_data[7] = (byte)(_can_protocol_ack); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
-		_general_board_error = ERROR_NONE; \
 }
 
 // end of messages 

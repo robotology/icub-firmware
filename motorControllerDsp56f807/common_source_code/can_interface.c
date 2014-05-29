@@ -49,7 +49,6 @@ extern Int16 read_p;
 extern UInt8 mais_counter;
 canmsg_t _canmsg;					// buffer to prepare messages for send 
 
-byte  _general_board_error = ERROR_NONE;
 byte  can_channels = 0; 
 dword broadcast_mask[JN]=INIT_ARRAY (0); // specifies which broadcast messages are to be sent 
 
@@ -302,8 +301,7 @@ byte can_interface (void)
 								// disable PWM
 								for (i=0; i<JN; i++)
 								{
-									PWM_outputPadDisable(i); 								
-									_general_board_error = ERROR_NONE; 								
+									PWM_outputPadDisable(i); 														
 								}
 								
 								//disable broadcast
