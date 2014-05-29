@@ -6,7 +6,6 @@
 //#define VERSION 0x0113			   	/* decouples the third joint of the shoulder */
 //#define VERSION 0x0114		    	/* feedback from the AD */
 //#define VERSION 0x0115		    	/* coordinated control of the eyes */
-//#define VERSION 0x0116		    	/* low level current control */
 //#define VERSION 0x0117		    	/* Analog Encoder in M3 (POT4) */
 //#define VERSION 0x0118		    	/* Analog Encoder in M0 (POT?) */
 //#define VERSION 0x0119                /* Differential Joint M1 M2 (wrist) analog in M3*/

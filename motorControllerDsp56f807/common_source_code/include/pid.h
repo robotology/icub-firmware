@@ -217,21 +217,6 @@ extern float  _param_a11_coeff;
 extern float  _param_a20_coeff;
 extern float  _param_a21_coeff;
 extern float  _param_a22_coeff;
-								
-#if VERSION == 0x0156 || VERSION == 0x0166 || VERSION == 0x0116
-// CURRENT PID
-extern Int32  _desired_current[JN] ;	// PID ref value, computed by the trajectory generator 
-extern Int16  _error_current[JN] ;		// current error
-extern Int16  _error_current_old[JN] ;	// current error at t-1 
-extern Int16  _kp_current[JN] ;			// PID gains: proportional ... 
-extern Int16  _kd_current[JN] ;			// ... derivative  ...
-extern Int16  _ki_current[JN] ;			// integral
-extern Int16  _kr_current[JN] ;			// scale factor (negative power of two) 
-extern Int32  _integral_current[JN] ;	// store the sum of the integral component 
-extern Int16  _current_limit[JN] ;		// pid current limit 
-extern Int32  _pd_current[JN] ;         // pd portion of the current pid
-#endif
-
 
 #if VERSION == 0x0153 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
 extern Int32  _cpl_pos_received[JN] ;		// the position of the synchronized card 

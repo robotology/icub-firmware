@@ -170,22 +170,6 @@ Int16  _kd_imp[JN] = INIT_ARRAY (0);			// damping coefficient
 Int16  _ko_imp[JN] = INIT_ARRAY (0);			// offset
 Int16  _kr_imp[JN] = INIT_ARRAY (0);		    // scale factor (negative power of two) 
 
-	
-#if VERSION == 0x0156 || VERSION == 0x0166 || VERSION == 0x0116
-// CURRENT PID
-Int32 _desired_current[JN] = INIT_ARRAY (0);	// PID ref value, computed by the trajectory generator 
-Int16  _error_current[JN] = INIT_ARRAY (0);		// current error
-Int16  _error_current_old[JN] = INIT_ARRAY (0);	// current error at t-1 
-Int16  _kp_current[JN] = INIT_ARRAY (40);		// PID gains: proportional ... 
-Int16  _kd_current[JN] = INIT_ARRAY (30);		// ... derivative  ...
-Int16  _ki_current[JN] = INIT_ARRAY (1);		// integral
-Int16  _kr_current[JN] = INIT_ARRAY (6);		// scale factor (negative power of two) 
-Int32  _integral_current[JN] = INIT_ARRAY (0);	// store the sum of the integral component 
-Int16  _current_limit[JN] = INIT_ARRAY (250);	// pid current limit 
-Int32  _pd_current[JN] = INIT_ARRAY (0);        // pd portion of the current pid
-#endif
-
-
 #if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
 Int32  _cpl_pos_received[JN] = INIT_ARRAY (0);	// the position of the synchronized card 
 Int32  _cpl_pos_prediction[JN] = INIT_ARRAY (0);// the actual adjustment (compensation) 
@@ -253,16 +237,6 @@ Int32 compute_pwm(byte j)
 		PWMoutput = PWMoutput + _ko_torque[j];
 		_pd[j] = _pd[j] + _ko_torque[j];
 		break; 
-		
-#elif VERSION == 0x0156
-	case MODE_POSITION: 
-	case MODE_VELOCITY: 
-	case MODE_CALIB_ABS_POS_SENS: 
-		compute_desired(j); 
-		IOUT = compute_pid2(j); 	
-		ENFORCE_CURRENT_LIMITS(j, IOUT); 
-		PWMoutput = compute_current_pid(j); 		
-		break;
 	
 #elif VERSION == 0x0351 
 	//iKart control
@@ -704,16 +678,6 @@ Int32 compute_pid2(byte j)
 	/* Integral */
 	IntegralError =  ( (Int32) _error_position[j]) * ((Int32) _ki[j]);
 
-#if VERSION == 0x0156 || VERSION == 0x0116 || VERSION == 0x0166
-
-	_integral_current[j] = _integral_current[j] + IntegralError;
-	IntegralPortion = _integral_current[j];
-
-	_pd_current[j] = L_add(ProportionalPortion, DerivativePortion);
-	PIDoutput = L_add(_pd_current[j], IntegralPortion);
-
-#else 
-
 	_integral[j] = _integral[j] + IntegralError;
 	IntegralPortion = _integral[j];
 	
@@ -742,7 +706,6 @@ Int32 compute_pid2(byte j)
 	_pi[j] = IntegralPortion;
 	PIDoutput = L_add(_pd[j], IntegralPortion);
 
-#endif
 					
 	return PIDoutput;
 }
@@ -848,58 +811,6 @@ Int32 compute_pid_speed(byte j)
 	return PIDoutput;
 }
 
-/*
- * compute PID control (integral implemented).
- */
-#if VERSION == 0x0156 || VERSION == 0x0166 || VERSION == 0x0116
-
-Int32 compute_current_pid(byte j)
-{
-	Int32 ProportionalPortion, DerivativePortion, IntegralPortion;
-	Int32 IntegralError;
-	Int32 PIDoutput;
-	Int32 InputError;
-		
-	/* the error @ previous cycle */
-	_error_current_old[j] = _error_current[j];
-
-	InputError = L_sub(_desired_current[j], get_current(j));
-		
-	if (InputError > MAX_16)
-		_error_current[j] = MAX_16;
-	else
-	if (InputError < MIN_16) 
-		_error_current[j] = MIN_16;
-	else
-	{
-		_error_current[j] = extract_l(InputError);
-	}		
-
-	/* Proportional */
-	ProportionalPortion = ((Int32) _error_current[j]) * ((Int32)_kp_current[j]);
-	ProportionalPortion = ProportionalPortion >> _kr_current[j];
-	/* Derivative */	
-	DerivativePortion = ((Int32) (_error_current[j]-_error_current_old[j])) * ((Int32) _kd_current[j]);
-	DerivativePortion = DerivativePortion >>  _kr_current[j];
-	/* Integral */
-	IntegralError = ( (Int32) _error_current[j]) * ((Int32) _ki_current[j]);
-	IntegralError = IntegralError >> _kr_current[j];
-	
-	if (IntegralError > MAX_16)
-		IntegralError = (Int32) MAX_16;
-	if (IntegralError < MIN_16) 
-		IntegralError = (Int32) MIN_16;
-	
-	_integral[j] = L_add(_integral[j], IntegralError);
-	IntegralPortion = _integral[j];
-		
-	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
-	_pi[j] = IntegralPortion;
-	PIDoutput = L_add(_pd[j], IntegralPortion);
-			
-	return PIDoutput;
-}
-#endif
 
 /* 
  * Compute PD for calibrating with the absolute postion sensors

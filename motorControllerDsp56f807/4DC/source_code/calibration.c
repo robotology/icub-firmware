@@ -406,37 +406,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 				#endif			
 		}		
 	}	
-/********
- *0x0116*
- ********/		
-#elif VERSION ==0x0116	 
-	#ifdef DEBUG_CALIBRATION
-	if (type==CALIB_ABS_POS_SENS)
-	{
- 		AS1_printStringEx ("Calibration ABS_POS aborted \r\n");
-	}
-	#endif
 
-	if (type==CALIB_HARD_STOPS)
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			AS1_printStringEx ("Calibration HARD_STOPS started \r\n");	
-			AS1_printStringEx ("param1: ");
-			AS1_printWord16AsChars (param1);
-			AS1_printStringEx ("param2: ");	
-			AS1_printWord16AsChars (param2);
-			#endif
-		}	
-	}
 /********
  *0x0117*
  ********/	

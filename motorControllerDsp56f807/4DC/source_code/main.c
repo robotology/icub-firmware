@@ -85,8 +85,6 @@ Int16 _version = 0x0113;
 Int16 _version = 0x0114;
 #elif VERSION == 0x0115
 Int16 _version = 0x0115;
-#elif VERSION == 0x0116
-Int16 _version = 0x0116;
 #elif VERSION == 0x0117
 Int16 _version = 0x0117;   
 #elif VERSION == 0x0118
