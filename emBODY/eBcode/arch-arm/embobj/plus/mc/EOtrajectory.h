@@ -86,7 +86,7 @@ extern void eo_trajectory_Init(EOtrajectory *o, int32_t p0, int32_t v0, int32_t 
     @brief      Aborts the trajectory.
     @param      o  The pointer to the trajectory object.
  **/
-extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos, int32_t stop_acc);
+extern void eo_trajectory_Stop(EOtrajectory *o, int32_t pos);
 extern void eo_trajectory_VelocityStop(EOtrajectory *o);
 
 /** @fn         extern float eo_trajectory_GetPos(EOtrajectory *o)

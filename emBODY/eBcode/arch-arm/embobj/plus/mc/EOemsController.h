@@ -66,14 +66,18 @@ extern EOemsController* eo_emsController_Init(void);
     @param      speed  The average speed.
  **/
 
-// synchronous
-extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure);
-extern void eo_emsController_ReadEncoders(int32_t *pos);
+// encoders
+
+extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign);
+extern void eo_emsController_AcquireAbsEncoders(int32_t *pos);
 #ifdef USE_2FOC_FAST_ENCODER
-extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed, int32_t pos);
+extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position);
 #endif
+
+
+
+extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure);
 extern void eo_emsController_PWM(int16_t* pwm);
-extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign);
 
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out);
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel);
@@ -90,6 +94,8 @@ extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interact
 //extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint);
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode);
+extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status);
+
 extern void eo_emsController_CheckCalibrations(void);
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
 

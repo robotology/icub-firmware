@@ -19,9 +19,13 @@ extern "C" {
  // - public #define  --------------------------------------------------------------------------------------------------
  
 //#define FORCE_ZERO_PWM_OUT
+
+#define CONTROL_II
+#define USE_2FOC_FAST_ENCODER
     
-//#define CONTROL_II
-//#define USE_2FOC_FAST_ENCODER
+#ifdef USE_2FOC_FAST_ENCODER
+    //#define USE_4BIT_INC_ENC_PRECISION
+#endif
     
 //#define V1_MECHANICS
 #define V2_MECHANICS

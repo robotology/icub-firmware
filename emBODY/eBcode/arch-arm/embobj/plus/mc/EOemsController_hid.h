@@ -47,9 +47,15 @@ struct EOemsController_hid
     uint16_t state_mask;
     
     EOmotors         *motors;
-    EOspeedmeter     *enc_speedometer[NAXLES];
     EOaxisController *axis_controller[NAXLES];
-   
+    
+    EOabsCalibratedEncoder *abs_calib_encoder[NAXLES];
+    EOaxleVirtualEncoder   *axle_virt_encoder[NAXLES];
+    
+    int16_t motor_current [NAXLES];
+    int32_t motor_velocity[NAXLES];
+    int32_t motor_position[NAXLES];
+    
     //float torque_meas[NJOINTS];
 }; 
 

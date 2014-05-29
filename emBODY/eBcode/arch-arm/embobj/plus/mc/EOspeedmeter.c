@@ -52,7 +52,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void encoder_init(EOspeedmeter* o, int32_t position);
 
 static int32_t normalize_angle(int32_t a);
 
@@ -67,29 +66,44 @@ static int32_t normalize_angle(int32_t a);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOspeedmeter* eo_speedmeter_New(void)
+#ifdef OLD_STYLE_ENCODER
+
+#error using old style encoder
+
+#else 
+/*
+struct EOabsCalibratedEncoder_hid
 {
-    EOspeedmeter *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOspeedmeter), 1);
+    int32_t distance;
+    int32_t position_last;
+    int32_t position_sure;
+
+    int32_t sign;
+    int32_t offset;
+
+    int32_t delta;
+
+    uint16_t state_mask;
+    uint8_t  first_valid_data;
+};
+*/
+
+extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void)
+{
+    EOabsCalibratedEncoder *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOabsCalibratedEncoder), 1);
 
     if (o)
     {        
-        //o->time = 0;
-        
         o->distance = 0;
         o->position_last = 0;
         o->position_sure = 0;
         
-        o->offset   = 0;
-        o->enc_sign = 0;
+        o->offset = 0;
+        o->sign = 0;
         
-        o->distance_x_reduction = 0;
-        o->fast_enc_pos = FAST_ENC_UNINIT;
-        
-        o->speed = 0;
-         
         o->delta = 0;
         
-        //o->invalid_data_cnt = 0;
+        o->invalid_data_cnt = 0;
         o->first_valid_data = 0;
         
         o->state_mask = SM_NOT_READY;
@@ -98,66 +112,185 @@ extern EOspeedmeter* eo_speedmeter_New(void)
     return o;
 }
 
-extern void eo_speedometer_SetEncSign(EOspeedmeter* o, int32_t enc_sign)
+extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder* o, int32_t sign)
 {
-    o->enc_sign = (enc_sign > 0) ? 1 : -1;
+    o->sign = (sign > 0) ? 1 : -1;
     RST_BITS(o->state_mask, SM_ENC_SIGN_NOT_SET);
 }
 
-extern void eo_speedometer_Calibrate(EOspeedmeter* o, int32_t offset)
-{
-    o->offset = offset;
-    o->distance_x_reduction = 0;
-    RST_BITS(o->state_mask, SM_NOT_CALIBRATED);
-    SET_BITS(o->state_mask, SM_NOT_INITIALIZED);
-}
-
-/*
-extern void eo_speedometer_Reset(EOspeedmeter* o)
-{
-    o->hard_fault = eobool_false;
-    o->is_started = eobool_false;
-    
-    o->invalid_data_cnt = 0;
-    o->first_valid_data = 0;
-}
-*/
-
-extern eObool_t eo_speedometer_IsOk(EOspeedmeter* o)
+extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder* o)
 {
     return o->state_mask == SM_OK;
 }
 
-extern eObool_t eo_speedometer_IsHardFault(EOspeedmeter* o)
+extern eObool_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder* o)
 {
     return o->state_mask & SM_HARDWARE_FAULT;
 }
 
-extern int32_t eo_speedometer_GetVelocity(EOspeedmeter* o)
-{    
-    return o->enc_sign*o->speed;
-}
-
-extern int32_t eo_speedometer_GetDistance(EOspeedmeter* o)
+extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o)
 {
-#ifdef USE_2FOC_FAST_ENCODER
-    return o->enc_sign*(o->distance + o->distance_x_reduction/GEARBOX_REDUCTION);
-#else
-    return o->enc_sign*o->distance;
-#endif
+    o->invalid_data_cnt = 0;
+    RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
+extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder* o, int32_t offset)
+{
+    o->offset = offset;
+    RST_BITS(o->state_mask, SM_NOT_CALIBRATED);
+    SET_BITS(o->state_mask, SM_NOT_INITIALIZED);
+}
 
+static void encoder_init(EOabsCalibratedEncoder* o, int32_t position);
+
+extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_t position)
+{
+    static const int16_t MAX_ENC_CHANGE = 3*ENCODER_QUANTIZATION;
+    
+    if (!o->sign) return 0;
+    
+    if (o->state_mask & SM_HARDWARE_FAULT)
+    {
+        return o->distance;
+    }
+    
+    if (position != ENC_INVALID)
+    {
+        position -= o->offset;
+        
+        if (position < 0)
+        {
+            position += TICKS_PER_REVOLUTION;
+        }
+        else if (position >= TICKS_PER_REVOLUTION)
+        {
+            position -= TICKS_PER_REVOLUTION;
+        }
+    }
+    else
+    {
+        ++o->invalid_data_cnt;
+        
+        if (o->invalid_data_cnt > 500)
+        {
+            SET_BITS(o->state_mask,SM_HARDWARE_FAULT);
+        }
+    }
+    
+    if (o->state_mask & SM_NOT_INITIALIZED)
+    {
+        encoder_init(o, position);
+        
+        return 0;
+    }
+    
+    if (position != ENC_INVALID)
+    {        
+        int32_t check = normalize_angle(position - o->position_last);
+        
+        o->position_last = position;
+
+        if (-MAX_ENC_CHANGE <= check && check <= MAX_ENC_CHANGE)
+        {
+            int32_t delta = normalize_angle(position - o->position_sure);
+            
+            if (delta || o->delta)
+            {
+                o->position_sure = position;
+                
+                int32_t inc = (o->delta + delta) >> 1;
+                
+                o->delta = delta;
+                
+                if (inc)
+                {
+                    o->distance += inc;
+                }
+            }
+        }
+    }
+    
+    return o->distance;
+}
+
+/*
+struct EOaxleVirtualEncoder_hid
+{
+    int32_t sign;
+    int32_t divisor;
+
+    int32_t 
+};
+*/
+
+extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
+{
+    EOaxleVirtualEncoder *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOaxleVirtualEncoder), 1);
+
+    if (o)
+    {        
+        o->inverted = eobool_false;
+        o->axle_virt_pos = 0;
+        o->axle_abs_pos = 0;
+        o->axle_inc_pos = 0;
+    }
+
+    return o;
+}
+
+extern void eo_axleVirtualEncoder_SetSign(EOaxleVirtualEncoder* o, eObool_t inverted)
+{
+    o->inverted = inverted;
+}
+
+extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel)
+{
+    
+    static const int32_t N_BITS_PRECISION_BOUND = GEARBOX_REDUCTION * ENCODER_QUANTIZATION;
+                        
+    int32_t inc = axle_abs_pos - o->axle_abs_pos;
+    
+    o->axle_abs_pos = axle_abs_pos;
+    
+    if (o->inverted)
+    {
+        o->velocity = -axle_virt_vel;    
+        o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
+    }
+    else
+    {
+        o->velocity =  axle_virt_vel;
+        o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
+    }
+
+    o->axle_inc_pos -= inc*GEARBOX_REDUCTION;
+                        
+    LIMIT(o->axle_inc_pos, N_BITS_PRECISION_BOUND);
+    
+    #ifdef USE_4BIT_INC_ENC_PRECISION
+    o->position = axle_abs_pos + o->axle_inc_pos/GEARBOX_REDUCTION;
+    #else
+    o->position = axle_abs_pos;
+    #endif
+    
+    o->axle_virt_pos = axle_virt_pos;
+}
+
+extern int32_t eo_axleVirtualEncoder_GetPos(EOaxleVirtualEncoder* o)
+{
+    return o->position;
+}
+
+extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder* o)
+{
+    return o->velocity;
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void encoder_init(EOspeedmeter* o, int32_t position)
+static void encoder_init(EOabsCalibratedEncoder* o, int32_t position)
 {
     if (!o) return;
     
@@ -187,16 +320,15 @@ static void encoder_init(EOspeedmeter* o, int32_t position)
 
         o->distance = position;
         
-        o->distance_x_reduction = 0;
-        
         o->delta = 0;
-        o->speed = 0;
 
         o->first_valid_data = 0;
         //o->invalid_data_cnt = 0;
         RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
     }
 }
+
+#endif
 
 static int32_t normalize_angle(int32_t a)
 {
@@ -205,207 +337,6 @@ static int32_t normalize_angle(int32_t a)
 
     return a;
 }
-
-#ifdef USE_2FOC_FAST_ENCODER
-extern void eo_speedometer_FastEncoderRead(EOspeedmeter* o, int32_t speed, int32_t fast_enc_pos)
-{
-    o->speed = speed;
-
-    if (o->fast_enc_pos == FAST_ENC_UNINIT) o->fast_enc_pos = fast_enc_pos;
-    
-    o->distance_x_reduction += fast_enc_pos - o->fast_enc_pos;
-    
-    o->fast_enc_pos = fast_enc_pos;
-}
-#endif
-
-extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
-{
-    static const int16_t MAX_ENC_CHANGE = 3*ENCODER_QUANTIZATION;
-    
-    if (!o) return;
-    
-    if (!o->enc_sign) return;
-    
-    if (position != ENC_INVALID)
-    {
-        position -= o->offset;
-        
-        if (position < 0)
-        {
-            position += TICKS_PER_REVOLUTION;
-        }
-        else if (position >= TICKS_PER_REVOLUTION)
-        {
-            position -= TICKS_PER_REVOLUTION;
-        }
-    }
-    
-    if (o->state_mask & SM_NOT_INITIALIZED)
-    {
-        encoder_init(o, position);
-        
-        return;
-    }
-    
-    if (position != ENC_INVALID)
-    {        
-        int32_t check = normalize_angle(position - o->position_last);
-        
-        o->position_last = position;
-
-        if (-MAX_ENC_CHANGE <= check && check <= MAX_ENC_CHANGE)
-        {
-            int32_t delta = normalize_angle(position - o->position_sure);
-            
-            if (delta || o->delta)
-            {
-                o->position_sure = position;
-                
-                int32_t inc = (o->delta + delta) >> 1;
-                
-                o->delta = delta;
-                
-                if (inc)
-                {
-                    o->distance += inc;
-                    
-#ifdef USE_2FOC_FAST_ENCODER
-                    {
-                        static const int32_t N_BITS_PRECISION_BOUND = GEARBOX_REDUCTION * ENCODER_QUANTIZATION;
-                        
-                        o->distance_x_reduction -= inc*GEARBOX_REDUCTION;
-                        
-                        LIMIT(o->distance_x_reduction, N_BITS_PRECISION_BOUND);
-                    }
-#endif
-                }
-            }
-        }
-    }
-}
-
-#if 0
-extern void eo_speedometer_SlowEncoderRead(EOspeedmeter* o, int32_t position)
-{
-    if (!o) return;
-    
-    if (!o->enc_sign) return;
-        
-    //if (o->hard_fault) return;
-    
-    if (position != ENC_INVALID)
-    {
-        position -= o->offset;
-        
-        if (position < 0)
-        {
-            position += IMPULSE_x_REVOLUTION;
-        }
-        else if (position >= IMPULSE_x_REVOLUTION)
-        {
-            position -= IMPULSE_x_REVOLUTION;
-        }
-        
-        position *= o->enc_sign;
-    }
-    
-    if (!o->is_started)
-    {
-        encoder_init(o, position);
-        return;
-    }
-    
-    //////////////////////////////
-
-    if (o->time < 1000) ++o->time;
-
-    /*
-    if (o->invalid_data_cnt >= 10000)
-    {
-        o->hard_fault = eobool_true;
-        o->invalid_data_cnt = 0;
-        return;
-    }
-    */
-    
-    if (position == ENC_INVALID)
-    {
-        //o->invalid_data_cnt += 10;
-    }
-    else
-    {        
-        //if (o->invalid_data_cnt) --o->invalid_data_cnt;
-
-        int32_t check = normalize_angle(position - o->position_last);
-        o->position_last = position;
-
-        if (-48 <= check && check <= 48)
-        {
-            int32_t delta = normalize_angle(position - o->position_sure);
-
-            if (delta<=-32 || delta>=32 || (o->dir!=1 && delta<=-16) || (o->dir!=-1 && delta>=16))
-            //if (delta)
-            {        
-                o->position_sure = position;
-                
-                o->distance += delta;
-
-                o->delta_filt = 0;
-                o->delta = delta*EMS_FREQUENCY_INT32;
-                
-                o->window = o->time;
-                
-                o->time = 0;
-                
-                o->dir = (delta>0) ? 1 : -1;
-            }
-            else if (delta)
-            {
-                o->dir = 0;
-            }
-        }
-        /*
-        else
-        {
-            o->invalid_data_cnt += 11;
-        }
-        */
-    }
-    
-    if (o->time < 999)
-    {        
-        int32_t w = o->window - o->time;
-        if (w <= 0) w = 1;
-
-        o->distance_pred = o->distance + (o->delta_filt + 500) / EMS_FREQUENCY_INT32;
-    
-        o->delta_filt = (w*o->delta_filt + o->delta + (w>>1)) / (w+1);
-        
-    
-    
-        int32_t distance_filt_old = o->distance_filt;
-
-        o->distance_filt = (w*o->distance_filt + o->distance + (w>>1)) / (w+1);
-        
-        int32_t speed_old = o->speed;
-        
-        o->speed = EMS_FREQUENCY_INT32*(o->distance_filt - distance_filt_old);
-
-        o->speed_filt = (198*o->speed_filt + speed_old + o->speed + 100) / 200;
-    }
-    else if (o->time == 999) // is still
-    {
-        o->distance_filt = o->distance_pred = o->distance;
-        
-        o->delta_filt = 0;
-        o->delta = 0;
-        o->speed_filt = 0;
-        o->speed = 0;
-        o->dir = 0;
-    }
-}
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

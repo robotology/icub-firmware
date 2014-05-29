@@ -107,18 +107,6 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t bError, e
     }
 }
 
-//             | 1     0       0   |
-// J = dq/dm = | 1   40/65     0   |
-//             | 0  -40/65   40/65 | 
-
-//        |    1       0       0   |
-// J^-1 = | -65/40   65/40     0   |
-//        | -65/40   65/40   65/40 |
-
-//      | 1     1       0   |
-// Jt = | 0   40/65  -40/65 |
-//      | 0     0     40/65 | 
-
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
@@ -129,6 +117,19 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
     uint8_t stop_mask = 0;
     
     #if defined(SHOULDER_BOARD)
+    
+        //             | 1     0       0   |
+        // J = dq/dm = | 1   40/65     0   |
+        //             | 0  -40/65   40/65 | 
+
+        //        |    1       0       0   |
+        // J^-1 = | -65/40   65/40     0   |
+        //        | -65/40   65/40   65/40 |
+
+        //      | 1     1       0   |
+        // Jt = | 0   40/65  -40/65 |
+        //      | 0     0     40/65 | 
+    
         if (o->motor_idle_mask & 0x07)
         {
             stop_mask |= 0x07;
@@ -172,9 +173,15 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
                 pwm_motor[2] += buff;
             }
             
-            //pwm_motor[0] = (int16_t)(stiff[0] ? (pwm_joint[0]) : (pwm_joint[0]+pwm_joint[1]));
-            //pwm_motor[1] = (int16_t)(stiff[1] ? ((65*(-pwm_joint[0]+pwm_joint[1]))/40) : ((40*(pwm_joint[1]-pwm_joint[2]))/65));
-            //pwm_motor[2] = (int16_t)(stiff[2] ? ((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40) : ((40*pwm_joint[2] )/65));
+            // stiff
+            //pwm_motor[0] = (int16_t)(pwm_joint[0]);
+            //pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+            //pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+            
+            // compliant
+            //pwm_motor[0] = (int16_t)(pwm_joint[0]+pwm_joint[1]);
+            //pwm_motor[1] = (int16_t)((40*(pwm_joint[1]-pwm_joint[2]))/65);
+            //pwm_motor[2] = (int16_t)((40*pwm_joint[2])/65);
         }
         
         if (o->motor_idle_mask & 0x08)
@@ -187,6 +194,19 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
             pwm_motor[3] = (int16_t)pwm_joint[3];
         }
     #elif defined(WAIST_BOARD)
+        
+        //             |   1     1     0   |
+        // J = dq/dm = |  -1     1     0   |
+        //             | 44/80 44/80 44/80 | 
+
+        //        | 1/2  -1/2    0   |
+        // J^-1 = | 1/2   1/2    0   |
+        //        | -1     0   80/44 |
+
+        //      | 1  -1  44/80 |
+        // Jt = | 1   1  44/80 |
+        //      | 0   0  44/80 | 
+        
         if (o->motor_idle_mask & 0x07)
         {
             stop_mask |= 0x07;
@@ -194,9 +214,54 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
         }
         else
         {
-            pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
-            pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
-            pwm_motor[2] = (int16_t)  pwm_joint[2];
+            if (stiff[0])
+            {
+                pwm_motor[0] = pwm_motor[1] = (int16_t)( pwm_joint[0]/2);
+                pwm_motor[2] = (int16_t)(-pwm_joint[0]);
+            }
+            else
+            {
+                pwm_motor[0] = pwm_motor[1] = (int16_t)(pwm_joint[0]);
+                pwm_motor[2] = 0;
+            }
+            
+            if (stiff[1])
+            {
+                pwm_motor[0] += (int16_t)(-pwm_joint[1]/2);
+                pwm_motor[1] += (int16_t)( pwm_joint[1]/2);
+            }
+            else
+            {
+                pwm_motor[0] += (int16_t)(-pwm_joint[1]);
+                pwm_motor[1] += (int16_t)( pwm_joint[1]);
+            }
+            
+            if (stiff[2])
+            {
+                pwm_motor[2] += (int16_t)((80*pwm_joint[2])/44);
+            }
+            else
+            {
+                int16_t buff = (int16_t)((44*pwm_joint[2])/80);
+                pwm_motor[0] += buff;
+                pwm_motor[1] += buff;
+                pwm_motor[2] += buff;
+            }
+            
+            // stiff
+            //pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
+            //pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
+            //pwm_motor[2] = (int16_t)(-pwm_joint[0]+(80*pwm_joint[2])/44);
+
+            // compliant
+            //pwm_motor[0] = (int16_t)(pwm_joint[0]-pwm_joint[1]+(44*pwm_joint[2])/80);
+            //pwm_motor[1] = (int16_t)(pwm_joint[0]+pwm_joint[1]+(44*pwm_joint[2])/80);
+            //pwm_motor[2] = (int16_t)(44*pwm_joint[2])/80);
+            
+            // original
+            //pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
+            //pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
+            //pwm_motor[2] = (int16_t)  pwm_joint[2];
         }
     #elif defined(UPPERLEG_BOARD)
         if (o->motor_idle_mask & 0x01)

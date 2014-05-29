@@ -25,6 +25,10 @@
 #include "EOMtheEMSbackdoor.h"
 #include "OPCprotocolManager_Cfg.h"
 
+#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
+#error mechanics is undefined
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,7 +75,7 @@ void set_2FOC_running(uint8_t joint, eOmc_controlmode_command_t mode);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOemsController *s_emsc = NULL;
+static EOemsController *ems = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -80,31 +84,34 @@ static EOemsController *s_emsc = NULL;
 extern EOemsController* eo_emsController_Init() 
 {    
 #ifndef NO_2FOC_BOARD
-    s_emsc = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
+    ems = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
 #endif
     
-    if (s_emsc)
+    if (ems)
     {        
-        s_emsc->n_calibrated = 0;
-        s_emsc->state_mask = EMS_OK;
+        ems->n_calibrated = 0;
+        ems->state_mask = EMS_OK;
         
         JOINTS(j)
         {
-            s_emsc->axis_controller[j] = eo_axisController_New(j);
-            s_emsc->enc_speedometer[j] = eo_speedmeter_New();
+            ems->axis_controller[j] = eo_axisController_New(j);
+            ems->abs_calib_encoder[j] = eo_absCalibratedEncoder_New();
+            ems->axle_virt_encoder[j] = eo_axleVirtualEncoder_New();
+            
+            ems->motor_current [j] = 0;
+            ems->motor_velocity[j] = 0;
+            ems->motor_position[j] = 0;
         }
         
-        s_emsc->motors = eo_motors_New(NAXLES);
+        ems->motors = eo_motors_New(NAXLES);
     }
     
-    return s_emsc;
+    return ems;
 }
 
-extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign)
+extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 {
-    if (!s_emsc) return;
-    
-    eo_speedometer_SetEncSign(s_emsc->enc_speedometer[jxx], enc_sign);
+    eo_absCalibratedEncoder_SetSign(ems->abs_calib_encoder[joint], sign);
 }
 
 //             | 1     0       0   |
@@ -122,78 +129,99 @@ extern void eo_emsController_SetEncSign(uint16_t jxx, int32_t enc_sign)
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
-#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
-#error mechanics is undefined
+#ifdef USE_2FOC_FAST_ENCODER
+extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position)
+{
+    ems->motor_current [motor] = current;
+    ems->motor_velocity[motor] = velocity;
+    ems->motor_position[motor] = position;
+}
 #endif
 
-extern void eo_emsController_ReadEncoders(int32_t *enc_pos)
+extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos)
 {
-    if (!s_emsc) return;
+    static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
     
-    int32_t enc_vel[NAXLES];
+    int32_t axle_abs_pos[NAXLES];
     
     ENCODERS(e)
     {
-        eo_speedometer_SlowEncoderRead(s_emsc->enc_speedometer[e], enc_pos[e]);
+        axle_abs_pos[e] = eo_absCalibratedEncoder_Acquire(ems->abs_calib_encoder[e], abs_enc_pos[e]);
         
-        enc_pos[e] = eo_speedometer_GetDistance(s_emsc->enc_speedometer[e]);
-        enc_vel[e] = eo_speedometer_GetVelocity(s_emsc->enc_speedometer[e]);
+        //if (eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[e])
+        //{
+        //    SET_BITS(ems->state_mask,EMS_FAULT);
+        //}
     }
-
+    
     #if defined(SHOULDER_BOARD) && defined(V1_MECHANICS)
         // |J0|   |  1     0    0   |   |E0|     
 		// |J1| = |  0     1    0   | * |E1|
 		// |J2|   |  1    -1  40/65 |   |E2|
-        
-        int32_t jnt_pos_2_ = enc_pos[0]-enc_pos[1]+(40*enc_pos[2])/65;
-        //s_emsc->cable_length_alarm = eo_motors_CableLimitAlarm(enc_pos[0], enc_pos[1], jnt_pos_2_);
-        eo_axisController_SetEncPos(s_emsc->axis_controller[0], enc_pos[0]);
-        eo_axisController_SetEncPos(s_emsc->axis_controller[1], enc_pos[1]);
-        eo_axisController_SetEncPos(s_emsc->axis_controller[2], jnt_pos_2_);
-        eo_axisController_SetEncPos(s_emsc->axis_controller[3], enc_pos[3]);
-    
-        #ifdef USE_2FOC_FAST_ENCODER
-            eo_axisController_SetEncVel(s_emsc->axis_controller[0], enc_vel[0]);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[1], enc_vel[0] + (40*enc_vel[1])/65);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[2], (40*(enc_vel[2]-enc_vel[1]))/65);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[3], enc_vel[3]);
-        #else
-            eo_axisController_SetEncVel(s_emsc->axis_controller[0], enc_vel[0]);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[1], enc_vel[1]);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[2], enc_vel[0]-enc_vel[1]+(40*enc_vel[2])/65);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[3], enc_vel[3]);
-        #endif
-    #else
-        JOINTS(j)
-        {
-            eo_axisController_SetEncPos(s_emsc->axis_controller[j], enc_pos[j]);
-            eo_axisController_SetEncVel(s_emsc->axis_controller[j], enc_vel[j]);
-        }
+        axle_abs_pos[2] = axle_abs_pos[0]-axle_abs_pos[1]+(40*axle_abs_pos[2])/65;
     #endif
     
-    if (s_emsc->n_calibrated != NAXLES)
+#ifdef USE_2FOC_FAST_ENCODER
+    
+    int16_t axle_virt_vel[NAXLES];
+    int32_t axle_virt_pos[NAXLES];
+
+    ENCODERS(e)
+    {
+        axle_virt_vel[e] =  FOC_2_EMS_SPEED*ems->motor_velocity[e];
+        axle_virt_pos[e] =  ems->motor_position[e];
+    }
+    
+    #if defined(SHOULDER_BOARD)
+        //             | 1     0       0   |
+        // J = dq/dm = | 1   40/65     0   |
+        //             | 0  -40/65   40/65 | 
+        axle_virt_vel[1] = FOC_2_EMS_SPEED*(ems->motor_velocity[0] + (40*ems->motor_velocity[1])/65);
+        axle_virt_vel[2] = FOC_2_EMS_SPEED*(40*(ems->motor_velocity[2]-ems->motor_velocity[1]))/65;
+        axle_virt_pos[1] = ems->motor_position[0] + (40*ems->motor_position[1])/65;
+        axle_virt_pos[2] = (40*(ems->motor_position[2]-ems->motor_position[1]))/65;
+    #elif defined(WAIST_BOARD)
+        //             |  1     1     0  |
+        // J = dq/dm = | -1     1     0  |
+        //             |  0     0     1  | 
+        axle_virt_vel[0] = FOC_2_EMS_SPEED*( ems->motor_velocity[0] + ems->motor_velocity[1]);
+        axle_virt_vel[1] = FOC_2_EMS_SPEED*(-ems->motor_velocity[0] + ems->motor_velocity[1]);
+        axle_virt_pos[0] =  ems->motor_position[0] + ems->motor_position[1];
+        axle_virt_pos[1] = -ems->motor_position[0] + ems->motor_position[1];
+    #endif
+    
+#endif
+    
+    JOINTS(j)
+    {
+        #ifdef USE_2FOC_FAST_ENCODER
+            eo_axleVirtualEncoder_Acquire(ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
+            eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
+            eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
+        #else
+            eo_axisController_SetEncPos(ems->axis_controller[j], axle_abs_pos[j]);
+        #endif
+    }
+    
+    if (ems->n_calibrated != NAXLES)
     {
         eo_emsController_CheckCalibrations();
     }
 }
 
+
+
+
 extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure)
 {
-    if (!s_emsc) return;
+    if (!ems) return;
     
-    eo_axisController_SetTorque(s_emsc->axis_controller[joint], trq_measure);
+    eo_axisController_SetTorque(ems->axis_controller[joint], trq_measure);
 }
-
-#ifdef USE_2FOC_FAST_ENCODER
-extern void eo_emsController_ReadSpeed(uint8_t axis, int32_t speed, int32_t pos)
-{
-    if (s_emsc) eo_speedometer_FastEncoderRead(s_emsc->enc_speedometer[axis], speed, pos);
-}
-#endif
 
 extern void eo_emsController_PWM(int16_t* pwm_motor)
 {
-    if ((!s_emsc) || (s_emsc->state_mask != EMS_OK) /*|| (s_emsc->n_calibrated != NAXLES)*/)
+    if ((!ems) || (ems->state_mask != EMS_OK) /*|| (ems->n_calibrated != NAXLES)*/)
     {
         MOTORS(m) pwm_motor[m] = 0;
         return;
@@ -201,7 +229,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     
     ENCODERS(e)
     {
-        if (eo_speedometer_IsHardFault(s_emsc->enc_speedometer[e]))
+        if (eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[e]))
         {
             //o->state_mask |= ...
             MOTORS(m) pwm_motor[m] = 0;
@@ -215,10 +243,10 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     
     JOINTS(j)
     {
-        pwm_joint[j] = eo_axisController_PWM(s_emsc->axis_controller[j], &stiffness[j]);
+        pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
     }
     
-    uint8_t stop_mask = eo_motors_PWM(s_emsc->motors, pwm_joint, pwm_motor, stiffness);
+    uint8_t stop_mask = eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
     
     JOINTS(j)
     {
@@ -241,32 +269,32 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
 
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
 {
-    if (s_emsc) eo_axisController_SetOutput(s_emsc->axis_controller[joint], out);    
+    if (ems) eo_axisController_SetOutput(ems->axis_controller[joint], out);    
 }
 
 extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
-    if (s_emsc) eo_axisController_SetPosRef(s_emsc->axis_controller[joint], pos, avg_vel);       
+    if (ems) eo_axisController_SetPosRef(ems->axis_controller[joint], pos, avg_vel);       
 }
 
 extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos)
 {
-    if (s_emsc) eo_axisController_SetPosRaw(s_emsc->axis_controller[joint], pos);       
+    if (ems) eo_axisController_SetPosRaw(ems->axis_controller[joint], pos);       
 }
 
 extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc)
 {
-    if (s_emsc) eo_axisController_SetVelRef(s_emsc->axis_controller[joint], vel, avg_acc);
+    if (ems) eo_axisController_SetVelRef(ems->axis_controller[joint], vel, avg_acc);
 }
 
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
 {
-    if (s_emsc) eo_axisController_SetTrqRef(s_emsc->axis_controller[joint], trq);
+    if (ems) eo_axisController_SetTrqRef(ems->axis_controller[joint], trq);
 }
 
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t b2FOC_off)
 {
-    if (!s_emsc) return;
+    if (!ems) return;
     
     static eObool_t motors_not_configured = eobool_true;
     
@@ -276,7 +304,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         MOTORS(m) config_2FOC(m);   
     }
     
-    eo_axisController_SetControlMode(s_emsc->axis_controller[joint], mode);
+    eo_axisController_SetControlMode(ems->axis_controller[joint], mode);
     
     if ((mode == eomc_controlmode_cmd_idle) || (mode == eomc_controlmode_cmd_switch_everything_off))
     {
@@ -324,102 +352,104 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
 
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint)
 {
-    if (!s_emsc) return eomc_controlmode_idle;
+    if (!ems) return eomc_controlmode_idle;
 
-    return eo_axisController_GetControlMode(s_emsc->axis_controller[joint]);
+    return eo_axisController_GetControlMode(ems->axis_controller[joint]);
 }
 
 extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode)
 {
-    return eo_axisController_SetInteractionMode(s_emsc->axis_controller[joint], mode);
+    return eo_axisController_SetInteractionMode(ems->axis_controller[joint], mode);
 }
 
 /*
 extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint)
 {
-    return eo_axisController_GetInteractionMode(s_emsc->axis_controller[joint]);
+    return eo_axisController_GetInteractionMode(ems->axis_controller[joint]);
 }
 */
 
 extern void eo_emsController_ResetPosPid(uint8_t joint)
 {
-    if (s_emsc) eo_pid_Reset(eo_axisController_GetPosPidPtr(s_emsc->axis_controller[joint]));
+    if (ems) eo_pid_Reset(eo_axisController_GetPosPidPtr(ems->axis_controller[joint]));
 }
 
 extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
 {
-    if (!s_emsc) return;
+    if (!ems) return;
     
-    s_emsc->n_calibrated = 0;
+    ems->n_calibrated = 0;
         
-    eo_speedometer_Calibrate(s_emsc->enc_speedometer[joint], offset);
+    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
     
-    eo_axisController_StartCalibration(s_emsc->axis_controller[joint]);
+    eo_axisController_StartCalibration(ems->axis_controller[joint]);
 }
     
 extern void eo_emsController_CheckCalibrations(void)
 {
-    if (!s_emsc) return;
+    if (!ems) return;
     
-    s_emsc->n_calibrated = 0;
+    ems->n_calibrated = 0;
     
-    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) || defined(WAIST_BOARD) || defined(V2_MECHANICS)
+    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) //|| defined(WAIST_BOARD) || defined(V2_MECHANICS)
         JOINTS(j)
         {
-            if (eo_axisController_IsCalibrated(s_emsc->axis_controller[j]))
+            if (eo_axisController_IsCalibrated(ems->axis_controller[j]))
             {
-                s_emsc->n_calibrated++;
+                ems->n_calibrated++;
             }
-            else if (eo_speedometer_IsOk(s_emsc->enc_speedometer[j]))
+            else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
             {    
-                s_emsc->n_calibrated++;
-                eo_axisController_SetCalibrated(s_emsc->axis_controller[j]);
+                ems->n_calibrated++;
+                eo_axisController_SetCalibrated(ems->axis_controller[j]);
             }
         }
-    #elif defined(SHOULDER_BOARD) 
-        if (eo_axisController_IsCalibrated(s_emsc->axis_controller[0]) &&
-            eo_axisController_IsCalibrated(s_emsc->axis_controller[1]) &&
-            eo_axisController_IsCalibrated(s_emsc->axis_controller[2]))
+    #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+        if (eo_axisController_IsCalibrated(ems->axis_controller[0]) &&
+            eo_axisController_IsCalibrated(ems->axis_controller[1]) &&
+            eo_axisController_IsCalibrated(ems->axis_controller[2]))
         {
-            s_emsc->n_calibrated+=3;
+            ems->n_calibrated+=3;
         }
-        else if (eo_speedometer_IsOk(s_emsc->enc_speedometer[0]) && 
-                 eo_speedometer_IsOk(s_emsc->enc_speedometer[1]) &&
-                 eo_speedometer_IsOk(s_emsc->enc_speedometer[2]))
+        else if (eo_speedometer_IsOk(ems->enc_speedometer[0]) && 
+                 eo_speedometer_IsOk(ems->enc_speedometer[1]) &&
+                 eo_speedometer_IsOk(ems->enc_speedometer[2]))
         {
-            s_emsc->n_calibrated+=3;
-            eo_axisController_SetCalibrated(s_emsc->axis_controller[0]);
-            eo_axisController_SetCalibrated(s_emsc->axis_controller[1]);
-            eo_axisController_SetCalibrated(s_emsc->axis_controller[2]);
+            ems->n_calibrated+=3;
+            eo_axisController_SetCalibrated(ems->axis_controller[0]);
+            eo_axisController_SetCalibrated(ems->axis_controller[1]);
+            eo_axisController_SetCalibrated(ems->axis_controller[2]);
         }
-
-        if (eo_axisController_IsCalibrated(s_emsc->axis_controller[3]))
+    #endif
+        
+    #if defined(SHOULDER_BOARD)
+        if (eo_axisController_IsCalibrated(ems->axis_controller[3]))
         {
-            s_emsc->n_calibrated++;
+            ems->n_calibrated++;
         }
-        else if (eo_speedometer_IsOk(s_emsc->enc_speedometer[3]))
+        else if (eo_speedometer_IsOk(ems->enc_speedometer[3]))
         {    
-            s_emsc->n_calibrated++;
-            eo_axisController_SetCalibrated(s_emsc->axis_controller[3]);
+            ems->n_calibrated++;
+            eo_axisController_SetCalibrated(ems->axis_controller[3]);
         }
     #endif  
 }
 
 extern void eo_emsController_Stop(uint8_t joint)
 {
-    if (s_emsc) eo_axisController_Stop(s_emsc->axis_controller[joint]);
+    if (ems) eo_axisController_Stop(ems->axis_controller[joint]);
 }
 
 extern void eo_emsController_ResetTrqPid(uint8_t joint)
 {
-    if (s_emsc) eo_pid_Reset(eo_axisController_GetTrqPidPtr(s_emsc->axis_controller[joint]));
+    if (ems) eo_pid_Reset(eo_axisController_GetTrqPidPtr(ems->axis_controller[joint]));
 }
 
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
 {
-    if (s_emsc && s_emsc->axis_controller[joint])
+    if (ems && ems->axis_controller[joint])
     {
-        eo_axisController_GetActivePidStatus(s_emsc->axis_controller[joint], pidStatus);
+        eo_axisController_GetActivePidStatus(ems->axis_controller[joint], pidStatus);
     }
     else
     {
@@ -431,9 +461,9 @@ extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status
 
 extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* jointStatus)
 {
-    if (s_emsc && s_emsc->axis_controller[joint])
+    if (ems && ems->axis_controller[joint])
     {
-        eo_axisController_GetJointStatus(s_emsc->axis_controller[joint], jointStatus);
+        eo_axisController_GetJointStatus(ems->axis_controller[joint], jointStatus);
     }
     else
     {
@@ -448,9 +478,9 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* 
 
 extern eObool_t eo_emsController_GetMotionDone(uint8_t joint)
 {
-    if (s_emsc && s_emsc->axis_controller[joint])
+    if (ems && ems->axis_controller[joint])
     {
-        return eo_axisController_GetMotionDone(s_emsc->axis_controller[joint]);
+        return eo_axisController_GetMotionDone(ems->axis_controller[joint]);
     }
     else
     {
@@ -462,58 +492,72 @@ extern eObool_t eo_emsController_GetMotionDone(uint8_t joint)
 // PID configurations
 extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
-    if (s_emsc) eo_axisController_SetPosPid(s_emsc->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff);    
+    if (ems)
+    {
+        eo_axisController_SetPosPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff);
+        
+        #ifdef USE_2FOC_FAST_ENCODER
+            eo_axleVirtualEncoder_SetSign(ems->axle_virt_encoder[joint], (Kp >= 0.0 ? 1:-1));
+        #endif
+    }
 }   
 extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
-    if (s_emsc) eo_axisController_SetTrqPid(s_emsc->axis_controller[joint], Kp, Kd,  Ki, Imax, Ymax, Yoff); 
+    if (ems) eo_axisController_SetTrqPid(ems->axis_controller[joint], Kp, Kd,  Ki, Imax, Ymax, Yoff); 
 }   
 // PID configurations
 ///////////////////////
 
 extern void eo_emsController_SetImpedance(uint8_t joint, int32_t stiffness, int32_t damping, int32_t offset)
 {
-    if (s_emsc) eo_axisController_SetImpedance(s_emsc->axis_controller[joint], stiffness, damping, offset);
+    if (ems) eo_axisController_SetImpedance(ems->axis_controller[joint], stiffness, damping, offset);
 }
 
 extern void eo_emsController_GetImpedance(uint8_t joint, int32_t *stiffness, int32_t *damping, int32_t *offset)
 {
-    if (s_emsc) eo_axisController_GetImpedance(s_emsc->axis_controller[joint], stiffness, damping, offset);
+    if (ems) eo_axisController_GetImpedance(ems->axis_controller[joint], stiffness, damping, offset);
 }
 
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout)
 {
-    if (s_emsc) eo_axisController_SetVelTimeout(s_emsc->axis_controller[joint], vel_timeout);
+    if (ems) eo_axisController_SetVelTimeout(ems->axis_controller[joint], vel_timeout);
 }
 
 extern void eo_emsController_SetLimits(uint8_t joint, int32_t pos_min, int32_t pos_max, int32_t vel_max)
 {
-    if (s_emsc) eo_axisController_SetLimits(s_emsc->axis_controller[joint], pos_min, pos_max, vel_max);
+    if (ems) eo_axisController_SetLimits(ems->axis_controller[joint], pos_min, pos_max, vel_max);
 }
 
 extern void eo_emsController_SetPosMin(uint8_t joint, int32_t pos_min)
 {
-    if (s_emsc) eo_axisController_SetPosMin(s_emsc->axis_controller[joint], pos_min);
+    if (ems) eo_axisController_SetPosMin(ems->axis_controller[joint], pos_min);
 }
 
 extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max)
 {
-    if (s_emsc) eo_axisController_SetPosMax(s_emsc->axis_controller[joint], pos_max);
+    if (ems) eo_axisController_SetPosMax(ems->axis_controller[joint], pos_max);
 }
 
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 {
-    if (s_emsc) eo_axisController_SetVelMax(s_emsc->axis_controller[joint], vel_max);
+    if (ems) eo_axisController_SetVelMax(ems->axis_controller[joint], vel_max);
 }
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode)
 {
-    if (s_emsc) eo_motor_set_motor_status(s_emsc->motors, motor, motorerror || canerror, controlmode);
+    if (ems) eo_motor_set_motor_status(ems->motors, motor, motorerror || canerror, controlmode);
+}
+
+extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status)
+{
+    motor_status->basic.position = ems->motor_position[mId];
+    motor_status->basic.velocity = ems->motor_velocity[mId];
+    motor_status->basic.current  = ems->motor_current [mId];
 }
 
 extern void eo_emsMotorController_GoIdle(void)
 {
-    if (s_emsc)
+    if (ems)
     {
         JOINTS(j)
         {

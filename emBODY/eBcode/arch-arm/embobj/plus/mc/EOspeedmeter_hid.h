@@ -64,35 +64,37 @@ struct EOspeedmeter_hid
 
     uint16_t state_mask;
     uint8_t  first_valid_data;
-    //uint16_t invalid_data_cnt;
+    uint16_t invalid_data_cnt;
 };
 
 #else
 
-struct EOslowenc_hid
+struct EOabsCalibratedEncoder_hid
 {
     int32_t distance;
     int32_t position_last;
     int32_t position_sure;
 
-    int32_t enc_sign;
+    int32_t sign;
     int32_t offset;
-    
-    int32_t speed;
+
     int32_t delta;
 
     uint16_t state_mask;
     uint8_t  first_valid_data;
+    uint16_t invalid_data_cnt;
 };
 
-struct EOfastenc_hid
+struct EOaxleVirtualEncoder_hid
 {
-    int32_t distance;
+    eObool_t inverted;
+    
+    int32_t velocity;
     int32_t position;
     
-    int32_t speed;
-
-    uint16_t state_mask;
+    int32_t axle_inc_pos;
+    int32_t axle_abs_pos;
+    int32_t axle_virt_pos;
 };
 
 #endif
