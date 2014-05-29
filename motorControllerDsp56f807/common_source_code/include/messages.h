@@ -303,15 +303,14 @@
 #define CAN_GET_ENCODER_POSITION_HANDLER(x) \
 { \
 	PREPARE_HEADER; \
-		CAN_LEN = 7; \
-		CAN_DATA[1] = BYTE_4(_position[axis]); \
-		CAN_DATA[2] = BYTE_3(_position[axis]); \
-		CAN_DATA[3] = BYTE_2(_position[axis]); \
-		CAN_DATA[4] = BYTE_1(_position[axis]); \
-		CAN_DATA[5] = BYTE_2(_speed[axis]); \
-		CAN_DATA[6] = BYTE_1(_speed[axis]); \
-		if (CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA) != ERR_OK) \
-			AS1_printStringEx ("err 20\r\n"); \
+	CAN_LEN = 7; \
+	CAN_DATA[1] = BYTE_4(_position[axis]); \
+	CAN_DATA[2] = BYTE_3(_position[axis]); \
+	CAN_DATA[3] = BYTE_2(_position[axis]); \
+	CAN_DATA[4] = BYTE_1(_position[axis]); \
+	CAN_DATA[5] = BYTE_2(_speed[axis]); \
+	CAN_DATA[6] = BYTE_1(_speed[axis]); \
+    CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
 
 //-------------------------------------------------------------------
@@ -335,17 +334,16 @@
 #endif
 
 
-
-
-
-
 //-------------------------------------------------------------------
 #define CAN_SET_COMMAND_POSITION_HANDLER(x) \
 { \
 	if (CAN_LEN == 5) \
 	{ \
-		_desired[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		abort_trajectory (axis, _desired[axis]); \
+		if (_control_mode[axis]==MODE_DIRECT) \
+		{ \
+			_desired[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
+			abort_trajectory (axis, _desired[axis]); \
+		} \
 	} \
 } 
 
@@ -354,7 +352,10 @@
 { \
 	if (CAN_LEN == 5) \
 	{ \
-		_set_point[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
+		if (1) \
+		{ \
+			_set_point[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
+		} \
 	} \
 }
 
@@ -362,12 +363,12 @@
 #define CAN_GET_DESIRED_POSITION_HANDLER(x) \
 { \
 	PREPARE_HEADER; \
-		CAN_LEN = 5; \
-		CAN_DATA[1] = BYTE_4(_desired[axis]); \
-		CAN_DATA[2] = BYTE_3(_desired[axis]); \
-		CAN_DATA[3] = BYTE_2(_desired[axis]); \
-		CAN_DATA[4] = BYTE_1(_desired[axis]); \
-		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+	CAN_LEN = 5; \
+	CAN_DATA[1] = BYTE_4(_desired[axis]); \
+	CAN_DATA[2] = BYTE_3(_desired[axis]); \
+	CAN_DATA[3] = BYTE_2(_desired[axis]); \
+	CAN_DATA[4] = BYTE_1(_desired[axis]); \
+	CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
 
 //-------------------------------------------------------------------
