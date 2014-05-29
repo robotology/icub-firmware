@@ -359,10 +359,6 @@ void main(void)
 		{ 
 			if (!mode_is_idle(i)) 
 			{
-				_control_mode[i] = MODE_IDLE;
-			}
-			else	
-			{
 				PWM_generate(i,_pid[i]);
 		//		setReg (TMRD0_CNTR, 39998);              				
 			}

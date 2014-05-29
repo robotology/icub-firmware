@@ -588,11 +588,7 @@ led0_off
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{
-			if (!mode_is_idle(i)) 
-			{
-				_control_mode[i] = MODE_IDLE;
-			}
-			else	
+			if (!mode_is_idle(i)) 	
 			{
 				PWM_generate(i,_pid[i]);
 		//		setReg (TMRD0_CNTR, 39998);              				
