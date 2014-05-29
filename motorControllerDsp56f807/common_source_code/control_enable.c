@@ -33,6 +33,7 @@ byte controlmode_api_to_fw(byte mode)
 		case icubCanProto_controlmode_impedance_pos: return MODE_IMPEDANCE_POS;
 		case icubCanProto_controlmode_impedance_vel: return MODE_IMPEDANCE_VEL;
         case icubCanProto_controlmode_openloop:      return MODE_OPENLOOP;
+		case icubCanProto_controlmode_hwFault:       return MODE_HW_FAULT;
 	}
 	
 	return MODE_UNKNOWN_ERROR;
@@ -54,7 +55,8 @@ byte controlmode_fw_to_api(byte mode)
 		case MODE_HANDLE_HARD_STOPS:		 return icubCanProto_controlmode_calibration;
 		case MODE_MARGIN_REACHED:   		 return icubCanProto_controlmode_calibration;
 		case MODE_CALIB_ABS_AND_INCREMENTAL: return icubCanProto_controlmode_calibration;
-		case MODE_OPENLOOP:                  return icubCanProto_controlmode_openloop;		
+		case MODE_OPENLOOP:                  return icubCanProto_controlmode_openloop;	
+		case MODE_HW_FAULT:                  return icubCanProto_controlmode_hwFault;
 	}
 	
 	return icubCanProto_controlmode_unknownError;
@@ -68,8 +70,6 @@ void disable_motor_pwm (char axis)
 	{  
 		PWM_outputPadDisable(0);  
 		PWM_outputPadDisable(1);  
-		_pad_enabled[0] = false;  
-		_pad_enabled[1] = false;  
 		can_printf("PWM DIS COUPLED:0 & 1"); 
 	}
 #elif VERSION == 0x0215 || VERSION == 0x0115
@@ -78,15 +78,12 @@ void disable_motor_pwm (char axis)
 		if ((axis==2) || (axis==3)) 
 		{ 
 			PWM_outputPadDisable(2);  
-			PWM_outputPadDisable(3);  
-			_pad_enabled[2] = false;  
-			_pad_enabled[3] = false;  
+			PWM_outputPadDisable(3);   
 			can_printf("PWM DIS COUPLED:2 & 3"); 
 		} 
 		else 
 		{ 
 			PWM_outputPadDisable(axis);  
-			_pad_enabled[axis] = false;  
 			can_printf("PWM DIS:%d",axis); 
 		} 
     }
@@ -97,14 +94,11 @@ void disable_motor_pwm (char axis)
 		{ 
 			PWM_outputPadDisable(1);  
 			PWM_outputPadDisable(2);  
-			_pad_enabled[1] = false;  
-			_pad_enabled[2] = false;   
 			can_printf("PWM DIS COUPLED:1 & 2"); 
 		} 
 		else 
 		{ 
 			PWM_outputPadDisable(axis);  
-			_pad_enabled[axis] = false;   
 			can_printf("PWM DIS:%d",axis); 
 		} 
 	}
@@ -113,9 +107,7 @@ void disable_motor_pwm (char axis)
 		if (_board_ID==1)  
 		{  
 			PWM_outputPadDisable(0);  
-			PWM_outputPadDisable(1);  
-			_pad_enabled[0] = false;  
-			_pad_enabled[1] = false;   
+			PWM_outputPadDisable(1);   
 			can_printf("PWM DIS COUPLED:012"); 
 			if (CAN_SRC==0)  
 				{  
@@ -129,8 +121,6 @@ void disable_motor_pwm (char axis)
 		{ 
 			PWM_outputPadDisable(0); 
 			PWM_outputPadDisable(1); 
-			_pad_enabled[0] = false; 
-			_pad_enabled[1] = false; 
 			can_printf("PWM ENA COUPLED:012");
 			if (CAN_SRC==0) 
 				{ 
@@ -147,7 +137,6 @@ void disable_motor_pwm (char axis)
 #else 
 	{ 
 		PWM_outputPadDisable(axis); 
-		_pad_enabled[axis] = false; 
 		can_printf("PWM DIS:%d",axis);
 	}
 #endif
@@ -156,20 +145,22 @@ void disable_motor_pwm (char axis)
 //---------------------------------------------------------------------------------------------------
 void enable_motor_pwm (char axis) 
 {
+		if (_control_mode[axis]== MODE_HW_FAULT) return;
+		
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 //this is for waist coupling
 	{   
 		if (_can_protocol_ack == false)   
 		{   
 			can_printf("can protocol NOT ack");   
+			_control_mode[0] = MODE_HW_FAULT;   
+			_control_mode[1] = MODE_HW_FAULT;   
 			return;   
 		}   
 		if (_calibrated[0] == true && _calibrated[1] == true)   
 		{   
 			PWM_outputPadEnable(0);   
 			PWM_outputPadEnable(1);   
-			_control_mode[0] = MODE_IDLE;   
-			_control_mode[1] = MODE_IDLE;   
 			can_printf("PWM ENA COUPLED:0 & 1");  
 		}   
 		else   
@@ -182,12 +173,13 @@ void enable_motor_pwm (char axis)
 	{   
 		if (_can_protocol_ack == false)   
 		{   
-			can_printf("can protocol NOT ack");   
+			can_printf("can protocol NOT ack"); 
+			_control_mode[2] = MODE_HW_FAULT;   
+			_control_mode[3] = MODE_HW_FAULT;    
 			return;   
 		}   
 		if ((axis==2) || (axis==3))  
 		{  
-			if (_pad_enabled[2] == false &&	_pad_enabled[3] == false)   
 			{   
 				PWM_outputPadEnable(2);   
 				PWM_outputPadEnable(3);   
@@ -197,7 +189,6 @@ void enable_motor_pwm (char axis)
 		else  
 		{  
 			PWM_outputPadEnable(axis);  
-			_control_mode[axis] = MODE_IDLE;   
 			can_printf("PWM ENA:%d",axis);  
 		}  
 	} 
@@ -206,12 +197,13 @@ void enable_motor_pwm (char axis)
 	{   
 		if (_can_protocol_ack == false)   
 		{   
-			can_printf("can protocol NOT ack");   
+			can_printf("can protocol NOT ack");  
+			_control_mode[1] = MODE_HW_FAULT;   
+			_control_mode[2] = MODE_HW_FAULT;   
 			return;   
 		}   
 		if ((axis>0) && (axis<3))  
 		{  
-			if (_pad_enabled[1] == false &&	_pad_enabled[2] == false)   
 			{   
 				PWM_outputPadEnable(1);   
 				PWM_outputPadEnable(2);   
@@ -221,7 +213,6 @@ void enable_motor_pwm (char axis)
 		else  
 		{  
 			PWM_outputPadEnable(axis);  
-			_control_mode[axis] = MODE_IDLE;   
 			can_printf("PWM ENA:%d",axis);  
 		}  
 	}
@@ -229,12 +220,13 @@ void enable_motor_pwm (char axis)
 	{   
 		if (_can_protocol_ack == false)   
 		{   
-			can_printf("can protocol NOT ack");   
+			can_printf("can protocol NOT ack");
+			_control_mode[0] = MODE_HW_FAULT;   
+			_control_mode[1] = MODE_HW_FAULT;     
 			return;   
 		}   
 		if (_board_ID==1)   
 		{   
-			if (_pad_enabled[0] == false &&	_pad_enabled[1] == false)   
 			{   
 				PWM_outputPadEnable(0);   
 				PWM_outputPadEnable(1);   
@@ -250,7 +242,6 @@ void enable_motor_pwm (char axis)
 		else   
 		if (_board_ID==2)   
 		{   
-			if (_pad_enabled[0] == false)   
 			{   
 				PWM_outputPadEnable(0);   
 				can_printf("PWM ENA COUPLED:012");  
@@ -269,27 +260,28 @@ void enable_motor_pwm (char axis)
 			if (_can_protocol_ack == false)   
 			{   
 				can_printf("can protocol NOT ack");   
+				_control_mode[axis] = MODE_HW_FAULT;  
 				return;   
 			}   
-			PWM_outputPadEnable(axis);   
-			_control_mode[axis] = MODE_IDLE;   
+			PWM_outputPadEnable(axis);    
 			can_printf("PWM ENA:%d",axis);  
 		}
 	#else //(CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
 		{   
 			if (_can_protocol_ack == false)   
 			{   
-				can_printf("can protocol NOT ack");   
+				can_printf("can protocol NOT ack"); 
+				_control_mode[axis] = MODE_HW_FAULT;     
 				return;   
 			}   
 			if (_calibrated[axis] == true)   
 			{   
-				PWM_outputPadEnable(axis);   
-				_control_mode[axis] = MODE_IDLE;    
+				PWM_outputPadEnable(axis);      
 				can_printf("PWM ENA:%d",axis);  
 			}   
 			else   
 			{   
+				_control_mode[axis] = MODE_HW_FAULT;     
 				can_printf("calib failed:%d",axis);   
 			}   
 		} 
@@ -301,15 +293,15 @@ void enable_motor_pwm (char axis)
 
 void enable_control (char axis)
 {
+		if (_control_mode[axis]== MODE_HW_FAULT) return;
+		
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 //this is for waist coupling
 	{ 
-		if ((_pad_enabled[0]==false) || (_pad_enabled[1]==false))
-			can_printf("WARNING: RUN called before AMP");
 		if ((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)) 
 		{ 
 		 	if ((_received_pid[0].rec_pid==0x7F) || (_received_pid[1].rec_pid==0x7F))   
 			{ 
-				_control_mode[0] = MODE_POSITION; 
+				/*_control_mode[0] = MODE_POSITION; 
 				_control_mode[1] = MODE_POSITION; 
 				_desired[0] = _position[0]; 
 				_desired[1] = _position[1]; 
@@ -320,11 +312,13 @@ void enable_control (char axis)
 				_set_point[0] = _position[0]; 
 				_set_point[1] = _position[1]; 
 				init_trajectory (0, _position[0], _position[0], 1); 
-				init_trajectory (1, _position[1], _position[1], 1); 
+				init_trajectory (1, _position[1], _position[1], 1);*/
 			} 
 			else 
 			{ 
-			  can_printf("WARNING:PID IS NOT SET");
+			    can_printf("WARNING:PID IS NOT SET");
+			    _control_mode[0] == MODE_HW_FAULT;
+			    _control_mode[1] == MODE_HW_FAULT; 
 			} 
 		} 
 	}
@@ -332,13 +326,11 @@ void enable_control (char axis)
 	{ 
 		if ((axis==2) || (axis==3))
 		{
-			if ((_pad_enabled[2]==false) || (_pad_enabled[3]==false))
-				can_printf("WARNING: RUN called before AMP");
 			if (((_control_mode[2] == MODE_IDLE) || (_control_mode[3] == MODE_IDLE)))  
 			{ 
 			 	if ((_received_pid[2].rec_pid==0x7F) || (_received_pid[3].rec_pid==0x7F))   
 				{ 
-					_control_mode[2] = MODE_POSITION; 
+				  /*_control_mode[2] = MODE_POSITION; 
 					_control_mode[3] = MODE_POSITION; 
 					_desired[2] = _position[2]; 
 					_desired[3] = _position[3]; 
@@ -349,33 +341,34 @@ void enable_control (char axis)
 					_set_point[2] = _position[2]; 
 					_set_point[3] = _position[3]; 
 					init_trajectory (2, _position[2], _position[2], 1); 
-					init_trajectory (3, _position[3], _position[3], 1); 
+					init_trajectory (3, _position[3], _position[3], 1);*/
 				} 
 				else 
 				{ 
 				  can_printf("WARNING:PID IS NOT SET");
+				  _control_mode[2] == MODE_HW_FAULT;
+			      _control_mode[3] == MODE_HW_FAULT; 
 				} 
 			} 
 		}
 		else
 		{
-			if (_pad_enabled[axis]==false)
-			can_printf("WARNING: RUN called before AMP");
 			if (_control_mode[axis] == MODE_IDLE) 
 			{ 
 				if (_received_pid[axis].rec_pid==0x7F)
 				{
-				_control_mode[axis] = MODE_POSITION; 
-				_desired[axis] = _position[axis]; 
-				_desired_vel[axis] = 0; 
-				_integral[axis] = 0; 
-				_ko_imp[axis] = 0; 
-				_set_point[axis] = _position[axis]; 
-				init_trajectory (axis, _position[axis], _position[axis], 1); 
+					/*_control_mode[axis] = MODE_POSITION; 
+					_desired[axis] = _position[axis]; 
+					_desired_vel[axis] = 0; 
+					_integral[axis] = 0; 
+					_ko_imp[axis] = 0; 
+					_set_point[axis] = _position[axis]; 
+					init_trajectory (axis, _position[axis], _position[axis], 1);*/ 
 				}
 				else
 				{ 
 					can_printf("WARNING:PID IS NOT SET"); 
+   			        _control_mode[axis] == MODE_HW_FAULT;
 				} 
 			} 
 		}
@@ -384,17 +377,16 @@ void enable_control (char axis)
 	{ 
 		if (_board_ID==1) 
 		{ 
-			if ((_pad_enabled[0]==false) || (_pad_enabled[1]==false)) can_printf("WARNING: RUN called before AMP");
-			else if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  
+			if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  
 			{ 
-				_control_mode[0] = MODE_POSITION; 
+				/*_control_mode[0] = MODE_POSITION; 
 				_control_mode[1] = MODE_POSITION; 
 				_desired[0] = _position[0]; 
 				_desired[1] = _position[1]; 
 				_integral[0] = 0; 
 				_integral[1] = 0; 
 				_set_point[0] = _position[0]; 
-				_set_point[1] = _position[1]; 
+				_set_point[1] = _position[1];*/
 				if (CAN_SRC==0) 
 				{ 
 				  CAN_ID = (_board_ID << 4) ; 
@@ -406,13 +398,12 @@ void enable_control (char axis)
 		else 
 		if (_board_ID==2) 
 		{ 
-			if (_pad_enabled[0]==false) can_printf("WARNING: RUN called before AMP");
-			else if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  
+			if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  
 			{ 
-				_control_mode[0] = MODE_POSITION; 
+				/*_control_mode[0] = MODE_POSITION; 
 				_desired[0] = _position[0]; 
 				_integral[0] = 0; 
-				_set_point[0] = _position[0]; 
+				_set_point[0] = _position[0];*/
 				if (CAN_SRC==0) 
 				{ 
 				  CAN_ID = (_board_ID << 4) ; 
@@ -426,13 +417,11 @@ void enable_control (char axis)
 	{ 
 		if ((axis>0) && (axis<3))
 		{
-			if ((_pad_enabled[1]==false) || (_pad_enabled[2]==false))
-				can_printf("WARNING: RUN called before AMP");
 			if (((_control_mode[1] == MODE_IDLE) || (_control_mode[2] == MODE_IDLE)))  
 			{ 
 			 	if ((_received_pid[1].rec_pid==0x7F) || (_received_pid[2].rec_pid==0x7F))   
 				{ 
-					_control_mode[1] = MODE_POSITION; 
+				    /*_control_mode[1] = MODE_POSITION; 
 					_control_mode[2] = MODE_POSITION; 
 					_desired[1] = _position[1]; 
 					_desired[2] = _position[2]; 
@@ -443,51 +432,50 @@ void enable_control (char axis)
 					_set_point[1] = _position[1]; 
 					_set_point[2] = _position[2]; 
 					init_trajectory (1, _position[1], _position[1], 1); 
-					init_trajectory (2, _position[2], _position[2], 1); 
+					init_trajectory (2, _position[2], _position[2], 1);*/
 				} 
 				else 
 				{ 
-				  can_printf("WARNING:PID IS NOT SET");
+				    can_printf("WARNING:PID IS NOT SET");
+				    _control_mode[1] = MODE_HW_FAULT; 
+					_control_mode[2] = MODE_HW_FAULT; 
 				} 
 			} 
 		}
 		else
 		{
-			if (_pad_enabled[axis]==false)
-			can_printf("WARNING: RUN called before AMP");
 			if (_control_mode[axis] == MODE_IDLE) 
 			{ 
 				if (_received_pid[axis].rec_pid==0x7F)
 				{
-					_control_mode[axis] = MODE_POSITION; 
+					/*_control_mode[axis] = MODE_POSITION; 
 					_desired[axis] = _position[axis]; 
 					_desired_vel[axis] = 0; 
 					_integral[axis] = 0; 
 					_ko_imp[axis] = 0; 
 					_set_point[axis] = _position[axis]; 
-					init_trajectory (axis, _position[axis], _position[axis], 1); 
+					init_trajectory (axis, _position[axis], _position[axis], 1);*/ 
 				}
 				else
 				{ 
 					can_printf("WARNING:PID IS NOT SET"); 
+					_control_mode[axis] = MODE_HW_FAULT; 
 				} 
 			} 
 		}
 	}
 #else //normal boards
 	{ 
-		if (_pad_enabled[axis]==false)
-			can_printf("WARNING: RUN called before AMP");
-		else if (_control_mode[axis] == MODE_IDLE) 
+		if (_control_mode[axis] == MODE_IDLE) 
 		{ 
 			if (_received_pid[axis].rec_pid==0x7F) 
 			{ 
-				_control_mode[axis] = MODE_POSITION; 
+				/*_control_mode[axis] = MODE_POSITION; 
 				_desired[axis] = _position[axis]; 
 				_integral[axis] = 0; 
 				_ko_imp[axis] = 0; 
 				_set_point[axis] = _position[axis]; 
-				init_trajectory (axis, _position[axis], _position[axis], 1); 
+				init_trajectory (axis, _position[axis], _position[axis], 1);*/ 
 			} 
 			else 
 			{ 
@@ -501,7 +489,7 @@ void enable_control (char axis)
 //---------------------------------------------------------------------------------------------------------------------------
 void disable_control(char axis)
 {
-	if (_control_mode[axis] != MODE_IDLE)
+	if (_control_mode[axis] != MODE_IDLE && _control_mode[axis] != MODE_HW_FAULT)
 	{
 		_control_mode[axis] = MODE_IDLE;
 	}
@@ -536,8 +524,9 @@ void get_control_mode_new(char axis)
 //---------------------------------------------------------------------------------------------------------------------------
 void set_control_mode_new(char axis)
 {
+    byte api_value = CAN_DATA[1];
     byte value = controlmode_api_to_fw(CAN_DATA[1]);
-	
+	can_printf("0, %d %d", axis,_control_mode[axis]);
 	//special case from fault you can go anyrwhere, execept IDLE
 	if (_control_mode[axis]==MODE_IDLE)
 	{
@@ -545,50 +534,46 @@ void set_control_mode_new(char axis)
         {
 	        enable_motor_pwm(axis);
 			enable_control(axis);
-			set_control_mode(axis);	
+			set_control_mode(axis, value);	
         }
         return;
 	}
-	
+	can_printf("1");
 	//special case, from FAULT you can only go to idle
-	if (_control_mode[axis]==MODE_IDLE) //HARDWARE FAULT
-	{
-		if (value==MODE_IDLE)	
-		{
+	if (_control_mode[axis]==MODE_HW_FAULT) //HARDWARE FAULT
+	{can_printf("2");
+		if (api_value==icubCanProto_controlmode_forceIdle)	
+		{can_printf("3");
 			disable_control(axis);
 			disable_motor_pwm(axis);
-			set_control_mode(axis);
+			set_control_mode(axis, MODE_IDLE);
 		}
 		return;
 	}
-	
+	can_printf("4");
 	//here current controlmode != IDLE, != FAULT, (motors are on)
 	//if you want to turn off motors do this...
 	if (value==MODE_IDLE)
 	{
 		disable_control(axis);
 		disable_motor_pwm(axis);
-		set_control_mode(axis);
+		set_control_mode(axis, value);
 		return;
 	}
 	
 	//otherwise just change control mode.
 	{
-		set_control_mode(axis);
+		set_control_mode(axis, value);
 	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void set_control_mode(char axis)
+void set_control_mode(char axis, byte value)
 {
-	byte value = 0; 
-	value = (CAN_DATA[1]);
-	
 #if VERSION != 0x0351 //normal boards
 	if (CAN_LEN == 2) 
 	{ 
-		
-		can_printf("CTRLMODE SET:%d",value);
+				can_printf("CTRLMODE SET:%d",value);
 		if (value>=0 && value <=0x50) _control_mode[axis] = value;
 		_desired_torque[axis]=0;
 		_desired[axis] = _position[axis];
@@ -676,4 +661,39 @@ void get_interaction_mode(char axis)
 	CAN_DATA[1] = m; 
 	CAN_DATA[2] = 0; 
 	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA);	
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+bool mode_is_idle(char axis)
+{
+	if (_control_mode[axis] == MODE_IDLE) return true;
+	if (_control_mode[axis] == MODE_HW_FAULT) return true;
+	return false;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+bool mode_is_impedance_position(char axis)
+{
+	if (_control_mode[axis] == MODE_IMPEDANCE_POS) return true;
+	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant)
+	{
+		if (_control_mode[axis] == MODE_POSITION ||
+		    _control_mode[axis] == MODE_MIXED    ||
+	        _control_mode[axis] == MODE_DIRECT)	
+		return true;
+	}
+	return false;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+bool mode_is_impedance_velocity(char axis)
+{
+	if (_control_mode[axis] == MODE_IMPEDANCE_VEL) return true;
+	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant)
+	{
+		if (_control_mode[axis] == MODE_VELOCITY ||
+		    _control_mode[axis] == MODE_MIXED)	
+		return true;
+	}
+	return false;	
 }

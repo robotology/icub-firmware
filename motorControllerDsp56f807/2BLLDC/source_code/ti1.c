@@ -54,7 +54,6 @@ void TI1_interrupt (void)
 			if ((get_current(i)>=25000) || (-get_current(i)>=25000))
 			{
 				_control_mode[i] = MODE_HW_FAULT;	
-				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
 #ifdef DEBUG_CAN_MSG
@@ -65,7 +64,6 @@ void TI1_interrupt (void)
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
 				_control_mode[i] = MODE_HW_FAULT;	
-				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
 #ifdef DEBUG_CAN_MSG

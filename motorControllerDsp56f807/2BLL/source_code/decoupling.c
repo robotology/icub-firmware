@@ -44,7 +44,6 @@ void decouple_positions(void)
 	else
 	{
 		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
 		PWM_outputPadDisable(0);
 	
 		#ifdef DEBUG_CAN_MSG
@@ -83,7 +82,6 @@ void decouple_positions(void)
 	else
 	{
 		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
 		PWM_outputPadDisable(0);
 
 		#ifdef DEBUG_CAN_MSG
@@ -304,7 +302,6 @@ void decouple_dutycycle(Int32 *pwm)
 	else
 	{
 		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
 		PWM_outputPadDisable(0);
 
 		#ifdef DEBUG_CAN_MSG

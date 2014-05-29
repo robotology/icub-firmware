@@ -4,10 +4,14 @@
 #include "dsp56f807.h"
 extern bool _can_protocol_ack;
 
+//This are private functions to be used only inside control_enable.cpp
+/*
 void enable_motor_pwm (char axis);
 void disable_motor_pwm (char axis);
 void enable_control (char axis);
 void disable_control (char axis);
+*/
+
 void set_control_mode(char axis, byte value);
 void get_control_mode(char axis);
 void set_control_mode_new(char axis);

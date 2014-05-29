@@ -71,7 +71,7 @@ typedef union {
 extern byte    _interaction_mode[JN];
 extern byte    _control_mode[JN] ;		// control mode (e.g. position, velocity, etc.) 
 extern Int16   _fault[JN] ;				// amp fault memory 
-extern bool    _pad_enabled[JN] ;
+//extern bool    _pad_enabled[JN] ;
 extern Int16   _counter ;					// used to count cycles, it resets now and then to generate periodic events 
 extern Int16   _counter_calib ;			// used in calibration to count the number of cycles											
 extern Int16   _pwm_calibration[JN] ;		// pid value during calibration with hard stops 

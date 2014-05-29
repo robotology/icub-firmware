@@ -488,7 +488,6 @@ Int32 compute_pwm(byte j)
 	#ifdef DEBUG_CAN_MSG
 		can_printf("MODE HANDLE HARD STOP");
 	#endif
-	    _pad_enabled[j] = false;
 	    PWM_outputPadDisable(j);
 		_control_mode[j] = MODE_IDLE;
 		break;
@@ -1318,7 +1317,6 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 			if (strain_num==-1)
 			{
 				_control_mode[jnt] = MODE_HW_FAULT;	
-				_pad_enabled[jnt] = false;
 
 				#ifdef DEBUG_CAN_MSG					
 					can_printf("WARN:force control not allowed jnt:%d",jnt);
@@ -1331,7 +1329,6 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 			if (_strain_wtd[strain_num]==0)
 			{
 				_control_mode[jnt] = MODE_HW_FAULT;	
-				_pad_enabled[jnt] = false;
 					
 				#ifdef DEBUG_CAN_MSG
 					can_printf("WARN:strain watchdog disabling pwm jnt:%d",jnt);				

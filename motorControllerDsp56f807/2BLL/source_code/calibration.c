@@ -62,7 +62,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 			PWM_outputPadDisable(channel);
 			_calibrated[channel] = true; 
 	//		AS1_printStringEx ("Calibration ABS_DIGITAL aborted\r\n");
@@ -132,7 +131,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 			PWM_outputPadDisable(channel);
 			_calibrated[channel] = true; 
 	//		AS1_printStringEx ("Calibration ABS_DIGITAL aborted\r\n");

@@ -327,7 +327,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 			PWM_outputPadDisable(channel);
 		#ifdef DEBUG_CALIBRATION
 			can_printf("Calibration ABS_DIGITAL aborted \r\n");
@@ -400,7 +399,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
+
 			PWM_outputPadDisable(channel);
 		#ifdef DEBUG_CALIBRATION
 			can_printf("Calibration ABS_DIGITAL aborted \r\n");
@@ -507,7 +506,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 			#ifdef DEBUG_CALIBRATION			
 			AS1_printStringEx ("Calibration ABS_DIGITAL aborted\r\n");
 			#endif			
@@ -604,7 +602,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			if (param2==0)
 			{
 				_control_mode[channel]=MODE_IDLE;	
-				_pad_enabled[channel] = false;
 				#ifdef DEBUG_CALIBRATION				
 				AS1_printStringEx ("Calibration ABS_DIGITAL aborted\r\n");
 				#endif				
@@ -693,7 +690,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			if (param2==0)
 			{
 				_control_mode[channel]=MODE_IDLE;	
-				_pad_enabled[channel] = false;
 				PWM_outputPadDisable(channel);
 			#ifdef DEBUG_CALIBRATION
 				can_printf("Calibration ABS_DIGITAL aborted \r\n");
@@ -718,7 +714,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			if (param2==0)
 			{
 				_control_mode[channel]=MODE_IDLE;	
-				_pad_enabled[channel] = false;
 				#ifdef DEBUG_CALIBRATION				
 				can_printf("Calibration ABS_DIGITAL aborted\r\n");
 				#endif				
@@ -787,7 +782,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 		#ifdef DEBUG_CALIBRATION			
 			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
 		#endif			
@@ -831,7 +825,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 
 		#ifdef DEBUG_CALIBRATION			
 
@@ -864,7 +857,7 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
+
 		#ifdef DEBUG_CALIBRATION			
 			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
 		#endif			
@@ -918,7 +911,6 @@ if ((type==CALIB_HARD_STOPS) )
 		if (param2==0)
 		{
 			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
 		#ifdef DEBUG_CALIBRATION			
 			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
 		#endif			

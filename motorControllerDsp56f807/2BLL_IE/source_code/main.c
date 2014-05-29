@@ -411,7 +411,6 @@ void main(void)
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
 					_control_mode[i] = MODE_HW_FAULT;	
-					_pad_enabled[i] = false;
 					PWM_outputPadDisable(i);
 			#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",i);	
@@ -425,7 +424,6 @@ void main(void)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 					_control_mode[0] = MODE_HW_FAULT;	
-					_pad_enabled[0] = false;
 					PWM_outputPadDisable(0);
 			#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",0);	
@@ -565,7 +563,7 @@ void main(void)
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{
-			if (_pad_enabled[i] == false && !mode_is_idle(i)) 
+			if (!mode_is_idle(i)) 
 			{
 				_control_mode[i] = MODE_IDLE;
 			}
@@ -599,7 +597,6 @@ void main(void)
 			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
 			{
 				_control_mode[i] = MODE_HW_FAULT;	
-				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
 #ifdef DEBUG_CAN_MSG
@@ -610,8 +607,7 @@ void main(void)
 			compute_i2t(i);
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
-				_control_mode[i] = MODE_HW_FAULT;	
-				_pad_enabled[i] = false;
+				_control_mode[i] = MODE_HW_FAULT;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
 #ifdef DEBUG_CAN_MSG

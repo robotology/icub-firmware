@@ -313,8 +313,6 @@ void main(void)
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
 					_control_mode[i] = MODE_HW_FAULT;	
-					_pad_enabled[0] = false;
-					_pad_enabled[1] = false;
 					PWM_outputPadDisable(0);
 					PWM_outputPadDisable(1);
 			#ifdef DEBUG_CAN_MSG
@@ -359,7 +357,7 @@ void main(void)
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{ 
-			if (_pad_enabled[i] == false && !mode_is_idle(i)) 
+			if (!mode_is_idle(i)) 
 			{
 				_control_mode[i] = MODE_IDLE;
 			}

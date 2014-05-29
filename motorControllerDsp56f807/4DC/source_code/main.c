@@ -624,7 +624,7 @@ void main(void)
 //******************************************************************************************/ 				
 		for (i=0; i<JN; i++)
 		{
-			if (_pad_enabled[i] == false && !mode_is_idle(i)) _control_mode[i] = MODE_IDLE;
+			if (!mode_is_idle(i)) _control_mode[i] = MODE_IDLE;
 			else
 			PWM_generate(i,_pid[i]);
 		}
@@ -652,7 +652,6 @@ void main(void)
 #endif			
 			{
 				_control_mode[i] = MODE_HW_FAULT;	
-				_pad_enabled[i] = false;
 				highcurrent[i]=true;
 				PWM_outputPadDisable(i);
 				can_printf("BIG CURR J%d %f!",i,_filt_current[i]);
