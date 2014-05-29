@@ -18,8 +18,13 @@ extern  byte	_board_ID ;
 #define CAN_ID _canmsg.CAN_messID
 #define CAN_SRC _canmsg.CAN_ID_src
 
+//private functions
 byte controlmode_api_to_fw(byte mode);
 byte controlmode_fw_to_api(byte mode);
+void enable_motor_pwm (char axis);
+void disable_motor_pwm (char axis);
+void enable_control (char axis);
+void disable_control (char axis);
 
 //-----------------------------------------------------------------------------------------------------------------------
 byte controlmode_api_to_fw(byte mode)
@@ -321,8 +326,8 @@ void enable_control (char axis)
 			else 
 			{ 
 			    can_printf("WARNING:PID IS NOT SET");
-			    _control_mode[0] == MODE_HW_FAULT;
-			    _control_mode[1] == MODE_HW_FAULT; 
+			    _control_mode[0] = MODE_HW_FAULT;
+			    _control_mode[1] = MODE_HW_FAULT; 
 			} 
 		} 
 	}
@@ -350,8 +355,8 @@ void enable_control (char axis)
 				else 
 				{ 
 				  can_printf("WARNING:PID IS NOT SET");
-				  _control_mode[2] == MODE_HW_FAULT;
-			      _control_mode[3] == MODE_HW_FAULT; 
+				  _control_mode[2] = MODE_HW_FAULT;
+			      _control_mode[3] = MODE_HW_FAULT; 
 				} 
 			} 
 		}
@@ -372,7 +377,7 @@ void enable_control (char axis)
 				else
 				{ 
 					can_printf("WARNING:PID IS NOT SET"); 
-   			        _control_mode[axis] == MODE_HW_FAULT;
+   			        _control_mode[axis] = MODE_HW_FAULT;
 				} 
 			} 
 		}
@@ -483,7 +488,8 @@ void enable_control (char axis)
 			} 
 			else 
 			{ 
-				can_printf("WARNING:PID IS NOT SET"); 
+				can_printf("WARNING:PID IS NOT SET");
+                _control_mode[axis] = MODE_HW_FAULT;  
 			} 
 		} 
 	}
