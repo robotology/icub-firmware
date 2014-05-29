@@ -120,7 +120,8 @@ float tmp;
 		if (_desired[i] < _min_position_coupled && (_desired[i] - previous_desired) <= 0) 
 		{
 			_desired[i] = _min_position_coupled;
-			if (_control_mode[i] == MODE_VELOCITY)
+			if (_control_mode[i] == MODE_VELOCITY ||
+			    _control_mode[i] == MODE_MIXED)
 				_set_vel[i] = 0;
 #ifdef DEBUG_CONTROL_MODE
 			can_printf("WARN: OUT of MIN LIMITS");	
@@ -131,7 +132,8 @@ float tmp;
 		if (_desired[i] > _max_position_coupled && (_desired[i] - previous_desired) >= 0)
 		{
 			_desired[i] = _max_position_coupled;
-			if (_control_mode[i] == MODE_VELOCITY)
+			if (_control_mode[i] == MODE_VELOCITY ||
+			    _control_mode[i] == MODE_MIXED)
 				_set_vel[i] = 0;
 #ifdef DEBUG_CONTROL_MODE
 			can_printf("WARN: OUT of MAX LIMITS");	
@@ -151,7 +153,8 @@ float tmp;
 			}
 			else
 			{
-				if (_control_mode[i] == MODE_VELOCITY)
+				if (_control_mode[i] == MODE_VELOCITY ||
+			        _control_mode[i] == MODE_MIXED)
 					_set_vel[i] = 0;
 				else
 					_desired[i] = _min_position[i];
@@ -167,7 +170,8 @@ float tmp;
 			}			
 			else 
 			{
-				if (_control_mode[i] == MODE_VELOCITY)
+				if (_control_mode[i] == MODE_VELOCITY ||
+			        _control_mode[i] == MODE_MIXED)
 					_set_vel[i] = 0;
 				else
 					_desired[i] = _max_position[i];
@@ -180,7 +184,8 @@ float tmp;
 		if (_desired[i] < _min_position[i] && (_desired[i] - previous_desired) < 0) 
 		{
 			_desired[i] = _min_position[i];
-			if (_control_mode[i] == MODE_VELOCITY)
+			if (_control_mode[i] == MODE_VELOCITY  ||
+			    _control_mode[i] == MODE_MIXED)
 				_set_vel[i] = 0;
 #ifdef DEBUG_CONTROL_MODE
 			can_printf("WARN: OUT of MIN LIMITS");	
@@ -189,7 +194,8 @@ float tmp;
 		if (_desired[i] > _max_position[i] && (_desired[i] - previous_desired) > 0)
 		{
 			_desired[i] = _max_position[i];
-			if (_control_mode[i] == MODE_VELOCITY)
+			if (_control_mode[i] == MODE_VELOCITY  ||
+			    _control_mode[i] == MODE_MIXED)
 				_set_vel[i] = 0;
 #ifdef DEBUG_CONTROL_MODE
 			can_printf("WARN: OUT of MAX LIMITS");	

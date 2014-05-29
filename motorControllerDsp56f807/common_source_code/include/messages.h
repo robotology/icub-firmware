@@ -531,36 +531,34 @@
 #define CAN_STOP_TRAJECTORY_HANDLER(x) \
 { \
 	if (_control_mode[axis] == MODE_IMPEDANCE_POS || \
-		_control_mode[axis] == MODE_POSITION ) \
+		_control_mode[axis] == MODE_POSITION || \
+		_control_mode[axis] == MODE_IMPEDANCE_VEL || \
+		_control_mode[axis] == MODE_VELOCITY || \
+		_control_mode[axis] == MODE_MIXED) \
 		{ \
+		    _set_vel[axis] = 0; \
+		    _set_acc[axis] = 0; \
+            _desired_vel[axis] = 0; \
 			init_trajectory (axis, _position[axis], _position[axis], 1); \
 		} \
-   	else if (_control_mode[axis] == MODE_IMPEDANCE_VEL) \
-    	{ \
-    	    _control_mode[axis] = MODE_IMPEDANCE_POS; \
-    		init_trajectory (axis, _position[axis], _position[axis], 1); \
-    	} \
-   	else if (_control_mode[axis] == MODE_VELOCITY) \
-    	{ \
-    	    _control_mode[axis] = MODE_POSITION; \
-    		init_trajectory (axis, _position[axis], _position[axis], 1); \
-    	} \
 }
 
 //-------------------------------------------------------------------
 #define CAN_POSITION_MOVE_HANDLER(x) \
 { \
+    if (mode_is_idle(axis)) \
+    { \
+    /* do nothing */ \
+    } \
+    else \
 	if (CAN_LEN == 7) \
 	{ \
-		if (_control_mode[axis] != MODE_IDLE && \
-		    _control_mode[axis] != MODE_TORQUE  && \
-		    _control_mode[axis] != MODE_OPENLOOP) \
+		/* only the following modes can received this command */ \
+		if (_control_mode[axis] == MODE_POSITION || \
+		    _control_mode[axis] == MODE_IMPEDANCE_POS || \
+		    _control_mode[axis] == MODE_MIXED) \
 		{ \
-			if (_control_mode[axis] != MODE_IMPEDANCE_POS && \
-				_control_mode[axis] != MODE_IMPEDANCE_VEL ) \
-			    _control_mode[axis] = MODE_POSITION; \
-			else \
-			    _control_mode[axis] = MODE_IMPEDANCE_POS; \
+			/* compute setpoint */ \
 			_set_point[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
 			if (_set_point[axis] < _min_position[axis]) \
 				_set_point[axis] = _min_position[axis]; \
@@ -568,8 +566,10 @@
 			if (_set_point[axis] > _max_position[axis]) \
 				_set_point[axis] = _max_position[axis]; \
 			_set_vel[axis] = BYTE_W(CAN_DATA[5], CAN_DATA[6]); \
+			/* compute setvel, setacc */ \
 			if (_set_vel[axis] < 1) \
 				_set_vel[axis] = 1; \
+			_set_acc[axis] = 0; \
 			/* stiction compensation (XOR condition on PID sign) */ \
 			if (_ended[axis]) \
 			{ \
@@ -578,48 +578,39 @@
 			   else \
 				  _kstc[axis] = _kstn[axis]; \
 			} \
-			/* _set_vel needs to be checked */ \
-			_set_acc[axis] = 0; \
+			/* this turn off velocity in MODE_POSITION, MODE_IMPEDANCE_POSITION*/ \
+			if (_control_mode[axis] == MODE_POSITION || \
+			    _control_mode[axis] == MODE_IMPEDANCE_POS ) \
+			{ \
+			   _desired_vel[axis] = 0; \
+			} \
+			/* starts trjectory generation */ \
 			init_trajectory (axis, _desired[axis], _set_point[axis], _set_vel[axis]); \
-			_general_board_error =  ERROR_NONE; \
-		} \
-		else \
-		{ \
-			_general_board_error = ERROR_MODE; \
 		} \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
 #define CAN_VELOCITY_MOVE_HANDLER(x) \
 { \
+	if (mode_is_idle(axis)) \
+    { \
+    /* do nothing */ \
+    } \
 	if (CAN_LEN == 5) \
 	{ \
-		if (_control_mode[axis] != MODE_IDLE && \
-		    _control_mode[axis] != MODE_TORQUE && \
-		    _control_mode[axis] != MODE_OPENLOOP) \
+		/* only the following modes can received this command */ \
+		if (_control_mode[axis] == MODE_VELOCITY || \
+		    _control_mode[axis] == MODE_IMPEDANCE_VEL  || \
+		    _control_mode[axis] == MODE_MIXED) \
 		{ \
 			_vel_counter[axis] = 0; \
-			if (_control_mode[axis] == MODE_POSITION || \
-				_control_mode[axis] == MODE_IMPEDANCE_POS ) \
-				_desired_vel[axis] = 0; \
-			if (_control_mode[axis] != MODE_IMPEDANCE_POS && \
-				_control_mode[axis] != MODE_IMPEDANCE_VEL ) \
-			    _control_mode[axis] = MODE_VELOCITY; \
-			else \
-			    _control_mode[axis] = MODE_IMPEDANCE_VEL; \
+            /* compute setpoint, set_vel, set_acc */ \
 			_set_point[axis] = _desired[axis]; \
 			_set_vel[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 			_set_acc[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
-			_general_board_error = ERROR_NONE; \
 		} \
-		else \
-			_general_board_error = ERROR_MODE; \
 	} \
-	else \
-		_general_board_error = ERROR_FMT; \
 }
 
 //-------------------------------------------------------------------
