@@ -28,6 +28,8 @@ byte controlmode_api_to_fw(byte mode)
 	{
 		case icubCanProto_controlmode_idle:          return MODE_IDLE;
 		case icubCanProto_controlmode_position:      return MODE_POSITION;
+		case icubCanProto_controlmode_mixed:         return MODE_MIXED;
+		case icubCanProto_controlmode_direct:        return MODE_DIRECT;
 		case icubCanProto_controlmode_velocity:      return MODE_VELOCITY;
 		case icubCanProto_controlmode_torque:        return MODE_TORQUE;
 		case icubCanProto_controlmode_impedance_pos: return MODE_IMPEDANCE_POS;
@@ -46,6 +48,8 @@ byte controlmode_fw_to_api(byte mode)
 	{
 		case MODE_IDLE:						 return icubCanProto_controlmode_idle;
 		case MODE_POSITION:			   	     return icubCanProto_controlmode_position;
+		case MODE_MIXED:			   	     return icubCanProto_controlmode_mixed;
+		case MODE_DIRECT:			   	     return icubCanProto_controlmode_direct;
 		case MODE_VELOCITY:					 return icubCanProto_controlmode_velocity;
 		case MODE_TORQUE:					 return icubCanProto_controlmode_torque;
 		case MODE_IMPEDANCE_POS:			 return icubCanProto_controlmode_impedance_pos;
@@ -526,8 +530,8 @@ void set_control_mode_new(char axis)
 {
     byte api_value = CAN_DATA[1];
     byte value = controlmode_api_to_fw(CAN_DATA[1]);
-	can_printf("0, %d %d", axis,_control_mode[axis]);
-	//special case from fault you can go anyrwhere, execept IDLE
+
+	//special case, from IDLE you can go anywhere, execept IDLE
 	if (_control_mode[axis]==MODE_IDLE)
 	{
         if (value!=MODE_IDLE)	
@@ -535,22 +539,22 @@ void set_control_mode_new(char axis)
 	        enable_motor_pwm(axis);
 			enable_control(axis);
 			set_control_mode(axis, value);	
-        }
+       }
         return;
 	}
-	can_printf("1");
-	//special case, from FAULT you can only go to idle
-	if (_control_mode[axis]==MODE_HW_FAULT) //HARDWARE FAULT
-	{can_printf("2");
+
+	//special case, from FAULT you can only go to IDLE
+	if (_control_mode[axis]==MODE_HW_FAULT)
+	{
 		if (api_value==icubCanProto_controlmode_forceIdle)	
-		{can_printf("3");
+		{
 			disable_control(axis);
 			disable_motor_pwm(axis);
 			set_control_mode(axis, MODE_IDLE);
 		}
 		return;
 	}
-	can_printf("4");
+
 	//here current controlmode != IDLE, != FAULT, (motors are on)
 	//if you want to turn off motors do this...
 	if (value==MODE_IDLE)
@@ -559,6 +563,13 @@ void set_control_mode_new(char axis)
 		disable_motor_pwm(axis);
 		set_control_mode(axis, value);
 		return;
+	}
+	if (api_value==icubCanProto_controlmode_forceIdle)
+	{
+		disable_control(axis);
+		disable_motor_pwm(axis);
+		set_control_mode(axis, MODE_IDLE);
+		return;		
 	}
 	
 	//otherwise just change control mode.
@@ -573,7 +584,7 @@ void set_control_mode(char axis, byte value)
 #if VERSION != 0x0351 //normal boards
 	if (CAN_LEN == 2) 
 	{ 
-				can_printf("CTRLMODE SET:%d",value);
+		can_printf("CTRLMODE SET:%d",value);
 		if (value>=0 && value <=0x50) _control_mode[axis] = value;
 		_desired_torque[axis]=0;
 		_desired[axis] = _position[axis];
