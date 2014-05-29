@@ -199,6 +199,79 @@ unsigned char WriteViaI2C(unsigned char Channel,unsigned char DeviceAddress, con
     return(AcknError);
 }
 
+
+
+//---------------------------------
+//WriteAD7147ViaI2C()
+//---------------------------------
+//Function that writes  via the I2C port pair of 16 bits data. It sends first the device
+//address including the write bit, then the register address and finally the
+//data. The function returns "1" if successfull otherwise "0".
+//--------------------------------------------------------------------------------
+unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer)
+{
+    unsigned int  DataToWrite;
+    unsigned char LowByteAddress, HighByteAddress;
+    unsigned char LowByteData, HighByteData;
+    unsigned char r, AcknError;
+    unsigned char DeviceAddressHeader;
+
+    AcknError=1; //No error on initialisation
+
+    //Add the write bit to the device address
+    DeviceAddressHeader = DeviceAddress<<1 | I2C_WR;
+    //Split the address in two bytes 
+    HighByteAddress = (RegisterStartAddress & 0xFF00) >>8;
+    LowByteAddress = RegisterStartAddress & 0x00FF;
+
+    //Start the I2C transfer
+    InitialiseI2CMaster(Channel);
+    StartI2CMaster_onSdaX(Channel, sdaNum);
+    //Send device address
+    if (!SendByteI2CMaster_onSdaX(Channel, sdaNum, DeviceAddressHeader))
+    {
+        //Send register address if the acknowledgement is there
+        if (!SendByteI2CMaster_onSdaX(Channel, sdaNum, HighByteAddress))
+        {
+            if (!SendByteI2CMaster_onSdaX(Channel, sdaNum, LowByteAddress))
+            {
+                //Perform block write
+                for (r=0;r<NumberOfRegistersToWrite;r++)
+                {
+                    DataToWrite = DataBuffer[OffsetInBuffer+r];
+                    LowByteData = DataToWrite & 0x00FF;
+                    HighByteData = (DataToWrite & 0xFF00)>>8;
+                    if (!SendByteI2CMaster_onSdaX(Channel, sdaNum, HighByteData))
+                    {
+                        SendByteI2CMaster_onSdaX(Channel, sdaNum, LowByteData);
+                    } else //No acknowledgement was found therefore send the stop condition
+                    {
+                        StopI2CMaster_onSdaX(Channel, sdaNum);
+                        AcknError=0;
+                    }
+                }
+                //Stop transfer
+                StopI2CMaster_onSdaX(Channel, sdaNum);
+            } else //No acknowledgement was found therefore send the stop condition
+            {
+                StopI2CMaster_onSdaX(Channel, sdaNum);
+                AcknError=0;
+            }
+        } else //No acknowledgement was found therefore send the stop condition
+        {
+            StopI2CMaster_onSdaX(Channel, sdaNum);
+            AcknError=0;
+        }
+    } else //No acknowledgement was found therefore send the stop condition
+    {
+        StopI2CMaster_onSdaX(Channel, sdaNum);
+        AcknError=0;
+    }
+    return(AcknError);
+}
+
+
+
 //---------------------------------
 //ReadByteViaI2C()
 //---------------------------------
@@ -580,6 +653,92 @@ void StartI2CMaster(unsigned char Channel)
 }
 
 
+
+void SetSdaReg(i2c_sda_num_t sdaNum, unsigned char input)
+{
+    switch(sdaNum)
+    {
+        case sda1:
+        {
+            DE1=input;
+        }break;
+        case sda2:
+        {
+            DE2=input;
+        }break;
+        case sda3:
+        {
+            DE3=input;
+        }break;
+        case sda4:
+        {
+            DE4=input;
+        }break;
+    };
+
+}
+
+
+void SetValReg(i2c_sda_num_t sdaNum, unsigned char val)
+{
+    switch(sdaNum)
+    {
+        case sda1:
+        {
+            DO1=val;
+        }break;
+        case sda2:
+        {
+            DO2=val;
+        }break;
+        case sda3:
+        {
+            DO3=val;
+        }break;
+        case sda4:
+        {
+            DO4=val;
+        }break;
+    };
+
+}
+
+void StartI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum)
+{
+	switch (Channel)
+	{
+	case CH0:
+	{	
+	    //DE_0input;
+        SetSdaReg(sdaNum, 1);
+        
+	    Wait(I2Cbit);
+	    MCO_0 = 1;    //SCL high
+	    Wait(I2Cbit);
+	  
+	 
+	    Wait(I2Cbit);
+	    //DE_0output    //SDA as output	
+        SetSdaReg(sdaNum, 0);
+
+	    //DO_0off
+        SetValReg(sdaNum, 0);
+	    Wait(I2Cbit);
+	    MCO_0 = 0;    //SCL low
+	    Wait(I2Cbit);	
+	}    
+	break;
+	case CH1:
+	{
+		;
+	}
+	break;
+	}
+  
+}
+
+
+
 //---------------------------------
 //StopI2CMaster();
 //---------------------------------
@@ -611,6 +770,35 @@ void StopI2CMaster(unsigned char Channel)
 	    Wait(I2Cbit);//Wait(I2Cbit);
 	    DO_1on   //SDA goes from low to high when SCL is already high,
 	    Wait(I2Cbit);//Wait(I2Cbit);
+	}	
+	break;
+	}
+}
+
+
+
+
+void StopI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum)
+{
+	switch (Channel)
+	{
+	case CH0:	
+    {
+	    //DE_0output  //SDA as output	
+        SetSdaReg(sdaNum, 0);        
+        
+	    //DO_0off  //SDA low
+        SetValReg(sdaNum, 0);
+	    Wait(I2Cbit);
+	    MCO_0 = 1;    //SCL high
+	    Wait(I2Cbit);//Wait(I2Cbit);
+	    //DE_0input  //SDA as output	
+        SetSdaReg(sdaNum, 1);
+	}
+	break;
+	case CH1:
+	{   
+	    ;
 	}	
 	break;
 	}
@@ -696,6 +884,85 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
     return(noack);
 }
 
+
+
+
+
+
+unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char ByteToSend)
+{
+
+    unsigned char i;
+    unsigned char noack=0;
+	
+	switch (Channel)
+	{
+	case CH0:
+	{
+	    //DE_0output  //SDAs as output
+        SetSdaReg(sdaNum, 0);
+        
+	    for (i=8; i>0; i--)
+	    {
+	        MCO_0 = 0;                //Reset SCL		
+	        /*@@@@@@@@@@@@
+	            DO = ByteToSend >> 7;	//Send data to SDA pin
+	        */
+	        if (ByteToSend >> 7)
+	        {
+	            //DO_0on;
+                SetValReg(sdaNum, 1);
+	        } 
+			else
+	        {
+	            //DO_0off;
+                SetValReg(sdaNum, 0);
+	        }
+	    	Wait(0);
+		
+	     //   Wait(I2Cbit);//Wait(I2Cbit);
+	        MCO_0 = 1;                //Set SCL
+	        Wait(I2Cbit);//Wait(I2Cbit);
+	        MCO_0 = 0;
+	        if (i==1)
+	        {
+		        //DE_0input;
+                SetSdaReg(sdaNum, 1);
+		    } 
+		    else
+		    {                //Reset SCL
+	        Wait(I2Cbit);//Wait(I2Cbit);
+	        ByteToSend<<=1;         //Rotate data
+	        }   
+	    }
+	    //DO_0off
+        SetValReg(sdaNum, 0);
+        
+	    //DE_0input                //SDA becomes an input
+        SetSdaReg(sdaNum, 1);
+        
+	    MCO_0 = 0;                //Reset SCL
+	
+	    Wait(I2Cbit);//Wait(I2Cbit);
+	    MCO_0 = 1;                //Set SCL
+
+		noack=0;  
+	
+	     Wait(I2Cbit);//Wait(I2Cbit);
+	    MCO_0 = 0;
+	    //DE_0output   //SDA becomes an output
+        SetSdaReg(sdaNum, 0);
+	   
+	}
+	break;
+	case CH1:
+	{
+        ;
+	}
+	break;
+	}
+    return(noack);
+}
 
 
 //---------------------------------

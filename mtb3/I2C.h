@@ -60,6 +60,18 @@
 #define I2CCLKPW		1             //This value define the CLK frequency
 #define REGISTER_LENGTH	16
 
+typedef enum
+{
+    sda1 = 0,
+    sda2 = 1,
+    sda3 = 2,
+    sda4 = 3,
+}i2c_sda_num_t;
+
+#define i2c_sda_num_max 4
+
+
+
 void I2C_Init(unsigned char Channel);
 void I2C_test(unsigned char Channel);
 //Local functions
@@ -67,6 +79,7 @@ void I2C_test(unsigned char Channel);
 //High level functions
 unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
 extern unsigned char WriteByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
+unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
 unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
 extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1, unsigned int *DataBuffer2, unsigned int *DataBuffer3, unsigned int *DataBuffer4, const unsigned int OffsetInBuffer);
 unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
@@ -77,4 +90,8 @@ void StopI2CMaster(unsigned char Channel);
 unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend);
 void ReceiveByteI2CMaster(unsigned char Channel,unsigned char ackn);  //modificated bit with unsigned char
 
-
+void SetValReg(i2c_sda_num_t sdaNum, unsigned char val);
+void SetSdaReg(i2c_sda_num_t sdaNum, unsigned char input);
+void StartI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum);
+void StopI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum);
+unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char ByteToSend);

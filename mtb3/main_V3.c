@@ -153,6 +153,8 @@ void Wait(unsigned int value);
 static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN);
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN);
+
+static void FillCanMessages8bit_test(unsigned char Channel,unsigned char triangleN);
 	
 void TrianglesInit(unsigned char Channel);
 void TrianglesInit_all(unsigned char Channel);
@@ -184,8 +186,11 @@ typedef struct error_cap
     unsigned int error;
 } error_cap;
 
-static struct error_cap err[12];
+static struct error_cap err[16];
 
+
+
+triangle_cfg_t triangle_cfg_list[16];
 
 volatile char flag;
 volatile char flag2;
@@ -258,6 +263,10 @@ int Tpad;      //current value of the Tpad
 int Tpad_palm_base; //initial value of the Tpad in the palm
 int Tpad_palm;      //current value of the Tpad in the palm
 int drift;      //current drift
+uint8_t can_transmission_enabled = 0;
+uint8_t transmission_was_enabled = 0;
+uint8_t new_configuration = 0; /*if mtb receives ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG or ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG 
+                                 then it uses class 4 to send periodic messages*/
 
 enum skin_type TYPE=new_skin; //SKIN_2; //if =0 means new skin with drift compensation and 10 pads
 unsigned int TRIANGLE_MASK=0xFFFF; //all the triangles are enabled for default
@@ -274,6 +283,12 @@ volatile  int AN3 = 0; //Analog Accelerometer Y axes
 volatile  int AN4 = 0; //Analog Accelerometer Z axes
 	tL3GI2COps l3g;
 	tLISI2COps l3a;
+    
+uint32_t period_timer=0; ///for debug  purpose
+ 
+
+
+
 
 //
 //------------------------------------------------------------------------------ 
@@ -284,7 +299,14 @@ extern void ConfigAD7147(unsigned char Channel, unsigned int i,unsigned int pw_c
 extern void ConfigAD7147_THREE(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
 extern void ConfigAD7147_FINGERTIP(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
 extern void ConfigAD7147_ALL(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue);
+extern void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned char indexInSet, unsigned int pw_control_val, uint16_t cdcoffset/*unsigned int * cdcOffset*/);
+//
+//------------------------------------------------------------------------------ 
+//								Static functions
+//------------------------------------------------------------------------------
 
+void SetCDCoffsetOnAllTriangles(uint16_t cdcOffset);
+void SetCDCoffsetOnSingleTriangle(uint16_t cdcOffset, unsigned char triangleN);
 //------------------------------------------------------------------------------
 // 								Interrrupt routines
 //------------------------------------------------------------------------------
@@ -338,7 +360,7 @@ int main(void)
     //									Variables   
     //------------------------------------------------------------------------
     char init;
-    unsigned char i,l;
+    unsigned char i,l,j;
     unsigned int counter;
     unsigned int led_counter=0;
    	int gx=0;
@@ -399,10 +421,12 @@ if (DIG_GYRO || DIG_ACC)
 	{
 		case CONFIG_SINGLE:
 		{
-			  for (i=0;i<4;i++)
-    			 {
-        	    	ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device	
-    		   	 }
+			  // for (i=0;i<4;i++)
+    			 // {
+        	    	// ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device	
+    		   	 // }
+                 
+                SetCDCoffsetOnAllTriangles(ConValue[0]);
   		       	flag=0;
     			init=0;
   			    WriteTimer1(0);
@@ -477,6 +501,16 @@ if (DIG_GYRO || DIG_ACC)
     l=0;
     i=0;
     counter=0; 
+    
+    
+    //init triangle_cfg_list
+    for(j=0;j<triangles_max_num; j++)
+    {
+        triangle_cfg_list[j].shift = SHIFT;
+        triangle_cfg_list[j].CDCoffset = ConValue[0];
+        triangle_cfg_list[j].setNum = j/4;
+        triangle_cfg_list[j].indexInSet =  j%4;
+    }
 //______________________________________  MAIN LOOP ____________________________________________
 //
 //
@@ -554,6 +588,7 @@ if (DIG_GYRO || DIG_ACC)
                         {
                             FillCanMessages8bit(CH0,i);
                         }
+                        //FillCanMessages8bit_test(CH0, i);
                     }
                 }
                 break;
@@ -585,9 +620,18 @@ if (DIG_GYRO || DIG_ACC)
                 {
                 case CONFIG_SINGLE:
                 {
-                    for (i=0;i<4;i++)
+/*                     for (i=0;i<4;i++)
                     {
                         ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device
+                    } */
+                    
+                    for(i=0; i<triangles_max_num;i++)
+                    {
+                        if(triangle_cfg_list[i].isToUpdate)
+                        {
+                            SetCDCoffsetOnSingleTriangle(triangle_cfg_list[i].CDCoffset, i);
+                            triangle_cfg_list[i].isToUpdate = 0;
+                        }
                     }
                     flag=0;
                     init=0;
@@ -600,6 +644,9 @@ if (DIG_GYRO || DIG_ACC)
                     WriteTimer1(0);
                     while (flag==0);
                     TrianglesInit(CH0);
+                    
+                    if(!transmission_was_enabled)
+                        can_enaDisa_transmission_messages(0);
                 }
                 break;
                 case CONFIG_THREE:
@@ -845,8 +892,10 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     unsigned int GAIN_PALM[12]={0,0,0,0,0,0,0,0,0,0,0,0}; //this gains are moltiplied by 128 with respect to matlab
     int UP_LIMIT, BOT_LIMIT;
 
-    UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
-    BOT_LIMIT=(NOLOAD)<<SHIFT;
+    // UP_LIMIT=((MAXVAL-NOLOAD)<<SHIFT);
+    // BOT_LIMIT=(NOLOAD)<<SHIFT;
+    UP_LIMIT=((MAXVAL-NOLOAD)<<triangle_cfg_list[triangleN].shift);
+    BOT_LIMIT=(NOLOAD)<<triangle_cfg_list[triangleN].shift;
 
     Tpad_base=_pCapOffset[triangleN][ADCRESULT_S6];
     Tpad=AD7147Registers[triangleN][ADCRESULT_S6];
@@ -914,7 +963,7 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
         }
         if ((value>-UP_LIMIT) && (value<BOT_LIMIT))
         {
-                txdata[i]=NOLOAD-(value>>SHIFT);
+                txdata[i]=NOLOAD-(value>>triangle_cfg_list[triangleN].shift);
         }
 //check if the sensor is far from the limits -> taxel could be broken;
         if ((value<=-(UP_LIMIT<<1)) || (value>=(BOT_LIMIT<<1)))
@@ -932,7 +981,15 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
         err[triangleN].error=error_notconnected;
     }
 
-    PMsgID=0x300;
+    if(new_configuration)
+    {
+        PMsgID = ICUBCANPROTO_CLASS_PERIODIC_SKIN << 8;
+    }
+    else
+    {
+        PMsgID=ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR << 8;
+    }
+    
     PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
     //First message
     data[0]=0x40;
@@ -951,13 +1008,69 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     data[7]=(unsigned char) ((err[triangleN].error_outofrange &0xf)<<4) | err[triangleN].error;
     CAN1_send(PMsgID,1,8,data);
 
-    if (err[triangleN].error!=error_ok) //do again the configuration since an error has occured
+    if ((err[triangleN].error!=error_ok) && (err[triangleN].error != error_notconnected))//do again the configuration since an error has occured
     {
         j=(triangleN/4);
         ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
         return;
     }
 }
+
+
+
+
+
+static void FillCanMessages8bit_test(unsigned char Channel,unsigned char triangleN)
+{
+    unsigned char data[8];
+    unsigned int i,j;
+    int value; //difference of the current measurement and the initial value (_pCapOffset)
+    unsigned int txdata[12];
+
+    PMsgID=0x300;
+    PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
+    
+    /*
+    shift;
+    uint8_t                    indexInSet; //triangle index in set
+    uint8_t                    setNum; //equal to sda num
+    uint8_t                    isToUpdate; //if =1 triangle needs to be recalibrated 
+    uint16_t                   CDCoffset;
+    */
+    
+    
+    //First message
+    data[0] = 0x40+ triangle_cfg_list[triangleN].isToUpdate;
+    data[1] = triangle_cfg_list[triangleN].setNum;
+    data[2] = triangle_cfg_list[triangleN].indexInSet;
+    data[3] = (triangle_cfg_list[triangleN].CDCoffset & 0x00ff );
+    data[4] = (triangle_cfg_list[triangleN].CDCoffset & 0xff00)>>8;
+    data[5] = triangle_cfg_list[triangleN].shift;
+    data[6] = TRIANGLE_MASK & 0x00ff;
+    data[7] = (TRIANGLE_MASK & 0xff00)>>8;
+    
+    CAN1_send(PMsgID,1,8,data);
+    //Second message
+    data[0]=0xC0;
+    data[1] = (period_timer & 0x000000ff);
+    data[2] = (period_timer &0x0000ff00) >> 8;
+    data[3] = (period_timer &0x00ff0000) >> 16;
+    data[4] = (period_timer &0xff000000) >> 24;
+    data[5] = TIMER_VALUE & 0x00ff;
+    data[6] = (TIMER_VALUE & 0xff00)>>8;
+    data[7] = 0;
+    CAN1_send(PMsgID,1,8,data);
+}
+
+
+
+
+
+
+
+
+
+
 void FillCanMessages8bit_all(unsigned char Channel,unsigned char triangleN)
 {
     unsigned char data[8];
@@ -1019,4 +1132,20 @@ void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN)
 	    CAN1_send(PMsgID,1,4,data); 
 }
 
+void SetCDCoffsetOnSingleTriangle(uint16_t cdcOffset, unsigned char triangleN)
+{
+    uint16_t cdcOffset_aux = cdcOffset; 
+    ConfigAD7147_onSdaX(CH0, triangle_cfg_list[triangleN].setNum, triangle_cfg_list[triangleN].indexInSet,  PW_CONTROL, cdcOffset/*&cdcOffset_aux*/);
+    
+    //ConfigAD7147(CH0,triangle_cfg_list[triangleN].indexInSet,PW_CONTROL, &cdcOffset_aux); 
+}
 
+void SetCDCoffsetOnAllTriangles(uint16_t cdcOffset)
+{
+    uint8_t i;
+    uint16_t cdcOffset_aux = cdcOffset; 
+    for (i=0;i<4;i++)
+    {
+        ConfigAD7147(CH0,i,PW_CONTROL, &cdcOffset_aux); //0 is the number of the device
+    }
+}

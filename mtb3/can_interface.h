@@ -1,6 +1,8 @@
 #include<p30f4011.h>
 #include<can.h>
 //#include"Pin Definitions.h"
+#include <iCubCanProtocol.h>
+#include <iCubCanProto_types.h>
 
 /* Frame formats */
 #define STANDARD_FORMAT            0
@@ -11,8 +13,6 @@
 #define REMOTE_FRAME               0
 
 #define CAN_TX_SOFTWARE_BUFFER_SIZE 20
-
-#define CURRENT_BOARD_TYPE       5   //SKIN
 
 // CAN RX message buffer
 #define CAN_RX_SOFTWARE_BUFFER_SIZE 5
@@ -32,6 +32,18 @@ typedef struct canmsg_tag
 	unsigned char 	CAN_length;						// len of the data 
 } canmsg_t;
 
+
+typedef struct 
+{
+    uint8_t                    shift;
+    uint8_t                    indexInSet; //triangle index in set
+    uint8_t                    setNum; //equal to sda num
+    uint8_t                    isToUpdate; //if =1 triangle needs to be recalibrated 
+    uint16_t                   CDCoffset;
+}triangle_cfg_t;
+
+#define triangles_max_num   16 
+
 void CAN_Init();
 unsigned char CAN1_send(unsigned int MessageID,unsigned char FrameType,unsigned char Length,unsigned char *Data);
 void CAN1_interruptTx (void);
@@ -41,130 +53,5 @@ void CAN1_RxbufferIndex_dec(); //canRxBufferIndex --
 int CAN1_handleRx    (unsigned int board_id);
 void can_receive_additional_info(); 
 void can_send_additional_info(); 
+void can_enaDisa_transmission_messages(uint8_t enable);
 
-/******************************************************/
-// can messages
-/******************************************************/
-
-//-----------------------------------------------------
-// this is 8 bits long, MSB is the channel (0 or 1). 
-
-#define CAN_NO_MESSAGE				0
-#define CAN_CONTROLLER_RUN		 	1
-#define CAN_CONTROLLER_IDLE			2
-#define CAN_TOGGLE_VERBOSE			3
-#define CAN_CALIBRATE_ENCODER		4
-#define CAN_ENABLE_PWM_PAD			5
-#define CAN_DISABLE_PWM_PAD			6
-#define CAN_GET_CONTROL_MODE		7
-#define CAN_MOTION_DONE				8
-
-#define CAN_WRITE_FLASH_MEM			10
-#define CAN_READ_FLASH_MEM			11
-#define CAN_GET_ADDITIONAL_INFO		12
-#define CAN_SET_ADDITIONAL_INFO		13
-
-#define CAN_GET_ENCODER_POSITION	20
-#define CAN_SET_DESIRED_POSITION	21
-#define CAN_GET_DESIRED_POSITION	22
-#define CAN_SET_DESIRED_VELOCITY	23
-#define CAN_GET_DESIRED_VELOCITY	24
-#define CAN_SET_DESIRED_ACCELER		25
-#define CAN_GET_DESIRED_ACCELER		26
-
-#define CAN_SET_ENCODER_POSITION	29
-#define CAN_GET_ENCODER_VELOCITY	61
-#define CAN_SET_COMMAND_POSITION	62
-
-#define CAN_POSITION_MOVE			27
-#define CAN_VELOCITY_MOVE			28
-
-#define CAN_SET_P_GAIN				30
-#define CAN_GET_P_GAIN				31
-#define CAN_SET_D_GAIN				32
-#define CAN_GET_D_GAIN				33
-#define CAN_SET_I_GAIN				34
-#define CAN_GET_I_GAIN				35
-#define CAN_SET_ILIM_GAIN			36
-#define CAN_GET_ILIM_GAIN			37
-#define CAN_SET_OFFSET				38
-#define CAN_GET_OFFSET				39
-#define CAN_SET_SCALE				40
-#define CAN_GET_SCALE				41
-#define CAN_SET_TLIM				42
-#define CAN_GET_TLIM				43
-
-#define CAN_SET_BOARD_ID			50
-#define CAN_GET_BOARD_ID			51
-
-#define CAN_GET_ERROR_STATUS		60
-
-#define CAN_GET_PID_OUTPUT			63
-#define CAN_GET_PID_ERROR			55
-
-#define CAN_SET_MIN_POSITION		64
-#define CAN_GET_MIN_POSITION		65
-#define CAN_SET_MAX_POSITION		66
-#define CAN_GET_MAX_POSITION		67
-#define CAN_SET_MAX_VELOCITY		68
-#define CAN_GET_MAX_VELOCITY		69
-
-// special messages for inter board communication/synchronization 
-//#define CAN_GET_ACTIVE_ENCODER_POSITION 70
-//#define CAN_SET_ACTIVE_ENCODER_POSITION 71
-
-#define CAN_SET_CURRENT_LIMIT		72
-#define CAN_SET_BCAST_POLICY		73
-
-#define CAN_SET_VEL_SHIFT			74
-
-#define CAN_SET_SMOOTH_PID          75
-
-//Tactile Sensor
-
-#define CAN_TACT_SETUP              76
-#define CAN_TACT_CALIB              77
-#define CAN_TACT_SETUP2             78
-#define CAN_ACC_GYRO_SETUP          79
-
-#define NUM_OF_MESSAGES				80
-
-// class 1 messages, broadcast 
-// when in bcast mode, messages are sent periodically by the controller
-
-#define CAN_BCAST_NONE				0
-#define CAN_BCAST_POSITION			1
-#define CAN_BCAST_PID_VAL			2
-#define CAN_BCAST_STATUS				3
-#define CAN_BCAST_CURRENT			4
-#define CAN_BCAST_OVERFLOW			5
-#define CAN_BCAST_PRINT				6
-#define CAN_BCAST_VELOCITY			7
-
-#define CAN_BCAST_MAX_MSGS			8
-
-
-//canLoader messages
-
-#define CMD_BROADCAST 0xFF
-#define CMD_BOARD     0x0
-
-#define CAN_MSG_CLASS_PERIODIC 0x0300
-// For messages of class 011 the meaning of data/ID is defined as follows:
-//  -------------------------- ----------------
-// |           11b            |        8B      |
-//  -------  -------  -------  -------  ------- 
-// | 3b     | 4b     | 4b     |      B[0-7]    |
-// |class	| Source | Type   |     Payload    |
-//  -------  -------  -------  -------  ------- 
-
-#define CAN_MSG_CLASS_POLLING 0x0200
-// For messages of class 010 the meaning of data/ID is defined as follows:
-//  -------------------------- -------------------------
-// |           11b            |           8B            |
-//  -------  -------  -------  -------  -------  ------- 
-// | 3b     | 4b     | 4b     | B[0]   |     B[1-7]     |
-// |class   | Source | Dest   | C type |    Payload     |
-//  -------  -------  -------  -------  -------  ------- 
-
-#define CAN_MSG_CLASS_LOADER   0x0700
