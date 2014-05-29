@@ -16,7 +16,6 @@
 //#define DEBUG_CALIBRATION			1		/* for calibration debugging through terminal */
 //#define DEBUG_CPL_BOARD	    	1		/* for coupled board debug */
 //#define EMERGENCY_DISABLED		1		/* emergency fault signal disabled */
-//#define SMOOTH_PID_CTRL			1		/* for debugging current spikes */
 //#define TEMPERATURE_SENSOR    	1
 //#define ENCODER_SHIFT_11BITS  	1
 //#define DEBUG_ABS_SENSOR_STATUS 	1
@@ -28,6 +27,6 @@
 #define BOARDSTATUSTIME 5000 //the time in ms between a BCAST_STATUS message and another
 #define USE_HALL_SENS   1
 #define USE_ABS_SSI     1
-//#define IDENTIF         1
+
 #endif
   

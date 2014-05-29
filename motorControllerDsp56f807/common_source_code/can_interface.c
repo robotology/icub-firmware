@@ -23,10 +23,6 @@
 #	error "No valid version specified"
 #endif
 
-#ifdef IDENTIF
-#	include "identification.h"
-#endif 
-
 #ifdef USE_NEW_DECOUPLING
 #	warning "Using new decoupling"
 #else
@@ -440,10 +436,7 @@ byte can_interface (void)
 				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT, CAN_SET_VEL_SHIFT_HANDLER)
 				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT, CAN_SET_VEL_TIMEOUT_HANDLER)
 				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY, CAN_STOP_TRAJECTORY_HANDLER)
-				
-#ifdef SMOOTH_PID_CTRL				
-				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__SET_SMOOTH_PID, CAN_SET_SMOOTH_PID_HANDLER)
-#endif				
+						
 				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID, CAN_SET_TORQUE_PID_HANDLER)
 				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, CAN_GET_TORQUE_PID_HANDLER)
 				HANDLE_MSG (ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS, CAN_SET_TORQUE_PIDLIMITS_HANDLER)
@@ -493,59 +486,6 @@ byte can_interface (void)
 	}
 			
 	return ERR_OK;
-}
-
-/*********************************************************** 
- * send broadcast messages FAST VERSION FOR IDENTIFICATION
- ***********************************************************/
-void can_send_broadcast_identification(byte j)
-{
-#ifdef IDENTIF
-	if (broadcast_mask[0] == 0) return;
-	if (j==0 && sine_ampl[0] == 0) return;
-	if (j==1 && sine_ampl[1] == 0) return;
-	
-		_canmsg.CAN_messID = 0x100;
-		_canmsg.CAN_messID |= (_board_ID) << 4;
-		_canmsg.CAN_messID |= 10; //special broadcast value
-		_canmsg.CAN_data[0] = BYTE_H((Int16)_position[j]); //WARNING: _position casted from 32 to 16 bit
-		_canmsg.CAN_data[1] = BYTE_L((Int16)_position[j]);
-		_canmsg.CAN_data[2] = BYTE_H(_speed[j]);
-		_canmsg.CAN_data[3] = BYTE_L(_speed[j]);
-		_canmsg.CAN_data[4] = BYTE_H(_pid[j]);
-		_canmsg.CAN_data[5] = BYTE_L(_pid[j]);
-		_canmsg.CAN_data[6] = BYTE_H(_strain_val[j]);
-		_canmsg.CAN_data[7] = BYTE_L(_strain_val[j]);			
-		_canmsg.CAN_length = 8;
-		_canmsg.CAN_frameType = DATA_FRAME;
-		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-
-		_canmsg.CAN_messID = 0x100;
-		_canmsg.CAN_messID |= (_board_ID) << 4;
-		_canmsg.CAN_messID |= 11; //special broadcast value
-		_canmsg.CAN_data[0] = BYTE_H((Int16)sine_freq[j]*10); 
-		_canmsg.CAN_data[1] = BYTE_L((Int16)sine_freq[j]*10); 
-		_canmsg.CAN_data[2] = BYTE_H((Int16)sine_ampl[j]); 
-		_canmsg.CAN_data[3] = BYTE_L((Int16)sine_ampl[j]); 
-		_canmsg.CAN_data[4] = 0;
-		_canmsg.CAN_data[5] = 0;
-		if (DutyCycle[j].Dir==0)
-		{
-		    _canmsg.CAN_data[4] = BYTE_H((Int16)DutyCycle[j].Duty);
-			_canmsg.CAN_data[5] = BYTE_L((Int16)DutyCycle[j].Duty);		
-	    }
-		else
-		{
-			_canmsg.CAN_data[4] = BYTE_H(-1*(Int16)DutyCycle[j].Duty);
-			_canmsg.CAN_data[5] = BYTE_L(-1*(Int16)DutyCycle[j].Duty);
-		}
-		_canmsg.CAN_data[6] = 0;
-		_canmsg.CAN_data[7] = 0;			
-		_canmsg.CAN_length = 8;
-		_canmsg.CAN_frameType = DATA_FRAME;
-		CAN1_send (_canmsg.CAN_messID, _canmsg.CAN_frameType, _canmsg.CAN_length, _canmsg.CAN_data);
-
-#endif 
 }
 
 /********************************************************************* 

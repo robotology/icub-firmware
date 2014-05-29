@@ -29,7 +29,6 @@
 //#define DEBUG_CURRENT			1		/* for debugging current through terminal */
 //#define DEBUG_CALIBRATION		1		/* for calibration debugging through terminal */
 //#define EMERGENCY_DISABLED	1		/* emergency fault signal disabled */
-//#define SMOOTH_PID_CTRL		1		/* for debugging current spikes */
 //#define DEBUG_ANA_INC         1       /* for debugging diff between analog and incremental*/
 
 

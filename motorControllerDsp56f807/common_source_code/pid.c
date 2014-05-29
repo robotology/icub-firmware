@@ -207,35 +207,6 @@ Int32  _delta_adj[JN] = INIT_ARRAY (0);			// velocity over the adjustment
 Int32  _adjustment[JN]=INIT_ARRAY (0);          // the sum of the three value coming from the MAIS board
 #endif
 
-
-#ifdef SMOOTH_PID_CTRL
-float _pid_old[JN] = INIT_ARRAY (0);			// pid control at previous time step 
-float _filt_pid[JN] = INIT_ARRAY (0);			// filtered pid control
-
-//variables for the smooth_pid
-Int16  ip[JN] = INIT_ARRAY (0);				// PID gains: proportional... 
-Int16  id[JN] = INIT_ARRAY (0);				// ... derivative  ...
-Int16  ii[JN] = INIT_ARRAY (0);
-byte   is[JN] = INIT_ARRAY (0);				// scale factor (negative power of two) 	
-Int16  fp[JN] = INIT_ARRAY (0);				// PID gains: proportional...
-Int16  fd[JN] = INIT_ARRAY (0);				// ... derivative  ...
-Int16  fi[JN] = INIT_ARRAY (0);
-byte   fs[JN] = INIT_ARRAY (0);				// scale factor (negative power of two) 	
-Int16 	dp[JN] = INIT_ARRAY (0);
-Int16 	dd[JN] = INIT_ARRAY (0);
-Int16 	di[JN] = INIT_ARRAY (0);
-Int16    n[JN] = INIT_ARRAY (0);
-Int16 time[JN] = INIT_ARRAY (0);
-Int16  step_duration[JN] = INIT_ARRAY (0);
-Int16   pp[4][8];
-Int16   pd[4][8];
-Int16   pi[4][8];
-byte    ss[4][8];
-bool  smoothing[JN]={false,false,false,false};
-Int16 smoothing_step[JN]=INIT_ARRAY(0);  
-Int16 smoothing_tip[JN]=INIT_ARRAY(0);
-#endif
-
 #if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 // max allowed position for encoder while controlling with absolute position sensors
 Int16 _max_position_enc[JN] = INIT_ARRAY (0);
@@ -278,34 +249,9 @@ Int32 compute_pwm(byte j)
 		_pd[j] = _pd[j] + _ko[j];
 		break;		
 	case MODE_TORQUE: 
-	#ifndef IDENTIF 
 		PWMoutput = compute_pid_torque(j, _strain[0][5]);
 		PWMoutput = PWMoutput + _ko_torque[j];
 		_pd[j] = _pd[j] + _ko_torque[j];
-	#endif
-	#ifdef IDENTIF 
-		compute_identif_wt(j);	 
-		if (_ki[0]==0) 
-			openloop_identif= true; 
-		else 
-			openloop_identif= false; 
-		if (openloop_identif==true)
-		{
-		 	//for open   loop transfer function
-			_desired_torque[j] = PWMoutput = (Int16)sine_ampl[j]*(sin(wt[j]));      
-		}
-		else
-		{
-			//for closed loop transfer function
-			_desired_torque[j]=(Int16)_ki[0]*(sin(wt[j]));
-			PWMoutput = compute_pid_torque(j, 5); 
-		//	PWMoutput -= (-_kr[0] * _speed[1])>>4;
-			PWMoutput = PWMoutput + _ko_torque[j];
-			_pd[j] = _pd[j] + _ko_torque[j];	
-		}	
-	#endif
-
-	
 		break; 
 		
 #elif VERSION == 0x0156
@@ -401,15 +347,7 @@ Int32 compute_pwm(byte j)
 		_pd[j] = _pd[j] + _ko[j];
 	break;
 	case MODE_OPENLOOP:
-		//PWMoutput = _ko[j];
 		PWMoutput = _ko_openloop[j];
-		#ifdef IDENTIF 
-		if (sine_ampl!=0)
-		{
-			compute_identif_wt(j);
-			PWMoutput = (Int16)sine_ampl[j]*(sin(wt[j]));  	 
-		}
-		#endif
 	break;	   
 
 #else //all other firmware versions
@@ -436,15 +374,7 @@ Int32 compute_pwm(byte j)
 		
 	break;
 	case MODE_OPENLOOP:
-		//PWMoutput = _ko[j];
 		PWMoutput = _ko_openloop[j];
-		#ifdef IDENTIF 
-		if (sine_ampl!=0)
-		{
-			compute_identif_wt(j);
-			PWMoutput = (Int16)sine_ampl[j]*(sin(wt[j]));  	 
-		}
-		#endif
 	break;
 	case MODE_TORQUE: 
 		PWMoutput = compute_pid_torque(j, _strain_val[j]);
@@ -494,18 +424,9 @@ Int32 compute_pwm(byte j)
 		
 	case MODE_IDLE:
 	case MODE_HW_FAULT:
-	#ifdef IDENTIF 
-		//parameters: j,  amp,  start_freq,  step_freq
-		reset_identif(j,_debug_in0[j],1,_debug_in1[j]);
-	#endif	
 		PWMoutput=0;
 	break; 
 	}
-	
-	
-#ifdef SMOOTH_PID_CTRL
-	PWMoutput = compute_filtpid(j, PWMoutput);
-#endif
 	
 	return PWMoutput;
 }
@@ -1008,39 +929,6 @@ Int32 compute_pid_abs(byte j)
 	return (PIDoutput >> 1);
 }
 
-/* 
- * this function filters the current (AD value).
- */
-#ifdef SMOOTH_PID_CTRL
- 
-Int32 compute_filtpid(byte jnt, Int32 PID)
-{
-	/*
-	The filter is the following:
-	_filt_current = a_1 * _filt_current_old 
-				  + a_2 * (_current_old + _current).
-	Parameters a_1 and a_2 are computed on the sample time
-	(Ts = 1 ms) and the rising time (ts = 200ms).Specifically
-	we have:
-	a_1 = (2*tau - Ts) / (2*tau + Ts)
-	a_2 = Ts / (2*tau + Ts)
-	where tau = ts/2.3. Therefore:
-	a_1 = 0.9773
-	a_2 = 0.0114
-	*/
-	float pid;
-	static float filt_pid_old[JN] = INIT_ARRAY(0); 
-	
-	pid = (float) PID;
-	filt_pid_old[jnt] = _filt_pid[jnt];
-	_filt_pid[jnt] = 0.9773 * filt_pid_old[jnt] + 0.0114 * (_pid_old[jnt] + pid);
-	_pid_old[jnt] = pid;
-	return (Int32) _filt_pid[jnt];
-	//return (Int32) pid;
-}
-
-#endif
-
 /*
  * a step in the trajectory generation for velocity control. 
  */
@@ -1214,100 +1102,6 @@ bool check_in_position(byte jnt)
 		return false;			
 	}			
 }
-
-/***************************************************************** 
-//this function reduces the PID values smoothly
-//The function divides the Time in steps and in each step it reduces the value of scalefactor and the pid.
-/****************************************************************/ 
-#ifdef SMOOTH_PID_CTRL
-void init_smooth_pid(byte jnt,Int16 finalp,Int16 finald,byte finals, Int16 Time)
-{	
-	Int16 * ppleft=0;
-	Int16 * pdleft=0;
-	Int16 * pileft=0;
-	byte  * ssleft=0;
-	Int16 * ppright=0;
-	Int16 * pdright=0;
-	Int16 * piright=0;
-	byte  * ssright=0;
-	Int16 t[JN]={0,0,0,0};
-	Int16 j=0;
-	Int16 yp;
-	Int16 finali=0;
-	ip[jnt]=_kp[jnt]<<8;	
-	id[jnt]=_kd[jnt]<<8;
-	ii[jnt]=_ki[jnt]<<8;
-	is[jnt]=_kr[jnt];
-	fp[jnt]=finalp<<8;	
-	fd[jnt]=finald<<8;
-	fi[jnt]=finali<<8;
-	fs[jnt]=finals;
-	time[jnt]=Time;
-	dp[jnt]=-(-fp[jnt]>>fs[jnt]+ip[jnt]>>is[jnt])/(Int32)time[jnt];// %rate di discesa del p
-	dd[jnt]=-(-fd[jnt]>>fs[jnt]+id[jnt]>>is[jnt])/(Int32)time[jnt];// %rate di discesa del p
-	di[jnt]=-(-fi[jnt]>>fs[jnt]+ii[jnt]>>is[jnt])/(Int32)time[jnt];// %rate di discesa del p
-	n[jnt]=(fs[jnt]-is[jnt]); // numero di step
-	step_duration[jnt]=(time[jnt]/ (Int32)(n[jnt]+1));//(time[jnt]/(n[jnt]+1));
-	 
-	for (j=0;j<n[jnt]<<1+2;j++)
-	{
-		pp[jnt][j]=0;
-		pd[jnt][j]=0;
-		pi[jnt][j]=0;	
-		ss[jnt][j]=0;
-		ppleft[j]=0;
-		pdleft[j]=0;
-		pileft[j]=0;	
-		ssleft[j]=0;			
-		ppright[j]=0;
-		pdright[j]=0;
-		piright[j]=0;
-		ssright[j]=0;		
-	}
-	
-	pp[jnt][0]=ip[jnt]>>8;
-	pd[jnt][0]=id[jnt]>>8;
-	pi[jnt][0]=ii[jnt]>>8;
-	pp[jnt][n[jnt]<<1+2]=fp[jnt]>>8;
-	pd[jnt][n[jnt]<<1+2]=fd[jnt]>>8;
-	pi[jnt][n[jnt]<<1+2]=fi[jnt]>>8;
-	for (j=0;j<n[jnt];j++)
-    {
-	    t[j]=step_duration[jnt]*(j+1);
-	    ssleft[j]=is[jnt]+(j);
-	    ssright[j]=ssleft[j]+1;
-	    yp=dp[jnt]*t[j]+ip[jnt]>>is[jnt];
-	    ppleft[j]=yp<<ssleft[j];
-	    ppright[j]=yp<<ssright[j];
-	    pp[jnt][(j*2)+1]=ppleft[j]>>8;
-	    pp[jnt][(j*2)+2]=ppright[j]>>8;
-	    ss[jnt][(j*2)+1]=ssleft[j];
-	    ss[jnt][(j*2)+1]=ssright[j];	
-    }	
-    smoothing_step[jnt]=n[jnt]+1;
-    smoothing[jnt]=true;
-}
-void smooth_pid(byte jnt)
-{
-	if (smoothing[jnt]==true && smoothing_step[jnt]<=n[jnt]+1)
-	{
-		if (_kp[jnt]<=pp[jnt][smoothing_step[jnt]*2+1])
-		{
-			_kp[jnt]--;
-		}
-		_kr[jnt]=ss[jnt][smoothing_step[jnt]*2];
-			}
-	if (smoothing_tip[jnt]<step_duration[jnt])
-	{
-		smoothing_tip[jnt]++;           	
-	} 
-	else
-	{
-		smoothing_tip[jnt]=0;	
-		smoothing_step[jnt]++;
-	}	
-}
-#endif
 
 /***************************************************************************/
 /**

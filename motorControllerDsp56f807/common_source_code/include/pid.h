@@ -255,13 +255,6 @@ extern Int32  _delta_adj[JN] ;		// velocity over the adjustment
 extern Int32  _adjustment[JN];         // the sum of the three value coming from the MAIS board
 #endif
 
-#ifdef SMOOTH_PID_CTRL
-extern float _pid_old[JN] ;				// pid control at previous time step 
-extern float _filt_pid[JN] ;			// filtered pid control
-#endif
-
-
-
 
 
 /******************************************************/

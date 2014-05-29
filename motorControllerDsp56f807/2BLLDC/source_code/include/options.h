@@ -13,7 +13,6 @@
 //#define DEBUG_CURRENT			1		/* for debugging current through terminal */
 #define DEBUG_CALIBRATION		1		/* for calibration debugging through terminal */
 //#define EMERGENCY_DISABLED	1		/* emergency fault signal disabled */
-//#define SMOOTH_PID_CTRL		1		/* for debugging current spikes */
 //#define   TEMPERATURE_SENSOR    1
 //#define ENCODER_SHIFT_11BITS  1
 //#define DEBUG_ABS_SENSOR_STATUS 1

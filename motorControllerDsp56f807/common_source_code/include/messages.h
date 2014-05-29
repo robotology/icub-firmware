@@ -1219,14 +1219,7 @@ else \
 			disable_can_print();\
 	} \
 }
-//-------------------------------------------------------------------
-#define CAN_SET_SMOOTH_PID_HANDLER(x) \
-{ \
-	if (CAN_LEN == 8) \
-	{ \
-		init_smooth_pid(axis,BYTE_W(CAN_DATA[1],CAN_DATA[2]),BYTE_W(CAN_DATA[3], CAN_DATA[4]),CAN_DATA[5],BYTE_W(CAN_DATA[6], CAN_DATA[7]));\
-	} \
-}
+
 //-------------------------------------------------------------------
 #define CAN_GET_FIRMWARE_VERSION_HANDLER(x) \
 { \

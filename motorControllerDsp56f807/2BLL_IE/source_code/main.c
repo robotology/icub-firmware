@@ -574,11 +574,6 @@ void main(void)
 
 		//send additional debug information
 		//can_send_broadcast_debug(1,1);
-
-#ifdef IDENTIF
-#warning "***** IDENTIFICATION MODE ON *****"
-		can_send_broadcast_identification(IDENTIF); //IDENTIF is the axis number 
-#endif
 	 
 /***********************************************************************
 // Check Current is made here
