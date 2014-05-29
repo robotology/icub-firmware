@@ -1267,7 +1267,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
     mstatus_ptr->basic.position = ((int32_t*)frame->data)[1];
      
 #ifdef USE_2FOC_FAST_ENCODER
-    eo_emsController_ReadSpeed(mId, SPEED_2FOC_TO_EMS(mstatus_ptr->basic.velocity), mstatus_ptr->basic.position);
+    eo_emsController_AcquireMotorEncoder(mId, mstatus_ptr->basic.current, mstatus_ptr->basic.velocity, mstatus_ptr->basic.position);
 #endif
 
     return(eores_OK);

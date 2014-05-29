@@ -172,7 +172,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.limitonoutput, 
                                     cfg->pidtorque.offset);
 
-    eo_emsController_SetEncSign((uint16_t)jxx, (int32_t)cfg->encoderconversionfactor);
+    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
 
     // 3) set velocity pid:    to be implemented
    

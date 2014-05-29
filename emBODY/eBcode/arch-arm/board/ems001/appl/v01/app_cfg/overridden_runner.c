@@ -449,7 +449,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         }        
     }
 
-    eo_emsController_ReadEncoders((int32_t*)encvalue);
+    eo_emsController_AcquireAbsEncoders((int32_t*)encvalue);
         
     /* 2) pid calc */
     eo_emsController_PWM(pwm);
@@ -470,14 +470,17 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
 {
     eOmc_joint_status_t             *jstatus_ptr;
+    eOmc_motor_status_t             *mstatus_ptr;
     eOmc_jointId_t                  jId;
     eOresult_t                      res;
     uint16_t                        numofjoint;
+    EOappTheDB                      *db = eo_appTheDB_GetHandle();
+    uint16_t                        numofmotors;
     
-    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(db);
     for(jId = 0; jId<numofjoint; jId++)
     {
-        res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId, &jstatus_ptr);
+        res = eo_appTheDB_GetJointStatusPtr(db, jId, &jstatus_ptr);
         if(eores_OK != res)
         {
             return; //error
@@ -505,6 +508,20 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
         }
         
         
+    }
+    
+    
+    
+    numofmotors =  eo_appTheDB_GetNumeberOfConnectedMotors(db);
+    for(jId = 0; jId<numofmotors; jId++)
+    {
+        res = eo_appTheDB_GetMotorStatusPtr(db, jId,  &mstatus_ptr);
+        if(eores_OK != res)
+        {
+            return; //error
+        }
+        
+        eo_emsController_GetMotorStatus(jId, mstatus_ptr);
     }
 }
 
