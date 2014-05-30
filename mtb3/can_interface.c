@@ -546,11 +546,11 @@ int CAN1_handleRx (unsigned int board_id)
 					
 					TRIANGLE_MASK= ((CANRxBuffer[canRxBufferIndex-1].CAN_data[6])<<8) | CANRxBuffer[canRxBufferIndex-1].CAN_data[5];
 
-                    new_board_MODE = board_MODE;
-					board_MODE = CALIB;
+                    //new_board_MODE = board_MODE;
+					//board_MODE = CALIB;
 					//EnableIntT1;
-                    transmission_was_enabled = can_transmission_enabled;
-                    can_enaDisa_transmission_messages(1);
+                    if(can_transmission_enabled)
+                        can_enaDisa_transmission_messages(1);
                                         
 				}
 				break;
