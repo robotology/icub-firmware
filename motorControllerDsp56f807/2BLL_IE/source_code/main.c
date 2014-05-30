@@ -404,7 +404,6 @@ void main(void)
 
 
 ///////////////////////////////////////////DEBUG////////////
-// ADDED VERSION !=0x0171
 #if (VERSION !=0x0254) && (VERSION !=0x0258)
 	    for (i=0; i<JN; i++) 
 		{		

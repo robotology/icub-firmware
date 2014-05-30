@@ -223,22 +223,7 @@ Int32 compute_pwm(byte j)
 	
 	switch (_control_mode[j]) 
 	{ 
-#if VERSION == 0x0170 || VERSION == 0x0171 || VERSION == 0x0172
-	case MODE_POSITION: 
-	case MODE_VELOCITY: 
-	case MODE_CALIB_ABS_POS_SENS:
-		compute_desired(j);
-		PWMoutput = compute_pid2(j);
-		PWMoutput = PWMoutput + _ko[j];
-		_pd[j] = _pd[j] + _ko[j];
-		break;		
-	case MODE_TORQUE: 
-		PWMoutput = compute_pid_torque(j, _strain[0][5]);
-		PWMoutput = PWMoutput + _ko_torque[j];
-		_pd[j] = _pd[j] + _ko_torque[j];
-		break; 
-	
-#elif VERSION == 0x0351 
+#if VERSION == 0x0351 
 	//iKart control
  	case MODE_POSITION: 
  		PWMoutput = 0;

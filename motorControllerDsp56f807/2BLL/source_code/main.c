@@ -85,12 +85,6 @@ Int16 _version = 0x0155;
 Int16 _version = 0x0157;
 #elif VERSION == 0x0158
 Int16 _version = 0x0158;
-#elif VERSION == 0x0170
-Int16 _version = 0x0170;
-#elif VERSION == 0x0171
-Int16 _version = 0x0171;
-#elif VERSION == 0x0172
-Int16 _version = 0x0172;
 #elif VERSION == 0x0351
 Int16 _version = 0x0351;
 #elif VERSION == 0x0140
@@ -257,7 +251,7 @@ void main(void)
     init_strain ();
 
     init_position_abs_ssi ();
-#if VERSION == 0x0153 || VERSION ==0x0157 || VERSION == 0x0172 || VERSION ==0x0351
+#if VERSION == 0x0153 || VERSION ==0x0157 || VERSION ==0x0351
     init_relative_position_abs_ssi();
 #endif 
  
@@ -352,14 +346,6 @@ void main(void)
 
 // READING CAN MESSAGES
 		can_interface();
-
-		
-		// Strain Gauges sampling by internal ADC
-#if	VERSION == 0x0171
-//		_strain[0][5] = (read_strain(1,1)*3.03/*2*1.515*/); // 1.515=5/3.3
-		_strain[0][5] = (read_strain(1,1)*3); // 1.515=5/3.3
-		_strain[0][5]-=0x7FFF;
-#endif
 	
 	    //Position calculation
 	    // This is used to have a shift of the zero-cross out of the 
@@ -376,14 +362,6 @@ void main(void)
 		_position_old[1]=_position[1];
 		if(get_error_abs_ssi(1)==ERR_OK) 
 			_position[1]=Filter_Bit (get_position_abs_ssi(1));
-#elif VERSION == 0x0172
-		_position_old[0]=_position[0];
-		if(get_error_abs_ssi(0)==ERR_OK) 
-			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));
-		
-		_position_old[1]=_position[1];
-		if(get_error_abs_ssi(1)==ERR_OK) 
-			_position[1]=Filter_Bit (get_relative_position_abs_ssi(1));
 #elif VERSION ==0x0155
 		_position_old[0]=_position[0];
 		_position[0]=Filter_Bit (get_position_abs_ssi(0));
@@ -417,8 +395,7 @@ void main(void)
 		for (i=0; i<JN; i++) _motor_position[i]=get_commutations(i);
 		
 ///////////////////////////////////////////DEBUG////////////
-// ADDED VERSION !=0x0171
-#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0171) && (VERSION !=0x0158)
+#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0158)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)

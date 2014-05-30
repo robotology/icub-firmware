@@ -161,21 +161,6 @@ void init_strain (void)
 		}
 	#endif
 
-	/*
-	// No more used. Now icubinterface starts the boards.			
-	#if VERSION == 0x0170 || VERSION == 0x0172
-		//start the can transmission. CAN must be already intialized.
-		start_strain(0x205);
-	#elif VERSION ==0x0157 || VERSION ==0x0150
-		//start the can transmission. CAN must be already intialized.
-		start_strain(0x20D);
-		start_strain(0x20C);	
-	#elif VERSION == 0x0171 
-		AD_init ();
-		AD_enableIntTriggerA ();
-		AD_enableIntTriggerB ();		
-	#endif
-	*/
 }
 
 /*************************************************************************** 
@@ -183,23 +168,5 @@ void init_strain (void)
  ***************************************************************************/
 word read_strain(byte jnt, bool sign)
 {
-	word temp;
-	Int32 temporary;	
-
-	#if VERSION == 0x0170 || VERSION == 0x0172
-		return _strain[0][jnt];
-	#else if VERSION == 0x0171 
-		switch (jnt)
-		{
-			case 0: AD_getChannel16A (2, &temp); break;
-			case 1: AD_getChannel16B (2, &temp); break;			
-		}
-
-		temporary = (Int32) temp;
-		if (!sign)	temporary = -temporary;
-		
-		return temporary;
-	#endif
-		
-	
+	return 0;
 }
