@@ -173,10 +173,14 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     static int hes_state_stored = 0;
     static int *ppwmH = NULL, *ppwmL = NULL, *ppwm0 = NULL;
-    static int *piH = NULL, *piL = NULL;
-    static int iHfilt = 0, iLfilt = 0;
+    static int *Isens = NULL;
+    //static int *piH = NULL, *piL = NULL;
+    //static int iHfilt = 0, iLfilt = 0;
+    //static int 
 
     int pwmH, pwmL;
+
+    int pwm_reg = 0; 
 
     // setting CORCON in this way rather than using CORCONbits is
     // slightly more efficient (because CORCONbits is volatile and
@@ -200,21 +204,33 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             switch (g_hes_state)
             {
             case 0b001: // Sector 1: (0,0,1)   60-120 degrees
+                if (P1OVDCON & 0x3F00) pwm_reg = 0x0F00;
+                Isens = &(ParkParm.qIa);
                 ppwmH = (int*) &PDC1; ppwmL = (int*) &PDC2; ppwm0 = (int*) &PDC3; break;
 
             case 0b011: // Sector 2: (0,1,1)  120-180 degrees
+                if (P1OVDCON & 0x3F00) pwm_reg = 0x3300;
+                Isens = &(ParkParm.qIa);
                 ppwmH = (int*) &PDC1; ppwm0 = (int*) &PDC2; ppwmL = (int*) &PDC3; break;
 
             case 0b010: // Sector 3: (0,1,0)  180-240 degrees
+                if (P1OVDCON & 0x3F00) pwm_reg = 0x3C00;
+                Isens = &(ParkParm.qIc);
                 ppwm0 = (int*) &PDC1; ppwmH = (int*) &PDC2; ppwmL = (int*) &PDC3; break;
 
             case 0b110: // Sector 4: (1,1,0)  240-300 degrees
+                if (P1OVDCON & 0x3F00) pwm_reg = 0x0F00;
+                Isens = &(ParkParm.qIa);
                 ppwmL = (int*) &PDC1; ppwmH = (int*) &PDC2; ppwm0 = (int*) &PDC3; break;
 
             case 0b100: // Sector 5: (1,0,0)  300-360 degrees
+                if (P1OVDCON & 0x3F00) pwm_reg = 0x3300;
+                Isens = &(ParkParm.qIc);
                 ppwmL = (int*) &PDC1; ppwm0 = (int*) &PDC2; ppwmH = (int*) &PDC3; break;
 
             case 0b101: // Sector 6: (1,0,1)    0- 60 degrees
+                if (P1OVDCON & 0x3F00) pwm_reg = 0x3C00;
+                Isens = &(ParkParm.qIc);
                 ppwm0 = (int*) &PDC1; ppwmL = (int*) &PDC2; ppwmH = (int*) &PDC3; break;
             }
         }
@@ -227,6 +243,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
         pwmL = pwmH;
     }
+    /*
     else if (SysStatus.TorqueControl) // start TORQUE CONTROL
     {
         static int KiErrIntH = 0, KiErrIntL = 0;
@@ -328,8 +345,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         else 
         if (pwmL < -PWM_MAX) pwmL = -PWM_MAX;
     }
+    */
     else // end TORQUE CONTROL
     {
+        if ((P1OVDCON & 0x3F00) && (P1OVDCON != 0x3F00)) pwm_reg = 0x3F00;
+ 
         pwmH = pwmL = 0;
     }
 
@@ -372,15 +392,18 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     *ppwm0 = PWM_CENTER;
     *ppwmL = PWM_CENTER - pwmL;
 
+    if (pwm_reg) P1OVDCON = pwm_reg;
+
     // perform I2T protection from ParkParm.qId,qIq
     //I2Tdata.IQMeasured = /*abs*/(ParkParm.qIq);
     //I2Tdata.IDMeasured = /*abs*/(ParkParm.qId);
 
-    I2Tdata.IQMeasured = I2Tdata.IDMeasured = ParkParm.qIa;
-    I2Tdata.IQMeasured += ParkParm.qIb;
-    I2Tdata.IQMeasured += ParkParm.qIb;
-    I2Tdata.IQMeasured *= 10;
-    I2Tdata.IQMeasured >>= 4;
+    I2Tdata.IQMeasured = I2Tdata.IDMeasured = *Isens;
+    
+    //I2Tdata.IQMeasured += ParkParm.qIb;
+    //I2Tdata.IQMeasured += ParkParm.qIb;
+    //I2Tdata.IQMeasured *= 10;
+    //I2Tdata.IQMeasured >>= 4;
 
     // Invoke the I2T integrator with new current values
     if (I2T(&I2Tdata))

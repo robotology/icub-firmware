@@ -100,13 +100,13 @@ MeasAndCompIaIcCalculateIb:
           mov.w     w4,_ParkParm+Park_qIc           ; ParkParm.qIc = qIc * qKc
 ; end of Ic related calculations
 
-          add.w     w5,w0,w0;                       ; w0 = qIa + qIb
-		  mov.w     w0,w5		                    ; w5 = qIa + qIb	
+;          add.w     w5,w0,w0;                       ; w0 = qIa + qIc
+;		  mov.w     w0,w5		                    ; w5 = qIa + qIc	
 
-          mov.w     _MeasCurrParm+ADC_qKb,w4        ; w4 = qKb
-          mpy       w4*w5,A                         ; Accum = qIb * qKb
-          sac.r     A,#0,w4                         ; w4 = qIb * qKb
-          mov.w     w4,_ParkParm+Park_qIb           ; ParkParm.qIb = qIb * qKb
+;          mov.w     _MeasCurrParm+ADC_qKb,w4        ; w4 = qKb
+;          mpy       w4*w5,A                         ; Accum = qIb * qKb
+;          sac.r     A,#0,w4                         ; w4 = qIb * qKb
+;          mov.w     w4,_ParkParm+Park_qIb           ; ParkParm.qIb = qIb * qKb
 
 ;restore DSP accumulator A from the stack
           pop.w w0

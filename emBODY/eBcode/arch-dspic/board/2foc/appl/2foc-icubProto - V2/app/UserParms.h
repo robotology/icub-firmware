@@ -368,7 +368,7 @@
 
   #ifdef QE_CE300_4_PARAMS
     // PPR (number of pulses in one phase) for ChipEncoder CE300-4 encoder
-    #define QE_PPR                   2000 //1970
+    #define QE_PPR                   2000 // 1970
     // CE300 do not need to swap A and B
     #define QE_SWAPAB                1
     // the index pulse occours every x pulses
@@ -822,7 +822,9 @@
 // For example AD reads about 12136 for 5A current,
 //#define I2T_NOMINAL_IMAX	12136 // for kollmorgen 5A nominal current (5.8 real nominal in datasheet)
 //#define I2T_NOMINAL_IMAX	0 // keep zero as "safe val"
-#define I2T_NOMINAL_IMAX         6550
+//#define I2T_NOMINAL_IMAX         6550
+//#define I2T_NOMINAL_IMAX         10000
+#define I2T_NOMINAL_IMAX         10000
 
 //
 // I2T parameters for FILTER implementation
@@ -830,7 +832,7 @@
 // This is the current threshold that will cause protection to fire
 // This value is in I AD units scaled to 16bit.
 // For example AD reads about 6553 for 5A current, 1310 for 1A
-#define I2T_CURRENT_THRESHOLD  1310 // keep zero as "safe val"
+#define I2T_CURRENT_THRESHOLD  2000 // keep zero as "safe val"
 
 // This is 2048*K where K is
 // K = 1-(e^(-tc/tau))
