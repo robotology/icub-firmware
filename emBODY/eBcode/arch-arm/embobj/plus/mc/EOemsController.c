@@ -411,9 +411,9 @@ extern void eo_emsController_CheckCalibrations(void)
         {
             ems->n_calibrated+=3;
         }
-        else if (eo_speedometer_IsOk(ems->enc_speedometer[0]) && 
-                 eo_speedometer_IsOk(ems->enc_speedometer[1]) &&
-                 eo_speedometer_IsOk(ems->enc_speedometer[2]))
+        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]) && 
+                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1]) &&
+                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2]))
         {
             ems->n_calibrated+=3;
             eo_axisController_SetCalibrated(ems->axis_controller[0]);
@@ -427,7 +427,7 @@ extern void eo_emsController_CheckCalibrations(void)
         {
             ems->n_calibrated++;
         }
-        else if (eo_speedometer_IsOk(ems->enc_speedometer[3]))
+        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[3]))
         {    
             ems->n_calibrated++;
             eo_axisController_SetCalibrated(ems->axis_controller[3]);

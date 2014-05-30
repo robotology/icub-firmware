@@ -214,6 +214,7 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
         }
         else
         {
+            /* to be tested
             if (stiff[0])
             {
                 pwm_motor[0] = pwm_motor[1] = (int16_t)( pwm_joint[0]/2);
@@ -247,6 +248,7 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
                 pwm_motor[1] += buff;
                 pwm_motor[2] += buff;
             }
+            to be tested */
             
             // stiff
             //pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
@@ -259,9 +261,9 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
             //pwm_motor[2] = (int16_t)(44*pwm_joint[2])/80);
             
             // original
-            //pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
-            //pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
-            //pwm_motor[2] = (int16_t)  pwm_joint[2];
+            pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
+            pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
+            pwm_motor[2] = (int16_t)  pwm_joint[2];
         }
     #elif defined(UPPERLEG_BOARD)
         if (o->motor_idle_mask & 0x01)

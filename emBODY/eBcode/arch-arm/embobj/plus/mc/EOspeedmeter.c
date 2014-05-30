@@ -114,6 +114,13 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void)
 
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder* o, int32_t sign)
 {
+    if (sign > 0) 
+        o->sign =  1; 
+    else if (sign < 0)
+        o->sign = -1; 
+    else 
+        o->sign =  0;
+		
     o->sign = (sign > 0) ? 1 : -1;
     RST_BITS(o->state_mask, SM_ENC_SIGN_NOT_SET);
 }
@@ -149,11 +156,13 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     
     if (!o->sign) return 0;
     
+    /*
     if (o->state_mask & SM_HARDWARE_FAULT)
     {
-        return o->distance;
+        return o->sign*o->distance;
     }
-    
+    */
+	
     if (position != ENC_INVALID)
     {
         position -= o->offset;
@@ -167,6 +176,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
             position -= TICKS_PER_REVOLUTION;
         }
     }
+    /*
     else
     {
         ++o->invalid_data_cnt;
@@ -176,12 +186,13 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
             SET_BITS(o->state_mask,SM_HARDWARE_FAULT);
         }
     }
+    */
     
     if (o->state_mask & SM_NOT_INITIALIZED)
     {
         encoder_init(o, position);
         
-        return 0;
+        return o->sign*o->distance;
     }
     
     if (position != ENC_INVALID)
@@ -210,7 +221,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         }
     }
     
-    return o->distance;
+    return o->sign*o->distance;
 }
 
 /*
