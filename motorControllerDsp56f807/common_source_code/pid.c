@@ -229,124 +229,148 @@ Int32 compute_pwm(byte j)
  		PWMoutput = 0;
  		_pd[j] = 0;
  	break;
+ 	
 	case MODE_VELOCITY: 
 		PWMoutput = compute_pid_speed(j);
 		PWMoutput = PWMoutput + _ko[j];
 		_pd[j] = _pd[j] + _ko[j];
 	break;
+	
 	case MODE_TORQUE: 
 		PWMoutput = compensate_bemf(j, _speed[j]);
 		_pd[j] = 0;
 	break;
-	case MODE_OPENLOOP:
-		//PWMoutput = _ko[j];
-		//_pd[j] = 0;
-		PWMoutput = _ko_openloop[j];
-	break;
 	
+    default:
+	    can_printf ("UNKNOWN CONTROLMODE PID");
+		_control_mode[j]=MODE_HW_FAULT;	
+		PWMoutput=0;
+	break;
+    	
 #elif VERSION == 0x0215 
    	case MODE_POSITION:
 	case MODE_VELOCITY:
+	case MODE_MIXED:
 	{
-        if (_sacc0[j] == 0)
+        if (_interaction_mode[i]==icubCanProto_interactionmode_stiff)
         {
-     		compute_desired(j);
-     		PWMoutput = compute_pid2(j);
-     		PWMoutput = PWMoutput + _ko[j];
-     		_pd[j] = _pd[j] + _ko[j];
+	        if (_sacc0[j] == 0)
+	        {
+	     		compute_desired(j);
+	     		PWMoutput = compute_pid2(j);
+	     		PWMoutput = PWMoutput + _ko[j];
+	     		_pd[j] = _pd[j] + _ko[j];
+	        }
+	        else
+	        {
+	       	    static bool up[4] =INIT_ARRAY (1);
+	       	    static byte time_div[4] = INIT_ARRAY (0);
+	       	    static Int16 accum[4] = INIT_ARRAY (0);
+	       		Int32 _des_saved = 0;
+	       
+	       	    time_div[j]++;
+	       	    if (time_div[j] > 4) time_div[j] =0;
+	       		
+	       		if (j==2)
+	       		{
+	       			if (up[j]) accum[j] += 2;
+	       			else       accum[j] -= 2;
+	       			if      (accum[j] >  200) up[j] = false; //280 = 1 deg
+	       			else if (accum[j] < -200) up[j] = true;				
+	       		}
+	       		if (j==1)
+	       		{
+	       			if (time_div[j]==0)
+	       			{
+	       				if (up[j]) accum[j] += 1;
+	       				else       accum[j] -= 1;	
+	       			}
+	       			if      (accum[j] >  5) up[j] = false; //11 = 1 deg
+	       			else if (accum[j] < -5) up[j] = true;				
+	       		}
+	       		
+	       		compute_desired(j);
+	       		//microsaccades
+	       		_des_saved=_desired[j];	
+	       		//randomNext();
+	       		
+	       		if (j==1 || j == 2) {_desired[j] = _desired[j]+accum[j];}
+	            //can_printf("%d %f %f %f %f", j, _desired[0], _desired[1], _desired[2], _desired[3]); //jnt == 2 corrisponde al giunto 4
+	       		
+	       		PWMoutput = compute_pid2(j);
+	       		PWMoutput = PWMoutput + _ko[j];
+	       		_pd[j] = _pd[j] + _ko[j];
+	       		_desired[j]=_des_saved;       	
+            }
+        }
+        else if (_interaction_mode[i]==icubCanProto_interactionmode_compliant)
+        {
+ 		 	can_printf ("UNSUPPORTED INTERACTION PID");
+		 	_control_mode[j]=MODE_HW_FAULT;	
+		 	PWMoutput=0;       	
         }
         else
         {
-       	    static bool up[4] =INIT_ARRAY (1);
-       	    static byte time_div[4] = INIT_ARRAY (0);
-       	    static Int16 accum[4] = INIT_ARRAY (0);
-       		Int32 _des_saved = 0;
-       
-       	    time_div[j]++;
-       	    if (time_div[j] > 4) time_div[j] =0;
-       		
-       		if (j==2)
-       		{
-       			if (up[j]) accum[j] += 2;
-       			else       accum[j] -= 2;
-       			if      (accum[j] >  200) up[j] = false; //280 = 1 deg
-       			else if (accum[j] < -200) up[j] = true;				
-       		}
-       		if (j==1)
-       		{
-       			if (time_div[j]==0)
-       			{
-       				if (up[j]) accum[j] += 1;
-       				else       accum[j] -= 1;	
-       			}
-       			if      (accum[j] >  5) up[j] = false; //11 = 1 deg
-       			else if (accum[j] < -5) up[j] = true;				
-       		}
-       		
-       		compute_desired(j);
-       		//microsaccades
-       		_des_saved=_desired[j];	
-       		//randomNext();
-       		
-       		if (j==1 || j == 2) {_desired[j] = _desired[j]+accum[j];}
-            //can_printf("%d %f %f %f %f", j, _desired[0], _desired[1], _desired[2], _desired[3]); //jnt == 2 corrisponde al giunto 4
-       		
-       		PWMoutput = compute_pid2(j);
-       		PWMoutput = PWMoutput + _ko[j];
-       		_pd[j] = _pd[j] + _ko[j];
-       		_desired[j]=_des_saved;
+ 		 	can_printf ("UNKNOWN INTERACTION PID");
+		 	_control_mode[j]=MODE_HW_FAULT;	
+		 	PWMoutput=0;       	
         }
 	}
-	break;
-	case MODE_CALIB_ABS_POS_SENS:
-	case MODE_CALIB_ABS_AND_INCREMENTAL:
-		compute_desired(j);
-		PWMoutput = compute_pid2(j);
-		PWMoutput = PWMoutput + _ko[j];
-		_pd[j] = _pd[j] + _ko[j];
-	break;
-	case MODE_OPENLOOP:
-		PWMoutput = _ko_openloop[j];
-	break;	   
+	break;  
 
-#else //all other firmware versions
+#else //all other firmware versions	
 	case MODE_POSITION:
 	case MODE_VELOCITY:
-	case MODE_CALIB_ABS_POS_SENS:
-	case MODE_CALIB_ABS_AND_INCREMENTAL:
-		compute_desired(j);
+	case MODE_MIXED:
+		 if (_interaction_mode[i]==icubCanProto_interactionmode_stiff)
+		 {
+			compute_desired(j);
+			PWMoutput = compute_pid2(j);
+			PWMoutput = PWMoutput + _ko[j];
+			_pd[j] = _pd[j] + _ko[j];		 	
+			
+			#if (CURRENT_BOARD_TYPE == BOARD_TYPE_4DC) 
+				PWMoutput = PWMoutput + _kstc[j];
+				_pd[j] = _pd[j] + _kstc[j];//stiction compensation for 4dc motros
+				if (_ended[j])
+				{
+					if (_kstc[j]> 0 ) _kstc[j]--;
+					if (_kstc[j]< 0 ) _kstc[j]++;
+				}
+			#endif
+		 }
+		 else if (_interaction_mode[i]==icubCanProto_interactionmode_compliant)
+		 {
+			compute_desired(j);
+			compute_pid_impedance(j);
+			PWMoutput = compute_pid_torque(j, _strain_val[j]);
+			PWMoutput = PWMoutput + _ko_torque[j];
+			_pd[j] = _pd[j] + _ko_torque[j];		 	
+		 }
+		 else
+		 {
+		 	can_printf ("UNKOWN INTERACTION PID");
+		 	_control_mode[j]=MODE_HW_FAULT;	
+		 	PWMoutput=0;
+		 }
+	break;
+
+	case MODE_TORQUE: 
+		PWMoutput = compute_pid_torque(j, _strain_val[j]);		
+		// additional speed damping. It uses the same shift factor for bemf compensation
+		speed_damping = ((Int32) (-_speed[j]) * ((Int32) _debug_in7[j]));
+		speed_damping >>= (_backemf_shift[j]+_jntVel_est_shift[j]);		
+		PWMoutput = PWMoutput + _ko_torque[j] + speed_damping;
+		_pd[j] = _pd[j] + _ko_torque[j] + speed_damping;
+	break;
+#endif
+
+	case MODE_DIRECT:
 		PWMoutput = compute_pid2(j);
 		PWMoutput = PWMoutput + _ko[j];
 		_pd[j] = _pd[j] + _ko[j];
-		
-		#if (CURRENT_BOARD_TYPE == BOARD_TYPE_4DC) 
-		//stiction compensation for 4dc motros
-			PWMoutput = PWMoutput + _kstc[j];
-			_pd[j] = _pd[j] + _kstc[j];
-			if (_ended[j])
-			{
-				if (_kstc[j]> 0 ) _kstc[j]--;
-				if (_kstc[j]< 0 ) _kstc[j]++;
-			}
-		#endif
-		
-		
 	break;
-	case MODE_OPENLOOP:
-		PWMoutput = _ko_openloop[j];
-	break;
-	case MODE_TORQUE: 
-		PWMoutput = compute_pid_torque(j, _strain_val[j]);
-		
-		// additional speed damping. It uses the same shift factor for bemf compensation
-		speed_damping = ((Int32) (-_speed[j]) * ((Int32) _debug_in7[j]));
-		speed_damping >>= (_backemf_shift[j]+_jntVel_est_shift[j]);
-		
-		PWMoutput = PWMoutput + _ko_torque[j] + speed_damping;
-		_pd[j] = _pd[j] + _ko_torque[j] + speed_damping;
-
 	
-	break;
 	case MODE_IMPEDANCE_POS:
 	case MODE_IMPEDANCE_VEL: 
 		compute_desired(j);
@@ -355,36 +379,47 @@ Int32 compute_pwm(byte j)
 		PWMoutput = PWMoutput + _ko_torque[j];
 		_pd[j] = _pd[j] + _ko_torque[j];
 	break;
-#endif
-
-#if (CURRENT_BOARD_TYPE == BOARD_TYPE_4DC) 
+	
+	case MODE_OPENLOOP:
+		PWMoutput = _ko_openloop[j];
+	break;
+	
+	case MODE_CALIB_ABS_POS_SENS:
+	case MODE_CALIB_ABS_AND_INCREMENTAL:
+		compute_desired(j);
+		PWMoutput = compute_pid2(j);
+		PWMoutput = PWMoutput + _ko[j];
+		_pd[j] = _pd[j] + _ko[j];
+	break;
+	
 	case MODE_CALIB_HARD_STOPS:
+        #if (CURRENT_BOARD_TYPE == BOARD_TYPE_4DC) 
 		_desired[j]+=_velocity_calibration[j];
 		PWMoutput = compute_pid2(j);
 		if 	(PWMoutput > _pwm_calibration[j])
 			PWMoutput = _pwm_calibration[j];
 		if 	(PWMoutput < -_pwm_calibration[j])	
 			PWMoutput = -_pwm_calibration[j];
-	break;
-#else
-	case MODE_CALIB_HARD_STOPS:
+		#else
 		PWMoutput = _pwm_calibration[j];
 		_counter_calib +=1;
+		#endif
 	break;
-#endif
 
 	case MODE_HANDLE_HARD_STOPS:
-	#ifdef DEBUG_CAN_MSG
+     	#ifdef DEBUG_CAN_MSG
 		can_printf("MODE HANDLE HARD STOP");
-	#endif
+	     #endif
 	    PWM_outputPadDisable(j);
 		_control_mode[j] = MODE_IDLE;
+		PWMoutput=0;
 		break;
 		
 	case MODE_IDLE:
 	case MODE_HW_FAULT:
 		PWMoutput=0;
-	break; 
+	break;
+	 
 	}
 	
 	return PWMoutput;
