@@ -20,7 +20,7 @@ void decouple_positions(void)
 
 #define a_coeff 1.6455F
 #define b_coeff 1.6455F
-#define t_coeff 0,6077F
+#define t_coeff 0.6077F
 
 #ifndef USE_NEW_DECOUPLING
 /***************************************************************************/
@@ -131,7 +131,7 @@ void decouple_dutycycle_new_motor(Int32 *pwm)
 	pwm[0] = (pwm[0] - pwm[1])>>1;
 	pwm[1] = (temp32         + pwm[1])>>1;	
 				
-	if (mode_is_idle(0) ||mode_is_idle(1))
+	if (mode_is_idle(0) || mode_is_idle(1))
 	{
 		pwm[0] = 0;
 		pwm[1] = 0;

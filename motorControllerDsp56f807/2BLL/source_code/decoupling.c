@@ -93,17 +93,6 @@ void decouple_positions(void)
 		count++;				
 		#endif			
 	}
-/*
-#elif VERSION == 0x0152
-		
-	//  Waist Differential coupling 
-	//	|Me1| |  1     1 |  |Je1|
-	//	|Me2|=|  1    -1 |* |Je2|    
-
-//_position[0] =_position[0] -  _position[1];
-//_position[1] =_position[0] +2*_position[1];
-*/
-
 #endif
 }
 
