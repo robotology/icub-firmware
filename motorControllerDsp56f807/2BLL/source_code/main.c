@@ -80,8 +80,6 @@ Int16 _version = 0x0152;
 Int16 _version = 0x0153;
 #elif VERSION == 0x0154
 Int16 _version = 0x0154;
-#elif VERSION == 0x0155
-Int16 _version = 0x0155;
 #elif VERSION == 0x0157
 Int16 _version = 0x0157;
 #elif VERSION == 0x0351
@@ -238,13 +236,7 @@ void main(void)
 	__DI();
    
 	init_leds  			  ();
-#if VERSION != 0x0155	
 	Init_Brushless_Comm	  (JN);
-#else 
-    Init_Brushless_Comm	  (1); //only one axis
-#endif				
-
-
 	serial_interface_init (JN);
 	can_interface_init    (JN);
     init_strain ();
@@ -254,12 +246,7 @@ void main(void)
     init_relative_position_abs_ssi();
 #endif 
  
-    init_faults           (true,true,true);	 
-    
-#if VERSION ==0x0155  
-    init_position_encoder ();
-#endif
-
+    init_faults           (true,true,true);	     
     init_temp_sens        ();
 	TI1_init 			  ();
 
@@ -282,22 +269,12 @@ void main(void)
 	
 	/* reset trajectory generation */
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
-	
-	
-#if VERSION !=0x0155
+		
 	///////////////////////////////////////
 	// reset of the ABS_SSI
 	// this is needed because the AS5045 gives the first value wrong !!!
     for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
     for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
-#else 
-   	_position[0]=(Int32) Filter_Bit(get_position_abs_ssi(0));
-    _max_real_position[0]=Filter_Bit(4095);
-	
-#endif//	AS1_printStringEx ("\r\n");
-	
-	
-	
  	
 	//////////////////////////////////////
 	
@@ -364,11 +341,6 @@ void main(void)
 		_position_old[1]=_position[1];
 		if(get_error_abs_ssi(1)==ERR_OK) 
 			_position[1]=Filter_Bit (get_position_abs_ssi(1));
-#elif VERSION ==0x0155
-		_position_old[0]=_position[0];
-		_position[0]=Filter_Bit (get_position_abs_ssi(0));
-		_position_old[1]=_position[1]; 
-		_position[1]=get_position_encoder(1);
 #elif VERSION == 0x0351
 		_position_old[0]=_position[0];
 		if(get_error_abs_ssi(0)==ERR_OK) 
@@ -392,7 +364,7 @@ void main(void)
 		for (i=0; i<JN; i++) _motor_position[i]=get_commutations(i);
 		
 ///////////////////////////////////////////DEBUG////////////
-#if (VERSION !=0x0154) && (VERSION !=0x0155) 
+#if (VERSION !=0x0154)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -407,7 +379,7 @@ void main(void)
 		}  
 #endif
 	
-#if (VERSION ==0x0154) || (VERSION ==0x0155) 
+#if (VERSION ==0x0154) 
 
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
@@ -458,7 +430,7 @@ void main(void)
 		}
 					
 		/* in position? */
-#if (VERSION != 0x0154) && (VERSION != 0x0155)
+#if (VERSION != 0x0154)
 		for (i=0; i<JN; i++) _in_position[i] = check_in_position(i); 
 #else
 		_in_position[0] = check_in_position(0);

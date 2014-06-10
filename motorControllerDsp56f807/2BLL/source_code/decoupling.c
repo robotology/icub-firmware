@@ -93,10 +93,6 @@ void decouple_positions(void)
 		count++;				
 		#endif			
 	}
-#elif VERSION == 0x0155
-//		_position[0] = _position[0] - _position[1];
-//		_position[1] = _position[0] + 2*_position[1];	
-		
 /*
 #elif VERSION == 0x0152
 		

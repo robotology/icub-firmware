@@ -4,7 +4,6 @@
 //#define VERSION 0x0111   				/* standard/basic implementation */
 //#define VERSION 0x0112				/* decouples shoulder first two joints */
 //#define VERSION 0x0113			   	/* decouples the third joint of the shoulder */
-//#define VERSION 0x0114		    	/* feedback from the AD */
 //#define VERSION 0x0115		    	/* coordinated control of the eyes */
 //#define VERSION 0x0117		    	/* Analog Encoder in M3 (POT4) */
 //#define VERSION 0x0118		    	/* Analog Encoder in M0 (POT?) */

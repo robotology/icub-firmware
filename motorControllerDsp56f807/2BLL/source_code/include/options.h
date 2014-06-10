@@ -6,7 +6,6 @@
 //#define VERSION 0x0152				/* waist deifferential decoupling */
 //#define VERSION 0x0153			   	/* decouples the third joint of the shoulder */
 //#define VERSION 0x0154		    	/* only one joint */
-//#define VERSION 0x0155                /* it reads absolute and incremental encoder for one motot */
 //#define VERSION 0x0157		    	/* position and pwm decoupling of the third joint of the shoulder */
 //#define VERSION 0x0140   				/* similar to 0x150, but no joint decoupling  */
 //#define VERSION 0x0147   				/* similar to 0x157, but no joint decoupling  */

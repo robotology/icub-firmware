@@ -221,20 +221,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		#endif
 	}
 /********
- *0x0114*
- ********/
-#elif VERSION ==0x0114
-	#ifdef DEBUG_CALIBRATION
-	if (type==CALIB_ABS_POS_SENS)
-	{
- 		AS1_printStringEx ("Calibration ABS_POS aborted \r\n");
-	}
-	if (type==CALIB_HARD_STOPS)
-	{
- 		AS1_printStringEx ("Calibration HARD_STOPS aborted \r\n");
-	}
-	#endif		
-/********
  *0x0115*
  ********/
 #elif VERSION ==0x0115

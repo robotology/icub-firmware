@@ -16,13 +16,8 @@
 #endif
 extern byte	_board_ID;	
 
-#if VERSION == 0x0114 || VERSION == 0x0164
-/* analog feedback */
-#define INPOSITION_THRESHOLD 150
-#else
-/* digital encoder feedback */
+
 #define INPOSITION_THRESHOLD 			60
-#endif
 #define INPOSITION_CALIB_THRESHOLD 		 1
 bool _in_position[JN] = INIT_ARRAY (true);
 

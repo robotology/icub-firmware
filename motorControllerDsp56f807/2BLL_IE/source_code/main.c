@@ -77,8 +77,6 @@ Int16 _version = 0x0251;
 Int16 _version = 0x0252;
 #elif VERSION == 0x0254
 Int16 _version = 0x0254;
-#elif VERSION == 0x0255
-Int16 _version = 0x0255;
 #elif VERSION == 0x0257
 Int16 _version = 0x0257;
 #endif
@@ -362,14 +360,7 @@ void main(void)
 			_position[0]=Filter_Bit (get_position_abs_ssi(0));
     	_position_old[1]=_position[1];
 		if(get_error_abs_ssi(1)==ERR_OK) 
-			_position[1]=Filter_Bit (get_position_abs_ssi(1));
-
-		 
-#elif VERSION ==0x0255
-		_position_old[0]=_position[0];
-		_position[0]=Filter_Bit (get_position_abs_ssi(0));
-		_position_old[1]=_position[1]; 
-		_position[1]=Filter_Bit (get_position_abs_ssi(1));
+			_position[1]=Filter_Bit (get_position_abs_ssi(1));		 
 #else
 	 	for (i=0; i<JN; i++) 
 		{
@@ -401,8 +392,7 @@ void main(void)
 		}  
 #endif
 	
-#warning "here we should put a control for 0x255"	
-#if (VERSION ==0x0254) || (VERSION ==0x0255)
+#if (VERSION ==0x0254)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 					_control_mode[0] = MODE_HW_FAULT;	

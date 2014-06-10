@@ -81,8 +81,6 @@ Int16 _version = 0x0111;
 Int16 _version = 0x0112;
 #elif VERSION == 0x0113
 Int16 _version = 0x0113;
-#elif VERSION == 0x0114
-Int16 _version = 0x0114;
 #elif VERSION == 0x0115
 Int16 _version = 0x0115;
 #elif VERSION == 0x0117
@@ -377,12 +375,7 @@ void main(void)
 // 								 update positions, 32 bit values 
 //******************************************************************************************/ 		
 		
-#if VERSION == 0x0114		
-		_position_old[0] = get_position_abs_analog(0)-HALL_EFFECT_SENS_ZERO;
-		_position_old[1] = get_position_abs_analog(1)-HALL_EFFECT_SENS_ZERO;
-#else
 		for (i=0; i<JN; i++) _position[i] = get_position_encoder(i);
-#endif
 		
 		/* read absolute position sensors*/
 #if VERSION == 0x0112

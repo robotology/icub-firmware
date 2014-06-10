@@ -38,14 +38,7 @@ inline Int32 compensate_bemf(byte j, Int16 motor_speed);
 // stable global data 
 /******************************************************/
 
-
-#if VERSION == 0x0164 || VERSION == 0x0114
-// analog feedback 
-#define INPOSITION_THRESHOLD 150
-#else
-// digital encoder feedback 
 #define INPOSITION_THRESHOLD 			60
-#endif
 #define INPOSITION_CALIB_THRESHOLD 		 1
 extern bool _in_position[JN] ;
 
