@@ -974,7 +974,7 @@ void compute_desired(byte i)
 			break;
 							
 							
-							
+		case MODE_MIXED:							
 		case MODE_VELOCITY:
 		case MODE_IMPEDANCE_VEL:
 			_desired[i] += step_trajectory_delta (i);
