@@ -57,6 +57,7 @@ bool    _can_protocol_ack = false;
 //**********************
 extern sDutyControlBL DutyCycle[2];
 extern sDutyControlBL DutyCycleReq[2];
+extern bool           _pad_enabled[2];
 
 //********************
 // Local prototypes 
@@ -80,8 +81,6 @@ Int16 _version = 0x0254;
 Int16 _version = 0x0255;
 #elif VERSION == 0x0257
 Int16 _version = 0x0257;
-#elif VERSION == 0x0258
-Int16 _version = 0x0258;
 #endif
 
 #ifndef VERSION 
@@ -123,11 +122,7 @@ void main(void)
 	byte first_step=0;
 
 #if (VERSION == 0x0351)
-
 	#define winSizeMax 32
-	#define initialWindowSize 4
-#elif (VERSION == 0x0258)
-	#define winSizeMax 4
 	#define initialWindowSize 4
 #else
 	#define winSizeMax 32
@@ -174,7 +169,7 @@ void main(void)
 
 	// enable FAULT
 	__ENIGROUP (61, 3); 
-	#if (VERSION == 0x0254 || VERSION == 0x0258)
+	#if (VERSION == 0x0254)
 	#else
 	__ENIGROUP (60, 3);
 	#endif	
@@ -200,7 +195,7 @@ void main(void)
 	//enable PWM reload 
 	__ENIGROUP (59, 7); // PMWA
 	
-	#if (VERSION == 0x0254 || VERSION == 0x0258)
+	#if (VERSION == 0x0254)
 	#else	
 	__ENIGROUP (58, 7); // PWMB
 	#endif
@@ -248,7 +243,7 @@ void main(void)
 
 	init_leds  			  ();
 	
-	#if (VERSION == 0x0254 || VERSION == 0x0258)
+	#if (VERSION == 0x0254)
 	
 	Init_Brushless_Comm	  (1,HALL); 
   	
@@ -297,18 +292,11 @@ void main(void)
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
 	
-#if VERSION !=0x0258
 	///////////////////////////////////////
 	// reset of the ABS_SSI
 	// this is needed because the AS5045 gives the first value wrong !!!
     for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
     for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
-#else 
-	_position[0]=0;	
-   	_position[1]=(Int32) Filter_Bit(get_position_abs_ssi(1));
-    _max_real_position[1]=Filter_Bit(4095);
-
-#endif
  	
 	//////////////////////////////////////
 	
@@ -357,7 +345,8 @@ void main(void)
 // READING CAN MESSAGES
 		can_interface();
 
-		
+		for (i=0; i<JN; i++)
+		if (_pad_enabled[i]==false && _control_mode[i]!=MODE_HW_FAULT) _control_mode[i]=MODE_IDLE;		
 	
 	
 	    //Position calculation
@@ -381,12 +370,6 @@ void main(void)
 		_position[0]=Filter_Bit (get_position_abs_ssi(0));
 		_position_old[1]=_position[1]; 
 		_position[1]=Filter_Bit (get_position_abs_ssi(1));
-#elif VERSION ==0x0258
-		_position_old[0]=_position[0];
-		_position[0]=get_position_encoder(0);//get_position_encoder(0);//Get_Sens1_Status();
-		_position[1]=Filter_Bit (get_position_abs_ssi(1));
-		_position_old[1]=_position[1]; 
-
 #else
 	 	for (i=0; i<JN; i++) 
 		{
@@ -404,7 +387,7 @@ void main(void)
 
 
 ///////////////////////////////////////////DEBUG////////////
-#if (VERSION !=0x0254) && (VERSION !=0x0258)
+#if (VERSION !=0x0254)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -418,7 +401,7 @@ void main(void)
 		}  
 #endif
 	
-#warning "here we should put a control for 0x0258 and 0x255"	
+#warning "here we should put a control for 0x255"	
 #if (VERSION ==0x0254) || (VERSION ==0x0255)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
@@ -476,7 +459,7 @@ void main(void)
 
 					
 		/* in position? */
-#if (VERSION != 0x0254)  && (VERSION != 0x0258)
+#if (VERSION != 0x0254)
 		for (i=0; i<JN; i++) _in_position[i] = check_in_position(i); 
 #else
 		_in_position[0] = check_in_position(0);
@@ -487,10 +470,8 @@ void main(void)
 
 	
 //******************************************* POSITION LIMIT CHECK ***************************/
-#if  (VERSION != 0x0258)
-
 		for (i=0; i<JN; i++)  check_range(i, _safeband[i], PWMoutput);
-#endif
+
 //******************************************* COMPUTES CONTROLS *****************************/
 
 		//FT sensor watchdog update 

@@ -16,7 +16,7 @@
 #endif
 extern byte	_board_ID;	
 
-#if VERSION == 0x0158 || VERSION == 0x0114 || VERSION == 0x0164
+#if VERSION == 0x0114 || VERSION == 0x0164
 /* analog feedback */
 #define INPOSITION_THRESHOLD 150
 #else
@@ -254,7 +254,7 @@ Int32 compute_pwm(byte j)
 	case MODE_VELOCITY:
 	case MODE_MIXED:
 	{
-        if (_interaction_mode[i]==icubCanProto_interactionmode_stiff)
+        if (_interaction_mode[j]==icubCanProto_interactionmode_stiff)
         {
 	        if (_sacc0[j] == 0)
 	        {
@@ -305,7 +305,7 @@ Int32 compute_pwm(byte j)
 	       		_desired[j]=_des_saved;       	
             }
         }
-        else if (_interaction_mode[i]==icubCanProto_interactionmode_compliant)
+        else if (_interaction_mode[j]==icubCanProto_interactionmode_compliant)
         {
  		 	can_printf ("UNSUPPORTED INTERACTION PID");
 		 	_control_mode[j]=MODE_HW_FAULT;	
@@ -979,17 +979,15 @@ void compute_desired(byte i)
 		case MODE_IMPEDANCE_VEL:
 			_desired[i] += step_trajectory_delta (i);
 			_desired[i] += step_velocity (i);
+
 			// checks if the velocity messages streaming
 			// has been interrupted (i.e. last message
 			// received  more than _vel_timeout ms ago)
-
-			_vel_counter[i]++;
-#if (VERSION != 0x0258)		  
+			_vel_counter[i]++; 
 		    if(_vel_counter[i] > _vel_timeout[i])
 		    {	
 		    	//disabling velocity control						
-				if (_control_mode[i] == MODE_IMPEDANCE_VEL) _control_mode[i] = MODE_IMPEDANCE_POS;
-				else _control_mode[i] = MODE_POSITION;	  	
+				_desired_vel[i] = 0;	
 						  	
 				init_trajectory (i, _desired[i], _desired[i], 1);
 				#ifdef DEBUG_CAN_MSG
@@ -999,12 +997,9 @@ void compute_desired(byte i)
 				//resetting the counter
 				_vel_counter[i] = 0;	
 		    }			  	
-#endif
 			break;
-		}
-#if (VERSION != 0x0258)		
+		}	
 		check_desired_within_limits(i, previous_desired);
-#endif
 	}
 }
 

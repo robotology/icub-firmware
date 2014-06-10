@@ -50,6 +50,12 @@ UInt8   BUS_OFF=false;
 
 #endif
 
+
+//**********************
+// externs
+//**********************
+extern bool           _pad_enabled[2];
+
 //********************
 // Local prototypes 
 //********************
@@ -242,6 +248,10 @@ void main(void)
 //		can_printf("adc %d",_adc_debug);
 		
 		can_interface();
+		
+		for (i=0; i<JN; i++)
+		if (_pad_enabled[i]==false && _control_mode[i]!=MODE_HW_FAULT) _control_mode[i]=MODE_IDLE;
+					
 	
 	    //Position calculation
 	    // This is used to have a shift of the zero-cross out of the 

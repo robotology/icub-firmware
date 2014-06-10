@@ -64,6 +64,7 @@ const byte winShift=5;
 //**********************
 extern sDutyControlBL DutyCycle[2];
 extern sDutyControlBL DutyCycleReq[2];
+extern bool           _pad_enabled[2];
 
 //********************
 // Local prototypes 
@@ -83,8 +84,6 @@ Int16 _version = 0x0154;
 Int16 _version = 0x0155;
 #elif VERSION == 0x0157
 Int16 _version = 0x0157;
-#elif VERSION == 0x0158
-Int16 _version = 0x0158;
 #elif VERSION == 0x0351
 Int16 _version = 0x0351;
 #elif VERSION == 0x0140
@@ -239,7 +238,7 @@ void main(void)
 	__DI();
    
 	init_leds  			  ();
-#if VERSION != 0x0155 && VERSION !=0x0158	
+#if VERSION != 0x0155	
 	Init_Brushless_Comm	  (JN);
 #else 
     Init_Brushless_Comm	  (1); //only one axis
@@ -257,7 +256,7 @@ void main(void)
  
     init_faults           (true,true,true);	 
     
-#if VERSION ==0x0155  || VERSION ==0x0158 
+#if VERSION ==0x0155  
     init_position_encoder ();
 #endif
 
@@ -285,7 +284,7 @@ void main(void)
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
 	
-#if VERSION !=0x0155	&& VERSION !=0x0158
+#if VERSION !=0x0155
 	///////////////////////////////////////
 	// reset of the ABS_SSI
 	// this is needed because the AS5045 gives the first value wrong !!!
@@ -347,6 +346,9 @@ void main(void)
 // READING CAN MESSAGES
 		can_interface();
 	
+		for (i=0; i<JN; i++)
+		if (_pad_enabled[i]==false && _control_mode[i]!=MODE_HW_FAULT) _control_mode[i]=MODE_IDLE;
+
 	    //Position calculation
 	    // This is used to have a shift of the zero-cross out of the 
 	    // joint workspace
@@ -367,11 +369,6 @@ void main(void)
 		_position[0]=Filter_Bit (get_position_abs_ssi(0));
 		_position_old[1]=_position[1]; 
 		_position[1]=get_position_encoder(1);
-#elif VERSION ==0x0158
-		_position_old[0]=_position[0];
-		_position[0]=get_position_encoder(1);
-		_position_old[1]=_position[1]; 
-		_position[1]=Filter_Bit (get_position_abs_ssi(0));
 #elif VERSION == 0x0351
 		_position_old[0]=_position[0];
 		if(get_error_abs_ssi(0)==ERR_OK) 
@@ -395,7 +392,7 @@ void main(void)
 		for (i=0; i<JN; i++) _motor_position[i]=get_commutations(i);
 		
 ///////////////////////////////////////////DEBUG////////////
-#if (VERSION !=0x0154) && (VERSION !=0x0155) && (VERSION !=0x0158)
+#if (VERSION !=0x0154) && (VERSION !=0x0155) 
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -410,7 +407,6 @@ void main(void)
 		}  
 #endif
 	
-#warning "here we should put a control for 0x0158"	
 #if (VERSION ==0x0154) || (VERSION ==0x0155) 
 
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
@@ -462,7 +458,7 @@ void main(void)
 		}
 					
 		/* in position? */
-#if (VERSION != 0x0154) && (VERSION != 0x0155) && (VERSION != 0x0158)
+#if (VERSION != 0x0154) && (VERSION != 0x0155)
 		for (i=0; i<JN; i++) _in_position[i] = check_in_position(i); 
 #else
 		_in_position[0] = check_in_position(0);

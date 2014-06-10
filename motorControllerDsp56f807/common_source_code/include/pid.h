@@ -39,7 +39,7 @@ inline Int32 compensate_bemf(byte j, Int16 motor_speed);
 /******************************************************/
 
 
-#if VERSION == 0x0164 || VERSION == 0x0158 || VERSION == 0x0114
+#if VERSION == 0x0164 || VERSION == 0x0114
 // analog feedback 
 #define INPOSITION_THRESHOLD 150
 #else
