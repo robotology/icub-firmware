@@ -205,16 +205,18 @@ Int32 compute_pwm(byte j)
 {
 	Int32 PWMoutput = 0;
 	Int32 Ioutput = 0;
-	byte  i=0;
 	Int32 speed_damping =0;
 
 	/*watchdog check for strain messages in torque control mode + input selection*/
 	//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
 	//the first number is joint, the second number is the watchdog identifier
-	for (i=0;i<JN; i++)
 	{
-	    //can_printf("%d %d %d %d",i,_selected_strain_id[i], _selected_strain_chan[i], _strain_wtd[_selected_strain_id[i]]);
-		read_force_data (i, _selected_strain_id[i], _selected_strain_chan[i]);		
+		byte i=0;
+		for (i=0;i<JN; i++)
+		{
+		    //can_printf("%d %d %d %d",i,_selected_strain_id[i], _selected_strain_chan[i], _strain_wtd[_selected_strain_id[i]]);
+			read_force_data (i, _selected_strain_id[i], _selected_strain_chan[i]);		
+		}
 	}
 #if	VERSION == 0x0351
 		//iKart has a fake torque mode that just compensates for back-emf
@@ -322,7 +324,7 @@ Int32 compute_pwm(byte j)
 	case MODE_POSITION:
 	case MODE_VELOCITY:
 	case MODE_MIXED:
-		 if (_interaction_mode[i]==icubCanProto_interactionmode_stiff)
+		 if (_interaction_mode[j]==icubCanProto_interactionmode_stiff)
 		 {
 			compute_desired(j);
 			PWMoutput = compute_pid2(j);
@@ -339,7 +341,7 @@ Int32 compute_pwm(byte j)
 				}
 			#endif
 		 }
-		 else if (_interaction_mode[i]==icubCanProto_interactionmode_compliant)
+		 else if (_interaction_mode[j]==icubCanProto_interactionmode_compliant)
 		 {
 			compute_desired(j);
 			compute_pid_impedance(j);
