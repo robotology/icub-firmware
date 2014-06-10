@@ -8,7 +8,6 @@
 //#define VERSION 0x0154		    	/* only one joint */
 //#define VERSION 0x0155                /* it reads absolute and incremental encoder for one motot */
 //#define VERSION 0x0157		    	/* position and pwm decoupling of the third joint of the shoulder */
-//#define VERSION 0x0158                /* commutation with incremental encoder
 //#define VERSION 0x0140   				/* similar to 0x150, but no joint decoupling  */
 //#define VERSION 0x0147   				/* similar to 0x157, but no joint decoupling  */
 //#define VERSION 0x0351		    	/* ikart wheels control*/

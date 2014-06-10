@@ -4,7 +4,6 @@
 //#define VERSION 0x0251                /* it reads absolute and incremental encoder for two motors */
                                         /* commutation with incremental encoder
 //#define VERSION 0x0255                /* it reads 3 absolute and 1 incremental encoder for one motor (M0)*/
-//#define VERSION 0x0258                /* commutation with incremental encoder
 
 //#define SERIAL_MENU_OPTION    1       /* if on, enables serial menu interface */
 
