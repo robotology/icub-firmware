@@ -325,7 +325,7 @@ void enable_control (char axis)
 			} 
 			else 
 			{ 
-			    can_printf("WARNING:PID IS NOT SET");
+			    can_printf("WARNING:PID IS NOT SET %d", axis);
 			    _control_mode[0] = MODE_HW_FAULT;
 			    _control_mode[1] = MODE_HW_FAULT; 
 			} 
@@ -354,9 +354,9 @@ void enable_control (char axis)
 				} 
 				else 
 				{ 
-				  can_printf("WARNING:PID IS NOT SET");
-				  _control_mode[2] = MODE_HW_FAULT;
-			      _control_mode[3] = MODE_HW_FAULT; 
+				    can_printf("WARNING:PID IS NOT SET %d", axis);
+				    _control_mode[2] = MODE_HW_FAULT;
+			        _control_mode[3] = MODE_HW_FAULT; 
 				} 
 			} 
 		}
@@ -376,7 +376,7 @@ void enable_control (char axis)
 				}
 				else
 				{ 
-					can_printf("WARNING:PID IS NOT SET"); 
+				    can_printf("WARNING:PID IS NOT SET %d", axis); 
    			        _control_mode[axis] = MODE_HW_FAULT;
 				} 
 			} 
@@ -398,9 +398,9 @@ void enable_control (char axis)
 				_set_point[1] = _position[1];*/
 				if (CAN_SRC==0) 
 				{ 
-				  CAN_ID = (_board_ID << 4) ; 
-				  CAN_ID |=  2; 
-				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
+				    CAN_ID = (_board_ID << 4) ; 
+				    CAN_ID |=  2; 
+				    CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
 				} 
 			} 
 		} 
@@ -415,9 +415,9 @@ void enable_control (char axis)
 				_set_point[0] = _position[0];*/
 				if (CAN_SRC==0) 
 				{ 
-				  CAN_ID = (_board_ID << 4) ; 
-				  CAN_ID |=  1; 
-				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
+				    CAN_ID = (_board_ID << 4) ; 
+				    CAN_ID |=  1; 
+				    CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
 				} 
 			} 
 		} 
@@ -445,7 +445,7 @@ void enable_control (char axis)
 				} 
 				else 
 				{ 
-				    can_printf("WARNING:PID IS NOT SET");
+				    can_printf("WARNING:PID IS NOT SET %d", axis);
 				    _control_mode[1] = MODE_HW_FAULT; 
 					_control_mode[2] = MODE_HW_FAULT; 
 				} 
@@ -467,7 +467,7 @@ void enable_control (char axis)
 				}
 				else
 				{ 
-					can_printf("WARNING:PID IS NOT SET"); 
+					can_printf("WARNING:PID IS NOT SET %d", axis); 
 					_control_mode[axis] = MODE_HW_FAULT; 
 				} 
 			} 
@@ -488,7 +488,7 @@ void enable_control (char axis)
 			} 
 			else 
 			{ 
-				can_printf("WARNING:PID IS NOT SET");
+				can_printf("WARNING:PID IS NOT SET %d", axis);
                 _control_mode[axis] = MODE_HW_FAULT;  
 			} 
 		} 
