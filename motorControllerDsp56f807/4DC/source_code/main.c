@@ -99,8 +99,6 @@ Int16 _version = 0x0128;
 Int16 _version = 0x0219;
 #elif VERSION == 0x0130
 Int16 _version = 0x0130;
-#elif VERSION == 0x0125
-Int16 _version = 0x0125;
 #elif VERSION == 0x0131
 Int16 _version = 0x0131;
 #elif VERSION == 0x0214
@@ -501,16 +499,7 @@ void main(void)
 // 							/* saturates controls if necessary */
 //******************************************************************************************/ 				
 
-#if VERSION==0x0125		
-/*
-		if(_strain_init[5]!=0 && _strain_init[4]!=0)
-		{
-			_Feq = 5*1333*(_strain[5]-_strain[4]); 
-		}
 
-		for (i=0; i<JN; i++) ENFORCE_LIMITS(i,1*_Feq);
-*/
-#else
 		for (i=0; i<JN; i++) 
 		{
 			if (_control_mode[i] == MODE_TORQUE ||
@@ -530,7 +519,7 @@ void main(void)
 			};
 		}
 
-#endif
+
 
 #if VERSION==0x0120
 		if (_calibrated[3]==true) 
