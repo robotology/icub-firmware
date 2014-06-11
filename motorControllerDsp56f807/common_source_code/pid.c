@@ -937,7 +937,6 @@ void compute_desired(byte i)
 	{
 		previous_desired = _desired[i];
 		
-		/* compute trajectory and control mode */
 		switch (_control_mode[i])
 		{
 		case MODE_POSITION:
@@ -957,26 +956,21 @@ void compute_desired(byte i)
 		case MODE_MIXED:							
 		case MODE_VELOCITY:
 		case MODE_IMPEDANCE_VEL:
-			_desired[i] += step_trajectory_delta (i);
-			_desired[i] += step_velocity (i);
-
-			// checks if the velocity messages streaming
-			// has been interrupted (i.e. last message
+			// checks if the velocity messages streaming has been interrupted (i.e. last message
 			// received  more than _vel_timeout ms ago)
 			_vel_counter[i]++; 
 		    if(_vel_counter[i] > _vel_timeout[i])
 		    {	
 		    	//disabling velocity control						
+				_vel_counter[i] = 0;
 				_desired_vel[i] = 0;	
-						  	
-				init_trajectory (i, _desired[i], _desired[i], 1);
+				_set_vel[i] = 0;		  	
 				#ifdef DEBUG_CAN_MSG
 					can_printf("No vel msgs in %d[ms]", _vel_counter[i]);
-				#endif	
-				
-				//resetting the counter
-				_vel_counter[i] = 0;	
-		    }			  	
+				#endif		
+		    }	
+			_desired[i] += step_trajectory_delta (i);
+			_desired[i] += step_velocity (i);
 			break;
 		}	
 		check_desired_within_limits(i, previous_desired);
