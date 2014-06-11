@@ -10,22 +10,8 @@
  * this function decouple encoder readings.
  ***************************************************************************/
 void decouple_positions(void)
-{
-#if VERSION == 0x0112
-		// (de)couple encoder readings 
-		_position[0] = L_sub(_position[0], _position[1]);
-				
-		
-#elif VERSION == 0x0113		
-		// beware of the first cycle when _old has no meaning 		
-		_position[0] = L_add(_position[0], _adjustment[0] >> 1);
-		_position[0] = L_sub(_position[0], _adjustment[0] / 7);
-		_position[0] = L_sub(_position[0], _adjustment[1] >> 2);  // last >>2 must be 11/41
-				
-		_adjustment[0] = L_add(_adjustment[0], _delta_adj[0]);
-		_adjustment[1] = L_add(_adjustment[1], _delta_adj[1]);
-				
-#elif VERSION == 0x0115
+{				
+#if VERSION == 0x0115
 		//_position[0] = _position[0] - _position[1];
 		//_position[1] = _position[0] + 2*_position[1];
 		//vergence / version inverted

@@ -176,11 +176,6 @@ Int16  _cpl_pid_prediction[JN] = INIT_ARRAY (0);// the predicted adjustment
 Int16  _cpl_pid_delta[JN] = INIT_ARRAY (0);		// the adjustment step
 Int16   _cpl_pid_counter = 0;					// counter to check when last _cpl_pid_ was received  
 #endif
-#if  VERSION == 0x0113
-Int32  _other_position[JN] = INIT_ARRAY (0);	// the position of the synchronized card
-Int32  _adjustment[JN] = INIT_ARRAY (0);		// the actual adjustment (compensation)
-Int32  _delta_adj[JN] = INIT_ARRAY (0);			// velocity over the adjustment
-#endif
 
 #if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 Int32  _adjustment[JN]=INIT_ARRAY (0);          // the sum of the three value coming from the MAIS board
@@ -951,21 +946,11 @@ void compute_desired(byte i)
 			_desired[i] = step_trajectory (i);
 			break;
 			
-		case MODE_CALIB_ABS_POS_SENS:
-		
+		case MODE_CALIB_ABS_POS_SENS:	
 			_desired_absolute[i] = (Int16) step_trajectory (i);
-			
-			/* The following lines handle two possible situations:
-				(1) the absolute position sensor increseas 
-					when the encoder increases
-				(2) the absolute position sensor increseas 
-					when the encoder increases */
-#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)		
-			if (VERSION == 0x0112 && i == 0)
-				_desired[i] = _desired[i] - compute_pid_abs (i);
-			else
-				_desired[i] = _desired[i] + compute_pid_abs (i);
-#endif	
+			#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)		
+			    _desired[i] = _desired[i] + compute_pid_abs (i);
+			#endif	
 			break;
 							
 							

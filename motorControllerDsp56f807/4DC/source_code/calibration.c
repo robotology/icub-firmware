@@ -193,34 +193,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}	
 	}
 /********
- *0x0112*
- ********/
-#elif VERSION == 0x0112
-	if (type==CALIB_ABS_POS_SENS)
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_ABS_POS_SENS;
-			_abs_pos_calibration[channel] = param1;		
-			_set_point[channel] = _abs_pos_calibration[channel];
-			_set_vel[channel] = param2;
-			init_trajectory (channel, (Int32) extract_h(_filt_abs_pos[channel]), _set_point[channel], _set_vel[channel]);	
-			#ifdef DEBUG_CALIBRATION			
-	 		AS1_printStringEx ("Calibration ABS_POS started \r\n");
-	 		AS1_printStringEx ("param1: ");
-			AS1_printWord16AsChars (param1);
-			AS1_printStringEx ("param2: ");	
-			AS1_printWord16AsChars (param2);
-			#endif			
-		}
-	}
-	if (type==CALIB_HARD_STOPS)
-	{
-		#ifdef DEBUG_CALIBRATION	
-		AS1_printStringEx ("Calibration HARD_STOPS aborted \r\n");	
-		#endif
-	}
-/********
  *0x0115*
  ********/
 #elif VERSION ==0x0115

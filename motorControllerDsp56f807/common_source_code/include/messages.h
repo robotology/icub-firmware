@@ -176,28 +176,6 @@
 		_timeout = 0; \
 	} \
 }
-#elif VERSION == 0x0113
-#define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
-{ \
-	long value; \
-	if (CAN_LEN == 8) \
-	{ \
-		value = BYTE_C(CAN_DATA[0], CAN_DATA[1], CAN_DATA[2], CAN_DATA[3]); \
-		_adjustment[0] = _other_position[0]; \
-		_delta_adj[0] = L_sub (value, _other_position[0]) >> 2; \
-		_adjustment[0] = L_add (_adjustment[0], _delta_adj[0]); \
-		_other_position[0] = value; \
-		\
-		value = BYTE_C(CAN_DATA[4], CAN_DATA[5], CAN_DATA[6], CAN_DATA[7]); \
-		_adjustment[1] = _other_position[1]; \
-		_delta_adj[1] = L_sub (value, _other_position[1]) >> 2; \
-		_adjustment[1] = L_add (_adjustment[1], _delta_adj[1]); \
-		_other_position[1] = value; \
-		\
-		_pending_request = false; \
-		_timeout = 0; \
-	} \
-}
 #elif VERSION == 0x0121
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
@@ -283,7 +261,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION == 0x0113 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
+#if VERSION == 0x0153 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_ERROR_HANDLER(x) \
 { \
 	Int16 value; \

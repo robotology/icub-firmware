@@ -107,38 +107,6 @@ void check_desired_within_limits(byte i, Int32 previous_desired)
 	Int32 _min_position_coupled = 0;
  	Int32 _max_position_coupled = 0;
  	
- 	
- 	
-#if VERSION == 0x0113
-float tmp;
-	if (i == 0 && _control_mode[i]!=MODE_CALIB_ABS_POS_SENS)
-	{		
-		tmp = (((float) _adjustment[0])*0.2683);
-		_min_position_coupled = _min_position[i] + (Int32) tmp; 
-		if (_desired[i] < _min_position_coupled && (_desired[i] - previous_desired) <= 0) 
-		{
-			_desired[i] = _min_position_coupled;
-			if (_control_mode[i] == MODE_VELOCITY ||
-			    _control_mode[i] == MODE_MIXED)
-				_set_vel[i] = 0;
-#ifdef DEBUG_CONTROL_MODE
-			can_printf("WARN: OUT of MIN LIMITS");	
-#endif
-		}
-		
-		_max_position_coupled = _max_position[i] + (Int32) tmp; 
-		if (_desired[i] > _max_position_coupled && (_desired[i] - previous_desired) >= 0)
-		{
-			_desired[i] = _max_position_coupled;
-			if (_control_mode[i] == MODE_VELOCITY ||
-			    _control_mode[i] == MODE_MIXED)
-				_set_vel[i] = 0;
-#ifdef DEBUG_CONTROL_MODE
-			can_printf("WARN: OUT of MAX LIMITS");	
-#endif
-		}
-	}
-#endif
 	if (_control_mode[i]!=MODE_CALIB_ABS_POS_SENS && _control_mode[i]!=MODE_CALIB_HARD_STOPS)
 	{
 		if (_desired[i] < _min_position[i] && (_desired[i] - previous_desired) < 0) 
