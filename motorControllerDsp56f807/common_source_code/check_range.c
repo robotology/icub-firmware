@@ -23,20 +23,18 @@ void check_range(byte i, Int16 band, Int32 *PWM)
 		band=0; //the band must be positive
 	}
 	
-	if (_control_mode[i] == MODE_OPENLOOP)
+	if (_control_mode[i] == MODE_OPENLOOP && _ko_openloop[i]!=0)
 	{		
  		if  (_position[i] > (_max_position[i]-band))   
 		{	
-			_control_mode[i] = MODE_POSITION; 		
-			init_trajectory (i, _position[i], _max_position[i]-band, 1);
-			_ko[i]=0;   
+			can_printf("WARN: OPENLOOP out limits on j:%d",i);
+			_ko_openloop[i]=0;   
 		} 
 		else
 		if  (_position[i] < (_min_position[i]+band))
 		{
-			_control_mode[i] = MODE_POSITION; 		
-			init_trajectory (i, _position[i], _min_position[i]+band, 1);
-			_ko[i]=0;   					
+			can_printf("WARN: OPENLOOP out limits on j:%d",i);
+			_ko_openloop[i]=0;   					
 		}
 	}
 }
