@@ -78,11 +78,7 @@ void check_encoder_hall_drift(byte jnt);
 #if   VERSION == 0x0111
 Int16 _version = 0x0111;
 #elif VERSION == 0x0115
-Int16 _version = 0x0115;
-#elif VERSION == 0x0117
-Int16 _version = 0x0117;   
-#elif VERSION == 0x0118
-Int16 _version = 0x0118;
+Int16 _version = 0x0115; 
 #elif VERSION == 0x0119
 Int16 _version = 0x0119;
 #elif VERSION == 0x0120
@@ -372,12 +368,6 @@ void main(void)
 		for (i=0; i<JN; i++) _position[i] = get_position_encoder(i);
 		
 		/* read absolute position sensors*/
-#if VERSION == 0x0117
-		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));	
-#endif
-#if VERSION == 0x0118
-		_position[0]= extract_h( compute_filt_pos(get_position_abs_analog(0)>>3,0));	
-#endif
 #if VERSION == 0x0119
 		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));	
 #endif
