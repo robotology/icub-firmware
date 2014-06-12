@@ -35,8 +35,8 @@
 byte	_board_ID = 15;	
 char    _additional_info [32];
 byte    _build_number = BUILD_4DC;
-byte    _my_can_protocol_major = 1;
-byte    _my_can_protocol_minor = 1;
+byte    _my_can_protocol_major = CAN_PROTOCOL_MAJOR;
+byte    _my_can_protocol_minor = CAN_PROTOCOL_MINOR;
 bool    _can_protocol_ack = false;
 
 UInt8    mainLoopOVF = 0;

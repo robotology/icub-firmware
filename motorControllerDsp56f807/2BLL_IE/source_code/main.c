@@ -40,8 +40,8 @@ int     _countBoardStatus[2] ={0,0};
 Int16   _flash_version=0; 
 UInt8   BUS_OFF=false;
 const byte winShift=5;
-byte    _my_can_protocol_major = 1;
-byte    _my_can_protocol_minor = 1;
+byte    _my_can_protocol_major = CAN_PROTOCOL_MAJOR;
+byte    _my_can_protocol_minor = CAN_PROTOCOL_MINOR;
 bool    _can_protocol_ack = false; 
 
 #ifdef TEMPERATURE_SENSOR

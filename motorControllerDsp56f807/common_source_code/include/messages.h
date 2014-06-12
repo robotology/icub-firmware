@@ -1194,7 +1194,7 @@ else \
 	PREPARE_HEADER; \
 		CAN_LEN = 8; \
 		_can_protocol_ack = (_my_can_protocol_major == server_can_protocol_major && \
-						     _my_can_protocol_minor == server_can_protocol_minor); \
+						     _my_can_protocol_minor >= server_can_protocol_minor); \
 		_canmsg.CAN_data[1] = CURRENT_BOARD_TYPE;   \
 		_canmsg.CAN_data[2] = (_version & 0xff00) >> 8; \
 		_canmsg.CAN_data[3] = _version & 0x00ff; 	    \

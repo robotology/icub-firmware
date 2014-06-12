@@ -42,8 +42,8 @@ byte	_board_ID = 16;
 char    _additional_info [32];
 UInt8    mainLoopOVF=0;
 byte    _build_number = BUILD_2BLL;
-byte    _my_can_protocol_major = 1;
-byte    _my_can_protocol_minor = 1;
+byte    _my_can_protocol_major = CAN_PROTOCOL_MAJOR;
+byte    _my_can_protocol_minor = CAN_PROTOCOL_MINOR;
 bool    _can_protocol_ack = false;
 
 int     _countBoardStatus[2] ={0,0};
