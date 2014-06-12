@@ -225,11 +225,14 @@ extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm)
 #endif
 }
 
-extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm)
+extern int32_t eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm)
 {
     //if (!o) return 0;
     
     float En = Tr - Tm;
+    
+    o->Dn *= o->A;
+    o->Dn += o->B*(En - o->En);
     
     //o->In += o->Ki*En;
     o->In += o->Ki*(En + o->En);
@@ -238,9 +241,76 @@ extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm)
     o->En = En;
     
     En *= o->Kp;
-    En += o->In;
+    En += o->In + o->Dn;
     
-    o->yv0 = 0.0034438644f*(o->xv0 + En)+0.9931122710f*o->yv0; // 3.0 Hz 
+    
+    o->yv0 = 0.0015683341f*(o->xv0 + En)+0.9968633318f*o->yv0; // 0.5 Hz 
+    o->xv0 = En;
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->yv0 /*+ o->Kff*Tr*/);
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+#ifdef FORCE_ZERO_PWM_OUT
+    return 0;
+#else
+    return o->pwm;
+#endif
+}
+
+extern int32_t eo_pid_PWM_pi_0_8Hz_1stLPF(EOpid *o, float Tr, float Tm)
+{
+    //if (!o) return 0;
+    
+    float En = Tr - Tm;
+    
+    o->Dn *= o->A;
+    o->Dn += o->B*(En - o->En);
+    
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
+    LIMIT(o->In, o->Imax);
+    
+    o->En = En;
+    
+    En *= o->Kp;
+    En += o->In + o->Dn;
+    
+    
+    o->yv0 = 0.00250697865f*(o->xv0 + En)+0.9949860427f*o->yv0; // 0.8 Hz 
+    o->xv0 = En;
+    
+    o->pwm = o->pwm_offset + (int32_t)(o->yv0 /*+ o->Kff*Tr*/);
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+#ifdef FORCE_ZERO_PWM_OUT
+    return 0;
+#else
+    return o->pwm;
+#endif
+}
+
+extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm)
+{
+    //if (!o) return 0;
+    
+    float En = Tr - Tm;
+    
+    o->Dn *= o->A;
+    o->Dn += o->B*(En - o->En);
+    
+    //o->In += o->Ki*En;
+    o->In += o->Ki*(En + o->En);
+    LIMIT(o->In, o->Imax);
+    
+    o->En = En;
+    
+    En *= o->Kp;
+    En += o->In + o->Dn;
+    
+    
+    o->yv0 = 0.0034438644f*(o->xv0 + En)+0.9931122710f*o->yv0; // 1.1 Hz 
     o->xv0 = En;
     
     o->pwm = o->pwm_offset + (int32_t)(o->yv0 /*+ o->Kff*Tr*/);
@@ -260,6 +330,9 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm)
     
     float En = Tr - Tm;
     
+    o->Dn *= o->A;
+    o->Dn += o->B*(En - o->En);
+    
     //o->In += o->Ki*En;
     o->In += o->Ki*(En + o->En);
     LIMIT(o->In, o->Imax);
@@ -267,7 +340,7 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm)
     o->En = En;
     
     En *= o->Kp;
-    En += o->In;
+    En += o->In + o->Dn;
     
     o->yv0 = 0.0093370547f*(o->xv0 + En)+0.9813258905f*o->yv0; // 3.0 Hz
     o->xv0 = En;
@@ -283,8 +356,27 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm)
 #endif
 }
 
-#if 0
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+
+
+
+
+#if 0
 extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm)
 {
     if (!o) return 0;
@@ -336,23 +428,3 @@ extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm)
 }
 
 #endif
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - end-of-file (leave a blank line after)
-// --------------------------------------------------------------------------------------------------------------------
-
-
-
-

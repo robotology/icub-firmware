@@ -165,7 +165,7 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t x0, int32_t x
     LIMIT(velAvg, o->vel_max)
     
     ///////////
-    o->xX = x0;
+    //o->xX = x0;
     ///////////
     
     float D = (float)xStar - o->xX;

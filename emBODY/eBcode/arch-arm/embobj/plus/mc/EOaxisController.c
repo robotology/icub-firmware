@@ -14,8 +14,8 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrorManager.h"
-#include "EOVtheSystem.h"
+//#include "EOtheErrorManager.h"
+//#include "EOVtheSystem.h"
 #include "EOemsControllerCfg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -465,6 +465,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         o->torque_timer = 0;
         o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
         o->torque_ref = 0;
+        o->torque_meas = 0;
         o->err = 0;
         o->control_mode = eomc_controlmode_torque;
         break;
@@ -518,6 +519,12 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             eo_trajectory_Init(o->trajectory, pos, vel, 0);
             *stiff = eobool_true;
             o->err = 0;
+            
+            if (pos <= o->pos_min || o->pos_max <= pos)
+            {
+                return 0;
+            }
+            
             return o->openloop_out;
         }
 
@@ -575,10 +582,12 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
 
                 o->err = err;
                 
-                #if defined(ANKLE_BOARD) || defined(WAIST_BOARD)
+                #if defined(ANKLE_BOARD) 
                     return eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
-                #elif defined(SHOULDER_BOARD) || defined(UPPERLEG_BOARD)
+                #elif defined(SHOULDER_BOARD) 
                     return eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
+                    return eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
                 #else
                     return 0;
                 #endif
@@ -608,15 +617,17 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             }
             else
             {
-                o->torque_ref = o->torque_meas = 0;
+                o->torque_ref = 0;
                 
-                return 0;
+                //return 0;
             }
             
-            #if defined(ANKLE_BOARD) || defined(WAIST_BOARD)
+            #if defined(ANKLE_BOARD) 
                 return eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
-            #elif defined(SHOULDER_BOARD) || defined(UPPERLEG_BOARD)
+            #elif defined(SHOULDER_BOARD) 
                 return eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
+                return eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
             #else
                 return 0;
             #endif
@@ -923,6 +934,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         o->torque_timer = 0;
         o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
         o->torque_ref = 0;
+        o->torque_meas = 0;
         o->err = 0;
         o->control_mode = eomc_controlmode_torque;
         break;
@@ -1070,15 +1082,17 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             }
             else
             {
-                o->torque_ref = o->torque_meas = 0;
+                o->torque_ref = 0;
                 
-                return 0;
+                //return 0;
             }
             
-            #if defined(ANKLE_BOARD) || defined(WAIST_BOARD)
+            #if defined(ANKLE_BOARD) 
                 int32_t pwm = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
-            #elif defined(SHOULDER_BOARD) || defined(UPPERLEG_BOARD)
+            #elif defined(SHOULDER_BOARD) 
                 int32_t pwm = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
+                int32_t pwm = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
             #else
                 int32_t pwm = 0;
             #endif

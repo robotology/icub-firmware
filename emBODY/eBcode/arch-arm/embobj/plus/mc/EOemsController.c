@@ -14,16 +14,16 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "hal_led.h"
+//#include "hal_led.h"
 
-#include <string.h>
+//#include <string.h>
 
 
 #include "EOicubCanProto_specifications.h"
 #include "EOtheEMSapplBody.h"
 
-#include "EOMtheEMSbackdoor.h"
-#include "OPCprotocolManager_Cfg.h"
+//#include "EOMtheEMSbackdoor.h"
+//#include "OPCprotocolManager_Cfg.h"
 
 #if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
 #error mechanics is undefined
@@ -165,29 +165,60 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos)
     
     int16_t axle_virt_vel[NAXLES];
     int32_t axle_virt_pos[NAXLES];
-
-    ENCODERS(e)
-    {
-        axle_virt_vel[e] =  FOC_2_EMS_SPEED*ems->motor_velocity[e];
-        axle_virt_pos[e] =  ems->motor_position[e];
-    }
     
     #if defined(SHOULDER_BOARD)
-        //             | 1     0       0   |
-        // J = dq/dm = | 1   40/65     0   |
-        //             | 0  -40/65   40/65 | 
-        axle_virt_vel[1] = FOC_2_EMS_SPEED*(ems->motor_velocity[0] + (40*ems->motor_velocity[1])/65);
-        axle_virt_vel[2] = FOC_2_EMS_SPEED*(40*(ems->motor_velocity[2]-ems->motor_velocity[1]))/65;
-        axle_virt_pos[1] = ems->motor_position[0] + (40*ems->motor_position[1])/65;
+    
+        //             | 1     0       0    0 |
+        // J = dq/dm = | 1   40/65     0    0 |
+        //             | 0  -40/65   40/65  0 |
+        //             | 0     0       0    1 |
+    
+        axle_virt_vel[0] = FOC_2_EMS_SPEED*ems->motor_velocity[0];
+        axle_virt_vel[1] = FOC_2_EMS_SPEED*(ems->motor_velocity[0]+(40*ems->motor_velocity[1])/65);
+        axle_virt_vel[2] = FOC_2_EMS_SPEED*((40*(ems->motor_velocity[2]-ems->motor_velocity[1]))/65);
+        axle_virt_vel[3] = FOC_2_EMS_SPEED*ems->motor_velocity[3];
+    
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[0]+(40*ems->motor_position[1])/65;
         axle_virt_pos[2] = (40*(ems->motor_position[2]-ems->motor_position[1]))/65;
+        axle_virt_pos[3] = ems->motor_position[3];
+    
     #elif defined(WAIST_BOARD)
-        //             |  1     1     0  |
-        // J = dq/dm = | -1     1     0  |
-        //             |  0     0     1  | 
-        axle_virt_vel[0] = FOC_2_EMS_SPEED*( ems->motor_velocity[0] + ems->motor_velocity[1]);
-        axle_virt_vel[1] = FOC_2_EMS_SPEED*(-ems->motor_velocity[0] + ems->motor_velocity[1]);
-        axle_virt_pos[0] =  ems->motor_position[0] + ems->motor_position[1];
-        axle_virt_pos[1] = -ems->motor_position[0] + ems->motor_position[1];
+    
+        //             |   1     1     0   |
+        // J = dq/dm = |  -1     1     0   |
+        //             | 44/80 44/80 44/80 | 
+
+        axle_virt_vel[0] = FOC_2_EMS_SPEED*(     ems->motor_velocity[0] + ems->motor_velocity[1]);
+        axle_virt_vel[1] = FOC_2_EMS_SPEED*(    -ems->motor_velocity[0] + ems->motor_velocity[1]);
+        axle_virt_vel[2] = FOC_2_EMS_SPEED*((44*(ems->motor_velocity[0] + ems->motor_velocity[1] + ems->motor_velocity[2]))/80);
+        
+        axle_virt_pos[0] =      ems->motor_position[0] + ems->motor_position[1];
+        axle_virt_pos[1] =     -ems->motor_position[0] + ems->motor_position[1];
+        axle_virt_pos[2] = (44*(ems->motor_velocity[0] + ems->motor_velocity[1] + ems->motor_velocity[2]))/80;
+        
+    #elif defined(UPPERLEG_BOARD)
+    
+        axle_virt_vel[0] = FOC_2_EMS_SPEED*(50*ems->motor_velocity[0])/75;
+        axle_virt_vel[1] = FOC_2_EMS_SPEED*    ems->motor_velocity[1]    ;
+        axle_virt_vel[2] = FOC_2_EMS_SPEED*    ems->motor_velocity[2]    ;
+        axle_virt_vel[3] = FOC_2_EMS_SPEED*    ems->motor_velocity[3]    ;
+        
+        axle_virt_pos[0] = (50*ems->motor_position[0])/75;
+        axle_virt_pos[1] =     ems->motor_position[1]    ;
+        axle_virt_pos[2] =     ems->motor_position[2]    ;
+        axle_virt_pos[3] =     ems->motor_position[3]    ;
+        
+    #elif defined(ANKLE_BOARD)
+        
+        axle_virt_vel[0] = FOC_2_EMS_SPEED*ems->motor_velocity[0];
+        axle_virt_vel[1] = FOC_2_EMS_SPEED*ems->motor_velocity[1];
+        
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[1];
+        
+    #else
+        //#error undefined board type
     #endif
     
 #endif
@@ -214,9 +245,11 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos)
 
 extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure)
 {
+#ifndef EXPERIMENTAL_MOTOR_TORQUE
     if (!ems) return;
     
     eo_axisController_SetTorque(ems->axis_controller[joint], trq_measure);
+#endif
 }
 
 extern void eo_emsController_PWM(int16_t* pwm_motor)
@@ -237,6 +270,54 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         }
     }
        
+#ifdef EXPERIMENTAL_MOTOR_TORQUE
+    #if defined(SHOULDER_BOARD)
+        //         |    1       0       0   |
+        // J^-1  = | -65/40   65/40     0   |
+        //         | -65/40   65/40   65/40 |
+    
+        //         | 1  -65/40  -65/40 |
+        // Jt^-1 = | 0   65/40   65/40 |
+        //         | 0     0     65/40 |
+    
+        int16_t axle_trq_2 = (65*ems->motor_current[2])/40;
+        int16_t axle_trq_1 = axle_trq_2 + (65*ems->motor_current[1])/40;
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0] - axle_trq_1);
+        eo_axisController_SetTorque(ems->axis_controller[1], axle_trq_1);
+        eo_axisController_SetTorque(ems->axis_controller[2], axle_trq_2);
+        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
+    
+    #elif defined(WAIST_BOARD)
+        //         | 1/2  -1/2    0   |
+        // J^-1 =  | 1/2   1/2    0   |
+        //         | -1     0   80/44 |
+
+        //         |  1/2  1/2   -1   |
+        // Jt^-1 = | -1/2  1/2    0   |
+        //         |   0    0   80/44 |
+        
+        eo_axisController_SetTorque(ems->axis_controller[0], (ems->motor_current[0]+ems->motor_current[1])/2 - ems->motor_current[2]);
+        eo_axisController_SetTorque(ems->axis_controller[1], (ems->motor_current[1]-ems->motor_current[0])/2);
+        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[3])/44);
+        
+    #elif defined(UPPERLEG_BOARD)
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], (75*ems->motor_current[0])/50);
+        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
+        eo_axisController_SetTorque(ems->axis_controller[2], ems->motor_current[2]);
+        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
+    
+    #elif defined(ANKLE_BOARD)
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0]);
+        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
+    
+    #else
+        #error undefined board type
+    #endif
+#endif
+    
     int32_t pwm_joint[NAXLES];
 
     eObool_t stiffness[NAXLES];
@@ -497,7 +578,7 @@ extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float 
         eo_axisController_SetPosPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff);
         
         #ifdef USE_2FOC_FAST_ENCODER
-            eo_axleVirtualEncoder_SetSign(ems->axle_virt_encoder[joint], (Kp >= 0.0 ? 1:-1));
+            eo_axleVirtualEncoder_SetSign(ems->axle_virt_encoder[joint], (Kp >= 0.0f ? 1:-1));
         #endif
     }
 }   

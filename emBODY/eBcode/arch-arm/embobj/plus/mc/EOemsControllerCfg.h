@@ -29,6 +29,7 @@ extern "C" {
     
 //#define V1_MECHANICS
 #define V2_MECHANICS
+//#define EXPERIMENTAL_MOTOR_TORQUE
     
 #define EMS_PERIOD           0.001f
 #define EMS_FREQUENCY_INT32  1000
