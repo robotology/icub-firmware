@@ -213,7 +213,7 @@ void decouple_dutycycle(Int32 *pwm)
 	_pd[0] = (_pd[0] - _pd[1])>>1;
 	_pd[1] = (temp32   + _pd[1])>>1;
 		
-#elif VERSION == 0x0253 || VERSION == 0x0257
+#elif VERSION == 0x0257
 	/* Version 0x0153 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
@@ -641,7 +641,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	}
 
 		
-#elif VERSION == 0x0253 || VERSION == 0x0257
+#elif VERSION == 0x0257
 	/*
 		  TORQUE COUPLING MATRIX
 		  
@@ -920,7 +920,7 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	}
 
 		
-#elif VERSION == 0x0253 || VERSION == 0x0257
+#elif VERSION == 0x0257
 	/*
 		  TORQUE COUPLING MATRIX
 		  
