@@ -152,7 +152,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 | VERSION==0x0147 || VERSION==0x0140 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
+#if VERSION==0x0157 || VERSION==0x0150 | VERSION==0x0147 || VERSION==0x0140 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
 	long value; \
@@ -176,20 +176,7 @@
 		_timeout = 0; \
 	} \
 }
-#elif VERSION == 0x0121
-#define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
-{ \
-	byte HES11,HES12,HES13; \
-	if (CAN_ID==MAIS_8bit_D_MSG) \
-	{ \
-		HES11=CAN_DATA[4];\
-		HES12=CAN_DATA[5];\
-		HES13=CAN_DATA[6];\
-		_adjustment[3] = HES11+HES12+HES13; \
-		_pending_request = false; \
-		_timeout = 0; \
-	} \
-}
+
 #elif ((VERSION == 0x0130 || VERSION==0x0230))
 #define CAN_SET_ACTIVE_ENCODER_POSITION_HANDLER(x) \
 { \
@@ -239,7 +226,7 @@
 
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
+#if VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_PID_HANDLER(x) \
 { \
 	Int16 value; \
@@ -261,7 +248,7 @@
 #endif
 
 //-------------------------------------------------------------------
-#if VERSION == 0x0153 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
+#if VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x351 || VERSION==0x0250 || VERSION==0x0257
 #define CAN_SET_ACTIVE_ERROR_HANDLER(x) \
 { \
 	Int16 value; \

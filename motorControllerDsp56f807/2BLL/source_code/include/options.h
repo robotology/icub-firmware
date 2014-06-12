@@ -4,7 +4,6 @@
 //#define VERSION 0x0150   				/* position and pwm decoupling of the first two joint of the shoulder  */
 //#define VERSION 0x0151   				/* standard/basic implementation */
 //#define VERSION 0x0152				/* waist deifferential decoupling */
-//#define VERSION 0x0153			   	/* decouples the third joint of the shoulder */
 //#define VERSION 0x0154		    	/* only one joint */
 //#define VERSION 0x0157		    	/* position and pwm decoupling of the third joint of the shoulder */
 //#define VERSION 0x0140   				/* similar to 0x150, but no joint decoupling  */

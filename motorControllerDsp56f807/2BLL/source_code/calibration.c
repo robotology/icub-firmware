@@ -68,17 +68,14 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	//		AS1_printStringEx ("Offset set\r\n");			
 		}
 	
-#elif VERSION==0x0153 || VERSION==0x0157 || VERSION==0x0147 
+#elif  VERSION==0x0157 || VERSION==0x0147 
 	//  	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0 && channel==0)
 		{
 			set_relative_position_abs_ssi_turns(channel, 0);
 			_position[channel] = get_relative_position_abs_ssi(channel);
-			#if VERSION==0x0153
-				_position[channel] = _position[channel]+ ((float)_cpl_pos_prediction[0]*6.5/4.0);  
-				_position[channel] = _position[channel]- ((float) _cpl_pos_prediction[1]*6.5/4.0);    
-			#elif VERSION==0x0157 
+			#if VERSION==0x0157 
 				_position[channel] = (((float) _position[channel])*0.6153F);  
 				_position[channel] = _position[channel]+ _cpl_pos_prediction[0];
 				_position[channel] = _position[channel]- _cpl_pos_prediction[1];			

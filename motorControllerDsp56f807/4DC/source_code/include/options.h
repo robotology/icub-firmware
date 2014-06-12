@@ -4,8 +4,6 @@
 //#define VERSION 0x0111   				/* standard/basic implementation */
 //#define VERSION 0x0115		    	/* coordinated control of the eyes */
 //#define VERSION 0x0119                /* Differential Joint M1 M2 (wrist) analog in M3*/
-//#define VERSION 0x0120     /* DEPRECATED? Analog Encoder in M3 (POT1IN+POT2IN+POT3IN)*/
-//#define VERSION 0x0121     /* DEPRECATED? Encoders in M0, M1, M2 MAISEncoder in M3 (HES11+HES12+HES13)*/
 //#define VERSION 0x0128                /* Analog encoder in M0 MAISEncoder in M1 (HES0), M2 (HES1+HES2), M3 (HES3) 
 //#define VERSION 0x0130                /* MAISEncoder in M0 (HES4+HES5), M1 (HES6), M2 (HES7+HES8), M3 (HES11+HES12+HES13) 
 //#define VERSION 0x0215                /* coordinated control of the eyes + neck yaw and eye tilt with AEA*/

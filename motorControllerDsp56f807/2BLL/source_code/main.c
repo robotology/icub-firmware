@@ -76,8 +76,6 @@ Int16 _version = 0x0150;
 Int16 _version = 0x0151;
 #elif VERSION == 0x0152
 Int16 _version = 0x0152;
-#elif VERSION == 0x0153
-Int16 _version = 0x0153;
 #elif VERSION == 0x0154
 Int16 _version = 0x0154;
 #elif VERSION == 0x0157
@@ -242,7 +240,7 @@ void main(void)
     init_strain ();
 
     init_position_abs_ssi ();
-#if VERSION == 0x0153 || VERSION ==0x0157 || VERSION ==0x0351
+#if VERSION ==0x0157 || VERSION ==0x0351
     init_relative_position_abs_ssi();
 #endif 
  
@@ -333,7 +331,7 @@ void main(void)
 	    // max_real_position is the limit of the joint starting from 
 	    // 4095 and going to decrease this number without zero-cross
 	    // untill the joint limit is reached
-#if   VERSION == 0x0153 || VERSION == 0x0157 || VERSION == 0x0147
+#if   VERSION == 0x0157 || VERSION == 0x0147
 		_position_old[0]=_position[0]; 
 		if(get_error_abs_ssi(0)==ERR_OK)
 			_position[0]=Filter_Bit (get_relative_position_abs_ssi(0));

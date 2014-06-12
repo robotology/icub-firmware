@@ -165,7 +165,7 @@ Int16  _kd_imp[JN] = INIT_ARRAY (0);			// damping coefficient
 Int16  _ko_imp[JN] = INIT_ARRAY (0);			// offset
 Int16  _kr_imp[JN] = INIT_ARRAY (0);		    // scale factor (negative power of two) 
 
-#if VERSION == 0x0153 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
+#if VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
 Int32  _cpl_pos_received[JN] = INIT_ARRAY (0);	// the position of the synchronized card 
 Int32  _cpl_pos_prediction[JN] = INIT_ARRAY (0);// the actual adjustment (compensation) 
 Int32  _cpl_pos_delta[JN] = INIT_ARRAY (0);		// velocity over the adjustment 
@@ -177,11 +177,11 @@ Int16  _cpl_pid_delta[JN] = INIT_ARRAY (0);		// the adjustment step
 Int16   _cpl_pid_counter = 0;					// counter to check when last _cpl_pid_ was received  
 #endif
 
-#if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
+#if ((VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 Int32  _adjustment[JN]=INIT_ARRAY (0);          // the sum of the three value coming from the MAIS board
 #endif
 
-#if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
+#if ((VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 // max allowed position for encoder while controlling with absolute position sensors
 Int16 _max_position_enc[JN] = INIT_ARRAY (0);
 Int16 _min_position_enc[JN] = INIT_ARRAY (0);

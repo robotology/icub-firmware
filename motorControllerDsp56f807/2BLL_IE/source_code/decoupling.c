@@ -16,46 +16,7 @@ void decouple_positions(void)
 	static UInt8 count=0;
 #endif			
 	
-#if   VERSION == 0x0153
-	_cpl_pos_counter++;
-	if (_cpl_pos_counter < timeout_cpl_pos && (get_error_abs_ssi(0)==ERR_OK))
-	{
-		// beware of the first cycle when _old has no meaning 
-		_position[0] = _position[0]+ (float) (((float) _cpl_pos_prediction[0])*1.625F);  
-		_position[0] = _position[0]- (float) (((float) _cpl_pos_prediction[1])*1.625F);
-		
-		// |J1| |  1     0    0   |  |E1|
-		// |J2|=|  0     1    0   |* |E2|     with a=40/65 i.e. a=1/1.625
-		// |J3| | 1/a  -1/a   1   |  |E3|
-		
-		_cpl_pos_prediction[0] = L_add(_cpl_pos_prediction[0], _cpl_pos_delta[0]);
-		_cpl_pos_prediction[1] = L_add(_cpl_pos_prediction[1], _cpl_pos_delta[1]);
-		
-		#ifdef DEBUG_CPL_BOARD
-		if(count==255)
-		{
-			can_printf("cplPos:(%d,%d)", (Int16) _cpl_pos_prediction[0], (Int16) _cpl_pos_prediction[1]);
-			count=0;
-		}			
-		count++;
-		#endif	
-
-	}
-	else
-	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		PWM_outputPadDisable(0);
-	
-		#ifdef DEBUG_CAN_MSG
-		if(count==255)
-		{
-			can_printf("No cpl pos info");
-			count=0;
-		}			
-		count++;				
-		#endif			
-	}
-#elif   VERSION == 0x0140 	
+#if   VERSION == 0x0140 	
 	//_position [0] = _position[0];
 	_position[1] = (float) (-_position[0] + _position[1]) * 1.625F;
 	
@@ -214,7 +175,7 @@ void decouple_dutycycle(Int32 *pwm)
 	_pd[1] = (temp32   + _pd[1])>>1;
 		
 #elif VERSION == 0x0257
-	/* Version 0x0153 relizes the shoulder coupling (here '_c' denotes 
+	/* Version 0x0257 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
 	 * 			[    Jm1,      0,      0]
@@ -404,7 +365,7 @@ void decouple_dutycycle(Int32 *pwm)
 	_pd[0] = (_pd[0] - _pd[1])>>1;
 	_pd[1] = (temp32   + _pd[1])>>1;
 		
-#elif VERSION == 0x0153 || VERSION == 0x0157
+#elif VERSION == 0x0157
 	// ----- JOINT 0 ONLY -----
 	if (_control_mode[0] == MODE_POSITION)
 	{
@@ -650,7 +611,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 		  		  [0  0  b]   	  
 	*/	  
 	
-	/* Version 0x0153 relizes the shoulder coupling (here '_c' denotes 
+	/* Version 0x0257 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
 	 * 			[    Jm1,      0,      0]
@@ -929,7 +890,7 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 		  		  [0  0  b]   	  
 	*/	  
 	
-	/* Version 0x0153 relizes the shoulder coupling (here '_c' denotes 
+	/* Version 0x0257 relizes the shoulder coupling (here '_c' denotes 
 	 * the coupled board variables).The applied coupling is the following:
 	 *
 	 * 			[    Jm1,      0,      0]

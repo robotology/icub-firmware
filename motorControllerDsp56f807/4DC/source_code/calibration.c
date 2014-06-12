@@ -22,7 +22,7 @@
 #	error "No valid version specified"
 #endif
 
-#if ((VERSION == 0x0120) || (VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
+#if ((VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 Int16 _max_position_enc_tmp[JN] = INIT_ARRAY (0);
 /* max allowd position for encoder while 
 controlling with absolute position sensors*/
@@ -66,17 +66,6 @@ void check_in_position_calib(byte jnt)
 		//Reset the encoder	
 		set_position_encoder (jnt, 0);
 
-#if ((VERSION == 0x0120) || (VERSION == 0x0121))
-		if (jnt==3)
-		{
-			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];
-			#ifdef DEBUG_CALIBRATION
-			can_printf("maxPosEnc: %d", _max_position_enc[jnt]);
-			#endif			
-			_calibrated[jnt] = true;
-			return;
-		}
-#endif		
 #if ((VERSION == 0x0128) || (VERSION == 0x0228))
 		if (jnt!=0)
 		{
@@ -575,72 +564,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			
 		}
 	}
-/********	********
- *0x0120*	*0x0121*
- ********	********/
-
-#elif ((VERSION == 0x0120) || (VERSION ==0x0121))
-
-	if (type==CALIB_ABS_POS_SENS)
-	{
-
-		#ifdef DEBUG_CALIBRATION	
- 		AS1_printStringEx ("Calibration ABS_POS aborted \r\n");
-		#endif
-	}
-	if ((type==CALIB_HARD_STOPS) && (channel!=3))
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-		#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration HARD_STOPS started %d , %d \r\n",param1,param2);
-		
-		#endif
-
-		}	
-	}
-	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel==3))
-	{
-
-		#ifdef DEBUG_CALIBRATION
-			can_printf("Starting the calibration %d", type);	
-		#endif
-
-		if (param2>0)
-		{
-		    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
-		    _set_point[channel] = param1;
-			_max_position_enc_tmp[channel] = param3;
-
-			#ifdef DEBUG_CALIBRATION		    
-
-		    can_printf("Params are: %d, %d, %d", param1, param2, param3);
-
-		#endif	
-			init_trajectory(channel, _position[channel], _set_point[channel], param2);
-		#ifdef DEBUG_CALIBRATION		
-			
-			AS1_printStringEx ("moving from: ");	
-			AS1_printWord16AsChars (_position[channel]);	
-			AS1_printStringEx ("moving to: ");	
-			AS1_printWord16AsChars (_set_point[channel]);	
-		#endif
-		}
-		if (param2==0)
-		{
-			_control_mode[channel]=MODE_IDLE;	
-		#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-		#endif			
-		} 			
-	}	
 
 /********	  
  *0x0128*	 

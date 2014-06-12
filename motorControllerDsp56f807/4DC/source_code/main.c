@@ -50,7 +50,7 @@ UInt16  mais_init_request=0;
 //#define  MAIS_INIT_REQUEST 500
 
  
-#if ((VERSION==0x0120) || (VERSION==0x0121) || (VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230))
+#if ((VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230))
 
 byte _initMAIS[8];
 UInt16 msec=0;
@@ -87,10 +87,6 @@ Int16 _version = 0x0111;
 Int16 _version = 0x0115; 
 #elif VERSION == 0x0119
 Int16 _version = 0x0119;
-#elif VERSION == 0x0120
-Int16 _version = 0x0120;
-#elif VERSION == 0x0121
-Int16 _version = 0x0121;
 #elif VERSION == 0x0128
 Int16 _version = 0x0128;
 #elif VERSION == 0x0219
@@ -238,7 +234,7 @@ void main(void)
 	}
 	
 	
-#if ((VERSION==0x0120) || (VERSION==0x0121) || (VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230))	
+#if ((VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230))	
 
 	for (i=0; i<JN; i++)
 	{
@@ -330,7 +326,7 @@ void main(void)
 //******************************************************************************************/		
 // 											MAIS CHECK                                      /
 //******************************************************************************************/ 		
-#if ( (VERSION==0x0121) || (VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230))	
+#if ( (VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230))	
 
 		//updates the 1000 msec counter
 		msec==1000 ? msec=0 : msec++;
@@ -383,14 +379,6 @@ void main(void)
 		/* read absolute position sensors*/
 #if VERSION == 0x0119
 		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));	
-#endif
-#if VERSION == 0x0120
-		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(0)>>3,0))+
-		extract_h( compute_filt_pos(get_position_abs_analog(1)>>3,1))+
-		extract_h( compute_filt_pos(get_position_abs_analog(2)>>3,2));	
-#endif
-#if VERSION == 0x0121
-		_position[3]= _adjustment[3];			
 #endif
 
 #if (VERSION == 0x0128 || VERSION == 0x0228) 
@@ -510,29 +498,7 @@ void main(void)
 			{
 				ENFORCE_LIMITS	(i,PWMoutput[i], _pid_limit[i] );
 			};
-		}
-
-
-
-#if VERSION==0x0120
-		if (_calibrated[3]==true) 
-		{
-			temp_swap = get_position_encoder(3);
-			ENFORCE_ENC_LIMITS((_pid[3]), temp_swap, ((Int32)_max_position_enc[3]));
-		}
-		// check for encoder drift
-		//check_encoder_hall_drift(3);
-#endif	
-
-#if VERSION==0x0121   //to limit the position of the encoder up to a certain number
-		if (_calibrated[3]==true) 
-		{
-			temp_swap = get_position_encoder(3);
-			ENFORCE_ENC_LIMITS((_pid[3]), temp_swap, ((Int32)_max_position_enc[3]));
-		}
-		// check for encoder drift
-		check_encoder_hall_drift(3);
-#endif	 	
+		}	
 
 #if VERSION==0x0128   //to limit the position of the encoder up to a certain number
 
@@ -672,7 +638,7 @@ void main(void)
 /* check if the encoder is moving while the hall effect sensor is not
 /**
 /***************************************************************************/
-#if ((VERSION==0x0121) || (VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230) )
+#if ((VERSION==0x0128) || (VERSION==0x0130) || (VERSION==0x0228) || (VERSION==0x0230) )
 
 void check_encoder_hall_drift( byte jnt)
 {

@@ -140,7 +140,7 @@ void decouple_dutycycle_new_motor(Int32 *pwm)
 	_pd[0] = (_pd[0] - _pd[1])>>1;
 	_pd[1] = (temp32   + _pd[1])>>1;
 		
-#elif VERSION == 0x0153 || VERSION == 0x0157
+#elif VERSION == 0x0157
 	// ----- JOINT 0 ONLY -----
 	if (_control_mode[0] == MODE_POSITION)
 	{

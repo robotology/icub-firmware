@@ -211,7 +211,7 @@ extern float  _param_a20_coeff;
 extern float  _param_a21_coeff;
 extern float  _param_a22_coeff;
 
-#if VERSION == 0x0153 || VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
+#if VERSION==0x0147 || VERSION==0x0140 || VERSION==0x0157 || VERSION==0x0150 || VERSION==0x0351 || VERSION==0x0250 || VERSION==0x0257
 extern Int32  _cpl_pos_received[JN] ;		// the position of the synchronized card 
 extern Int32  _cpl_pos_prediction[JN] ;		// the actual adjustment (compensation) 
 extern Int32  _cpl_pos_delta[JN] ;			// velocity over the adjustment 
@@ -223,7 +223,7 @@ extern Int16  _cpl_pid_delta[JN] ;			// the adjustment step
 extern Int16  _cpl_pid_counter ;			// the adjustment step
 #endif
 
-#if ((VERSION == 0x0121) || (VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
+#if ((VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 extern Int32  _adjustment[JN];         // the sum of the three value coming from the MAIS board
 #endif
 
