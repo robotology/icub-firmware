@@ -216,12 +216,6 @@ typedef void (*hal_void_fp_voidp_t) (void* p);
 
 
 
-/** @typedef    typedef void (*hal_void_fp_void_t) (void)
-    @brief      is a pointer to a function which returns void and has a void argument.
- **/
-typedef void (*hal_void_fp_void_t) (void);
-
-
 /** @typedef    ttypedef void (*hal_void_fp_err_ccharp_t) (hal_fatalerror_t errorcode, const char * errormsg)
     @brief      is a pointer to a function which returns void and has a void pointer argument.
  **/
@@ -287,15 +281,10 @@ typedef hal_result_t (*hal_res_fp_int32_uint8_uint32_voidp_t) (int32_t, uint8_t 
 typedef hal_result_t (*hal_res_fp_int32_t) (int32_t);
 
 
-/** @typedef    typedef void (*hal_void_fp_void_t) (void)
-    @brief      is a pointer to a function which returns void and has a void argument.
- **/
-typedef void (*hal_void_fp_void_t) (void);
 
 
 typedef void* (*hal_voidp_fp_uint32_t) (uint32_t);
 
-typedef void (*hal_void_fp_voidp_t) (void*);
 
 
 // - particular function pointers
