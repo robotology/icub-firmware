@@ -53,7 +53,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 /* Since inthe fist 64th messages most of them are obsolete, the table start at msg 64 and manage other such as exception*/
-#define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max          ICUBCANPROTO_POL_MC_CMD_MAXNUM -64 
+#define eo_icubCanProto_pollingMotorBoardMsg_inTbl_max          (ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS -64 +1) 
 #define eo_icubCanProto_pollingMotorBoardMsg_maxNum             ICUBCANPROTO_POL_MC_CMD_MAXNUM
 
 #define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   12 //until ICUBCANPROTO_PER_MC_MSG__MOTOR_SPEED 
