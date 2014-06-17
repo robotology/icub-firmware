@@ -65,13 +65,13 @@
 //-------------------------------------------------------------------
 #define CAN_GET_CONTROL_MODE_HANDLER(x) \
 { \
-	get_control_mode_new(axis); \
+	get_control_mode(axis); \
 }
 
 //-------------------------------------------------------------------
 #define CAN_SET_CONTROL_MODE_HANDLER(x) \
 { \
-	set_control_mode_new(axis); \
+	set_control_mode(axis); \
 }
 #endif
 

@@ -19,15 +19,19 @@ extern  byte	_board_ID ;
 #define CAN_SRC _canmsg.CAN_ID_src
 
 //private functions
-byte controlmode_api_to_fw(byte mode);
-byte controlmode_fw_to_api(byte mode);
-void enable_motor_pwm (char axis);
-void disable_motor_pwm (char axis);
-void enable_control (char axis);
-void disable_control (char axis);
+void enable_motor_pwm      (byte axis);
+void disable_motor_pwm     (byte axis);
+
+byte helper_controlmode_api_to_fw (byte mode);
+byte helper_controlmode_fw_to_api (byte mode);
+void helper_set_control_mode      (byte axis, byte value);	
+void helper_enable_single_motor   (byte j);
+void helper_enable_coupled_motor  (byte j1, byte j2);
+void helper_disable_single_motor  (byte j);
+void helper_disable_coupled_motor (byte j1, byte j2);
 
 //-----------------------------------------------------------------------------------------------------------------------
-byte controlmode_api_to_fw(byte mode)
+byte helper_controlmode_api_to_fw(byte mode)
 {
 	switch (mode)
 	{
@@ -47,7 +51,7 @@ byte controlmode_api_to_fw(byte mode)
 }
 
 //-----------------------------------------------------------------------------------------------------------------------
-byte controlmode_fw_to_api(byte mode)
+byte helper_controlmode_fw_to_api(byte mode)
 {
 	switch (mode)
 	{
@@ -72,456 +76,211 @@ byte controlmode_fw_to_api(byte mode)
 }
 
 //=======================================================================================================================
-void disable_motor_pwm (char axis) 
+void disable_motor_pwm (byte axis) 
 {
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 //this is for waist coupling
 	{  
-		PWM_outputPadDisable(0);  
-		PWM_outputPadDisable(1);  
-		can_printf("PWM DIS COUPLED:0 & 1"); 
+		helper_disable_coupled_motor(0,1);
 	}
 #elif VERSION == 0x0215 || VERSION == 0x0115
 //this is for eyes coupling
 	{  
 		if ((axis==2) || (axis==3)) 
 		{ 
-			PWM_outputPadDisable(2);  
-			PWM_outputPadDisable(3);   
-			can_printf("PWM DIS COUPLED:2 & 3"); 
+			helper_disable_coupled_motor(2,3);
 		} 
 		else 
 		{ 
-			PWM_outputPadDisable(axis);  
-			can_printf("PWM DIS:%d",axis); 
+			helper_disable_single_motor(axis);
 		} 
     }
 #elif VERSION == 0x0219  || VERSION == 0x0119
 //this is for wrist coupling
 	{  
-		if ((axis>0) && (axis<3)) 
+		if ((axis==1) || (axis==2)) 
 		{ 
-			PWM_outputPadDisable(1);  
-			PWM_outputPadDisable(2);  
-			can_printf("PWM DIS COUPLED:1 & 2"); 
+			helper_disable_coupled_motor(1,2);
 		} 
 		else 
 		{ 
-			PWM_outputPadDisable(axis);  
-			can_printf("PWM DIS:%d",axis); 
+			helper_disable_single_motor(axis);
 		} 
 	}
 #elif VERSION == 0x0351 
+//ikart firmware
 	{  
 		if (_board_ID==1)  
 		{  
-			PWM_outputPadDisable(0);  
-			PWM_outputPadDisable(1);   
-			can_printf("PWM DIS COUPLED:012"); 
-			if (CAN_SRC==0)  
-				{  
-				  CAN_ID = (_board_ID << 4) ;  
-				  CAN_ID |=  2;  
-				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
-				}  
+			helper_disable_coupled_motor(0,1);
 		} 
 		else 
 		if (_board_ID==2) 
 		{ 
-			PWM_outputPadDisable(0); 
-			PWM_outputPadDisable(1); 
-			can_printf("PWM ENA COUPLED:012");
-			if (CAN_SRC==0) 
-				{ 
-				  CAN_ID = (_board_ID << 4) ; 
-				  CAN_ID |=  1; 
-				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
-				} 
-			CAN_LEN = 3; 
-			CAN_DATA[1] = _control_mode[axis];
-			CAN_DATA[2] = 0;
-			CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
+			helper_disable_single_motor(0);
 		} 
 	}
 #else 
+//standard version
 	{ 
-		PWM_outputPadDisable(axis); 
-		can_printf("PWM DIS:%d",axis);
+		helper_disable_single_motor(axis);
 	}
 #endif
 }
 
 //---------------------------------------------------------------------------------------------------
-void enable_motor_pwm (char axis) 
+void helper_disable_coupled_motor(byte j1, byte j2)
 {
-		if (_control_mode[axis]== MODE_HW_FAULT) return;
-		
+	if (_control_mode[j1] != MODE_IDLE && 
+	    _control_mode[j1] != MODE_HW_FAULT)
+	{
+		_control_mode[j1] = MODE_IDLE;
+	}
+	if (_control_mode[j2] != MODE_IDLE && 
+	    _control_mode[j2] != MODE_HW_FAULT)
+	{
+		_control_mode[j2] = MODE_IDLE;
+	}
+	
+	PWM_outputPadDisable(j1);
+	PWM_outputPadDisable(j2);	 
+	can_printf("PWM ENA COUPLED:%d & %d",j1,j2);  
+}
+
+//---------------------------------------------------------------------------------------------------
+void helper_disable_single_motor(byte j)
+{
+	if (_control_mode[j] != MODE_IDLE && 
+	    _control_mode[j] != MODE_HW_FAULT)
+	{
+		_control_mode[j] = MODE_IDLE;
+	}
+	
+	PWM_outputPadDisable(j); 
+	can_printf("PWM DIS:%d",j);
+}
+
+//---------------------------------------------------------------------------------------------------
+void helper_enable_single_motor(byte j)
+{
+	if (_control_mode[j]== MODE_HW_FAULT) return;
+	
+	if (_can_protocol_ack == false)
+	{
+		can_printf("can protocol NOT ack");
+		_control_mode[j] = MODE_HW_FAULT;
+		return;
+	}
+	if (!(_received_pid[j].rec_pid==0x7F))
+	{
+		can_printf("PID IS NOT SET %d", j);
+		_control_mode[j] = MODE_HW_FAULT;
+		return;
+	}
+	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC)
+	if (_calibrated[j] == false)
+	{
+		can_printf("calib failed %d",j);  
+		_control_mode[j] = MODE_HW_FAULT;		
+	}
+	#endif
+	PWM_outputPadEnable(j);   
+	can_printf("PWM ENA:%d",j);
+}
+
+//---------------------------------------------------------------------------------------------------
+void helper_enable_coupled_motor(byte j1, byte j2)
+{
+	if (_control_mode[j1]== MODE_HW_FAULT) return;
+	if (_control_mode[j2]== MODE_HW_FAULT) return;
+	
+	if (_can_protocol_ack == false)
+	{
+		can_printf("can protocol NOT ack %d & %d", j1, j2);
+		_control_mode[j1] = MODE_HW_FAULT;
+		_control_mode[j2] = MODE_HW_FAULT;
+		return;
+	}
+	if (!(_received_pid[j1].rec_pid==0x7F) ||
+	    !(_received_pid[j2].rec_pid==0x7F))
+	{
+		can_printf("WARNING:PID IS NOT SET %d & %d", j1, j2);
+		_control_mode[j1] = MODE_HW_FAULT;
+		_control_mode[j2] = MODE_HW_FAULT; 		
+		return;	
+	}	
+	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC)
+	if (_calibrated[j1] == false ||
+	    _calibrated[j2] == false)
+	{
+		can_printf("calib failed %d & %d",j1,j2);  
+		_control_mode[j1] = MODE_HW_FAULT;
+		_control_mode[j2] = MODE_HW_FAULT; 		
+		return;			
+	}
+	#endif
+	PWM_outputPadEnable(j1);   
+	PWM_outputPadEnable(j2);   
+	can_printf("PWM ENA COUPLED:%d & %d",j1,j2);  
+}
+
+//---------------------------------------------------------------------------------------------------
+void enable_motor_pwm (byte axis) 
+{		
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 //this is for waist coupling
 	{   
-		if (_can_protocol_ack == false)   
-		{   
-			can_printf("can protocol NOT ack");   
-			_control_mode[0] = MODE_HW_FAULT;   
-			_control_mode[1] = MODE_HW_FAULT;   
-			return;   
-		}   
-		if (_calibrated[0] == true && _calibrated[1] == true)   
-		{   
-			PWM_outputPadEnable(0);   
-			PWM_outputPadEnable(1);   
-			can_printf("PWM ENA COUPLED:0 & 1");  
-		}   
-		else   
-		{   
-			can_printf("calib failed 0&1");   
-		}   
+		helper_enable_coupled_motor(0,1);
 	}
 #elif VERSION == 0x0215 || VERSION == 0x0115
 //this is for eyes coupling
 	{   
-		if (_can_protocol_ack == false)   
-		{   
-			can_printf("can protocol NOT ack"); 
-			_control_mode[2] = MODE_HW_FAULT;   
-			_control_mode[3] = MODE_HW_FAULT;    
-			return;   
-		}   
 		if ((axis==2) || (axis==3))  
 		{  
-			{   
-				PWM_outputPadEnable(2);   
-				PWM_outputPadEnable(3);   
-				can_printf("PWM ENA COUPLED:2 & 3");  
-			}   
+			helper_enable_coupled_motor(2,3);
 		}  
 		else  
 		{  
-			PWM_outputPadEnable(axis);  
-			can_printf("PWM ENA:%d",axis);  
+			helper_enable_single_motor(axis);
 		}  
 	} 
 #elif VERSION == 0x0219 || VERSION == 0x0119
 //this is for wrist coupling
 	{   
-		if (_can_protocol_ack == false)   
-		{   
-			can_printf("can protocol NOT ack");  
-			_control_mode[1] = MODE_HW_FAULT;   
-			_control_mode[2] = MODE_HW_FAULT;   
-			return;   
-		}   
-		if ((axis>0) && (axis<3))  
+		if ((axis==1) || (axis==2))  
 		{  
-			{   
-				PWM_outputPadEnable(1);   
-				PWM_outputPadEnable(2);   
-				can_printf("PWM ENA COUPLED:1 & 2");  
-			}   
+			helper_enable_coupled_motor(1,2);
 		}  
 		else  
 		{  
-			PWM_outputPadEnable(axis);  
-			can_printf("PWM ENA:%d",axis);  
+			helper_enable_single_motor(axis);
 		}  
 	}
-#elif VERSION == 0x0351  //ikart 
+#elif VERSION == 0x0351 
+//ikart 
 	{   
-		if (_can_protocol_ack == false)   
-		{   
-			can_printf("can protocol NOT ack");
-			_control_mode[0] = MODE_HW_FAULT;   
-			_control_mode[1] = MODE_HW_FAULT;     
-			return;   
-		}   
 		if (_board_ID==1)   
-		{   
-			{   
-				PWM_outputPadEnable(0);   
-				PWM_outputPadEnable(1);   
-				can_printf("PWM ENA COUPLED:012");  
-				if (CAN_SRC==0)   
-				{   
-				  CAN_ID = (_board_ID << 4) ;   
-				  CAN_ID |=  2;   
-				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA);   
-				}   
-			}   
-		}   
+		{
+			helper_enable_coupled_motor(0,1);		
+		}
 		else   
 		if (_board_ID==2)   
 		{   
-			{   
-				PWM_outputPadEnable(0);   
-				can_printf("PWM ENA COUPLED:012");  
-				if (CAN_SRC==0)   
-				{   
-				  CAN_ID = (_board_ID << 4) ;   
-				  CAN_ID |=  1;   
-				  CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA);   
-				}   
-			}   
+			helper_enable_single_motor(0);
 		}   
 	}
 #else
-	#if (CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
-		{   
-			if (_can_protocol_ack == false)   
-			{   
-				can_printf("can protocol NOT ack");   
-				_control_mode[axis] = MODE_HW_FAULT;  
-				return;   
-			}   
-			PWM_outputPadEnable(axis);    
-			can_printf("PWM ENA:%d",axis);  
-		}
-	#else //(CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
-		{   
-			if (_can_protocol_ack == false)   
-			{   
-				can_printf("can protocol NOT ack"); 
-				_control_mode[axis] = MODE_HW_FAULT;     
-				return;   
-			}   
-			if (_calibrated[axis] == true)   
-			{   
-				PWM_outputPadEnable(axis);      
-				can_printf("PWM ENA:%d",axis);  
-			}   
-			else   
-			{   
-				_control_mode[axis] = MODE_HW_FAULT;     
-				can_printf("calib failed:%d",axis);   
-			}   
-		} 
-	#endif //(CURRENT_BOARD_TYPE  == BOARD_TYPE_4DC)
-#endif
-}
-
-//---------------------------------------------------------------------------------------------------------------------------
-
-void enable_control (char axis)
-{
-		if (_control_mode[axis]== MODE_HW_FAULT) return;
-		
-#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 //this is for waist coupling
-	{ 
-		if ((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)) 
-		{ 
-		 	if ((_received_pid[0].rec_pid==0x7F) || (_received_pid[1].rec_pid==0x7F))   
-			{ 
-				/*_control_mode[0] = MODE_POSITION; 
-				_control_mode[1] = MODE_POSITION; 
-				_desired[0] = _position[0]; 
-				_desired[1] = _position[1]; 
-				_integral[0] = 0; 
-				_integral[1] = 0; 
-				_ko_imp[0] = 0; 
-				_ko_imp[1] = 0; 
-				_set_point[0] = _position[0]; 
-				_set_point[1] = _position[1]; 
-				init_trajectory (0, _position[0], _position[0], 1); 
-				init_trajectory (1, _position[1], _position[1], 1);*/
-			} 
-			else 
-			{ 
-			    can_printf("WARNING:PID IS NOT SET %d", axis);
-			    _control_mode[0] = MODE_HW_FAULT;
-			    _control_mode[1] = MODE_HW_FAULT; 
-			} 
-		} 
-	}
-#elif VERSION == 0x0215 || VERSION == 0x0115 //this is for eyes coupling
-	{ 
-		if ((axis==2) || (axis==3))
-		{
-			if (((_control_mode[2] == MODE_IDLE) || (_control_mode[3] == MODE_IDLE)))  
-			{ 
-			 	if ((_received_pid[2].rec_pid==0x7F) || (_received_pid[3].rec_pid==0x7F))   
-				{ 
-				  /*_control_mode[2] = MODE_POSITION; 
-					_control_mode[3] = MODE_POSITION; 
-					_desired[2] = _position[2]; 
-					_desired[3] = _position[3]; 
-					_integral[2] = 0; 
-					_integral[3] = 0; 
-					_ko_imp[2] = 0; 
-					_ko_imp[3] = 0; 
-					_set_point[2] = _position[2]; 
-					_set_point[3] = _position[3]; 
-					init_trajectory (2, _position[2], _position[2], 1); 
-					init_trajectory (3, _position[3], _position[3], 1);*/
-				} 
-				else 
-				{ 
-				    can_printf("WARNING:PID IS NOT SET %d", axis);
-				    _control_mode[2] = MODE_HW_FAULT;
-			        _control_mode[3] = MODE_HW_FAULT; 
-				} 
-			} 
-		}
-		else
-		{
-			if (_control_mode[axis] == MODE_IDLE) 
-			{ 
-				if (_received_pid[axis].rec_pid==0x7F)
-				{
-					/*_control_mode[axis] = MODE_POSITION; 
-					_desired[axis] = _position[axis]; 
-					_desired_vel[axis] = 0; 
-					_integral[axis] = 0; 
-					_ko_imp[axis] = 0; 
-					_set_point[axis] = _position[axis]; 
-					init_trajectory (axis, _position[axis], _position[axis], 1);*/ 
-				}
-				else
-				{ 
-				    can_printf("WARNING:PID IS NOT SET %d", axis); 
-   			        _control_mode[axis] = MODE_HW_FAULT;
-				} 
-			} 
-		}
-	}
-#elif VERSION == 0x0351 //ikart
-	{ 
-		if (_board_ID==1) 
-		{ 
-			if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  
-			{ 
-				/*_control_mode[0] = MODE_POSITION; 
-				_control_mode[1] = MODE_POSITION; 
-				_desired[0] = _position[0]; 
-				_desired[1] = _position[1]; 
-				_integral[0] = 0; 
-				_integral[1] = 0; 
-				_set_point[0] = _position[0]; 
-				_set_point[1] = _position[1];*/
-				if (CAN_SRC==0) 
-				{ 
-				    CAN_ID = (_board_ID << 4) ; 
-				    CAN_ID |=  2; 
-				    CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
-				} 
-			} 
-		} 
-		else 
-		if (_board_ID==2) 
-		{ 
-			if (((_control_mode[0] == MODE_IDLE) || (_control_mode[1] == MODE_IDLE)))  
-			{ 
-				/*_control_mode[0] = MODE_POSITION; 
-				_desired[0] = _position[0]; 
-				_integral[0] = 0; 
-				_set_point[0] = _position[0];*/
-				if (CAN_SRC==0) 
-				{ 
-				    CAN_ID = (_board_ID << 4) ; 
-				    CAN_ID |=  1; 
-				    CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
-				} 
-			} 
-		} 
-	}
-#elif VERSION == 0x0219 || VERSION == 0x0119 //this is for wrist coupling
-	{ 
-		if ((axis==1) || (axis==2))
-		{
-			if (((_control_mode[1] == MODE_IDLE) || (_control_mode[2] == MODE_IDLE)))  
-			{ 
-			 	if ((_received_pid[1].rec_pid==0x7F) || (_received_pid[2].rec_pid==0x7F))   
-				{ 
-				    /*_control_mode[1] = MODE_POSITION; 
-					_control_mode[2] = MODE_POSITION; 
-					_desired[1] = _position[1]; 
-					_desired[2] = _position[2]; 
-					_integral[1] = 0; 
-					_integral[2] = 0; 
-					_ko_imp[1] = 0; 
-					_ko_imp[2] = 0; 
-					_set_point[1] = _position[1]; 
-					_set_point[2] = _position[2]; 
-					init_trajectory (1, _position[1], _position[1], 1); 
-					init_trajectory (2, _position[2], _position[2], 1);*/
-				} 
-				else 
-				{ 
-				    can_printf("WARNING:PID IS NOT SET %d", axis);
-				    _control_mode[1] = MODE_HW_FAULT; 
-					_control_mode[2] = MODE_HW_FAULT; 
-				} 
-			} 
-		}
-		else
-		{
-			if (_control_mode[axis] == MODE_IDLE) 
-			{ 
-				if (_received_pid[axis].rec_pid==0x7F)
-				{
-					/*_control_mode[axis] = MODE_POSITION; 
-					_desired[axis] = _position[axis]; 
-					_desired_vel[axis] = 0; 
-					_integral[axis] = 0; 
-					_ko_imp[axis] = 0; 
-					_set_point[axis] = _position[axis]; 
-					init_trajectory (axis, _position[axis], _position[axis], 1);*/ 
-				}
-				else
-				{ 
-					can_printf("WARNING:PID IS NOT SET %d", axis); 
-					_control_mode[axis] = MODE_HW_FAULT; 
-				} 
-			} 
-		}
-	}
-#else //normal boards
-	{ 
-		if (_control_mode[axis] == MODE_IDLE) 
-		{ 
-			if (_received_pid[axis].rec_pid==0x7F) 
-			{ 
-				/*_control_mode[axis] = MODE_POSITION; 
-				_desired[axis] = _position[axis]; 
-				_integral[axis] = 0; 
-				_ko_imp[axis] = 0; 
-				_set_point[axis] = _position[axis]; 
-				init_trajectory (axis, _position[axis], _position[axis], 1);*/ 
-			} 
-			else 
-			{ 
-				can_printf("WARNING:PID IS NOT SET %d", axis);
-                _control_mode[axis] = MODE_HW_FAULT;  
-			} 
-		} 
-	}
-#endif
-}
-
-//---------------------------------------------------------------------------------------------------------------------------
-void disable_control(char axis)
-{
-	if (_control_mode[axis] != MODE_IDLE && _control_mode[axis] != MODE_HW_FAULT)
+// standard firmware
 	{
-		_control_mode[axis] = MODE_IDLE;
+		helper_enable_single_motor(axis);
 	}
+#endif
 }
 
-
 //---------------------------------------------------------------------------------------------------------------------------
-void get_control_mode(char axis)
+void get_control_mode(byte axis)
 {
-    byte m=controlmode_fw_to_api(_control_mode[axis]);
-    
-	PREPARE_HEADER; 
-	CAN_LEN = 3; 
-	CAN_DATA[1] = m; 
-	CAN_DATA[2] = 0; 
-	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA);	
-}
-		
-//---------------------------------------------------------------------------------------------------------------------------
-void get_control_mode_new(char axis)
-{
-    byte m=controlmode_fw_to_api(_control_mode[axis]);
+    byte m=helper_controlmode_fw_to_api(_control_mode[axis]);
 
 	PREPARE_HEADER; 
 	CAN_LEN = 3; 
@@ -532,10 +291,10 @@ void get_control_mode_new(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void set_control_mode_new(char axis)
+void set_control_mode(byte axis)
 {
     byte api_value = CAN_DATA[1];
-    byte value = controlmode_api_to_fw(CAN_DATA[1]);
+    byte value = helper_controlmode_api_to_fw(CAN_DATA[1]);
 
 	//special case, from IDLE you can go anywhere, execept IDLE
 	if (_control_mode[axis]==MODE_IDLE)
@@ -543,8 +302,7 @@ void set_control_mode_new(char axis)
         if (value!=MODE_IDLE)	
         {
 	        enable_motor_pwm(axis);
-			enable_control(axis);
-			set_control_mode(axis, value);	
+			helper_set_control_mode(axis, value);	
        }
         return;
 	}
@@ -554,9 +312,8 @@ void set_control_mode_new(char axis)
 	{
 		if (api_value==icubCanProto_controlmode_forceIdle)	
 		{
-			disable_control(axis);
 			disable_motor_pwm(axis);
-			set_control_mode(axis, MODE_IDLE);
+			helper_set_control_mode(axis, MODE_IDLE);
 		}
 		return;
 	}
@@ -565,29 +322,26 @@ void set_control_mode_new(char axis)
 	//if you want to turn off motors do this...
 	if (value==MODE_IDLE)
 	{
-		disable_control(axis);
 		disable_motor_pwm(axis);
-		set_control_mode(axis, value);
+		helper_set_control_mode(axis, value);
 		return;
 	}
 	if (api_value==icubCanProto_controlmode_forceIdle)
 	{
-		disable_control(axis);
 		disable_motor_pwm(axis);
-		set_control_mode(axis, MODE_IDLE);
+		helper_set_control_mode(axis, MODE_IDLE);
 		return;		
 	}
 	
 	//otherwise just change control mode.
 	{
-		set_control_mode(axis, value);
+		helper_set_control_mode(axis, value);
 	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void set_control_mode(char axis, byte value)
+void helper_set_control_mode(byte axis, byte value)
 {
-#if VERSION != 0x0351 //normal boards
 	if (CAN_LEN == 2) 
 	{ 
 		can_printf("CTRLMODE SET:%d",value);
@@ -602,63 +356,14 @@ void set_control_mode(char axis, byte value)
 		clear_lpf_ord1_3hz  (axis);
 		_ko_openloop[axis] = 0;
 	} 
-#elif VERSION == 0x0351 //ikart
-	if (CAN_LEN == 2)
+	else
 	{
-		if (_board_ID == 1)
-		{
-			can_printf("CTRLMODE SET COUPLED 012:%d",value);
-			if (value>=0 && value <=0x50)
-			{
-				_control_mode[0] = value;
-				_control_mode[1] = value;
-			}
-			_desired[0] = _position[0];
-			_desired[1] = _position[1];
-			_desired_vel[0] = 0;
-			_desired_vel[1] = 0;
-			_integral[0] = 0;
-			_integral[1] = 0;
-			_ko_imp[0] = 0;
-			_ko_imp[1] = 0;
-			_set_point[0] = _position[0];
-			_set_point[1] = _position[1];
-			_ko_openloop[0] = 0;
-		    _ko_openloop[1] = 0;
-			if (CAN_SRC==0)
-			{ 
-				 CAN_ID = (_board_ID << 4) ;
-				 CAN_ID |=  2;
-				 CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
-			}
-		}
-		else
-		if (_board_ID == 2)
-		{ 
-			can_printf("CTRLMODE SET COUPLED 012:%d",value);
-			if (value>=0 && value <=0x50)
-			{ 
-				_control_mode[0] = value; 
-			} 
-			_desired[0] = _position[0]; 
-			_desired_vel[0] = 0; 
-			_integral[0] = 0; 
-			_ko_imp[0] = 0; 
-			_set_point[0] = _position[0]; 
-			_ko_openloop[0] = 0; 
-			if (CAN_SRC==0) 
-			{ 
-				 CAN_ID = (_board_ID << 4) ; 
-				 CAN_ID |=  1; 
-				 CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); 
-			} 
-		} 
+		can_printf("CTRLMODE ERR");
 	}
-#endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void set_interaction_mode(char axis)
+void set_interaction_mode(byte axis)
 {
 	byte value = 0; 
 	value = (CAN_DATA[1]);
@@ -669,7 +374,7 @@ void set_interaction_mode(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void get_interaction_mode(char axis)
+void get_interaction_mode(byte axis)
 {
     byte m=_interaction_mode[axis];
     
@@ -681,7 +386,7 @@ void get_interaction_mode(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-bool mode_is_idle(char axis)
+bool mode_is_idle(byte axis)
 {
 	if (_control_mode[axis] == MODE_IDLE) return true;
 	if (_control_mode[axis] == MODE_HW_FAULT) return true;
@@ -689,7 +394,7 @@ bool mode_is_idle(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-bool mode_is_stiff(char axis)
+bool mode_is_stiff(byte axis)
 {
 	if (_control_mode[axis] == MODE_IDLE)     return false;
 	if (_control_mode[axis] == MODE_HW_FAULT) return false;
@@ -703,7 +408,7 @@ bool mode_is_stiff(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-bool mode_is_force_controlled(char axis)
+bool mode_is_force_controlled(byte axis)
 {
 	if (_control_mode[axis] == MODE_IDLE)     return false;
 	if (_control_mode[axis] == MODE_HW_FAULT) return false;
@@ -717,7 +422,7 @@ bool mode_is_force_controlled(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-bool mode_is_impedance_position(char axis)
+bool mode_is_impedance_position(byte axis)
 {
 	if (_control_mode[axis] == MODE_IMPEDANCE_POS) return true;
 	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant)
@@ -731,7 +436,7 @@ bool mode_is_impedance_position(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-bool mode_is_impedance_velocity(char axis)
+bool mode_is_impedance_velocity(byte axis)
 {
 	if (_control_mode[axis] == MODE_IMPEDANCE_VEL) return true;
 	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant)
