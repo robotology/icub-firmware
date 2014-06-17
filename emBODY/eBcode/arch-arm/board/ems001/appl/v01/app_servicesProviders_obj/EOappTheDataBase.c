@@ -213,12 +213,12 @@ extern uint16_t eo_appTheDB_GetNumeberOfCanboards(EOappTheDB *p)
 extern eOresult_t eo_appTheDB_GetTypeOfCanboard(EOappTheDB *p, eObrd_boardId_t bid, eObrd_types_t *type_ptr)
 {
     eOappTheDB_hid_canBoardInfo_t   *b_ptr;
-	
+    
     if((NULL == p) || (NULL == type_ptr))
     {
         return(eores_NOK_nullpointer);
     }
-	
+    
     b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, bid);
     if(NULL == b_ptr)
     {
@@ -231,7 +231,7 @@ extern eOresult_t eo_appTheDB_GetTypeOfCanboard(EOappTheDB *p, eObrd_boardId_t b
 }
 
 
-extern eObool_t	eo_appTheDB_isSkinConnected(EOappTheDB *p)
+extern eObool_t eo_appTheDB_isSkinConnected(EOappTheDB *p)
 {
 
     if((NULL == p) || (NULL == p->skinList))
@@ -249,14 +249,14 @@ extern eObool_t	eo_appTheDB_isSkinConnected(EOappTheDB *p)
 extern eOresult_t eo_appTheDB_GetJointCanLocation(EOappTheDB *p, eOmc_jointId_t jId,  eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eObrd_types_t *type_ptr)
 {
     eOappTheDB_hid_canBoardInfo_t   *b_ptr;
-	eOappTheDB_hid_jointInfo_t 		*j_ptr;
-	
-	
+    eOappTheDB_hid_jointInfo_t      *j_ptr;
+    
+    
     if((NULL == p) || (NULL == canloc_ptr))
     {
         return(eores_NOK_nullpointer);
     }
-	
+    
     j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, jId);
     if(NULL == j_ptr)
     {
@@ -283,15 +283,15 @@ extern eOresult_t eo_appTheDB_GetJointCanLocation(EOappTheDB *p, eOmc_jointId_t 
 
 extern eOresult_t eo_appTheDB_GetMotorCanLocation(EOappTheDB *p, eOmc_motorId_t mId,  eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eObrd_types_t *type_ptr)
 {
-    eOappTheDB_hid_canBoardInfo_t		*b_ptr;
-	eOappTheDB_hid_motorInfo_t 		*m_ptr;
-	
-	
+    eOappTheDB_hid_canBoardInfo_t       *b_ptr;
+    eOappTheDB_hid_motorInfo_t      *m_ptr;
+    
+    
     if((NULL == p) || (NULL == canloc_ptr))
     {
         return(eores_NOK_nullpointer);
     }
-	
+    
     m_ptr = (eOappTheDB_hid_motorInfo_t *)eo_array_At(p->motorsList, mId);
     if(NULL == m_ptr)
     {
@@ -332,7 +332,7 @@ extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOapp
         return(eores_NOK_generic);
     }
 
-	b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
+    b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsList, eo_appTheDB_hid_GetBoardIdWithAddress(p, canloc_ptr->addr));
     if(NULL == b_ptr)
     {
        return(eores_NOK_nodata);
@@ -417,8 +417,8 @@ extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, e
 
 extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOas_maisId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr)
 {
-    eOappTheDB_hid_snsrMaisInfo_t		*s_ptr;
-	eOappTheDB_hid_canBoardInfo_t		*b_ptr;
+    eOappTheDB_hid_snsrMaisInfo_t       *s_ptr;
+    eOappTheDB_hid_canBoardInfo_t       *b_ptr;
     
     if((NULL == p) || (NULL == canloc_ptr))
     {
@@ -484,8 +484,8 @@ extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p,
 
 extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strainId_t sId, eOappTheDB_sensorCanLocation_t *canloc_ptr)
 {
-    eOappTheDB_hid_snsrStrainInfo_t		*s_ptr;
-	eOappTheDB_hid_canBoardInfo_t		*b_ptr;
+    eOappTheDB_hid_snsrStrainInfo_t     *s_ptr;
+    eOappTheDB_hid_canBoardInfo_t       *b_ptr;
     
     if((NULL == p) || (NULL == canloc_ptr))
     {
@@ -563,10 +563,10 @@ extern eOresult_t eo_appTheDB_GetSkinId_BySkinCanLocation(EOappTheDB *p, eOappTh
 }
 extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_config_t **jconfig_ptr)
 {
-	if((NULL == p) || (NULL == jconfig_ptr))
-	{
+    if((NULL == p) || (NULL == jconfig_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOmc_joint_t *j_ptr = (eOmc_joint_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)jId);
     
@@ -582,10 +582,10 @@ extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jI
 
 extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_status_t **jstatus_ptr)
 {
-	if((NULL == p) || (NULL == jstatus_ptr))
-	{
+    if((NULL == p) || (NULL == jstatus_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOmc_joint_t *j_ptr = (eOmc_joint_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)jId);
     
@@ -601,10 +601,10 @@ extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jI
 
 // extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_inputs_t **jinputs_ptr)
 // {
-// 	if((NULL == p) || (NULL == jinputs_ptr))
-// 	{
+//  if((NULL == p) || (NULL == jinputs_ptr))
+//  {
 //         return(eores_NOK_nullpointer);
-// 	}
+//  }
 //     
 //     if(jId >= p->cfg.jointsList->size)
 //     {
@@ -619,10 +619,10 @@ extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jI
 
 // extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_controlmode_t **jcmdcontrolmode_ptr)
 // {
-// 	if((NULL == p) || (NULL == jcmdcontrolmode_ptr))
-// 	{
+//  if((NULL == p) || (NULL == jcmdcontrolmode_ptr))
+//  {
 //         return(eores_NOK_nullpointer);
-// 	}
+//  }
 //     
 //     if(jId >= p->cfg.jointsList->size)
 //     {
@@ -639,13 +639,13 @@ extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jI
 
 extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t **shiftval_ptr)
 {
-    eOappTheDB_hid_jointInfo_t 		*j_ptr;
+    eOappTheDB_hid_jointInfo_t      *j_ptr;
     
     
-	if((NULL == p) || (NULL == shiftval_ptr))
-	{
+    if((NULL == p) || (NULL == shiftval_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     if(jId >= eo_array_Capacity(p->jointsList))
     {
@@ -661,13 +661,13 @@ extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_joint
 
 extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOicubCanProto_bcastpolicy_t **bcast_ptr)
 {
-    eOappTheDB_hid_jointInfo_t 		*j_ptr;
+    eOappTheDB_hid_jointInfo_t      *j_ptr;
     
 
-	if((NULL == p) || (NULL == bcast_ptr))
-	{
+    if((NULL == p) || (NULL == bcast_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     if(jId >= eo_array_Capacity(p->jointsList))
     {
@@ -684,10 +684,10 @@ extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId
 
 // extern eOresult_t eo_appTheDB_GetMotorConfigPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_config_t **mconfig_ptr)
 // {
-// 	if((NULL == p) || (NULL == mconfig_ptr))
-// 	{
+//  if((NULL == p) || (NULL == mconfig_ptr))
+//  {
 //         return(eores_NOK_nullpointer);
-// 	}
+//  }
 
 //     if(mId >= p->cfg.motorsList->size)
 //     {
@@ -702,10 +702,10 @@ extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId
 
 extern eOresult_t eo_appTheDB_GetMotorStatusPtr(EOappTheDB *p, eOmc_motorId_t mId,  eOmc_motor_status_t **mstatus_ptr)
 {
-	if((NULL == p) || (NULL == mstatus_ptr))
-	{
+    if((NULL == p) || (NULL == mstatus_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOmc_motor_t *m_ptr = (eOmc_motor_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, (eOprotIndex_t)mId);
     
@@ -721,10 +721,10 @@ extern eOresult_t eo_appTheDB_GetMotorStatusPtr(EOappTheDB *p, eOmc_motorId_t mI
 
 extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_config_t **sconfig_ptr)
 {
-	if((NULL == p) || (NULL == sconfig_ptr))
-	{
+    if((NULL == p) || (NULL == sconfig_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOas_mais_t *mais_ptr = (eOas_mais_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)sId);
     
@@ -741,10 +741,10 @@ extern eOresult_t eo_appTheDB_GetSnrMaisConfigPtr(EOappTheDB *p, eOas_maisId_t s
 
 extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOas_maisId_t sId,  eOas_mais_status_t **sstatus_ptr)
 {
-	if((NULL == p) || (NULL == sstatus_ptr))
-	{
+    if((NULL == p) || (NULL == sstatus_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOas_mais_t *mais_ptr = (eOas_mais_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)sId);
     
@@ -762,10 +762,10 @@ extern eOresult_t eo_appTheDB_GetSnrMaisStatusPtr(EOappTheDB *p, eOas_maisId_t s
 
 extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOas_strainId_t sId,  eOas_strain_config_t **sconfig_ptr)
 {
-	if((NULL == p) || (NULL == sconfig_ptr))
-	{
+    if((NULL == p) || (NULL == sconfig_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOas_strain_t *strain_ptr = (eOas_strain_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)sId);
     
@@ -783,10 +783,10 @@ extern eOresult_t eo_appTheDB_GetSnrStrainConfigPtr(EOappTheDB *p, eOas_strainId
 
 extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId_t sId,  eOas_strain_status_t **sstatus_ptr)
 {
-	if((NULL == p) || (NULL == sstatus_ptr))
-	{
+    if((NULL == p) || (NULL == sstatus_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOas_strain_t *strain_ptr = (eOas_strain_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)sId);
     
@@ -803,10 +803,10 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId
 
 // extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr)
 // {
-// 	if((NULL == p) || (NULL == sigmode_ptr))
-// 	{
+//  if((NULL == p) || (NULL == sigmode_ptr))
+//  {
 //         return(eores_NOK_nullpointer);
-// 	}
+//  }
 //     
 //     eOsk_skin_t *sk_ptr = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)skId);
 //     
@@ -839,10 +839,10 @@ extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId, 
 }
 extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_skinId_t skId,  EOarray_of_10canframes **arrayof10canframes_ptr)
 {
-	if((NULL == p) || (NULL == arrayof10canframes_ptr))
-	{
+    if((NULL == p) || (NULL == arrayof10canframes_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     eOsk_skin_t *sk_ptr = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)skId);
     
@@ -859,10 +859,10 @@ extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_sk
 extern eOresult_t eo_appTheDB_GetCanBoardCfg(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_cfg_canBoardInfo_t **cfg_canbrd_ptr)
 {
     eOappTheDB_hid_canBoardInfo_t *b_ptr;
-	if((NULL == p) || (NULL == cfg_canbrd_ptr))
-	{
+    if((NULL == p) || (NULL == cfg_canbrd_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     if(bid >= eo_array_Capacity(p->canboardsList))
     {
@@ -880,10 +880,10 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
     eOappTheDB_hid_canBoardInfo_t *b_ptr;
     uint16_t numofboard = 0;
     
-	if((NULL == p) || (NULL == canloc_ptr) || (NULL == bid_ptr))
-	{
+    if((NULL == p) || (NULL == canloc_ptr) || (NULL == bid_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     numofboard = eo_array_Capacity(p->canboardsList);    
     for(i=0; i<numofboard; i++)
@@ -904,10 +904,10 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
 
 extern eOresult_t eo_appTheDB_GetVirtualStrainDataPtr(EOappTheDB *p, uint16_t **virtStrain_ptr)
 {
-	if((NULL == p) || (NULL == virtStrain_ptr))
-	{
+    if((NULL == p) || (NULL == virtStrain_ptr))
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     *virtStrain_ptr = &p->virtualStrainData.values[0];
     return(eores_OK);
@@ -916,10 +916,10 @@ extern eOresult_t eo_appTheDB_GetVirtualStrainDataPtr(EOappTheDB *p, uint16_t **
 
 extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue)
 {
-	if(NULL == p)
-	{
+    if(NULL == p)
+    {
         return(eores_NOK_nullpointer);
-	}
+    }
     
     switch(jId)
     {
@@ -952,10 +952,10 @@ extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_
 
 extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p)
 {
- 	if(NULL == p)
-	{
+    if(NULL == p)
+    {
         return(0);
-	}   
+    }   
     return(p->virtualStrainData.isupdated);
 }
 
@@ -1071,9 +1071,9 @@ static eObool_t s_appTheDB_checkConfiguaration(eOappTheDB_cfg_t *cfg)
 
 static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
 {
-    eOsizecntnr_t 					i, k;
-    eOappTheDB_cfg_canBoardInfo_t 	*b_cfg_ptr = NULL;	// pointer to configuration 
-	eOappTheDB_hid_canBoardInfo_t 	*b_ptr = NULL;		// pointer to db memory
+    eOsizecntnr_t                   i, k;
+    eOappTheDB_cfg_canBoardInfo_t   *b_cfg_ptr = NULL;  // pointer to configuration 
+    eOappTheDB_hid_canBoardInfo_t   *b_ptr = NULL;      // pointer to db memory
     
     
     //if no canboard is connected to board (skin only mode) ==> nothing to do and return ok 
@@ -1086,27 +1086,27 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
     
     //1) create canboardsList
     p->canboardsList = eo_array_New(p->cfg.canboardsList->size, sizeof(eOappTheDB_hid_canBoardInfo_t), NULL);
-	if(NULL == p->canboardsList)
-	{
-		return(eores_NOK_generic);
-	}
+    if(NULL == p->canboardsList)
+    {
+        return(eores_NOK_generic);
+    }
     
     b_cfg_ptr = (eOappTheDB_cfg_canBoardInfo_t*)(p->cfg.canboardsList->item_array_data);
-	
+    
     for(i = 0; i< p->cfg.canboardsList->size; i++)
     {
 
-		b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, i);
         
-		//1.1) save pointer to board cfg info
+        //1.1) save pointer to board cfg info
         b_ptr->cfg_ptr = &b_cfg_ptr[i];
         
         //create array of "connected stuff" (joints or sensors)
         if((eobrd_mc4 == b_ptr->cfg_ptr->type) || (eobrd_1foc == b_ptr->cfg_ptr->type))
         {
-			b_ptr->s.jm.connectedjoints =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+            b_ptr->s.jm.connectedjoints =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
                                                     sizeof(eOmc_jointId_t), eOicubCanProto_jm_indexInBoard_max);
-			b_ptr->s.jm.connectedmotors =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
+            b_ptr->s.jm.connectedmotors =  eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, 
                                                     sizeof(eOmc_motorId_t), eOicubCanProto_jm_indexInBoard_max);
             for(k=0; k<eOicubCanProto_jm_indexInBoard_max; k++)
             {
@@ -1130,8 +1130,8 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
 static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
 {
     eOsizecntnr_t                       i;
-    eOappTheDB_cfg_jointInfo_t   		*j_cfg_ptr = NULL; 	//pointer to configuration
-	eOappTheDB_hid_jointInfo_t			*j_ptr = NULL; 		//pointer to db memory
+    eOappTheDB_cfg_jointInfo_t          *j_cfg_ptr = NULL;  //pointer to configuration
+    eOappTheDB_hid_jointInfo_t          *j_ptr = NULL;      //pointer to db memory
     eOappTheDB_hid_canBoardInfo_t       *b_ptr = NULL;
     eOappTheDB_jointShiftValues_t       *shiftvalues_ptr;
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;    
@@ -1146,11 +1146,11 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
     
     //1) create jointList
     p->jointsList = eo_array_New(p->cfg.jointsList->size, sizeof(eOappTheDB_hid_jointInfo_t), NULL);
-	if(NULL == p->jointsList)
-	{
-		return(eores_NOK_generic);
-	}
-	
+    if(NULL == p->jointsList)
+    {
+        return(eores_NOK_generic);
+    }
+    
     //2) fill jointsList
     j_cfg_ptr = (eOappTheDB_cfg_jointInfo_t*)(p->cfg.jointsList->item_array_data);
         
@@ -1160,7 +1160,7 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
     
     for(i = 0; i< p->cfg.jointsList->size; i++)
     {
-		j_ptr = (eOappTheDB_hid_jointInfo_t*)eo_array_At(p->jointsList, i);
+        j_ptr = (eOappTheDB_hid_jointInfo_t*)eo_array_At(p->jointsList, i);
         
         j_ptr->cfg_ptr = &j_cfg_ptr[i];
         j_ptr->shiftvalues_ptr = shiftvalues_ptr;
@@ -1178,8 +1178,8 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
 static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
 {
     eOsizecntnr_t                       i;
-    eOappTheDB_cfg_motorInfo_t			*m_cfg_ptr = NULL; 	//pointer to configuration
-	eOappTheDB_hid_motorInfo_t		    *m_ptr = NULL; 		//pointer to db memory
+    eOappTheDB_cfg_motorInfo_t          *m_cfg_ptr = NULL;  //pointer to configuration
+    eOappTheDB_hid_motorInfo_t          *m_ptr = NULL;      //pointer to db memory
     eOappTheDB_hid_canBoardInfo_t       *b_ptr = NULL;
 
     //if no motor is connected to board (skin only mode) ==> nothing to do and return ok 
@@ -1192,10 +1192,10 @@ static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
 
     //1) create jointList
     p->motorsList = eo_array_New(p->cfg.motorsList->size, sizeof(eOappTheDB_hid_motorInfo_t), NULL);
-	if(NULL == p->motorsList)
-	{
-		return(eores_NOK_generic);
-	}
+    if(NULL == p->motorsList)
+    {
+        return(eores_NOK_generic);
+    }
 
  
     //2) fill motorsList
@@ -1203,11 +1203,11 @@ static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
 
     for(i = 0; i< p->cfg.motorsList->size; i++)
     {
-		m_ptr = (eOappTheDB_hid_motorInfo_t*)eo_array_At(p->motorsList, i);
+        m_ptr = (eOappTheDB_hid_motorInfo_t*)eo_array_At(p->motorsList, i);
         m_ptr->cfg_ptr = &m_cfg_ptr[i];
         
         //2.1)make a connection beetween board to joint also ==> fill "connected joints list" of board
-		b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, m_ptr->cfg_ptr->canLoc.belong2board);
+        b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, m_ptr->cfg_ptr->canLoc.belong2board);
         b_ptr->s.jm.connectedmotors[m_ptr->cfg_ptr->canLoc.indexinboard] = (eOmc_motorId_t)i; //set motor's id
     }
     
@@ -1218,8 +1218,8 @@ static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
 static eOresult_t s_appTheDB_snsrMaislist_init(EOappTheDB *p)
 {
     eOsizecntnr_t                       i;
-    eOappTheDB_cfg_snsrMaisInfo_t        *s_cfg_ptr = NULL; 	//pointer to configuration
-	eOappTheDB_hid_snsrMaisInfo_t		*s_ptr = NULL;		//pointer to db memory
+    eOappTheDB_cfg_snsrMaisInfo_t        *s_cfg_ptr = NULL;     //pointer to configuration
+    eOappTheDB_hid_snsrMaisInfo_t       *s_ptr = NULL;      //pointer to db memory
 
     //if no sensor is connected to board ==> nothing to do and return ok
     if(0 == p->cfg.snsrMaisList->size)
@@ -1230,20 +1230,20 @@ static eOresult_t s_appTheDB_snsrMaislist_init(EOappTheDB *p)
     
     //1) create sensors mais List
     p->snsrMaisList = eo_array_New(p->cfg.snsrMaisList->size, sizeof(eOappTheDB_hid_snsrMaisInfo_t), NULL);
-	if(NULL == p->snsrMaisList)
-	{
-		return(eores_NOK_generic);
-	}
-	
-	
-	//2) fill sensors mais List
+    if(NULL == p->snsrMaisList)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    
+    //2) fill sensors mais List
     s_cfg_ptr = (eOappTheDB_cfg_snsrMaisInfo_t*)(p->cfg.snsrMaisList->item_array_data);
 
     for(i = 0; i<p->cfg.snsrMaisList->size; i++)
     {
-		s_ptr = (eOappTheDB_hid_snsrMaisInfo_t*)eo_array_At(p->snsrMaisList, i);
+        s_ptr = (eOappTheDB_hid_snsrMaisInfo_t*)eo_array_At(p->snsrMaisList, i);
         s_ptr->cfg_ptr = &s_cfg_ptr[i];
-		
+        
         /* Since almost only one sensor is connected to ems, i don't use a table to get sensor id(it will always 0) */
     }
     
@@ -1254,8 +1254,8 @@ static eOresult_t s_appTheDB_snsrMaislist_init(EOappTheDB *p)
 static eOresult_t s_appTheDB_snsrStrainlist_init(EOappTheDB *p)
 {
     eOsizecntnr_t                       i;
-    eOappTheDB_cfg_snsrStrainInfo_t      *s_cfg_ptr = NULL; 	//pointer to configuration
-	eOappTheDB_hid_snsrStrainInfo_t		*s_ptr = NULL;		//pointer to db memory
+    eOappTheDB_cfg_snsrStrainInfo_t      *s_cfg_ptr = NULL;     //pointer to configuration
+    eOappTheDB_hid_snsrStrainInfo_t     *s_ptr = NULL;      //pointer to db memory
 
     //if no sensor is connected to board ==> nothing to do and return ok
     if(0 == p->cfg.snsrStrainList->size)
@@ -1266,20 +1266,20 @@ static eOresult_t s_appTheDB_snsrStrainlist_init(EOappTheDB *p)
     
     //1) create sensors mais List
     p->snsrStrainList = eo_array_New(p->cfg.snsrStrainList->size, sizeof(eOappTheDB_hid_snsrStrainInfo_t), NULL);
-	if(NULL == p->snsrStrainList)
-	{
-		return(eores_NOK_generic);
-	}
-	
-	
-	//2) fill sensors mais List
+    if(NULL == p->snsrStrainList)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    
+    //2) fill sensors mais List
     s_cfg_ptr = (eOappTheDB_cfg_snsrStrainInfo_t*)(p->cfg.snsrStrainList->item_array_data);
 
     for(i = 0; i<p->cfg.snsrStrainList->size; i++)
     {
-		s_ptr = (eOappTheDB_hid_snsrStrainInfo_t*)eo_array_At(p->snsrStrainList, i);
+        s_ptr = (eOappTheDB_hid_snsrStrainInfo_t*)eo_array_At(p->snsrStrainList, i);
         s_ptr->cfg_ptr = &s_cfg_ptr[i];
-		
+        
         /* Since almost only one sensor is connected to ems, i don't use a table to get sensor id(it will always 0) */
     }
     
@@ -1291,7 +1291,7 @@ static eOresult_t s_appTheDB_skinlist_init(EOappTheDB *p)
 {
     int8_t                              i;
     eOappTheDB_cfg_skinInfo_t           *sk_cfg_ptr = NULL;
-	eOappTheDB_hid_skinInfo_t			*sk_ptr = NULL;
+    eOappTheDB_hid_skinInfo_t           *sk_ptr = NULL;
 
     //if no sensor is connected to board ==> nothing to do and return ok
     if(0 == p->cfg.skinList->size)
@@ -1302,10 +1302,10 @@ static eOresult_t s_appTheDB_skinlist_init(EOappTheDB *p)
     
     //1) create sensorsList
     p->skinList = eo_array_New(p->cfg.skinList->size, sizeof(eOappTheDB_hid_skinInfo_t), NULL);
-	if(NULL == p->skinList)
-	{
-		return(eores_NOK_generic);
-	}
+    if(NULL == p->skinList)
+    {
+        return(eores_NOK_generic);
+    }
 
 
     //2) fill skin List
@@ -1313,7 +1313,7 @@ static eOresult_t s_appTheDB_skinlist_init(EOappTheDB *p)
 
     for(i = 0; i< p->cfg.skinList->size; i++)
     {
-		sk_ptr = (eOappTheDB_hid_skinInfo_t*)eo_array_At(p->skinList, i);
+        sk_ptr = (eOappTheDB_hid_skinInfo_t*)eo_array_At(p->skinList, i);
         sk_ptr->cfg_ptr = &sk_cfg_ptr[i];
         /* Since skin is seen like a unique board, connected to a specific ems port 
             i don't need a method to get skin id by can location */
@@ -1325,9 +1325,9 @@ static eOresult_t s_appTheDB_skinlist_init(EOappTheDB *p)
 
 static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
 {
-    eOsizecntnr_t 		     		 	i;
-// 	eObrd_boardId_t						maxusedcanaddr = 0;
-    icubCanProto_canBoardAddress_t 	    maxusedcanaddr = 0, addr;
+    eOsizecntnr_t                       i;
+//  eObrd_boardId_t                     maxusedcanaddr = 0;
+    icubCanProto_canBoardAddress_t      maxusedcanaddr = 0, addr;
     
     if(0 == p->cfg.canboardsList->size)
     {
@@ -1337,25 +1337,25 @@ static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p)
     }
     
     //1) get max used can address (it will be in range [1,E]. 0 is ems can port address and F is bradcast address)
-	eOappTheDB_cfg_canBoardInfo_t *b_cfg_ptr = (eOappTheDB_cfg_canBoardInfo_t*)(p->cfg.canboardsList->item_array_data);
-	
-	for(i = 0; i< p->cfg.canboardsList->size; i++)
-	{
+    eOappTheDB_cfg_canBoardInfo_t *b_cfg_ptr = (eOappTheDB_cfg_canBoardInfo_t*)(p->cfg.canboardsList->item_array_data);
+    
+    for(i = 0; i< p->cfg.canboardsList->size; i++)
+    {
         //select only the addresses that are:
         //  - connected 2 ems port used to commnd joint (joints and motors are connected to a different can bus of sensors) AND
         //  - belong to motor baord (1 foc and mc4)
-		if( (db_emscanportconnected2motorboard == b_cfg_ptr[i].canLoc.emscanport) &&
+        if( (db_emscanportconnected2motorboard == b_cfg_ptr[i].canLoc.emscanport) &&
             ((eobrd_1foc == b_cfg_ptr[i].type) || (eobrd_mc4 == b_cfg_ptr[i].type)) &&
             (maxusedcanaddr < b_cfg_ptr[i].canLoc.addr))
-		{
-			maxusedcanaddr = b_cfg_ptr[i].canLoc.addr;
-		}   
-	}
+        {
+            maxusedcanaddr = b_cfg_ptr[i].canLoc.addr;
+        }   
+    }
 
     // 2) create the lookup tbl
-	p->canaddressLookuptbl.capacity = maxusedcanaddr+1; //cosi' lascio l'elemento 0-esimo, anche se non lo uso.    
+    p->canaddressLookuptbl.capacity = maxusedcanaddr+1; //cosi' lascio l'elemento 0-esimo, anche se non lo uso.    
     p->canaddressLookuptbl.tbl = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eObrd_boardId_t), 
-													  p->canaddressLookuptbl.capacity);
+                                                      p->canaddressLookuptbl.capacity);
     
     // 3) fill lookup tbl
     b_cfg_ptr = (eOappTheDB_cfg_canBoardInfo_t*)(p->cfg.canboardsList->item_array_data);
