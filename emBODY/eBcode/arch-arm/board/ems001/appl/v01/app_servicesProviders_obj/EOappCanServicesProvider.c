@@ -81,7 +81,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 #define eoappCanSP_timeoutsenddiagnostics           1000
 #define eoappCanSP_onEvtMode_timeoutSendFrame       2000
-#define eoappCanSP_onDemandMode_timeoutSendFrame    10000
+#define eoappCanSP_onDemandMode_timeoutSendFrame    17000
 
 
 // --------------------------------------------------------------------------------------------------------------------
