@@ -184,7 +184,8 @@ void helper_enable_single_motor(byte j)
 		_control_mode[j] = MODE_HW_FAULT;		
 	}
 	#endif
-	PWM_outputPadEnable(j);   
+	PWM_outputPadEnable(j); 
+	_control_mode[j] = MODE_POSITION;  
 	can_printf("PWM ENA:%d",j);
 }
 
@@ -220,7 +221,9 @@ void helper_enable_coupled_motor(byte j1, byte j2)
 	}
 	#endif
 	PWM_outputPadEnable(j1);   
-	PWM_outputPadEnable(j2);   
+	PWM_outputPadEnable(j2);  
+	_control_mode[j1] = MODE_POSITION;
+	_control_mode[j2] = MODE_POSITION; 	 
 	can_printf("PWM ENA COUPLED:%d & %d",j1,j2);  
 }
 
