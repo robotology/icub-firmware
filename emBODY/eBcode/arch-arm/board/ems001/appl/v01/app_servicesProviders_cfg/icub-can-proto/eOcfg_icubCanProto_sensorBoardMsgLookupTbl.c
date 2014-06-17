@@ -60,7 +60,8 @@ and with id not continuos. */
 #define eo_icubCanProto_pollingSensorBoardMsg_inTbl_max        1   //ICUBCANPROTO_POL_AS_CMD_MAXNUM
 #define eo_icubCanProto_pollingSensorBoardMsgClass_maxNum      ICUBCANPROTO_POL_AS_CMD_MAXNUM
 
-#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max ICUBCANPROTO_PER_AS_MSG_MAXNUM
+#define eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max 6 // vale: removed ICUBCANPROTO_PER_AS_MSG_MAXNUM macro in 
+                                                                 // order unbind proto definition from my tables.
 #define eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max 2 
 #define eo_icubCanProto_periodicSensorBoardMsg_maxNum          ICUBCANPROTO_PER_AS_MSG_MAXNUM
 
