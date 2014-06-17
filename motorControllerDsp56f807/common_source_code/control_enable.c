@@ -424,7 +424,7 @@ void enable_control (char axis)
 	}
 #elif VERSION == 0x0219 || VERSION == 0x0119 //this is for wrist coupling
 	{ 
-		if ((axis>0) && (axis<3))
+		if ((axis==1) || (axis==2))
 		{
 			if (((_control_mode[1] == MODE_IDLE) || (_control_mode[2] == MODE_IDLE)))  
 			{ 
@@ -686,6 +686,32 @@ bool mode_is_idle(char axis)
 	if (_control_mode[axis] == MODE_IDLE) return true;
 	if (_control_mode[axis] == MODE_HW_FAULT) return true;
 	return false;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+bool mode_is_stiff(char axis)
+{
+	if (_control_mode[axis] == MODE_IDLE)     return false;
+	if (_control_mode[axis] == MODE_HW_FAULT) return false;
+	if (_control_mode[axis] == MODE_IMPEDANCE_POS ) return false;
+	if (_control_mode[axis] == MODE_IMPEDANCE_VEL ) return false;
+	if (_control_mode[axis] == MODE_OPENLOOP ) return false;
+	
+	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant) return false;
+	return true;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+bool mode_is_compliant(char axis)
+{
+	if (_control_mode[axis] == MODE_IDLE)     return false;
+	if (_control_mode[axis] == MODE_HW_FAULT) return false;
+	if (_control_mode[axis] == MODE_IMPEDANCE_POS ) return true;
+	if (_control_mode[axis] == MODE_IMPEDANCE_VEL ) return true;
+	if (_control_mode[axis] == MODE_OPENLOOP ) return false;
+		
+	if (_interaction_mode[axis] == icubCanProto_interactionmode_stiff) return false;	
+	return true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
