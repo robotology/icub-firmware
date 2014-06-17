@@ -242,6 +242,14 @@ byte can_interface (void)
 					_strain[strain_num][5] = (Int16)(BYTE_W(_canmsg.CAN_data[4],_canmsg.CAN_data[5])-(UInt16)0x8000);
 					break;
 					
+					#if VERSION == 0x0119 || VERSION == 0x0219
+					case 0xc:
+					case 0xd:
+					//This can be reached only by a ETH robot, since MAIS & VIRTUAL STRAIN are on the same forearm CAN bus.
+					//On the old CAN bus robot, MAIS & VIRTUAL STRAIN are on different CAN buses (forearm and hand)
+					break;
+					#endif
+					
 					default:
 					strain_num=0;
 					can_printf("ERR: UNKNOWN STRAIN MSG!");
