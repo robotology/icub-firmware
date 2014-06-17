@@ -22,5 +22,5 @@ bool mode_is_impedance_position(char axis);
 bool mode_is_impedance_velocity(char axis);
 bool mode_is_idle (char axis);
 bool mode_is_stiff (char axis);
-bool mode_is_compliant (char axis);
+bool mode_is_force_controlled (char axis);
 #endif

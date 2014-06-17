@@ -695,6 +695,7 @@ bool mode_is_stiff(char axis)
 	if (_control_mode[axis] == MODE_HW_FAULT) return false;
 	if (_control_mode[axis] == MODE_IMPEDANCE_POS ) return false;
 	if (_control_mode[axis] == MODE_IMPEDANCE_VEL ) return false;
+	if (_control_mode[axis] == MODE_TORQUE )        return false;
 	if (_control_mode[axis] == MODE_OPENLOOP ) return false;
 	
 	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant) return false;
@@ -702,12 +703,13 @@ bool mode_is_stiff(char axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-bool mode_is_compliant(char axis)
+bool mode_is_force_controlled(char axis)
 {
 	if (_control_mode[axis] == MODE_IDLE)     return false;
 	if (_control_mode[axis] == MODE_HW_FAULT) return false;
 	if (_control_mode[axis] == MODE_IMPEDANCE_POS ) return true;
 	if (_control_mode[axis] == MODE_IMPEDANCE_VEL ) return true;
+	if (_control_mode[axis] == MODE_TORQUE )        return true;
 	if (_control_mode[axis] == MODE_OPENLOOP ) return false;
 		
 	if (_interaction_mode[axis] == icubCanProto_interactionmode_stiff) return false;	
