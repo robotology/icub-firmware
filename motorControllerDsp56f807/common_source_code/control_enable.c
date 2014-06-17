@@ -302,12 +302,13 @@ void set_control_mode(byte axis)
 	//special case, from IDLE you can go anywhere, execept IDLE
 	if (_control_mode[axis]==MODE_IDLE)
 	{
-        if (value!=MODE_IDLE)	
-        {
+       if (value!=MODE_IDLE &&
+           api_value!=icubCanProto_controlmode_forceIdle)	
+       {
 	        enable_motor_pwm(axis);
 			helper_set_control_mode(axis, value);	
        }
-        return;
+       return;
 	}
 
 	//special case, from FAULT you can only go to IDLE
