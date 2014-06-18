@@ -35,6 +35,31 @@
 //    #error HL-ERR: unrecognised HL_TARGET_MPU_NAME
 //#endif
 
+
+// marco.accame on 17jun14: 
+// mdk5 environment automatically adds -DSTM32F40_41xxx when using the stm32f407.
+// it adds similar define with other mpus.
+// as a result of this action, there is a redefinition of STM32F40_41xxx or of other macros.
+// to maintain the control of the code vs mdk5, we must undefine all possible macros used by cmsis
+// macros used for stm32f1:
+#undef STM32F10X_LD
+#undef STM32F10X_LD_VL
+#undef STM32F10X_MD
+#undef STM32F10X_MD_VL
+#undef STM32F10X_HD 
+#undef STM32F10X_HD_VL
+#undef STM32F10X_XL
+#undef STM32F10X_CL
+// macros used for stm32f4:
+#undef STM32F40_41xxx
+#undef STM32F427_437xx 
+#undef STM32F429_439xx
+#undef STM32F401xx
+#undef STM32F40XX
+#undef STM32F427X
+
+// ok, now i can convert HL macros into CMSIS macros
+
 #if     defined(HL_USE_MPU_NAME_STM32F103RB)
     #define STM32F10X_MD
 #elif   defined(HL_USE_MPU_NAME_STM32F107VC)
