@@ -124,8 +124,11 @@
 #endif
 
 #include <stdint.h>                      /* standard types definitions                      */
-#include <core_cmInstr.h>                /* Core Instruction Access                         */
-#include <core_cmFunc.h>                 /* Core Function Access                            */
+// IIT-EXT
+//#include "core_cmInstr.h"                /* Core Instruction Access                         */
+//#include "core_cmFunc.h"                 /* Core Function Access                            */
+#include "../api/core_cmInstr.h"        /* Core Instruction Access                         */
+#include "../api/core_cmFunc.h"         /* Core Function Access                            */
 
 #endif /* __CORE_CM0PLUS_H_GENERIC */
 

@@ -15,5 +15,7 @@ It is possible to use HL at various levels. The core/cmsis is the lowest level a
   4. It is added some code under #ifdef which makes it easier for the hl-plus library (see midware folder) to configure cmsis. 
      The code is activated only if macro HL_CFG_PLUS_TARGET_BY_FILE is defined. If not defined, the code is the same as the 
      original distribution
+  5. in folder hl-core/cmsis/api, we have forced the search of cmsis .h files inside the same folder, by changing #include<xx.h> into
+     #include"../api/xx.h"  
      
      
