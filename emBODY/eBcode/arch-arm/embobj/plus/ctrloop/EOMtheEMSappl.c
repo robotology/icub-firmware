@@ -130,8 +130,9 @@ static const char s_eobj_ownname[] = "EOMtheEMSappl";
 static EOMtheEMSappl s_emsappl_singleton = 
 {
     EO_INIT(.sm)                NULL,
-	EO_INIT(.cfg) 
-    {   
+    EO_INIT(.cfg) 
+    { 
+        EO_INIT(.emsappinfo)        NULL,
         EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
     },
     EO_INIT(.initted)           0
@@ -160,7 +161,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     memcpy(&s_emsappl_singleton.cfg, emsapplcfg, sizeof(eOemsappl_cfg_t));
     
     // tell something
-    snprintf(str, sizeof(str)-1, 
+    snprintf(str, sizeof(str), 
              "THE EMS APPLICATION IS %s VER %d.%d BUILT ON: %d/%d/%d at %d:%d", 
              s_emsappl_singleton.cfg.emsappinfo->info.name,
              s_emsappl_singleton.cfg.emsappinfo->info.entity.version.major,
@@ -285,12 +286,12 @@ extern eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOsmState
         {
             //if i'm here means newstate is eo_emsappl_STrun
             res = eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
-        }break;
+        } break;
         
         case eo_sm_emsappl_STrun:
         {
             res = eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg); //pay attention: currently is not possible go to err by cmd    
-        }break;
+        } break;
         
         // case eo_sm_emsappl_STerr:
         // {
@@ -299,7 +300,7 @@ extern eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOsmState
         default:
         {
             res = eores_NOK_generic;
-        }
+        } break;
 
     }
     return(res);
