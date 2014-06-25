@@ -232,41 +232,6 @@ extern Int32  _adjustment[JN];         // the sum of the three value coming from
 /******************************************************/
 // macro
 /******************************************************/
-
-//void enforce_PIDlimits(byte j, Int32 PIDoutput)
-#define ENFORCE_CURRENT_LIMITS(j, I) \
-{ \
-	/* Anti reset wind up scheme */ \
-	if (I > _current_limit[j]) \
-    { \
-    	if ( _ki[j] != 0) \
-		{ \
-    		_integral_current[j] =  ((Int32) _current_limit[j]) - _pd_current[j]; \
-		} \
-	} \
-	else \
-	{\
-		if (I < -_current_limit[j]) \
-		{ \
-			if ( _ki[j] != 0) \
-			{ \
-	    		_integral_current[j] =  ((Int32) (-_current_limit[j])) - _pd_current[j]; \
-			} \
-		} \
-	}\
-	/* Control saturation */ \
-	if (I > (Int32) _current_limit[j]) \
-    	_desired_current[j] = _current_limit[j]; \
-	else \
-	{\
-	if ( I < - ((Int32) _current_limit[j])) \
-		_desired_current[j] =  -_current_limit[j]; \
-	else \
-		_desired_current[j] = (Int16)(I); \
-	}\
-}
-
-
 //void enforce_PIDlimits(byte j, Int32 PIDoutput)
 #define ENFORCE_LIMITS(j, PID, PID_LIMIT) \
 { \
