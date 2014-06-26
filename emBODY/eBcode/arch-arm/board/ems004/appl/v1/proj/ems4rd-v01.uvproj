@@ -412,14 +412,14 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
               <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg-stm32f4\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1591,14 +1591,14 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal_startup_cpu_nam_stm32f407.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBtest\arch-arm\libs\highlevel\abslayer\hal2\hal\hal-stg\hal_startup_cpu_nam_stm32f407.s</FilePath>
-            </File>
-            <File>
               <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+            </File>
+            <File>
+              <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\abslayer-cfg-stm32f4\hal_startup_mpu_name_stm32f407ig.s</FilePath>
             </File>
           </Files>
         </Group>
