@@ -61,11 +61,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-			PWM_outputPadDisable(channel);
-			_calibrated[channel] = true; 
-	//		can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-	//		can_printf ("Offset set\r\n");			
+			put_motor_in_fault(channel);
+			can_printf ("invalid calib p2");				
 		}
 	
 #elif  VERSION==0x0157 || VERSION==0x0147 
@@ -97,11 +94,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-			PWM_outputPadDisable(channel);
-			_calibrated[channel] = true; 
-	//		can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-	//		can_printf ("Offset set\r\n");			
+			put_motor_in_fault(channel);
+			can_printf ("invalid calib p2");				
 		}
 #endif
 	}   

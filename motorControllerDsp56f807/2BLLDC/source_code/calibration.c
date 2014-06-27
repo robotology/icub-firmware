@@ -78,9 +78,9 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	if (type==CALIB_HARD_STOPS)
 	{
 #if VERSION==0x0161 
-	#ifdef DEBUG_CALIBRATION    
+    	#ifdef DEBUG_CALIBRATION    
 		can_printf("Calibration Encoder started \r\n");
-	#endif		
+	    #endif		
 		if (!mode_is_idle(channel) && IS_DONE(channel))
 		{
 			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
@@ -95,9 +95,9 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			{
 				_velocity_calibration[channel]=1;
 			}
-		#ifdef DEBUG_CALIBRATION
+	     	#ifdef DEBUG_CALIBRATION
 			can_printf("Calibration HARD_STOPS started %d %d \r\n", param1,param2);
-		#endif				
+		    #endif				
 		}	
 #endif
 	}
@@ -106,9 +106,9 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	{
 #if VERSION==0x0162
 
-	#ifdef DEBUG_CALIBRATION	
+    	#ifdef DEBUG_CALIBRATION	
 		can_printf("Calibration ABS_DIGITAL started \r\n");
-	#endif		
+    	#endif		
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0)
 		{		
@@ -118,22 +118,16 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-		
-			
-		#ifdef DEBUG_CALIBRATION
+				
+		     #ifdef DEBUG_CALIBRATION
 			can_printf("calib JNT:%d V:%d",channel, _calibrated[channel] );
 			can_printf ("Calibration ABS_DIGITAL terminated \r\n");
-		#endif		
+		     #endif		
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-			PWM_outputPadDisable(channel);
-			_calibrated[channel] = true; 
-		     #ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-			can_printf ("Offset setted\r\n");		
-		    #endif					
+			put_motor_in_fault(channel);
+			can_printf ("invalid calib p2");				
 		}
 #endif
 return;

@@ -48,7 +48,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		
 #elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0257 ) 
 
-	//	can_printf ("Calibration ABS_DIGITAL started \r\n");
+     	//	can_printf ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) 
 		{
 			set_max_position(channel, param3);	
@@ -64,45 +64,10 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-			PWM_outputPadDisable(channel);
-			_calibrated[channel] = true; 	
+			put_motor_in_fault(channel);
+			can_printf ("invalid calib p2");		
 		}
-	
-#elif  VERSION==0x0157
-	//  	can_printf ("Calibration ABS_DIGITAL started \r\n");
-		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
-		if (param2>0 && channel==0)
-		{
-			set_relative_position_abs_ssi_turns(channel, 0);
-			_position[channel] = get_relative_position_abs_ssi(channel);
-			_position[channel] = (((float) _position[channel])*0.6153F);  
-			_position[channel] = _position[channel]+ _cpl_pos_prediction[0];
-			_position[channel] = _position[channel]- _cpl_pos_prediction[1];			
-			_set_point[channel] = param1;
-			init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			_in_position[channel] = false;
-			_calibrated[channel] = true;
-	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
-		}
-		if (param2>0 &&channel==1)
-		{
-		    _position[channel] = get_position_abs_ssi(channel);
-			_set_point[channel] = param1;
-			init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			_in_position[channel] = false;
-			_calibrated[channel] = true;
-	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
-		}
-		if (param2==0)
-		{
-			_control_mode[channel]=MODE_IDLE;	
-			_pad_enabled[channel] = false;
-			PWM_outputPadDisable(channel);
-			_calibrated[channel] = true; 
-	//		can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-	//		can_printf ("Offset set\r\n");			
-		}
+
 #endif
 	}   
 }
