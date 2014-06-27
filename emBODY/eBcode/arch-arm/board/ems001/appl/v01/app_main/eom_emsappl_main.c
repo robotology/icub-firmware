@@ -42,6 +42,7 @@
 
 #include "OPCprotocolManager_Cfg.h" 
 #include "EOtheEMSapplDiagnostics.h"
+#include "emBODYrobot.h"
 
 
 

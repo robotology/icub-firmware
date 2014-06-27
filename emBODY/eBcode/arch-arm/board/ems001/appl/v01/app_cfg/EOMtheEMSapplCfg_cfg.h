@@ -14,11 +14,14 @@ extern "C" {
     @date       07/02/2012
  **/
 
-
+#include "emBODYrobot.h"
+    
 // -  default constants ----------------------------------------------------------------------------------------------- 
 
-#if defined(USE_EMS4RD)
-    #error --> so far the ems4rd has a dedicated EOMtheEMSapplCfg_cfg.h file
+#if defined(USE_EMS4RD) || (emBODYrobot_BOARD_NAME == boardEMS4RD)
+    #error --> cannot use this EOMtheEMSapplCfg_cfg.h file unless a ems4rd board
+#else
+    //ok
 #endif
  
 // - configuration wizard ---------------------------------------------------------------------------------------------
@@ -55,7 +58,7 @@ extern "C" {
 //  <o> ID of the EMS board     <0=> Use external file <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     0
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
 
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 0
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
