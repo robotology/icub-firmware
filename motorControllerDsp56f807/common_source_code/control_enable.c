@@ -22,8 +22,6 @@ extern  byte	_board_ID ;
 void enable_motor_pwm      (byte axis);
 void disable_motor_pwm     (byte axis);
 
-byte helper_controlmode_api_to_fw (byte mode);
-byte helper_controlmode_fw_to_api (byte mode);
 void helper_set_control_mode      (byte axis, byte value);	
 void helper_enable_single_motor   (byte j);
 void helper_enable_coupled_motor  (byte j1, byte j2);

@@ -18,6 +18,7 @@
 #include "filters.h"
 #include "identification.h"
 #include "control_enable.h"
+#include "decoupling.h"
 
 #ifndef VERSION
 #	error "No valid version specified"
@@ -798,7 +799,7 @@ if ((CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_
 		}
 	
 		//  --- Control Mode axes 0 ---
-		_canmsg.CAN_data[1]= _control_mode[0];	
+		_canmsg.CAN_data[1]= helper_controlmode_fw_to_api(_control_mode[0]);	
 		if (_control_mode[0] != old_control_mode[0] )
 		{
 			old_control_mode[0]=_control_mode[0];
@@ -844,7 +845,7 @@ if ((CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_
 		
 	#endif
 		//  --- Control Mode axes 1 ---
-		_canmsg.CAN_data[3]= _control_mode[1]; 		
+		_canmsg.CAN_data[3]= helper_controlmode_fw_to_api(_control_mode[1]); 		
 		if (_control_mode[1] != old_control_mode[1])
 		{
 			old_control_mode[1]=_control_mode[1];
@@ -964,7 +965,7 @@ if ((CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_
 			sendB=true;
 		}
 		//  --- Control Mode axes 2 ---
-		_canmsg.CAN_data[1]= _control_mode[2];	
+		_canmsg.CAN_data[1]= helper_controlmode_fw_to_api(_control_mode[2]);	
 		if (_control_mode[2] != old_control_mode[2])
 		{
 			sendB = true;
@@ -977,7 +978,7 @@ if ((CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_
 		}
 				
 		//  --- Control Mode axes 3 ---
-		_canmsg.CAN_data[3]= _control_mode[3]; 		
+		_canmsg.CAN_data[3]= helper_controlmode_fw_to_api(_control_mode[3]); 		
 		if (_control_mode[3] != old_control_mode[3])
 		{
 			sendB = true;

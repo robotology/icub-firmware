@@ -4,6 +4,9 @@
 #include "dsp56f807.h"
 extern bool _can_protocol_ack;
 
+byte helper_controlmode_api_to_fw (byte mode);
+byte helper_controlmode_fw_to_api (byte mode);
+
 void set_control_mode           (byte axis);
 void get_control_mode           (byte axis);
 void set_interaction_mode       (byte axis);
