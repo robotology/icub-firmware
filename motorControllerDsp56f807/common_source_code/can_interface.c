@@ -561,12 +561,12 @@ void can_send_broadcast(void)
 		if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		{
 			FAULT_ABS0 = 1;
-			_control_mode[0] = MODE_HW_FAULT;
+			put_motor_in_fault(0);
 		}
 		if (get_error_abs_ssi(1)==ERR_ABS_SSI)
 		{
 			FAULT_ABS1 = 1;	
-			_control_mode[1] = MODE_HW_FAULT;
+			put_motor_in_fault(1);
 		}
 	#endif		
 	#endif
@@ -579,7 +579,7 @@ void can_send_broadcast(void)
 			FAULT_HLL0 |= ((getHallStatus(0) &0x1)<<4);
 			FAULT_HLL0 |= ((getHallStatus(0) &0x2)<<5);
 			FAULT_HLL0 |= ((getHallStatus(0) &0x4)<<5);
-			if (FAULT_HLL0) _control_mode[0] = MODE_HW_FAULT;
+			if (FAULT_HLL0) put_motor_in_fault(0);
 			setHallStatus(0,0);
 		}	
 		if (getHallStatus(1))
@@ -587,7 +587,7 @@ void can_send_broadcast(void)
 			FAULT_HLL1 |= ((getHallStatus(1) &0x1)<<4);
 			FAULT_HLL1 |= ((getHallStatus(1) &0x2)<<5);
 			FAULT_HLL1 |= ((getHallStatus(1) &0x4)<<5);
-			if (FAULT_HLL1) _control_mode[1] = MODE_HW_FAULT;
+			if (FAULT_HLL1) put_motor_in_fault(1);
 			setHallStatus(1,0);
 		}
 	#endif

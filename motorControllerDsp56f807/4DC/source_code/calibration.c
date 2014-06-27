@@ -250,11 +250,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-			PWM_outputPadDisable(channel);
-		    #ifdef DEBUG_CALIBRATION
-			can_printf("Calibration ABS_DIGITAL aborted \r\n");
-			#endif			
+			put_motor_in_fault(channel);
+			can_printf ("invalid calib p2");		
 		}		
 	}	
 /********
@@ -314,12 +311,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-
-			PWM_outputPadDisable(channel);
-		    #ifdef DEBUG_CALIBRATION
-			can_printf("Calibration ABS_DIGITAL aborted \r\n");
-			#endif			
+			put_motor_in_fault(channel);
+			can_printf ("invalid calib p2");		
 		}		
 	}	
 
@@ -408,12 +401,9 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			}
 			if (param2==0)
 			{
-				_control_mode[channel]=MODE_IDLE;	
-				#ifdef DEBUG_CALIBRATION				
-				can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-				#endif				
+		 	   put_motor_in_fault(channel);		
+			   can_printf ("invalid calib p2");			
 			} 		
-			
 		}	
 	}
 /********
@@ -487,11 +477,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			}
 			if (param2==0)
 			{
-				_control_mode[channel]=MODE_IDLE;	
-				PWM_outputPadDisable(channel);
-			    #ifdef DEBUG_CALIBRATION
-				can_printf("Calibration ABS_DIGITAL aborted \r\n");
-				#endif			
+				put_motor_in_fault(channel);		
+				can_printf ("invalid calib p2");	
 			}	
 		}
 		else
@@ -511,10 +498,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			}
 			if (param2==0)
 			{
-				_control_mode[channel]=MODE_IDLE;	
-				#ifdef DEBUG_CALIBRATION				
-				can_printf("Calibration ABS_DIGITAL aborted\r\n");
-				#endif				
+			   put_motor_in_fault(channel);		
+			   can_printf ("invalid calib p2");				
 			} 		
 			
 		}
@@ -542,10 +527,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-	  	    #ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-            #endif			
+			put_motor_in_fault(channel);		
+			can_printf ("invalid calib p2");	
 		} 			
 	}	
 
@@ -570,10 +553,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-		    #ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-		    #endif			
+			put_motor_in_fault(channel);		
+			can_printf ("invalid calib p2");		
 		} 			
 	}
 	
@@ -610,10 +591,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 		if (param2==0)
 		{
-			_control_mode[channel]=MODE_IDLE;	
-		    #ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
-		    #endif			
+			put_motor_in_fault(channel);		
+			can_printf ("invalid calib p2");
 		} 			
 	}	
 #endif
