@@ -154,15 +154,15 @@
 #endif
 //   <o> IP1 <0-255> 
 #ifndef IPAL_IP1
- #define IPAL_IP1        255
+ #define IPAL_IP1        0
 #endif
 //   <o> IP2 <0-255> 
 #ifndef IPAL_IP2
- #define IPAL_IP2        72
+ #define IPAL_IP2        1
 #endif
 //   <o> IP3 <0-255> 
 #ifndef IPAL_IP3
- #define IPAL_IP3        19
+ #define IPAL_IP3        1
 #endif
 
 //  </h>Fixed IP address
