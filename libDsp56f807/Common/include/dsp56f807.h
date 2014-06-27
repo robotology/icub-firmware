@@ -1464,7 +1464,6 @@ extern volatile word SR_lock;
 #define ERR_COMMON				-3
 #define ERR_VALUE				-4
 #define ERR_RANGE				-5
-#define ERR_SPEED				-6
 #define ERR_BUSY				-7
 #define ERR_NOTAVAIL			-8
 #define ERR_ABS_SSI             -9

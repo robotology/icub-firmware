@@ -70,7 +70,7 @@ void check_in_position_calib(byte jnt)
 /**************************************************************** 
  * calibration procedure, depends on the firmware version.
  ****************************************************************/
-byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
+void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
 {
   // this board has only brushless motor with digital absolute
   // position sensors. So, the only operation required for the 
@@ -137,6 +137,6 @@ byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		#endif					
 		}
 #endif
-return 0;
+return;
 	}
 }

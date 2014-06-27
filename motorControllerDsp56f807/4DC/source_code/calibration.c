@@ -147,7 +147,7 @@ void check_in_position_calib(byte jnt)
 /**************************************************************** 
  * calibration procedure, depends on the firmware version.
  ****************************************************************/
-byte calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
+void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
 {
 /********
  *0x0111*
@@ -696,7 +696,6 @@ if ((type==CALIB_HARD_STOPS) )
 #endif
 
 	_calibrated[channel] = false; 
-	/* need to change this val */
-	return ERR_SPEED;
+	return;
 	
 }
