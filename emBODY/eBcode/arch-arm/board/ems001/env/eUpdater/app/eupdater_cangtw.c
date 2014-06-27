@@ -178,12 +178,12 @@ extern void task_cangateway(void *p)
     eom_task_Start(p);
 }  
 
-#if     defined(HAL_USE_VERSION_2)
+#if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
 static void errcallback(void* p) {};
 #endif
 extern void cangateway_hid_hal_init(void)
 {  
-#if     defined(HAL_USE_VERSION_2)
+#if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
     hal_can_cfg_t canxcfg = 
     {
         .runmode                    = hal_can_runmode_isr_1txq1rxq, 

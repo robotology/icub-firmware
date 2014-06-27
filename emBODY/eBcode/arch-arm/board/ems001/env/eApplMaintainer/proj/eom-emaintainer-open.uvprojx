@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_proj.xsd">
+<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_projx.xsd">
 
-  <SchemaVersion>1.1</SchemaVersion>
+  <SchemaVersion>2.1</SchemaVersion>
 
   <Header>### uVision Project, (C) Keil Software</Header>
 
@@ -346,7 +346,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -357,14 +357,14 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
-            <uSurpInc>1</uSurpInc>
-            <uC99>1</uC99>
+            <uSurpInc>0</uSurpInc>
+            <uC99>0</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
-              <Define>HAL_USE_ARCH_ARM</Define>
+              <MiscControls>--c99</MiscControls>
+              <Define>HAL_USE_ARCH_ARM _MAINTAINER_APPL_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\eUpdater\app;..\app</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -375,7 +375,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
-            <uSurpInc>1</uSurpInc>
+            <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
@@ -394,7 +394,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\eUpdater.sct</ScatterFile>
+            <ScatterFile>.\eApplication.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -405,37 +405,32 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app</GroupName>
+          <GroupName>app-shared-with-updater</GroupName>
           <Files>
             <File>
               <FileName>eom-eupdater-main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\eom-eupdater-main.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater-info.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app\eupdater-info.c</FilePath>
+              <FilePath>..\..\eUpdater\app\eom-eupdater-main.c</FilePath>
             </File>
             <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\eupdater_parser.c</FilePath>
+              <FilePath>..\..\eUpdater\app\eupdater_parser.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\updater-core.c</FilePath>
+              <FilePath>..\..\eUpdater\app\updater-core.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>app-only-for-maintainer</GroupName>
+          <Files>
             <File>
-              <FileName>eOcfg_sm_cangtw.c</FileName>
+              <FileName>emaintainer-info.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\eOcfg_sm_cangtw.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater_cangtw.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app\eupdater_cangtw.c</FilePath>
+              <FilePath>..\app\emaintainer-info.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -526,6 +521,11 @@
         <Group>
           <GroupName>eo-core</GroupName>
           <Files>
+            <File>
+              <FileName>EOtheLEDpulser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+            </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
@@ -748,6 +748,9 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -789,7 +792,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>eUpdaterCANgtw_ems001_open</OutputName>
+          <OutputName>eMaintainer_ems001_open</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -822,7 +825,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\eUpdaterCANgtw_ems001_open.hex ..\bin\eUpdaterCANgtw_ems001_open.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\eMaintainer_ems001_open.hex ..\bin\eMaintainer_ems001_open.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1090,8 +1093,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -1106,9 +1109,9 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS001 -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
-              <Define>HAL_USE_ARCH_ARM DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
+              <Define>HAL_USE_ARCH_ARM _MAINTAINER_APPL_ DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api..\..\..\..\..\libs\highlevel\abslayer\hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\eUpdater\app;..\app;..\..\..\..\..\..\robotconfig</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1138,7 +1141,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\eUpdater.sct</ScatterFile>
+            <ScatterFile>.\eApplication.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -1149,37 +1152,32 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app</GroupName>
+          <GroupName>app-shared-with-updater</GroupName>
           <Files>
             <File>
               <FileName>eom-eupdater-main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\eom-eupdater-main.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater-info.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app\eupdater-info.c</FilePath>
+              <FilePath>..\..\eUpdater\app\eom-eupdater-main.c</FilePath>
             </File>
             <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\eupdater_parser.c</FilePath>
+              <FilePath>..\..\eUpdater\app\eupdater_parser.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\updater-core.c</FilePath>
+              <FilePath>..\..\eUpdater\app\updater-core.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>app-only-for-maintainer</GroupName>
+          <Files>
             <File>
-              <FileName>eOcfg_sm_cangtw.c</FileName>
+              <FileName>emaintainer-info.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\eOcfg_sm_cangtw.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater_cangtw.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\app\eupdater_cangtw.c</FilePath>
+              <FilePath>..\app\emaintainer-info.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1270,6 +1268,11 @@
         <Group>
           <GroupName>eo-core</GroupName>
           <Files>
+            <File>
+              <FileName>EOtheLEDpulser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\core\core\EOtheLEDpulser.c</FilePath>
+            </File>
             <File>
               <FileName>EOaction.c</FileName>
               <FileType>1</FileType>
@@ -1492,8 +1495,85 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>2</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <useXO>2</useXO>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
+        </Group>
       </Groups>
     </Target>
   </Targets>
+
+  <RTE>
+    <apis/>
+    <components>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="3.30.0" condition="CMSIS Core">
+        <package name="CMSIS" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="4.1.0"/>
+        <targetInfos>
+          <targetInfo excluded="1" name="ems001"/>
+          <targetInfo name="mcbstm32c"/>
+        </targetInfos>
+      </component>
+    </components>
+    <files/>
+  </RTE>
 
 </Project>

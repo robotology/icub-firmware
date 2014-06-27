@@ -34,6 +34,7 @@
 #include "ipal.h"
 
 #include "EOMtheSystem.h"
+#include "emBODYrobot.h"
 
 
 extern const hal_cfg_t     hal_cfg;
@@ -77,8 +78,9 @@ extern const osal_cfg_t    osal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(BOARD_EMS001)
-extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+#if (emBODYrobot_BOARD_NAME == boardEMS001)
+
+const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
     {
@@ -129,9 +131,9 @@ extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_ME
     .extra      = {0}
 };
 
-#elif   defined(BOARD_EMS004)
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
 
-extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
     {
@@ -142,14 +144,14 @@ extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_ME
             .version    = 
             { 
                 .major = 2, 
-                .minor = 3
+                .minor = 4
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 4,
-                .day   = 7,
-                .hour  = 16,
+                .month = 6,
+                .day   = 27,
+                .hour  = 15,
                 .min   = 0
             }
         },
@@ -181,10 +183,11 @@ extern const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_ME
     },
     .extra      = {0}
 };
-
+#else
+    #error --> specify emBODYrobot_BOARD_NAME
 #endif
 
-extern const eOmsystem_cfg_t eom_applbasic_info_syscfg =
+const eOmsystem_cfg_t eom_applbasic_info_syscfg =
 {
     .codespaceoffset    = (EENV_MEMMAP_EAPPLICATION_ROMADDR-EENV_ROMSTART),
     .halcfg             = &hal_cfg,

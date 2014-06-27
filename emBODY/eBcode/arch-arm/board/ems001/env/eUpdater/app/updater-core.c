@@ -30,6 +30,7 @@
 #include "ipal.h"
 
 #include "eEsharedServices.h"
+#include "emBODYrobot.h"
 
 #include "eEmemorymap.h"
  
@@ -76,9 +77,7 @@ static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size);
 
 void upd_core_init(void)
 {
-#if		!defined(HAL_USE_VERSION_2)
-	hal_gpio_init(hal_gpio_portE, hal_gpio_pin13, hal_gpio_dirOUT, hal_gpio_speed_low);
-#else
+#if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
     const  hal_gpio_t gpio = 
     {
         .port   = hal_gpio_portE,
@@ -92,6 +91,8 @@ void upd_core_init(void)
         .altcfg = NULL
     };
     hal_gpio_init(gpio, &gpiocfg);
+#else
+    hal_gpio_init(hal_gpio_portE, hal_gpio_pin13, hal_gpio_dirOUT, hal_gpio_speed_low);
 #endif
 }
 

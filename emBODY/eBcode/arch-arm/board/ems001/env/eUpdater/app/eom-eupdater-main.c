@@ -28,6 +28,7 @@
 
 #include "stdint.h"
 #include "stdlib.h"
+#include "stdio.h"
 
 // abslayer 
 #include "hal.h"
@@ -66,6 +67,8 @@
 
 
 #include "eEsharedServices.h" 
+
+#include "emBODYrobot.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -177,7 +180,7 @@ static const eOmempool_cfg_t memcfg =
 int main(void)
 {
     eom_sys_Initialise( psyscfg,
-                        &memcfg,                           // mempool
+                        &memcfg,                        // mempool
                         &errmancfg,                     // errman
                         &eom_timerman_DefaultCfg,
                         &eom_callbackman_DefaultCfg

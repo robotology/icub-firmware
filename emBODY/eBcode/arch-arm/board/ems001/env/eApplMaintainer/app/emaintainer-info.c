@@ -29,6 +29,8 @@
 #include "eEcommon.h"
 #include "eEmemorymap.h"
 
+#include "emBODYrobot.h"
+
 #include "hal.h"
 #include "osal.h"
 #include "ipal.h"
@@ -70,9 +72,9 @@ extern const ipal_cfg_t    ipal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(BOARD_EMS001)
+#if (emBODYrobot_BOARD_NAME == boardEMS001)
 
-extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
     {
@@ -123,9 +125,9 @@ extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EA
     .extra      = {0}
 };
 
-#elif   defined(BOARD_EMS004)
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
 
-extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
     {
@@ -136,14 +138,14 @@ extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 5
+                .minor = 6
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 4,
-                .day   = 28,
-                .hour  = 12,
+                .month = 6,
+                .day   = 27,
+                .hour  = 15,
                 .min   = 0
             }
         },
@@ -176,10 +178,12 @@ extern const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EA
     .extra      = {0}
 };
 
+#else
+    #error --> specify emBODYrobot_BOARD_NAME
 #endif
 
 
-extern const eOmsystem_cfg_t emaintainer_syscfg =
+const eOmsystem_cfg_t emaintainer_syscfg =
 {
     .codespaceoffset    = (EENV_MEMMAP_EAPPLICATION_ROMADDR-EENV_ROMSTART),
     .halcfg             = &hal_cfg,
@@ -187,7 +191,7 @@ extern const eOmsystem_cfg_t emaintainer_syscfg =
     .fsalcfg            = NULL
 };
 
-extern const ipal_cfg_t* emaintainer_ipal_cfg = &ipal_cfg;
+const ipal_cfg_t* emaintainer_ipal_cfg = &ipal_cfg;
 
 
 // --------------------------------------------------------------------------------------------------------------------

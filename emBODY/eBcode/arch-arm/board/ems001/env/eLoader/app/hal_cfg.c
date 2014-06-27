@@ -41,7 +41,7 @@
 static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg);
 
 
-extern const hal_cfg_t hal_cfg = 
+const hal_cfg_t hal_cfg = 
 {   
     .cpu_family             = (hal_cpufamily_t) HAL_CPUFAM,
     .cpu_type               = (hal_cputype_t) HAL_CPUTYPE,
@@ -78,7 +78,7 @@ extern const hal_cfg_t hal_cfg =
 };
 
 
-extern const hal_cfg_t *hal_cfgMINE = &hal_cfg;
+const hal_cfg_t *hal_cfgMINE = &hal_cfg;
 
 
 void SysTick_Handler(void)
@@ -110,7 +110,7 @@ static void s_hal_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * err
     for(;;)
     {
         uint32_t volatile i = 0x100000;
-        for(;i--; i>0);
+        for(;i--; i>1);
         hal_led_toggle(hal_led2);
     }
 

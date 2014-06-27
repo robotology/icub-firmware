@@ -52,6 +52,8 @@
 
 #include "eEsharedServices.h" 
 
+#include "emBODYrobot.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -111,17 +113,17 @@ static void s_loader_HW_LED_Config(void);
 static void s_loader_HW_LED_On(uint32_t led);
 static void s_loader_HW_LED_Off(uint32_t led);
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-//static void s_loader_eval_user_request(void);
-static void s_loader_HW_INP_Config(void);
-static uint32_t s_loader_HW_INP_IsPushed(void);
-#endif
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
+////static void s_loader_eval_user_request(void);
+//static void s_loader_HW_INP_Config(void);
+//static uint32_t s_loader_HW_INP_IsPushed(void);
+//#endif
 
 
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
-static void s_eval_eeprom_erase(void);
-#endif
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
+//static void s_eval_eeprom_erase(void);
+//#endif
 
 #if defined(FORCE_EEPROM_ERASE) || defined(ENABLE_ERASE_EEPROM)
 static void s_eeprom_erase(void);
@@ -131,7 +133,7 @@ static void s_eeprom_erase(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(BOARD_EMS001)
+#if (emBODYrobot_BOARD_NAME == boardEMS001)
 
 static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -230,7 +232,7 @@ static eEboardInfo_t s_loader_boardinfo =
     .extra          = {0}
 };
 
-#elif defined(BOARD_MCBSTM32C)
+#elif (emBODYrobot_BOARD_NAME == boardMCBSTM32C)
 
 static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -328,7 +330,7 @@ static eEboardInfo_t s_loader_boardinfo =
     .extra          = {0}
 };
 
-#elif defined(BOARD_EMS004)
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
 
 static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -341,14 +343,14 @@ static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_
             .version    = 
             { 
                 .major = 2, 
-                .minor = 7
+                .minor = 8
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 4,
-                .day   = 28,
-                .hour  = 13,
+                .month = 6,
+                .day   = 27,
+                .hour  = 15,
                 .min   = 0
             }
         },
@@ -421,13 +423,68 @@ static eEboardInfo_t s_loader_boardinfo =
             .addr   = EENV_STGSTART
         },
         .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
-        .name           = "ems004"
+        .name           = "ems4rd"
     },
     .uniqueid       = 0,
     .extra          = {0}
 };
 
-#elif defined(BOARD_MCBSTM32F400)
+#elif (emBODYrobot_BOARD_NAME == boardMCBSTM32F400)
+
+
+#error --> MISSING THE CORRECT HAL for boardMCBSTM32F400
+
+static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procLoader,
+            .version    = 
+            { 
+                .major = 2, 
+                .minor = 7
+            },  
+            .builddate  = 
+            {
+                .year  = 2014,
+                .month = 4,
+                .day   = 28,
+                .hour  = 13,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
+            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
+            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_none,
+        .name           = "eLoader"
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 0, .minor = 0},
+        .can1protversion = { .major = 0, .minor = 0},
+        .can2protversion = { .major = 0, .minor = 0},
+        .gtwprotversion  = { .major = 0, .minor = 0}
+    },
+    .extra      = {0}
+};
+
 
 static eEboardInfo_t s_loader_boardinfo =                        
 {
@@ -473,6 +530,9 @@ static eEboardInfo_t s_loader_boardinfo =
     .uniqueid       = 0,
     .extra          = {0}
 };
+
+#else
+    #error --> specify emBODYrobot_BOARD_NAME
 #endif
 
 
@@ -480,15 +540,16 @@ static volatile uint32_t s_loader_msTicks;
 
 static uint8_t hw_initted = 0; 
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-static const hal_gpio_cfg_t s_loader_input_button =
-{   // userBUTTON on mcbstm32c
-    .port       = hal_gpio_portB,
-    .pin        = hal_gpio_pin7,
-    .speed      = hal_gpio_speed_low,
-    .dir        = hal_gpio_dirINP
-};
-#endif
+////#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
+//#if (emBODYrobot_BOARD_NAME == boardMCBSTM32C) && defined(ENABLE_USER_INPUT)
+//static const hal_gpio_cfg_t s_loader_input_button =
+//{   // userBUTTON on mcbstm32c
+//    .port       = hal_gpio_portB,
+//    .pin        = hal_gpio_pin7,
+//    .speed      = hal_gpio_speed_low,
+//    .dir        = hal_gpio_dirINP
+//};
+//#endif
 
                         
 
@@ -858,20 +919,20 @@ static void s_loader_HW_init(void)
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL); 
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-    s_loader_HW_INP_Config();
-#endif
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
+//    s_loader_HW_INP_Config();
+//#endif
     
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
-    s_eval_eeprom_erase();
-#endif   
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
+//    s_eval_eeprom_erase();
+//#endif   
 
 #if defined(FORCE_EEPROM_ERASE)
     s_eeprom_erase();
 #endif    
     
 
-#if defined(BOARD_EMS001)
+#if (emBODYrobot_BOARD_NAME == boardEMS001)
     if(hal_false == hal_switch_initted_is())
     {
         hal_switch_init(NULL);
@@ -907,28 +968,28 @@ static void s_eeprom_erase(void)
 }
 #endif
 
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
-static void s_loader_HW_INP_Config(void)
-{
-    hal_gpio_init(s_loader_input_button.port, s_loader_input_button.pin, s_loader_input_button.dir, s_loader_input_button.speed);
-}
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT)
+//static void s_loader_HW_INP_Config(void)
+//{
+//    hal_gpio_init(s_loader_input_button.port, s_loader_input_button.pin, s_loader_input_button.dir, s_loader_input_button.speed);
+//}
+//
+//static uint32_t s_loader_HW_INP_IsPushed(void)
+//{
+//    return((hal_gpio_valLOW == hal_gpio_getval(s_loader_input_button.port, s_loader_input_button.pin)) ? (1) : (0));
+//}
+//#endif//BOARD_MCBSTM32C
 
-static uint32_t s_loader_HW_INP_IsPushed(void)
-{
-    return((hal_gpio_valLOW == hal_gpio_getval(s_loader_input_button.port, s_loader_input_button.pin)) ? (1) : (0));
-}
-#endif//BOARD_MCBSTM32C
-
-#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
-static void s_eval_eeprom_erase(void)
-{
-  
-    if(1 == s_loader_HW_INP_IsPushed())
-    {    
-        s_eeprom_erase();
-    }
-}
-#endif   
+//#if defined(BOARD_MCBSTM32C) && defined(ENABLE_USER_INPUT) && defined(ENABLE_ERASE_EEPROM)
+//static void s_eval_eeprom_erase(void)
+//{
+//  
+//    if(1 == s_loader_HW_INP_IsPushed())
+//    {    
+//        s_eeprom_erase();
+//    }
+//}
+//#endif   
 
 static void s_loader_HW_LED_Config(void) 
 {
