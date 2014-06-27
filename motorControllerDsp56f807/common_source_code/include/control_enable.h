@@ -20,5 +20,6 @@ bool mode_is_force_controlled   (byte axis);
 
 void enable_motor_pwm           (byte axis);
 void disable_motor_pwm          (byte axis);
+void put_motor_in_fault         (byte axis);
 
 #endif
