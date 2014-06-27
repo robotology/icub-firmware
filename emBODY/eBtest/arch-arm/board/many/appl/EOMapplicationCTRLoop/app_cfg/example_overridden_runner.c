@@ -96,6 +96,11 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     static uint32_t totalreceived = 0;
     
     totalreceived += p->numofrxpackets;
+
+// if defined, then when it receives three packets it goes back to cfg
+// if undefined, the transition is done upon reception of the proper rop 
+
+#if defined(TOGGLE_RUN_CFG_WITH3RXPACKETS)
     
     if(3 == totalreceived)
     {
@@ -123,9 +128,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         s_xxx_delay(100);
     }
     
-
-
-    
+#endif   
 }
 
 
@@ -203,7 +206,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
  
-    s_xxx_delay(100);    
+//    s_xxx_delay(100);    
 
 //     if(0 == (xxxcount % 20))
 //     {

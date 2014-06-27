@@ -113,6 +113,20 @@ extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
 }
 
 
+extern void eoprot_fun_UPDT_mn_comm_status(const EOnv* nv, const eOropdescriptor_t* rd) 
+{
+    
+    uint32_t rrr = 0;
+    
+    if(0 == rd->id32)
+    {
+        rrr = 1;
+    }
+    
+    rrr = rrr;
+    
+}
+
 
 extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, const eOropdescriptor_t* rd) 
 {

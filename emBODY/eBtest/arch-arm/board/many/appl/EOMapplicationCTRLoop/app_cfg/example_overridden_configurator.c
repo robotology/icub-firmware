@@ -80,8 +80,12 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+// if defined, then when it receives three packets it goes to run
+// if undefined, the transition is done upon reception of the proper rop 
+
 extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
 {
+#if defined(TOGGLE_RUN_CFG_WITH3RXPACKETS)
     static uint8_t num = 0;
     // just for debug
     if(0 == p->numofrxrops)
@@ -94,7 +98,7 @@ extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSco
             eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
         }
     }
-
+#endif
 } 
 
 
