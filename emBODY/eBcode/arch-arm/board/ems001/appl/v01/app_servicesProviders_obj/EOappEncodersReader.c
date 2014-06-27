@@ -96,7 +96,7 @@ static void s_eo_appEncReader_check(EOappEncReader *p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     defined(HAL_USE_VERSION_2)
+#if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
 
 #define HALv1_encoder1      hal_encoder1
 #define HALv1_encoder2      hal_encoder2
@@ -309,7 +309,7 @@ static void s_eo_appEncReader_readConnectedEncConfg(EOappEncReader *p, EOappEncR
 static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_encoder_t startEnc, hal_encoder_t endEnc, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX)
 {
     uint8_t i;
-#if     defined(HAL_USE_VERSION_2)    
+#if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
     hal_encoder_cfg_t enc_cfg =
     {
         .priority           = INTPRIO_SPI_ENCODERS,
