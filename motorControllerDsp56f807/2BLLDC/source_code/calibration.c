@@ -5,7 +5,6 @@
 
 #include "dsp56f807.h"
 #include "options.h"
-#include "asc.h"
 #include "pid.h"
 #include "trajectory.h"
 #include "pwm_interface.h"
@@ -131,10 +130,10 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			_control_mode[channel]=MODE_IDLE;	
 			PWM_outputPadDisable(channel);
 			_calibrated[channel] = true; 
-		#ifdef DEBUG_CALIBRATION			
+		     #ifdef DEBUG_CALIBRATION			
 			can_printf ("Calibration ABS_DIGITAL aborted\r\n");
 			can_printf ("Offset setted\r\n");		
-		#endif					
+		    #endif					
 		}
 #endif
 return;

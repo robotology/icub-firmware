@@ -5,7 +5,6 @@
 
 #include "dsp56f807.h"
 #include "options.h"
-#include "asc.h"
 #include "pid.h"
 #include "controller.h"
 #include "trajectory.h"
@@ -49,7 +48,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		
 #elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0257 ) 
 
-	//	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
+	//	can_printf ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) 
 		{
 			set_max_position(channel, param3);	
@@ -67,12 +66,11 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		{
 			_control_mode[channel]=MODE_IDLE;	
 			PWM_outputPadDisable(channel);
-			_calibrated[channel] = true; 
-			
+			_calibrated[channel] = true; 	
 		}
 	
 #elif  VERSION==0x0157
-	//  	AS1_printStringEx ("Calibration ABS_DIGITAL started \r\n");
+	//  	can_printf ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0 && channel==0)
 		{
@@ -85,7 +83,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-	//		AS1_printStringEx ("Calibration ABS_DIGITAL terminated \r\n");
+	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
 		}
 		if (param2>0 &&channel==1)
 		{
@@ -94,7 +92,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-	//		AS1_printStringEx ("Calibration ABS_DIGITAL terminated \r\n");
+	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
 		}
 		if (param2==0)
 		{
@@ -102,8 +100,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			_pad_enabled[channel] = false;
 			PWM_outputPadDisable(channel);
 			_calibrated[channel] = true; 
-	//		AS1_printStringEx ("Calibration ABS_DIGITAL aborted\r\n");
-	//		AS1_printStringEx ("Offset set\r\n");			
+	//		can_printf ("Calibration ABS_DIGITAL aborted\r\n");
+	//		can_printf ("Offset set\r\n");			
 		}
 #endif
 	}   
