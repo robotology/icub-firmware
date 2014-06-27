@@ -344,24 +344,17 @@ void set_control_mode(byte axis)
 //---------------------------------------------------------------------------------------------------------------------------
 void helper_set_control_mode(byte axis, byte value)
 {
-	if (CAN_LEN == 2) 
-	{ 
-		can_printf("CTRLMODE SET:%d",value);
-		if (value>=0 && value <=0x50) _control_mode[axis] = value;
-		_desired_torque[axis]=0;
-		_desired[axis] = _position[axis];
-		_desired_vel[axis] = 0;
-		_integral[axis] = 0;
-		_ko_imp[axis] = 0;
-		_set_point[axis] = _position[axis];
-		init_trajectory (axis, _position[axis], _position[axis], 1);
-		clear_lpf_ord1_3hz  (axis);
-		_ko_openloop[axis] = 0;
-	} 
-	else
-	{
-		can_printf("CTRLMODE ERR");
-	}
+	can_printf("CTRLMODE SET:%d",value);
+	if (value>=0 && value <=0x50) _control_mode[axis] = value;
+	_desired_torque[axis]=0;
+	_desired[axis] = _position[axis];
+	_desired_vel[axis] = 0;
+	_integral[axis] = 0;
+	_ko_imp[axis] = 0;
+	_set_point[axis] = _position[axis];
+	init_trajectory (axis, _position[axis], _position[axis], 1);
+	clear_lpf_ord1_3hz  (axis);
+	_ko_openloop[axis] = 0;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------

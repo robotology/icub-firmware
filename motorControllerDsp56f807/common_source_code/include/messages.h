@@ -48,8 +48,6 @@
    								  BYTE_W(CAN_DATA[6], CAN_DATA[7])); \
 }
 
-#define USE_NEW_CONTROL_MODES  //USE NEW CONTROL MODES!!
-#ifndef USE_NEW_CONTROL_MODES 
 //-------------------------------------------------------------------
 #define CAN_GET_CONTROL_MODE_HANDLER(x) \
 { \
@@ -59,21 +57,15 @@
 //-------------------------------------------------------------------
 #define CAN_SET_CONTROL_MODE_HANDLER(x) \
 { \
-	set_control_mode(axis, CAN_DATA[1]); \
+	if (CAN_LEN == 2)\
+	{ \
+		set_control_mode(axis); \
+	} \
+	else \
+	{ \
+		can_printf("ERR CTRL:%d",axis); \
+	} \
 }
-#else
-//-------------------------------------------------------------------
-#define CAN_GET_CONTROL_MODE_HANDLER(x) \
-{ \
-	get_control_mode(axis); \
-}
-
-//-------------------------------------------------------------------
-#define CAN_SET_CONTROL_MODE_HANDLER(x) \
-{ \
-	set_control_mode(axis); \
-}
-#endif
 
 //-------------------------------------------------------------------
 #define CAN_GET_INTERACTION_MODE_HANDLER(x) \
