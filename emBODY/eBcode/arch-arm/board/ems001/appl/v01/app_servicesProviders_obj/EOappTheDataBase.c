@@ -959,6 +959,16 @@ extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p)
     return(p->virtualStrainData.isupdated);
 }
 
+extern void eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(EOappTheDB *p)
+{
+    if(NULL == p)
+    {
+        return;
+    }   
+    p->virtualStrainData.isupdated = 0;
+}
+
+
 extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_canBoardCanLocation_t *canloc_ptr)
 {
     uint8_t                         numofboard, i;

@@ -72,7 +72,10 @@
 #define runner_timeout_send_diagnostics         1000
 #define runner_countmax_check_ethlink_status    5000 //every one second
 
-#define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        50
+#define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        10
+#define COUNT_BETWEEN_TWO_UPDATES_MAx           200 /* equal to timeout in mc4 before mc4 considers useless strain values
+                                                       see macro "STRAIN_SAFE" in iCub\firmware\motorControllerDsp56f807\common_source_code\include\strain_board.h*/
+
 
 
 
@@ -135,6 +138,7 @@ static void s_checkEthLinks(void);
 static uint16_t motionDoneJoin2Use = 0;
 static uint16_t count_ethlink_status = 0;
 static uint8_t count_watchdog_virtaulStrain = 0;
+static uint8_t count_between_two_updates = 0;
 #if defined(EVIEWER_ENABLED) 
 static uint8_t event_view = 0;
 #endif 
@@ -574,18 +578,36 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     
  
 
-    //prepare virtual strain data
+    /*prepare virtual strain data:
+      i send virtual strain data to mc4 if:
+        - pc104 send me new values
+        - or if have been not passede more then COUNT_BETWEEN_TWO_UPDATES_MAx millisec from last received value.
+      More over, i send message every 10 millisec
+    */
+    send_virtualStrainData = 0;
     if(eo_appTheDB_IsVirtualStrainDataUpdated(db_ptr))
     {
         send_virtualStrainData = 1;
         count_watchdog_virtaulStrain = 0;
+        count_between_two_updates = 0;
+        eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(db_ptr);
     }
     else
     {
+        count_between_two_updates ++;
         count_watchdog_virtaulStrain++;
-        if(count_watchdog_virtaulStrain <= COUNT_WATCHDOG_VIRTUALSTRAIN_MAX)
+        
+        if(count_between_two_updates <= COUNT_BETWEEN_TWO_UPDATES_MAx)
         {
-            send_virtualStrainData = 1;
+            if(count_watchdog_virtaulStrain == COUNT_WATCHDOG_VIRTUALSTRAIN_MAX)
+            {
+                send_virtualStrainData = 1;
+                count_watchdog_virtaulStrain = 0;
+            }
+            else
+            {
+                send_virtualStrainData = 0;
+            }
         }
         else
         {

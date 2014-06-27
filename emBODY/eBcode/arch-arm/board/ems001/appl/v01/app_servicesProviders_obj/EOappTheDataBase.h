@@ -250,6 +250,7 @@ extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_sk
 
 extern eOresult_t eo_appTheDB_GetVirtualStrainDataPtr(EOappTheDB *p, uint16_t **virtStrain_ptr);
 extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p);
+extern void eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(EOappTheDB *p);
 extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue);
 
 

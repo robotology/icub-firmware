@@ -164,7 +164,7 @@ static const eOappTheDB_cfg_skinInfo_t  s_cfg_appDB_skin [] =
     {
         EO_INIT(.connected2emsport)                       eOcanport2,
         EO_INIT(.boardAddrStart)                          8,
-        EO_INIT(.numofboards)                             7
+        EO_INIT(.numofboards)                             6
     }
 };
 

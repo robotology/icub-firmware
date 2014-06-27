@@ -79,6 +79,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status);
+static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncefullscale);
 
 
 
@@ -276,10 +277,7 @@ extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
 
 extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    uint8_t                             channel = 0;
-    eOresult_t                          res;
     eOicubCanProto_msgDestination_t     msgdest;
-    eOas_strain_status_t                *sstatus_ptr;
     eOappTheDB_sensorCanLocation_t      canLoc;
     eOsmStatesEMSappl_t                 currentstate;
     eOas_strainId_t                     strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
@@ -307,24 +305,8 @@ extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescript
     msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
     
-    if(straincfg->signaloncefullscale)
-    {
-        //clear array in strainstatus
-        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), strainId,  &sstatus_ptr);
-        if(eores_OK != res)
-        {
-            return;
-        }
-        
-        sstatus_ptr->fullscale.head.size = 0;
-        memset(&sstatus_ptr->fullscale.data[0], 0, 12);
-        channel = 0;
-        msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
-    }
-    
-    /* Note: here i don't set head data of arrays in status, because they are init by constant default one strain 
-    (see eOcfg_nvsEP_as_any_con_sxxdefault.c) */
+    s_signalGetFullScales(strainId, straincfg->signaloncefullscale);
+
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -375,34 +357,10 @@ extern void eoprot_fun_UPDT_as_strain_config_datarate(const EOnv* nv, const eOro
 
 extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    uint8_t                     channel = 0;
-    eOresult_t                  res;
-    eOas_strain_status_t        *sstatus_ptr;
     eObool_t                    *signaloncefullscale = (eObool_t*)nv->ram;
     eOas_strainId_t             strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
-    };
 
-    if(*signaloncefullscale)
-    {
-        EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-        
-        //clear array in strainstatus
-        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), strainId,  &sstatus_ptr);
-        if(eores_OK != res)
-        {
-            return;
-        }
-        
-        sstatus_ptr->fullscale.head.size = 0;
-        memset(&sstatus_ptr->fullscale.data[0], 0, 12);
-        channel = 0;
-        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, &channel);
-    }
-
+    s_signalGetFullScales(strainId, *signaloncefullscale);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -446,6 +404,46 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
     EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
     eo_array_Resize(array, size);    
    
+}
+
+
+static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncefullscale)
+{
+    eOas_strain_status_t        *sstatus_ptr;
+    uint8_t                     channel = 0;
+    eOresult_t                  res = eores_OK;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
+    };
+
+    if(signaloncefullscale)
+    {
+        EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+        //clear array in strainstatus
+        res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), strainId,  &sstatus_ptr);
+        if(eores_OK == res)
+        {
+            sstatus_ptr->fullscale.head.size = 0;
+            memset(&sstatus_ptr->fullscale.data[0], 0, 12);
+            channel = 0;
+            msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
+            //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
+             eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, &channel);
+        }
+    }
+    /* Note: here i don't set head data of arrays in status, because they are init by constant default one strain 
+    (see eOcfg_nvsEP_as_any_con_sxxdefault.c) */
+    
+    // #include "EOtheEMSapplDiagnostics.h"
+    // #include "EOMtheEMSbackdoor.h"
+    // #include "hal_trace.h"
+    // char str[128];
+    // snprintf(str, sizeof(str)-1, "signaloncefullscale cmd received %d res=%d", signaloncefullscale, res);
+    // eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+    // eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+    // hal_trace_puts(str);
 }
 
 
