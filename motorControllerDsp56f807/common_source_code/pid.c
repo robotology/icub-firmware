@@ -235,7 +235,7 @@ Int32 compute_pwm(byte j)
 	
     default:
 	    can_printf ("UNKNOWN CONTROLMODE PID");
-		_control_mode[j]=MODE_HW_FAULT;	
+		put_motor_in_fault(j);	
 		PWMoutput=0;
 	break;
     	
@@ -298,13 +298,13 @@ Int32 compute_pwm(byte j)
         else if (_interaction_mode[j]==icubCanProto_interactionmode_compliant)
         {
  		 	can_printf ("UNSUPPORTED INTERACTION PID");
-		 	_control_mode[j]=MODE_HW_FAULT;	
+		 	put_motor_in_fault(j);	
 		 	PWMoutput=0;       	
         }
         else
         {
  		 	can_printf ("UNKNOWN INTERACTION PID");
-		 	_control_mode[j]=MODE_HW_FAULT;	
+		 	put_motor_in_fault(j);	
 		 	PWMoutput=0;       	
         }
 	}
@@ -342,7 +342,7 @@ Int32 compute_pwm(byte j)
 		 else
 		 {
 		 	can_printf ("UNKOWN INTERACTION PID");
-		 	_control_mode[j]=MODE_HW_FAULT;	
+		 	put_motor_in_fault(j);	
 		 	PWMoutput=0;
 		 }
 	break;
@@ -399,9 +399,7 @@ Int32 compute_pwm(byte j)
 	break;
 
 	case MODE_HANDLE_HARD_STOPS:
-     	#ifdef DEBUG_CAN_MSG
 		can_printf("MODE HANDLE HARD STOP");
-	     #endif
 	    PWM_outputPadDisable(j);
 		_control_mode[j] = MODE_IDLE;
 		PWMoutput=0;
@@ -1019,7 +1017,7 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 		{
 			if (strain_num==-1)
 			{
-				_control_mode[jnt] = MODE_HW_FAULT;	
+				put_motor_in_fault(jnt);	
 
 				#ifdef DEBUG_CAN_MSG					
 					can_printf("WARN:force control not allowed jnt:%d",jnt);
@@ -1031,7 +1029,7 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 			}
 			if (_strain_wtd[strain_num]==0)
 			{
-				_control_mode[jnt] = MODE_HW_FAULT;	
+				put_motor_in_fault(jnt);	
 					
 				#ifdef DEBUG_CAN_MSG
 					can_printf("WARN:strain watchdog disabling pwm jnt:%d",jnt);				

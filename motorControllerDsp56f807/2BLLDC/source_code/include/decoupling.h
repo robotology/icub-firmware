@@ -6,8 +6,8 @@
 #define USE_NEW_DECOUPLING 1
 
 void decouple_positions (void);
-void decouple_dutycycle (Int32 *);
-void decouple_dutycycle_new_motor(Int32 *);
+//void decouple_dutycycle (Int32 *);
+//void decouple_dutycycle_new_motor(Int32 *);
 void decouple_dutycycle_new_joint(Int32 *pwm);
 
 #endif

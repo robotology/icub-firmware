@@ -334,7 +334,7 @@ void main(void)
 			#ifdef DEBUG_CAN_MSG
 				can_printf("DISABLE BUS OFF");
 			#endif	
-			for (i=0; i<JN; i++) _control_mode[i]=MODE_HW_FAULT;
+			for (i=0; i<JN; i++) put_motor_in_fault(i);
 			led1_off
 		}
 		else
@@ -383,11 +383,10 @@ void main(void)
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
-					_control_mode[i] = MODE_HW_FAULT;	
-					PWM_outputPadDisable(i);
-			#ifdef DEBUG_CAN_MSG
+				put_motor_in_fault(i);	
+				#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",i);	
-			#endif
+				#endif
 		   }				
 		}  
 #endif
@@ -395,11 +394,10 @@ void main(void)
 #if (VERSION ==0x0254)
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
-					_control_mode[0] = MODE_HW_FAULT;	
-					PWM_outputPadDisable(0);
-			#ifdef DEBUG_CAN_MSG
+				put_motor_in_fault(0);
+				#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",0);	
-			#endif
+				#endif
 		   }	
 					 
 #endif	
@@ -553,23 +551,21 @@ void main(void)
 		{
 			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
 			{
-				_control_mode[i] = MODE_HW_FAULT;	
+				put_motor_in_fault(i);	
 				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
-#ifdef DEBUG_CAN_MSG
+				#ifdef DEBUG_CAN_MSG
 				can_printf("j%d curr %f",i,get_current(i));
-#endif
+				#endif
 			}
 			check_current(i, (_pid[i] > 0));		
 			compute_i2t(i);
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
-				_control_mode[i] = MODE_HW_FAULT;
+				put_motor_in_fault(i);	
 				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
-#ifdef DEBUG_CAN_MSG
+				#ifdef DEBUG_CAN_MSG
 				can_printf("j%d filtcurr %f",i,_filt_current[i]);
-#endif	
+				#endif	
 			}			
 		}
 

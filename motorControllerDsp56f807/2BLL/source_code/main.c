@@ -310,9 +310,9 @@ void main(void)
 		if (getCanBusOffstatus() )
 		{
 			#ifdef DEBUG_CAN_MSG
-				can_printf("DIASBLE BUS OFF");
+			can_printf("DIASBLE BUS OFF");
 			#endif	
-			for (i=0; i<JN; i++) _control_mode[i]=MODE_HW_FAULT;
+			for (i=0; i<JN; i++) put_motor_in_fault(i);
 			led1_off
 		}
 		else
@@ -367,11 +367,10 @@ void main(void)
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
-					_control_mode[i] = MODE_HW_FAULT;	
-					PWM_outputPadDisable(i);
-			#ifdef DEBUG_CAN_MSG
+				put_motor_in_fault(i);
+				#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",i);	
-			#endif
+				#endif
 		   }	
 					
 		}  
@@ -381,11 +380,10 @@ void main(void)
 
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
-					_control_mode[0] = MODE_HW_FAULT;	
-					PWM_outputPadDisable(0);
-			#ifdef DEBUG_CAN_MSG
+				put_motor_in_fault(0);
+				#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",0);	
-			#endif
+				#endif
 		   }	
 					 
 #endif	
@@ -610,22 +608,17 @@ led0_off
 			TempSensCount2 = 0;		
 		}
 
-	//check for overtemperature
+	    //check for overtemperature
 		for (i=0; i<JN; i++) 
 		{
 			overtemp[i]=false;
 			if ((TempSens[i] > 75) && _pad_enabled[i] == true)
 			{
-				_control_mode[i] = MODE_HW_FAULT;	
-				_pad_enabled[i] = false;
-				
+				put_motor_in_fault(i);
 				overtemp[i]=true;
-			#ifdef DEBUG_CAN_MSG
-			
+				#ifdef DEBUG_CAN_MSG
 				can_printf("WARN: VERY HIGH temp ax%d: %d! disabling pwm...",i,TempSens[i]);	
-			
-			#endif				
-				PWM_outputPadDisable(i);				
+				#endif								
 			}
 		}	
 #endif		
@@ -638,23 +631,21 @@ led0_off
 		{
 			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
 			{
-				_control_mode[i] = MODE_HW_FAULT;	
+				put_motor_in_fault(i);	
 				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
-#ifdef DEBUG_CAN_MSG
+                #ifdef DEBUG_CAN_MSG
 				can_printf("j%d curr %f",i,get_current(i));
-#endif
+                #endif
 			}
 			check_current(i, (_pid[i] > 0));		
 			compute_i2t(i);
 			if (_filt_current[i] > MAX_I2T_CURRENT)
 			{
-				_control_mode[i] = MODE_HW_FAULT;	
+				put_motor_in_fault(i);
 				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
-#ifdef DEBUG_CAN_MSG
+                #ifdef DEBUG_CAN_MSG
 				can_printf("j%d filtcurr %f",i,_filt_current[i]);
-#endif	
+                #endif	
 			}			
 		}
 

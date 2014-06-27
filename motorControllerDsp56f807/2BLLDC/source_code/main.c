@@ -237,7 +237,7 @@ void main(void)
 	// BUS_OFF check
 		if (getCanBusOffstatus() )
 		{
-			for (i=0; i<JN; i++) _control_mode[i]=MODE_HW_FAULT;
+			for (i=0; i<JN; i++) put_motor_in_fault(i);
 			led1_off
 		}
 		else
@@ -322,12 +322,12 @@ void main(void)
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
 		   {
-					_control_mode[i] = MODE_HW_FAULT;	
-					PWM_outputPadDisable(0);
-					PWM_outputPadDisable(1);
-			#ifdef DEBUG_CAN_MSG
+				put_motor_in_fault(i);	
+				PWM_outputPadDisable(0);
+				PWM_outputPadDisable(1);
+				#ifdef DEBUG_CAN_MSG
 		    	can_printf("ABS error %d",i);	
-			#endif
+				#endif
 		   }				
 		}  
 						
@@ -372,8 +372,8 @@ void main(void)
 			    _position[1]>_max_position[1] || _position[1]<_min_position[1])
 			{
 				can_printf("OUT!!");
-				_control_mode[0]=MODE_HW_FAULT;		
-				_control_mode[1]=MODE_HW_FAULT;		
+				put_motor_in_fault(0);
+				put_motor_in_fault(1);
 			}
 			else
 #endif

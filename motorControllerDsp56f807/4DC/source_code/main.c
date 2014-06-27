@@ -285,7 +285,7 @@ void main(void)
 			{
 				turn_led_on(0);
 				turn_led_on(1);
-				_control_mode[i]=MODE_HW_FAULT; 
+				put_motor_in_fault(i); 
 			}
 		}
 //-------------------------------------------------------------------------------------------
@@ -335,7 +335,7 @@ void main(void)
 		{
 			for (i=0; i<JN; i++)
 			{
-				_control_mode[i] = MODE_HW_FAULT;
+				put_motor_in_fault(i);
 			}
 			if (msec==0) can_printf("MAIS error");	
 		}
@@ -588,9 +588,8 @@ void main(void)
 			if ((_filt_current[i] > (_max_allowed_current[i]*1000)))
 #endif			
 			{
-				_control_mode[i] = MODE_HW_FAULT;	
+				put_motor_in_fault(i);	
 				highcurrent[i]=true;
-				PWM_outputPadDisable(i);
 				can_printf("BIG CURR J%d %f!",i,_filt_current[i]);
 			} 			
 			else

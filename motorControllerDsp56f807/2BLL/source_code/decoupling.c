@@ -42,9 +42,7 @@ void decouple_positions(void)
 	}
 	else
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		PWM_outputPadDisable(0);
-
+		put_motor_in_fault(0);	
 		#ifdef DEBUG_CAN_MSG
 		if(count==255)
 		{
@@ -247,9 +245,7 @@ void decouple_dutycycle(Int32 *pwm)
 	}
 	else
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		PWM_outputPadDisable(0);
-
+		put_motor_in_fault(0);	
 		#ifdef DEBUG_CAN_MSG
 		if(count==255)
 		{
@@ -333,8 +329,7 @@ void decouple_dutycycle(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[1] = MODE_HW_FAULT;	
-		_pad_enabled[1] = false;
+		put_motor_in_fault(1);	
 		PWM_outputPadDisable(0);
 
 		#ifdef DEBUG_CAN_MSG
@@ -400,10 +395,7 @@ void decouple_dutycycle(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
-		PWM_outputPadDisable(0);
-
+		put_motor_in_fault(0);	
 		#ifdef DEBUG_CAN_MSG
 			if(count==255)
 			{
@@ -567,13 +559,8 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
-		PWM_outputPadDisable(0);
-		_control_mode[1] = MODE_HW_FAULT;	
-		_pad_enabled[1] = false;
-		PWM_outputPadDisable(1);
-
+		put_motor_in_fault(0);	
+		put_motor_in_fault(1);
 		#ifdef DEBUG_CAN_MSG
 			if(count==255)
 			{
@@ -697,10 +684,7 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
-		PWM_outputPadDisable(0);
-
+		put_motor_in_fault(0);	
 		#ifdef DEBUG_CAN_MSG
 			if(count==255)
 			{
@@ -846,13 +830,8 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
-		PWM_outputPadDisable(0);
-		_control_mode[1] = MODE_HW_FAULT;	
-		_pad_enabled[1] = false;
-		PWM_outputPadDisable(1);
-
+		put_motor_in_fault(0);
+		put_motor_in_fault(1);	
 		#ifdef DEBUG_CAN_MSG
 			if(count==255)
 			{
@@ -962,10 +941,7 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		_control_mode[0] = MODE_HW_FAULT;	
-		_pad_enabled[0] = false;
-		PWM_outputPadDisable(0);
-
+		put_motor_in_fault(0);	
 		#ifdef DEBUG_CAN_MSG
 			if(count==255)
 			{

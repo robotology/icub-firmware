@@ -163,20 +163,20 @@ void helper_enable_single_motor(byte j)
 	if (_can_protocol_ack == false)
 	{
 		can_printf("can protocol NOT ack");
-		_control_mode[j] = MODE_HW_FAULT;
+		put_motor_in_fault(j);
 		return;
 	}
 	if (!(_received_pid[j].rec_pid==0x7F))
 	{
 		can_printf("PID IS NOT SET %d", j);
-		_control_mode[j] = MODE_HW_FAULT;
+		put_motor_in_fault(j);
 		return;
 	}
 	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC)
 	if (_calibrated[j] == false)
 	{
 		can_printf("calib failed %d",j);  
-		_control_mode[j] = MODE_HW_FAULT;		
+		put_motor_in_fault(j);		
 	}
 	#endif
 	PWM_outputPadEnable(j); 
@@ -193,16 +193,16 @@ void helper_enable_coupled_motor(byte j1, byte j2)
 	if (_can_protocol_ack == false)
 	{
 		can_printf("can protocol NOT ack %d & %d", j1, j2);
-		_control_mode[j1] = MODE_HW_FAULT;
-		_control_mode[j2] = MODE_HW_FAULT;
+		put_motor_in_fault(j1);
+		put_motor_in_fault(j2);
 		return;
 	}
 	if (!(_received_pid[j1].rec_pid==0x7F) ||
 	    !(_received_pid[j2].rec_pid==0x7F))
 	{
 		can_printf("WARNING:PID IS NOT SET %d & %d", j1, j2);
-		_control_mode[j1] = MODE_HW_FAULT;
-		_control_mode[j2] = MODE_HW_FAULT; 		
+		put_motor_in_fault(j1);
+		put_motor_in_fault(j2);		
 		return;	
 	}	
 	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC)
@@ -210,8 +210,8 @@ void helper_enable_coupled_motor(byte j1, byte j2)
 	    _calibrated[j2] == false)
 	{
 		can_printf("calib failed %d & %d",j1,j2);  
-		_control_mode[j1] = MODE_HW_FAULT;
-		_control_mode[j2] = MODE_HW_FAULT; 		
+		put_motor_in_fault(j1);
+		put_motor_in_fault(j2);		
 		return;			
 	}
 	#endif
