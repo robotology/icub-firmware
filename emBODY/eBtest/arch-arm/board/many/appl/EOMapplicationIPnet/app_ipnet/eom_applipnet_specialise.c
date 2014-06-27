@@ -278,13 +278,23 @@ static void s_eom_applipnet_specialise_ipnet_start(void)
         .maxdatagramenqueuedintx    = 2         // max 2 datagrams in tx queue of IPnet
     };
  
-
+    
     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,     // the properties of the two tasks of IPnet
                          used_ipal_cfg,             // the ipal config
                          NULL,                      // the ip/mac addresses. if NULL ... they are taken from ipal_cfg
                          &used_dtgskt_cfg           // the datagrams   
                          );
 
+    char str[128];
+    const uint8_t* ipadr = ((const uint8_t*)(&used_ipal_cfg->eth_ip));
+    const uint8_t* ipmsk = ((const uint8_t*)(&used_ipal_cfg->eth_mask));
+    
+    snprintf(str, sizeof(str), "IPnet started: IP = %d.%d.%d.%d, msk = %d.%d.%d.%d", 
+                               ipadr[0], ipadr[1], ipadr[2], ipadr[3],
+                               ipmsk[0], ipmsk[1], ipmsk[2], ipmsk[3]);
+    
+    eo_errman_Info(eo_errman_GetHandle(), "", str);
+    
 }
 
 
@@ -349,6 +359,20 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t)
     s_eom_applipnet_specialise_transceiver_init();
 
     //eventviewer_load(ev_ID_first_usrdef+0, getfromEOsocket);
+    
+    
+    char str[128];
+    const char mode[] = 
+#if defined(USE_RECEIVER_ECHOER)          
+        "ECHOER"
+#else    
+        "ASYMM"
+#endif
+    ;
+    
+    snprintf(str, sizeof(str), "Socket listening on port %d, with %s mode", s_server_port, mode);
+    
+    eo_errman_Info(eo_errman_GetHandle(), "", str);    
         
 }
 
