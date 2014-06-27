@@ -367,6 +367,16 @@ void main(void)
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{ 
+#ifdef DEBUG_FAULT_ON_LIMIT
+			if (_position[0]>_max_position[0] || _position[0]<_min_position[0] ||
+			    _position[1]>_max_position[1] || _position[1]<_min_position[1])
+			{
+				can_printf("OUT!!");
+				_control_mode[0]=MODE_HW_FAULT;		
+				_control_mode[1]=MODE_HW_FAULT;		
+			}
+			else
+#endif
 			if (!mode_is_idle(i)) 
 			{
 				PWM_generate(i,_pid[i]);
