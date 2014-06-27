@@ -95,7 +95,7 @@
 //   <i> Free-assigned part of the MAC (last three octets).
 //   <i> Default: 0x010103
 #ifndef IPAL_MAC3OCT
- #define IPAL_MAC3OCT        10634590
+ #define IPAL_MAC3OCT        10634579
 #endif
 
 //  </h>MAC address
