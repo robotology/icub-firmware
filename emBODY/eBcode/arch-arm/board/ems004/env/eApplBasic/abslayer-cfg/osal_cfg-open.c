@@ -73,7 +73,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 static void s_osal_cfg_on_idle(void);
 
 
-extern const osal_cfg_t osal_cfg = 
+const osal_cfg_t osal_cfg = 
 {   
     .rtostype               = (osal_rtostype_t)OSAL_RTOSTYPE,          // uint8_t         rtostype;
     .memorymodel            = (osal_memorymodel_t)OSAL_MEMMODEL,
@@ -106,7 +106,7 @@ extern const osal_cfg_t osal_cfg =
 };
 
 
-extern const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
+const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
 
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)

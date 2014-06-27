@@ -48,11 +48,11 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
 
 
 
-extern uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);  
+uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);  
 
 
 
-extern const ipal_cfg_t ipal_cfg = 
+const ipal_cfg_t ipal_cfg = 
 { 
     .arch_ipstack           = (ipal_ipstack_t)IPAL_TCPIPTYPE,
     .memorymodel            = (ipal_memorymodel_t)IPAL_MEMMODEL,
@@ -160,7 +160,7 @@ extern const ipal_cfg_t ipal_cfg =
 };
 
  
-extern const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
+const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
 static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)

@@ -44,7 +44,7 @@ static void* myheap_new(uint32_t size);
 static void myheap_delete(void* mem);
 
 
-extern const hal_core_cfg_t hal_cfg = 
+const hal_core_cfg_t hal_cfg = 
 {   
     .basecfg    =
     {
@@ -73,7 +73,7 @@ extern const hal_core_cfg_t hal_cfg =
 };
 
 
-extern const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
+const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
 
 
 // void SysTick_Handler(void)

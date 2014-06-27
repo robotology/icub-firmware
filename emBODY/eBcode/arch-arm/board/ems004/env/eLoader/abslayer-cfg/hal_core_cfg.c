@@ -44,7 +44,7 @@ static void* myheap_new(uint32_t size);
 static void myheap_delete(void* mem);
 
 
-extern const hal_core_cfg_t hal_core_cfg = 
+const hal_core_cfg_t hal_core_cfg = 
 {   
     .basecfg    =
     {
