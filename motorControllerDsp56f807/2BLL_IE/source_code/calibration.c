@@ -14,6 +14,7 @@
 #include "abs_ssi_interface.h"
 #include "encoders_interface.h"
 #include "calibration.h"
+#include "control_enable.h"
 
 #ifndef VERSION   
 #	error "No valid version specified"

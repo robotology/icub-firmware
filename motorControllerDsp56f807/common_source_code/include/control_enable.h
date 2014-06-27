@@ -18,4 +18,7 @@ bool mode_is_idle               (byte axis);
 bool mode_is_stiff              (byte axis);
 bool mode_is_force_controlled   (byte axis);
 
+void enable_motor_pwm           (byte axis);
+void disable_motor_pwm          (byte axis);
+
 #endif
