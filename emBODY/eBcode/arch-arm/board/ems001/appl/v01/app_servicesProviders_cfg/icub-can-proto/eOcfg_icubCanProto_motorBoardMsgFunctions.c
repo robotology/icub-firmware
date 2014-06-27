@@ -104,6 +104,11 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
 // --------------------------------------------------------------------------------------------------------------------
 extern eOresult_t eo_icubCanProto_parser_pol_mb_unexpected_cmd(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
+    // #include "hal_trace.h"
+    // char str [70];
+    
+    // snprintf(str, sizeof(str), "parser_pol_mb_unexpected_cmd: id=0x%x, cmd=%d", frame->id, frame->data[0]);
+    // hal_trace_puts(str);
     return(eores_NOK_unsupported);
 }
 
@@ -215,6 +220,12 @@ extern eOresult_t eo_icubCanProto_parser_test(EOicubCanProto* p, eOcanframe_t *f
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_unexpected_cmd(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    // #include "hal_trace.h"
+    // char str [70];
+    
+    // snprintf(str, sizeof(str), "former_pol_mb_unexpected_cmd: ");
+    // hal_trace_puts(str);
+    
     return(eores_NOK_unsupported);
 }
 
