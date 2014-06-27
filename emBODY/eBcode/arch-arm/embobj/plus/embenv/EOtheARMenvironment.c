@@ -29,11 +29,14 @@
 #include "EOtheErrorManager.h"
 
 #include "EOVtheEnvironment_hid.h"
-#if		!defined(HAL_USE_VERSION_2)
+
+#include "hal.h"
+
+#if		defined(HAL_IS_VERSION_2) || defined(HAL_USE_VERSION_2)
+#include "hal_uniqueid.h"
+#else
 #include "hal_arch_arm.h"
 #define hal_uniqueid_id64bit_get hal_arch_arm_uniqueid64_get
-#else	//HAL_USE_VERSION_2
-#include "hal_uniqueid.h"
 #endif
 
 #include "eEsharedServices.h" 
