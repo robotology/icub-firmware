@@ -1023,7 +1023,6 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 					can_printf("WARN:force control not allowed jnt:%d",jnt);
 				#endif
 								
-				PWM_outputPadDisable(jnt);	
 				_strain_val[jnt]=0;
 				return false;				
 			}
@@ -1035,7 +1034,6 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 					can_printf("WARN:strain watchdog disabling pwm jnt:%d",jnt);				
 				#endif	
 				
-				PWM_outputPadDisable(jnt);	
 				_strain_val[jnt]=0;
 				return false;
 			}
