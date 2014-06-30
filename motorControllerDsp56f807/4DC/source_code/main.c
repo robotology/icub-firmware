@@ -249,7 +249,7 @@ void main(void)
  
 	
 	print_version ();
-	
+
 	
 	/* initialization */
 	for (i=0; i<JN; i++) _calibrated[i] = false;
@@ -335,8 +335,8 @@ void main(void)
 		{
 			for (i=0; i<JN; i++)
 			{
-			    if (mode_is_idle(i) != false)
-					put_motor_in_fault(i);
+			    if (!mode_is_idle(i))
+					put_motor_in_fault(i);	    
 			}
 			if (msec==0) can_printf("MAIS error");	
 		}
