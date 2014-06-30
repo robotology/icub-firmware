@@ -49,6 +49,17 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_GET_CALIBRATION_STATUS_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+	CAN_LEN = 4; \
+	CAN_DATA[1] = BYTE_H(_calibrated[axis]); \
+	CAN_DATA[2] = BYTE_H(_control_mode[axis]); \
+	CAN_DATA[3] = BYTE_H(_interaction_mode[axis]); \
+	CAN1_send( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+}
+
+//-------------------------------------------------------------------
 #define CAN_GET_CONTROL_MODE_HANDLER(x) \
 { \
 	get_control_mode(axis); \
