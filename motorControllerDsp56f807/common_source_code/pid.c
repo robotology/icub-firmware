@@ -1013,7 +1013,8 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 {
 	if (_control_mode[jnt] == MODE_TORQUE ||
 		_control_mode[jnt] == MODE_IMPEDANCE_POS ||
-		_control_mode[jnt] == MODE_IMPEDANCE_VEL )
+		_control_mode[jnt] == MODE_IMPEDANCE_VEL ||
+		_interaction_mode[jnt] == icubCanProto_interactionmode_compliant )
 		{
 			if (strain_num==-1)
 			{
@@ -1043,7 +1044,10 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 				return true;	
 			}	
 		}
-	_strain_val[jnt]=_strain[strain_num][strain_chan];
-	return true;		
+	else
+	{
+		//here we are in stiff control mode (i.e. position)
+		return true;			
+	}	
 }
 
