@@ -6,10 +6,10 @@ Int16 _strain[STRAIN_MAX][6];
 Int16 _strain_init[STRAIN_MAX][6];
 Int16 _strain_old[STRAIN_MAX][6];
 
-byte  _strain_wtd[STRAIN_MAX];
+byte  _strain_wtd[STRAIN_MAX]   = INIT_ARRAY (STRAIN_SAFE);;
 
-byte  _selected_strain_id[JN];
-byte  _selected_strain_chan[JN];
+byte  _selected_strain_id[JN]   = INIT_ARRAY (-1);
+byte  _selected_strain_chan[JN] = INIT_ARRAY (-1);
 
 extern byte _board_ID;
 
