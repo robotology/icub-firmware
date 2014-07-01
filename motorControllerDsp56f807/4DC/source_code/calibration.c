@@ -27,6 +27,9 @@ Int16 _max_position_enc_tmp[JN] = INIT_ARRAY (0);
 controlling with absolute position sensors*/
 #endif
 
+//helper functions
+void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3);
+void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 param3);
 
 /************************************************************ 
  * this function checks if the calibration is terminated
@@ -141,112 +144,85 @@ void check_in_position_calib(byte jnt)
 	}
 }
 
+/**************************************************************** 
+ * helper functions
+ ****************************************************************/
+void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (!mode_is_idle(channel) && IS_DONE(channel))
+	{
+		_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
+		_counter_calib = 0;
+		_pwm_calibration[channel] = param1;
+		if (param2!=0)
+	 		_velocity_calibration[channel]=param2;
+		else
+			_velocity_calibration[channel]=1;
+	}		
+}
 
+void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (param3 >=0 && param3 <=4095) 
+	{
+		set_max_position(channel, param3);	
+		#if (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0257 ) 
+		set_position_encoder(channel,0);
+		#endif
+	}
+	if (param2>0)
+	{
+	    _position[channel] = get_position_abs_ssi(channel);
+		_set_point[channel] = param1;
+		init_trajectory (channel, _position[channel], _set_point[channel], param2);
+		_in_position[channel] = false;
+		_calibrated[channel] = true;
+	}
+	if (param2==0)
+	{
+		put_motor_in_fault(channel);
+		can_printf ("invalid calib p2");				
+	}	
+}
 
 /**************************************************************** 
  * calibration procedure, depends on the firmware version.
  ****************************************************************/
 void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
 {
-/********
- *0x0111*
- ********/
+//-------------------------------
+// 1.11 4DC
+//-------------------------------
 #if VERSION == 0x0111
 	 
-	if (type==CALIB_HARD_STOPS)
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration HARD_STOPS started \r\n");
-			can_printf ("param1: ");
-			can_print_dword (param1);
-			can_printf ("param2: ");	
-			can_print_dword (param2);
-			#endif
-		}	
-	}
-/********
- *0x0115*
- ********/
+	if (type==CALIB_HARD_STOPS)	helper_calib_hard_stops (channel, param1, param2,param3);
+
+//-------------------------------
+// 1.15 4DC
+//-------------------------------
 #elif VERSION ==0x0115
 	 
-	if (type==CALIB_HARD_STOPS)
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration HARD_STOPS started \r\n");		
-			#endif
-		}	
-	}
-/********
- *0x0214*
- ********/	
+	if (type==CALIB_HARD_STOPS) helper_calib_hard_stops (channel, param1, param2,param3);
+
+//-------------------------------
+// 2.14 4DC
+//-------------------------------
 #elif VERSION ==0x0214
 
-	if ((type==CALIB_HARD_STOPS) && (channel<=2))
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration hardstop started  %d \r\n",channel);
-			can_printf("param1: ");
-			can_print_dword (param1);
-			can_printf ("param2: ");	
-			can_print_dword (param2);
-			#endif			
-		}	
-	}
+	if ((type==CALIB_HARD_STOPS) && (channel<=2)) helper_calib_hard_stops (channel, param1, param2,param3);
+
 
 	if ((type==CALIB_ABS_DIGITAL ) && (channel==3))
-	{
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("Calibration started  %d \r\n",channel);
-		#endif
-		
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("BC ");
-    	can_print_dword(_position[channel]);
-		#endif	
+	{		
 		if ((param3 >=0 && param3 <=4095) )	set_max_position(AEA4, param3);	
 		
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("AC ");
-		can_print_dword(_position[channel]);
-		#endif
 		if (param2>0)
-		{
-		
+		{		
 		    _position[channel] = get_position_abs_ssi(AEA3);
 			_set_point[channel] = param1;
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-				#ifdef DEBUG_CALIBRATION
-			can_printf("Calibration ABS_DIGITAL terminated %d \r\n", channel);
-				#endif
 		}
 		if (param2==0)
 		{
@@ -254,50 +230,20 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			can_printf ("invalid calib p2");		
 		}		
 	}	
-/********
- *0x0215*
- ********/	
+//-------------------------------
+// 2.15 4DC
+//-------------------------------	
 #elif VERSION ==0x0215
 
-	if ((type==CALIB_HARD_STOPS) && (channel>=2))
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration hardstop started  %d \r\n",channel);
-			can_printf("param1: ");
-			can_print_dword (param1);
-			can_printf ("param2: ");	
-			can_print_dword (param2);
-			#endif			
-		}	
-	}
+	if ((type==CALIB_HARD_STOPS) && (channel>=2)) helper_calib_hard_stops (channel, param1, param2,param3);
 
 	if ((type==CALIB_ABS_DIGITAL ) && (channel<=1))
-	{
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("Calibration started  %d \r\n",channel);
-		#endif
-		
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("BC ");
-    	can_print_dword(_position[channel]);
-		#endif	
+	{	
 		if ((param3 >=0 && param3 <=4095) && (channel==0))
 			set_max_position(AEA3, param3);	
 		else
 			set_max_position(AEA4, param3);
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("AC ");
-		can_print_dword(_position[channel]);
-		#endif
+
 		if (param2>0)
 		{
 		    _position[channel] = ((channel==0) ? get_position_abs_ssi(AEA3): get_position_abs_ssi(AEA4));
@@ -305,9 +251,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-			#ifdef DEBUG_CALIBRATION
-			can_printf("Calibration ABS_DIGITAL terminated %d \r\n", channel);
-			#endif
 		}
 		if (param2==0)
 		{
@@ -316,35 +259,19 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}		
 	}	
 
-/********
- *0x0119*
- ********/	
-#elif VERSION ==0x0119
-	byte channel1;
-	byte channel2; 
-	if ((type==CALIB_HARD_STOPS) && (channel==0))
-	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration HARD_STOPS started \r\n");
-			can_printf ("param1: ");
-			can_printf_dword (param1);
-			can_printf ("param2: ");	
-			can_printf_dword (param2);
-			#endif			
-		}	
-	}
+//-------------------------------	 
+// 1.19 2.19 4DC   
+//-------------------------------	 
+#elif (VERSION ==0x0219 || VERSION == 0x0119)
 
-	if (type==CALIB_HARD_STOPS_DIFF)
-	{
+	//pronosupination J4
+	if ((type==CALIB_HARD_STOPS) && (channel==0)) helper_calib_hard_stops (channel, param1, param2,param3);
+
+	//wrist J5 J6
+	if (type==CALIB_HARD_STOPS_DIFF) //VERSION 0x119 ONLY
+	{	
+		byte channel1;
+	    byte channel2; 
 		if (channel==1)
 		{
 			channel1=1; //maybe it could be change somehow 
@@ -366,137 +293,56 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		 		_velocity_calibration[channel1]=param2;
 			else
 				_velocity_calibration[channel1]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration CALIB_HARD_STOPS_DIFF started \r\n");	
-			can_printf ("param1: ");
-			can_printf_dword (param1);
-			can_printf ("param2: ");	
-			can_printf_dword (param2);
-			#endif
 		}	
 	}	
-	if (type==CALIB_ABS_DIGITAL)
-	{
-		#ifdef DEBUG_CALIBRATION	
-		can_printf ("Calibration ABS_DIGITAL started \r\n");
-		can_printf ("param1: ");
-		can_printf_dword (param1);
-		can_printf ("param2: ");	
-		can_printf_dword (param2);
-		#endif		
-		if (channel==3)
-		{
-			if (param2>0)
-			{
-				_set_point[channel] = param1;
-				init_trajectory(channel, _position[channel], _set_point[channel], param2);
-				_calibrated[channel] = true;
-				#ifdef DEBUG_CALIBRATION				
-				can_printf ("moving from: ");	
-				can_printf_dword (_position[channel]);	
-				can_printf ("moving to: ");	
-				can_printf_dword (_set_point[channel]);	
-				can_printf ("Calibration ABS_DIGITAL terminated \r\n");
-				#endif				
-			}
-			if (param2==0)
-			{
-		 	   put_motor_in_fault(channel);		
-			   can_printf ("invalid calib p2");			
-			} 		
-		}	
-	}
-/********
- *0x0219*
- ********/	
-#elif VERSION ==0x0219
 
-	if ((type==CALIB_HARD_STOPS) && (channel==0))
+	if (type==CALIB_ABS_DIGITAL )  //VERSION 0x129 ONLY
 	{
-		if (!mode_is_idle(channel) && IS_DONE(channel))
-		{
-			_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-			_counter_calib = 0;
-			_pwm_calibration[channel] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel]=param2;
-			else
-				_velocity_calibration[channel]=1;
-			#ifdef DEBUG_CALIBRATION			
-			can_printf ("Calibration HARD_STOPS started \r\n");
-			can_printf ("param1: ");
-			can_printf_dword (param1);
-			can_printf ("param2: ");	
-			can_printf_dword (param2);
-			#endif			
-		}	
-	}
-
-	if (type==CALIB_ABS_DIGITAL )  
-	{	
+		//wrist J5 J6	
 		if (channel!=3)
-		{	
-			#ifdef DEBUG_CALIBRATION	
-			can_printf ("Calibration started  %d \r\n",channel);
-			#endif
-			
-			#ifdef DEBUG_CALIBRATION	
-			can_printf ("BC ");
-	    	can_print_dword(_position[channel]);
-			#endif	
+		{					
 			if (channel==1)
 			{
 				if (param3 >=0 && param3 <=4095) set_max_position(AEA6, param3);	
+				_position[channel] = get_position_abs_ssi(AEA6);
 			}
 			if (channel==2)
 			{
 				if (param3 >=0 && param3 <=4095) set_max_position(AEA5, param3);	
+				_position[channel] = get_position_abs_ssi(AEA5);
 			}
 		
-			#ifdef DEBUG_CALIBRATION	
-			can_printf ("AC ");
-			can_print_dword(_position[channel]);
-			#endif
 			if (param2>0)
 			{
-				if (channel==1)
+				_calibrated[channel] = true;
+				if (_calibrated[1] == true && 
+				    _calibrated[2] == true )
 				{
-				    _position[channel] = get_position_abs_ssi(AEA6);
+					enable_motor_pwm(channel);
 				}
-				if (channel==2)
-				{
-			    	_position[channel] = get_position_abs_ssi(AEA5);
-				}
+				    		    
 				_set_point[channel] = param1;
 				init_trajectory (channel, _position[channel], _set_point[channel], param2);
 				_in_position[channel] = false;
-				_calibrated[channel] = true;
-				#ifdef DEBUG_CALIBRATION
-				can_printf("Calibration ABS_DIGITAL terminated %d \r\n", channel);
-				#endif
 			}
-			if (param2==0)
+			else
 			{
 				put_motor_in_fault(channel);		
 				can_printf ("invalid calib p2");	
 			}	
 		}
+		// FINGER J7
 		else
 		{
 			if (param2>0)
 			{
-				_set_point[channel] = param1;
-				init_trajectory(channel, _position[channel], _set_point[channel], param2);
 				_calibrated[channel] = true;
-				#ifdef DEBUG_CALIBRATION				
-				can_printf("moving from:%d");	
-				can_print_dword(_position[channel]);	
-				can_printf("moving to: %d",_set_point[channel]);	
-				can_print_dword(_set_point[channel]);	
-				can_printf("Calibration ABS_DIGITAL terminated \r\n");
-				#endif				
+			    enable_motor_pwm(channel);
+
+				_set_point[channel] = param1;
+				init_trajectory(channel, _position[channel], _set_point[channel], param2);		
 			}
-			if (param2==0)
+			else
 			{
 			   put_motor_in_fault(channel);		
 			   can_printf ("invalid calib p2");				
@@ -505,50 +351,39 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 	}
 
-/********	  
- *0x0128*	 
- ********/
+//-------------------------------	 	  
+// 1.28  2.28 4DC	 
+//-------------------------------	 
  
 #elif ((VERSION == 0x0128) ||(VERSION == 0x0228) )
 
-	if ((type==CALIB_ABS_DIGITAL) && (channel==0) )
+   //FINGER J8
+	if ((type==CALIB_ABS_DIGITAL) && (channel==0) ) 
 	{
-		#ifdef DEBUG_CALIBRATION
-		can_printf("Calibration ABS_DIGITAL started \r\n");
-		#endif
 		if (param2>0)
 		{
+			_calibrated[channel] = true;
+			enable_motor_pwm(channel);
+				
 			_set_point[channel] = param1;
 			init_trajectory(channel, _position[channel], _set_point[channel], param2);
-			_calibrated[channel] = true;
-		    #ifdef DEBUG_CALIBRATION	
-			can_printf("moving....");		
-		    #endif
 		}
-		if (param2==0)
+		else
 		{
 			put_motor_in_fault(channel);		
 			can_printf ("invalid calib p2");	
 		} 			
 	}	
 
-	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0))
+    //FINGER J9 J10 J11
+	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) 
 	{
-		#ifdef DEBUG_CALIBRATION
-	  	can_printf("Starting the calibration %d", type);
-		#endif
 		if (param2>0)
 		{
 		    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
 		    _set_point[channel] = param1;
 			_max_position_enc_tmp[channel] = param3;
-		    #ifdef DEBUG_CALIBRATION		    
-		    can_printf("Params are: %d, %d, %d", param1, param2, param3);
-			can_printf ("_position");
-		    can_print_dword(_position[channel]);
-		    can_printf ("_set_point");
-		    can_print_dword(_set_point[channel]);
-		    #endif	
+
 			init_trajectory(channel, _position[channel], _set_point[channel], param2);
 		}
 		if (param2==0)
@@ -558,36 +393,22 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		} 			
 	}
 	
-/********	  
- *0x0130*	 
- ********/
+//-------------------------------	 	  
+//  1.30 2.30   4DC  	 
+//-------------------------------	 
  
 #elif ((VERSION == 0x0130) || (VERSION == 0x0230))
 
-	if ((type==CALIB_ABS_AND_INCREMENTAL) )
+    //FINGER J12 J13 J14 J15
+	if ((type==CALIB_ABS_AND_INCREMENTAL) ) 
 	{
-		#ifdef DEBUG_CALIBRATION
-		can_printf("Starting the calibration %d", type);	
-		#endif
 		if (param2>0)
 		{
 		    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
 		    _set_point[channel] = param1;
 			_max_position_enc_tmp[channel] = param3;
-		    #ifdef DEBUG_CALIBRATION		    
-		    can_printf("Params are: %d, %d, %d", param1, param2, param3);
-			can_printf ("_position");
-		    can_print_dword(_position[channel]);
-		    can_printf ("_set_point");
-		    can_print_dword(_set_point[channel]);
-	        #endif	
+	
 			init_trajectory(channel, _position[channel], _set_point[channel], param2);
-	    	#ifdef DEBUG_CALIBRATION		
-			can_printf ("moving from: ");	
-			can_printf (_position[channel]);	
-			can_printf ("moving to: ");	
-			can_printf (_set_point[channel]);	
-		    #endif
 		}
 		if (param2==0)
 		{
@@ -595,9 +416,95 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			can_printf ("invalid calib p2");
 		} 			
 	}	
+
+//-------------------------------	 	  
+// 3.51     2BLLIE  
+//-------------------------------	 
+#elif (VERSION==0x0351)
+
+	//iKart
+	if (type==CALIB_ABS_DIGITAL) 
+	{
+		set_current_as_middle_position(channel);
+		set_relative_position_abs_ssi_turns(channel, 0);
+		_position[channel] = get_relative_position_abs_ssi(channel);				
+	}
+
+//-----------------------------------	  
+// 2.50 2.51 2.52 2.54 2.57 2BLLIE 	 
+//-----------------------------------	 
+#elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0257 ) 
+
+	// standard bllIe calibrator
+	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital (channel, param1, param2,param3);
+
+//-----------------------------------	  
+// 1.61 2BLLDC 	 
+//-----------------------------------
+#elif VERSION==0x0161
+
+	if (type==CALIB_HARD_STOPS) helper_calib_hard_stops (channel, param1, param2,param3);
+			
+//-----------------------------------	  
+// 1.62 2BLLDC 	 
+//-----------------------------------
+#elif VERSION==0x0162
+
+	//neck V2
+	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital (channel, param1, param2,param3);
+
+//-----------------------------------	  
+// 1.40 1.50 1.51 1.52 1.54 2BLL 	 
+//-----------------------------------	 
+#elif (VERSION==0x0140 || VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 ) 
+
+	//first two joints of the shoulder
+    if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital (channel, param1, param2,param3);
+
+//-----------------------------------	  
+// 1.47 1.57 2BLL 	 
+//-----------------------------------
+#elif  VERSION==0x0157 || VERSION==0x0147 
+
+	//special calibrator for coupled shoulder joint (V1 mechanics)
+	if (param3 >=0 && param3 <=4095)
+	{
+		set_max_position(channel, param3);	
+	}
+	if (param2>0 && channel==0)
+	{
+		set_relative_position_abs_ssi_turns(channel, 0);
+		_position[channel] = get_relative_position_abs_ssi(channel);
+		#if VERSION==0x0157 
+			_position[channel] = (((float) _position[channel])*0.6153F);  
+			_position[channel] = _position[channel]+ _cpl_pos_prediction[0];
+			_position[channel] = _position[channel]- _cpl_pos_prediction[1];			
+		#endif			
+		_set_point[channel] = param1;
+		init_trajectory (channel, _position[channel], _set_point[channel], param2);
+		_in_position[channel] = false;
+		_calibrated[channel] = true;
+	}
+	if (param2>0 &&channel==1)
+	{
+	    _position[channel] = get_position_abs_ssi(channel);
+		_set_point[channel] = param1;
+		init_trajectory (channel, _position[channel], _set_point[channel], param2);
+		_in_position[channel] = false;
+		_calibrated[channel] = true;
+	}
+	if (param2==0)
+	{
+		put_motor_in_fault(channel);
+		can_printf ("invalid calib p2");				
+	}
+#else
+
+	//this should be unreachable
+	#warning UNDEFINED CALIBRATOR TYPE!!
+	#error   UNDEFINED CALIBRATOR TYPE!!
+	
 #endif
 
-	_calibrated[channel] = false; 
-	return;
-	
+ return;	
 }
