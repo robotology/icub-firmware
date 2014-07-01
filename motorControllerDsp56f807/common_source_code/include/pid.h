@@ -264,20 +264,6 @@ extern Int32  _adjustment[JN];         // the sum of the three value coming from
 	}\
 }
 
-//	/* Control hard limit reached ? i.e. abnormal high current ? */ \
-//	if (_control_mode[j] == MODE_POSITION) \
-//	{\
-//		if (_filt_current[j] > _max_allowed_current[j] ) \
-//		{\
-//			_control_mode[j] = MODE_HANDLE_HARD_STOPS; \
-//			_pid[j] = 0; \
-//			if      (j == 0) PWMoutput[0] = 0; \
-//			else if (j == 1) PWMoutput[1] = 0; \
-//			else if (j == 2) PWMoutput[2] = 0; \
-//			else if (j == 3) PWMoutput[3] = 0; \
-//		}\
-//	}\
-
 /* Version 0x120 0x121 0x128 0x130 only: encoder reached its limit? */
 /* the encoder from 0 should not go more then a certain value specified in the calibration message*/
 #define ENFORCE_ENC_LIMITS(PID, POS, MAX_POS) \

@@ -60,7 +60,6 @@ byte helper_controlmode_fw_to_api(byte mode)
 		case MODE_IMPEDANCE_VEL:			 return icubCanProto_controlmode_impedance_vel;
 		case MODE_CALIB_ABS_POS_SENS:		 return icubCanProto_controlmode_calibration;
 		case MODE_CALIB_HARD_STOPS:      	 return icubCanProto_controlmode_calibration;
-		case MODE_HANDLE_HARD_STOPS:		 return icubCanProto_controlmode_calibration;
 		case MODE_MARGIN_REACHED:   		 return icubCanProto_controlmode_calibration;
 		case MODE_CALIB_ABS_AND_INCREMENTAL: return icubCanProto_controlmode_calibration;
 		case MODE_OPENLOOP:                  return icubCanProto_controlmode_openloop;	

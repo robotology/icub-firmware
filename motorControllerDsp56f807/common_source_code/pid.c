@@ -397,13 +397,6 @@ Int32 compute_pwm(byte j)
 		_counter_calib +=1;
 		#endif
 	break;
-
-	case MODE_HANDLE_HARD_STOPS:
-		can_printf("MODE HANDLE HARD STOP");
-	    PWM_outputPadDisable(j);
-		_control_mode[j] = MODE_IDLE;
-		PWMoutput=0;
-		break;
 		
 	case MODE_IDLE:
 	case MODE_HW_FAULT:

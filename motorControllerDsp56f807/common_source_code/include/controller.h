@@ -52,7 +52,7 @@
 #define MODE_DIRECT                     0x08
 #define MODE_CALIB_ABS_POS_SENS			0x10 //internal calib status
 #define MODE_CALIB_HARD_STOPS			0x20 //internal calib status
-#define MODE_HANDLE_HARD_STOPS			0x30 //internal calib status
+#define MODE_HANDLE_HARD_STOPS			0x30 //deprecated
 #define MODE_MARGIN_REACHED    			0x40 //internal calib status
 #define MODE_CALIB_ABS_AND_INCREMENTAL	0x41 //internal calib status
 #define MODE_OPENLOOP               	0x50
