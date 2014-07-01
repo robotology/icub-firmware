@@ -48,7 +48,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		
 #elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0257 ) 
 
-     	//	can_printf ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) 
 		{
 			set_max_position(channel, param3);	

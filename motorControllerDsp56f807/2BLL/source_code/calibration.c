@@ -48,7 +48,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		
 #elif (VERSION==0x0140 || VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 ) 
 
-		//can_printf ("Calibration ABS_DIGITAL started \r\n");
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0)
 		{
@@ -57,7 +56,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
 		}
 		if (param2==0)
 		{
@@ -66,7 +64,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}
 	
 #elif  VERSION==0x0157 || VERSION==0x0147 
-	//  	can_printf ("Calibration ABS_DIGITAL started \r\n");
+
 		if (param3 >=0 && param3 <=4095) set_max_position(channel, param3);	
 		if (param2>0 && channel==0)
 		{
@@ -81,7 +79,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
 		}
 		if (param2>0 &&channel==1)
 		{
@@ -90,7 +87,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
 			_in_position[channel] = false;
 			_calibrated[channel] = true;
-	//		can_printf ("Calibration ABS_DIGITAL terminated \r\n");
 		}
 		if (param2==0)
 		{
