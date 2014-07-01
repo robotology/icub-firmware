@@ -39,17 +39,17 @@ void check_in_position_calib(byte jnt)
 	bool temporary_cond2; 
 	bool temporary_cond3; 
 	
-	/* increase the counter for the calibration (wait for the movement to start)*/
+	// increase the counter for the calibration (wait for the movement to start)
 	_counter_calib +=1;
-	/* final consideration reached? and ... */
+	// final consideration reached? and ... 
 	temporary_long = (Int32) extract_h(_filt_abs_pos[jnt]);
 	temporary_cond1 = (__abs( temporary_long - _abs_pos_calibration[jnt]) < INPOSITION_CALIB_THRESHOLD);
 	temporary_cond2 = (_position[jnt] == _position_old[jnt]);
-	/* ... control mode is calibration? and ... */
+	// ... control mode is calibration? and ...
 	temporary_cond1 = temporary_cond1 && (_control_mode[jnt] == MODE_CALIB_ABS_POS_SENS);
 	temporary_cond2 = temporary_cond2 && (_control_mode[jnt] == MODE_CALIB_HARD_STOPS);
 	temporary_cond3 =                    (_control_mode[jnt] == MODE_CALIB_ABS_AND_INCREMENTAL);
-	/* ... trajecotry ended? */
+	// ... trajecotry ended? 
 	temporary_cond1 = temporary_cond1 && _ended[jnt];
 	temporary_cond2 = temporary_cond2 && (_counter_calib > 1000);
 	temporary_cond3 = temporary_cond3 && _ended[jnt];
@@ -58,65 +58,54 @@ void check_in_position_calib(byte jnt)
 	{
 		
 #if VERSION != 0x0119
-		#ifdef DEBUG_CALIBRATION
-		can_printf ("Calibration sequence terminated \r\n");
-		#endif
 		_control_mode[jnt] = MODE_POSITION;
-		//Reset the encoder	
 		set_position_encoder (jnt, 0);
 
-#if ((VERSION == 0x0128) || (VERSION == 0x0228))
+#elif ((VERSION == 0x0128) || (VERSION == 0x0228))
 		if (jnt!=0)
 		{
-			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];
-			#ifdef DEBUG_CALIBRATION
-			can_printf("maxPosEnc: %d", _max_position_enc[jnt]);
-			#endif			
-			
+			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];					
 			_min_position_enc[1]=-1800; //Thumb proximal right and left
+			
 			if (_max_position_enc[2]>0)
-			_min_position_enc[2]=-3000; //Thumb distal
+				_min_position_enc[2]=-3000; //Thumb distal
    			 else 
-   			 _min_position_enc[2]=3000; //Thumb distal
+   			 	_min_position_enc[2]=3000; //Thumb distal
   
 			_min_position_enc[3]=-300; //Index proximal  right and left
 			
 			_calibrated[jnt] = true;
 			return;
 		}		
-#endif
-#if ((VERSION == 0x0130) || (VERSION == 0x0230))
+
+#elif ((VERSION == 0x0130) || (VERSION == 0x0230))
 		{
 			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];
-			#ifdef DEBUG_CALIBRATION
-			can_printf("maxPosEnc: %d", _max_position_enc[jnt]);
-			#endif
-			
+		
 			if (_max_position_enc[0]>0)
-			_min_position_enc[0]=-3000; //Index distal
+				_min_position_enc[0]=-3000; //Index distal
 			else
-			_min_position_enc[0]=3000; //Index distal
+				_min_position_enc[0]=3000; //Index distal
+				
 			_min_position_enc[1]=-300; //Middle proximal right and left
+			
 			if (_max_position_enc[2]>0)
-			_min_position_enc[2]=-3000; //Middle distal
+				_min_position_enc[2]=-3000; //Middle distal
 			else
-			_min_position_enc[2]=3000; //Middle distal	
+				_min_position_enc[2]=3000; //Middle distal	
+			
 			_min_position_enc[3]=0; //little fingers  right and left
 				
 			_calibrated[jnt] = true;
 			return;
 		}						
-#endif
 		
 #elif VERSION ==0x0119
-		#ifdef DEBUG_CALIBRATION
-		can_printf ("Calibration sequence terminated \r\n");
-		#endif
+
 		_control_mode[jnt] = MODE_POSITION;	
 
 		if (jnt == 0)
 		{
-			//Reset the encoder	
 			set_position_encoder (jnt, 0);
 		}
 		if (jnt==1)
