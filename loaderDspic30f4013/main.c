@@ -37,7 +37,10 @@
 **      
 **1.4   09 Sep 2010  Changed the BOOTLDR_ADDR  0x6D40. 	        M.Maggiali 
 **					 Added the check in CMD_BOARD if the ID is the correct board id. 
-**				                    
+**
+**
+**1.5   25 Jun 2014   	        M.Maggiali 
+**					 Added a toggle on the red button if an error happen. 				                    
 **-------------------------------------------------------------------------
 **
 **
@@ -416,6 +419,8 @@ int CAN_Messages_buff_ptr = 0;
 struct canmsg_tag CAN_Messages[CAN_MAX_MESSAGES_IN_BUFF];
 
 void __delay32(unsigned long);
+
+void RunAppl(void);
    
 void EEnqueue(unsigned x)
 // Insert error in queue
@@ -565,12 +570,18 @@ void SendCanErrorMsg(unsigned char Dest, unsigned char ErrorCode)
 void HaltBootloader(unsigned char Dest, unsigned char ErrorCode)
 {
   int i;
-  while(1)
+  unsigned char error=0;
+
+//  ToggleLED();	
+  while(error!=ErrorCode)
   {
-    SendCanErrorMsg(Dest, ErrorCode);
-    for(i=1; i<=100; i++)
-      ;
+//    SendCanErrorMsg(Dest, ErrorCode);
+ 	ToggleLED();
+	error++;
+   __delay32(1800000);
+	
   }
+  RunAppl(); //
 }
 
 void InitBufParams(unsigned int RowSize, unsigned long OffsetAdr)
