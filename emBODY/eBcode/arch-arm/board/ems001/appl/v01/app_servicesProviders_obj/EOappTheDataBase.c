@@ -46,7 +46,9 @@
 // #include "eOcfg_nvsEP_sk.h"
 
 #include "EOMtheEMSapplCfg_cfg.h" //here is define type of ems used
-
+#ifdef USE_PROTO_PROXY
+#include "EOlist_hid.h"
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,7 +69,9 @@
 #define db_emscanportconnected2motorboard     eOcanport1 
 //#define DB_NULL_VALUE_U16                     0xFFFF
 #define DB_NULL_VALUE_U08                     0xFF
-
+#ifdef USE_PROTO_PROXY
+#define db_numOfEthProtoReq_for_entity        2
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -91,7 +95,10 @@ static eOresult_t s_appTheDB_snsrMaislist_init(EOappTheDB *p);
 static eOresult_t s_appTheDB_snsrStrainlist_init(EOappTheDB *p);
 static eOresult_t s_appTheDB_skinlist_init(EOappTheDB *p);
 static eOresult_t s_appTheDB_canaddressLookuptbl_init(EOappTheDB *p);
-
+#ifdef USE_PROTO_PROXY
+static EOlist * s_appTheDB_getEthProtoReqList(EOappTheDB *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index);
+static eOresult_t s_appTheDB_searchEthProtoReq_matchingRule(void *item, void *param);
+#endif
 
 //static eOresult_t s_appTheDB_nvsramref_init(EOappTheDB *p);
 
@@ -1027,6 +1034,69 @@ extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t 
 
 }
 
+#ifdef USE_PROTO_PROXY
+extern eOresult_t eo_appTheDB_appendEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, eOappTheDB_hid_ethProtoRequest_t *req)
+{
+    EOlist  *ethProtoReq_list = NULL;
+    EOlistIter* li =NULL;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    ethProtoReq_list = s_appTheDB_getEthProtoReqList(p, eoprot_endpoint_motioncontrol, entity, index);
+    
+    if(NULL == ethProtoReq_list)
+    {
+        return(eores_NOK_nodata);
+    }
+    
+    if(eo_list_Full(ethProtoReq_list))
+    {
+        return(eores_NOK_busy);
+    }
+    
+    
+    li = eo_list_Find(ethProtoReq_list, s_appTheDB_searchEthProtoReq_matchingRule, &req->id32);
+    if(NULL == li)
+    {
+        eo_list_PushBack(ethProtoReq_list, req);
+    }
+    else
+    {
+        //se sono qui allora non ho ricevuto tutte le risposte can che mi aspettavo...e quindi e' rimansta una entri sporca...
+        ((eOappTheDB_hid_ethProtoRequest_t *)li->data)->numOfREceivedResp = 0;
+    }
+    
+    return(eores_OK);
+}
+
+
+extern EOlistIter* eo_appTheDB_searchEthProtoRequest(EOappTheDB *p, eOprotID32_t id32)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    eOprotID32_t key = id32;
+    eOprotEndpoint_t ep     = eoprot_ID2endpoint(id32);
+    eOprotEntity_t   entity = eoprot_ID2entity(id32);
+    eOprotIndex_t    index  = eoprot_ID2index(id32); 
+   
+    EOlist  *ethProtoReq_list = s_appTheDB_getEthProtoReqList(p, eoprot_endpoint_motioncontrol, entity, index);
+
+    return (eo_list_Find(ethProtoReq_list, s_appTheDB_searchEthProtoReq_matchingRule, &key));
+
+}
+extern eOresult_t eo_appTheDB_removeEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, EOlistIter* li)
+{
+    eo_list_Erase( s_appTheDB_getEthProtoReqList(p, eoprot_endpoint_motioncontrol, entity, index), li);
+    return(eores_OK);
+    #warning VALE: mettre controllo in eo_appTheDB_removeEthProtoRequest????
+}
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1176,6 +1246,10 @@ static eOresult_t s_appTheDB_jointslist_init(EOappTheDB *p)
         j_ptr->shiftvalues_ptr = shiftvalues_ptr;
         j_ptr->bcastpolicy_ptr = bcastpolicy_ptr;
         
+        #ifdef USE_PROTO_PROXY
+            j_ptr->ethProtoReq_list = eo_list_New(sizeof(eOappTheDB_hid_ethProtoRequest_t), db_numOfEthProtoReq_for_entity, NULL, 0, NULL, NULL);
+        #endif
+        
         
         //2.1)make a connection beetween board to joint also ==> fill "connected joints list" of baord
         b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, j_ptr->cfg_ptr->canLoc.belong2board);
@@ -1215,7 +1289,9 @@ static eOresult_t s_appTheDB_motorslist_init(EOappTheDB *p)
     {
         m_ptr = (eOappTheDB_hid_motorInfo_t*)eo_array_At(p->motorsList, i);
         m_ptr->cfg_ptr = &m_cfg_ptr[i];
-        
+        #ifdef USE_PROTO_PROXY
+            m_ptr->ethProtoReq_list = eo_list_New(sizeof(eOappTheDB_hid_ethProtoRequest_t), db_numOfEthProtoReq_for_entity, NULL, 0, NULL, NULL);
+        #endif
         //2.1)make a connection beetween board to joint also ==> fill "connected joints list" of board
         b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsList, m_ptr->cfg_ptr->canLoc.belong2board);
         b_ptr->s.jm.connectedmotors[m_ptr->cfg_ptr->canLoc.indexinboard] = (eOmc_motorId_t)i; //set motor's id
@@ -1517,6 +1593,49 @@ static eOresult_t s_appTheDB_virtualStrainData_init(EOappTheDB *p)
     return(eores_OK);
 }
 
+
+#ifdef USE_PROTO_PROXY
+static EOlist * s_appTheDB_getEthProtoReqList(EOappTheDB *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index)
+{
+    if((eoprot_endpoint_motioncontrol == ep) && (eoprot_entity_mc_joint == entity))
+    {
+        eOappTheDB_hid_jointInfo_t *j_ptr = (eOappTheDB_hid_jointInfo_t *)eo_array_At(p->jointsList, index);
+        if(NULL != j_ptr)
+        {
+            return(j_ptr->ethProtoReq_list);
+        }
+    }
+    
+    if((eoprot_endpoint_motioncontrol == ep) && (eoprot_entity_mc_motor == entity))
+    {
+        eOappTheDB_hid_motorInfo_t * m_ptr = (eOappTheDB_hid_motorInfo_t *)eo_array_At(p->motorsList, index);
+        if(NULL != m_ptr)
+        {
+            return (m_ptr->ethProtoReq_list);
+        }
+    }
+    
+    return(NULL);
+
+}
+
+
+static eOresult_t s_appTheDB_searchEthProtoReq_matchingRule(void *item, void *param)
+{
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)item;
+    eOprotID32_t * id32 = (eOprotID32_t*)param;
+    
+    if(req->id32 == *id32)
+    {
+        return(eores_OK);
+    }
+    else
+    {
+        return(eores_NOK_generic);
+    }
+
+}
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

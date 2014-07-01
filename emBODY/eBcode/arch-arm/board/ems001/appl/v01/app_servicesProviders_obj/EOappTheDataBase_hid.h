@@ -61,12 +61,18 @@ typedef struct
     eOappTheDB_cfg_jointInfo_t   		*cfg_ptr;
     eOappTheDB_jointShiftValues_t       *shiftvalues_ptr;   
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
+#ifdef USE_PROTO_PROXY
+    EOlist                              *ethProtoReq_list;
+#endif
 } eOappTheDB_hid_jointInfo_t;
 
 
 typedef struct
 {
-    eOappTheDB_cfg_motorInfo_t   		*cfg_ptr;
+    eOappTheDB_cfg_motorInfo_t          *cfg_ptr;
+#ifdef USE_PROTO_PROXY
+    EOlist                              *ethProtoReq_list;
+#endif
 } eOappTheDB_hid_motorInfo_t;
 
 

@@ -50,6 +50,12 @@
 #include "OPCprotocolManager_Cfg.h"
 #include "EoDiagnostics.h"
 #include "EOtheEMSapplDiagnostics.h"
+
+#ifdef USE_PROTO_PROXY
+#include "EOtheBOARDtransceiver.h" //to get proxy pointer
+#include "EoProtocolMC.h"
+#include "EOlist_hid.h"
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -621,7 +627,57 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    eOmc_setpoint_t                         setpoint;
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+    icubCanProto_torque_t icub_trq =  *((icubCanProto_torque_t*)(&frame->data[1]));
+    
+    setpoint.type = eomc_setpoint_torque;
+    setpoint.to.torque.value = eo_appMeasConv_torque_S2I(appMeasConv_ptr, jId, icub_trq);
+
+
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &setpoint);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+    }
+#endif    
+    return(res);
 }
 
 
@@ -684,11 +740,71 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMinPosition(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMinPosition(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    eOresult_t                              res;
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jId, eoprot_tag_mc_joint_config_limitsofjoint);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    eOmeas_position_limits_t *limits_ptr = (eOmeas_position_limits_t*)req->nvRam_ptr;
+    
+    icubCanProto_position_t icub_pos =  *((icubCanProto_position_t*)(&frame->data[1]));
+    limits_ptr->min = eo_appMeasConv_jntPosition_E2I(eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle()), jId, icub_pos);
+    
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmeas_position_limits_t limits_aux;
+        memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+        
+    }
+#endif
+    return(res);
+
+
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMinPosition(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION;
     return(eores_OK);
 }
 
@@ -708,11 +824,68 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMaxPosition(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMaxPosition(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jId, eoprot_tag_mc_joint_config_limitsofjoint);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    eOmeas_position_limits_t *limits_ptr = (eOmeas_position_limits_t*)req->nvRam_ptr;
+    
+    icubCanProto_position_t icub_pos =  *((icubCanProto_position_t*)(&frame->data[1]));
+    limits_ptr->max = eo_appMeasConv_jntPosition_E2I(eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle()), jId, icub_pos);
+    
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmeas_position_limits_t limits_aux;
+        memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+        
+    }
+#endif
+    return(res);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMaxPosition(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
     return(eores_OK);
 }
 
@@ -826,11 +999,72 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePid(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePid(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    eOresult_t                              res;
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jId, eoprot_tag_mc_joint_config_pidtorque);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    eOmc_PID_t* pid_ptr = (eOmc_PID_t*)req->nvRam_ptr;
+    pid_ptr->kp = *((uint16_t*)&frame->data[1]);
+    pid_ptr->ki = *((uint16_t*)&frame->data[3]);
+    pid_ptr->kd = *((uint16_t*)&frame->data[5]);
+    
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmc_PID_t pid_aux;
+        memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+        
+    }
+#endif    
+    return(res);
+
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getTorquePid(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+
+    /* 2) set can command */
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID;
     return(eores_OK);
 }
 
@@ -861,11 +1095,69 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePidLimits(EOicubCa
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_pidtorque);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    eOmc_PID_t* pid_ptr = (eOmc_PID_t*)req->nvRam_ptr;
+    
+    pid_ptr->offset = *((uint16_t*)(&frame->data[1]));
+    pid_ptr->limitonoutput = *((uint16_t*)(&frame->data[3]));
+    pid_ptr->limitonintegral = *((uint16_t*)(&frame->data[5]));
+  
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmc_PID_t pid_aux;
+        memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+    }
+#endif
+    return(res);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getTorquePidLimits(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+
+    /* 2) set can command */
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS;
     return(eores_OK);
 }
 
@@ -894,12 +1186,74 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPid(EOicubCanProto* p
 
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
-{
-    return(eores_OK);
+{    
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jId, eoprot_tag_mc_joint_config_pidposition);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    eOmc_PID_t* pid_ptr = (eOmc_PID_t*)req->nvRam_ptr;
+    pid_ptr->kp = (*((uint16_t*)&frame->data[1]));
+    pid_ptr->ki = (*((uint16_t*)&frame->data[3]));
+    pid_ptr->kd = *((uint16_t*)&frame->data[5]);
+    
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmc_PID_t pid_aux;
+        memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+        
+    }
+#endif
+    return(res);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getPosPid(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    
+     /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+
+    /* 2) set can command */
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_POS_PID;
     return(eores_OK);
 }
 
@@ -929,11 +1283,69 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPidLimits(EOicubCanPr
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_pidposition);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    eOmc_PID_t* pid_ptr = (eOmc_PID_t*)req->nvRam_ptr;
+    
+    pid_ptr->offset = *((uint16_t*)(&frame->data[1]));
+    pid_ptr->limitonoutput = *((uint16_t*)(&frame->data[3]));
+    pid_ptr->limitonintegral = *((uint16_t*)(&frame->data[5]));
+  
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmc_PID_t pid_aux;
+        memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+    }
+#endif    
+    return(res);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getPosPidLimits(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    /* 1) prepare base information*/
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+
+    /* 2) set can command */
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS;
     return(eores_OK);
 }
 
@@ -972,11 +1384,74 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceParams(EOicubCa
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+    
+    eOmc_impedance_t  *impedance_ptr = (eOmc_impedance_t*)req->nvRam_ptr;
+    
+    icubCanProto_stiffness_t icub_stiff = *((icubCanProto_stiffness_t*)(&frame->data[1]));
+    icubCanProto_damping_t   icub_dump = *((icubCanProto_damping_t*)(&frame->data[3]));
+    
+    impedance_ptr->stiffness = eo_appMeasConv_impedenceStiffness_S2I(appMeasConv_ptr, jId, icub_stiff);
+    impedance_ptr->damping = eo_appMeasConv_impedenceDamping_S2I(appMeasConv_ptr, jId, icub_dump);
+    
+
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmc_impedance_t imp_aux;
+        memcpy(&imp_aux, impedance_ptr, sizeof(eOmc_impedance_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &imp_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+    }
+#endif    
+    return(res);
+    
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceParams(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+    
+    memset(&canFrame->data[0], 0, 8);
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS;
     return(eores_OK);
 }
 
@@ -997,12 +1472,73 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setImpedanceOffset(EOicubCa
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+eOresult_t                                  res = eores_OK;
+#ifdef USE_PROTO_PROXY
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    eOresult_t                              res;
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
+    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+    if(NULL == li)
+    {
+        return(eores_NOK_generic);
+        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+    }
+    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+    
+    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+    
+    eOmc_impedance_t  *impedance_ptr = (eOmc_impedance_t*)req->nvRam_ptr;
+    
+    icubCanProto_torque_t icub_trq = *((icubCanProto_torque_t*)(&frame->data[1]));
+    impedance_ptr->offset = eo_appMeasConv_torque_S2I(appMeasConv_ptr, jId, icub_trq);
+
+    req->numOfREceivedResp++;
+    res = eores_OK;
+    
+    if(req->numOfREceivedResp == req->numOfExpectedResp)
+    {
+        //send back response
+        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOmc_impedance_t imp_aux;
+        memcpy(&imp_aux, impedance_ptr, sizeof(eOmc_impedance_t));
+        
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &imp_aux);
+        if(eores_OK != res)
+        {
+            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            res = res;
+        }
+        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+    }
+#endif    
+    return(res);
+    
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceOffset(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+    
+    memset(&canFrame->data[0], 0, 8);
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET;
     return(eores_OK);
+
 }
 
 

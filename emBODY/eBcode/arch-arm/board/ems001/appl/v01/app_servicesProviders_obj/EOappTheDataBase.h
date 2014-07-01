@@ -50,7 +50,10 @@ extern "C" {
 #include "eOSkin.h"
 #include "EOicubCanProto_specifications.h"
 #include "EOappEncodersReader.h"
-
+#ifdef USE_PROTO_PROXY
+#include "EoProtocol.h"
+#include "EOlist.h"
+#endif
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
@@ -130,9 +133,23 @@ typedef struct
     */
 } eOappTheDB_jointShiftValues_t;       //thi values are usefull only for joint connected to MC4
 
+#ifdef USE_PROTO_PROXY
+typedef struct
+{
+    eOprotID32_t    id32;
+    void            *nvRam_ptr;
+    uint8_t         numOfExpectedResp;
+    uint8_t         numOfREceivedResp;
+} eOappTheDB_hid_ethProtoRequest_t;
+#endif
 
 typedef struct
 {
+    //EOnvsCfg                        *nvsCfg;       /**<  Network Variable configuration          */
+//     eOnvEP8_t                        mc_endpoint;   /**<  motion control endpoint managed by the application */
+//     eOnvEP8_t                        as_endpoint;   /**<  analog sensor endpoint managed by the application */
+//     eOnvEP8_t                        sk_endpoint;   /**<  analog sensor endpoint managed by the application */
+
     /* if one of endpoints is not present ==> then set endpoint to EOK_uint16dummy */
     const EOconstvector* const      canboardsList;   /**< list of CAN boards connected to ems by can */
     const EOconstvector* const      jointsList;      /**< list of joints managed by an EMS board */
@@ -244,6 +261,7 @@ extern eOresult_t eo_appTheDB_GetSnrStrainStatusPtr(EOappTheDB *p, eOas_strainId
 extern eOresult_t eo_appTheDB_GetSkinConfigPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOappTheDB_cfg_skinInfo_t **skconfig_ptr);
 // extern eOresult_t eo_appTheDB_GetSkinStatusPtr(EOappTheDB *p,eOsk_skinId_t sId,  eOsk_status_t **skstatus_ptr);
 //extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr);
+extern eOresult_t eo_appTheDB_GetSkinCfgSigModePtr(EOappTheDB *p,eOsk_skinId_t skId,  eOsk_sigmode_t **sigmode_ptr);
 extern eOresult_t eo_appTheDB_GetSkinStArray10CanFramesPtr(EOappTheDB *p,eOsk_skinId_t skId,  EOarray_of_10canframes **arrayof10canframes_ptr);
 
 
@@ -256,6 +274,12 @@ extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_
 
 extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_canBoardCanLocation_t *canloc_ptr);
 extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady);
+#ifdef USE_PROTO_PROXY
+//eth proto request
+extern eOresult_t eo_appTheDB_appendEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, eOappTheDB_hid_ethProtoRequest_t *req);
+extern EOlistIter * eo_appTheDB_searchEthProtoRequest(EOappTheDB *p, eOprotID32_t id32);
+extern eOresult_t eo_appTheDB_removeEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, EOlistIter* li);
+#endif
 /** @}            
     end of group eo_app_encodersReader
  **/
