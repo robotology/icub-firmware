@@ -21,15 +21,12 @@
 #	error "No valid version specified"
 #endif
 
-#if ((VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
 Int16 _max_position_enc_tmp[JN] = INIT_ARRAY (0);
-/* max allowd position for encoder while 
-controlling with absolute position sensors*/
-#endif
 
 //helper functions
 void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3);
 void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 param3);
+void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, Int16 param3);
 
 /************************************************************ 
  * this function checks if the calibration is terminated
@@ -183,6 +180,23 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 		put_motor_in_fault(channel);
 		can_printf ("invalid calib p2");				
 	}	
+}
+
+void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (param2>0)
+	{
+	    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
+	    _set_point[channel] = param1;
+		_max_position_enc_tmp[channel] = param3;
+
+		init_trajectory(channel, _position[channel], _set_point[channel], param2);
+	}
+	if (param2==0)
+	{
+		put_motor_in_fault(channel);		
+		can_printf ("invalid calib p2");
+	} 			
 }
 
 /**************************************************************** 
@@ -376,22 +390,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	}	
 
     //FINGER J9 J10 J11
-	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) 
-	{
-		if (param2>0)
-		{
-		    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
-		    _set_point[channel] = param1;
-			_max_position_enc_tmp[channel] = param3;
-
-			init_trajectory(channel, _position[channel], _set_point[channel], param2);
-		}
-		if (param2==0)
-		{
-			put_motor_in_fault(channel);		
-			can_printf ("invalid calib p2");		
-		} 			
-	}
+	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) helper_calib_abs_and_incremental (channel, param1, param2,param3);	
 	
 //-------------------------------	 	  
 //  1.30 2.30   4DC  	 
@@ -400,22 +399,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif ((VERSION == 0x0130) || (VERSION == 0x0230))
 
     //FINGER J12 J13 J14 J15
-	if ((type==CALIB_ABS_AND_INCREMENTAL) ) 
-	{
-		if (param2>0)
-		{
-		    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
-		    _set_point[channel] = param1;
-			_max_position_enc_tmp[channel] = param3;
-	
-			init_trajectory(channel, _position[channel], _set_point[channel], param2);
-		}
-		if (param2==0)
-		{
-			put_motor_in_fault(channel);		
-			can_printf ("invalid calib p2");
-		} 			
-	}	
+	if ((type==CALIB_ABS_AND_INCREMENTAL) ) helper_calib_abs_and_incremental (channel, param1, param2,param3);	
 
 //-------------------------------	 	  
 // 3.51     2BLLIE  
