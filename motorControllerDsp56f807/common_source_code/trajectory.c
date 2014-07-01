@@ -9,6 +9,7 @@
 #include "asc.h"
 #include "trajectory.h"
 #include "can1.h"
+#include "pid.h"
 
 /******************************************************/
 // global variables
@@ -270,4 +271,32 @@ Int32 step_trajectory_delta (byte jj)
 	//can_printf ("VEL_ENDED");
 	_ended[jj] = true;
 	return 0;
+}
+
+/***************************************************************** 
+ * this function checks if the trajectory is terminated
+ * and if trajectory is terminated sets the variable _in_position
+ *****************************************************************/
+bool check_in_position(byte jnt)
+{
+	if (_control_mode[jnt] == MODE_POSITION ||
+	    _control_mode[jnt] == MODE_VELOCITY ||
+	    _control_mode[jnt] == MODE_MIXED    ||
+	    _control_mode[jnt] == MODE_IMPEDANCE_POS ||
+	    _control_mode[jnt] == MODE_IMPEDANCE_VEL)
+		{
+			//if (__abs(_position[jnt] - _set_point[jnt]) < INPOSITION_THRESHOLD && _ended[jnt])
+			if (_ended[jnt])
+				return true;
+			else
+				return false;
+		}
+	else if (_control_mode[jnt] == MODE_DIRECT)
+	{
+		return true;
+	}
+	else
+	{
+		return false;			
+	}			
 }
