@@ -162,7 +162,6 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 	    _position[channel] = get_position_abs_ssi(channel);
 		_set_point[channel] = param1;
 		init_trajectory (channel, _position[channel], _set_point[channel], param2);
-		_in_position[channel] = false;
 		_calibrated[channel] = true;
 	}
 	if (param2==0)
@@ -225,7 +224,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		    _position[channel] = get_position_abs_ssi(AEA3);
 			_set_point[channel] = param1;
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			_in_position[channel] = false;
 			_calibrated[channel] = true;
 		}
 		if (param2==0)
@@ -253,7 +251,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		    _position[channel] = ((channel==0) ? get_position_abs_ssi(AEA3): get_position_abs_ssi(AEA4));
 			_set_point[channel] = param1;
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			_in_position[channel] = false;
 			_calibrated[channel] = true;
 		}
 		if (param2==0)
@@ -327,7 +324,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 				    		    
 				_set_point[channel] = param1;
 				init_trajectory (channel, _position[channel], _set_point[channel], param2);
-				_in_position[channel] = false;
 			}
 			else
 			{
@@ -456,7 +452,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		#endif			
 		_set_point[channel] = param1;
 		init_trajectory (channel, _position[channel], _set_point[channel], param2);
-		_in_position[channel] = false;
 		_calibrated[channel] = true;
 	}
 	if (param2>0 &&channel==1)
@@ -464,7 +459,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	    _position[channel] = get_position_abs_ssi(channel);
 		_set_point[channel] = param1;
 		init_trajectory (channel, _position[channel], _set_point[channel], param2);
-		_in_position[channel] = false;
 		_calibrated[channel] = true;
 	}
 	if (param2==0)

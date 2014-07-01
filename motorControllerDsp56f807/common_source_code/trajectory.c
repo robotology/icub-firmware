@@ -284,13 +284,13 @@ bool check_in_position(byte jnt)
 	    _control_mode[jnt] == MODE_MIXED    ||
 	    _control_mode[jnt] == MODE_IMPEDANCE_POS ||
 	    _control_mode[jnt] == MODE_IMPEDANCE_VEL)
-		{
-			//if (__abs(_position[jnt] - _set_point[jnt]) < INPOSITION_THRESHOLD && _ended[jnt])
-			if (_ended[jnt])
-				return true;
-			else
-				return false;
-		}
+	{
+		//if (__abs(_position[jnt] - _set_point[jnt]) < INPOSITION_THRESHOLD && _ended[jnt])
+		if (_ended[jnt])
+			return true;
+		else
+			return false;
+	}
 	else if (_control_mode[jnt] == MODE_DIRECT)
 	{
 		return true;
