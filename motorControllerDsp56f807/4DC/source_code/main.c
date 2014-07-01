@@ -95,8 +95,6 @@ Int16 _version = 0x0219;
 Int16 _version = 0x0130;
 #elif VERSION == 0x0131
 Int16 _version = 0x0131;
-#elif VERSION == 0x0214
-Int16 _version = 0x0214;
 #elif VERSION == 0x0215
 Int16 _version = 0x0215;
 #elif VERSION == 0x0228
@@ -206,7 +204,7 @@ void main(void)
     init_pwm			  ();	 
     init_faults           (true,true,true);	 
     init_position_encoder ();
-   	#if (VERSION==0x0219) || (VERSION==0x0215) || (VERSION==0x0214)		
+   	#if (VERSION==0x0219) || (VERSION==0x0215)		
 
 	init_position_abs_ssi();
 
@@ -414,13 +412,7 @@ void main(void)
 		_position[2]= get_position_encoder(2);
 		_position[3]= get_position_encoder(3);					
 #endif
-#if VERSION == 0x0214
-	    _position[0]= get_position_encoder(0);	
-		_position[1]= get_position_encoder(1);
-		_position[2]= get_position_encoder(2);
-		_position[3]= get_position_abs_ssi(AEA3);	
-					
-#endif
+
 //-------------------------------------------------------------------------------------------
 
 //******************************************************************************************/		

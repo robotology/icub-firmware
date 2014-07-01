@@ -215,35 +215,6 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	if (type==CALIB_HARD_STOPS) helper_calib_hard_stops (channel, param1, param2,param3);
 
 //-------------------------------
-// 2.14 4DC
-//-------------------------------
-#elif VERSION ==0x0214
-
-	if ((type==CALIB_HARD_STOPS) && (channel<=2)) helper_calib_hard_stops (channel, param1, param2,param3);
-
-
-	if ((type==CALIB_ABS_DIGITAL ) && (channel==3))
-	{		
-		if ((param3 >=0 && param3 <=4095) )	set_max_position(AEA4, param3);	
-		
-		if (param2>0)
-		{	
-			enable_motor_pwm(channel);
-	    	_control_mode[channel] = MODE_POSITION;
-	    	_interaction_mode[channel] = icubCanProto_interactionmode_stiff;
-	    	
-		    _position[channel] = get_position_abs_ssi(AEA3);
-			_set_point[channel] = param1;
-			init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			_calibrated[channel] = true;
-		}
-		if (param2==0)
-		{
-			put_motor_in_fault(channel);
-			can_printf ("invalid calib p2");		
-		}		
-	}	
-//-------------------------------
 // 2.15 4DC
 //-------------------------------	
 #elif VERSION ==0x0215
