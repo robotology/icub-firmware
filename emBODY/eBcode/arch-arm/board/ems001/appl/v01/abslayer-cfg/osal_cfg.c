@@ -97,6 +97,54 @@ extern void* osal_ext_calloc(uint32_t s, uint32_t n)
     return(ret);
 }
 
+
+/*README: if you need a static allocator instead of dynamic one (used by default), 
+          you can comment previous definition of osal_ext_calloc function and use 
+          following code under #ifdef USE_STATIC_ALLOCATOR
+          with static allocator there is a significant savings of ram!!!
+          Pay attention: if you use static allocator, you should set HAL_SYS_HEAPSIZE equal to 0x00000020
+*/
+#ifdef USE_STATIC_ALLOCATOR
+
+#define SIZE_STATIC_HEAP        0xc170 //48kB
+static uint8_t staticheap[SIZE_STATIC_HEAP];
+uint32_t    tot_mem = 0;
+
+extern void* osal_ext_calloc(uint32_t s, uint32_t n)
+{
+    char str[80];
+    static uint32_t usedsize = 0;
+    uint32_t reqsize; //required size
+    uint8_t *retmem_ptr = NULL;
+    
+    reqsize = s*n;
+    //uint32_t usersize = reqsize = s*n;
+    //allineo a 8
+    reqsize+=7; reqsize>>=3; reqsize<<=3;
+    
+    
+    if((usedsize+reqsize) > SIZE_STATIC_HEAP)
+    {
+         snprintf(str, sizeof(str), "no more static memory!! usedmem=0x%x reqsize=0x%x", usedsize, reqsize);
+         hal_trace_puts(str);
+        return(NULL);
+    }
+    
+    retmem_ptr = &staticheap[usedsize];
+    usedsize += reqsize;
+    tot_mem=usedsize;
+//     otot += reqsize-usersize;
+//     snprintf(str, sizeof(str), "userSize=0x%x totmem=0x%x osize=0x%x otot=0x%x", usersize, usedsize, (reqsize-usersize), otot);
+//     hal_trace_puts(str);
+    
+    return((void*)retmem_ptr);
+    
+}
+
+
+
+#endif
+
 extern void osal_ext_free(void* m)
 {
     free(m);
