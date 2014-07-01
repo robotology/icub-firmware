@@ -136,16 +136,16 @@ void check_in_position_calib(byte jnt)
  ****************************************************************/
 void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
-	if (!mode_is_idle(channel) && IS_DONE(channel))
-	{
-		_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-		_counter_calib = 0;
-		_pwm_calibration[channel] = param1;
-		if (param2!=0)
-	 		_velocity_calibration[channel]=param2;
-		else
-			_velocity_calibration[channel]=1;
-	}		
+	enable_motor_pwm(channel);
+	_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
+	_interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	
+	_counter_calib = 0;
+	_pwm_calibration[channel] = param1;
+	if (param2!=0)
+ 		_velocity_calibration[channel]=param2;
+	else
+		_velocity_calibration[channel]=1;
 }
 
 void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 param3)
@@ -159,6 +159,10 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 	}
 	if (param2>0)
 	{
+	    enable_motor_pwm(channel);
+	    _control_mode[channel] = MODE_POSITION;
+	    _interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	    
 	    _position[channel] = get_position_abs_ssi(channel);
 		_set_point[channel] = param1;
 		init_trajectory (channel, _position[channel], _set_point[channel], param2);
@@ -175,7 +179,10 @@ void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, I
 {
 	if (param2>0)
 	{
+		enable_motor_pwm(channel);
 	    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
+	    _interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	    
 	    _set_point[channel] = param1;
 		_max_position_enc_tmp[channel] = param3;
 
@@ -220,7 +227,11 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		if ((param3 >=0 && param3 <=4095) )	set_max_position(AEA4, param3);	
 		
 		if (param2>0)
-		{		
+		{	
+			enable_motor_pwm(channel);
+	    	_control_mode[channel] = MODE_POSITION;
+	    	_interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	    	
 		    _position[channel] = get_position_abs_ssi(AEA3);
 			_set_point[channel] = param1;
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
@@ -248,6 +259,10 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 		if (param2>0)
 		{
+			enable_motor_pwm(channel);
+	    	_control_mode[channel] = MODE_POSITION;
+	    	_interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	    
 		    _position[channel] = ((channel==0) ? get_position_abs_ssi(AEA3): get_position_abs_ssi(AEA4));
 			_set_point[channel] = param1;
 			init_trajectory (channel, _position[channel], _set_point[channel], param2);
@@ -320,6 +335,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 				    _calibrated[2] == true )
 				{
 					enable_motor_pwm(channel);
+					_control_mode[channel] = MODE_POSITION;
+	    	        _interaction_mode[channel] = icubCanProto_interactionmode_stiff;
 				}
 				    		    
 				_set_point[channel] = param1;
@@ -334,20 +351,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		// FINGER J7
 		else
 		{
-			if (param2>0)
-			{
-				_calibrated[channel] = true;
-			    enable_motor_pwm(channel);
-
-				_set_point[channel] = param1;
-				init_trajectory(channel, _position[channel], _set_point[channel], param2);		
-			}
-			else
-			{
-			   put_motor_in_fault(channel);		
-			   can_printf ("invalid calib p2");				
-			} 		
-			
+			helper_calib_abs_digital (channel, param1, param2, -1); //param3 must be < 0				
 		}
 	}
 
@@ -358,22 +362,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif ((VERSION == 0x0128) ||(VERSION == 0x0228) )
 
    //FINGER J8
-	if ((type==CALIB_ABS_DIGITAL) && (channel==0) ) 
-	{
-		if (param2>0)
-		{
-			_calibrated[channel] = true;
-			enable_motor_pwm(channel);
-				
-			_set_point[channel] = param1;
-			init_trajectory(channel, _position[channel], _set_point[channel], param2);
-		}
-		else
-		{
-			put_motor_in_fault(channel);		
-			can_printf ("invalid calib p2");	
-		} 			
-	}	
+	if ((type==CALIB_ABS_DIGITAL) && (channel==0) ) helper_calib_abs_digital (channel, param1, param2, -1); //param3 must be < 0	
 
     //FINGER J9 J10 J11
 	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) helper_calib_abs_and_incremental (channel, param1, param2,param3);	
