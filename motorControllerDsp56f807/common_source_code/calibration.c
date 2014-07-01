@@ -60,8 +60,9 @@ void check_in_position_calib(byte jnt)
 #if VERSION != 0x0119
 		_control_mode[jnt] = MODE_POSITION;
 		set_position_encoder (jnt, 0);
+#endif
 
-#elif ((VERSION == 0x0128) || (VERSION == 0x0228))
+#if ((VERSION == 0x0128) || (VERSION == 0x0228))
 		if (jnt!=0)
 		{
 			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];					
