@@ -578,7 +578,7 @@ void HaltBootloader(unsigned char Dest, unsigned char ErrorCode)
 //    SendCanErrorMsg(Dest, ErrorCode);
  	ToggleLED();
 	error++;
-   __delay32(1800000);
+   __delay32(2000000);
 	
   }
   RunAppl(); //
