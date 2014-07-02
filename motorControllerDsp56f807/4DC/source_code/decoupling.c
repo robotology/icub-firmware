@@ -46,11 +46,6 @@ void decouple_dutycycle(Int32 *pwm)
 		if ( ! ((_control_mode[0] == MODE_CALIB_HARD_STOPS ) ||
 			    (_control_mode[1] == MODE_CALIB_HARD_STOPS ) ) )
 		{
-			/*
-			pwm[0] = (pwm[0] + pwm[1]) >> 1;
-			pwm[1] = pwm[0] - pwm[1];	
-			pwm[1] = -pwm[1];
-			*/
 			temp32 	 = pwm[0];
 			pwm[0] = (pwm[0] + pwm[1]) >> 1;
 			pwm[1] = (temp32    - pwm[1]) >> 1;	
@@ -60,11 +55,6 @@ void decouple_dutycycle(Int32 *pwm)
 				pwm[0] = 0;
 				pwm[1] = 0;
 			}
-			/*
-			_pd[0] = (_pd[0] + _pd[1]) >> 1;
-			_pd[1] = _pd[0] - _pd[1];	
-			_pd[1] = -_pd[1];
-			*/
 			temp32 = _pd[0];
 			_pd[0] = (_pd[0] 	+ _pd[1]) >> 1;
 			_pd[1] = (temp32 - _pd[1]) >> 1;		
@@ -78,8 +68,7 @@ void decouple_dutycycle(Int32 *pwm)
 
 		if ( ! ((_control_mode[2] == MODE_CALIB_HARD_STOPS ) ||
 			    (_control_mode[3] == MODE_CALIB_HARD_STOPS ) ) )
-		{
-		
+		{		
 			temp32 	 = pwm[2];
 			pwm[2] = (pwm[2] + pwm[3]) >> 1;
 			pwm[3] = (temp32    - pwm[3]) >> 1;			
