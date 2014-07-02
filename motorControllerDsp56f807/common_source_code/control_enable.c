@@ -20,8 +20,8 @@ extern  byte	_board_ID ;
 
 //private functions
 void helper_set_control_mode      (byte axis, byte value);	
-void helper_enable_single_motor   (byte j);
-void helper_enable_coupled_motor  (byte j1, byte j2);
+void helper_enable_single_motor   (byte j, byte value);
+void helper_enable_coupled_motor  (byte j1, byte j2, byte value);
 void helper_disable_single_motor  (byte j);
 void helper_disable_coupled_motor (byte j1, byte j2);
 
@@ -155,7 +155,7 @@ void helper_disable_single_motor(byte j)
 }
 
 //---------------------------------------------------------------------------------------------------
-void helper_enable_single_motor(byte j)
+void helper_enable_single_motor(byte j, byte with_control_mode)
 {
 	if (_control_mode[j]== MODE_HW_FAULT) return;
 	
@@ -179,12 +179,12 @@ void helper_enable_single_motor(byte j)
 	}
 	#endif
 	PWM_outputPadEnable(j); 
-	_control_mode[j] = MODE_POSITION;  
+	switch_control_mode(j, with_control_mode);  
 	can_printf("PWM ENA:%d",j);
 }
 
 //---------------------------------------------------------------------------------------------------
-void helper_enable_coupled_motor(byte j1, byte j2)
+void helper_enable_coupled_motor(byte j1, byte j2, byte with_control_mode)
 {
 	if (_control_mode[j1]== MODE_HW_FAULT) return;
 	if (_control_mode[j2]== MODE_HW_FAULT) return;
@@ -216,29 +216,29 @@ void helper_enable_coupled_motor(byte j1, byte j2)
 	#endif
 	PWM_outputPadEnable(j1);   
 	PWM_outputPadEnable(j2);  
-	_control_mode[j1] = MODE_POSITION;
-	_control_mode[j2] = MODE_POSITION; 	 
+	switch_control_mode(j1, with_control_mode);
+	switch_control_mode(j2, with_control_mode);
 	can_printf("PWM ENA COUPLED:%d & %d",j1,j2);  
 }
 
 //---------------------------------------------------------------------------------------------------
-void enable_motor_pwm (byte axis) 
+void enable_motor_pwm (byte axis, byte with_control_mode) 
 {		
 #if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
 //this is for waist coupling
 	{   
-		helper_enable_coupled_motor(0,1);
+		helper_enable_coupled_motor(0,1, with_control_mode);
 	}
 #elif VERSION == 0x0215 || VERSION == 0x0115
 //this is for eyes coupling
 	{   
 		if ((axis==2) || (axis==3))  
 		{  
-			helper_enable_coupled_motor(2,3);
+			helper_enable_coupled_motor(2,3, with_control_mode);
 		}  
 		else  
 		{  
-			helper_enable_single_motor(axis);
+			helper_enable_single_motor(axis, with_control_mode);
 		}  
 	} 
 #elif VERSION == 0x0219 || VERSION == 0x0119
@@ -246,11 +246,11 @@ void enable_motor_pwm (byte axis)
 	{   
 		if ((axis==1) || (axis==2))  
 		{  
-			helper_enable_coupled_motor(1,2);
+			helper_enable_coupled_motor(1,2, with_control_mode);
 		}  
 		else  
 		{  
-			helper_enable_single_motor(axis);
+			helper_enable_single_motor(axis, with_control_mode);
 		}  
 	}
 #elif VERSION == 0x0351 
@@ -258,24 +258,24 @@ void enable_motor_pwm (byte axis)
 	{   
 		if (_board_ID==1)   
 		{
-			helper_enable_coupled_motor(0,1);		
+			helper_enable_coupled_motor(0,1, with_control_mode);		
 		}
 		else   
 		if (_board_ID==2)   
 		{   
-			helper_enable_single_motor(0);
+			helper_enable_single_motor(0, with_control_mode);
 		}   
 	}
 #else
 // standard firmware
 	{
-		helper_enable_single_motor(axis);
+		helper_enable_single_motor(axis, with_control_mode);
 	}
 #endif
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void get_control_mode(byte axis)
+void can_get_control_mode(byte axis)
 {
     byte m=helper_controlmode_fw_to_api(_control_mode[axis]);
 
@@ -288,7 +288,7 @@ void get_control_mode(byte axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void set_control_mode(byte axis)
+void can_set_control_mode(byte axis)
 {
     byte api_value = CAN_DATA[1];
     byte value = helper_controlmode_api_to_fw(CAN_DATA[1]);
@@ -299,8 +299,7 @@ void set_control_mode(byte axis)
        if (value!=MODE_IDLE &&
            api_value!=icubCanProto_controlmode_forceIdle)	
        {
-	        enable_motor_pwm(axis);
-			helper_set_control_mode(axis, value);	
+	        enable_motor_pwm(axis, value);
        }
        return;
 	}
@@ -311,7 +310,7 @@ void set_control_mode(byte axis)
 		if (api_value==icubCanProto_controlmode_forceIdle)	
 		{
 			disable_motor_pwm(axis);
-			helper_set_control_mode(axis, MODE_IDLE);
+			switch_control_mode(axis, MODE_IDLE);
 		}
 		return;
 	}
@@ -321,51 +320,69 @@ void set_control_mode(byte axis)
 	if (value==MODE_IDLE)
 	{
 		disable_motor_pwm(axis);
-		helper_set_control_mode(axis, value);
+		switch_control_mode(axis, MODE_IDLE);
 		return;
 	}
 	if (api_value==icubCanProto_controlmode_forceIdle)
 	{
 		disable_motor_pwm(axis);
-		helper_set_control_mode(axis, MODE_IDLE);
+		switch_control_mode(axis, MODE_IDLE);
 		return;		
 	}
 	
 	//otherwise just change control mode.
 	{
-		helper_set_control_mode(axis, value);
+		switch_control_mode(axis, value);
 	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void helper_set_control_mode(byte axis, byte value)
+void switch_control_mode(byte axis, byte value)
 {
-	can_printf("CTRLMODE SET:%d",value);
-	if (value>=0 && value <=0x50) _control_mode[axis] = value;
-	_desired_torque[axis]=0;
-	_desired[axis] = _position[axis];
-	_desired_vel[axis] = 0;
-	_integral[axis] = 0;
-	_ko_imp[axis] = 0;
-	_set_point[axis] = _position[axis];
-	init_trajectory (axis, _position[axis], _position[axis], 1);
-	clear_lpf_ord1_3hz  (axis);
-	_ko_openloop[axis] = 0;
+	if (value!=_control_mode[axis])
+	{
+		can_printf("CMODE SET:%d",value);
+		_control_mode[axis] = value;
+		_desired_torque[axis]=0;
+		_desired[axis] = _position[axis];
+		_desired_vel[axis] = 0;
+		_integral[axis] = 0;
+		_ko_imp[axis] = 0;
+		_set_point[axis] = _position[axis];
+		init_trajectory (axis, _position[axis], _position[axis], 1);
+		clear_lpf_ord1_3hz  (axis);
+		_ko_openloop[axis] = 0;
+	}
+}
+
+void switch_interaction_mode(byte axis, byte value)
+{
+	if (value!=_interaction_mode[axis])
+	{
+		can_printf("IMODE SET:%d",value);
+		_interaction_mode[axis] = value;
+		_desired_torque[axis]=0;
+		_desired[axis] = _position[axis];
+		_desired_vel[axis] = 0;
+		_integral[axis] = 0;
+		_ko_imp[axis] = 0;
+		_set_point[axis] = _position[axis];
+		init_trajectory (axis, _position[axis], _position[axis], 1);
+		clear_lpf_ord1_3hz  (axis);
+		_ko_openloop[axis] = 0;		
+	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void set_interaction_mode(byte axis)
+void can_set_interaction_mode(byte axis)
 {
 	byte value = 0; 
 	value = (CAN_DATA[1]);
-	if (value!=_interaction_mode[axis])
-	{
-		_interaction_mode[axis]=value;
-	}
+	switch_interaction_mode(axis, value);
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-void get_interaction_mode(byte axis)
+void can_get_interaction_mode(byte axis)
 {
     byte m=_interaction_mode[axis];
     

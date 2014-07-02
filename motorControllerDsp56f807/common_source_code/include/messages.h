@@ -62,7 +62,7 @@
 //-------------------------------------------------------------------
 #define CAN_GET_CONTROL_MODE_HANDLER(x) \
 { \
-	get_control_mode(axis); \
+	can_get_control_mode(axis); \
 }
 
 //-------------------------------------------------------------------
@@ -70,7 +70,7 @@
 { \
 	if (CAN_LEN == 2)\
 	{ \
-		set_control_mode(axis); \
+		can_set_control_mode(axis); \
 	} \
 	else \
 	{ \
@@ -81,13 +81,13 @@
 //-------------------------------------------------------------------
 #define CAN_GET_INTERACTION_MODE_HANDLER(x) \
 { \
-	get_interaction_mode(axis); \
+	can_get_interaction_mode(axis); \
 }
 
 //-------------------------------------------------------------------
 #define CAN_SET_INTERACTION_MODE_HANDLER(x) \
 { \
-	set_interaction_mode(axis); \
+	can_set_interaction_mode(axis); \
 }
 
 //-------------------------------------------------------------------

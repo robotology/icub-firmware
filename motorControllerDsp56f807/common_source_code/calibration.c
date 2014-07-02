@@ -136,9 +136,8 @@ void check_in_position_calib(byte jnt)
  ****************************************************************/
 void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
-	enable_motor_pwm(channel);
-	_control_mode[channel] = MODE_CALIB_HARD_STOPS;	
-	_interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	enable_motor_pwm(channel, MODE_CALIB_HARD_STOPS);
+	switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
 	
 	_counter_calib = 0;
 	_pwm_calibration[channel] = param1;
@@ -159,9 +158,8 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 	}
 	if (param2>0)
 	{
-	    enable_motor_pwm(channel);
-	    _control_mode[channel] = MODE_POSITION;
-	    _interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+	    enable_motor_pwm(channel, MODE_POSITION);
+	    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
 	    
 	    _position[channel] = get_position_abs_ssi(channel);
 		_set_point[channel] = param1;
@@ -179,9 +177,8 @@ void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, I
 {
 	if (param2>0)
 	{
-		enable_motor_pwm(channel);
-	    _control_mode[channel] = MODE_CALIB_ABS_AND_INCREMENTAL;
-	    _interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+		enable_motor_pwm(channel, MODE_CALIB_ABS_AND_INCREMENTAL);
+	    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
 	    
 	    _set_point[channel] = param1;
 		_max_position_enc_tmp[channel] = param3;
@@ -230,9 +227,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
 		if (param2>0)
 		{
-			enable_motor_pwm(channel);
-	    	_control_mode[channel] = MODE_POSITION;
-	    	_interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+			enable_motor_pwm(channel, MODE_POSITION);
+			switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
 	    
 		    _position[channel] = ((channel==0) ? get_position_abs_ssi(AEA3): get_position_abs_ssi(AEA4));
 			_set_point[channel] = param1;
@@ -305,9 +301,8 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 				if (_calibrated[1] == true && 
 				    _calibrated[2] == true )
 				{
-					enable_motor_pwm(channel);
-					_control_mode[channel] = MODE_POSITION;
-	    	        _interaction_mode[channel] = icubCanProto_interactionmode_stiff;
+					enable_motor_pwm(channel, MODE_POSITION);
+	    	        switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
 				}
 				    		    
 				_set_point[channel] = param1;
