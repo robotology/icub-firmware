@@ -51,9 +51,9 @@ void check_in_position_calib(byte jnt)
 	temporary_cond3 =                    (_control_mode[jnt] == MODE_CALIB_ABS_AND_INCREMENTAL);
 	// ... trajecotry ended? 
 	temporary_cond1 = temporary_cond1 && _ended[jnt];
-	temporary_cond2 = temporary_cond2 && (_counter_calib > 1000);
+	temporary_cond2 = temporary_cond2 && (_counter_calib > 1200);
 	temporary_cond3 = temporary_cond3 && _ended[jnt];
-		
+	
 	if (temporary_cond1 | temporary_cond2 | temporary_cond3)
 	{
 		
@@ -147,6 +147,28 @@ void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 para
 		_velocity_calibration[channel]=1;
 }
 
+void helper_calib_eyes(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (channel == 2)
+	{
+		enable_motor_pwm    (2, MODE_CALIB_HARD_STOPS);
+		switch_control_mode (3, MODE_POSITION);
+	}
+	else if (channel ==3)
+	{
+   	    enable_motor_pwm    (3, MODE_CALIB_HARD_STOPS);
+		switch_control_mode (2, MODE_POSITION);		
+	}
+	switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+	
+	_counter_calib = 0;
+	_pwm_calibration[channel] = param1;
+	if (param2!=0)
+ 		_velocity_calibration[channel]=param2;
+	else
+		_velocity_calibration[channel]=1;
+}
+
 void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
 	if (param3 >=0 && param3 <=4095) 
@@ -173,6 +195,33 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 	}	
 }
 
+void helper_calib_abs_digital_coupled_neck(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (param3 >=0 && param3 <=4095) 
+	{
+		set_max_position(channel, param3);	
+	}
+	if (param2>0)
+	{
+		_calibrated[channel] = true;
+		if (_calibrated[0] == true && 
+		    _calibrated[1] == true )
+		{
+			enable_motor_pwm(channel, MODE_POSITION);
+	        switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+		}	    
+	    _position[channel] = get_position_abs_ssi(channel);
+		_set_point[channel] = param1;
+		init_trajectory (channel, _position[channel], _set_point[channel], param2);
+		_calibrated[channel] = true;
+	}
+	if (param2==0)
+	{
+		put_motor_in_fault(channel);
+		can_printf ("invalid calib p2");
+	}	
+}
+
 void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
 	if (param2>0)
@@ -191,6 +240,41 @@ void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, I
 		can_printf ("invalid calib p2");
 	} 			
 }
+
+#if (VERSION == 0x0219)
+void helper_calib_abs_digital_coupled_wrist_v2(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (channel==1)
+	{
+		if (param3 >=0 && param3 <=4095) set_max_position(AEA6, param3);	
+		_position[channel] = get_position_abs_ssi(AEA6);
+	}
+	if (channel==2)
+	{
+		if (param3 >=0 && param3 <=4095) set_max_position(AEA5, param3);	
+		_position[channel] = get_position_abs_ssi(AEA5);
+	}
+
+	if (param2>0)
+	{
+		_calibrated[channel] = true;
+		if (_calibrated[1] == true && 
+		    _calibrated[2] == true )
+		{
+			enable_motor_pwm(channel, MODE_POSITION);
+	        switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+		}
+		    		    
+		_set_point[channel] = param1;
+		init_trajectory (channel, _position[channel], _set_point[channel], param2);
+	}
+	else
+	{
+		put_motor_in_fault(channel);		
+		can_printf ("invalid calib p2");	
+	}		
+}
+#endif
 
 /**************************************************************** 
  * calibration procedure, depends on the firmware version.
@@ -216,7 +300,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 //-------------------------------	
 #elif VERSION ==0x0215
 
-	if ((type==CALIB_HARD_STOPS) && (channel>=2)) helper_calib_hard_stops (channel, param1, param2,param3);
+	if ((type==CALIB_HARD_STOPS) && (channel>=2)) helper_calib_eyes (channel, param1, param2,param3);
 
 	if ((type==CALIB_ABS_DIGITAL ) && (channel<=1))
 	{	
@@ -243,15 +327,15 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	}	
 
 //-------------------------------	 
-// 1.19 2.19 4DC   
+// 1.19 4DC   
 //-------------------------------	 
-#elif (VERSION ==0x0219 || VERSION == 0x0119)
+#elif (VERSION == 0x0119)
 
 	//pronosupination J4
 	if ((type==CALIB_HARD_STOPS) && (channel==0)) helper_calib_hard_stops (channel, param1, param2,param3);
 
 	//wrist J5 J6
-	if (type==CALIB_HARD_STOPS_DIFF) //VERSION 0x119 ONLY
+	if (type==CALIB_HARD_STOPS_DIFF) 
 	{	
 		byte channel1;
 	    byte channel2; 
@@ -279,40 +363,20 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		}	
 	}	
 
-	if (type==CALIB_ABS_DIGITAL )  //VERSION 0x129 ONLY
+//-------------------------------	 
+// 2.19 4DC   
+//-------------------------------	 
+#elif (VERSION ==0x0219)
+
+	//pronosupination J4
+	if ((type==CALIB_HARD_STOPS) && (channel==0)) helper_calib_hard_stops (channel, param1, param2,param3);
+
+	if (type==CALIB_ABS_DIGITAL )  
 	{
 		//wrist J5 J6	
-		if (channel!=3)
+		if (channel!=3)  
 		{					
-			if (channel==1)
-			{
-				if (param3 >=0 && param3 <=4095) set_max_position(AEA6, param3);	
-				_position[channel] = get_position_abs_ssi(AEA6);
-			}
-			if (channel==2)
-			{
-				if (param3 >=0 && param3 <=4095) set_max_position(AEA5, param3);	
-				_position[channel] = get_position_abs_ssi(AEA5);
-			}
-		
-			if (param2>0)
-			{
-				_calibrated[channel] = true;
-				if (_calibrated[1] == true && 
-				    _calibrated[2] == true )
-				{
-					enable_motor_pwm(channel, MODE_POSITION);
-	    	        switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
-				}
-				    		    
-				_set_point[channel] = param1;
-				init_trajectory (channel, _position[channel], _set_point[channel], param2);
-			}
-			else
-			{
-				put_motor_in_fault(channel);		
-				can_printf ("invalid calib p2");	
-			}	
+            helper_calib_abs_digital_coupled_wrist_v2 (channel, param1, param2,param3);
 		}
 		// FINGER J7
 		else
@@ -320,7 +384,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			helper_calib_abs_digital (channel, param1, param2, -1); //param3 must be < 0				
 		}
 	}
-
+	
 //-------------------------------	 	  
 // 1.28  2.28 4DC	 
 //-------------------------------	 
@@ -376,7 +440,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif VERSION==0x0162
 
 	//neck V2
-	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital (channel, param1, param2,param3);
+	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital_coupled_neck (channel, param1, param2,param3);
 
 //-----------------------------------	  
 // 1.40 1.50 1.51 1.52 1.54 2BLL 	 
