@@ -12,16 +12,13 @@
 void decouple_positions(void)
 {				
 #if VERSION == 0x0115
-		//_position[0] = _position[0] - _position[1];
-		//_position[1] = _position[0] + 2*_position[1];
-		//vergence / version inverted
+	    Int32 temp32 = _position[0];
 		_position[0] = _position[0] + _position[1];
-		_position[1] = _position[0] - 2*_position[1];
+		_position[1] = temp32       - _position[1];
 #elif VERSION == 0x0215
-
+        Int32 temp32 = _position[2];
 		_position[2] = _position[2] + _position[3];
-		_position[3] = _position[2] - 2*_position[3];	
-			
+		_position[3] = temp32       - _position[3];		
 #elif VERSION == 0x0119
 		//_position[1] = _position[1];		//omitted
 		_position[2] = _position[1] + _position[2];		
