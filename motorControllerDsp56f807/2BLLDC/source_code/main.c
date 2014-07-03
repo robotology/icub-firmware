@@ -368,14 +368,14 @@ void main(void)
 		for (i=0; i<JN; i++)
 		{ 
 #ifdef DEBUG_FAULT_ON_LIMIT
-			if (_position[0]>_max_position[0] || _position[0]<_min_position[0] ||
-			    _position[1]>_max_position[1] || _position[1]<_min_position[1])
+			if (_calibrated[0]==true && _calibrated[1] == true)
+				if (_position[0]>_max_position[0] || _position[0]<_min_position[0] ||
+			        _position[1]>_max_position[1] || _position[1]<_min_position[1])
 			{
 				can_printf("OUT!!");
 				put_motor_in_fault(0);
 				put_motor_in_fault(1);
 			}
-			else
 #endif
 			if (!mode_is_idle(i)) 
 			{
