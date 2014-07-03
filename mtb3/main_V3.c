@@ -96,6 +96,9 @@
 //  Rev 2.10.9 del 11/03/2014
 //  added the diagnostic for each triagle
 
+//  Rev 2.10.14 del 03/07/2014
+//  added the MTB accelerometer reading
+
 #include<p30f4011.h>
 #include"can_interface.h"
 #include "AD7147RegMap.h"
@@ -131,7 +134,6 @@ _FWDT(WDT_OFF);      // WD disabled
  
  _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 _FGS(CODE_PROT_OFF); // Code protection disabled
-
 
 
 enum Errors
@@ -1134,7 +1136,7 @@ void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN)
 
 void SetCDCoffsetOnSingleTriangle(uint16_t cdcOffset, unsigned char triangleN)
 {
-    uint16_t cdcOffset_aux = cdcOffset; 
+//    uint16_t cdcOffset_aux = cdcOffset;
     ConfigAD7147_onSdaX(CH0, triangle_cfg_list[triangleN].setNum, triangle_cfg_list[triangleN].indexInSet,  PW_CONTROL, cdcOffset/*&cdcOffset_aux*/);
     
     //ConfigAD7147(CH0,triangle_cfg_list[triangleN].indexInSet,PW_CONTROL, &cdcOffset_aux); 

@@ -11,10 +11,10 @@
 #define CH1     1
 
 #define	MCO_0	      PORTFbits.RF6    // CLK in I2C mode 
-#define	DO1			  PORTDbits.RD0 //0x01    //LATDbits.LATD0    // SDA1 in I2C mode 
-#define	DO2			  PORTDbits.RD2 //0x03    //LATDbits.LATD2    // SDA2 in I2C mode 
-#define	DO3			  PORTDbits.RD3 //0x04    //LATDbits.LATD3    // SDA3 in I2C mode 
-#define	DO4		      PORTDbits.RD1 //0x02    //LATDbits.LATD1    // SDA4 in I2C mode 
+#define	DO1           PORTDbits.RD0 //0x01    //LATDbits.LATD0    // SDA1 in I2C mode
+#define	DO2           PORTDbits.RD2 //0x03    //LATDbits.LATD2    // SDA2 in I2C mode
+#define	DO3           PORTDbits.RD3 //0x04    //LATDbits.LATD3    // SDA3 in I2C mode
+#define	DO4           PORTDbits.RD1 //0x02    //LATDbits.LATD1    // SDA4 in I2C mode
 
 #define MCE_0         TRISFbits.TRISF6 // SCO  Input/Output	 
 #define DE1           TRISDbits.TRISD0 // SDA1 Input/Output	
@@ -31,23 +31,18 @@
 #define MCE_0output   MCE_0=0;
 
 
-#define MCO_1      	  PORTBbits.RB8    // CLK in I2C mode 	
-#define	DO5			  PORTBbits.RB7 //0x01    //LATDbits.LATD0    // SDA1 in I2C mode 
-#define	DO6		      PORTBbits.RB6 //0x03    //LATDbits.LATD2    // SDA2 in I2C mode 
-#define	DO7			  PORTBbits.RB5 //0x04    //LATDbits.LATD3    // SDA3 in I2C mode 
-#define	DO8			  PORTBbits.RB4 //0x02    //LATDbits.LATD1    // SDA4 in I2C mode 
+#define MCO_1      	  PORTEbits.RE1    // CLK in I2C mode
+#define	DO5	          PORTEbits.RE0 //0x01    //LATDbits.LATD0    // SDA1 in I2C mode
+
 	
-#define MCE_1      	  TRISBbits.TRISB8 // SCO  Input/Output
-#define DE5        	  TRISBbits.TRISB7 // SDA1 Input/Output	
-#define DE6        	  TRISBbits.TRISB6 // SDA2 Input/Output	
-#define DE7        	  TRISBbits.TRISB5 // SDA3 Input/Output	
-#define DE8        	  TRISBbits.TRISB4 // SDA4 Input/Output	
+#define MCE_1      	  TRISEbits.TRISE1 // SCO  Input/Output
+#define DE5        	  TRISEbits.TRISE0 // SDA1 Input/Output
 
 
-#define DO_1on        PORTB=0xF0; //DO1=1; DO4=1; DO2=1; DO3=1; 
-#define DO_1off       PORTB &=0xFF0F; //DO1=0; DO4=0; DO2=0; DO3=0; 
-#define DE_1input     DE5=1; DE6=1; DE7=1; DE8=1;
-#define DE_1output    DE5=0; DE6=0; DE7=0; DE8=0;
+#define DO_1on        PORTEbits.RE0=0x01; //DO1=1; DO4=1; DO2=1; DO3=1;
+#define DO_1off       PORTE &=0xFFFE; //DO1=0; DO4=0; DO2=0; DO3=0;
+#define DE_1input     DE5=1; 
+#define DE_1output    DE5=0; 
 #define MCE_1input    MCE_1=1;
 #define MCE_1output   MCE_1=0;
 
