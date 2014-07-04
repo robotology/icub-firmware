@@ -100,7 +100,7 @@ static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] =
         EO_INIT(.canLoc)
         {
             EO_INIT(.emscanport)              eOcanport2,
-            EO_INIT(.addr)                    13,
+            EO_INIT(.addr)                    1,
         },
         EO_INIT(.type)                        eobrd_strain,
      }
