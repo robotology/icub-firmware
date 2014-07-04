@@ -163,6 +163,7 @@ typedef U32 EVENT_t;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 extern void* rt_iit_memory_new(uint32_t size);
+extern void* rt_iit_memory_realloc(void* m, uint32_t size);
 extern void rt_iit_memory_del(void* mem);
 
 // - sys routines -

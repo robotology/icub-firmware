@@ -202,6 +202,12 @@ extern const uint64_t oosiit_asaptime;  // = OOSIIT_ASAPTIME
  **/ 
 extern void* oosiit_ext_calloc(uint32_t s, uint32_t n);
 
+/** @fn         extern void* oosiit_ext_realloc(void* m, uint32_t s)
+    @brief      memory reallocator such as the normal realloc(). It must be externally defined for use in 
+                oosiit_memory_realloc()
+ **/ 
+extern void* oosiit_ext_realloc(void* m, uint32_t s);
+
 /** @fn         extern void oosiit_ext_free(void* m)
     @brief      memory deallocator such as the normal free(). It must be externally defined for use in 
                 oosiit_memory_del()
@@ -218,6 +224,16 @@ extern void oosiit_ext_free(void* m);
     @warning    needs the definition of an external oosiit_ext_calloc() function.
  **/ 
 extern void* oosiit_memory_new(uint32_t size);
+
+
+/** @fn         extern void* oosiit_memory_realloc(void* m, uint32_t size)
+    @brief      Thread safe memory reallocator. 
+    @param      m               the memory to reallocate. if NULL, then the function behaves as oosiit_memory_new().
+    @param      size            the size of the requested memory in bytes.
+    @return     if successful a proper 8-aligned memory pointer, otherwise it returns NULL.
+    @warning    needs the definition of an external oosiit_ext_realloc() function.
+ **/ 
+extern void* oosiit_memory_realloc(void* m, uint32_t size);
 
 
 /** @fn         extern oosiit_result_t oosiit_memory_del(void* mem)

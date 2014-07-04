@@ -212,6 +212,11 @@ extern void* rt_iit_memory_new(uint32_t size)
     return(oosiit_ext_calloc(size, 1));
 }
 
+extern void* rt_iit_memory_realloc(void* m, uint32_t size)
+{
+    return(oosiit_ext_realloc(m, size));
+}
+
 extern void rt_iit_memory_del(void* mem)
 {
     oosiit_ext_free(mem);

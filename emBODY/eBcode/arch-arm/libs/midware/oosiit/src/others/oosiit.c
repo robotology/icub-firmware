@@ -130,6 +130,7 @@ static uint16_t s_oosiit_params_get_ram32size(const oosiit_cfg_t *cfg);
 static uint16_t s_oosiit_params_get_ram64size(const oosiit_cfg_t *cfg);
 
 static __INLINE void* isr_oosiit_memory_new(uint32_t size);
+static __INLINE void* isr_oosiit_memory_realloc(void* m, uint32_t size);
 static __INLINE oosiit_result_t isr_oosiit_memory_del(void* mem);
 static __INLINE oosiit_tskptr_t isr_oosiit_tsk_self(void);
 static __INLINE oosiit_result_t isr_oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata);
@@ -163,6 +164,7 @@ static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* h
 
 // - memory
 SVC_1_1(svc_oosiit_memory_new,          void*,             uint32_t,                                                                    RET_pointer);
+SVC_2_1(svc_oosiit_memory_realloc,      void*,             void*,               uint32_t,                                               RET_pointer);
 SVC_1_1(svc_oosiit_memory_del,          oosiit_result_t,   void*,                                                                       RET_int32_t);
 
 
@@ -279,6 +281,36 @@ extern void* oosiit_memory_new(uint32_t size)
     else
     {   // not within an isr. os not started   
         ret = rt_iit_memory_new(size);
+    }
+    
+    if(NULL == ret)
+    {
+        oosiit_sys_error(oosiit_error_memory_allocation);
+    }
+    
+    
+    return(ret);
+}
+
+extern void* oosiit_memory_realloc(void* m, uint32_t size)
+{
+    void* ret = NULL;
+        
+    if(0 == size)
+    {
+        return(NULL);
+    }    
+    else if(0 != __get_IPSR()) 
+    {   // inside isr
+        ret = isr_oosiit_memory_realloc(m, size);
+    }     
+    else if(1 == s_oosiit_started)
+    {   // not within an isr. os started     
+        ret = __svc_oosiit_memory_realloc(m, size);
+    }
+    else
+    {   // not within an isr. os not started   
+        ret = rt_iit_memory_realloc(m, size);
     }
     
     if(NULL == ret)
@@ -1407,6 +1439,11 @@ extern void* svc_oosiit_memory_new(uint32_t size)
     return(oosiit_ext_calloc(size, 1));
 }
 
+extern void* svc_oosiit_memory_realloc(void* m, uint32_t size)
+{
+    return(oosiit_ext_realloc(m, size));
+}
+
 extern oosiit_result_t svc_oosiit_memory_del(void* mem)
 {
     oosiit_ext_free(mem);
@@ -1936,6 +1973,12 @@ extern oosiit_result_t svc_oosiit_advtmr_delete(oosiit_objptr_t timer)
 static __INLINE void* isr_oosiit_memory_new(uint32_t size)
 {
     return(rt_iit_memory_new(size));
+}
+
+
+static __INLINE void* isr_oosiit_memory_realloc(void* m, uint32_t size)
+{
+    return(rt_iit_memory_realloc(m, size));
 }
 
 static __INLINE oosiit_result_t isr_oosiit_memory_del(void* mem)
