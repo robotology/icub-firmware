@@ -1,4 +1,6 @@
 #include "strain_board.h"
+#include "control_enable.h"
+#include "pid.h"
 #include "ad.h"
 #include "can1.h" 
 
@@ -170,3 +172,49 @@ word read_strain(byte jnt, bool sign)
 {
 	return 0;
 }
+
+/***************************************************************************/
+/**
+ * this function turns off pwm of joint <jnt> if <strain_num> watchdog is
+ * triggered (returns false). Returns true otherwise (all ok).
+ * the force value contained in the <strain_channel> is assigned to strain_val
+ ***************************************************************************/
+bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
+{
+	if (mode_is_force_controlled(jnt))
+	{
+		if (strain_num==-1)
+		{
+			put_motor_in_fault(jnt);	
+
+			#ifdef DEBUG_CAN_MSG					
+				can_printf("WARN:force control not allowed jnt:%d",jnt);
+			#endif
+							
+			_strain_val[jnt]=0;
+			return false;				
+		}
+		if (_strain_wtd[strain_num]==0)
+		{
+			put_motor_in_fault(jnt);	
+				
+			#ifdef DEBUG_CAN_MSG
+				can_printf("WARN:strain watchdog disabling pwm jnt:%d",jnt);				
+			#endif	
+			
+			_strain_val[jnt]=0;
+			return false;
+		}
+		else
+		{
+			_strain_val[jnt]=_strain[strain_num][strain_chan];
+			return true;	
+		}	
+	}
+	else
+	{
+		//here we are in stiff control mode (i.e. position)
+		return true;			
+	}	
+}
+

@@ -33,6 +33,5 @@ void init_strain ();
 word read_strain(byte jnt, bool sign);
 void start_strain(word can_address);
 void stop_strain(word can_address);
-
-
+bool read_force_data (byte jnt, byte strain_num, byte strain_chan);
 #endif

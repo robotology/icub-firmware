@@ -30,7 +30,6 @@ Int32 step_velocity (byte jj);
 void  compute_desired(byte i);
 void  init_smooth_pid(byte jnt,Int16 finalp,Int16 finald,byte finals, Int16 Time);
 void  smooth_pid(byte jnt);
-bool  read_force_data (byte,byte,byte);
 inline Int32 compensate_bemf(byte j, Int16 motor_speed);
 
 /******************************************************/
