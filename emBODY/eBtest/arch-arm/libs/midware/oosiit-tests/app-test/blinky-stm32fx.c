@@ -398,8 +398,19 @@ static void s_init(void* p)
     action.cbk = s_callback_1sec; action.par = (void*)0x1000;
     s_tmr1sec = oosiit_advtmr_new();
     oosiit_advtmr_start(s_tmr1sec, &timing, &action);
-
-   
+    
+    void* mem1 = NULL;
+    void* mem2 = NULL;
+    
+    mem1 = oosiit_memory_new(32);
+    mem1 = oosiit_memory_realloc(mem1, 64);
+    mem2 = oosiit_memory_realloc(mem2, 32);
+    oosiit_memory_del(mem1);
+    mem1 = NULL;
+    mem1 = oosiit_memory_new(32);
+    mem1 = mem1;
+    mem2 = mem2;
+      
 }
 
 
