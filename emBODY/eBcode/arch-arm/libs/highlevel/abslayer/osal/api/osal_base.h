@@ -323,14 +323,21 @@ extern const osal_abstime_t osal_abstimeNONE;
 
 /** @fn         extern void* osal_ext_calloc(uint32_t s, uint32_t n)
     @brief      memory allocator such as the normal calloc(). It must be externally defined for use in 
-                osal_memory_new()
+                osal_base_memory_new()
  **/ 
 extern void* osal_ext_calloc(uint32_t s, uint32_t n);
 
 
+/** @fn         extern void* osal_ext_realloc(void* m, uint32_t s)
+    @brief      memory reallocator such as the normal realloc(). It must be externally defined for use in 
+                osal_base_memory_realloc()
+ **/ 
+extern void* osal_ext_realloc(void* m, uint32_t s);
+
+
 /** @fn         extern void osal_ext_free(void* m)
     @brief      memory deallocator such as the normal free(). It must be externally defined for use in 
-                osal_memory_del()
+                osal_base_memory_del()
  **/ 
 extern void osal_ext_free(void* m);
 
@@ -345,6 +352,7 @@ extern void osal_ext_free(void* m);
  **/
 extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08aligned);
 
+
 /** @fn         extern void* osal_base_memory_new(uint32_t size)
     @brief      Thread safe memory allocator. It cannot be called from within an ISR. 
     @param      size            the size of the requested memory in bytes.
@@ -353,12 +361,20 @@ extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08
 extern void* osal_base_memory_new(uint32_t size);
 
 
-/** @fn         extern osal_result_t osal_base_memory_del(void* mem)
+/** @fn         extern void* osal_base_memory_realloc(void* mem, uint32_t size)
+    @brief      Thread safe memory reallocator. It cannot be called from within an ISR. 
+    @param      mem             the memory to reallocate. if NULL, it is allocated.
+    @param      size            the size of the requested memory in bytes.
+    @return     if successful a proper 8-aligned memory pointer, otherwise it returns NULL.
+ **/ 
+extern void* osal_base_memory_realloc(void* mem, uint32_t size);
+
+
+/** @fn         extern void osal_base_memory_del(void* mem)
     @brief      Thread-safe memory free. It cannot be called from within an ISR. 
     @param      mem             the pointer to the memory to be de-allocated.
-    @return     if successful osal_res_OK, otherwise it returns osal_res_NOK_generic (for instance if called with NULL pointer)
  **/ 
-extern osal_result_t osal_base_memory_del(void* mem);
+extern void osal_base_memory_del(void* mem);
 
 
 /** @fn         extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data08aligned)

@@ -246,16 +246,22 @@ extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08
     return(retval);
 }
 
+
 extern void* osal_base_memory_new(uint32_t size)
 {
     return(oosiit_memory_new(size));
 }
 
-
-extern osal_result_t osal_base_memory_del(void* mem)
+extern void* osal_base_memory_realloc(void* mem, uint32_t size)
 {
-    oosiit_result_t rr = oosiit_memory_del(mem);
-    return((oosiit_res_OK == rr) ? (osal_res_OK) : (osal_res_NOK_generic));
+    return(oosiit_memory_realloc(mem, size));
+}
+
+extern void osal_base_memory_del(void* mem)
+{
+//    oosiit_result_t rr = oosiit_memory_del(mem);
+//    return((oosiit_res_OK == rr) ? (osal_res_OK) : (osal_res_NOK_generic));
+    oosiit_memory_del(mem);
 }
 
 extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data08aligned)
@@ -1655,6 +1661,13 @@ extern void* oosiit_ext_calloc(uint32_t s, uint32_t n)
 {
     return(osal_ext_calloc(s, n));
 }
+
+
+extern void* oosiit_ext_realloc(void* m, uint32_t s)
+{
+    return(osal_ext_realloc(m, s));
+}
+
 
 extern void oosiit_ext_free(void* m)
 {

@@ -105,6 +105,13 @@ extern void* osal_ext_calloc(uint32_t s, uint32_t n)
     return(ret);
 }
 
+extern void* osal_ext_realloc(void* m, uint32_t s)
+{
+    void* ret = realloc(m, s);
+    
+    return(ret);
+}
+
 extern void oosiit_ext_free(void* m)
 {
     free(m);
