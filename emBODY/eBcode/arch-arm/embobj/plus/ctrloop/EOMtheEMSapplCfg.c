@@ -20,7 +20,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 #include "EoCommon.h"
@@ -59,6 +59,8 @@
 #include "hal_cfg.h"
 #include "osal_cfg.h"
 #include "ipal_cfg.h"
+
+#include "EOMtheSystem.h"
 
 // to see the EOMTHEEMSAPPLCFG_* macros
 #include "EOMtheEMSapplCfg_cfg.h"
@@ -100,7 +102,7 @@ extern const ipal_cfg_t    ipal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern const eEmoduleInfo_t eom_emsapplcfg_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+const eEmoduleInfo_t eom_emsapplcfg_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .info           =
     {
@@ -188,15 +190,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .mempoolcfg     =
         {   
             .mode                   = eo_mempool_alloc_dynamic,
-            .memallocator           = osal_base_memory_new,
-            .size08                 = 0,
-            .data08                 = NULL,
-            .size16                 = 0,
-            .data16                 = NULL,    
-            .size32                 = 0,
-            .data32                 = NULL,    
-            .size64                 = 0,
-            .data64                 = NULL    
+            .conf                   = &eom_thesystem_mempool_alloc_config_heaposal
         },
         .errmancfg      =
         {
@@ -397,7 +391,7 @@ __weak extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtyp
 
     if(emsapplcfg->errmng_haltrace_enabled)
     {
-        snprintf(str, sizeof(str)-1, "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+        snprintf(str, sizeof(str), "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
         hal_trace_puts(str);
     }
     if(errtype <= eo_errortype_warning)
