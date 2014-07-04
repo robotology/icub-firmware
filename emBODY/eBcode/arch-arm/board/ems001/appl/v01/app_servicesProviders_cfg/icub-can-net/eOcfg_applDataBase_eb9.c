@@ -28,6 +28,7 @@
 #include "EoCommon.h"
 #include "EOconstvector_hid.h" 
 
+#include "emBODYrobot.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -69,8 +70,8 @@
 #define FOC_ADDRCAN_1_BID       0
 #define FOC_ADDRCAN_2_BID       1
 
-#if     defined(ICUB_DARMSTADT01) 
-    #define STRAIN_ADDRCAN_13_BID   2
+#if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )
+    #define STRAIN_ADDRCAN_1_BID   2
 #endif
 
 static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] = 
@@ -93,10 +94,10 @@ static const eOappTheDB_cfg_canBoardInfo_t s_cfg_appDB_boards[] =
         EO_INIT(.type)                        eobrd_1foc,
      }
      
-#if     defined(ICUB_DARMSTADT01)     
+#if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )    
      ,
      
-     { // 2 == STRAIN_ADDRCAN_13_BID
+     { // 2 == STRAIN_ADDRCAN_1_BID
         EO_INIT(.canLoc)
         {
             EO_INIT(.emscanport)              eOcanport2,
@@ -186,11 +187,11 @@ extern const EOconstvector* const eo_cfg_appDB_constvec_snsrMais__ptr = &s_eo_cf
 
 
 
-#if     defined(ICUB_DARMSTADT01)
+#if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )
 static const eOappTheDB_cfg_snsrStrainInfo_t  s_cfg_appDB_snsrStrain[] =
 {
     {// 0
-       EO_INIT(.belong2board)                       STRAIN_ADDRCAN_13_BID,
+       EO_INIT(.belong2board)                       STRAIN_ADDRCAN_1_BID,
     }
 };
 
