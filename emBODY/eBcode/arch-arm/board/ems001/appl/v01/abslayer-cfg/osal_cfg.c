@@ -145,6 +145,11 @@ extern void* osal_ext_calloc(uint32_t s, uint32_t n)
 
 #endif
 
+extern void* osal_ext_realloc(void* m, uint32_t s)
+{
+    return(realloc(m, s));
+}
+
 extern void osal_ext_free(void* m)
 {
     free(m);
