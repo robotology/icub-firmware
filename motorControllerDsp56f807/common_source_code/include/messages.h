@@ -1192,9 +1192,11 @@ else \
 //-------------------------------------------------------------------
 #define CAN_GET_FIRMWARE_VERSION_HANDLER(x) \
 { \
-	byte server_can_protocol_major = CAN_DATA[1]; \
-	byte server_can_protocol_minor = CAN_DATA[2]; \
-	PREPARE_HEADER; \
+    if (CAN_LEN == 3) \
+	{ \
+        byte server_can_protocol_major = CAN_DATA[1]; \
+     	byte server_can_protocol_minor = CAN_DATA[2]; \
+     	PREPARE_HEADER; \
 		CAN_LEN = 8; \
 		_can_protocol_ack = (_my_can_protocol_major == server_can_protocol_major && \
 						     _my_can_protocol_minor >= server_can_protocol_minor); \
@@ -1206,6 +1208,7 @@ else \
 		_canmsg.CAN_data[6] = _my_can_protocol_minor; \
 		_canmsg.CAN_data[7] = (byte)(_can_protocol_ack); \
 		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+	} \
 }
 
 // end of messages 
