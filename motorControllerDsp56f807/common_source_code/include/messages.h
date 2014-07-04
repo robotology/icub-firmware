@@ -1143,7 +1143,7 @@ else \
 	if (CAN_LEN == 2) \
 	{ \
 		value = CAN_DATA[1]; \
-		if (value>=1 && value <=15) _board_ID = value; \
+		if (value>=1 && value <=14) _board_ID = value; \
 		CAN1_init (_board_ID); \
 		set_can_masks(); \
 		writeToFlash (_flash_addr); \
