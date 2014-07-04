@@ -55,7 +55,23 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+const eOmempool_alloc_config_t eom_thesystem_mempool_alloc_config_heaposal =
+{
+    .heap =
+    {
+        .allocate       = osal_base_memory_new,
+        .reallocate     = osal_base_memory_realloc,
+        .release        = osal_base_memory_del
+    }
+};
+
+const eOmempool_cfg_t eom_thesystem_mempool_cfg_osal = 
+{
+    .mode               = eo_mempool_alloc_dynamic, // we use static allcoation
+    .conf               = &eom_thesystem_mempool_alloc_config_heaposal    
+};
+
 
 
 

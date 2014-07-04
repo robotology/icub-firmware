@@ -51,7 +51,6 @@ extern "C" {
 #include "EOMtheTimerManager.h"
 #include "EOMtheCallbackManager.h"
 #include "hal.h"
-//#include "fsal.h"
 #include "osal.h"
 
 
@@ -102,7 +101,9 @@ typedef void EOMtheSystemDerived;
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
+extern const eOmempool_alloc_config_t eom_thesystem_mempool_alloc_config_heaposal;
+extern const eOmempool_cfg_t eom_thesystem_mempool_cfg_osal;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
