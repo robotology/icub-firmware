@@ -254,6 +254,23 @@ __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
     return(eobool_false);
 }
 
+__inline extern eOboolvalues_t eo_appEncReader_isReadySPI1(EOappEncReader *p)
+{
+    if((eOEncReader_readSt__finished == p->configuredEnc_SPI1.st))
+    {
+        return(eobool_true);
+    }
+    return(eobool_false);
+}
+
+__inline extern eOboolvalues_t eo_appEncReader_isReadySPI3(EOappEncReader *p)
+{
+    if((eOEncReader_readSt__finished == p->configuredEnc_SPI3.st))
+    {
+        return(eobool_true);
+    }
+    return(eobool_false);
+}
 
 extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p)
 {
