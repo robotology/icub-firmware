@@ -41,6 +41,7 @@
 #include "OPCprotocolManager_Cfg.h" 
 #include "EOtheEMSapplDiagnostics.h"
 
+#include "osal.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -165,6 +166,9 @@ extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
     //reset diagnostics info
     memset(&retptr->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));
     
+    memset(&retptr->times[0], 0, 4); // spi1
+    memset(&retptr->times[1], 0, 4); // spi3
+    
     return(retptr);
 }
 
@@ -179,13 +183,17 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
     s_eo_appEncReader_check(p);
 
     if(ENCODER_NULL != p->configuredEnc_SPI1.readSeq.first)
-    {   
+    { 
+        memset(&p->times[0], 0, 4); // spi1  
+        p->times[0][0] = osal_system_abstime_get();
         p->configuredEnc_SPI1.st = eOEncReader_readSt__started;
         hal_encoder_read_start((hal_encoder_t)p->configuredEnc_SPI1.readSeq.first);  
     }
 
     if(ENCODER_NULL != p->configuredEnc_SPI3.readSeq.first)
     {   
+        memset(&p->times[1], 0, 4); // spi3   
+        p->times[1][0] = osal_system_abstime_get();        
         p->configuredEnc_SPI3.st = eOEncReader_readSt__started;
         hal_encoder_read_start((hal_encoder_t)p->configuredEnc_SPI3.readSeq.first);  
     }
@@ -243,7 +251,17 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     return(eores_OK);
 }
 
+extern uint32_t eo_appEncReader_deltaSPI1(EOappEncReader *p)
+{
+    uint64_t d = p->times[0][3] - p->times[0][0];
+    return((uint32_t)d);
+}
 
+extern uint32_t eo_appEncReader_deltaSPI2(EOappEncReader *p)
+{
+    uint64_t d = p->times[1][3] - p->times[1][0];
+    return((uint32_t)d);    
+}
 
 __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
 {
@@ -379,6 +397,8 @@ static void s_eo_appEncReader_isrCbk_onEncRead(void *arg)
 static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI1(void *arg)
 {
    EOappEncReader *p = (EOappEncReader *)arg;
+    
+   p->times[0][3] = osal_system_abstime_get(); 
  
    p->configuredEnc_SPI1.st = eOEncReader_readSt__finished;
    //if reading on spi3 are already fnished and the user has configured a callback ==> then invoke it
@@ -391,6 +411,8 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI1(void *arg)
 static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI3(void *arg)
 {
    EOappEncReader *p = (EOappEncReader *)arg;
+    
+   p->times[1][3] = osal_system_abstime_get();
 
    //set status of reding on spi3
    p->configuredEnc_SPI3.st = eOEncReader_readSt__finished;

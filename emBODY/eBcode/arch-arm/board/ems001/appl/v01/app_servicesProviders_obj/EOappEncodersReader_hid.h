@@ -85,6 +85,7 @@ struct EOappEncReader_hid
     EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI1;
     EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI3;
     eOappEncReader_diagnosticsinfo_t dgninfo;
+    uint64_t    times[2][4];
 }; 
 
 
