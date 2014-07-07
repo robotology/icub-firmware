@@ -195,7 +195,7 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 	}	
 }
 
-void helper_calib_abs_digital_coupled_neck(byte channel, Int16 param1,Int16 param2, Int16 param3)
+void helper_calib_abs_digital_coupled (byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
 	if (param3 >=0 && param3 <=4095) 
 	{
@@ -420,13 +420,21 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	}
 
 //-----------------------------------	  
-// 2.50 2.51 2.52 2.54 2.57 2BLLIE 	 
+// 2.50 2.51 2.54 2.57 2BLLIE 	 
 //-----------------------------------	 
-#elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0252 || VERSION==0x0254 || VERSION==0x0257 ) 
+#elif (VERSION==0x0250 || VERSION==0x0251 || VERSION==0x0254 || VERSION==0x0257 ) 
 
 	// standard bllIe calibrator
 	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital (channel, param1, param2,param3);
 
+//-----------------------------------	  
+// 2.52 2BLLIE 	 
+//-----------------------------------
+#elif (VERSION==0x0252 ) 
+
+	//torso coupling
+	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital_coupled (channel, param1, param2,param3);
+	
 //-----------------------------------	  
 // 1.61 2BLLDC 	 
 //-----------------------------------
@@ -440,16 +448,24 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif VERSION==0x0162
 
 	//neck V2
-	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital_coupled_neck (channel, param1, param2,param3);
+	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital_coupled (channel, param1, param2,param3);
 
 //-----------------------------------	  
 // 1.40 1.50 1.51 1.52 1.54 2BLL 	 
 //-----------------------------------	 
-#elif (VERSION==0x0140 || VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0152 || VERSION==0x0154 ) 
+#elif (VERSION==0x0140 || VERSION==0x0150 || VERSION==0x0151 || VERSION==0x0154 ) 
 
 	//first two joints of the shoulder
     if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital (channel, param1, param2,param3);
 
+//-----------------------------------	  
+// 1.52 2BLL 
+//-----------------------------------
+#elif (VERSION==0x0152 ) 
+
+	//torso coupling
+	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital_coupled (channel, param1, param2,param3);
+	
 //-----------------------------------	  
 // 1.47 1.57 2BLL 	 
 //-----------------------------------
