@@ -60,7 +60,7 @@
 
 
 #define VERSION   1
-#define BUILD     4
+#define BUILD     5
 
 #define CONFIG_WORD_WRITE  0x4008
 
@@ -248,7 +248,7 @@ _FGS(CODE_PROT_OFF); // Code protection disabled
 _FWDT(WDT_OFF);     // WD disabled
 //_FWDT(WDT_ON & WDTPSA_512 & WDTPSB_1); // WD enabled 1:512*16
 
-_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV_27);  // BOR 2.7V POR 64msec
+_FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV27);  // BOR 2.7V POR 64msec
 
 //TODO: Error queue / error flag set/reset
 //TODO: Erroristica CAN 
@@ -1116,7 +1116,7 @@ int main(void)
 
   ConfAdr.Val32 = FBORPOR;
   FBORPOR_Val = ReadLatchCM(ConfAdr.Word.HW,ConfAdr.Word.LW);        //Save FBORPOR configuration register
-  ConfVal = (MCLR_EN & PWRT_64 & PBOR_ON & BORV_27) & FBORPOR_MASK;  //Update register value to run bootloader (WD disabled)
+  ConfVal = (MCLR_EN & PWRT_64 & PBOR_ON & BORV27) & FBORPOR_MASK;  //Update register value to run bootloader (WD disabled)
   WriteLatchCM(ConfAdr.Word.HW,ConfAdr.Word.LW,ConfVal);
   WriteMem(CONFIG_WORD_WRITE);
 
