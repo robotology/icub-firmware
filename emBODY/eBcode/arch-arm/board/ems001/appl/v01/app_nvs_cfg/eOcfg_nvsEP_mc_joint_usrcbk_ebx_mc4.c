@@ -77,8 +77,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, icubCanProto_controlmode_t *icubcanProto_controlmode);
-
+static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOmc_jointId_t jId,
+                                                                      icubCanProto_controlmode_t *icubcanProto_controlmode);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -756,7 +756,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
     icubCanProto_calibrator_t               iCubCanProtCalibrator;
-    eOboolvalues_t                          enableAMPbeforeCalib = eobool_false;
     eOmc_joint_status_t                     *jstatus_ptr;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -802,7 +801,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             iCubCanProtCalibrator.params.type0.pwmlimit = calibrator->params.type0.pwmlimit;
 //            iCubCanProtCalibrator.params.type0.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type0.velocity);           
             iCubCanProtCalibrator.params.type0.velocity = calibrator->params.type0.velocity;
-            enableAMPbeforeCalib = eobool_true;
         }break;
             
         case eomc_calibration_type1_abs_sens_analog:
@@ -817,7 +815,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 //             iCubCanProtCalibrator.params.type1.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type1.velocity);
              iCubCanProtCalibrator.params.type1.position = calibrator->params.type1.position; 
              iCubCanProtCalibrator.params.type1.velocity =  calibrator->params.type1.velocity;
-            enableAMPbeforeCalib = eobool_false;
         }break;
 
         case eomc_calibration_type2_hard_stops_diff:
@@ -825,7 +822,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             iCubCanProtCalibrator.params.type2.pwmlimit = calibrator->params.type2.pwmlimit;
 //            iCubCanProtCalibrator.params.type2.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, jxx, calibrator->params.type2.velocity);           
             iCubCanProtCalibrator.params.type2.velocity = calibrator->params.type2.velocity;           
-            enableAMPbeforeCalib = eobool_true;
         }break;
 
         case eomc_calibration_type3_abs_sens_digital:
@@ -841,7 +837,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             iCubCanProtCalibrator.params.type1.position = calibrator->params.type3.position; 
             iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type3.velocity;            
             iCubCanProtCalibrator.params.type3.offset = calibrator->params.type3.offset;
-            enableAMPbeforeCalib = eobool_false;
         }break;
 
         case eomc_calibration_type4_abs_and_incremental:
@@ -858,35 +853,12 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
             iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
             iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
-            enableAMPbeforeCalib = eobool_true;
         }break;
         
     }
 
-    if(eobool_true == enableAMPbeforeCalib)
-    {
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-    
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &iCubCanProtCalibrator);
-    }
-    else
-    {
-//        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, &iCubCanProtCalibrator);
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &iCubCanProtCalibrator);
-
-        #warning VALE-->devo invoiare ena_PWM e RUN?
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-    
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-    }
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &iCubCanProtCalibrator);
  
 }
 
@@ -900,6 +872,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     eOmc_controlmode_command_t              *controlmode_cmd_ptr = (eOmc_controlmode_command_t*)nv->ram;
     icubCanProto_controlmode_t              icubcanProto_controlmode;
     eOicubCanProto_msgDestination_t         msgdest;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
@@ -910,66 +884,186 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 
 
     // 1) ge control mode in status nv
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &jstatus_ptr);
+    res = eo_appTheDB_GetJointStatusPtr(db, (eOmc_jointId_t)jxx, &jstatus_ptr);
     if(eores_OK != res)
     {
         return;
-    }   
-
+    }
 
     // 2) get joint can location
-    res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jxx,  &canLoc, NULL);
+    res = eo_appTheDB_GetJointCanLocation(db, jxx,  &canLoc, NULL);
     if(eores_OK != res)
     {
         return;
     }
-
-    //set destination of all messages 
+    
+    // 4) set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
 
-    if(eomc_controlmode_idle == jstatus_ptr->basic.controlmodestatus)
-    {
-        if(eomc_controlmode_cmd_position != *controlmode_cmd_ptr)
-        {
-            //i can exit from idle only if i received set control mode position command
-            return;
-        }
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-    }
-    else
-    {
-        if(eomc_controlmode_cmd_switch_everything_off == *controlmode_cmd_ptr)
-        {
-            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//     #include "hal.h"
+//     char str[60];
+//     
+//     snprintf(str, sizeof(str), "received control mode =%d joint %d", *controlmode_cmd_ptr, jxx);
+//     hal_trace_puts(str);
+    
+//i commented this code because with new control modes, i don't need to send ena or disa pwm.    
+//     if( (eomc_controlmode_cmd_switch_everything_off == *controlmode_cmd_ptr) ||
+//         (eomc_controlmode_cmd_force_idle == *controlmode_cmd_ptr)            ||
+//         (eomc_controlmode_cmd_idle == *controlmode_cmd_ptr) )
+//         {
+//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
+//             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
 
-            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-        }
-        else
-        {
-            res = s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode_cmd_ptr, &icubcanProto_controlmode);
-            if(eores_OK != res)
-            {
-                return;
-            }
-            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
-        }
+//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
+//             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//             
+//             snprintf(str, sizeof(str), "in controlmode: snd disa pwm e idle joint %d", jxx);
+//             hal_trace_puts(str);
+//             return;
+//         }
+//     
+//     if((eomc_controlmode_idle == jstatus_ptr->basic.controlmodestatus) &&
+//         (eomc_controlmode_cmd_force_idle != *controlmode_cmd_ptr)     &&
+//         (eomc_controlmode_cmd_idle != *controlmode_cmd_ptr)           &&
+//         (eomc_controlmode_cmd_switch_everything_off != *controlmode_cmd_ptr))
+//     {
+//         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
+//         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//     
+//         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
+//         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//          snprintf(str, sizeof(str), "in controlmode: snd ena pwm e run joint %d", jxx);
+//             hal_trace_puts(str);
+//     }
+    
+    
+        
+        
+    res = s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode_cmd_ptr, jxx, &icubcanProto_controlmode);
+    if(eores_OK != res)
+    {
+        return;
     }
+    
+//     snprintf(str, sizeof(str), "in controlmode: snd icubcontrolmode =%d joint %d", icubcanProto_controlmode, jxx);
+//     hal_trace_puts(str);
+    
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+//     if(eomc_controlmode_idle == jstatus_ptr->basic.controlmodestatus)
+//     {
+//         if(eomc_controlmode_cmd_position != *controlmode_cmd_ptr)
+//         {
+//             //i can exit from idle only if i received set control mode position command
+//             return;
+//         }
+//         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
+//         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//     
+//         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
+//         eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//     }
+//     else
+//     {
+//         if(eomc_controlmode_cmd_switch_everything_off == *controlmode_cmd_ptr)
+//         {
+//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
+//             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+
+//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
+//             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+//         }
+//         else
+//         {
+//             res = s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode_cmd_ptr, &icubcanProto_controlmode);
+//             if(eores_OK != res)
+//             {
+//                 return;
+//             }
+//             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+//             eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &icubcanProto_controlmode);
+//         }
+//     }
 
 }
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_interactionmode_t* interaction = (eOmc_interactionmode_t*)rd->data;
-    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_interactionmode_t                  *interaction = (eOmc_interactionmode_t*)rd->data;
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOresult_t                              res;
+    eOmc_joint_status_t                     *jstatus_ptr;
+    EOappCanSP                              *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    icubCanProto_interactionmode_t          icub_interctmode;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
-    #warning --> mettere qui codice per eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode() mc4
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return;
+    }
+    
+    
+    eOicubCanProto_msgCommand_t             msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
+    };
+
+    
+
+    if(eOmc_interactionmode_stiff == *interaction)
+    {
+        icub_interctmode = icubCanProto_interactionmode_stiff;
+    }
+    else if(eOmc_interactionmode_compliant == *interaction)
+    {
+        icub_interctmode = icubCanProto_interactionmode_compliant;
+    }
+    else
+    {
+        //icub_interctmode = icubCanProto_interactionmode_unknownError;
+        return;
+    }
+
+    eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, &icub_interctmode);
+
 }
 
 
@@ -996,7 +1090,8 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, 
+
+static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOmc_jointId_t jId,
                                                                       icubCanProto_controlmode_t *icubcanProto_controlmode)
 {
     switch(eomc_controlmode)
@@ -1024,7 +1119,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         case eomc_controlmode_cmd_current:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_current;
-        }
+        }break;
         case eomc_controlmode_cmd_openloop:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_openloop;
@@ -1033,6 +1128,22 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         {
             return(eores_NOK_generic);
         }
+        case eomc_controlmode_cmd_force_idle:
+        {
+            *icubcanProto_controlmode = icubCanProto_controlmode_forceIdle;
+        }break;
+        case eomc_controlmode_cmd_mixed:
+        {
+            *icubcanProto_controlmode = icubCanProto_controlmode_mixed;
+        }break;
+        case eomc_controlmode_cmd_direct:
+        {
+            *icubcanProto_controlmode = icubCanProto_controlmode_direct;
+        }break;
+        case eomc_controlmode_cmd_idle:
+        {
+            *icubcanProto_controlmode = icubCanProto_controlmode_idle;
+        }break;
         default:
         {
             return(eores_NOK_generic);
@@ -1041,6 +1152,93 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
     }
     return(eores_OK);
 }
+
+//I implement following function in order to translate new control modes to older modes.
+// static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOmc_jointId_t jId,
+//                                                                       icubCanProto_controlmode_t *icubcanProto_controlmode)
+// {
+//     eOmc_joint_commands_t       *jcmds_ptr;
+//     eOresult_t                  res;
+//     
+//     // get joint can location
+//     res = eo_appTheDB_GetJointCommandsPtr(eo_appTheDB_GetHandle(), jId,  &jcmds_ptr);
+//     if(eores_OK != res)
+//     {
+//         return(res);
+//     }
+//     
+//     #warning VALE: ho lasciato anche i vecchi control mode per compatibilita'!
+//     
+//     switch(eomc_controlmode)
+//     {
+//         case eomc_controlmode_cmd_position:
+//         case eomc_controlmode_cmd_mixed:
+//         case eomc_controlmode_cmd_direct:
+//         {
+//             if(jcmds_ptr->interactionmode == eOmc_interactionmode_stiff)
+//             {
+//                 *icubcanProto_controlmode = icubCanProto_controlmode_position;
+//                 return(eores_OK);
+//             }
+//             
+//             if(jcmds_ptr->interactionmode == eOmc_interactionmode_compliant)
+//             {
+//                 *icubcanProto_controlmode = icubCanProto_controlmode_impedance_pos;
+//                 return(eores_OK);
+//             }
+//             
+//             return(eores_NOK_generic);
+//             
+//         }//break;
+//         case eomc_controlmode_cmd_velocity:
+//         {
+//             if(jcmds_ptr->interactionmode == eOmc_interactionmode_stiff)
+//             {
+//                 *icubcanProto_controlmode = icubCanProto_controlmode_velocity;
+//                 return(eores_OK);
+//             }
+//             
+//             if(jcmds_ptr->interactionmode == eOmc_interactionmode_compliant)
+//             {
+//                 *icubcanProto_controlmode = icubCanProto_controlmode_impedance_vel;
+//                 return(eores_OK);
+//             }
+//             
+//             return(eores_NOK_generic);
+//             
+//         }//break;
+//         case eomc_controlmode_cmd_torque:
+//         {
+//             *icubcanProto_controlmode = icubCanProto_controlmode_torque;
+//         }break;
+//         case eomc_controlmode_cmd_impedance_pos: //old to remove!!!
+//         {
+//             *icubcanProto_controlmode = icubCanProto_controlmode_impedance_pos;
+//         }break;
+//         case eomc_controlmode_cmd_impedance_vel: //old to remove!!!
+//         {
+//              *icubcanProto_controlmode = icubCanProto_controlmode_impedance_vel;
+//         }break;
+//         case eomc_controlmode_cmd_current:
+//         {
+//             *icubcanProto_controlmode = icubCanProto_controlmode_current;
+//         }
+//         case eomc_controlmode_cmd_openloop:
+//         {
+//             *icubcanProto_controlmode = icubCanProto_controlmode_openloop;
+//         }break;
+//         case eomc_controlmode_cmd_switch_everything_off: //old to remove
+//         {
+//             return(eores_NOK_generic);
+//         }
+//         default:
+//         {
+//             return(eores_NOK_generic);
+//         }
+//             
+//     }
+//     return(eores_OK);
+// }
 
 
 
