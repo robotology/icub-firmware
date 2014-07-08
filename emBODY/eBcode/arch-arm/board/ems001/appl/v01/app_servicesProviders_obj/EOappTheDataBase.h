@@ -238,8 +238,8 @@ extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTh
 
 extern eOresult_t eo_appTheDB_GetJointConfigPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_config_t **jconfig_ptr);
 extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_status_t **jstatus_ptr);
+//extern eOresult_t eo_appTheDB_GetJointCommandsPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_commands_t **jcmds_ptr);
 //extern eOresult_t eo_appTheDB_GetJointInputsPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_inputs_t **jinputs_ptr);
-//extern eOresult_t eo_appTheDB_GetJointCmdControlmodePtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_controlmode_t **jcmdcontrolmode_ptr);
 extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t **shiftval_ptr);
 extern eOresult_t eo_appTheDB_GetJointBcastpolicyPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOicubCanProto_bcastpolicy_t **bcast_ptr);
 // extern eOresult_t eo_appTheDB_SetJointCurrentControlmode(EOappTheDB *p, eOmc_jointId_t jId, eOmc_controlmode_t curr_mode);

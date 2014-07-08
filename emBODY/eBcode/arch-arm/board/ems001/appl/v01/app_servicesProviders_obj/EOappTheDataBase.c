@@ -643,6 +643,24 @@ extern eOresult_t eo_appTheDB_GetJointStatusPtr(EOappTheDB *p, eOmc_jointId_t jI
 // }
 
 
+// extern eOresult_t eo_appTheDB_GetJointCommandsPtr(EOappTheDB *p, eOmc_jointId_t jId,  eOmc_joint_commands_t **jcmds_ptr)
+// {
+//     if((NULL == p) || (NULL == jcmds_ptr))
+//     {
+//         return(eores_NOK_nullpointer);
+//     }
+//     
+//     
+//     eOmc_joint_t *j_ptr = (eOmc_joint_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)jId);
+//     
+//     if(NULL == j_ptr)
+//     {
+//         return(eores_NOK_nodata);
+//     }
+//     
+//     *jcmds_ptr = &(j_ptr->cmmnds);
+//     return(eores_OK);
+// }
 
 extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t **shiftval_ptr)
 {
