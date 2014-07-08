@@ -564,11 +564,14 @@ void can_send_broadcast(void)
 			FAULT_ABS0 = 1;
 			put_motor_in_fault(0);
 		}
+	    #if (VERSION != 0x0154 && VERSION != 0x0254)
+	    //this board has one single motor and encoder
 		if (get_error_abs_ssi(1)==ERR_ABS_SSI)
 		{
 			FAULT_ABS1 = 1;	
 			put_motor_in_fault(1);
 		}
+		#endif
 	#endif		
 	#endif
 
@@ -583,6 +586,8 @@ void can_send_broadcast(void)
 			if (FAULT_HLL0) put_motor_in_fault(0);
 			setHallStatus(0,0);
 		}	
+	    #if (VERSION != 0x0154 && VERSION != 0x0254)
+	    //this board has one single motor and encoder
 		if (getHallStatus(1))
 		{
 			FAULT_HLL1 |= ((getHallStatus(1) &0x1)<<4);
@@ -591,6 +596,7 @@ void can_send_broadcast(void)
 			if (FAULT_HLL1) put_motor_in_fault(1);
 			setHallStatus(1,0);
 		}
+		#endif
 	#endif
 	#endif
 	
