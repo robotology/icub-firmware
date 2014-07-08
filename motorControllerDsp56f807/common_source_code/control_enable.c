@@ -460,5 +460,5 @@ bool mode_is_impedance_velocity(byte axis)
 void put_motor_in_fault (byte axis)
 {
     _control_mode[axis] = MODE_HW_FAULT;
-    PWM_outputPadDisable (axis);	
+    disable_motor_pwm (axis);	
 }
