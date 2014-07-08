@@ -8,6 +8,7 @@
 #include "trajectory.h"
 #include "filters.h"
 #include "messages.h"
+#include "options.h"
 
 extern canmsg_t _canmsg;
 extern  byte	_board_ID ;
@@ -352,6 +353,13 @@ void switch_control_mode(byte axis, byte value)
 		init_trajectory (axis, _position[axis], _position[axis], 1);
 		clear_lpf_ord1_3hz  (axis);
 		_ko_openloop[axis] = 0;
+		
+#ifdef HANDLE_OLD_IMPEDANCE_MODES
+		//for backcompatibility
+		if (_control_mode[axis]== MODE_IMPEDANCE_POS ||
+		    _control_mode[axis]== MODE_IMPEDANCE_VEL )
+		    switch_interaction_mode (axis, icubCanProto_interactionmode_compliant);
+#endif
 	}
 }
 

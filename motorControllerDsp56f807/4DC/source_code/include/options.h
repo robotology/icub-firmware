@@ -31,6 +31,6 @@
 #define JN					4		/* number of axes */
 #define CAN_SYNCHRO_STEPS 5
 #define BOARDSTATUSTIME 5000 //the time in ms between a BCAST_STATUS message and another
-
+#define HANDLE_OLD_IMPEDANCE_MODES 1
 
 #endif
