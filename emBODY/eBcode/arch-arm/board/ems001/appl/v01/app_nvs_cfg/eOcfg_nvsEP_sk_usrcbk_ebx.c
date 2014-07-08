@@ -193,8 +193,6 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
                 EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP
             };
             
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-            
             for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
             {
                 
