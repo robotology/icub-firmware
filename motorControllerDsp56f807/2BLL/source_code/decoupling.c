@@ -42,15 +42,19 @@ void decouple_positions(void)
 	}
 	else
 	{
-		put_motor_in_fault(0);	
-		#ifdef DEBUG_CAN_MSG
-		if(count==255)
+		//disable the joint if no POSITION data is receveived from the coupled joint
+		if (!mode_is_idle(0))
 		{
-			can_printf("No cpl pos info");
-			count=0;
-		}			
-		count++;				
-		#endif			
+			put_motor_in_fault(0);	
+			#ifdef DEBUG_CAN_MSG
+			if(count==255)
+			{
+				can_printf("No cpl pos info");
+				count=0;
+			}			
+			count++;				
+			#endif	
+		}
 	}
 #endif
 }
@@ -245,15 +249,19 @@ void decouple_dutycycle(Int32 *pwm)
 	}
 	else
 	{
-		put_motor_in_fault(0);	
-		#ifdef DEBUG_CAN_MSG
-		if(count==255)
+		//disable the joint if no PID data is receveived from the coupled joint
+		if (!mode_is_idle(0))
 		{
-			can_printf("No cpl pid info");
-			count=0;
-		}			
-		count++;				
-		#endif			
+			put_motor_in_fault(0);	
+			#ifdef DEBUG_CAN_MSG
+				if(count==255)
+				{
+					can_printf("No cpl pid info");
+					count=0;
+				}			
+				count++;				
+			#endif				
+		}
 	}
 #endif			
 }
@@ -559,16 +567,21 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		put_motor_in_fault(0);	
-		put_motor_in_fault(1);
-		#ifdef DEBUG_CAN_MSG
-			if(count==255)
-			{
-				can_printf("No cpl pid info");
-				count=0;
-			}			
-			count++;				
-		#endif			
+		//disable the joint if no PID data is receveived from the coupled joint
+		if (!mode_is_idle(0) &&
+		    !mode_is_idle(1))
+		{
+			put_motor_in_fault(0);
+			put_motor_in_fault(1);				
+			#ifdef DEBUG_CAN_MSG
+				if(count==255)
+				{
+					can_printf("No cpl pid info");
+					count=0;
+				}			
+				count++;				
+			#endif				
+		}		
 	}
 	
 #elif VERSION == 0x0152
@@ -684,15 +697,19 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		put_motor_in_fault(0);	
-		#ifdef DEBUG_CAN_MSG
-			if(count==255)
-			{
-				can_printf("No cpl pid info");
-				count=0;
-			}			
-			count++;				
-		#endif			
+		//disable the joint if no PID data is receveived from the coupled joint
+		if (!mode_is_idle(0))
+		{
+			put_motor_in_fault(0);	
+			#ifdef DEBUG_CAN_MSG
+				if(count==255)
+				{
+					can_printf("No cpl pid info");
+					count=0;
+				}			
+				count++;				
+			#endif				
+		}		
 	}
 #endif
 
@@ -830,16 +847,21 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		put_motor_in_fault(0);
-		put_motor_in_fault(1);	
-		#ifdef DEBUG_CAN_MSG
-			if(count==255)
-			{
-				can_printf("No cpl pid info");
-				count=0;
-			}			
-			count++;				
-		#endif			
+		//disable the joint if no PID data is receveived from the coupled joint
+		if (!mode_is_idle(0) &&
+		    !mode_is_idle(1))
+		{
+			put_motor_in_fault(0);
+			put_motor_in_fault(1);				
+			#ifdef DEBUG_CAN_MSG
+				if(count==255)
+				{
+					can_printf("No cpl pid info");
+					count=0;
+				}			
+				count++;				
+			#endif				
+		}				
 	}
 	
 #elif VERSION == 0x0152
@@ -941,15 +963,19 @@ void decouple_dutycycle_new_joint_parametric(Int32 *pwm)
 	_cpl_pid_counter++;
 	if (_cpl_pid_counter >= timeout_cpl_pid)
 	{
-		put_motor_in_fault(0);	
-		#ifdef DEBUG_CAN_MSG
-			if(count==255)
-			{
-				can_printf("No cpl pid info");
-				count=0;
-			}			
-			count++;				
-		#endif			
+		//disable the joint if no PID data is receveived from the coupled joint
+		if (!mode_is_idle(0))
+		{
+			put_motor_in_fault(0);			
+			#ifdef DEBUG_CAN_MSG
+				if(count==255)
+				{
+					can_printf("No cpl pid info");
+					count=0;
+				}			
+				count++;				
+			#endif				
+		}	
 	}
 #endif
 
