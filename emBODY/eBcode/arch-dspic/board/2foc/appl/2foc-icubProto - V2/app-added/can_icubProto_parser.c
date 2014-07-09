@@ -202,7 +202,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 *txlen = 0;
                 return(0);
             }
-			      // go to Ready to Switch On state
+	
+            // In ICUB the states DISABLE_OPERATION and SHUTDOWN goes in the same state. 
+		      // go to Ready to Switch On state
             DS402_Controlword.Flags.EnableVoltage = 0;   
             // In ICUB the states DISABLE_OPERATION and SHUTDOWN goes in the same state. 
             // go to Switched On state
@@ -298,16 +300,31 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
 
             //this command has effect only when i'm in enable operation state
-            if(1 != DS402_Controlword.Flags.EnableOperation)
+//            if(1 != DS402_Controlword.Flags.EnableOperation)
+//            {
+////                *txlen = 0x1;
+////                txpayload->b[1] = CAN_ERROR_COMMAND_IN_INVALID_STATE;
+//                *txlen = 0x0;
+//                return(0);
+//            }
+
+
+            if (!sCanProtocolCompatible)
             {
-//                *txlen = 0x1;
-//                txpayload->b[1] = CAN_ERROR_COMMAND_IN_INVALID_STATE;
-                *txlen = 0x0;
-                return(0);    
+                *txlen=0;
+                return 0;
             }
 
-            //let change control mode on fly
-            s_controlMode_reset();
+            received_canloader_msg=0; // start to transmit status messages
+
+            if(rxpayload->b[1] != icubCanProto_controlmode_idle)
+            {
+                DS402_Controlword.Flags.SwitchOn = 1;
+
+                DS402_Controlword.Flags.EnableOperation = 1;
+                //let change control mode on fly
+                s_controlMode_reset();
+            }
 
             switch(rxpayload->b[1])
             {          
