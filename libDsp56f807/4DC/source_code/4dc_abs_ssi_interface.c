@@ -6,6 +6,22 @@
  *	Globals
  ***************************************************************************/ 
 UInt16 max_real_position[4] = {4095, 4095, 4095, 4095};
+typedef struct ABS_SENSOR_STATUS
+{
+union 
+	{ 
+		struct bb
+		{	byte  status_ocf;
+			byte  status_cof;
+			byte  status_lin;
+			byte  status_inc;
+			byte  status_dec;
+		};
+		byte wordbb[5];
+	};
+}abs_sensor_status;
+
+abs_sensor_status status[4];
 
 /***************************************************************************/
 /**
@@ -110,11 +126,35 @@ UInt16 get_absolute_real_position_abs_ssi(byte jnt)
 			bit=getRegBits(GPIO_E_DR,GPIO_E6); //DATAIN
 			value=value | (bit <<(11-i)); 	
 		}		
+		else
+		{
+		 	status[jnt].wordbb[i-12]=getRegBits(GPIO_E_DR,GPIO_E6);	 	
+		}
 	}
 	setRegBits(GPIO_A_DR,mask); //DISABLE
 	return (UInt16) value;
 }
 
+void get_status_abs_ssi(bool* s_ocf,bool* s_cof,bool* s_lin, bool* s_inc, bool* s_dec, byte jnt)
+{
+	(*s_ocf)= status[jnt].status_ocf;
+	(*s_cof)= status[jnt].status_cof;
+	(*s_lin)= status[jnt].status_lin;
+	(*s_inc)= status[jnt].status_inc;
+	(*s_dec)= status[jnt].status_dec;
+}
+
+byte get_error_abs_ssi(byte jnt)
+{
+//	get_absolute_real_position_abs_ssi(jnt);
+	
+	if ((status[jnt].status_inc==1) && (status[jnt].status_dec==1) && (status[jnt].status_ocf==1) && (status[jnt].status_cof==1) && (status[jnt].status_lin==1) )
+	{
+		return ERR_ABS_SSI;	
+	}
+	
+	return ERR_OK;
+}
 /***************************************************************************/
 /**
  * this function reads the current _position which will be used in the PID.
