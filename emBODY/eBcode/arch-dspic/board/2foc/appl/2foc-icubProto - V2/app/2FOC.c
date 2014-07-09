@@ -166,14 +166,14 @@ void ResetSetpointWatchdog(); //prototype
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
-    extern tPID2 CurrentQPID;
+    //extern tPID2 CurrentQPID;
 
     static const int PWM_CENTER = LOOPINTCY / 2;
     static const int PWM_MAX = (18*PWM_CENTER)/20; // 25%
 
     static int hes_state_stored = 0;
     static int *ppwmH = NULL, *ppwmL = NULL, *ppwm0 = NULL;
-    static int *Isens = NULL;
+    static short *Isens = NULL,Isign = 0;
     //static int *piH = NULL, *piL = NULL;
     //static int iHfilt = 0, iLfilt = 0;
     //static int 
@@ -205,32 +205,32 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             {
             case 0b001: // Sector 1: (0,0,1)   60-120 degrees
                 if (P1OVDCON & 0x3F00) pwm_reg = 0x0F00;
-                Isens = &(ParkParm.qIa);
+                Isens = &(ParkParm.qIa); Isign = 1;
                 ppwmH = (int*) &PDC1; ppwmL = (int*) &PDC2; ppwm0 = (int*) &PDC3; break;
 
             case 0b011: // Sector 2: (0,1,1)  120-180 degrees
                 if (P1OVDCON & 0x3F00) pwm_reg = 0x3300;
-                Isens = &(ParkParm.qIa);
+                Isens = &(ParkParm.qIa); Isign = 1;
                 ppwmH = (int*) &PDC1; ppwm0 = (int*) &PDC2; ppwmL = (int*) &PDC3; break;
 
             case 0b010: // Sector 3: (0,1,0)  180-240 degrees
                 if (P1OVDCON & 0x3F00) pwm_reg = 0x3C00;
-                Isens = &(ParkParm.qIc);
+                Isens = &(ParkParm.qIc); Isign = -1;
                 ppwm0 = (int*) &PDC1; ppwmH = (int*) &PDC2; ppwmL = (int*) &PDC3; break;
 
             case 0b110: // Sector 4: (1,1,0)  240-300 degrees
                 if (P1OVDCON & 0x3F00) pwm_reg = 0x0F00;
-                Isens = &(ParkParm.qIa);
+                Isens = &(ParkParm.qIa); Isign =-1;
                 ppwmL = (int*) &PDC1; ppwmH = (int*) &PDC2; ppwm0 = (int*) &PDC3; break;
 
             case 0b100: // Sector 5: (1,0,0)  300-360 degrees
                 if (P1OVDCON & 0x3F00) pwm_reg = 0x3300;
-                Isens = &(ParkParm.qIc);
+                Isens = &(ParkParm.qIc); Isign = 1;
                 ppwmL = (int*) &PDC1; ppwm0 = (int*) &PDC2; ppwmH = (int*) &PDC3; break;
 
             case 0b101: // Sector 6: (1,0,1)    0- 60 degrees
                 if (P1OVDCON & 0x3F00) pwm_reg = 0x3C00;
-                Isens = &(ParkParm.qIc);
+                Isens = &(ParkParm.qIc); Isign = 1;
                 ppwm0 = (int*) &PDC1; ppwmL = (int*) &PDC2; ppwmH = (int*) &PDC3; break;
             }
         }
@@ -398,8 +398,23 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     //I2Tdata.IQMeasured = /*abs*/(ParkParm.qIq);
     //I2Tdata.IDMeasured = /*abs*/(ParkParm.qId);
 
-    I2Tdata.IQMeasured = I2Tdata.IDMeasured = *Isens;
-    
+    I2Tdata.IQMeasured = I2Tdata.IDMeasured = Isign * (*Isens);
+
+	/*
+	static char Itimer = 0;
+	static long int Ibuff = 0;
+
+	if (++Itimer >= 20)
+	{
+		Itimer = 0;
+		Ifilt = Ibuff/20;
+		Ibuff = 0; 
+	}
+	else
+	{
+		Ibuff += I2Tdata.IQMeasured; 
+	}
+    */
     //I2Tdata.IQMeasured += ParkParm.qIb;
     //I2Tdata.IQMeasured += ParkParm.qIb;
     //I2Tdata.IQMeasured *= 10;

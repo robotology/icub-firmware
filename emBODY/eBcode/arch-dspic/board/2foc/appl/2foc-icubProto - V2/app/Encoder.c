@@ -149,10 +149,10 @@ inline SFRAC16 EncoderPositionQE()
   return (SFRAC16)(tmp);
   */
 
-    static const unsigned int DIVISOR = QE_RESOLUTION;
+    //static const unsigned int DIVISOR = QE_RESOLUTION;
 
-    return (SFRAC16)__builtin_divud(0xFFFFUL*QEPGet(),DIVISOR);
-
+    //return (SFRAC16)__builtin_divud(0xFFFFUL*QEPGet(),DIVISOR);
+	return (SFRAC16)__builtin_divud(16384UL*QEPGet(),QE_PPR);
     //return (SFRAC16)QEPGet();
 }
 

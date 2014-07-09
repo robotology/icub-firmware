@@ -380,6 +380,7 @@ volatile long Current_position = 0;
 // this is equal to the Current_position but it does
 // take in account the CAN position zeroing command
 volatile long Reported_position = 0;
+//volatile int  Ifilt = 0;
 
 // Offset needed for zeroing the axes position 
 volatile long Offset4Zeroing=0;
@@ -489,7 +490,7 @@ const unsigned int * PeriodicData[ELEMENTS_IN_PREIODIC_DATA_LIST]={
 /* 27 */ (unsigned int*) &encoder_value,
 /* 28 */ (unsigned int*) &Encoder_SyncPulsePosition,
 /* 29 */ (unsigned int*) &Zero,//&rotor_alignment_dhes_approx_espp,
-/* 2A */ (unsigned int*) &I2Tdata.IQMeasured,
+/* 2A */ (unsigned int*) &I2Tdata.IQMeasured, //&Ifilt,
 /* 2B */ (unsigned int*) &I2Tdata.IDMeasured,
 /* 2C */ (unsigned int*) &Zero,
 /* 2D */ (unsigned int*) &Zero,
