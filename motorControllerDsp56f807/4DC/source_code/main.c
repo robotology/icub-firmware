@@ -395,7 +395,23 @@ void main(void)
 	    _position[0]= get_position_encoder(0);	
 		_position[1]= get_position_abs_ssi(AEA6); 
 		_position[2]= get_position_abs_ssi(AEA5); 
-		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));					
+		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));	
+		
+		if (get_error_abs_ssi(AEA6)==ERR_ABS_SSI)
+	    {
+			put_motor_in_fault(1);
+			#ifdef DEBUG_CAN_MSG
+	    	can_printf("ABS error %d",1);	
+			#endif
+	    }	
+		if (get_error_abs_ssi(AEA5)==ERR_ABS_SSI)
+	    {
+			put_motor_in_fault(2);
+			#ifdef DEBUG_CAN_MSG
+	    	can_printf("ABS error %d",2);	
+			#endif
+	    }						 
+				
 #endif
 
 
@@ -406,11 +422,27 @@ void main(void)
 		_position_enc[2]= get_position_encoder(2);
 		_position_enc[3]= get_position_encoder(3);
 #endif
+
 #if VERSION == 0x0215
 	    _position[0]= get_position_abs_ssi(AEA3);	
 		_position[1]= get_position_abs_ssi(AEA4);
 		_position[2]= get_position_encoder(2);
-		_position[3]= get_position_encoder(3);					
+		_position[3]= get_position_encoder(3);
+		
+		if (get_error_abs_ssi(AEA3)==ERR_ABS_SSI)
+	    {
+			put_motor_in_fault(0);
+			#ifdef DEBUG_CAN_MSG
+	    	can_printf("ABS error %d",0);	
+			#endif
+	    }	
+		if (get_error_abs_ssi(AEA4)==ERR_ABS_SSI)
+	    {
+			put_motor_in_fault(1);
+			#ifdef DEBUG_CAN_MSG
+	    	can_printf("ABS error %d",1);	
+			#endif
+	    }					
 #endif
 
 //-------------------------------------------------------------------------------------------
