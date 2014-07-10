@@ -360,9 +360,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         }
     }
     
-
     switch (setPoint->type)
-    {
+    { 
         case eomc_setpoint_position:
         {
 //             #if defined(EOMTHEEMSAPPLCFG_USE_EB8)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)
@@ -594,7 +593,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     */
     
     // 2) set control mode to ems controller
-    eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr), eobool_true);       
+    eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr));       
 }
 
 

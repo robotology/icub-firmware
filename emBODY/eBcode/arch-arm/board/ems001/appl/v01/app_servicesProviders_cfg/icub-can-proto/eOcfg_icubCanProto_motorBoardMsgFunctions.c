@@ -1929,7 +1929,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         {
             return(res);
         }
-        eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4], eomc_controlmode);
+        eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4]/*, eomc_controlmode*/);
         //l'aggiornamento delle nv del giunto sara' fatto nel DO.
         //se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
         s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);

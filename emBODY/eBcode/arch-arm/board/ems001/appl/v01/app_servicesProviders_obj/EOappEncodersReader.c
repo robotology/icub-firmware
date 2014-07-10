@@ -233,8 +233,7 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
         p->dgninfo.enclist[enc][err_onReadFromSpi]++;
         return(res);
     }
-   // eOboolvalues_t res = s_eo_appEncReader_IsValidValue(&val_raw, &errortype); 
-
+    
     if (eobool_false == s_eo_appEncReader_IsValidValue(&val_raw, &errortype))
     {
         *value = (eOappEncReader_errortype_t)errortype;  
@@ -251,13 +250,23 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     return(eores_OK);
 }
 
+extern uint64_t eo_appEncReader_startSPI1(EOappEncReader *p)
+{
+    return p->times[0][0];
+}
+
+extern uint64_t eo_appEncReader_startSPI3(EOappEncReader *p)
+{
+    return p->times[1][0];
+}
+
 extern uint32_t eo_appEncReader_deltaSPI1(EOappEncReader *p)
 {
     uint64_t d = p->times[0][3] - p->times[0][0];
     return((uint32_t)d);
 }
 
-extern uint32_t eo_appEncReader_deltaSPI2(EOappEncReader *p)
+extern uint32_t eo_appEncReader_deltaSPI3(EOappEncReader *p)
 {
     uint64_t d = p->times[1][3] - p->times[1][0];
     return((uint32_t)d);    

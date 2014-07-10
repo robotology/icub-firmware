@@ -49,6 +49,8 @@
 
 #include "eventviewer.h"
 
+#include <stdio.h>
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -95,7 +97,21 @@ void userDef_hwErrCntr(void){}
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+/*
+extern uint64_t startofcycletime;
+    
+extern uint64_t eom_emsrunner_rxstart;
+extern uint64_t eom_emsrunner_dostart;
+extern uint64_t eom_emsrunner_txstart;
+    
+extern uint64_t eom_emsrunner_rxduration;
+extern uint64_t eom_emsrunner_doduration;
+extern uint64_t eom_emsrunner_txduration;
 
+extern uint64_t eom_emsrunner_rxprevduration;
+extern uint64_t eom_emsrunner_doprevduration;
+extern uint64_t eom_emsrunner_txprevduration;
+*/
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -425,19 +441,123 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
 }
 #endif
 
+extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
     eOresult_t          res;
     EOtheEMSapplBody    *emsappbody_ptr = eo_emsapplBody_GetHandle();
-    uint32_t            encvalue[4] = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
+    uint32_t            encvalue[4]; // = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
     int16_t             pwm[4];
-//     static uint8_t             mask = 0;
-//     static uint32_t             count_mask = 0;
-//     #define     COUNT_MASK_MAX      2000
+    EOappEncReader      *app_enc_reader = eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr);
+    uint8_t             error_mask = 0;
 
     uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
-
+    
+    //uint64_t start_read = osal_system_abstime_get();
+    //uint64_t enc1_delta = start_read - eo_appEncReader_startSPI1(app_enc_reader);
+    //uint64_t stop_read = 0;
+    
+    //uint8_t spi1 = 0, spi3 = 0;
+    
+    for(uint8_t i=0; i<30; ++i)
+    {
+        if (eo_appEncReader_isReady(app_enc_reader))
+        {
+            //stop_read = osal_system_abstime_get();
+            break;
+        }
+        else
+        {
+            //if (!eo_appEncReader_isReadySPI1(app_enc_reader)) ++spi1;
+            //if (!eo_appEncReader_isReadySPI3(app_enc_reader)) ++spi3;
+            hal_sys_delay(5);
+        }
+    }
+    
+    /*
+    static char msg[31];
+    
+    static uint8_t error_flag_1 = 0;
+    static uint8_t error_flag_3 = 0;
+    
+    if (spi1 || error_flag_1)
+    {
+        if (spi1) error_flag_1 = 1; else error_flag_1 = 0;
+        
+        snprintf(msg,sizeof(msg),"T1<%d,%d,%d>",(uint32_t)enc1_delta,(uint32_t)(stop_read-start_read),(uint32_t)(stop_read-eo_appEncReader_startSPI1(app_enc_reader)));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+        
+        snprintf(msg,sizeof(msg),"START(%0.3d:%0.3d:%0.3d)\n",
+            (uint32_t)(startofcycletime/1000000),
+            (uint32_t)((startofcycletime%1000000)/1000),
+            (uint32_t)(startofcycletime%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+        
+        snprintf(msg,sizeof(msg),"1:Rx(%d,%d %0.3d:%0.3d:%0.3d)\n",
+            (uint32_t)eom_emsrunner_rxprevduration,
+            (uint32_t)eom_emsrunner_rxduration,
+            (uint32_t)(eom_emsrunner_rxstart/1000000),
+            (uint32_t)((eom_emsrunner_rxstart%1000000)/1000),
+            (uint32_t)(eom_emsrunner_rxstart%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+        
+        snprintf(msg,sizeof(msg),"1:Do(%d,%d %0.3d:%0.3d:%0.3d)\n",
+            (uint32_t)eom_emsrunner_doprevduration,
+            (uint32_t)eom_emsrunner_doduration,
+            (uint32_t)(eom_emsrunner_dostart/1000000),
+            (uint32_t)((eom_emsrunner_dostart%1000000)/1000),
+            (uint32_t)(eom_emsrunner_dostart%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+                
+        snprintf(msg,sizeof(msg),"1:Tx(%d,%d %0.3d:%0.3d:%0.3d)\n",
+            (uint32_t)eom_emsrunner_txprevduration,
+            (uint32_t)eom_emsrunner_txduration,
+            (uint32_t)(eom_emsrunner_txstart/1000000),
+            (uint32_t)((eom_emsrunner_txstart%1000000)/1000),
+            (uint32_t)(eom_emsrunner_txstart%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+    }
+    
+    if (spi3 || error_flag_3)
+    {
+        if (spi3) error_flag_3 = 1; else error_flag_3 = 0;
+        
+        snprintf(msg,sizeof(msg),"T3<%d,%d,%d>",(uint32_t)enc1_delta,(uint32_t)(stop_read-start_read),(uint32_t)(stop_read-eo_appEncReader_startSPI1(app_enc_reader)));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+        
+        snprintf(msg,sizeof(msg),"START(%0.3d:%0.3d:%0.3d)\n",
+            (uint32_t)(startofcycletime/1000000),
+            (uint32_t)((startofcycletime%1000000)/1000),
+            (uint32_t)(startofcycletime%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+        
+        snprintf(msg,sizeof(msg),"3:Rx(%d,%d %0.3d:%0.3d:%0.3d)",
+            (uint32_t)eom_emsrunner_rxprevduration,
+            (uint32_t)eom_emsrunner_rxduration,
+            (uint32_t)(eom_emsrunner_rxstart/1000000),
+            (uint32_t)((eom_emsrunner_rxstart%1000000)/1000),
+            (uint32_t)(eom_emsrunner_rxstart%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+        
+        snprintf(msg,sizeof(msg),"3:Do(%d,%d %0.3d:%0.3d:%0.3d)",
+            (uint32_t)eom_emsrunner_doprevduration,
+            (uint32_t)eom_emsrunner_doduration,
+            (uint32_t)(eom_emsrunner_dostart/1000000),
+            (uint32_t)((eom_emsrunner_dostart%1000000)/1000),
+            (uint32_t)(eom_emsrunner_dostart%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+                
+        snprintf(msg,sizeof(msg),"3:Tx(%d,%d %0.3d:%0.3d:%0.3d)",
+            (uint32_t)eom_emsrunner_txprevduration,
+            (uint32_t)eom_emsrunner_txduration,
+            (uint32_t)(eom_emsrunner_txstart/1000000),
+            (uint32_t)((eom_emsrunner_txstart%1000000)/1000),
+            (uint32_t)(eom_emsrunner_txstart%1000));
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
+    }
+    */
+    
     if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr)))
     {    
         for (uint8_t enc = 0; enc < numofjoint; ++enc)
@@ -446,14 +566,17 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
             
             if (res != eores_OK)
             {
-                //if (enc == 3) ++hysto_error[encvalue[3]];
-                
-                encvalue[enc] = (uint32_t)ENC_INVALID;
+                error_mask |= 1<<(enc<<1);
+                //encvalue[enc] = (uint32_t)ENC_INVALID;
             }
         }        
     }
+    else
+    {
+        error_mask = 0xAA; // timeout
+    }
 
-    eo_emsController_AcquireAbsEncoders((int32_t*)encvalue);
+    eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
         
     /* 2) pid calc */
     eo_emsController_PWM(pwm);

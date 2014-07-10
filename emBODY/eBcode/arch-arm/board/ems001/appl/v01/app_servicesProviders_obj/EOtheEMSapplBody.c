@@ -154,7 +154,7 @@ extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default =
     .icubcanprotoimplementedversion =
     {
         .major                  = 1,
-        .minor                  = 2
+        .minor                  = 1
     },
     .connectedEncodersMask      = EOMTHEEMSAPPLCFG_EBX_encodersMASK,
 //     .endpoints                  =

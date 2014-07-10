@@ -93,8 +93,11 @@ EO_extern_inline eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p);  //p
 EO_extern_inline eOboolvalues_t eo_appEncReader_isReadySPI1(EOappEncReader *p);
 EO_extern_inline eOboolvalues_t eo_appEncReader_isReadySPI3(EOappEncReader *p);
 
+extern uint64_t eo_appEncReader_startSPI1(EOappEncReader *p);
+extern uint64_t eo_appEncReader_startSPI3(EOappEncReader *p);
+
 extern uint32_t eo_appEncReader_deltaSPI1(EOappEncReader *p);
-extern uint32_t eo_appEncReader_deltaSPI2(EOappEncReader *p);
+extern uint32_t eo_appEncReader_deltaSPI3(EOappEncReader *p);
 
 extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value);
 

@@ -166,7 +166,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-            ///*
+            ///*///
             uint32_t canBoardsReady;
             char str[60];
             if(!eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady))
@@ -174,7 +174,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
                 snprintf(str, sizeof(str), "not all boards are ready mask=%u", canBoardsReady);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "on rec go2run cmd", str);
             }
-            //*/
+            ///*///
             eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
         }break;
         
