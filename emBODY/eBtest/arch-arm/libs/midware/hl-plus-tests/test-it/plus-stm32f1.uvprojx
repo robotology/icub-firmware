@@ -159,7 +159,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\stm32-cfg.ini</InitializationFile>
+            <InitializationFile>.\debugsetup-f1x.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -994,7 +994,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\stm32-cfg.ini</InitializationFile>
+            <InitializationFile>.\debugsetup-f1x.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -1197,7 +1197,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_MCBSTM32_C</Define>
+              <Define>HL_CFG_PLUS_TARGET_BY_FILE HL_USE_BRD_MCBSTM32C</Define>
               <Undefine></Undefine>
               <IncludePath>..\hl-plus-stm32f1-cfg;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
@@ -1829,7 +1829,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\stm32-cfg.ini</InitializationFile>
+            <InitializationFile>.\debugsetup-f1x.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>

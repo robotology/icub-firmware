@@ -60,7 +60,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     defined(HL_USE_BRD_MCBSTM32_F400)
+#if     defined(HL_USE_BRD_MCBSTM32F400)
 
 
 #if     defined(HL_USE_UTIL_I2C)
@@ -262,10 +262,10 @@ extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 
 //
-#elif   defined(HL_USE_BRD_EMS4RD)
+#elif   defined(HL_USE_BRD_EMS4RD) | defined(HL_USE_BRD_MC4PLUS)
 //
 
-
+#warning --> FOR MC4PLUS: must define the mappings ... so fare we assume they are equal to ems4rd
 
 #if     defined(HL_USE_UTIL_I2C)
 

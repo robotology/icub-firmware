@@ -55,7 +55,7 @@
 
 
 
-#if   defined(HL_USE_BRD_MCBSTM32_F400) 
+#if   defined(HL_USE_BRD_MCBSTM32F400) 
 
 
 // HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
@@ -103,6 +103,38 @@
 #define HL_USE_CHIP_XX_EEPROM
 #define HL_USE_CHIP_ST_L3G4200D
 #define HL_USE_CHIP_ST_LIS3X
+//#define HL_USE_CHIP_MICREL_KS8893
+#define HL_USE_CHIP_XX_ETHPHY
+#define HL_USE_UTIL_TIMER
+
+
+#elif   defined(HL_USE_BRD_MC4PLUS) 
+
+#warning --> FOR MC4PLUS: choose the hl-modules
+
+
+// HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
+
+#define HL_USE_UTIL_SYS
+#define HL_USE_UTIL_GPIO
+#define HL_USE_UTIL_BITS
+#define HL_USE_UTIL_FIFO
+#define HL_USE_UTIL_I2C
+#define HL_USE_UTIL_ETH
+#define HL_USE_UTIL_ETHTRANS
+#define HL_USE_UTIL_CAN
+#define HL_USE_UTIL_CAN_COMM
+#define HL_USE_UTIL_SPI
+
+#define HL_USE_UTIL_CRC07
+#define HL_USE_UTIL_CRC16
+#define HL_USE_UTIL_CRC32
+
+// HL_USE_CHIP_* allow compilation of the driver of a given chip
+
+#define HL_USE_CHIP_XX_EEPROM
+#undef HL_USE_CHIP_ST_L3G4200D
+#undef HL_USE_CHIP_ST_LIS3X
 //#define HL_USE_CHIP_MICREL_KS8893
 #define HL_USE_CHIP_XX_ETHPHY
 #define HL_USE_UTIL_TIMER

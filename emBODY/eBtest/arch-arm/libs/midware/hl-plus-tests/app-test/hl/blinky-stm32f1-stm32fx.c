@@ -362,13 +362,13 @@ extern hl_result_t extclockinit(void)
     s_switch_mco_initialise();
     return(hl_res_OK);
 }
-#elif   defined(HL_USE_BRD_EMS4RD)
+#elif   defined(HL_USE_BRD_EMS4RD) | defined(HL_USE_BRD_MC4PLUS)
 extern hl_result_t extclockinit(void)
 {
     
     return(hl_res_OK);
 }
-#endif//defined(HL_USE_BRD_EMS4RD)
+#endif//defined(HL_USE_BRD_EMS4RD) | defined(HL_USE_BRD_MC4PLUS)
 #endif//defined(HL_USE_CHIP_MICREL_KS8893)
 
 static void init_switch(void)
@@ -384,7 +384,7 @@ static void init_switch(void)
         .extclockinit   = extclockinit,
         .targetphymode  = hl_ethtrans_phymode_auto // hl_ethtrans_phymode_fullduplex10mbps //hl_ethtrans_phymode_auto (
     };  
-#elif   defined(HL_USE_BRD_EMS4RD)
+#elif   defined(HL_USE_BRD_EMS4RD) | defined(HL_USE_BRD_MC4PLUS)
     const hl_chip_micrel_ks8893_cfg_t micrelcfg  = 
     { 
         .i2cid          = hl_i2c3,
@@ -394,7 +394,7 @@ static void init_switch(void)
         .targetphymode  = hl_ethtrans_phymode_auto //hl_ethtrans_phymode_fullduplex10mbps
     }; 
 #else
-    #error -> define an eeprom cfg
+    #error -> define a cfg for micrel
 #endif   
     
     hl_ethtrans_phymode_t phymode = hl_ethtrans_phymode_auto;
@@ -423,7 +423,7 @@ static void test_eeprom(void)
         .wp_val         = hl_gpio_valSET,
         .wp_gpio        = { .port = hl_gpio_portB, .pin = hl_gpio_pin10 }           
     };
-#elif   defined(HL_USE_BRD_MCBSTM32) | defined(HL_USE_BRD_MCBSTM32_C)
+#elif   defined(HL_USE_BRD_MCBSTM32) | defined(HL_USE_BRD_MCBSTM32C)
     const hl_chip_xx_eeprom_cfg_t eepromcfg = 
     {
         .chip           = hl_chip_xx_eeprom_chip_st_m24c64, 
@@ -432,7 +432,7 @@ static void test_eeprom(void)
         .wp_val         = hl_gpio_valUNDEF,
         .wp_gpio        = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }           
     };
-#elif   defined(HL_USE_BRD_MCBSTM32_F400)
+#elif   defined(HL_USE_BRD_MCBSTM32F400)
     const hl_chip_xx_eeprom_cfg_t eepromcfg = 
     {
         .chip           = hl_chip_xx_eeprom_chip_st_m24lr64, 
@@ -450,7 +450,7 @@ static void test_eeprom(void)
         .wp_val         = hl_gpio_valSET,
         .wp_gpio        = { .port = hl_gpio_portD, .pin = hl_gpio_pin10 }           
     };  
-#elif   defined(HL_USE_BRD_EMS4RD)
+#elif   defined(HL_USE_BRD_EMS4RD) | defined(HL_USE_BRD_MC4PLUS)
     const hl_chip_xx_eeprom_cfg_t eepromcfg = 
     {
         .chip           = hl_chip_xx_eeprom_chip_atmel_at24c512b, 

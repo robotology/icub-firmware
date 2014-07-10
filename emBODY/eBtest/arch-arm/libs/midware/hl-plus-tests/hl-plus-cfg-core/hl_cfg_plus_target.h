@@ -33,7 +33,7 @@
  
     #define HL_USE_MPU_NAME_STM32F103RB
     
-#elif   defined(HL_USE_BRD_MCBSTM32_C)
+#elif   defined(HL_USE_BRD_MCBSTM32C)
 
     #define HL_USE_MPU_NAME_STM32F107VC
  

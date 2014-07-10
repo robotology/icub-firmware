@@ -41,7 +41,7 @@
 // }
 
 
-#if     defined(HL_USE_BRD_EMS4RD)
+#if     defined(HL_USE_BRD_EMS4RD) | defined(HL_USE_BRD_MC4PLUS)
 
 // need to use a different SystemInit() because we dont have the normal clock as in mcbstm32f400 
 
@@ -99,7 +99,7 @@ extern void hl_system_stm32fx_before_setsysclock(void)
 #endif
 
 
-#endif//defined(HL_USE_BRD_EMS4RD)
+#endif//defined(HL_USE_BRD_EMS4RD)|defined(HL_USE_BRD_MC4PLUS)
 
 
 

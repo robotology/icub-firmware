@@ -27,7 +27,7 @@
     
     #include "cmsis_stm32f1.h"
     
-#elif   defined(HL_USE_BRD_MCBSTM32_C)
+#elif   defined(HL_USE_BRD_MCBSTM32C)
 
     #include "cmsis_stm32f1.h"
     
@@ -35,16 +35,16 @@
 
     #include "cmsis_stm32f1.h"
     
-#elif   defined(HL_USE_BRD_MCBSTM32_F200)
+#elif   defined(HL_USE_BRD_MCBSTM32F200)
 
     #include "cmsis_stm32f2.h"
 
-#elif   defined(HL_USE_BRD_MCBSTM32_F400)
+#elif   defined(HL_USE_BRD_MCBSTM32F400)
     
     #include "cmsis_stm32f4.h" 
 
 #else
-    #error --> define a MCBSTM32 board
+    #error --> define a board
 #endif
 
 typedef enum

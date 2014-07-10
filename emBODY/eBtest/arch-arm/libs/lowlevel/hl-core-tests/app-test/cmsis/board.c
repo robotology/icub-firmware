@@ -20,13 +20,13 @@
 
 #if     defined(HL_USE_BRD_MCBSTM32)
     #include "brd_mcbstm32.c" 
-#elif   defined(HL_USE_BRD_MCBSTM32_C)
+#elif   defined(HL_USE_BRD_MCBSTM32C)
     #include "brd_mcbstm32c.c" 
 #elif   defined(HL_USE_BRD_EMS001)
     #include "brd_ems001.c"     
-#elif   defined(HL_USE_BRD_MCBSTM32_F200)
+#elif   defined(HL_USE_BRD_MCBSTM32F200)
     #include "brd_mcbstm32f200.c" 
-#elif   defined(HL_USE_BRD_MCBSTM32_F400)
+#elif   defined(HL_USE_BRD_MCBSTM32F400)
     #include "brd_mcbstm32f400.c" 
 #else
     #error --> define a MCBSTM32 board

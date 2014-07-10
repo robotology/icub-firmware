@@ -64,7 +64,7 @@
 
 #include "hl_sys.h"
 
-#if     defined(HL_USE_BRD_MCBSTM32_C)
+#if     defined(HL_USE_BRD_MCBSTM32C)
 
 
 
@@ -86,7 +86,7 @@
 
 #include "hl_i2c.h"
 
-#if     defined(HL_USE_BRD_MCBSTM32_C)
+#if     defined(HL_USE_BRD_MCBSTM32C)
 
 static const hl_i2c_mapping_t s_hl_i2c_mapping =
 {
@@ -342,7 +342,7 @@ extern hl_result_t hl_ethtrans_chip_init(void* param)
 
 #include "hl_can.h"
 
-#if     defined(HL_USE_BRD_MCBSTM32_C)
+#if     defined(HL_USE_BRD_MCBSTM32C)
 
 
 #elif   defined(HL_USE_BRD_MCBSTM32)
@@ -405,7 +405,7 @@ static const hl_timer_mapping_t s_hl_timer_mapping =
 extern const hl_timer_mapping_t* hl_timer_map = &s_hl_timer_mapping;
 
 
-#elif   defined(HL_USE_BRD_MCBSTM32_C)
+#elif   defined(HL_USE_BRD_MCBSTM32C)
 
 
 static const hl_timer_mapping_t s_hl_timer_mapping =

@@ -72,7 +72,7 @@
 //#define HL_USE_CHIP_ST_L3G4200D
 //#define HL_USE_CHIP_ST_LIS3X
  
-#elif   defined(HL_USE_BRD_MCBSTM32_C) 
+#elif   defined(HL_USE_BRD_MCBSTM32C) 
 
 
 // HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
