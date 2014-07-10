@@ -16,7 +16,7 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
-
+//#include "hal_led.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,28 +66,6 @@ static int32_t normalize_angle(int32_t a);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#ifdef OLD_STYLE_ENCODER
-
-#error using old style encoder
-
-#else 
-/*
-struct EOabsCalibratedEncoder_hid
-{
-    int32_t distance;
-    int32_t position_last;
-    int32_t position_sure;
-
-    int32_t sign;
-    int32_t offset;
-
-    int32_t delta;
-
-    uint16_t state_mask;
-    uint8_t  first_valid_data;
-};
-*/
-
 extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void)
 {
     EOabsCalibratedEncoder *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOabsCalibratedEncoder), 1);
@@ -103,7 +81,8 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void)
         
         o->delta = 0;
         
-        o->invalid_data_cnt = 0;
+        o->invalid_fault_cnt = 0;
+        o->timeout_fault_cnt = 0;
         o->first_valid_data = 0;
         
         o->state_mask = SM_NOT_READY;
@@ -130,14 +109,25 @@ extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder* o)
     return o->state_mask == SM_OK;
 }
 
-extern eObool_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder* o)
+extern uint8_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder* o)
 {
     return o->state_mask & SM_HARDWARE_FAULT;
 }
 
+extern uint8_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder* o)
+{
+    return o->state_mask & SM_TIMEOUT_FAULT;
+}
+
+extern uint8_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder* o)
+{
+    return o->state_mask & SM_INVALID_FAULT;
+}
+
 extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o)
 {
-    o->invalid_data_cnt = 0;
+    o->invalid_fault_cnt = 0;
+    o->timeout_fault_cnt = 0;
     RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
 }
 
@@ -148,22 +138,15 @@ extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder* o, int32_t
     SET_BITS(o->state_mask, SM_NOT_INITIALIZED);
 }
 
-static void encoder_init(EOabsCalibratedEncoder* o, int32_t position);
+static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t error_mask);
 
-extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_t position)
+extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_t position, uint8_t error_mask)
 {
     static const int16_t MAX_ENC_CHANGE = 3*ENCODER_QUANTIZATION;
     
     if (!o->sign) return 0;
-    
-    /*
-    if (o->state_mask & SM_HARDWARE_FAULT)
-    {
-        return o->sign*o->distance;
-    }
-    */
 	
-    if (position != ENC_INVALID)
+    if (!error_mask)
     {
         position -= o->offset;
         
@@ -175,27 +158,53 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         {
             position -= TICKS_PER_REVOLUTION;
         }
+        
+        o->invalid_fault_cnt = 0;
+        o->timeout_fault_cnt = 0;
     }
-    /*
     else
     {
-        ++o->invalid_data_cnt;
-        
-        if (o->invalid_data_cnt > 500)
+        if (error_mask & 0x01)
         {
-            SET_BITS(o->state_mask,SM_HARDWARE_FAULT);
+            if (o->invalid_fault_cnt > 50)
+            {
+                SET_BITS(o->state_mask, SM_INVALID_FAULT);
+            }
+            else
+            {
+                ++o->invalid_fault_cnt;
+            }
         }
+        else
+        {
+            o->invalid_fault_cnt = 0;
+        }    
+        
+        if (error_mask & 0x02)
+        {
+            if (o->timeout_fault_cnt > 50)
+            {
+                SET_BITS(o->state_mask, SM_TIMEOUT_FAULT);
+            }
+            else
+            {
+                ++o->timeout_fault_cnt;
+            }
+        }
+        else
+        {
+            o->timeout_fault_cnt = 0;
+        }  
     }
-    */
     
     if (o->state_mask & SM_NOT_INITIALIZED)
     {
-        encoder_init(o, position);
+        encoder_init(o, position, error_mask);
         
         return o->sign*o->distance;
     }
     
-    if (position != ENC_INVALID)
+    if (!error_mask)
     {        
         int32_t check = normalize_angle(position - o->position_last);
         
@@ -223,16 +232,6 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     
     return o->sign*o->distance;
 }
-
-/*
-struct EOaxleVirtualEncoder_hid
-{
-    int32_t sign;
-    int32_t divisor;
-
-    int32_t 
-};
-*/
 
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
 {
@@ -301,11 +300,11 @@ extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder* o)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void encoder_init(EOabsCalibratedEncoder* o, int32_t position)
+static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t error_mask)
 {
     if (!o) return;
     
-    if (position == ENC_INVALID)
+    if (error_mask)
     {
         o->first_valid_data = 0;
         return;
@@ -339,8 +338,6 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position)
     }
 }
 
-#endif
-
 static int32_t normalize_angle(int32_t a)
 {
     while (a < -TICKS_PER_HALF_REVOLUTION) a += TICKS_PER_REVOLUTION;
@@ -352,7 +349,4 @@ static int32_t normalize_angle(int32_t a)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
 

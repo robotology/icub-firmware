@@ -17,6 +17,7 @@
 //#include "EOtheErrorManager.h"
 //#include "EOVtheSystem.h"
 #include "EOemsControllerCfg.h"
+//#include "hal_led.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -101,7 +102,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         
         o->openloop_out = 0;
 
-        o->control_mode = eomc_controlmode_idle;
+        o->control_mode  = eomc_controlmode_notConfigured;
         o->interact_mode = eOmc_interactionmode_stiff;
 
         o->err = 0;
@@ -125,6 +126,12 @@ extern eObool_t eo_axisController_IsOk(EOaxisController* o)
 extern void eo_axisController_StartCalibration(EOaxisController *o)
 {
     if (!o) return;
+    
+    if (NOT_READY() && (o->state_mask !=  AC_NOT_CALIBRATED))
+    {
+        o->control_mode = eomc_controlmode_hwFault;
+        return;
+    }
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
     
@@ -401,6 +408,11 @@ extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq)
     return eobool_true;
 }
 
+extern void eo_axisController_SetHardwareFault(EOaxisController *o)
+{
+		o->control_mode = eomc_controlmode_hwFault;
+}
+
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc)
 {
     //if (!o) return eobool_false;
@@ -420,11 +432,12 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     
     if (NOT_READY())
     {
-        o->control_mode = eomc_controlmode_notConfigured;
+        //o->control_mode = eomc_controlmode_notConfigured;
         
         return eobool_false;
     }
     
+    /*
     if (o->control_mode == eomc_controlmode_calib)
     {
         if (cmc == eomc_controlmode_cmd_idle)
@@ -436,24 +449,44 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         
         return eobool_false;
     }
+    */
     
-    o->control_mode = eomc_controlmode_idle;
+    //o->control_mode = eomc_controlmode_idle;
     
     switch (cmc)
     {
+    case eomc_controlmode_cmd_force_idle:
     case eomc_controlmode_cmd_idle:
         axisMotionReset(o);
         o->control_mode = eomc_controlmode_idle;
         return eobool_true;
     
     case eomc_controlmode_direct:
-        if (o->control_mode == eomc_controlmode_idle) o->control_mode = eomc_controlmode_direct; 
+        o->control_mode = eomc_controlmode_direct;
+        eo_pid_Reset(o->pidP);
+        eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+        o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->err = 0;
+        return eobool_true;
+    
     case eomc_controlmode_cmd_position:
-        if (o->control_mode == eomc_controlmode_idle) o->control_mode = eomc_controlmode_position;
+        o->control_mode = eomc_controlmode_position;
+        eo_pid_Reset(o->pidP);
+        eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+        o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->err = 0;
+        return eobool_true;
+    
     case eomc_controlmode_cmd_velocity:
-        if (o->control_mode == eomc_controlmode_idle) o->control_mode = eomc_controlmode_velocity;
+        o->control_mode = eomc_controlmode_velocity;
+        eo_pid_Reset(o->pidP);
+        eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+        o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->err = 0;
+        return eobool_true;
+    
     case eomc_controlmode_cmd_mixed:
-        if (o->control_mode == eomc_controlmode_idle) o->control_mode = eomc_controlmode_mixed;
+        o->control_mode = eomc_controlmode_mixed;
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
@@ -468,13 +501,13 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         o->torque_meas = 0;
         o->err = 0;
         o->control_mode = eomc_controlmode_torque;
-        break;
+        return eobool_true;
     
     case eomc_controlmode_cmd_openloop:
         o->control_mode = eomc_controlmode_openloop;
         o->openloop_out = 0;
         o->err = 0;
-        return eobool_false;
+        return eobool_true;
     }
     
     return eobool_false;
@@ -495,6 +528,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         case eomc_controlmode_calib:
         {
             if (IS_CALIBRATED())
+            //if (!NOT_READY())
             {
                 eo_pid_Reset(o->pidP);
                 eo_trajectory_Init(o->trajectory, pos, vel, 0);
@@ -767,8 +801,10 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 #ifndef CONTROL_II
 
 extern void eo_axisController_SetOutput(EOaxisController *o, int16_t out)
-{
-    if (o) o->openloop_out = out;
+{   
+    o->openloop_out = out;
+    
+    o->control_mode = eomc_controlmode_openloop;
 }
 
 extern void eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel)
@@ -805,7 +841,7 @@ extern void eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos)
     if (!o) return;
     
     if (NOT_READY()) return;
-
+    
     switch (o->control_mode)
     {
     case eomc_controlmode_velocity:
@@ -889,7 +925,9 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     
     if (o->control_mode == eomc_controlmode_calib)
     {
-        if (cmc == eomc_controlmode_cmd_idle || cmc == eomc_controlmode_cmd_switch_everything_off)
+        if (cmc == eomc_controlmode_cmd_idle || 
+            cmc == eomc_controlmode_cmd_switch_everything_off || 
+            cmc == eomc_controlmode_cmd_force_idle)
         {
             o->control_mode = eomc_controlmode_idle;
             
@@ -958,9 +996,9 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_false;
     
     case eomc_controlmode_cmd_openloop:
-        return eobool_false;
-        //o->control_mode = eomc_controlmode_openloop;
-        //break;
+        //return eobool_false;
+        o->control_mode = eomc_controlmode_openloop;
+        break;
     }
     
     return eobool_true;

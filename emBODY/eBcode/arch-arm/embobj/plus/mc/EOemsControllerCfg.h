@@ -45,7 +45,6 @@ extern "C" {
 #define TORQUE_SENSOR_TIMEOUT     100 // cycles
 #define ENCODER_TIMEOUT            10 // cycles
 
-#define SAFE_MAX_CURRENT    10000
 #define NOMINAL_CURRENT     10000
 
 #if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 

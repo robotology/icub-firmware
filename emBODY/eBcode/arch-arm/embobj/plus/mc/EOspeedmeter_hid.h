@@ -34,40 +34,12 @@ extern "C" {
                 used also by its derived objects.
  **/
 
-#define SM_OK                  0x0000
+#define SM_OK                  0x00
 
-#define SM_NOT_CALIBRATED      0x0001
-#define SM_NOT_INITIALIZED     0x0002
-#define SM_ENC_SIGN_NOT_SET    0x0004
+#define SM_NOT_CALIBRATED      0x01
+#define SM_NOT_INITIALIZED     0x02
+#define SM_ENC_SIGN_NOT_SET    0x04
 #define SM_NOT_READY           (SM_NOT_CALIBRATED|SM_NOT_INITIALIZED|SM_ENC_SIGN_NOT_SET)
-
-#define SM_HARDWARE_FAULT      0x8000
-
-#ifdef OLD_STYLE_ENCODER
-
-struct EOspeedmeter_hid
-{
-    //int32_t time;
-
-    int32_t distance;
-    int32_t position_last;
-    int32_t position_sure;
-
-    int32_t enc_sign;
-    int32_t offset;
-
-    int32_t distance_x_reduction;
-    int32_t fast_enc_pos;
-    
-    int32_t speed;
-    int32_t delta;
-
-    uint16_t state_mask;
-    uint8_t  first_valid_data;
-    uint16_t invalid_data_cnt;
-};
-
-#else
 
 struct EOabsCalibratedEncoder_hid
 {
@@ -80,9 +52,10 @@ struct EOabsCalibratedEncoder_hid
 
     int32_t delta;
 
-    uint16_t state_mask;
+    uint8_t  state_mask;
     uint8_t  first_valid_data;
-    uint16_t invalid_data_cnt;
+    uint16_t invalid_fault_cnt;
+    uint16_t timeout_fault_cnt;
 };
 
 struct EOaxleVirtualEncoder_hid
@@ -96,8 +69,6 @@ struct EOaxleVirtualEncoder_hid
     int32_t axle_abs_pos;
     int32_t axle_virt_pos;
 };
-
-#endif
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

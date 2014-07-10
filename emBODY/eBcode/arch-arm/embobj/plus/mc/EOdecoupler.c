@@ -78,12 +78,12 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
 
     if (o)
     {
-        o->motor_idle_mask = 0x00;
-        
-        for (uint8_t m=0; m<MAX_MOTORS; ++m)
-        {
-            o->zero_rotation_torque[m] = ZERO_ROTATION_TORQUE;
-        }
+        o->motor_fault_mask = 0x00;
+
+        //for (uint8_t m=0; m<MAX_MOTORS; ++m)
+        //{
+        //    o->zero_rotation_torque[m] = ZERO_ROTATION_TORQUE;
+        //}
         
         if (n_motors > MAX_MOTORS) n_motors = MAX_MOTORS;
         
@@ -93,28 +93,36 @@ extern EOmotors* eo_motors_New(uint8_t n_motors)
     return o;
 }
 
-extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t bError, eOmc_controlmode_t control_mode)
+extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t motor_error, uint8_t can_error)
 {
-    if (!o) return;
-    
-    if (bError /*|| (control_mode == eomc_ctrlmval_idle)*/)
+    if (can_error || motor_error)
     {
-        o->motor_idle_mask |=  (1<<m);
+        if (motor_error & 0x04) // external fault
+        {
+            o->motor_fault_mask |=  (2<<(m<<1));
+        }
+        else
+        {
+            o->motor_fault_mask |=  (1<<(m<<1));
+        }
     }
     else
     {
-        o->motor_idle_mask &= ~(1<<m);
+        o->motor_fault_mask &= ~(3<<(m<<1));
     }
+}
+
+extern eObool_t eo_motor_are_motors_in_fault(EOmotors *o, uint8_t mask)
+{
+    return o->motor_fault_mask & mask;
 }
 
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
-extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff)
+extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff)
 {
-    if (!o) return 0xFF;
-    
-    uint8_t stop_mask = 0;
+    //if (!o) return;
     
     #if defined(SHOULDER_BOARD)
     
@@ -130,12 +138,6 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
         // Jt = | 0   40/65  -40/65 |
         //      | 0     0     40/65 | 
     
-        if (o->motor_idle_mask & 0x07)
-        {
-            stop_mask |= 0x07;
-            pwm_motor[0] = pwm_motor[1] = pwm_motor[2] = 0;
-        }
-        else
         {
             int16_t buff;
             
@@ -182,17 +184,10 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
             //pwm_motor[0] = (int16_t)(pwm_joint[0]+pwm_joint[1]);
             //pwm_motor[1] = (int16_t)((40*(pwm_joint[1]-pwm_joint[2]))/65);
             //pwm_motor[2] = (int16_t)((40*pwm_joint[2])/65);
-        }
         
-        if (o->motor_idle_mask & 0x08)
-        {            
-            stop_mask |= 0x08;
-            pwm_motor[3] = 0;
-        }
-        else
-        {   
             pwm_motor[3] = (int16_t)pwm_joint[3];
         }
+        
     #elif defined(WAIST_BOARD)
         
         //             |   1     1     0   |
@@ -207,12 +202,6 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
         // Jt = | 1   1  44/80 |
         //      | 0   0  44/80 | 
         
-        if (o->motor_idle_mask & 0x07)
-        {
-            stop_mask |= 0x07;
-            pwm_motor[0] = pwm_motor[1] = pwm_motor[2] = 0;
-        }
-        else
         {
             /*
             if (stiff[0])
@@ -265,13 +254,9 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
             pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
             pwm_motor[2] = (int16_t)  pwm_joint[2];
         }
+        
     #elif defined(UPPERLEG_BOARD)
-        if (o->motor_idle_mask & 0x01)
-        {
-            stop_mask |= 0x01;
-            pwm_motor[0] = 0;
-        }
-        else
+        
         {
             if (stiff[0])
             {
@@ -281,64 +266,23 @@ extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor
             {
                 pwm_motor[0] = (50*pwm_joint[0])/75;
             }
-        }
-        
-        if (o->motor_idle_mask & 0x02)
-        {
-            stop_mask |= 0x02;
-            pwm_motor[1] = 0;
-        }
-        else
-        {
             pwm_motor[1] = pwm_joint[1];
-        }
-        
-        if (o->motor_idle_mask & 0x04)
-        {
-            stop_mask |= 0x04;
-            pwm_motor[2] = 0;
-        }
-        else
-        {
             pwm_motor[2] = pwm_joint[2];
-        }
-        
-        if (o->motor_idle_mask & 0x08)
-        {
-            stop_mask |= 0x08;
-            pwm_motor[3] = 0;
-        }
-        else
-        {
             pwm_motor[3] = pwm_joint[3];
         }
+        
     #elif defined(ANKLE_BOARD)
-        if (o->motor_idle_mask & 0x01)
-        {
-            stop_mask |= 0x01;
-            pwm_motor[0] = 0;
-        }
-        else
+        
         {
             pwm_motor[0] = pwm_joint[0];
-        }
-        
-        if (o->motor_idle_mask & 0x02)
-        {
-            stop_mask |= 0x02;
-            pwm_motor[1] = 0;
-        }
-        else
-        {
             pwm_motor[1] = pwm_joint[1];
         }
+        
     #else
         MOTORS(m) pwm_motor[m] = 0;
     #endif
             
     MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
-    
-    return stop_mask;
 }
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2)

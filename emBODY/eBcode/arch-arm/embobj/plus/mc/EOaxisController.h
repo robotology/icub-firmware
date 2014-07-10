@@ -106,6 +106,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
+extern void eo_axisController_SetHardwareFault(EOaxisController *o);
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc);
 extern eOmc_controlmode_t eo_axisController_GetControlMode(EOaxisController *o);
 

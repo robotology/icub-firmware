@@ -14,13 +14,22 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-//#include "hal_led.h"
+#include "hal_led.h"
 
-//#include <string.h>
+#include <string.h>
 
 
 #include "EOicubCanProto_specifications.h"
 #include "EOtheEMSapplBody.h"
+
+//////////////////////////////////
+#include "EOtheBOARDtransceiver.h"
+#include "EOrop.h"
+#include "EOprotocolMN.h"
+#include "EOnv_hid.h"
+
+extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
+//////////////////////////////////
 
 //#include "EOMtheEMSbackdoor.h"
 //#include "OPCprotocolManager_Cfg.h"
@@ -138,26 +147,124 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
 }
 #endif
 
-extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos)
+extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
+    //static int  enc_error_seq = 0;
+    static char enc_error_msg[31] = { "Enc(x):ERROR" } ;
+    
     static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
     
     int32_t axle_abs_pos[NAXLES];
     
     ENCODERS(e)
     {
-        axle_abs_pos[e] = eo_absCalibratedEncoder_Acquire(ems->abs_calib_encoder[e], abs_enc_pos[e]);
-        
-        //if (eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[e])
-        //{
-        //    SET_BITS(ems->state_mask,EMS_FAULT);
-        //}
+        axle_abs_pos[e] = eo_absCalibratedEncoder_Acquire(ems->abs_calib_encoder[e], abs_enc_pos[e], 0x03 & (error_mask>>(e<<1)));
     }
     
+    ////////////////////////////////////////////////////
+    // CHECK HARDWARE ENCODER FAULT
+    #if defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+        uint8_t ef0 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[0]);
+        uint8_t ef1 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[1]);
+        uint8_t ef2 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[2]);
+    
+        if (ef0 || ef1 || ef2 || eo_motor_are_motors_in_fault(ems->motors, 0x15)) // hard fault
+        {
+            
+            if (ef0)
+            {
+                enc_error_msg[4] = '0';
+                send_diagnostics_to_server(enc_error_msg, 0xffffffff, 1);
+            }
+            if (ef1)
+            {
+                enc_error_msg[4] = '1';
+                send_diagnostics_to_server(enc_error_msg, 0xffffffff, 1);
+            }
+            if (ef2)
+            {
+                enc_error_msg[4] = '2';
+                send_diagnostics_to_server(enc_error_msg, 0xffffffff, 1);
+            }
+            
+            
+            eo_axisController_SetHardwareFault(ems->axis_controller[0]);
+            eo_axisController_SetHardwareFault(ems->axis_controller[1]);
+            eo_axisController_SetHardwareFault(ems->axis_controller[2]);
+            
+            //SET_BITS(ems->state_mask,EMS_FAULT);
+            
+            if (!eo_motor_are_motors_in_fault(ems->motors, 0x03)) set_2FOC_idle(0);
+            if (!eo_motor_are_motors_in_fault(ems->motors, 0x0C)) set_2FOC_idle(1);
+            if (!eo_motor_are_motors_in_fault(ems->motors, 0x30)) set_2FOC_idle(2);
+        }
+        else if (eo_motor_are_motors_in_fault(ems->motors, 0x2A)) // external fault
+        {
+            eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_idle);
+            eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_idle);
+            eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);
+            
+            set_2FOC_idle(0);
+            set_2FOC_idle(1);
+            set_2FOC_idle(2);
+        }
+    #elif defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+        JOINTS(j)
+        {
+            uint8_t fault_mask = 3<<(j<<1);
+            uint8_t efj = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[j]);
+            
+            if (efj || eo_motor_are_motors_in_fault(ems->motors, fault_mask & 0x55)) // hard fault
+            {
+                
+                if (efj)
+                {
+                    enc_error_msg[4] = '0'+j;
+                    send_diagnostics_to_server(enc_error_msg, 0xffffffff, 1);
+                }
+                
+                eo_axisController_SetHardwareFault(ems->axis_controller[j]);
+                
+                //SET_BITS(ems->state_mask,EMS_FAULT);
+                
+                if (!eo_motor_are_motors_in_fault(ems->motors, fault_mask)) set_2FOC_idle(0);
+            }
+            else if (eo_motor_are_motors_in_fault(ems->motors, fault_mask & 0xAA)) // ext fault
+            {
+                eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_idle);
+            }
+        }
+    #endif
+        
+    #if defined(SHOULDER_BOARD)
+        uint8_t ef3 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[3]);
+        if (ef3 || eo_motor_are_motors_in_fault(ems->motors, 0x40))
+        {   
+            
+            if (ef3)
+            {
+                enc_error_msg[4] = '3';
+                send_diagnostics_to_server(enc_error_msg, 0xffffffff, 1);
+            }
+            
+            eo_axisController_SetHardwareFault(ems->axis_controller[3]);
+            
+            //SET_BITS(ems->state_mask,EMS_FAULT);
+            
+            if (!eo_motor_are_motors_in_fault(ems->motors, 0xC0)) set_2FOC_idle(3);
+        }
+        else if (eo_motor_are_motors_in_fault(ems->motors, 0x80))
+        {
+            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_idle);
+        }
+    #endif
+    // CHECK HARDWARE ENCODER FAULT
+    ////////////////////////////////////////////////////
+        
     #if defined(SHOULDER_BOARD) && defined(V1_MECHANICS)
         // |J0|   |  1     0    0   |   |E0|     
-		// |J1| = |  0     1    0   | * |E1|
-		// |J2|   |  1    -1  40/65 |   |E2|
+        // |J1| = |  0     1    0   | * |E1|
+        // |J2|   |  1    -1  40/65 |   |E2|
         axle_abs_pos[2] = axle_abs_pos[0]-axle_abs_pos[1]+(40*axle_abs_pos[2])/65;
     #endif
     
@@ -259,17 +366,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         MOTORS(m) pwm_motor[m] = 0;
         return;
     }
-    
-    ENCODERS(e)
-    {
-        if (eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[e]))
-        {
-            //o->state_mask |= ...
-            MOTORS(m) pwm_motor[m] = 0;
-            return;
-        }
-    }
-       
+        
 #ifdef EXPERIMENTAL_MOTOR_TORQUE
     #if defined(SHOULDER_BOARD)
         //         |    1       0       0   |
@@ -326,16 +423,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
     {
         pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
     }
-    
-    uint8_t stop_mask = eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
-    
-    JOINTS(j)
-    {
-        if (stop_mask & (1<<j))
-        {
-            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_idle, eobool_false);
-        }
-    }
+     
+    eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -373,7 +462,7 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
     if (ems) eo_axisController_SetTrqRef(ems->axis_controller[joint], trq);
 }
 
-extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode, eObool_t b2FOC_off)
+extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode)
 {
     if (!ems) return;
     
@@ -385,32 +474,56 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         MOTORS(m) config_2FOC(m);   
     }
     
-    eo_axisController_SetControlMode(ems->axis_controller[joint], mode);
-    
-    if ((mode == eomc_controlmode_cmd_idle) || (mode == eomc_controlmode_cmd_switch_everything_off))
+    if (mode == eomc_controlmode_cmd_force_idle)
     {
-        if (b2FOC_off)
-        {
-            #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
-                set_2FOC_idle(joint);
-            #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
-                if (joint < 3)
-                {
-                    if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
-                        eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
-                        eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
-                    {
-                        set_2FOC_idle(0);
-                        set_2FOC_idle(1);
-                        set_2FOC_idle(2);
-                    }
-                }
-            #endif
+        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+            set_2FOC_idle(joint);
+            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[joint]);
+        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+            if (joint < 3)
+            {
+                set_2FOC_idle(0);
+                set_2FOC_idle(1);
+                set_2FOC_idle(2);
                 
-            #if defined(SHOULDER_BOARD)
-                if (joint == 3) set_2FOC_idle(3);
-            #endif
-        }
+                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[0]);
+                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[1]);
+                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[2]);
+            }
+        #endif
+                
+        #if defined(SHOULDER_BOARD)
+            if (joint == 3)
+            {
+                set_2FOC_idle(3);
+                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[3]);
+            }
+        #endif
+    }
+    else if ((mode == eomc_controlmode_cmd_idle) ||  
+             (mode == eomc_controlmode_cmd_switch_everything_off))
+    {
+        //hal_led_toggle(hal_led2);
+        
+        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+            set_2FOC_idle(joint);
+        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+            if (joint < 3)
+            {
+                if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
+                    eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
+                    eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
+                {
+                    set_2FOC_idle(0);
+                    set_2FOC_idle(1);
+                    set_2FOC_idle(2);
+                }
+            }
+        #endif
+                
+        #if defined(SHOULDER_BOARD)
+            if (joint == 3) set_2FOC_idle(3);
+        #endif
     }
     else
     {
@@ -429,6 +542,8 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             if (joint == 3) set_2FOC_running(3, mode);
         #endif
     }
+    
+    eo_axisController_SetControlMode(ems->axis_controller[joint], mode);
 }
 
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint)
@@ -624,9 +739,9 @@ extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
     if (ems) eo_axisController_SetVelMax(ems->axis_controller[joint], vel_max);
 }
 
-extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror, eOmc_controlmode_t controlmode)
+extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror)
 {
-    if (ems) eo_motor_set_motor_status(ems->motors, motor, motorerror || canerror, controlmode);
+    if (ems) eo_motor_set_motor_status(ems->motors, motor, motorerror, canerror);
 }
 
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status)
@@ -642,7 +757,7 @@ extern void eo_emsMotorController_GoIdle(void)
     {
         JOINTS(j)
         {
-            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_idle, eobool_true);
+            eo_emsController_SetControlMode(j, eomc_controlmode_cmd_idle);
         }
         
         MOTORS(m) set_2FOC_idle(m);
@@ -701,10 +816,10 @@ void config_2FOC(uint8_t motor)
 
 void set_2FOC_idle(uint8_t motor)
 {
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()); 
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
     eOicubCanProto_msgDestination_t msgdest;
-    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_idle;
+    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_idle; //+
     
     eOicubCanProto_msgCommand_t msgCmd =
     {
@@ -716,14 +831,16 @@ void set_2FOC_idle(uint8_t motor)
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
     
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
-    
-//    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
-//    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE; //+
+    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc); //+
 
-//    //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
-//    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD; //-
+    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL); //-
+    
+    //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
+    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    
+    eo_motor_set_motor_status(ems->motors, motor, 0, 0);
 }
 
 void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
@@ -747,14 +864,67 @@ void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
     controlmode_2foc = icubCanProto_controlmode_openloop;
     //controlmode_2foc = icubCanProto_controlmode_current;
         
-//    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-//    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
-//            
-//    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-//    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
+    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+            
+    //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
+    //eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+}
+
+extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime)
+{
+    static uint8_t initted = 0;
+    static eOropdescriptor_t rd;
+    static EOnv* nv = NULL;
+    static EOtransceiver *t = NULL;  
+    static EOnvSet * nvset = NULL;  
+    eOmn_info_status_t infostatus = {0};
+
+    uint16_t maxlen = sizeof(infostatus.string)-1;
+    
+    if((NULL == str) || (strlen(str) > maxlen))
+    {
+        return(eores_NOK_generic);
+    }
+    
+    if(0 == initted)
+    {
+        t = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+        nvset = eo_boardtransceiver_GetNVset(eo_boardtransceiver_GetHandle());
+        memcpy(&rd, &eok_ropdesc_basic, sizeof(eOropdescriptor_t));
+        rd.ropcode  = eo_ropcode_sig;
+        rd.id32     = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status);
+        rd.data     = NULL; 
+        
+        nv = eo_nv_New();
+        eo_nvset_NV_Get(nvset, eok_ipv4addr_localhost, rd.id32, nv);    
+        
+     
+        initted = 1;
+    }
+    
+    // fill signature
+    rd.control.plussign     = (eo_nv_ID32dummy == signature) ? (0) : 1;
+    rd.signature            = signature;
+    rd.control.plustime     = plustime;
+    
+    // must put str into the 8 bytes of eOmn_appl_status_t
+    
+    uint16_t size = 0;
+    eo_nv_Get(nv, eo_nv_strg_volatile, &infostatus, &size);
+   
+    infostatus.type = 0x6;
+    memcpy(&infostatus.string[0], str, strlen(str));
+    
+    eo_nv_Set(nv, &infostatus, eobool_true, eo_nv_upd_dontdo);
+       
+    
+    eo_transceiver_OccasionalROP_Load(t, &rd);
+  
+    return(eores_OK);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -27,7 +27,11 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define ENC_INVALID 0x7FFFFFFF
+//#define ENC_INVALID 0x7FFFFFFF
+
+#define SM_INVALID_FAULT       0x40
+#define SM_TIMEOUT_FAULT       0x80
+#define SM_HARDWARE_FAULT      0xC0
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -48,15 +52,12 @@ typedef struct EOaxleVirtualEncoder_hid EOaxleVirtualEncoder;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-//#define OLD_STYLE_ENCODER
-
-#ifdef OLD_STYLE_ENCODER
-#else
-
 extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void);
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder*, int32_t sign);
-extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder*, int32_t pos);
-extern eObool_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);
+extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder*, int32_t pos, uint8_t error_mask);
+extern uint8_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);
+extern uint8_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder*);
+extern uint8_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o);
 extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder*, int32_t offset);
@@ -67,8 +68,6 @@ extern void eo_axleVirtualEncoder_SetSign(EOaxleVirtualEncoder*, eObool_t invert
 extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder*, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel);
 extern int32_t eo_axleVirtualEncoder_GetPos(EOaxleVirtualEncoder*);
 extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder*);
-
-#endif
 
 /** @}            
     end of group eo_pid  

@@ -51,12 +51,12 @@ typedef struct EOmotors_hid EOmotors;
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors);
 
-extern uint8_t eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t *stiff);
+extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t *stiff);
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 
-extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, eObool_t on_off, eOmc_controlmode_t control_mode);
-
+extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t motor_error, uint8_t can_error);
+extern uint8_t eo_motor_are_motors_in_fault(EOmotors *o, uint8_t mask);
 
 /** @}            
     end of group eo_decopler  
