@@ -55,6 +55,7 @@
 #include "EOtheBOARDtransceiver.h" //to get proxy pointer
 #include "EoProtocolMC.h"
 #include "EOlist_hid.h"
+#include "EOtheEMSapplDiagnostics.h"
 #endif
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -651,8 +652,12 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -674,7 +679,11 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &setpoint);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -748,7 +757,6 @@ eOresult_t                                  res = eores_OK;
     eOmc_jointId_t                          jId;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
-    eOresult_t                              res;
     
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -766,8 +774,11 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -789,7 +800,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -849,8 +863,11 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -872,7 +889,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -1007,7 +1027,6 @@ eOresult_t                                  res = eores_OK;
     eOmc_jointId_t                          jId;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
-    eOresult_t                              res;
     
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -1024,8 +1043,12 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -1047,7 +1070,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -1118,8 +1144,12 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidtorque );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -1142,7 +1172,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -1213,8 +1246,12 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidposition );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
+
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -1236,12 +1273,16 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
         
     }
+    
 #endif
     return(res);
 }
@@ -1306,8 +1347,11 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidposition );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -1330,7 +1374,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -1407,8 +1454,11 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -1436,7 +1486,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &imp_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
@@ -1480,8 +1533,7 @@ eOresult_t                                  res = eores_OK;
     eOmc_jointId_t                          jId;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
-    eOresult_t                              res;
-    
+
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
@@ -1496,8 +1548,11 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
+        char str[128];
+        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
+        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
-        #warning VALE: ricevuto msg da can ma non ce ethreq!!!
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
@@ -1521,7 +1576,10 @@ eOresult_t                                  res = eores_OK;
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &imp_aux);
         if(eores_OK != res)
         {
-            #warning VALE: gestisci errore in proxy_ReplyROP_Load;
+            char str[128];
+            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
             res = res;
         }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);

@@ -48,6 +48,7 @@
 #include "EOappMeasuresConverter.h"
 #include "EOappMeasuresConverter_hid.h"
 
+#include "EOtheEMSapplDiagnostics.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -277,7 +278,11 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-            #warning aggiungi controllo in diagnostica!!!
+           char str[128];
+           snprintf(str, sizeof(str)-1, "in ask pospid errrore j=%d res=%d",jxx, res);
+           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+           return;
         }
         // send pid position 
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_POS_PID;
@@ -341,7 +346,11 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-            #warning aggiungi controllo in diagnostica!!!
+           char str[128];
+           snprintf(str, sizeof(str)-1, "in ask pidtrq errore j=%d res=%d",jxx, res);
+           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+            return;
         }
         // send pid position 
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID;
@@ -415,7 +424,11 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-            #warning aggiungi controllo in diagnostica!!!
+           char str[128];
+           snprintf(str, sizeof(str)-1, "in ask impedance errore j=%d res=%d",jxx, res);
+           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+            return;
         }
         // send pid position 
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS;
@@ -502,7 +515,11 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-            #warning aggiungi controllo in diagnostica!!!
+           char str[128];
+           snprintf(str, sizeof(str)-1, "in ask setpoint errore j=%d res=%d",jxx, res);
+           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+           return;
         }
 
         msgCmd.cmdId =     ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION;
@@ -721,7 +738,11 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-            #warning aggiungi controllo in diagnostica!!!
+           char str[128];
+           snprintf(str, sizeof(str)-1, "in ask setpoint errore j=%d res=%d",jxx, res);
+           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+           return;
         }
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE;
         eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
