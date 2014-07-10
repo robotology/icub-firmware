@@ -205,7 +205,8 @@ void helper_calib_hall_digital(byte channel, Int16 param1,Int16 param2, Int16 pa
     switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
     //_set_point[channel] = param1;
     _set_point[channel]= _position[channel];
-	init_trajectory (channel, _position[channel], _set_point[channel], param2);				
+	init_trajectory (channel, _position[channel], _set_point[channel], param2);	
+	_calibrated[channel] = true;			
 }
 
 void helper_calib_abs_digital_coupled (byte channel, Int16 param1,Int16 param2, Int16 param3)
