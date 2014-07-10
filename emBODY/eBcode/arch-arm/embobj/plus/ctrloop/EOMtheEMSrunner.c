@@ -104,6 +104,8 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 };
 
 
+uint64_t startofcycletime = 0;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -180,6 +182,19 @@ static eOemsrunner_diagnosticsinfo_t s_eom_emsrunner_diagnosticsinfo   =
     .executionoverflows                         = {0, 0, 0},
     .datagrams_failed_to_go_in_txsocket         = 0  
 };
+
+uint64_t eom_emsrunner_rxstart = 0;
+uint64_t eom_emsrunner_dostart = 0;
+uint64_t eom_emsrunner_txstart = 0;
+
+uint64_t eom_emsrunner_rxduration = 0;
+uint64_t eom_emsrunner_doduration = 0;
+uint64_t eom_emsrunner_txduration = 0;
+
+uint64_t eom_emsrunner_rxprevduration = 0;
+uint64_t eom_emsrunner_doprevduration = 0;
+uint64_t eom_emsrunner_txprevduration = 0;
+
 //static const hal_timer_t s_eom_runner_timers_task[3] = {hal_timer2, hal_timer3, hal_timer4};
 //static const hal_timer_t s_eom_runner_timers_warn[3] = {hal_timer5, hal_timer6, hal_timer7};
 
@@ -778,6 +793,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
     
+    eom_emsrunner_rxstart = osal_system_abstime_get();
     
     //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
@@ -803,6 +819,9 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX); 
     }
     
+    eom_emsrunner_rxprevduration = eom_emsrunner_rxduration;
+    eom_emsrunner_rxduration = osal_system_abstime_get() - eom_emsrunner_rxstart;
+    
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO], osal_callerTSK);
 }
@@ -819,6 +838,8 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
 
+    eom_emsrunner_dostart = osal_system_abstime_get();
+    
     if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {
         // perform the do activity
@@ -839,6 +860,9 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO);     
     }
     
+    eom_emsrunner_doprevduration = eom_emsrunner_doduration;
+    eom_emsrunner_doduration = osal_system_abstime_get() - eom_emsrunner_dostart;
+    
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runTX], osal_callerTSK);
 }
@@ -854,6 +878,7 @@ static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
 static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
+    eom_emsrunner_txstart = osal_system_abstime_get();
     
     s_theemsrunner.numoftxpackets = 0;
     
@@ -918,6 +943,8 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     else
     {   
         
+        eom_emsrunner_txprevduration = eom_emsrunner_txduration;
+        eom_emsrunner_txduration = osal_system_abstime_get() - eom_emsrunner_txstart;
         // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
         s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
     }
@@ -1097,7 +1124,11 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
       
     // send event to activate the task in argument
     eom_task_isrSetEvent(currtask, eo_emsrunner_evt_execute);
-    
+
+    if(eo_emsrunner_taskid_runRX == currtaskid)
+    {
+        startofcycletime = osal_system_abstime_get();
+    }
 
 #if defined(EVIEWER_ENABLED)    
     eventviewer_switch_to(preventityid);
@@ -1217,7 +1248,6 @@ void usrDef_RUNRecRopframe(void){}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
 
 
 
