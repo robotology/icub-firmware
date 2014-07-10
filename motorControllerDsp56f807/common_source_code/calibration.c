@@ -26,7 +26,10 @@ Int16 _max_position_enc_tmp[JN] = INIT_ARRAY (0);
 //helper functions
 void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3);
 void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 param3);
+void helper_calib_hall_digital(byte channel, Int16 param1,Int16 param2, Int16 param3);
 void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, Int16 param3);
+void helper_calib_abs_digital_coupled (byte channel, Int16 param1,Int16 param2, Int16 param3);
+void helper_calib_eyes(byte channel, Int16 param1,Int16 param2, Int16 param3);
 
 /************************************************************ 
  * this function checks if the calibration is terminated
@@ -185,7 +188,7 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 	    
 	    _position[channel] = get_position_abs_ssi(channel);
 		_set_point[channel] = param1;
-		init_trajectory (channel, _position[channel], _set_point[channel], param2);
+	    init_trajectory (channel, _position[channel], _set_point[channel], param2);				
 		_calibrated[channel] = true;
 	}
 	if (param2==0)
@@ -193,6 +196,16 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 		put_motor_in_fault(channel);
 		can_printf ("invalid calib p2");				
 	}	
+}
+
+void helper_calib_hall_digital(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+    _position[channel] = get_position_abs_ssi(channel);
+    enable_motor_pwm(channel, MODE_POSITION);
+    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+    //_set_point[channel] = param1;
+    _set_point[channel]= _position[channel];
+	init_trajectory (channel, _position[channel], _set_point[channel], param2);				
 }
 
 void helper_calib_abs_digital_coupled (byte channel, Int16 param1,Int16 param2, Int16 param3)
@@ -381,7 +394,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		// FINGER J7
 		else
 		{
-			helper_calib_abs_digital (channel, param1, param2, -1); //param3 must be < 0				
+			helper_calib_hall_digital (channel, param1, param2, param3);				
 		}
 	}
 	
@@ -392,7 +405,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 #elif ((VERSION == 0x0128) ||(VERSION == 0x0228) )
 
    //FINGER J8
-	if ((type==CALIB_ABS_DIGITAL) && (channel==0) ) helper_calib_abs_digital (channel, param1, param2, -1); //param3 must be < 0	
+	if ((type==CALIB_ABS_DIGITAL) && (channel==0) ) helper_calib_hall_digital (channel, param1, param2, param3); 
 
     //FINGER J9 J10 J11
 	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) helper_calib_abs_and_incremental (channel, param1, param2,param3);	
