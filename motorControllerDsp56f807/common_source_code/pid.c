@@ -358,9 +358,25 @@ Int32 compute_pwm(byte j)
 #endif
 
 	case MODE_DIRECT:
-		PWMoutput = compute_pid2(j);
-		PWMoutput = PWMoutput + _ko[j];
-		_pd[j] = _pd[j] + _ko[j];
+		if (_interaction_mode[j]==icubCanProto_interactionmode_stiff)
+		{
+			PWMoutput = compute_pid2(j);
+			PWMoutput = PWMoutput + _ko[j];
+			_pd[j] = _pd[j] + _ko[j];			
+		}
+		else if (_interaction_mode[j]==icubCanProto_interactionmode_compliant)
+		{
+			compute_pid_impedance(j);
+			PWMoutput = compute_pid_torque(j, _strain_val[j]);
+			PWMoutput = PWMoutput + _ko_torque[j];
+			_pd[j] = _pd[j] + _ko_torque[j];					
+		}
+		else
+	    {
+	     	can_printf ("UNKOWN INTERACTION PID");
+		 	put_motor_in_fault(j);	
+		 	PWMoutput=0;
+		}
 	break;
 	
 	case MODE_IMPEDANCE_POS:
