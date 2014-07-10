@@ -908,7 +908,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMaxPosition(EOicubCanPro
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
     canFrame->size = 1;
-    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION;
     return(eores_OK);
 }
 
