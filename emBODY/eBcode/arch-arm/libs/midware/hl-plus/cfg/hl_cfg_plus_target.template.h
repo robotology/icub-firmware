@@ -53,7 +53,7 @@
     #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
     #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)    
     
-#elif   defined(HL_USE_BRD_EMS004)    
+#elif   defined(HL_USE_BRD_EMS4RD)    
 
     #define HL_USE_MPU_NAME_STM32F407IG
     
