@@ -267,6 +267,13 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
         //prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId, &myfullscale);
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
+        
+
+        // char str[128];
+        // snprintf(str, sizeof(str)-1, "recievd 6 getfullscale");
+        // eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        // eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        
         //if application is in cfg state, then request to configurator to send rop just prepared
         if(eo_sm_emsappl_STcfg == appl_st)
         {
@@ -275,6 +282,11 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     }
     else
     {
+        // char str[128];
+        // snprintf(str, sizeof(str)-1, "recievd getfullscale until channel  = %d", channel);
+        // eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+        // eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        
         channel++;
         sstatus_ptr->fullscale.head.size++;
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
