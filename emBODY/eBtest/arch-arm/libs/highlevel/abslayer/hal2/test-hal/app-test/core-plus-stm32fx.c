@@ -141,6 +141,15 @@
 //#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
 
+#if     defined(HAL_BOARD_MCBSTM32F400 )
+
+    #undef EXECUTE_TEST_I2C
+    #undef  EXECUTE_TEST_EEPROM
+    #undef EXECUTE_TEST_ENCODER
+    #undef EXECUTE_TEST_CAN
+
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
