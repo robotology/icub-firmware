@@ -1846,6 +1846,122 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getI2TParams(EOicubCanProto
 
 
 
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    eOresult_t                                  res = eores_OK;
+    eOmc_jointId_t                          jId;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    int16_t                                 value;
+    eOmc_joint_status_t                     *jstatus_ptr = NULL;
+    
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    
+    
+    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId,  &jstatus_ptr);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
+    
+    jstatus_ptr->ofpid.reference = *((int16_t*)&frame->data[1]);
+
+    return(eores_OK);
+}
+
+
+
+
+
+//extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+//{
+//eOresult_t                                  res = eores_OK;
+//#ifdef USE_PROTO_PROXY
+//    eOmc_jointId_t                          jId;
+//    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+//    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+//    int16_t                                 value;
+//    eOmc_joint_status_ofpid_t               statusOfPid;
+//    
+//    canLoc.emscanport = canPort;
+//    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+//    canLoc.indexinboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+//    
+//    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_status_ofpid);
+//    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+//    if(NULL == li)
+//    {
+//           char str[128];
+//           snprintf(str, sizeof(str)-1, "in ask openLoop errrore j=%d res=%d",jId, res);
+//           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//           return(eores_NOK_generic);
+//    }
+//    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+//    
+//    statusOfPid.reference = *((int16_t*)&frame->data[1]);
+
+
+//    req->numOfREceivedResp++;
+//    res = eores_OK;
+//    
+//    if(req->numOfREceivedResp == req->numOfExpectedResp)
+//    {
+//        //send back response
+//        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+//        
+//        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &setpoint);
+//        if(eores_OK != res)
+//        {
+//           char str[128];
+//           snprintf(str, sizeof(str)-1, "error in ReplyROP_Load openLoop j=%d res=%d",jId, res);
+//           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//        }
+//        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+//    }
+//#endif    
+//    return(res);
+//}
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setOpenLoopParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    icubCanProto_setpoint_current_t *setpoint_ptr = (icubCanProto_setpoint_current_t*)nv_ptr;
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 3;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS;
+    *((int16_t*)(&canFrame->data[1])) = setpoint_ptr->value;
+    return(eores_OK);
+}
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getOpenLoopParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    icubCanProto_setpoint_current_t *setpoint_ptr = (icubCanProto_setpoint_current_t*)nv_ptr;
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 1;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS;
+    return(eores_OK);
+}
+
+
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCmdPos(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);

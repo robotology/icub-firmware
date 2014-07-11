@@ -696,8 +696,16 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_current:
             {
-                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT;                             
-                val_ptr =  &(setPoint->to.current.value);    
+                //removed until setpoint open loop will be introduced
+                //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT;                             
+                //val_ptr =  &(setPoint->to.current.value);
+                
+                icubCanProto_setpoint_current_t setpoint_current;
+                setpoint_current.value = setPoint->to.current.value;
+                
+                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS;           
+                val_ptr =  &setpoint_current;    
+                
             }break;
 
             case eomc_setpoint_positionraw:
@@ -715,18 +723,21 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
         // 3) send msg
         eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, val_ptr);
+        
+        
+        if(eomc_setpoint_current == setPoint->type)
+        {
+            //since mc4 don't send perodic message with openloop refernce
+            //i need to ask it direct to mc4
+            msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS; 
+            eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
+        }
         return;
     }
 
 #ifdef USE_PROTO_PROXY
     if(eo_ropcode_ask == rd->ropcode)
     {
-        if(setPoint->type != eomc_setpoint_torque)
-        {   
-            return;
-        }
-        
-        
         eOappTheDB_hid_ethProtoRequest_t req = 
         {
             .id32 = rd->id32,
@@ -734,6 +745,26 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             .numOfExpectedResp = 1,
             .numOfREceivedResp = 0
         };
+        
+        //only for setpoint of type current and torque exist the get command
+        switch(setPoint->type)
+        {
+            case eomc_setpoint_torque:
+            {
+                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE;
+            }break;
+
+//            case eomc_setpoint_current:
+//            {
+//                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS;
+//                
+//            }break;
+
+            default:
+            {
+                return;
+            }
+        }
         
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
@@ -744,8 +775,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
            return;
         }
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE;
         eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
+        
         return;
     }
 #endif

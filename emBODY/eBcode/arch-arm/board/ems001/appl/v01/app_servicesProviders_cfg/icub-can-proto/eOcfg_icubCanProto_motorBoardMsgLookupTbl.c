@@ -53,7 +53,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 /* Since inthe fist 64th messages most of them are obsolete, the table start at msg 64 and manage other such as exception*/
-#define eo_icubCanProto_pollingMotorBoardMsg_inParserTbl_max          (ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS -64 +1) 
+#define eo_icubCanProto_pollingMotorBoardMsg_inParserTbl_max          (ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS -64 +1) 
 #define eo_icubCanProto_pollingMotorBoardMsg_inFormerTbl_max          (ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE -64 +1) 
 #define eo_icubCanProto_pollingMotorBoardMsg_maxNum                    ICUBCANPROTO_POL_MC_CMD_MAXNUM
 
@@ -292,13 +292,13 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getI2TParams
     },
     
-//     {   // 114  ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS
-//         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
-//     },
-//     
-//     {   // 115  ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS
-//         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
-//     },
+    {   // 114  ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS
+        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+    },
+
+    {   // 115  ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS
+        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams
+    },
 //     
 //     {   // 116  ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
 //         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
@@ -528,11 +528,11 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingMotorBo
     },
 
     {   // 114  ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setOpenLoopParams
     },
 
     {   // 115  ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getOpenLoopParams
     },
 
     {   // 116  ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
