@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Marco Maggiali
- * email:   marco.maggiali@iit.it
+ * Copyright (C) 2014 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Maggiali, Valentina Gaggero, Marco Accame
+ * email:   marco.maggiali@iit.it, valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -18,96 +18,153 @@
   
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_BRDCFG_EMS004_MODULES_H_
-#define _HAL_BRDCFG_EMS004_MODULES_H_
+#ifndef _HAL_BRDCFG_MC4PLUS_MODULES_H_
+#define _HAL_BRDCFG_MC4PLUS_MODULES_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/* @file       hal_brdcfg_mcv4plus_modules.h
+/* @file       hal_brdcfg_mc4plus_modules.h
     @brief      This header file defines the modules to be compiled in hal
-    @author     marco.maggiali@iit.it
-    @date       15/03/2013
+    @author     marco.accame@iit.it
+    @date       7/11/2014
  **/
 
+// # HAL section: begin -----------------------------------------------------------------------------------------------
 
-// - modules to be built ----------------------------------------------------------------------------------------------
+// - porting across multiple mpus -------------------------------------------------------------------------------------
 
-//#define     HAL_BUILD_ONLYCORE
-//#define     HAL_BUILD_ONLYBLINKY
+// -- mpu: choose one NAME: STM32F103RB, STM32F107VC, STM32F407IG. 
+
+#define     HAL_USE_MPU_NAME_STM32F407IG
+// #define     HAL_USE_MPU_TYPE_STM32F4
+// #define     HAL_USE_MPU_ARCH_ARMCM4
+
+// -- convert NAME into whatever else is needed (TYPE, ARCH). just include hal_mpuname2macros.h
+
+#include "hal_mpuname2macros.h"
+
+// - HAL modules to be built ------------------------------------------------------------------------------------------
 
 
-// -- core: these values must be always defined
+// -- core: these moduled must be always defined
+
 #define     HAL_USE_BASE
 #define     HAL_USE_CORE
-#define     HAL_USE_CPU
+#define     HAL_USE_MPU
 #define     HAL_USE_FLASH
 #define     HAL_USE_HEAP
 #define     HAL_USE_MIDDLEWARE_INTERFACE
 #define     HAL_USE_SYS
 
-// -- cpu: choose one ARC, FAM, and NAM for the cpu
-#define     HAL_USE_CPU_ARC_ARMCM4
-#define     HAL_USE_CPU_FAM_STM32F4
-#define     HAL_USE_CPU_NAM_STM32F407
-
-// -- the utilities, mpu peripherals, devices, chips, and external boards are used only if the build is not forced to core only 
-#ifndef HAL_BUILD_ONLYCORE 
-
-// -- utilities: define what you need to use (beware that most of mpu peripheral modules use BITS and some use FIFO)
-#define     HAL_USE_UTILITY_BITS
-#define     HAL_USE_UTILITY_CRC07
-#define     HAL_USE_UTILITY_CRC16
-#define     HAL_USE_UTILITY_CRC32
-#define     HAL_USE_UTILITY_FIFO
-
-// -- mpu peripherals: define what you need to use (beware of cross dependencies)
-#undef     HAL_USE_PERIPH_CAN
-#undef     HAL_USE_PERIPH_CRC
-#undef     HAL_USE_PERIPH_DMA
-#define     HAL_USE_PERIPH_ETH
-#define     HAL_USE_PERIPH_GPIO
-#define     HAL_USE_PERIPH_I2C
-#undef     HAL_USE_PERIPH_SPI
-#define     HAL_USE_PERIPH_TIMER
-#define     HAL_USE_PERIPH_TRACE
-#define     HAL_USE_PERIPH_UNIQUEID
-#define     HAL_USE_PERIPH_WATCHDOG
-
-// -- devices: define what you need to use (beware of cross dependencies from mpu peripherals and amongst devices)
-#undef  HAL_USE_DEVICE_ACCELEROMETER
-#undef     HAL_USE_DEVICE_CANTRANSCEIVER
-#undef  HAL_USE_DEVICE_DISPLAY  
-#define     HAL_USE_DEVICE_EEPROM
-#undef  HAL_USE_DEVICE_ENCODER
-#define     HAL_USE_DEVICE_ETHTRANSCEIVER
-#undef  HAL_USE_DEVICE_GYROSCOPE
-#define     HAL_USE_DEVICE_LED
-#undef     HAL_USE_DEVICE_MUX
-#define HAL_USE_DEVICE_SWITCH
-#undef  HAL_USE_DEVICE_TERMOMETER
 
 
-// -- chips: define what you need to use
-#define     HAL_USE_CHIP_GENERIC_ETHTRANSCEIVER
-#undef     HAL_USE_CHIP_ST_L3G4200D
-#undef     HAL_USE_CHIP_ST_LIS3DH
-#define  HAL_USE_CHIP_MICREL_KS8893
-#define     HAL_USE_CHIP_XX_EEPROM
 
-// -- external boards: define what you need to use
-#undef     HAL_USE_EXTBRD_KEIL_MCBQVGA
+// -- whatever else 
 
-#endif//HAL_BUILD_ONLYCORE 
+// -- peripherals: define what you need (beware of cross dependencies)
 
-
-// - exceptions -------------------------------------------------------------------------------------------------------
-// not managed so far
-
-
-// - cross dependencies -----------------------------------------------------------------------------------------------
-// not managed so far 
+#undef     HAL_USE_CAN
+#define     HAL_USE_ETH
+#define     HAL_USE_GPIO
+#define     HAL_USE_I2C
+#undef     HAL_USE_SPI
+#define     HAL_USE_TIMER
+#define     HAL_USE_TRACE
+#define     HAL_USE_UNIQUEID
+#undef     HAL_USE_WATCHDOG
 
 
+// -- devices: define what you need (beware of cross dependencies)
+
+#undef  HAL_USE_ACCELEROMETER
+#undef     HAL_USE_CANTRANSCEIVER
+#define     HAL_USE_EEPROM
+#undef     HAL_USE_ENCODER
+#define     HAL_USE_ETHTRANSCEIVER
+#undef  HAL_USE_GYROSCOPE
+#define     HAL_USE_LED
+#undef     HAL_USE_MUX
+#define     HAL_USE_SWITCH
+#undef  HAL_USE_TERMOMETER
+
+
+// -- behaviour: define how the code is shaped
+// validity check verifies if the module has been initted before executing something 
+// argument check verifies that the arguments are corrects
+//#define  HAL_BEH_REMOVE_RUNTIME_INITTED_CHECK
+//#define  HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK
+
+
+
+// # HAL section: end -------------------------------------------------------------------------------------------------
+
+
+// # HL section: begin ------------------------------------------------------------------------------------------------
+// # this section is required so that we propagate what specified above in HAL section also to HL.
+
+// - hl_cfg_plus_target.h ---------------------------------------------------------------------------------------------
+
+
+// - mpu name (defined even if it is already defined by the call of hal_mpuname2macros.h)
+
+    #if !defined(HL_USE_MPU_NAME_STM32F407IG)
+        #define HL_USE_MPU_NAME_STM32F407IG
+    #endif
+
+// - preparation of setsysclock
+
+    #define HL_CFG_OVERRIDE_hl_system_stm32fx_before_setsysclock
+
+// - mpu speed used in setsysclock
+    
+    #define HL_CFG_MPUSPEED_HSEBYPASS
+    #define HL_CFG_MPUSPEED_INTclockspeed               ((uint32_t)16000000)
+    #define HL_CFG_MPUSPEED_EXTclockspeed               ((uint32_t)50000000)
+    
+    #define HL_CFG_MPUSPEED_STM32F4_PLL_m               (50)
+    #define HL_CFG_MPUSPEED_STM32F4_PLL_n               (336)
+    #define HL_CFG_MPUSPEED_STM32F4_PLL_p               (2)
+    #define HL_CFG_MPUSPEED_STM32F4_PLL_q               (7)
+    
+
+// - mpu arch:
+#include "hl_mpu2arch.h"
+
+
+// - mpu speed:
+#include "hl_mpuspeed.h"    
+
+
+// - hl_cfg_plus_modules.h --------------------------------------------------------------------------------------------
+
+#define HL_USE_CORE_CMSIS
+
+#define HL_USE_CORE_STM32
+
+#define HL_USE_UTIL_SYS
+#define HL_USE_UTIL_GPIO
+#define HL_USE_UTIL_BITS
+#define HL_USE_UTIL_FIFO
+#define HL_USE_UTIL_I2C
+#define HL_USE_UTIL_ETH
+#define HL_USE_UTIL_ETHTRANS
+#define HL_USE_CHIP_MICREL_KS8893
+#undef HL_USE_UTIL_CAN
+#undef HL_USE_UTIL_CAN_COMM
+#define HL_USE_CHIP_XX_EEPROM
+#undef HL_USE_UTIL_SPI
+#define HL_USE_UTIL_TIMER
+#undef HL_USE_CHIP_ST_LIS3X
+#undef HL_USE_CHIP_ST_L3G4200D
+
+#if     defined(MC4PLUS_ETHDBG)
+#define MC4PLUS_USE_MICREL_AS_MANAGED_DEVICE
+#endif
+
+
+
+//#define HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK
+//#define HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK
 
 #endif  // include-guard
 
