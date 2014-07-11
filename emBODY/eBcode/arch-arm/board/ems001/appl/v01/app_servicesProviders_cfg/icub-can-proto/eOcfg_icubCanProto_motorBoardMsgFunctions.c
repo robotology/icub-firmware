@@ -795,7 +795,17 @@ eOresult_t                                  res = eores_OK;
         //send back response
         EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
         eOmeas_position_limits_t limits_aux;
-        memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
+        
+        
+        if(limits_ptr->max < limits_ptr->min)
+        {
+            limits_aux.max = limits_ptr->min;
+            limits_aux.min = limits_ptr->max;
+        }
+        else
+        {
+            memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
+        }
         
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
         if(eores_OK != res)
@@ -884,7 +894,17 @@ eOresult_t                                  res = eores_OK;
         //send back response
         EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
         eOmeas_position_limits_t limits_aux;
-        memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
+        
+        
+        if(limits_ptr->max < limits_ptr->min)
+        {
+            limits_aux.max = limits_ptr->min;
+            limits_aux.min = limits_ptr->max;
+        }
+        else
+        {
+            memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
+        }
         
         res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
         if(eores_OK != res)
