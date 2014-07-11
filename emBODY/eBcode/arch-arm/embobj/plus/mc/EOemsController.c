@@ -204,9 +204,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_idle);
             eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);
             
-            set_2FOC_idle(0);
-            set_2FOC_idle(1);
-            set_2FOC_idle(2);
+            //set_2FOC_idle(0);
+            //set_2FOC_idle(1);
+            //set_2FOC_idle(2);
         }
     #elif defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         JOINTS(j)
@@ -476,74 +476,135 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     if (mode == eomc_controlmode_cmd_force_idle)
     {
-        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
-            set_2FOC_idle(joint);
-            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[joint]);
-        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
-            if (joint < 3)
-            {
-                set_2FOC_idle(0);
-                set_2FOC_idle(1);
-                set_2FOC_idle(2);
-                
-                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[0]);
-                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[1]);
-                eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[2]);
-            }
-        #endif
-                
+        if (!eo_axisController_IsHardwareFault(ems->axis_controller[joint]))
+        {
+            mode = eomc_controlmode_cmd_idle;
+        }
+    }
+    
+    if (mode == eomc_controlmode_cmd_force_idle)
+    {
         #if defined(SHOULDER_BOARD)
+        
             if (joint == 3)
             {
                 set_2FOC_idle(3);
                 eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[3]);
+                eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_force_idle);
             }
+        
         #endif
-    }
-    else if ((mode == eomc_controlmode_cmd_idle) ||  
-             (mode == eomc_controlmode_cmd_switch_everything_off))
-    {
-        //hal_led_toggle(hal_led2);
         
         #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+        
             set_2FOC_idle(joint);
+            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[joint]);
+            eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_force_idle);
+        
         #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+            
             if (joint < 3)
             {
-                if (eo_emsController_GetControlMode(0) == eomc_controlmode_idle &&
-                    eo_emsController_GetControlMode(1) == eomc_controlmode_idle &&
-                    eo_emsController_GetControlMode(2) == eomc_controlmode_idle)
+                if (eo_axisController_IsHardwareFault(ems->axis_controller[0]) && 
+                    eo_axisController_IsHardwareFault(ems->axis_controller[1]) &&
+                    eo_axisController_IsHardwareFault(ems->axis_controller[3]))
+                {
+                    // ENCODER OR MOTOR FAULT
+                    set_2FOC_idle(0);
+                    set_2FOC_idle(1);
+                    set_2FOC_idle(2);
+                
+                    eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[0]);
+                    eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[1]);
+                    eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[2]);
+                    
+                    eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_force_idle);
+                    eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_force_idle);
+                    eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_force_idle);
+                }
+                else
+                {
+                    eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_force_idle);
+                }
+            }
+            
+        #endif
+    }
+    else if ((mode == eomc_controlmode_cmd_idle) || (mode == eomc_controlmode_cmd_switch_everything_off))
+    {
+        eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_idle);
+        
+        #if   defined(SHOULDER_BOARD)
+        
+            if (joint == 3) set_2FOC_idle(3);
+        
+        #endif
+        
+        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+        
+            set_2FOC_idle(joint);
+        
+        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+
+            if (joint < 3)
+            {
+                if ((eo_emsController_GetControlMode(0) == eomc_controlmode_idle || 
+                     eo_emsController_GetControlMode(0) == eomc_controlmode_hwFault ) &&
+                    (eo_emsController_GetControlMode(1) == eomc_controlmode_idle || 
+                     eo_emsController_GetControlMode(1) == eomc_controlmode_hwFault ) &&
+                    (eo_emsController_GetControlMode(2) == eomc_controlmode_idle || 
+                     eo_emsController_GetControlMode(2) == eomc_controlmode_hwFault ))
                 {
                     set_2FOC_idle(0);
                     set_2FOC_idle(1);
                     set_2FOC_idle(2);
                 }
             }
-        #endif
-                
-        #if defined(SHOULDER_BOARD)
-            if (joint == 3) set_2FOC_idle(3);
+            
         #endif
     }
-    else
+    else // not an idle mode
     {
+        if (eo_axisController_SetControlMode(ems->axis_controller[joint], mode))
+        {
+        #if   defined(SHOULDER_BOARD)
+            
+            if (joint == 3)
+            {
+                // external fault reset
+                if (eo_motor_are_motors_in_fault(ems->motors, 0x80)) set_2FOC_idle(3);
+                
+                set_2FOC_running(3, mode);
+            }
+            
+        #endif
+            
         #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+       
+            // external fault reset
+            if (eo_motor_are_motors_in_fault(ems->motors, 2 << (joint<<1))) set_2FOC_idle(joint);
+            
             set_2FOC_running(joint, mode);
+        
         #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+        
             if (joint < 3)
             {
+                // external fault reset
+                if (eo_motor_are_motors_in_fault(ems->motors, 0x02)) set_2FOC_idle(0);
+                if (eo_motor_are_motors_in_fault(ems->motors, 0x08)) set_2FOC_idle(1);
+                if (eo_motor_are_motors_in_fault(ems->motors, 0x20)) set_2FOC_idle(2);
+            
                 set_2FOC_running(0, mode);
                 set_2FOC_running(1, mode);
                 set_2FOC_running(2, mode);
             }
+            
         #endif
-        
-        #if defined(SHOULDER_BOARD)
-            if (joint == 3) set_2FOC_running(3, mode);
-        #endif
+        }
     }
     
-    eo_axisController_SetControlMode(ems->axis_controller[joint], mode);
+    //eo_axisController_SetControlMode(ems->axis_controller[joint], mode);
 }
 
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint)

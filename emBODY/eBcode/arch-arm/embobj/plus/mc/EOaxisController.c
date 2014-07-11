@@ -413,6 +413,11 @@ extern void eo_axisController_SetHardwareFault(EOaxisController *o)
 		o->control_mode = eomc_controlmode_hwFault;
 }
 
+extern eObool_t eo_axisController_IsHardwareFault(EOaxisController *o)
+{
+		return o->control_mode == eomc_controlmode_hwFault;
+}
+
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc)
 {
     //if (!o) return eobool_false;
