@@ -547,7 +547,11 @@ void main(void)
 // Check Current is made here
 /***********************************************************************/
 
-		for (i=0; i<JN; i++) 
+#if (VERSION != 0x0254)
+		for (i=0; i<JN; i++)
+#else
+		for (i=0; i<1; i++)
+#endif  
 		{
 			if ((get_current(i)>=25000) || (get_current(i)<=-25000))
 			{
