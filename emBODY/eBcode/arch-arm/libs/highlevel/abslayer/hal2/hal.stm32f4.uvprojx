@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>hal.mcbstm32f400</TargetName>
+      <TargetName>hal-mcbstm32f400</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -45,7 +45,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>hal.stm32f4.mcbstm32f400</OutputName>
+          <OutputName>hal_mcbstm32f400</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -78,7 +78,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\hal.stm32f4.mcbstm32f400.lib ..\hal-lib\hal.stm32f4.mcbstm32f400.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\hal_mcbstm32f400.lib .\lib\hal.mcbstm32f400.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -346,8 +346,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -357,14 +357,14 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
-            <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uSurpInc>1</uSurpInc>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_MCBSTM32F400 HL_USE_BRD_MCBSTM32_F400 HL_CFG_PLUS_TARGET_BY_FILE</Define>
+              <MiscControls></MiscControls>
+              <Define>HAL_BOARD_MCBSTM32F400 HL_CFG_PLUS_TARGET_BY_FILE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\api;.\src\core;.\src\brdcfg;.\src\extra\chips;.\src\extra\devices;.\src\extra\extbrds;.\src\extra\periphs;.\src\extra\utilities;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\abslayer\ipal\api;..\app-test\stm32f4;..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
+              <IncludePath>.\api;.\src\core;.\src\brdcfg;.\src\extra\chips;.\src\extra\devices;.\src\extra\extbrds;.\src\extra\periphs;.\src\extra\utilities;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -375,7 +375,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
-            <uSurpInc>0</uSurpInc>
+            <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
@@ -578,7 +578,7 @@
                   <RVCTZI>0</RVCTZI>
                   <RVCTOtherData>0</RVCTOtherData>
                   <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
+                  <IncludeInBuild>2</IncludeInBuild>
                   <AlwaysBuild>2</AlwaysBuild>
                   <GenerateAssemblyFile>2</GenerateAssemblyFile>
                   <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -4576,7 +4576,7 @@
           <targetInfo excluded="1" name="hal-ems4rd-ethdbg"/>
           <targetInfo excluded="1" name="hal-mc4plus" versionMatchMode=""/>
           <targetInfo excluded="1" name="hal-mc4plus-ethdbg" versionMatchMode=""/>
-          <targetInfo excluded="1" name="hal.mcbstm32f400"/>
+          <targetInfo excluded="1" name="hal-mcbstm32f400"/>
         </targetInfos>
       </component>
     </components>
