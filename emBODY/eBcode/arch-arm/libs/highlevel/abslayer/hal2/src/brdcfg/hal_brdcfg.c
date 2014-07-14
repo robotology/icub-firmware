@@ -38,16 +38,8 @@
 
 // - the file ---------------------------------------------------------------------------------------------------------
 
-#if   defined(HAL_BOARD_MCBSTM32C)
-	#include "mcbstm32c/hal_brdcfg_mcbstm32c.c"
-#elif defined(HAL_BOARD_STM3210CEVAL)
-	#include "stm3210ceval/hal_brdcfg_stm3210ceval.c"    
-#elif defined(HAL_BOARD_EMS001)
-	#include "ems001/hal_brdcfg_ems001.c"
-#elif defined(HAL_BOARD_MCBSTM32F400) 
+#if   defined(HAL_BOARD_MCBSTM32F400) 
     #include "mcbstm32f400/hal_brdcfg_mcbstm32f400.c"
-#elif defined(HAL_BOARD_EMS004) 
-    #include "ems004/hal_brdcfg_ems004.c"    
 #elif defined(HAL_BOARD_EMS4RD) 
     #include "ems4rd/hal_brdcfg_ems4rd.c"  
 #elif defined(HAL_BOARD_MC4PLUS) 
