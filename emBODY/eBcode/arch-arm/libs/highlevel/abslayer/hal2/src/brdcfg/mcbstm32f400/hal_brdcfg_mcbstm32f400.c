@@ -74,121 +74,70 @@
 
     #include "hal_ethtransceiver.h"
 
-#if     0
-// qui ci deve stare qualosa del transceiver 
 
-    #warning --> using micrel as automatic un-mananaged device
+    #warning --> using chip_xx ethphy 
 
-    // the micrel is hw configured in autonegotiation for its port1 and port2. 
-    // the mode for the rmii cannot be read from the micrel, thus we assume it is fd100
-    #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
-    #define HAL_ETH_PHYMODE_THEONEUSED                  hal_ethtransceiver_phymode_fullduplex100mbps
+    #include "hl_chip_xx_ethphy.h"
+   
 
-    static hal_result_t s_switch_dummy_init(int32_t id, void* param)
+    extern const hl_chip_xx_ethphy_cfg_t ethphymode_config = 
     {
-        // the HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE mode is done in HW
-        return(hal_res_OK);
-    }   
-    static hal_result_t s_switch_dummy_start(int32_t id, void* p)
-    {
-        hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*)p;
-        // the mode of the rmii is surely this one
-        *usedphymode = HAL_ETH_PHYMODE_THEONEUSED;
-        return(hal_res_OK);
-    }   
-    static hal_result_t s_switch_dummy_getmiiphymode(int32_t id, void* p)
-    {
-        hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*)p;
-        // the mode of the rmii is surely this one
-        *usedphymode = HAL_ETH_PHYMODE_THEONEUSED;
-        return(hal_res_OK);
-    }  
-    static hal_result_t s_switch_dummy_getlinkupmask(int32_t id, void* p)
-    {
-        //uint8_t *mask = (uint8_t*)p;
-        return(hal_res_NOK_generic);
-    }
-    static hal_result_t s_switch_dummy_getphystatus(int32_t id, void* p, uint8_t n)
-    {
-        return(hal_res_NOK_generic);
-    }
-
-    static hal_result_t s_switch_dummy_getphyerrorinfo(int32_t id, uint8_t n, uint32_t t, void* p)
-    {
-        return(hal_res_NOK_generic);
-    } 
-    
-#elif 0
-    
-
-// lo tengo perche' forse mi serve per il hl_chip_xx_ethphy
-
-    #warning --> using micrel as managed device w/ EMS4RD_USE_MICREL_AS_MANAGED_DEVICE
-
-    #include "hl_chip_micrel_ks8893.h"
-    #include "hal_i2c.h"
-    
-    // the micrel must be sw configured. we set it in autonegotiation for its port1 and port2. 
-    // the mode for the rmii is read via sw from the micrel
-    // for debug you can also use: hl_ethtrans_phymode_fullduplex10mbps // hl_ethtrans_phymode_halfduplex10mbps //hl_ethtrans_phymode_auto
-    #define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_auto
-    
-    // we also need to define a target phy mode for the hal-ethtransceiver, but that is dummy. i use auto
-    #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
-    
-    static hl_result_t s_switch_micrel_extclock_init(void)
-    {   // the external clock is not managed by a mpu peripheral, thus i do nothing
-        return(hl_res_OK);    
-    }    
-
-    extern const hl_chip_micrel_ks8893_cfg_t ks8893_config = 
-    {
-        .i2cid              = hl_i2c3,
-        .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
-        .resetval           = hl_gpio_valRESET,
-        .extclockinit       = s_switch_micrel_extclock_init,
-        .targetphymode      = HL_ETHTRANS_PHYMODE_THEONE2USE
+        .chip               = hl_chip_xx_ethphy_chip_autodetect,
+        .targetphymode      = hl_ethtrans_phymode_fullduplex100mbps
     };    
     
-    static hal_result_t s_switch_micrel_init(int32_t id, void* param)
-    {
-        // i2c3 must be initted.
-        hal_i2c_init((hal_i2c_t)ks8893_config.i2cid, NULL);        
-        hl_result_t r = hl_chip_micrel_ks8893_init((const hl_chip_micrel_ks8893_cfg_t*)param);
+    static hal_result_t s_ethphy_init(int32_t id, void* param)
+    {        
+        hl_result_t r = hl_chip_xx_ethphy_init((const hl_chip_xx_ethphy_cfg_t *)param);
         return((hal_result_t)r);
     }  
 
-    static hal_result_t s_switch_micrel_start(int32_t id, void* p)
+    static hal_result_t s_ethphy_start(int32_t id, void* p)
     {
         //hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*);
-        return((hal_result_t)hl_chip_micrel_ks8893_start((hl_ethtrans_phymode_t*)p));
+        return((hal_result_t)hl_chip_xx_ethphy_start((hl_ethtrans_phymode_t*)p));
     }
 
-    static hal_result_t s_switch_micrel_getmiiphymode(int32_t id, void* p)
+    static hal_result_t s_ethphy_getmiiphymode(int32_t id, void* p)
     {
         //hal_ethtransceiver_phymode_t* usedphymode = (hal_ethtransceiver_phymode_t*)p;
-        return((hal_result_t)hl_chip_micrel_ks8893_mii_getphymode((hl_ethtrans_phymode_t*)p));        
+        return((hal_result_t)hl_chip_xx_ethphy_getphymode((hl_ethtrans_phymode_t*)p));        
     }  
 
-    static hal_result_t s_switch_micrel_getlinkupmask(int32_t id, void* p)
+    static hal_result_t s_ethphy_getlinkupmask(int32_t id, void* p)
     {
-        //uint8_t *mask = (uint8_t*)p;
-        return((hal_result_t)hl_chip_micrel_ks8893_linkupmask((uint8_t*)p));
+        uint8_t *mask = (uint8_t*)p;
+        *mask = 1;
+        return(hal_res_OK);
+        //return(hal_res_NOK_generic);
     }
 
-    static hal_result_t s_switch_micrel_getphystatus(int32_t id, void* p, uint8_t n)
+    static hal_result_t s_ethphy_getphystatus(int32_t id, void* p, uint8_t n)
     {
-        return((hal_result_t)hl_chip_micrel_ks8893_phy_status((hl_ethtrans_phystatus_t*)p, (uint8_t)n));
+        hl_ethtrans_phystatus_t *ps = (hl_ethtrans_phystatus_t*)p;
+        
+        ps->linkisup        = 1;
+        ps->autoNeg_done    = 1;
+        ps->linkisgood      = 1;
+        ps->linkspeed       = 1;
+        ps->linkduplex      = 1;
+        ps->dummy           = 0;
+        return(hal_res_OK);
+        //return(hal_res_NOK_generic);
     }
 
-    static hal_result_t s_switch_micrel_getphyerrorinfo(int32_t id, uint8_t n, uint32_t t, void* p)
+    static hal_result_t s_ethphy_getphyerrorinfo(int32_t id, uint8_t n, uint32_t t, void* p)
     {
-        return((hal_result_t)hl_chip_micrel_ks8893_phy_errorinfo((uint8_t)n, (hl_ethtrans_phyerror_t)t, (hl_ethtrans_phyerrorinfo_t*)p));
+        hl_ethtrans_phyerrorinfo_t* e = (hl_ethtrans_phyerrorinfo_t*)p;
+        e->value                    = 0;
+        e->counteroverflow          = 0;
+        e->validvalue               = 1;
+        e->dummy                    = 0;
+        return(hal_res_OK);
+        //return(hal_res_NOK_generic);
     } 
     
     
-#endif
-
 #endif
 
 
@@ -367,7 +316,57 @@
 #endif//HAL_USE_GPIO
 
 
+#ifdef  HAL_USE_I2C
+    
+    #include "hal_i2c_hid.h"
+    
+    extern const hal_i2c_boardconfig_t hal_i2c__theboardconfig =
+    {
+        .supportedmask          = (1 << hal_i2c1) | (0 << hal_i2c2) | (0 << hal_i2c3),
+        .gpiomap                =
+        {
+            {   // hal_i2c1 
+                .scl    =
+                {
+                    .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin8 }, 
+                    .af32   = GPIO_AF_I2C1
+                },
+                 .sda   = 
+                {    
+                    .gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin9 }, 
+                    .af32   = GPIO_AF_I2C1
+                }   
+            },   
 
+            {   // hal_i2c2 
+                .scl    =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                },
+                 .sda   = 
+                {    
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                }   
+            }, 
+            
+            {   // hal_i2c3 
+                .scl    =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                },
+                 .sda   = 
+                {    
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                }   
+            }     
+        }       
+    }; 
+    
+#endif//HAL_USE_I2C
       
 #ifdef  HAL_USE_TIMER
     
@@ -423,87 +422,119 @@
 
 
 
+#ifdef  HAL_USE_EEPROM
+    
+    #include "hal_eeprom_hid.h" 
+    #include "hl_chip_xx_eeprom.h"
+    
+    const hl_chip_xx_eeprom_cfg_t hl_eepromcfg = 
+    {
+        .chip           = hl_chip_xx_eeprom_chip_st_m24lr64, 
+        .i2cid          = hl_i2c1,
+        .hwaddra2a1a0   = 0,
+        .wp_val         = hl_gpio_valUNDEF,
+        .wp_gpio        = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }           
+    };        
+    static hal_result_t s_chip_xx_eeprom_init(int32_t id, const hl_chip_xx_eeprom_cfg_t * cfg)
+    {
+        return((hal_result_t)hl_chip_xx_eeprom_init(cfg));
+    }
+    static hal_result_t s_chip_xx_eeprom_read(int32_t id, uint32_t address, uint32_t size, uint8_t* buffer, uint32_t* writtenbytes)
+    {
+        return((hal_result_t)hl_chip_xx_eeprom_read(address, size, buffer, writtenbytes));        
+    }   
+    static hal_result_t s_chip_xx_eeprom_write(int32_t id, uint32_t address, uint32_t size, uint8_t* buffer, uint32_t* writtenbytes)
+    {
+        return((hal_result_t)hl_chip_xx_eeprom_write(address, size, buffer, writtenbytes));        
+    } 
+    
 
+
+    extern const hal_eeprom_boardconfig_t hal_eeprom__theboardconfig =
+    {
+        .supportedmask      =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
+        .driver             =
+        {            
+            {   // hal_eeprom1_emulatedflash 
+                .cfg.fls    =
+                {
+                    .baseaddress    = 0x08000000,
+                    .totalsize      = 0
+                },
+                .fun        =
+                {   // emulated flash does not use user-defined functions
+                    .init           = NULL, 
+                    .read           = NULL,
+                    .write          = NULL                    
+                }
+            },
+            {   // hal_eeprom2_i2c_01
+                .cfg.i2c    =
+                {
+                    .baseaddress    = 0,
+                    .totalsize      = 8*1024,
+                    .i2cid          = hal_i2c1,
+                    .initpar        = (void*)&hl_eepromcfg
+                },
+                .fun        =
+                {   // use the chip xx_eeprom
+                    .init           = (hal_res_fp_int32_voidp_t)s_chip_xx_eeprom_init,
+                    .read           = (hal_res_fp_int32_uint32_uint32_voidp_voidp_t)s_chip_xx_eeprom_read, 
+                    .write          = (hal_res_fp_int32_uint32_uint32_voidp_voidp_t)s_chip_xx_eeprom_write,                             
+                }                              
+            },
+            {   // hal_eeprom3_i2c_02
+                .cfg.i2c    =
+                {
+                    .baseaddress    = 0,
+                    .totalsize      = 0,
+                    .i2cid          = hal_i2c1,
+                    .initpar        = NULL
+                },
+                .fun        =
+                {   // use ... nothing
+                    .init           = NULL,
+                    .read           = NULL, 
+                    .write          = NULL,                             
+                }
+            }                
+        }
+    
+    };    
+#endif//HAL_USE_EEPROM 
   
 
 
 #ifdef  HAL_USE_ETHTRANSCEIVER
     
     #include "hal_ethtransceiver_hid.h" 
+             
+    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
+    {
+        .supportedmask          = (1 << hal_ethtransceiver1),
+        .driver                 =
+        {
+            {   // hal_ethtransceiver1
+                .cfg    =
+                {
+                    .numofphysicals     = 1,
+                    .targetphymode      = hal_ethtransceiver_phymode_auto,  
+                    .initpar            = (void*)&ethphymode_config,                    
+                },
+                .fun    =
+                {
+                    .init           = s_ethphy_init,
+                    .start          = s_ethphy_start, 
+                    .getmiiphymode  = s_ethphy_getmiiphymode,                
+                    .phylinkupmask  = s_ethphy_getlinkupmask,
+                    .phystatus      = s_ethphy_getphystatus,
+                    .phyerrorinfo   = s_ethphy_getphyerrorinfo                    
+                }  
+            } 
+        }
+    };
+    
  
-    #warning --> to be done   
-    
-#if     defined(EMS4RD_USE_MICREL_AS_MANAGED_DEVICE)      
-            
-    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
-    {
-        .supportedmask          = (1 << hal_ethtransceiver1),
-        .driver                 =
-        {
-            {   // hal_ethtransceiver1
-                .cfg    =
-                {
-                    .numofphysicals     = 2,
-                    .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,  
-                    .initpar            = (void*)&ks8893_config,                    
-                },
-                .fun    =
-                {
-                    .init           = s_switch_micrel_init,
-                    .start          = s_switch_micrel_start, 
-                    .getmiiphymode  = s_switch_micrel_getmiiphymode,                
-                    .phylinkupmask  = s_switch_micrel_getlinkupmask,
-                    .phystatus      = s_switch_micrel_getphystatus,
-                    .phyerrorinfo   = s_switch_micrel_getphyerrorinfo                    
-                }  
-            } 
-        }
-    };
-    
-
-#elif 0
-
-    static hal_result_t s_switch_dummy_linkupmask(void* p)
-    {
-        return(hal_res_NOK_generic);        
-    }
-    static hal_result_t s_switch_dummy_phy_status(void* p, uint8_t num)
-    {
-        return(hal_res_NOK_generic);        
-    }  
-    static hal_result_t s_switch_dummy_phy_errorinfo(uint8_t num, uint32_t e, void* p)
-    {
-        return(hal_res_NOK_generic);        
-    } 
-
-
-    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
-    {
-        .supportedmask          = (1 << hal_ethtransceiver1),
-        .driver                 =
-        {
-            {   // hal_ethtransceiver1
-                .cfg    =
-                {
-                    .numofphysicals     = 2,
-                    .targetphymode      = HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE,  
-                    .initpar            = NULL,                    
-                },
-                .fun    =
-                {
-                    .init           = s_switch_dummy_init,
-                    .start          = s_switch_dummy_start, 
-                    .getmiiphymode  = s_switch_dummy_getmiiphymode,                
-                    .phylinkupmask  = s_switch_dummy_getlinkupmask,
-                    .phystatus      = s_switch_dummy_getphystatus,
-                    .phyerrorinfo   = s_switch_dummy_getphyerrorinfo                    
-                }  
-            } 
-        }
-    };
-        
-#endif
-    
 #endif//HAL_USE_ETHTRANSCEIVER
 
 
@@ -518,8 +549,8 @@
         .supportedmask      = (1 << hal_led0) | (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) | (1 << hal_led4) | (1 << hal_led5), // = 0x3F: only first 6 leds ...
         .boardcommon        =
         {
-            .value_on       = hal_gpio_valLOW,
-            .value_off      = hal_gpio_valHIGH
+            .value_on       = hal_gpio_valHIGH,
+            .value_off      = hal_gpio_valLOW
         },    
         .gpiomap            =
         {

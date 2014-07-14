@@ -66,7 +66,7 @@
 #undef     HAL_USE_CAN
 #define     HAL_USE_ETH
 #define     HAL_USE_GPIO
-#undef     HAL_USE_I2C
+#define    HAL_USE_I2C
 #undef     HAL_USE_SPI
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
@@ -78,7 +78,7 @@
 
 #undef  HAL_USE_ACCELEROMETER
 #undef     HAL_USE_CANTRANSCEIVER
-#undef     HAL_USE_EEPROM
+#define     HAL_USE_EEPROM
 #undef     HAL_USE_ENCODER
 #define     HAL_USE_ETHTRANSCEIVER
 #undef  HAL_USE_GYROSCOPE
@@ -145,13 +145,13 @@
 #define HL_USE_UTIL_GPIO
 #define HL_USE_UTIL_BITS
 #define HL_USE_UTIL_FIFO
-#undef HL_USE_UTIL_I2C
+#define HL_USE_UTIL_I2C
 #define HL_USE_UTIL_ETH
 #define HL_USE_UTIL_ETHTRANS
 #undef HL_USE_CHIP_MICREL_KS8893
 #undef HL_USE_UTIL_CAN
 #undef HL_USE_UTIL_CAN_COMM
-#undef HL_USE_CHIP_XX_EEPROM
+#define HL_USE_CHIP_XX_EEPROM
 #undef HL_USE_UTIL_SPI
 #define HL_USE_UTIL_TIMER
 #undef HL_USE_CHIP_ST_LIS3X
