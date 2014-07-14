@@ -78,7 +78,7 @@
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\hal.stm32f2.mcbstm32f200.lib .\hal-lib\hal.stm32f2.mcbstm32f200.lib</UserProg1Name>
+            <UserProg1Name></UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -146,7 +146,7 @@
             <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>9</TargetSelection>
+          <TargetSelection>7</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -159,7 +159,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32f4x-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -172,7 +172,7 @@
             <Capability>1</Capability>
             <DriverSelection>4101</DriverSelection>
           </Flash1>
-          <bUseTDR>0</bUseTDR>
+          <bUseTDR>1</bUseTDR>
           <Flash2>BIN\ULP2CM3.DLL</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
@@ -212,7 +212,7 @@
             <GenPPlst>0</GenPPlst>
             <AdsCpuType>"Cortex-M4"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
-            <mOS>1</mOS>
+            <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
             <hadIROM>1</hadIROM>
@@ -346,8 +346,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -357,14 +357,14 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
-            <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uSurpInc>1</uSurpInc>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>--c99</MiscControls>
-              <Define>HAL_BOARD_MCBSTM32F400 HL_USE_BRD_MCBSTM32_F400 HL_CFG_PLUS_TARGET_BY_FILE</Define>
+              <MiscControls></MiscControls>
+              <Define>HAL_USE_LIB</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\hal\hal-api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\core;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\brdcfg;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\chips;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\extbrds;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\utilities;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\app-test\stm32f4;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\app-test\stm32f4</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -375,7 +375,7 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
-            <uSurpInc>0</uSurpInc>
+            <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
@@ -453,9 +453,9 @@
               <FilePath>..\app-test\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -476,26 +476,167 @@
               <FileName>hal2.ems4rd.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>hal2.mc4plus.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.mc4plus.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>hal2.mc4plus.ethdbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.mc4plus.ethdbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>hal.mcbstm32f400.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.mcbstm32f400.lib</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>2</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <useXO>2</useXO>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
         </Group>
       </Groups>
     </Target>
@@ -652,7 +793,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\eventviewer-stm32f1-cfg.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32f4x-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -946,9 +1087,9 @@
               <FilePath>..\app-test\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1022,6 +1163,30 @@
               <FileName>hal2.mc4plus.ethdbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.mc4plus.ethdbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>hal.mcbstm32f400.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.mcbstm32f400.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1262,7 +1427,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\eventviewer-stm32f1-cfg.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32f4x-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -1556,9 +1721,9 @@
               <FilePath>..\app-test\ipal_cfg.c</FilePath>
             </File>
             <File>
-              <FileName>ipal.base.medium.lib</FileName>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1632,6 +1797,30 @@
               <FileName>hal2.mc4plus.ethdbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal2.mc4plus.ethdbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>hal.mcbstm32f400.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\lib\hal.mcbstm32f400.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1729,7 +1918,7 @@
         <targetInfos>
           <targetInfo excluded="1" name="ems4rd"/>
           <targetInfo excluded="1" name="mc4plus" versionMatchMode=""/>
-          <targetInfo name="mcbstm32f400"/>
+          <targetInfo excluded="1" name="mcbstm32f400"/>
         </targetInfos>
       </component>
     </components>

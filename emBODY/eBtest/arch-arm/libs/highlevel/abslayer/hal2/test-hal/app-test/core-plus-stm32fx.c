@@ -143,8 +143,8 @@
 
 #if     defined(HAL_BOARD_MCBSTM32F400 )
 
-    #undef EXECUTE_TEST_I2C
-    #undef  EXECUTE_TEST_EEPROM
+    //#undef EXECUTE_TEST_I2C
+    //#undef  EXECUTE_TEST_EEPROM
     #undef EXECUTE_TEST_ENCODER
     #undef EXECUTE_TEST_CAN
 
@@ -943,7 +943,7 @@ static void test_device_eeprom(void)
     
 //    return;   
     
-    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 0x2000);
+    res = hal_eeprom_erase(hal_eeprom_i2c_01, 0, 1024*2);
     res =  res;
     
     res = hal_eeprom_read(hal_eeprom_i2c_01, ADDRESS_TO_TEST, BYTES_TO_VERIFY, tmp);

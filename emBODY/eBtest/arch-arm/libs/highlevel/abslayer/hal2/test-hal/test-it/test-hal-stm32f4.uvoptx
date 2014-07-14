@@ -156,19 +156,19 @@
         <tDllPa></tDllPa>
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
-        <tIfile>.\eventviewer-stm32f4-cfg.ini</tIfile>
+        <tIfile>.\eventviewer-stm32f4x-cfg.ini</tIfile>
         <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O207 -S12 -C0 -P00 -TO3 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407IG$Flash\STM32F4xx_1024.FLM)</Name>
+          <Name>-UP1123199 -O207 -S12 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO3 -TC168000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407IG$Flash\STM32F4xx_1024.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>(107=-1,-1,-1,-1,0)</Name>
+          <Name></Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -264,12 +264,6 @@
       </DebugFlag>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
-      <SystemViewers>
-        <Entry>
-          <Name>OS Support\Event Viewer</Name>
-          <WinId>35904</WinId>
-        </Entry>
-      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -409,7 +403,7 @@
         <tDllPa></tDllPa>
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
-        <tIfile>.\eventviewer-stm32f1-cfg.ini</tIfile>
+        <tIfile>.\eventviewer-stm32f4x-cfg.ini</tIfile>
         <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
@@ -643,7 +637,7 @@
         <tDllPa></tDllPa>
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
-        <tIfile>.\eventviewer-stm32f1-cfg.ini</tIfile>
+        <tIfile>.\eventviewer-stm32f4x-cfg.ini</tIfile>
         <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
@@ -743,7 +737,7 @@
 
   <Group>
     <GroupName>app</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -798,7 +792,7 @@
 
   <Group>
     <GroupName>hal-startup</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -853,7 +847,7 @@
 
   <Group>
     <GroupName>hal-core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1253,8 +1247,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.lib</PathWithFileName>
-      <FilenameWithoutPath>ipal.base.medium.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</PathWithFileName>
+      <FilenameWithoutPath>ipal.base.medium.cm4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1317,7 +1311,7 @@
 
   <Group>
     <GroupName>hl-plus-wrappers</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
