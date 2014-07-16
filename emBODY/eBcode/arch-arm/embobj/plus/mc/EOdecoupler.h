@@ -51,7 +51,7 @@ typedef struct EOmotors_hid EOmotors;
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors);
 
-extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t *stiff);
+extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t *stiff);
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 

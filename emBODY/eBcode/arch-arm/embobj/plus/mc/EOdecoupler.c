@@ -38,7 +38,7 @@
 
 #define CABLE_WARNING_x_100  2000
 
-#define MOTORS(m) for (uint8_t m=0; m<o->n_motors; ++m)
+#define MOTORS(m) for (uint8_t m=0; m<NAXLES; ++m)
 
 
 
@@ -120,7 +120,7 @@ extern eObool_t eo_motor_are_motors_in_fault(EOmotors *o, uint8_t mask)
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
-extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff)
+extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff)
 {
     //if (!o) return;
     

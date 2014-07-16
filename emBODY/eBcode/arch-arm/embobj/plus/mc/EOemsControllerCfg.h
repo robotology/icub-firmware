@@ -24,7 +24,7 @@ extern "C" {
 #define USE_2FOC_FAST_ENCODER
     
 #ifdef USE_2FOC_FAST_ENCODER
-    //#define USE_4BIT_INC_ENC_PRECISION
+    #define USE_4BIT_INC_ENC_PRECISION
 #endif
     
 //#define V1_MECHANICS

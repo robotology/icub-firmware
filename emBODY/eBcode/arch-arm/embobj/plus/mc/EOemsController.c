@@ -78,7 +78,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
 
 void config_2FOC(uint8_t joint);
 void set_2FOC_idle(uint8_t joint);
-void set_2FOC_running(uint8_t joint, eOmc_controlmode_command_t mode);
+void set_2FOC_running(uint8_t joint);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -396,7 +396,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         
         eo_axisController_SetTorque(ems->axis_controller[0], (ems->motor_current[0]+ems->motor_current[1])/2 - ems->motor_current[2]);
         eo_axisController_SetTorque(ems->axis_controller[1], (ems->motor_current[1]-ems->motor_current[0])/2);
-        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[3])/44);
+        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[2])/44);
         
     #elif defined(UPPERLEG_BOARD)
     
@@ -424,7 +424,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor)
         pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
     }
      
-    eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
+    eo_motors_PWM(pwm_joint, pwm_motor, stiffness);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -507,7 +507,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             {
                 if (eo_axisController_IsHardwareFault(ems->axis_controller[0]) && 
                     eo_axisController_IsHardwareFault(ems->axis_controller[1]) &&
-                    eo_axisController_IsHardwareFault(ems->axis_controller[3]))
+                    eo_axisController_IsHardwareFault(ems->axis_controller[2]))
                 {
                     // ENCODER OR MOTOR FAULT
                     set_2FOC_idle(0);
@@ -574,7 +574,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                 // external fault reset
                 if (eo_motor_are_motors_in_fault(ems->motors, 0x80)) set_2FOC_idle(3);
                 
-                set_2FOC_running(3, mode);
+                set_2FOC_running(3);
             }
             
         #endif
@@ -584,7 +584,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             // external fault reset
             if (eo_motor_are_motors_in_fault(ems->motors, 2 << (joint<<1))) set_2FOC_idle(joint);
             
-            set_2FOC_running(joint, mode);
+            set_2FOC_running(joint);
         
         #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
         
@@ -595,9 +595,9 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                 if (eo_motor_are_motors_in_fault(ems->motors, 0x08)) set_2FOC_idle(1);
                 if (eo_motor_are_motors_in_fault(ems->motors, 0x20)) set_2FOC_idle(2);
             
-                set_2FOC_running(0, mode);
-                set_2FOC_running(1, mode);
-                set_2FOC_running(2, mode);
+                set_2FOC_running(0);
+                set_2FOC_running(1);
+                set_2FOC_running(2);
             }
             
         #endif
@@ -904,7 +904,7 @@ void set_2FOC_idle(uint8_t motor)
     eo_motor_set_motor_status(ems->motors, motor, 0, 0);
 }
 
-void set_2FOC_running(uint8_t motor, eOmc_controlmode_command_t mode)
+void set_2FOC_running(uint8_t motor)
 {
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
