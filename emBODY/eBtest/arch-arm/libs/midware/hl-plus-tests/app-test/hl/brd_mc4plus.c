@@ -31,12 +31,12 @@ typedef struct
 
 static const led_data_t s_led_data[8] = 
 {
-    {GPIOE, GPIO_Pin_8},
-    {GPIOE, GPIO_Pin_10},
-    {GPIOE, GPIO_Pin_12},
-    {GPIOE, GPIO_Pin_15},
-    {GPIOD, GPIO_Pin_11},
-    {GPIOB, GPIO_Pin_7},
+    {GPIOH, GPIO_Pin_2},
+    {GPIOH, GPIO_Pin_3},
+    {GPIOH, GPIO_Pin_4},
+    {GPIOH, GPIO_Pin_5},
+    {NULL, 0},
+    {NULL, 0},
     {NULL, 0},
     {NULL, 0}
 };
@@ -48,44 +48,21 @@ extern void board_led_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     
-    // enable clock for GPIOE
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
-    // configure PE8-10-12-15 as outputs push-pull, max speed 50 MHz              
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_8  | GPIO_Pin_10  | GPIO_Pin_12 | GPIO_Pin_15;
-    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP;
-    GPIO_Init(GPIOE, &GPIO_InitStructure);
-    
-    
-    // enable clock for GPIOD
+    // enable clock for GPIOH
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOH, ENABLE);
-    // configure PD11 as outputs push-pull, max speed 50 MHz              
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_11;
+              
+    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_2  | GPIO_Pin_3  | GPIO_Pin_4 | GPIO_Pin_5;
     GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP;
-    GPIO_Init(GPIOD, &GPIO_InitStructure);    
-    
-    // enable clock for GPIOB
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE);
-    // configure PB7 as outputs push-pull, max speed 50 MHz              
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_7;
-    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_OType   = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd    = GPIO_PuPd_UP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure); 
-    
+    GPIO_Init(GPIOH, &GPIO_InitStructure);
+       
     
     board_led_off(board_led_0);
     board_led_off(board_led_1);
     board_led_off(board_led_2);
-    board_led_off(board_led_3);
-    board_led_off(board_led_4);
-    board_led_off(board_led_5);
+		board_led_off(board_led_3);
     
 }
 
