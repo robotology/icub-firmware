@@ -213,7 +213,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
     },
     
     {   // 94  ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS		
-        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getPosStictionParams
     },
     
     {   // 95  ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS		
@@ -221,7 +221,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
     },
     
     {   // 96  ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS		
-        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getTorqueStictionParams
     },
     
     {   // 97  ICUBCANPROTO_POL_MC_CMD__SET_BACKEMF_PARAMS		
@@ -229,7 +229,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
     },
     
     {   // 98  ICUBCANPROTO_POL_MC_CMD__GET_BACKEMF_PARAMS		
-        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getBackemfParams
     },
     
     {   // 99  ICUBCANPROTO_POL_MC_CMD__SET_MODEL_PARAMS		
@@ -237,7 +237,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
     },
     
     {   // 100  ICUBCANPROTO_POL_MC_CMD__GET_MODEL_PARAMS		
-        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+        EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getModelParams
     },
     
     {   // 101  ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID		
@@ -444,35 +444,35 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingMotorBo
     },
 
     {   // 93  ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setPosStictionParams
     },
 
     {   // 94  ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getPosStictionParams
     },
 
     {   // 95  ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)   eo_icubCanProto_former_pol_mb_cmd__setTorqueStictionParams
     },
 
     {   // 96  ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getTorqueStictionParams
     },
 
     {   // 97  ICUBCANPROTO_POL_MC_CMD__SET_BACKEMF_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setBackemfParams
     },
 
     {   // 98  ICUBCANPROTO_POL_MC_CMD__GET_BACKEMF_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getBackemfParams
     },
 
     {   // 99  ICUBCANPROTO_POL_MC_CMD__SET_MODEL_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getModelParams
     },
 
     {   // 100  ICUBCANPROTO_POL_MC_CMD__GET_MODEL_PARAMS		
-        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__getModelParams
     },
 
     {   // 101  ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID		

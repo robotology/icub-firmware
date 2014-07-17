@@ -1661,6 +1661,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     return(eores_OK);
 }
 
+
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getFirmwareVersion(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     eOicubCanProto_protocolVersion_t *protover_ptr = (eOicubCanProto_protocolVersion_t *)val_ptr;
@@ -1676,6 +1677,74 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getFirmwareVersion(EOicubCa
     
     return(eores_OK);
 }
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosStictionParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getPosStictionParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosStictionParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorqueStictionParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getTorqueStictionParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorqueStictionParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setBackemfParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getBackemfParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getBackemfParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setModelParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getModelParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getModelParams(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
+{
+    return(eores_OK);
+}
+
+
+
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPid(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
@@ -1852,7 +1921,6 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
     eOmc_jointId_t                          jId;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
-    int16_t                                 value;
     eOmc_joint_status_t                     *jstatus_ptr = NULL;
     
     canLoc.emscanport = canPort;
@@ -1952,7 +2020,6 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setOpenLoopParams(EOicubCan
 }
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getOpenLoopParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    icubCanProto_setpoint_current_t *setpoint_ptr = (icubCanProto_setpoint_current_t*)nv_ptr;
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
