@@ -363,18 +363,16 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			channel1=2; //maybe it could be change somehow 
 			channel2=1;
 		}
-		if ((!mode_is_idle(channel1) && IS_DONE(channel1)) && 
-		    (!mode_is_idle(channel2) && IS_DONE(channel2)))
-		{
-			_control_mode[channel1] = MODE_CALIB_HARD_STOPS;
-			_counter_calib = 0;
-			_pwm_calibration[channel1] = param1;
-			_pwm_calibration[channel2] = param1;
-			if (param2!=0)
-		 		_velocity_calibration[channel1]=param2;
-			else
-				_velocity_calibration[channel1]=1;
-		}	
+		
+	    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+	    enable_motor_pwm(channel, MODE_CALIB_HARD_STOPS);	    		    
+		_counter_calib = 0;
+		_pwm_calibration[channel1] = param1;
+		_pwm_calibration[channel2] = param1;
+		if (param2!=0)
+			_velocity_calibration[channel1]=param2;
+		else
+			_velocity_calibration[channel1]=1;	
 	}	
 	
 	if (type==CALIB_ABS_DIGITAL ) 
