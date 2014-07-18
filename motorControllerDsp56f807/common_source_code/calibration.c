@@ -376,6 +376,12 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 				_velocity_calibration[channel1]=1;
 		}	
 	}	
+	
+	if (type==CALIB_ABS_DIGITAL ) 
+	{
+		if (channel==3)  
+			helper_calib_hall_digital (channel, param1, param2, param3);				
+	}
 
 //-------------------------------	 
 // 2.19 4DC   
