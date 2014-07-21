@@ -1190,15 +1190,17 @@ typedef struct
 #endif
 
 #if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
-static void can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
+static hal_result_t can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
 {   
+		static hal_result_t r;
     ((can_message_format_t*)frametx->data)->sequencenumber = cnt;
     
     frametx->data[0] = cnt & 0xff;    
 
     
-    hal_can_put(haLcAn1, frametx, hal_can_send_normprio_now);
+    r=hal_can_put(haLcAn1, frametx, hal_can_send_normprio_now);
     
+	return r;
 }
 #elif   defined(EXECUTE_TEST_CAN_TX1_BURST)
 static void can_transmit_burst(hal_can_frame_t* frametx, uint8_t burstlen, uint32_t cnt)
@@ -1278,30 +1280,37 @@ static void test_periph_can(void)
     canxconfig.arg_cb_rx        = (void*)haLcAn1;
     hal_can_init(haLcAn1, &canxconfig);
     hal_can_enable(haLcAn1);   
-   
+    
     // 2. run 10 times 
-	  uint32_t count = 0;
-    for(count=0;count<9;count++)
-    {
-        
-        if(1 == s_tick_slower)
-        {
-            s_tick_slower = 0;
+	  static uint32_t count = 0;
+		static hal_result_t r;
+			test_message("Try to send a message");
+			if(1 == s_tick_slower)
+			{
+					s_tick_slower = 0;
 #if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
-            can_transmit_regular(&canframetx, count); 
+					r=can_transmit_regular(&canframetx, count);
+					if (r==hal_res_OK)
+					{
+						test_message("Message OK sent");
+					}
+					else
+					{
+					test_message("Message NOK not sent");	
+					}
 #elif   defined(EXECUTE_TEST_CAN_TX1_BURST)
-            can_transmit_burst(&canframetx, BURSTLEN, count); 
+					can_transmit_burst(&canframetx, BURSTLEN, count); 
 #elif   defined(EXECUTE_TEST_CAN_TX1_MIXED)
-            can_transmit_mixed(&canframetx, BURSTLEN, count); 
+					can_transmit_mixed(&canframetx, BURSTLEN, count); 
 #endif        
-        }
-        
-        if(1 == can1_received)
-        {
-            can1_received = 0;
-					  test_message("Message received to can1");
-        }
-    } 
+			}
+			
+			if(1 == can1_received)
+			{
+					can1_received = 0;
+					test_message("Message received to can1");
+			}
+     
 		test_was_successful("can"); 
       
     
