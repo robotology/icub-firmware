@@ -110,9 +110,6 @@
 
 #elif   defined(HL_USE_BRD_MC4PLUS) 
 
-#warning --> FOR MC4PLUS: choose the hl-modules
-
-
 // HL_USE_UTIL_* allow compilation of a given module (peripheral or sw utility)
 
 #define HL_USE_UTIL_SYS
@@ -132,11 +129,11 @@
 
 // HL_USE_CHIP_* allow compilation of the driver of a given chip
 
-#define HL_USE_CHIP_XX_EEPROM
+#define  HL_USE_CHIP_XX_EEPROM
 #undef HL_USE_CHIP_ST_L3G4200D
 #undef HL_USE_CHIP_ST_LIS3X
-//#define HL_USE_CHIP_MICREL_KS8893
-#define HL_USE_CHIP_XX_ETHPHY
+#define HL_USE_CHIP_MICREL_KS8893
+#undef HL_USE_CHIP_XX_ETHPHY
 #define HL_USE_UTIL_TIMER
 
 #else

@@ -42,8 +42,6 @@ static const led_data_t s_led_data[8] =
 };
 
 
-#warning --> FOR MC4PLUS: verify LED mapping
-
 extern void board_led_init(void) 
 {
     GPIO_InitTypeDef GPIO_InitStructure;
