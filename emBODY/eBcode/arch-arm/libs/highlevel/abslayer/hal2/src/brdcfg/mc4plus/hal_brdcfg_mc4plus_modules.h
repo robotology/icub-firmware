@@ -63,11 +63,11 @@
 
 // -- peripherals: define what you need (beware of cross dependencies)
 
-#undef     HAL_USE_CAN
+#define     HAL_USE_CAN
 #define     HAL_USE_ETH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-#undef     HAL_USE_SPI
+#define     HAL_USE_SPI
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_UNIQUEID
@@ -77,7 +77,7 @@
 // -- devices: define what you need (beware of cross dependencies)
 
 #undef  HAL_USE_ACCELEROMETER
-#undef     HAL_USE_CANTRANSCEIVER
+#define     HAL_USE_CANTRANSCEIVER
 #define     HAL_USE_EEPROM
 #undef     HAL_USE_ENCODER
 #define     HAL_USE_ETHTRANSCEIVER
@@ -149,10 +149,10 @@
 #define HL_USE_UTIL_ETH
 #define HL_USE_UTIL_ETHTRANS
 #define HL_USE_CHIP_MICREL_KS8893
-#undef HL_USE_UTIL_CAN
-#undef HL_USE_UTIL_CAN_COMM
+#define HL_USE_UTIL_CAN
+#define HL_USE_UTIL_CAN_COMM
 #define HL_USE_CHIP_XX_EEPROM
-#undef HL_USE_UTIL_SPI
+#define HL_USE_UTIL_SPI
 #define HL_USE_UTIL_TIMER
 #undef HL_USE_CHIP_ST_LIS3X
 #undef HL_USE_CHIP_ST_L3G4200D
