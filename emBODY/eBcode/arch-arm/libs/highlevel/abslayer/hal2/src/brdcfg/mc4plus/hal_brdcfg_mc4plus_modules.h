@@ -70,8 +70,9 @@
 #define     HAL_USE_SPI
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
+#define     HAL_USE_ADC
 #define     HAL_USE_UNIQUEID
-#undef     HAL_USE_WATCHDOG
+#undef      HAL_USE_WATCHDOG
 
 
 // -- devices: define what you need (beware of cross dependencies)
@@ -86,6 +87,7 @@
 #undef     HAL_USE_MUX
 #define     HAL_USE_SWITCH
 #undef  HAL_USE_TERMOMETER
+#define HAL_USE_DEVICE_MOTORCTL
 
 
 // -- behaviour: define how the code is shaped
