@@ -130,6 +130,9 @@
 #undef EXECUTE_TEST_ETH
 #define EXECUTE_TEST_ETH
 
+#define EXECUTE_TEST_ADC
+
+#define EXECUTE_TEST_DEVICE_MOTORCTL
 
 #ifdef EXECUTE_TEST_ETH
 #define EXECUTE_TEST_ETH_PING
@@ -188,6 +191,9 @@ static void test_was_successful(const char* msg);
 static void test_has_failed(const char* msg);
 static void test_message(const char* msg);
 
+static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH);
+static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH);
+
 static void info_about_core_plus_led(void);
 
 
@@ -225,6 +231,15 @@ static void test_periph_uniqueid(void);
 #if     defined(EXECUTE_TEST_CAN)    
 static void test_periph_can(void);
 #endif//defined(EXECUTE_TEST_CAN)  
+
+#if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
+static void test_device_motorctl_1(void);
+static void test_device_motorctl_2(void);
+#endif//defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
+
+#if     defined(EXECUTE_TEST_ADC)    
+static void test_periph_adc(void);
+#endif//defined(EXECUTE_TEST_ADC) 
 
 #if     defined(EXECUTE_TEST_ETH)    
 static void test_periph_eth(void);
@@ -403,6 +418,14 @@ int main(void)
     test_periph_can();
 #endif//defined(EXECUTE_TEST_CAN)
      
+#if     defined(EXECUTE_TEST_ADC)    
+    test_periph_adc();
+#endif//defined(EXECUTE_TEST_ADC)   
+
+#if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
+      test_device_motorctl_2();
+//    	test_device_motorctl_1();
+#endif//defined(EXECUTE_TEST_DEVICE_MOTORCL) 
 
 // it also contains a forever loop. you cannot ping it. just use the two ports
 
@@ -1262,7 +1285,7 @@ static void test_periph_can(void)
 #if defined(EXECUTE_TEST_CAN_TX1)  
     
     test_is_beginning("can");   
-    char msg[128] =  {0};
+//    char msg[128] =  {0};
     hal_can_frame_t canframetx =
     {
         .id                 = 7,
@@ -1296,7 +1319,7 @@ static void test_periph_can(void)
 					}
 					else
 					{
-					test_message("Message NOK not sent");	
+						test_message("Message NOK not sent");	
 					}
 #elif   defined(EXECUTE_TEST_CAN_TX1_BURST)
 					can_transmit_burst(&canframetx, BURSTLEN, count); 
@@ -1304,13 +1327,13 @@ static void test_periph_can(void)
 					can_transmit_mixed(&canframetx, BURSTLEN, count); 
 #endif        
 			}
-			
-			if(1 == can1_received)
+			test_message("Waiting a message ");	
+			while(0 == can1_received)
 			{
-					can1_received = 0;
-					test_message("Message received to can1");
+					//can1_received = 0;
+					
 			}
-     
+      test_message("Message received to can1"); 
 		test_was_successful("can"); 
       
     
@@ -1336,6 +1359,194 @@ static void test_device_switch(void)
 }
 
 #endif//defined(EXECUTE_TEST_SWITCH)   
+
+static void test_device_motorctl_1(void)
+
+
+{
+#if     defined(HAL_USE_DEVICE_MOTORCTL)
+    
+	// init the CAN
+	hal_can_frame_t canframe;
+	hal_can_t CAN_PERIPH=hal_can1;
+	static hal_result_t res;
+	hal_motor_t id=motor1;
+    hal_pwm_cfg_t *cfg=NULL;
+	uint8_t finished=0;
+
+
+	uint8_t remaining=0;
+
+
+	int16_t pwm=0; 
+	test_is_beginning("TEST MOTORS");
+    
+    
+    // init the Motors 1 and 2 
+
+	res=hal_motor_init(id , cfg);
+
+    if(hal_res_OK != res)
+    {			
+		test_message("MOTORS DEVICE INIT FAILED");
+        return;
+    }
+	
+	while(finished==0)
+	{
+		res=hal_can_get(CAN_PERIPH, &canframe, &remaining); 
+		if (res==hal_res_OK) 
+		{
+			switch (canframe.data[0]) //in data 0 there is the command: 0..3 pwm for motor 0..3, F= finished  
+			{
+			case 0xF: 
+			{
+				pwm=0; 	
+				hal_motor_pwmset(motor1,pwm);
+				hal_motor_pwmset(motor2,pwm);
+				hal_motor_pwmset(motor3,pwm);
+				hal_motor_pwmset(motor4,pwm);
+				
+				finished=1;
+			}
+			break;
+			default:
+			{
+				pwm=canframe.data[1]+ ( canframe.data[2]<<8); 	
+				hal_motor_pwmset((hal_motor_t) canframe.data[0],(int32_t)pwm);
+				canframe.id=1;
+				canframe.data[1]=((uint16_t)pwm & 0xFF);
+				canframe.data[2]=((uint16_t)pwm & 0xFF00)>>8;
+				  
+				hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now); 
+				send_adcTocan(canframe,CAN_PERIPH);
+			}
+			break;
+			}		
+		}
+					
+	} 
+  
+    test_was_successful("CAN: check if you have receive the message in the CANREAL");
+
+    
+    test_was_successful("MOTOR: test done");
+
+    
+
+#endif//defined(HAL_USE_DEVICE_MOTORCTL)
+}
+
+#if     defined(HAL_USE_ADC)
+static void test_periph_adc(void)
+{
+    test_is_beginning("ADC");
+    hal_can_frame_t canframe;
+	hal_can_t CAN_PERIPH=hal_can1;
+    hal_result_t res;
+	uint8_t message_received=0;
+	uint8_t remaining=0;
+
+
+     
+    canframe.id = 0x1AD;
+    canframe.id_type = hal_can_frameID_std;
+    canframe.frame_type = hal_can_frame_data;
+    canframe.data[0] = 0xAD;
+    canframe.size = 8;
+    
+	test_message("INIT ADC");
+
+	hal_adc_dma_init();
+
+	while(message_received==0)
+	{
+		res=hal_can_get(CAN_PERIPH, &canframe, &remaining); 
+		send_adcTocan(canframe,CAN_PERIPH);
+		if (res==hal_res_OK ) message_received=1;		
+	}
+		  
+    test_was_successful("ADC: test finished %d");
+
+
+}
+#endif//defined(HAL_USE_ADC)
+
+static uint16_t ADC_result[9];
+volatile int16_t current[4]={0,0,0,0};
+volatile int16_t current_P[4]={0,0,0,0};
+volatile int16_t current_I[4]={0,0,0,0};
+
+static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
+{	
+	ADC_result[0]=hal_get_adc(1,0);
+	ADC_result[1]=hal_get_adc(1,1);
+	ADC_result[2]=hal_get_adc(1,2);
+	canframe.id = 0x1AD; 
+	canframe.data[1] = ADC_result[0] & 0xFF;
+	canframe.data[2] = (ADC_result[0] & 0xFF00)>>8;
+ 	canframe.data[3] = ADC_result[1] & 0xFF;
+	canframe.data[4] = (ADC_result[1] & 0xFF00)>>8;
+	canframe.data[5] = ADC_result[2] & 0xFF;
+	canframe.data[6] = (ADC_result[2] & 0xFF00)>>8;
+
+	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+	ADC_result[3]=hal_get_adc(2,0);
+	ADC_result[4]=hal_get_adc(2,1);
+	ADC_result[5]=hal_get_adc(2,2);
+	canframe.id = 0x1AE;
+	canframe.data[1] = ADC_result[3] & 0xFF;
+	canframe.data[2] = (ADC_result[3] & 0xFF00)>>8;
+ 	canframe.data[3] = ADC_result[4] & 0xFF;
+	canframe.data[4] = (ADC_result[4] & 0xFF00)>>8;
+	canframe.data[5] = ADC_result[5] & 0xFF;
+	canframe.data[6] = (ADC_result[5] & 0xFF00)>>8;
+	
+	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+  ADC_result[6]=hal_get_adc(3,0);
+	ADC_result[7]=hal_get_adc(3,1);
+	ADC_result[8]=hal_get_adc(3,2);
+
+	canframe.id = 0x1AF;
+	canframe.data[1] = ADC_result[6] & 0xFF;
+	canframe.data[2] = (ADC_result[6] & 0xFF00)>>8;
+ 	canframe.data[3] = ADC_result[7] & 0xFF;
+	canframe.data[4] = (ADC_result[7] & 0xFF00)>>8;
+	canframe.data[5] = ADC_result[8] & 0xFF;
+	canframe.data[6] = (ADC_result[8] & 0xFF00)>>8;
+	
+	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+	hal_sys_delay(1000*hal_RELTIME_1microsec);
+}
+
+static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
+{	
+	
+	current[0]=ADC_result[0]=hal_get_current(0);
+	current[1]=ADC_result[1]=hal_get_current(1);
+	current[2]=ADC_result[2]=hal_get_current(2);
+	current[3]=ADC_result[3]=hal_get_current(3);
+	canframe.id = 0x1AD; 
+	canframe.size= 8;
+	canframe.data[1] = ADC_result[0] & 0xFF;
+	canframe.data[2] = (ADC_result[0] & 0xFF00)>>8;
+ 	canframe.data[3] = ADC_result[1] & 0xFF;
+	canframe.data[4] = (ADC_result[1] & 0xFF00)>>8;
+	canframe.data[5] = 0;// ADC_result[2] & 0xFF;
+	canframe.data[6] = 0;//(ADC_result[2] & 0xFF00)>>8;
+
+	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+
+	canframe.id = 0x1AF;
+	canframe.data[1] = ADC_result[2] & 0xFF;
+	canframe.data[2] = (ADC_result[2] & 0xFF00)>>8;
+	canframe.data[3] = ADC_result[3] & 0xFF;
+	canframe.data[4] = (ADC_result[3] & 0xFF00)>>8;
+	canframe.data[5] =0;
+	canframe.data[6] =0;
+	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+
+}
 
 
 #if     defined(EXECUTE_TEST_ETH)    
@@ -1717,6 +1928,8 @@ static void test_encoder_cbk(void* arg)
     rr = rr;    
     positioncbk = positioncbk;    
 }
+
+
 
 #endif//defined(EXECUTE_TEST_ENCODER)  
 
