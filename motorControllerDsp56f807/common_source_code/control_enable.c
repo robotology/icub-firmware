@@ -205,7 +205,7 @@ void helper_enable_coupled_motor(byte j1, byte j2, byte with_control_mode)
 		put_motor_in_fault(j2);		
 		return;	
 	}	
-	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC)
+	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC && VERSION != 0x0351)
 	if (_calibrated[j1] == false ||
 	    _calibrated[j2] == false)
 	{
