@@ -568,8 +568,25 @@ void can_send_broadcast(void)
 	    //this board has one single motor and encoder
 		if (get_error_abs_ssi(1)==ERR_ABS_SSI)
 		{
-			FAULT_ABS1 = 1;	
-			put_motor_in_fault(1);
+			//ikart special case
+		    #if (VERSION == 0x0351)
+		    {
+		    	if (_board_ID==1)
+		    	{
+		    		FAULT_ABS1 = 1;	
+					put_motor_in_fault(1);
+		    	}
+		    	else
+		    	{
+		    		//_board_ID==2 skips the fault
+		    	}
+		    }
+		    #else
+		    {
+			    FAULT_ABS1 = 1;	
+				put_motor_in_fault(1);	    	
+		    }
+		    #endif
 		}
 		#endif
 	#endif		
