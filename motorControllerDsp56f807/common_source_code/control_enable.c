@@ -130,16 +130,17 @@ void helper_disable_coupled_motor(byte j1, byte j2)
 	    _control_mode[j1] != MODE_HW_FAULT)
 	{
 		_control_mode[j1] = MODE_IDLE;
+		can_printf("PWM DIS COUPLED:%d",j1);  
 	}
 	if (_control_mode[j2] != MODE_IDLE && 
 	    _control_mode[j2] != MODE_HW_FAULT)
 	{
 		_control_mode[j2] = MODE_IDLE;
+		can_printf("PWM DIS COUPLED:%d",j2);  
 	}
 	
 	PWM_outputPadDisable(j1);
 	PWM_outputPadDisable(j2);	 
-	can_printf("PWM ENA COUPLED:%d & %d",j1,j2);  
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -149,10 +150,10 @@ void helper_disable_single_motor(byte j)
 	    _control_mode[j] != MODE_HW_FAULT)
 	{
 		_control_mode[j] = MODE_IDLE;
+		can_printf("PWM DIS:%d",j);
 	}
 	
 	PWM_outputPadDisable(j); 
-	can_printf("PWM DIS:%d",j);
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -172,7 +173,7 @@ void helper_enable_single_motor(byte j, byte with_control_mode)
 		put_motor_in_fault(j);
 		return;
 	}
-	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC)
+	#if (CURRENT_BOARD_TYPE  != BOARD_TYPE_4DC && VERSION != 0x0351)
 	if (_calibrated[j] == false)
 	{
 		can_printf("calib failed %d",j);  
