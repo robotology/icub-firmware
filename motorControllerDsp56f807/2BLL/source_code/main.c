@@ -362,7 +362,7 @@ void main(void)
 		for (i=0; i<JN; i++) _motor_position[i]=get_commutations(i);
 		
 ///////////////////////////////////////////DEBUG////////////
-#if (VERSION !=0x0154)
+#if (VERSION !=0x0154 && VERSION != 0x0351)
 	    for (i=0; i<JN; i++) 
 		{		
 		   if (get_error_abs_ssi(i)==ERR_ABS_SSI)
@@ -375,9 +375,7 @@ void main(void)
 					
 		}  
 #endif
-	
 #if (VERSION ==0x0154) 
-
 		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
 		   {
 				put_motor_in_fault(0);
@@ -387,6 +385,26 @@ void main(void)
 		   }	
 					 
 #endif	
+#if (VERSION ==0x0351) 
+		   if (get_error_abs_ssi(0)==ERR_ABS_SSI)
+		   {
+				put_motor_in_fault(0);
+				#ifdef DEBUG_CAN_MSG
+		    	can_printf("ABS error %d",0);	
+				#endif
+		   }	
+		   if (_board_ID==1 )
+		   {
+			   if (get_error_abs_ssi(1)==ERR_ABS_SSI)
+			   {
+					put_motor_in_fault(1);
+					#ifdef DEBUG_CAN_MSG
+			    	can_printf("ABS error %d",1);	
+					#endif
+			   }			   	
+		   }
+#endif	
+
 		// decoupling the position	 	
 		decouple_positions();
 		

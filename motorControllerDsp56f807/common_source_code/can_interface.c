@@ -603,7 +603,7 @@ void can_send_broadcast(void)
 			if (FAULT_HLL0) put_motor_in_fault(0);
 			setHallStatus(0,0);
 		}	
-	    #if (VERSION != 0x0154 && VERSION != 0x0254)
+	    #if (VERSION != 0x0154 && VERSION != 0x0254 && VERSION != 0x0351)
 	    //this board has one single motor and encoder
 		if (getHallStatus(1))
 		{
@@ -839,7 +839,7 @@ if ((CURRENT_BOARD_TYPE == BOARD_TYPE_BLL) || (CURRENT_BOARD_TYPE == BOARD_TYPE_
 		_canmsg.CAN_data[2]= FAULT1;
 
 		//  --- HIGH CURRENT CH 1---
-	#if (VERSION !=0x0154) && (VERSION !=0x0254) 
+	#if (VERSION !=0x0154) && (VERSION !=0x0254) && (VERSION !=0x0351) 
 		if (highcurrent[1])
 		{
 			_canmsg.CAN_data[2] |=highcurrent[1]<<3;
