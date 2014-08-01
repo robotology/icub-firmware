@@ -93,7 +93,11 @@ extern const hl_eth_mapping_t* hl_eth_map = NULL;
 typedef struct
 {
     hal_eth_cfg_t               config;  
+#ifdef HAL_COMPATIBLE_LWIP
+    hal_eth_stackIPhookfunctions_t stackIpfuncs;
+#else
     hal_eth_onframereception_t  onframerx; 
+#endif
     hl_eth_cfg_t                hl_eth_config;    
 } hal_eth_internal_item_t;
 
@@ -204,8 +208,11 @@ extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
     
     memcpy(&intitem->config, cfg, sizeof(hal_eth_cfg_t));
     
+    #ifdef HAL_COMPATIBLE_LWIP
+    memcpy(&intitem->stackIpfuncs, cfg->stackIpfuncs, sizeof(hal_eth_stackIPhookfunctions_t));
+    #else
     memcpy(&intitem->onframerx, cfg->onframerx, sizeof(hal_eth_onframereception_t));    
-
+    #endif
     // initialise the eth transceiver.
     if(hal_res_OK != hal_ethtransceiver_init(NULL))
     {
@@ -252,11 +259,18 @@ extern hal_result_t hal_eth_disable(void)
     return((hal_result_t)hl_eth_disable());
 }
 
-
+#ifdef HAL_COMPATIBLE_LWIP
+extern hal_result_t hal_eth_sendframe(hal_eth_genericframe_t *genframe)
+{
+     return((hal_result_t)hl_eth_sendframe((hl_eth_genericframe_t*)genframe));
+}
+#else
 extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame) 
 {
     return((hal_result_t)hl_eth_sendframe((hl_eth_frame_t*)frame));
 }
+#endif
+
 
 
 extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
@@ -341,6 +355,43 @@ extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_i
 //  the ETH_IRQHandler() is in hl_eth.c
 // ---- isr of the module: end ------
 
+#ifdef HAL_COMPATIBLE_LWIP
+extern uint32_t hl_eth_moveframe2higherlayer(uint8_t *inputbuffer, uint32_t size)
+{
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];   
+    if(NULL == intitem->stackIpfuncs.moveframe2higherlayer)
+    {
+        return(0);
+    }
+    
+    return(intitem->stackIpfuncs.moveframe2higherlayer(inputbuffer, size));
+}
+
+extern uint32_t hl_eth_moveframe2lowerlayer(hl_eth_genericframe_t *frame, uint8_t *outputbuffer)
+{
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];   
+    if(NULL == intitem->stackIpfuncs.moveframe2lowerlayer)
+    {
+        return(0);
+    }
+    
+    return(intitem->stackIpfuncs.moveframe2lowerlayer((hal_eth_genericframe_t*)frame, outputbuffer));
+}
+
+
+extern void hl_eth_alert(void)
+{
+    const hal_eth_t id = hal_eth1;
+    hal_eth_internal_item_t* intitem = s_hal_eth_theinternals.items[HAL_eth_id2index(id)];   
+
+    if(NULL != intitem->stackIpfuncs.alerthigherlayer)
+    {
+        intitem->stackIpfuncs.alerthigherlayer();
+    }    
+}
+#else
 // redefinition of functions used inside ETH_IRQHandler() as defined in hl_eth.c
 
 extern hl_eth_frame_t* hl_eth_frame_new(uint32_t len)
@@ -378,7 +429,7 @@ extern void hl_eth_alert(void)
         intitem->onframerx.frame_alerthigherlayer();
     }    
 }
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

@@ -59,6 +59,14 @@
 typedef uint64_t hal_eth_macaddress_t;
 
 
+#ifdef HAL_COMPATIBLE_LWIP
+typedef struct
+{
+    void     *frame;
+    uint32_t length;
+}hal_eth_genericframe_t;
+
+#else
 /** @typedef    typedef struct hal_eth_frame_t 
     @brief      hal_eth_frame_t is used to exchange ethernet frames to hal. The frame data must begin with
                 member datafirstbyte. One method is to use a hal_eth_frame_t pointer and to cast it to
@@ -70,8 +78,24 @@ typedef struct
     uint16_t index;                 /**< index to the used byte */
     uint8_t  datafirstbyte[1];      /**< keeps first byte of the frame. The other length-1 bytes must be consecutive to this */
 } hal_eth_frame_t; 
+#endif
 
 
+#ifdef HAL_COMPATIBLE_LWIP
+/** @typedef    typedef struct hal_eth_stackIPhookfunctions 
+    @brief      hal_eth_stackIPhookfunctions is used to configure the behavior of the hal ethernet depending by stackIP used.
+                 - move2higherlayer is used when a frame is received in order to move data from inputbuffer to stack's buffer
+                 - move2lowerlayer is used when stackIP calls sendfram function: it is use to copy data from stack's buffer to ha's buffer
+                 - alerthigherlevel() lets somone known that one or more frame  frame are available.
+ **/
+typedef struct
+{
+    uint32_t (*moveframe2higherlayer)(uint8_t *inputbuffer, uint32_t size);
+    uint32_t (*moveframe2lowerlayer)(hal_eth_genericframe_t *genframe, uint8_t *outputbuffer);
+    void (*alerthigherlayer)(void);
+} hal_eth_stackIPhookfunctions_t;
+
+#else
 /** @typedef    typedef struct hal_eth_onframereception_t 
     @brief      hal_eth_onframereception_t is used to configure the behavior of the hal ethernet on reception of
                 one frame. The eth ISR will ask memory for copying the new frame using the frame_new() method,
@@ -84,6 +108,9 @@ typedef struct
     void (*frame_movetohigherlayer)(hal_eth_frame_t *frame);
     void (*frame_alerthigherlayer)(void);
 } hal_eth_onframereception_t;
+#endif
+
+
 
 
 /** @typedef    typedef struct hal_eth_cfg_t;
@@ -95,7 +122,11 @@ typedef struct
     uint8_t                         capacityoftxfifoofframes;   /**< the number of eth frames buffered by tx dma in transmission */
     uint8_t                         capacityofrxfifoofframes;   /**< the number of eth frames buffered in rx dma before the ISR can move to higher layers */    
     uint8_t                         dummy;                      /**< nothing */
+#ifdef HAL_COMPATIBLE_LWIP
+    hal_eth_stackIPhookfunctions_t*   stackIpfuncs;
+#else
     hal_eth_onframereception_t*     onframerx;                  /**< The user must customise the behavior in reception using these functions. Only the alert function can be NULL. */
+#endif
     hal_eth_macaddress_t            macaddress;                 /**< Keeps the mac address */
 } hal_eth_cfg_t;
 
@@ -109,7 +140,11 @@ typedef struct
     hal_result_t (*eth_init)(const hal_eth_cfg_t *cfg);
     hal_result_t (*eth_enable)(void);
     hal_result_t (*eth_disable)(void);
+#ifdef HAL_COMPATIBLE_LWIP
+    hal_result_t (*eth_sendframe)(hal_eth_genericframe_t *fr);
+#else
     hal_result_t (*eth_sendframe)(hal_eth_frame_t *fr);
+#endif
 } hal_eth_network_functions_t;
 
 
@@ -166,8 +201,11 @@ extern hal_result_t hal_eth_disable(void);
     @param      frame           The frame to send
     @warning    It is generally used by a TCP-IP stack
  **/
+#ifdef HAL_COMPATIBLE_LWIP
+extern hal_result_t hal_eth_sendframe(hal_eth_genericframe_t *genframe);
+#else
 extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame);
-
+#endif
 
 /** @fn         extern const hal_eth_network_functions_t * hal_eth_get_network_functions(void)
     @brief      retrieves the network functions used by HAL

@@ -162,13 +162,20 @@ typedef struct
 
 
 #warning --> TODO: for use with lwip we need to modify it
+#ifdef HAL_COMPATIBLE_LWIP
+typedef struct
+{
+    void     *frame;
+    uint32_t length;
+}hl_eth_genericframe_t;
+#else
 typedef struct
 {
     uint16_t length;                /**< the length of the frame in bytes */
     uint16_t index;                 /**< index to the used byte */
     uint8_t  datafirstbyte[1];    
 } hl_eth_frame_t;
- 
+#endif 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 // it must be externally declared.
@@ -220,18 +227,24 @@ extern uint16_t hl_eth_smi_read(uint8_t PHYaddr, uint8_t REGaddr);
 // if hl_eth_smi_init() never called it does nothing
 extern void hl_eth_smi_write(uint8_t PHYaddr, uint8_t REGaddr, uint16_t value);
 
+#ifdef HAL_COMPATIBLE_LWIP
+extern uint32_t hl_eth_moveframe2higherlayer(uint8_t *inputbuffer, uint32_t size);
 
+extern uint32_t hl_eth_moveframe2lowerlayer(hl_eth_genericframe_t *frame, uint8_t *outputbuffer);
+
+extern hl_result_t hl_eth_sendframe(hl_eth_genericframe_t *frame);
+
+#else
 extern hl_eth_frame_t* hl_eth_frame_new(uint32_t len);
 
 
 extern void hl_eth_on_frame_received(hl_eth_frame_t* frame);
 
-extern void hl_eth_alert(void);
-
 
 extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame);
+#endif
 
-
+extern void hl_eth_alert(void);
 
 /** @}            
     end of group doxy_group_hl_eth  
