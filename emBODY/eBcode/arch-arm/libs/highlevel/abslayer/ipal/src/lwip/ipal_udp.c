@@ -387,6 +387,8 @@ extern ipal_result_t ipal_udpsocket_sendto(ipal_udpsocket_t* skt, ipal_packet_t 
     ipaddr.addr = ipal2lwip_ipv4addr(remaddr);
     err = udp_sendto(skt->pcb_ptr, internalbuffer, &ipaddr, remport);
     
+    pbuf_free(internalbuffer);
+    
     ipal_base_hid_threadsafety_unlock();
 
     return( (ERR_OK != err) ? ipal_res_NOK_generic : ipal_res_OK );
@@ -535,29 +537,38 @@ static void s_ipal_udpsocket_lwiprecvfn(void *arg, struct udp_pcb *upcb, struct 
 
 static ipal_result_t s_ipal_copydata2internalbuf(ipal_packet_t *pkt, struct pbuf *internalbuffer) 
 {
-    err_t err;
-
-    //Copy application supplied data into a pbuf
-    err = pbuf_take(internalbuffer, (void*)pkt->data, pkt->size);
-    return((ERR_OK==err) ? ipal_res_OK : ipal_res_NOK_generic);
+    struct pbuf *q;
+    uint32_t l=0;
+    
+    for (q = internalbuffer; q != NULL; q = q->next)
+    {
+        memcpy((u8_t*)q->payload, (u8_t*)&pkt->data[l], q->len);
+        l = l + q->len;
+    } 
+    
+    return(ipal_res_OK);
+    
+    
 }
 
 static ipal_result_t s_ipal_copydatafrominternalbuf(struct pbuf *internalbuffer, ipal_packet_t *pkt) 
 {
     uint16_t copiedbytes = 0;
     char str[150];
+    struct pbuf *q;
+    uint32_t l = 0;
     
-    //fill pkt data
-    copiedbytes = pbuf_copy_partial(internalbuffer, (void*)&receive_buff[0], internalbuffer->tot_len, 0/* offset in the pbuf */);
-    
-    if(copiedbytes != internalbuffer->tot_len)
+    for(q = internalbuffer; q != NULL; q = q->next) 
     {
-        snprintf(str, sizeof(str), "errorn in s_ipal_copydatafrominternalbuf copiedbytes=%d, pkt_len=%d", copiedbytes, internalbuffer->tot_len);
-        ipal_base_hid_on_fatalerror(ipal_error_internal0, str);
-        return(ipal_res_NOK_generic);
+      memcpy((u8_t*)&receive_buff[l], q->payload, q->len);
+      l = l + q->len;
     }
+
+    
     pkt->size = internalbuffer->tot_len;
     pkt->data = &receive_buff[0];
+    
+    pbuf_free(internalbuffer);
 
     return(ipal_res_OK);
 }

@@ -37,7 +37,7 @@
  * critical regions during buffer allocation, deallocation and memory
  * allocation and deallocation.
  */
-#define SYS_LIGHTWEIGHT_PROT    0
+#define SYS_LIGHTWEIGHT_PROT    1
 
 /**
  * NO_SYS==1: Provides VERY minimal functionality. Otherwise,
@@ -150,7 +150,7 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
     /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
     #define PBUF_POOL_BUFSIZE       256
 
-#elif IPAL_MEMORY_MEDIUM
+#elif IPAL_MEMORY_MEDIUM //total size is 3Kb like tcpnet stack
     /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
     #define PBUF_POOL_SIZE          12
 

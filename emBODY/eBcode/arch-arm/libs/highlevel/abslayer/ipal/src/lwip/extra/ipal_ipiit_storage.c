@@ -106,14 +106,18 @@ extern ipal_result_t ipal_ipiit_storage_dhcp_init(const ipal_cfg_t *cfg)
 
 // - lwip: functions required --------------------------------------------------------------------------------------
 
+typedef struct
+{
+    void     *frame;
+    uint32_t length;
+}ipal_genericframe_t;
+
 
 typedef struct
 {
-    void* (*frame_new)(uint32_t);               // return is: ipal_generic_network_frame_t*; args is: its size
-    void  (*frame_movetohigherlayer)(void*);     // arg is: ipal_generic_network_frame_t*
-    void  (*frame_onrxalerthigherlayer)(void);
-    void  (*frame_copytohigherlayer)(uint8_t */*dma_ptr*/, uint16_t/*size*/);
-    uint16_t (*frame_copyfromhigherlayer)(void *, uint8_t */*dma_ptr*/);
+    uint32_t (*move2higherlayer)(uint8_t *inputbuffer, uint32_t size);
+    uint32_t (*move2lowerlayer)(ipal_genericframe_t *genframe, uint8_t *outputbuffer);
+    void (*alerthigherlayer)(void);
 } ipal_network_hw_init_arg0_t;
 
 typedef struct
@@ -123,23 +127,67 @@ typedef struct
     uint64_t                        macaddress;
 } ipal_network_hw_init_cfg_t;
 
-
-//func prototype
-static void s_ipal_eth_signal_higherlayer(void);
-static void s_frame_copytohigherlayer(uint8_t *dma_ptr, uint16_t size);
-static uint16_t s_frame_copyfromhigherlayer(void * src, uint8_t *dma_ptr);
-
-
-//static var
-
-static const ipal_network_hw_init_arg0_t s_ipal_eth_ntw_hw_init_arg0 = 
+static uint32_t s_ipal_eth_moveframe2higherlayer(uint8_t *inputbuffer, uint32_t size)
 {
-    .frame_new = NULL,
-    .frame_movetohigherlayer = NULL,
-    .frame_onrxalerthigherlayer = s_ipal_eth_signal_higherlayer,
-    .frame_copytohigherlayer = s_frame_copytohigherlayer,
-    .frame_copyfromhigherlayer = s_frame_copyfromhigherlayer
-};
+    ipal_eth_hid_netif *netif =  ipal_eth_hid_getnetif();
+    err_t err;
+    struct pbuf * pbuf_ptr, *q;
+    ipal_result_t res;
+    uint32_t l=0;
+    
+    if(0 == size)
+    {
+        ipal_base_hid_on_fatalerror(ipal_error_internal0, "in moveframe2higherlayer required 0 size");
+    }
+    //trsformo da hal_buf in lwip_buf
+    pbuf_ptr = pbuf_alloc(PBUF_RAW, size, PBUF_POOL);
+    if(NULL == pbuf_ptr)
+    {
+        ipal_base_hid_on_fatalerror(ipal_error_internal0, "pbuf_alloc returns NULL in moveframe2higherlayer");
+        return(0);
+    }
+    
+
+    for (q = pbuf_ptr; q != NULL; q = q->next)
+    {
+        memcpy((u8_t*)q->payload, (u8_t*)&inputbuffer[l], q->len);
+        l = l + q->len;
+    } 
+
+
+    
+    ipal_fifo_item_t item =(void*) pbuf_ptr;
+    
+    //ipal_base_hid_cfg.extfn.hal_eth_disable(); non dovrebbero servirmi perche' la funz e' chiamata da dentro la isr
+    res = ipal_fifo_hid_put((ipal_fifo_t*)(netif->netif.state), &item);
+    //ipal_base_hid_cfg.extfn.hal_eth_enable();
+    
+    if(ipal_res_OK != res)
+    {
+        ipal_base_hid_on_fatalerror(ipal_error_internal0, "no more space in netif fifo");
+        return(0);
+    }
+    
+    return(size);
+}
+
+static uint32_t s_ipal_eth_moveframe2lowerlayer(ipal_genericframe_t *genframe, uint8_t *outputbuffer)
+{
+    u16_t numofcopiedbytes = 0;
+    struct pbuf *p = (struct pbuf *)genframe->frame;
+    struct pbuf *q;
+    char str[150];
+    uint32_t l = 0;
+    
+    for(q = p; q != NULL; q = q->next) 
+    {
+      memcpy((u8_t*)&outputbuffer[l], q->payload, q->len);
+      l = l + q->len;
+    }
+        
+    return(p->tot_len);
+    
+}
 
 static void s_ipal_eth_signal_higherlayer(void)
 {
@@ -149,55 +197,16 @@ static void s_ipal_eth_signal_higherlayer(void)
     }
 }
 
-static void s_frame_copytohigherlayer(uint8_t *dma_ptr, uint16_t size)
-{
-    ipal_eth_hid_netif *netif =  ipal_eth_hid_getnetif();
-    err_t err;
-    struct pbuf * pbuf_ptr;
-    ipal_result_t res;
-    
-    //trsformo da hal_buf in lwip_buf
-    pbuf_ptr = pbuf_alloc(PBUF_RAW, size, PBUF_POOL);
-    if(NULL == pbuf_ptr)
-    {
-        ipal_base_hid_on_fatalerror(ipal_error_internal0, "pbuf_alloc returns NULL in _copytohigherlayer");
-        return;
-    }
-    err = pbuf_take(pbuf_ptr, (void*)dma_ptr, size);
-    if(ERR_OK != err)
-     {
-        ipal_base_hid_on_fatalerror(ipal_error_internal0, "error in coping data from dma to pbuf");
-        return;
-    }  
-    
-    ipal_fifo_item_t item =(void*) pbuf_ptr;
-    
-    ipal_base_hid_cfg.extfn.hal_eth_disable();
-    res = ipal_fifo_hid_put((ipal_fifo_t*)(netif->netif.state), &item);
-    ipal_base_hid_cfg.extfn.hal_eth_enable();
-    
-    if(ipal_res_OK != res)
-    {
-        ipal_base_hid_on_fatalerror(ipal_error_internal0, "no more space in netif fifo");
-    }
 
-}
-
-static uint16_t s_frame_copyfromhigherlayer(void * src, uint8_t *dma_ptr)
+static const ipal_network_hw_init_arg0_t s_ipal_eth_ntw_hw_init_arg0 =
 {
-    u16_t numofcopiedbytes = 0;
-    struct pbuf *p = (struct pbuf *)src;
-    char str[150];
-    
-    numofcopiedbytes = pbuf_copy_partial(p, (void*)dma_ptr, p->tot_len, 0);
-    if(numofcopiedbytes != p->tot_len)
-    {
-        snprintf(str, sizeof(str),  "error in _copyfromhigherlayer: numofcopiedbytes=%d pktlen=%d", numofcopiedbytes, p->tot_len);
-        ipal_base_hid_on_fatalerror(ipal_error_internal0, str);
-        return(0);
-    }
-    return(p->tot_len);
-}
+    s_ipal_eth_moveframe2higherlayer,
+    s_ipal_eth_moveframe2lowerlayer,
+    s_ipal_eth_signal_higherlayer
+};
+
+
+
 
 //ext func
 extern void low_level_init(struct netif *netif)
@@ -261,17 +270,21 @@ extern struct pbuf *low_level_input(struct netif *netif)
 }
 
 
+
 extern err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
     ipal_result_t res;
 
-    res = ipal_base_hid_cfg.extfn.hal_eth_sendframe(p);
+    ipal_genericframe_t genframe;
+    genframe.frame = (void*)p;
+    genframe.length = p->tot_len;
     
-    pbuf_free(p);
+    res = ipal_base_hid_cfg.extfn.hal_eth_sendframe(&genframe);
+    
+    //pbuf_free(p); spostato in ipal_udpsocket_sendto
     
     return((ipal_res_OK == res)? ERR_OK : ERR_IF);
 }
-
 
 
 extern err_t ethernetif_init(struct netif *netif)
@@ -319,6 +332,35 @@ extern ipal_result_t ipal_ipiit_storage_eth_init(const ipal_cfg_t *cfg)
 }
 
 #endif//IPAL_USE_ETH
+
+//#if SYS_LIGHTWEIGHT_PROT
+extern int ethisr_isrunning; //this variable is defined in hl_etc.c
+                             /*I use it in order to know is i'm in isr rx func or not */
+sys_prot_t sys_arch_protect(void)
+{
+    if(!ethisr_isrunning)
+    {
+        ipal_base_hid_cfg.extfn.hal_eth_disable();
+        return(1);
+    }
+    else
+    {
+        return(0);
+    }
+}
+
+
+void sys_arch_unprotect(sys_prot_t pval)
+{
+    if(1==pval)
+        ipal_base_hid_cfg.extfn.hal_eth_enable(); 
+}
+//#endif
+
+
+
+
+
 
 
 

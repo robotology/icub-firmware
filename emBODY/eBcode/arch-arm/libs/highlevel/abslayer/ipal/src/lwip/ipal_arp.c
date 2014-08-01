@@ -134,9 +134,9 @@ extern ipal_result_t ipal_arp_request(ipal_ipv4addr_t ip, ipal_arp_cachemode_t c
     
     ipal_base_hid_threadsafety_unlock();
 
-    //return( (ERR_OK == err) ? (ipal_res_OK) : (ipal_res_NOK_generic) );
+    return( (ERR_OK == err) ? (ipal_res_OK) : (ipal_res_NOK_generic) );
     //se sono qui vuol dire che devoi fare una arp request e che quindi la mia arp table non contiene ancora nessuna entry relatina a @ip
-    return(ipal_res_NOK_generic);
+    //return(ipal_res_NOK_generic);
 }
 
 
