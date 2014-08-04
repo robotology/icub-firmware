@@ -28,6 +28,7 @@
 #include "hal.h"  
 #include "hal_core.h"  
 #include "pid.h"
+#include "as5048.h"
 #if     !defined(HAL_USE_LIB)
 #include "hal_brdcfg_modules.h"
 #else
@@ -108,6 +109,9 @@
 
 //#undef EXECUTE_TEST_CAN
 #define EXECUTE_TEST_CAN
+
+//#undef EXECUTE_TEST_ENCODER_SPI
+#define EXECUTE_TEST_ENCODER_SPI
 
 #define haLcAn1    hal_can1
 //#define haLcAn2    hal_can2
@@ -236,6 +240,11 @@ static void test_periph_can(void);
 static void test_device_motorctl_1(void);
 static void test_device_motorctl_2(void);
 #endif//defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
+
+#if     defined(EXECUTE_TEST_ENCODER_SPI)    
+static void test_encoder_spi(void);
+#endif//defined(EXECUTE_TEST_ENCODER_SPI) 
+
 
 #if     defined(EXECUTE_TEST_ADC)    
 static void test_periph_adc(void);
@@ -417,7 +426,11 @@ int main(void)
 #if     defined(EXECUTE_TEST_CAN)    
     test_periph_can();
 #endif//defined(EXECUTE_TEST_CAN)
-     
+
+#if     defined(EXECUTE_TEST_ENCODER_SPI)
+	test_encoder_spi();
+#endif//defined(EXECUTE_TEST_ENCODER_SPI)
+
 #if     defined(EXECUTE_TEST_ADC)    
     test_periph_adc();
 #endif//defined(EXECUTE_TEST_ADC)   
@@ -588,6 +601,18 @@ static void leds_led2_toggle(void)
     hal_result_t res;
     
     res = hal_led_toggle(hal_led2);
+    res =  res;
+
+#endif//defined(HAL_USE_LED)    
+}
+
+static void leds_led3_toggle(void)
+{
+#if     defined(HAL_USE_LED)
+        
+    hal_result_t res;
+    
+    res = hal_led_toggle(hal_led3);
     res =  res;
 
 #endif//defined(HAL_USE_LED)    
@@ -929,6 +954,72 @@ static void test_periph_i2c(void)
     
 }
 #endif//defined(EXECUTE_TEST_I2C)  
+
+#if     defined(EXECUTE_TEST_ENCODER_SPI)    
+static void test_encoder_spi(void)
+{
+  hal_can_frame_t canframe;
+	hal_can_t CAN_PERIPH=hal_can1;
+  hal_result_t res;
+	uint8_t message_received=0;
+	uint8_t remaining=0;
+	uint16_t angle[2]={0,0};
+  int32_t enc[4]={0,0,0,0};
+  test_is_beginning("encoder as5048 : "); 
+
+	as5048_init(0);
+	as5048_init(1);
+	hal_quad_enc_Init();
+
+    canframe.id = 0x1AA;
+    canframe.id_type = hal_can_frameID_std;
+    canframe.frame_type = hal_can_frame_data;
+    canframe.data[0] = 0xAA;
+    canframe.size = 8;
+   	 
+	while(message_received==0)
+	{
+	  angle[0]=0; 
+	  angle[0]=1; 
+   	  angle[0]=as5048_read(0);
+	  angle[1]=as5048_read(1);	 
+		canframe.id = 0x1AA;
+    canframe.data[1] = (angle[0] & 0xFF); 
+	  canframe.data[2] = (angle[0] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
+	  canframe.data[3] = (angle[1] & 0xFF); 
+	  canframe.data[4] = (angle[1] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
+//		  canframe.data[5] = (aRxBuffer[0] & 0x8000)>>8;	   //parity
+//		  canframe.data[6] = (aRxBuffer[0] & 0x4000)>>8;	   //error flag
+    hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);	
+	  hal_sys_delay(100*hal_RELTIME_1microsec);  
+	  
+				  enc[0]=hal_quad_enc_getCounter(0);
+			enc[1]=hal_quad_enc_getCounter(1); 
+			enc[2]=hal_quad_enc_getCounter(2);
+			enc[3]=hal_quad_enc_getCounter(3); 
+			canframe.id=0x300;
+			canframe.data[0]=((uint16_t)enc[0] & 0xFF);
+			canframe.data[1]=((uint16_t)enc[0] & 0xFF00)>>8;
+			canframe.data[2]=((uint16_t)enc[1] & 0xFF);
+			canframe.data[3]=((uint16_t)enc[1] & 0xFF00)>>8;	
+			canframe.data[4]=((uint16_t)enc[2] & 0xFF);
+			canframe.data[5]=((uint16_t)enc[2] & 0xFF00)>>8;
+			canframe.data[6]=((uint16_t)enc[3] & 0xFF);
+			canframe.data[7]=((uint16_t)enc[3] & 0xFF00)>>8;	
+			hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now); 
+			 
+			hal_sys_delay(250*hal_RELTIME_1microsec);
+		
+		res=hal_can_get(CAN_PERIPH, &canframe, &remaining);
+		
+		
+		
+	  if (res==hal_res_OK ) message_received=1;		  
+	} 
+  
+	    
+}
+#endif//defined(EXECUTE_TEST_ENCODER_SPI)  
 
 
 #if     defined(EXECUTE_TEST_EEPROM)
@@ -1327,8 +1418,8 @@ static void test_periph_can(void)
 					can_transmit_mixed(&canframetx, BURSTLEN, count); 
 #endif        
 			}
-			test_message("Waiting a message ");	
-			while(0 == can1_received)
+	//		test_message("Waiting a message ");	
+	//		while(0 == can1_received)
 			{
 					//can1_received = 0;
 					
