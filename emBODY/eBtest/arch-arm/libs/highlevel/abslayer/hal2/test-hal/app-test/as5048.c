@@ -18,10 +18,10 @@
 
 #include "hal_sys.h"
 #include "as5048.h"
-#include "stm32f4xx_spi.h"
+#include "hl_core.h"
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
-#include "hal_utility_bits.h" 
+
 /* @file       as5048.c
 	@brief      This file implements the reading of the as5048 sensor (Absolute Magnetic sensor)
 	@author     marco.maggiali@iit.it, 
@@ -156,7 +156,7 @@ void as5048_init(uint8_t sensorID)
 	  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
 	  SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
 	  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
+	  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
 	  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	  SPI_InitStructure.SPI_CRCPolynomial = 7;
 	  SPI_Init(SPI3, &SPI_InitStructure);
@@ -172,7 +172,7 @@ void as5048_init(uint8_t sensorID)
 	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	
 	
-	  // NVIC_Init(&NVIC_InitStructure);
+	  //NVIC_Init(&NVIC_InitStructure);
 	
 	  SPI_Cmd(SPI3, ENABLE);
 	  /* Enable the Rx buffer not empty interrupt */
@@ -230,7 +230,7 @@ void as5048_init(uint8_t sensorID)
 	  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
 	  SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
 	  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
+	  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
 	  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	  SPI_InitStructure.SPI_CRCPolynomial = 7;
 	  SPI_Init(SPI2, &SPI_InitStructure);
@@ -265,12 +265,12 @@ void as5048_init(uint8_t sensorID)
 
 uint16_t as5048_read(uint8_t sensorID) 
  {
- 	  uint16_t value=0;
+ 	  uint16_t value=0x3FFF;
 
       if (sensorID==0)
 	  {
 	  GPIO_ResetBits(SPI3_NSEL_GPIO_PORT, SPI3_NSEL_PIN);
-	  SPI_I2S_SendData(SPI3, value);   //send a dummy value 
+	  SPI_I2S_SendData(SPI3, 0xffff);   //send a dummy value 
 	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE)==0);
 	  value=SPI_I2S_ReceiveData(SPI3)&0x3fff;  //remove the parity and errorflag bit
 	  //angle[0] +=(aRxBuffer[0]&0x3fff);
@@ -280,7 +280,7 @@ uint16_t as5048_read(uint8_t sensorID)
 	  else 
 	  {
 	  GPIO_ResetBits(SPI2_NSEL_GPIO_PORT, SPI2_NSEL_PIN);
-	  SPI_I2S_SendData(SPI2, value);   //send a dummy value 
+	  SPI_I2S_SendData(SPI2, 0x5555);   //send a dummy value 
 	  while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE)==0);
 	  value=SPI_I2S_ReceiveData(SPI2)&0x3fff;  //remove the parity and errorflag bit
 	  //angle[0] +=(aRxBuffer[0]&0x3fff);
