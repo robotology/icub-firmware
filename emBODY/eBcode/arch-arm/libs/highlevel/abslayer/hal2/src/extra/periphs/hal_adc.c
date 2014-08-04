@@ -224,8 +224,8 @@ extern hal_result_t hal_adc_dma_init()
 
 	  /* ADC2 regular channel3 4 and 5 configuration *************************************/
 	  ADC_RegularChannelConfig(ADC2, ADC_Channel_8 , 1, SAMPLING_TIME_CK);
-   	  ADC_RegularChannelConfig(ADC2, ADC_Channel_9 , 2, SAMPLING_TIME_CK);
-  	  ADC_RegularChannelConfig(ADC2, ADC_Channel_10, 3, SAMPLING_TIME_CK);
+   	ADC_RegularChannelConfig(ADC2, ADC_Channel_9 , 2, SAMPLING_TIME_CK);
+  	ADC_RegularChannelConfig(ADC2, ADC_Channel_10, 3, SAMPLING_TIME_CK);
  		
 	  /* ADC3 regular channel3 4 and 5 configuration *************************************/
 	  ADC_RegularChannelConfig(ADC3, ADC_Channel_6 , 1, SAMPLING_TIME_CK);
