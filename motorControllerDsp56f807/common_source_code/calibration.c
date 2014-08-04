@@ -200,7 +200,7 @@ void helper_calib_abs_digital(byte channel, Int16 param1,Int16 param2, Int16 par
 
 void helper_calib_hall_digital(byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
-    _position[channel] = get_position_abs_ssi(channel);
+    //_position[channel] = get_position_abs_ssi(channel); //no SSI for calib_hall_digital
     enable_motor_pwm(channel, MODE_POSITION);
     switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
     //_set_point[channel] = param1;
