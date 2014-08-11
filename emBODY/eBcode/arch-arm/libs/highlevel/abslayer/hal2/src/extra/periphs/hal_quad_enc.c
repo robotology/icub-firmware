@@ -132,7 +132,7 @@ void hal_quad_enc_Init(void)
   
   GPIO_StructInit(&GPIO_InitStructure);
   /* Configure PC.06,07 as encoder input */
-  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6 | GPIO_Pin_7  ;
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6 | GPIO_Pin_7;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -142,12 +142,14 @@ void hal_quad_enc_Init(void)
   /* Connect TIM pins to AF2 */
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);	
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM3);	
+#warning -> removed the TIM3 interrupt enable	
+	
   /* Enable the TIM3 Update Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = TIMx_PRE_EMPTION_PRIORITY;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = TIMx_SUB_PRIORITY;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+//  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = TIMx_PRE_EMPTION_PRIORITY;
+//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = TIMx_SUB_PRIORITY;
+//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//  NVIC_Init(&NVIC_InitStructure);
 
   /* Timer configuration in Encoder mode */
   TIM_DeInit(ENCODER2_TIMER);

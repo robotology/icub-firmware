@@ -130,15 +130,14 @@ static uint16_t s_hal_device_motor_initted = 0;
 extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 {
  /*   const hal_gpio_map_t *gm = NULL;		  */
-//    hal_result_t res = hal_res_NOK_generic;
+    hal_result_t res = hal_res_NOK_generic;
 	  TIM_TimeBaseInitTypeDef TIM1_TimeBaseStructure;
   	TIM_OCInitTypeDef TIM1_OCInitStructure;
-//  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure;
+  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure;
 //  	NVIC_InitTypeDef NVIC_InitStructure;
   	GPIO_InitTypeDef GPIO_InitStructure;
 
 /* INIT MOTOR 1 and 2 */
-
 
 //	if (id<2)  
 	{
@@ -166,7 +165,7 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 
 	/* TIM1 clock enable */
 	TIM_DeInit(TIM1);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);	
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);	
 //	TIM_TimeBaseStructInit(&TIM1_TimeBaseStructure);
 	/* Time Base configuration */
 	TIM1_TimeBaseStructure.TIM_Prescaler = PWM_PRSC;
@@ -193,13 +192,13 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>0); //dummy value 
 	TIM_OC1Init(TIM1, &TIM1_OCInitStructure);
 	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>8); //dummy value
-    TIM_OC2Init(TIM1, &TIM1_OCInitStructure);
+  TIM_OC2Init(TIM1, &TIM1_OCInitStructure);
 	
 	//MOTOR2 PHASE A and B
 	 
 	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>8); //clock wise
 	TIM_OC3Init(TIM1, &TIM1_OCInitStructure);
-    TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
+  TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
 	TIM_OC4Init(TIM1, &TIM1_OCInitStructure);
 
 /*	
@@ -222,7 +221,7 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 	/* TIM1 counter enable */
 	TIM_Cmd(TIM1, ENABLE);
 	/* Main PWM Output Enable */
-    TIM_CtrlPWMOutputs(TIM1,ENABLE);
+  TIM_CtrlPWMOutputs(TIM1,ENABLE);
 
 	//ENABLING THE EN1..EN4 L6206
 	
@@ -231,10 +230,10 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 	GPIO_StructInit(&GPIO_InitStructure);  
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15; 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  	GPIO_Init(GPIOE, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOE, &GPIO_InitStructure);
 
 	GPIO_SetBits(GPIOE, GPIO_Pin_12);
 	GPIO_SetBits(GPIOE, GPIO_Pin_13);
@@ -249,12 +248,10 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1| GPIO_Pin_2 | GPIO_Pin_3; 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOD, &GPIO_InitStructure);
 	}
 	
 	{
@@ -271,7 +268,7 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
 {
  /*   const hal_gpio_map_t *gm = NULL;		  */
-//    hal_result_t res = hal_res_NOK_generic;
+    hal_result_t res = hal_res_NOK_generic;
 	  TIM_TimeBaseInitTypeDef TIM1_TimeBaseStructure;
   	TIM_OCInitTypeDef TIM1_OCInitStructure;
 	  TIM_TimeBaseInitTypeDef TIM8_TimeBaseStructure;
@@ -284,17 +281,16 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 
 /* INIT MOTOR 1 and 2 */
 
-		//ENABLING THE EN1..EN4 L6206
-	
+		//ENABLING THE EN1..EN4 L6206	
 	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOE , ENABLE);
 
 	GPIO_StructInit(&GPIO_InitStructure);  
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15; 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  	GPIO_Init(GPIOE, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOE, &GPIO_InitStructure);
 
 	GPIO_SetBits(GPIOE, GPIO_Pin_12);
 	GPIO_SetBits(GPIOE, GPIO_Pin_13);
@@ -309,10 +305,10 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1| GPIO_Pin_2 | GPIO_Pin_3; 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  	GPIO_Init(GPIOD, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOD, &GPIO_InitStructure);
 
 
 //	if (id<2)  
@@ -325,13 +321,12 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	/* GPIOA Configuration: Channel 1, 2, 3 and 4 as alternate function push-pull */
   	
 	GPIO_StructInit(&GPIO_InitStructure);  
-	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
-  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
-  	GPIO_Init(GPIOA, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
  
 	/*Timer1 alternate function full remapping*/  
 	GPIO_PinAFConfig(GPIOA,GPIO_PinSource8,GPIO_AF_TIM1);  //MOT1_PHA
@@ -395,18 +390,20 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	//initialization of TIM1 for controlling the first 2 motors
 	/* TIM1 Peripheral Configuration -------------------------------------------*/
  	/* GPIOA  Clocks enable */
-  	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOI , ENABLE);
+	
+	
+  RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOI , ENABLE);
 
-	/* GPIOA Configuration: Channel 1, 2, 3 and 4 as alternate function push-pull */
+	/* GPIOI Configuration: Channel 1, 2, 3 and 4 as alternate function push-pull */
   	
 	GPIO_StructInit(&GPIO_InitStructure);  
 	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_2;
-  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
-  	GPIO_Init(GPIOI, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
+  GPIO_Init(GPIOI, &GPIO_InitStructure);
  
 	/*Timer1 alternate function full remapping*/  
 	GPIO_PinAFConfig(GPIOI,GPIO_PinSource5,GPIO_AF_TIM8);  //MOT3_PHA
@@ -418,7 +415,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	/* TIM8 clock enable */
 	TIM_DeInit(TIM8);
 	TIM_TimeBaseStructInit(&TIM8_TimeBaseStructure);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8 , ENABLE);	
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8 , ENABLE);	
 	/* Time Base configuration */
 	TIM8_TimeBaseStructure.TIM_Prescaler = PWM_PRSC;
 	TIM8_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned1;//TIM_CounterMode_Up;
@@ -443,12 +440,12 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	TIM8_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //dummy value 
 	TIM_OC1Init(TIM8, &TIM8_OCInitStructure);
 	TIM8_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //dummy value
-    TIM_OC2Init(TIM8, &TIM8_OCInitStructure);
+   TIM_OC2Init(TIM8, &TIM8_OCInitStructure);
 	
 	//MOTOR4 PHASE A and B	 
 	TIM8_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //clock wise
 	TIM_OC3Init(TIM8, &TIM8_OCInitStructure);
-    TIM8_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
+  TIM8_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
 	TIM_OC4Init(TIM8, &TIM8_OCInitStructure);
 
 /*	
@@ -469,24 +466,21 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	
 	
 	TIM_SelectOutputTrigger(TIM1, TIM_TRGOSource_Update);
-
 	// Resynch to have the Update evend during Undeflow
-	TIM_GenerateEvent(TIM1, TIM_EventSource_Update);
-	  
+	TIM_GenerateEvent(TIM1, TIM_EventSource_Update);  
 	// Clear Update Flag
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);
-	  
 	TIM_ITConfig(TIM1, TIM_IT_Update, DISABLE);	  
 
 	/* TIM1 counter enable */
 	TIM_Cmd(TIM1, ENABLE);
 	/* Main PWM Output Enable */
-    TIM_CtrlPWMOutputs(TIM1,ENABLE);	  
+  TIM_CtrlPWMOutputs(TIM1,ENABLE);	  
 	TIM_ITConfig(TIM8, TIM_IT_Update, DISABLE);	  
 	/* TIM8 counter enable */
 	TIM_Cmd(TIM8, ENABLE);
 	/* Main PWM Output Enable */
-    TIM_CtrlPWMOutputs(TIM8,ENABLE);
+  TIM_CtrlPWMOutputs(TIM8,ENABLE);
 
 	hal_adc_inj_init();
 	/* Configure one bit for preemption priority */
