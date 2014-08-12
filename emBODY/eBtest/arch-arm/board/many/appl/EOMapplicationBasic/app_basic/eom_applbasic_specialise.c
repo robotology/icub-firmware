@@ -47,6 +47,8 @@
 
 #include "EOtheLEDpulser.h"
 
+#include "EOtheMemoryPool.h"
+
 
 
 
@@ -139,11 +141,149 @@ static const char s_eobj_ownname[] = "EOMapplBASIC";
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOvector.h"
+#include "EOlist.h"
 
+typedef struct
+{
+    uint32_t v1;
+    uint16_t v2;   
+    uint64_t v3;
+} samplestruct; EO_VERIFYsizeof(samplestruct, 16);
+
+eOresult_t item_init(void* p, uint32_t u)
+{
+    samplestruct* ss = (samplestruct*)p;
+    ss->v1 = u+1;
+    ss->v2 = u+2;
+    ss->v3 = u+3; 
+    return(eores_OK);
+}
+
+eOresult_t item_copy(void* p, void* e)
+{
+    samplestruct* ss = (samplestruct*)p;
+    samplestruct* ee = (samplestruct*)e;
+    ss->v1 = ee->v1;
+    ss->v2 = ee->v2;
+    ss->v3 = ee->v3;  
+    return(eores_OK);
+}
+
+eOresult_t item_clear(void* p)
+{
+    samplestruct* ss = (samplestruct*)p;
+    ss->v1 = 0;
+    ss->v2 = 0;
+    ss->v3 = 0;   
+    return(eores_OK);
+}
 
 extern void eom_applbasic_specialise_system(void)
 {
+#if 0    
+    // tests
+    void* p01 = eo_mempool_New(eo_mempool_GetHandle(), 1);
+    void* p02 = eo_mempool_New(eo_mempool_GetHandle(), 2);
+    void* p03 = eo_mempool_New(eo_mempool_GetHandle(), 3);
+    void* p04 = eo_mempool_New(eo_mempool_GetHandle(), 4);
+    void* p07 = eo_mempool_New(eo_mempool_GetHandle(), 7);
+    void* pxx = eo_mempool_New(eo_mempool_GetHandle(), 12);
+    pxx = eo_mempool_Realloc(eo_mempool_GetHandle(), pxx, 10);
+    pxx = eo_mempool_Realloc(eo_mempool_GetHandle(), pxx, 12);
+    pxx = eo_mempool_Realloc(eo_mempool_GetHandle(), pxx, 15);
+    pxx = eo_mempool_Realloc(eo_mempool_GetHandle(), pxx, 10);
+   
+    eo_mempool_Delete(eo_mempool_GetHandle(), p01);
+    eo_mempool_Delete(eo_mempool_GetHandle(), p02);
+    eo_mempool_Delete(eo_mempool_GetHandle(), p07);
+    p01 = eo_mempool_New(eo_mempool_GetHandle(), 1);
+#endif 
+    
+//    void* p04 = eo_mempool_New(eo_mempool_GetHandle(), 4);
+//    p04 = eo_mempool_Realloc(eo_mempool_GetHandle(), p04, 7);
+//    p04 = eo_mempool_Realloc(eo_mempool_GetHandle(), p04, 0);
+//    p04 = p04;
+//    eo_mempool_Delete(eo_mempool_GetHandle(), p04);
+//    p04 = p04;
 
+
+    EOvector *v = eo_vector_New(sizeof(samplestruct), eo_vectorcapacity_dynamic, item_init, 1, item_copy, item_clear);
+    
+    samplestruct s;
+    s.v1 = 11;
+    s.v2 = 12;
+    s.v3 = 13;
+    eo_vector_PushBack(v, &s);
+    s.v1 = 21;
+    s.v2 = 22;
+    eo_vector_PushBack(v, &s);
+    
+    samplestruct* sp = NULL;
+    sp = (samplestruct*) eo_vector_Back(v);
+    eo_vector_PopBack(v);
+    sp = (samplestruct*) eo_vector_Back(v);
+    
+    samplestruct items[2] =  {0};
+    items[0].v1 = 30;
+    items[1].v1 = 31;
+    
+    eo_vector_Assign(v, 4, items, 2);
+    uint16_t size = eo_vector_Size(v);
+    
+    sp = (samplestruct*) eo_vector_Back(v);
+    sp = sp;
+    
+    eo_vector_Resize(v, 10);
+    size = eo_vector_Size(v);
+    
+    sp = (samplestruct*) eo_vector_Back(v);
+    sp = sp;
+    
+    eo_vector_Delete(v);
+    
+
+    uint16_t cap = eo_vectorcapacity_dynamic;
+    EOlist *l = eo_list_New(sizeof(samplestruct), cap, item_init, 1, item_copy, item_clear);
+    
+    //samplestruct s;
+    s.v1 = 11;
+    s.v2 = 12;
+    s.v3 = 13;
+    eo_list_PushBack(l, &s);
+    s.v1 = 21;
+    s.v2 = 22;
+    eo_list_PushBack(l, &s);
+    
+    //samplestruct* sp = NULL;
+    sp = (samplestruct*) eo_list_Back(l);
+    eo_list_PopFront(l);
+    sp = (samplestruct*) eo_list_Front(l);
+    
+    size = eo_list_Size(l);
+    
+//    samplestruct items[2] =  {0};
+    items[0].v1 = 30;
+    items[1].v1 = 31;
+    
+    eo_list_Insert(l, eo_list_Begin(l), &items[0]);
+    //uint16_t 
+    size = eo_list_Size(l);
+    
+    sp = (samplestruct*) eo_list_Front(l);
+    sp = sp;
+    
+    sp = (samplestruct*) eo_list_Back(l);
+    sp = sp;
+    
+    
+    sp = (samplestruct*) eo_list_Back(l);
+    sp = sp;
+    
+    eo_list_Delete(l);    
+    
+    
+    
     // -- service 1:    init the leds.
     //                  led0, led1, led2 with the LEDpulser. led3, led4, and led5 manually
     //                  led0 will blink forever at 1Hz
@@ -159,6 +299,10 @@ extern void eom_applbasic_specialise_system(void)
     //                  the event driven pulses led2 and prints with the error manager.
 
     s_eom_applbasic_specialise_tasks_start();  
+    
+    char str[64] = "";
+    snprintf(str, sizeof(str), "EOtheMemoryPool has used %d bytes so far", eo_mempool_SizeOfAllocated(eo_mempool_GetHandle()));
+    eo_errman_Info(eo_errman_GetHandle(),  "init task", str);
 
 }
 

@@ -107,11 +107,56 @@ static const eOmsystem_cfg_t syscfg =
     .fsalcfg            = NULL                      // forget it
 };
 
+#undef USE_HEAP
+#define USE_HEAP
+
+#if defined(USE_HEAP)
+
+static const eOmempool_alloc_config_t osalheapconf =
+{
+    .heap =
+    {
+        .allocate       = osal_base_memory_new,
+        .reallocate     = osal_base_memory_realloc,
+        .release        = osal_base_memory_del
+    }
+};
+
 static const eOmempool_cfg_t memcfg =
 {
-    .mode               = eo_mempool_alloc_dynamic, // we use dynamic allcoation
-    .memallocator       = osal_base_memory_new      // and we use the osal allocator which protects from concurrency use
+    .mode               = eo_mempool_alloc_dynamic, // we use static allcoation
+    .conf               = &osalheapconf
 };
+
+#else
+
+static uint8_t   pool08[8*1024];
+static uint16_t  pool16[4*1024];
+static uint32_t  pool32[8*1024];
+static uint64_t  pool64[8*1024];
+
+static const eOmempool_alloc_config_t staticconf =
+{
+    .pool =
+    {
+        .size08         = sizeof(pool08),
+        .data08         = pool08,
+        .size16         = sizeof(pool16),
+        .data16         = pool16,   
+        .size32         = sizeof(pool32),
+        .data32         = pool32,   
+        .size64         = sizeof(pool64),
+        .data64         = pool64  
+    }
+};
+
+static const eOmempool_cfg_t memcfg =
+{
+    .mode               = eo_mempool_alloc_static, // we use dynamic allcoation
+    .conf               = &staticconf
+};
+
+#endif
 
 static const eOerrman_cfg_t  errcfg = 
 {
@@ -157,7 +202,7 @@ static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
     char str[128];
 
-    snprintf(str, sizeof(str)-1, "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
     hal_trace_puts(str);
 
     if(errtype <= eo_errortype_warning)

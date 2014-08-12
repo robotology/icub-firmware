@@ -58,6 +58,18 @@ extern void* osal_ext_calloc(uint32_t s, uint32_t n)
     return(ret);
 }
 
+extern void* osal_ext_realloc(void* m, uint32_t s)
+{
+    char str[64];
+  
+    void* ret = realloc(m, s);
+        
+    snprintf(str, sizeof(str), "mycalloc %d bytes: [%x, %x]", s, (uint32_t)ret, (uint32_t)ret+s);
+    hal_trace_puts(str);
+    
+    return(ret);
+}
+
 extern void osal_ext_free(void* m)
 {
 //    char str[64];
