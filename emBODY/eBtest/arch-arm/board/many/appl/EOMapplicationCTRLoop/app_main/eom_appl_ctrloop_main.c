@@ -138,7 +138,7 @@ static void s_eom_emsappl_main_init(void)
    
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
 
-    s_eom_emsappl_main_sometests();
+//    s_eom_emsappl_main_sometests();
     
     eom_emsappl_Initialise(&emscfg->applcfg);
 }
@@ -352,6 +352,94 @@ static void s_eom_emsappl_main_sometests(void)
 //     res = res;
     
 }
+
+//#include "EOtheBOARDtransceiver.h"
+//#include "EOrop.h"
+//#include "EOprotocolMN.h"
+//#include "EOnv_hid.h"
+
+//extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature)
+//{
+//    static uint8_t initted = 0;
+//    static eOropdescriptor_t rd;
+//    static EOnv* nv = NULL;
+//    static EOtransceiver *t = NULL;  
+//    static EOnvSet * nvset = NULL;  
+
+//    
+//    if((NULL == str) || (strlen(str) > 5))
+//    {
+//        return(eores_NOK_generic);
+//    }
+//    
+//    if(0 == initted)
+//    {
+//        t = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+//        nvset = eo_boardtransceiver_GetNVset(eo_boardtransceiver_GetHandle());
+//        memcpy(&rd, &eok_ropdesc_basic, sizeof(eOropdescriptor_t));
+//        rd.ropcode  = eo_ropcode_sig;
+//        rd.id32     = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+//        rd.data     = NULL; 
+//        
+//        nv = eo_nv_New();
+//        eo_nvset_NV_Get(nvset, eo_nv_ownership_local, rd.id32, nv);    
+//        
+//     
+//        initted = 1;
+//    }
+//    
+//    // fill signature
+//    rd.control.plussign     = (eo_nv_ID32dummy == signature) ? (0) : 1;
+//    rd.signature            = signature;
+//    
+//    // must put str into the 8 bytes of eOmn_appl_status_t
+//    
+//    eOmn_appl_status_t applstatus;
+//    uint16_t size = 0;
+//    eo_nv_Get(nv, eo_nv_strg_volatile, &applstatus, &size);
+//   
+//    memcpy(&applstatus.filler06[0], str, 6);
+//    
+//    eo_nv_Set(nv, &applstatus, eobool_true, eo_nv_upd_dontdo);
+//       
+//    
+//    eo_transceiver_OccasionalROP_Load(t, &rd);
+//  
+//    return(eores_OK);
+//}
+
+
+//#include "EoCommon.h"
+//#include "EoProtocolMN.h"
+
+//#include "string.h"
+//#include "stdint.h"
+//#include "stdlib.h"
+
+
+//    
+//void eoprot_fun_UPDT_mn_appl_status(const EOnv* nv, const eOropdescriptor_t* rd)
+//{
+//    static const char* states[] =     
+//    {
+//        "applstate_config",
+//        "applstate_running",
+//        "applstate_error",
+//        "not initted"
+//    };
+//    
+//    char str[128] = {0};
+//    
+//    eOmn_appl_status_t* appstatus = (eOmn_appl_status_t*) rd->data;
+//    
+//    const char* state = (appstatus->currstate > 2) ? (states[3]) : (states[appstatus->currstate]);
+//    
+//    snprintf(str, sizeof(str), "DIAGNOSTICS: board EB%d -> state = %s, sign = %x, msg = %s ", eo_nv_GetBRD(nv)+1, state, rd->signature, appstatus->filler06); 
+//    
+//    printf("%s\n", str);
+//    //printf("DIAGNOSTICS: board EB%d -> state = %s, sign = %x, msg = %s\n", eo_nv_GetBRD(nv)+1, state, rd->signature, appstatus->filler06); 
+
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
