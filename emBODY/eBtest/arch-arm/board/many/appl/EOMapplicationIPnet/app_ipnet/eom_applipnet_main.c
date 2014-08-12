@@ -109,10 +109,20 @@ static const eOmsystem_cfg_t syscfg =
     .fsalcfg            = NULL                      // forget it
 };
 
+static const eOmempool_alloc_config_t osalheapconf =
+{
+    .heap =
+    {
+        .allocate       = osal_base_memory_new,
+        .reallocate     = osal_base_memory_realloc,
+        .release        = osal_base_memory_del
+    }
+};
+
 static const eOmempool_cfg_t memcfg =
 {
-    .mode               = eo_mempool_alloc_dynamic, // we use dynamic allcoation
-    .memallocator       = osal_base_memory_new      // and we use the osal allocator which protects from concurrency use
+    .mode               = eo_mempool_alloc_dynamic, // we use static allcoation
+    .conf               = &osalheapconf
 };
 
 static const eOerrman_cfg_t  errcfg = 
