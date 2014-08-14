@@ -129,37 +129,6 @@ void hal_quad_enc_Init(void)
   
   TIM_Cmd(ENCODER1_TIMER, ENABLE);
   
-  // Index //
-	/* Enable GPIOA clock */
-	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOG , ENABLE); 
-	/* Enable SYSCFG clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-	
-	GPIO_StructInit(&GPIO_InitStructure);
-  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOG, &GPIO_InitStructure);
-	
-	/* Connect EXTI Line0 to PAG12 pin */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource12);
-	
-	  /* Configure EXTI Line0 */
-  EXTI_InitStructure.EXTI_Line = EXTI_Line12;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-
-  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
-  NVIC_InitStructure.NVIC_IRQChannel =  EXTI15_10_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-	
-	
-	
   // Encoder 2 unit connected to TIM3, 4X mode  
   // ENCODER 2 
   /* TIM2 clock source enable */
@@ -311,6 +280,39 @@ void hal_quad_enc_Init(void)
   ENCODER4_TIMER->CNT = 0;
   
   TIM_Cmd(ENCODER4_TIMER, ENABLE);
+	
+	// Indexes  //
+	/* Enable GPIOG clock */
+	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOG , ENABLE); 
+	/* Enable SYSCFG clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+	
+	GPIO_StructInit(&GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13 |GPIO_Pin_14 |GPIO_Pin_15;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOG, &GPIO_InitStructure);
+	
+	/* Connect EXTI Line 12 to PAG12 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource12);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource13);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource14);
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource15);
+	  /* Configure EXTI Line0 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line12|EXTI_Line13|EXTI_Line14|EXTI_Line15;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel =  EXTI15_10_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+	
+	
 
 }
 
@@ -368,13 +370,30 @@ void EXTI15_10_IRQHandler(void)
     /* Clear the EXTI line 12 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line12);
   }
-  else if(EXTI_GetITStatus(EXTI_Line13) != RESET)
+  if(EXTI_GetITStatus(EXTI_Line13) != RESET)
   {
     /* Reset Counter ENCODER2 -> TIM3 */
+    TIM_SetCounter(ENCODER2_TIMER,0x0);  
     
    
     /* Clear the EXTI line 13 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line13);
+  }
+	if(EXTI_GetITStatus(EXTI_Line14) != RESET)
+  {
+    /* Reset Counter ENCODER3 -> TIM4 */
+    TIM_SetCounter(ENCODER3_TIMER,0x0);  
+   
+    /* Clear the EXTI line 14 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line14);
+  }
+	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
+  {
+    /* Reset Counter ENCODER4 -> TIM5 */
+    TIM_SetCounter(ENCODER4_TIMER,0x0);  
+   
+    /* Clear the EXTI line 15 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line15);
   }
 }
 
