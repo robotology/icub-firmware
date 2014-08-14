@@ -132,7 +132,7 @@
 //#define EXECUTE_TEST_SWITCH
 
 #undef EXECUTE_TEST_ETH
-#define EXECUTE_TEST_ETH
+//#define EXECUTE_TEST_ETH
 
 #define EXECUTE_TEST_ADC
 
@@ -144,14 +144,6 @@
 //#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
 
-#if     defined(HAL_BOARD_MCBSTM32F400 )
-
-    //#undef EXECUTE_TEST_I2C
-    //#undef  EXECUTE_TEST_EEPROM
-    #undef EXECUTE_TEST_ENCODER
-    #undef EXECUTE_TEST_CAN
-
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -185,6 +177,7 @@ static void leds_init(void);
 static void leds_led0_toggle(void);
 static void leds_led1_toggle(void);
 static void leds_led2_toggle(void);
+static void leds_led3_toggle(void);
 extern void onsystick(void); // use extern to be used w/ eventviewer
 
 static void button_init(void);
@@ -533,6 +526,9 @@ static void leds_init(void)
     
     res = hal_led_init(hal_led3, NULL);
     res =  res;
+		
+		leds_led3_toggle();
+    leds_led3_toggle();
     
     res = hal_led_init(hal_led4, NULL);
     res =  res;
@@ -633,6 +629,7 @@ extern void onsystick(void)
     {
         count = 0;
         leds_led0_toggle();
+				leds_led1_toggle();
     }
     
     if(0 == (msTicks % s_tick_slower_rate_ms))
@@ -993,7 +990,7 @@ static void test_encoder_spi(void)
     hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);	
 	  hal_sys_delay(100*hal_RELTIME_1microsec);  
 	  
-				  enc[0]=hal_quad_enc_getCounter(0);
+		  enc[0]=hal_quad_enc_getCounter(0);
 			enc[1]=hal_quad_enc_getCounter(1); 
 			enc[2]=hal_quad_enc_getCounter(2);
 			enc[3]=hal_quad_enc_getCounter(3); 

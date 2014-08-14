@@ -43,7 +43,7 @@
 #define ICx_FILTER          (u8) 8 // 8<-> 670nsec
 
 
-#define ENCODER_PPR 10
+#define ENCODER_PPR 16000
 #define ENCODER1_TIMER TIM2
 #define ENCODER2_TIMER TIM3
 #define ENCODER3_TIMER TIM4
@@ -61,22 +61,28 @@ void hal_quad_enc_Init(void)
 {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   TIM_ICInitTypeDef TIM_ICInitStructure;
-  
-
-    
+  EXTI_InitTypeDef   EXTI_InitStructure;  
   GPIO_InitTypeDef GPIO_InitStructure;
   NVIC_InitTypeDef NVIC_InitStructure;
   
   
   // Encoder 1 unit connected to TIM2, 4X mode  
   // ENCODER 1  
+	/* Configure 
+							 PA0 as PHA 
+							 PB3 as PHB 
+							 PG12  as INDEX  */
+	
   /* TIM2 clock source enable */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-  /* Enable GPIOA and GPIOB, clock */
+  
+	
+	/* Enable GPIOA and GPIOB, clock */
+	
   RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA , ENABLE);
   RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOB , ENABLE);
+
   GPIO_StructInit(&GPIO_InitStructure);
-  /* Configure PC.06,07 as encoder input */
   GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -90,6 +96,7 @@ void hal_quad_enc_Init(void)
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOB, &GPIO_InitStructure);  
+	
   /* Connect TIM pins to AF1 */
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource0, GPIO_AF_TIM2);	
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_TIM2);	
@@ -122,7 +129,37 @@ void hal_quad_enc_Init(void)
   
   TIM_Cmd(ENCODER1_TIMER, ENABLE);
   
-  
+  // Index //
+	/* Enable GPIOA clock */
+	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOG , ENABLE); 
+	/* Enable SYSCFG clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+	
+	GPIO_StructInit(&GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOG, &GPIO_InitStructure);
+	
+	/* Connect EXTI Line0 to PAG12 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource12);
+	
+	  /* Configure EXTI Line0 */
+  EXTI_InitStructure.EXTI_Line = EXTI_Line12;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel =  EXTI15_10_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+	
+	
+	
   // Encoder 2 unit connected to TIM3, 4X mode  
   // ENCODER 2 
   /* TIM2 clock source enable */
@@ -316,5 +353,28 @@ int32_t hal_quad_enc_getCounter(int16_t encoder_number)
   return temp; 
 }
 
-
+/**
+  * @brief  This function handles External lines 15 to 10 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line12) != RESET)
+  {
+    /* Reset Counter ENCODER1 -> TIM2 */
+    TIM_SetCounter(ENCODER1_TIMER,0x0);  
+    
+    /* Clear the EXTI line 12 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line12);
+  }
+  else if(EXTI_GetITStatus(EXTI_Line13) != RESET)
+  {
+    /* Reset Counter ENCODER2 -> TIM3 */
+    
+   
+    /* Clear the EXTI line 13 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line13);
+  }
+}
 

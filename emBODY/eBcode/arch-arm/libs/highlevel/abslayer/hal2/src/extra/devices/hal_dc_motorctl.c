@@ -58,33 +58,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-/////////////////////// PWM Peripheral Input clock ////////////////////////////
-#define CKTIM	((uint32_t )168000000uL) 	/* Silicon running at 60MHz Resolution: 1Hz */
-/****	Power devices switching frequency  ****/
-#define PWM_FREQ ((uint16_t) 25000) // in Hz  (N.b.: pattern type is center aligned)
 
-/****    Deadtime Value   ****/
-#define DEADTIME_NS	((uint16_t) 800)  //in nsec; range is [0...3500] 
-
-#define LOW_SIDE_POLARITY  TIM_OCIdleState_Reset
-
-////////////////////// PWM Frequency ///////////////////////////////////
-
-/****	 Pattern type is edge aligned  ****/
-
-	#define PWM_PRSC ((uint8_t)0)
-
-        /* Resolution: 1Hz */                            
-	#define PWM_PERIOD ((uint16_t) (CKTIM / (uint32_t)(1 * PWM_FREQ *(PWM_PRSC+1)))) 
-
-#define PWM_MINDUTY 20
-/****	ADC IRQ-HANDLER frequency, related to PWM  ****/
-#define REP_RATE (1)  // MUST BE ODD(N.b): Internal current loop is performed every 
-                      //             (REP_RATE + 1)/(2*PWM_PERIOD) seconds.     
-					     
-////////////////////////////// MOTOR DEADTIME Value /////////////////////////////////
-	#define MOTOR_DEADTIME  (uint16_t)((unsigned long long)CKTIM/2 \
-          *(unsigned long long)DEADTIME_NS/1000000000uL) 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -273,7 +247,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   	TIM_OCInitTypeDef TIM1_OCInitStructure;
 	  TIM_TimeBaseInitTypeDef TIM8_TimeBaseStructure;
   	TIM_OCInitTypeDef TIM8_OCInitStructure;
-  //	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure, TIM8_BDTRInitStructure;
+  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure, TIM8_BDTRInitStructure;
   	NVIC_InitTypeDef NVIC_InitStructure;
   	GPIO_InitTypeDef GPIO_InitStructure;
 //	ADC_InitTypeDef ADC_InitStructure;
@@ -341,7 +315,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);	
 	/* Time Base configuration */
 	TIM1_TimeBaseStructure.TIM_Prescaler = PWM_PRSC;
-	TIM1_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned1;//TIM_CounterMode_Up;
+	TIM1_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned3;//TIM_CounterMode_Up;
 	TIM1_TimeBaseStructure.TIM_Period = PWM_PERIOD/2; // in CenterAligned mode the couter counts twice half a pwm period 
 	TIM1_TimeBaseStructure.TIM_ClockDivision = 0;// TIM_CKD_DIV2;
 	TIM1_TimeBaseStructure.TIM_RepetitionCounter = REP_RATE;
@@ -371,13 +345,13 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
     TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
 	TIM_OC4Init(TIM1, &TIM1_OCInitStructure);
 
-/*	
+	
 	// Automatic Output enable, Break, dead time and lock configuration
 	TIM1_BDTRInitStructure.TIM_OSSRState = TIM_OSSRState_Enable;
 	TIM1_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
 	TIM1_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM1_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
+//	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
 	TIM1_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_Low;
 	TIM1_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
@@ -385,7 +359,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 		
 	TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
 	TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
-*/	
+	
 	
 	//initialization of TIM1 for controlling the first 2 motors
 	/* TIM1 Peripheral Configuration -------------------------------------------*/
@@ -418,7 +392,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8 , ENABLE);	
 	/* Time Base configuration */
 	TIM8_TimeBaseStructure.TIM_Prescaler = PWM_PRSC;
-	TIM8_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned1;//TIM_CounterMode_Up;
+	TIM8_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned3;//TIM_CounterMode_Up;
 	TIM8_TimeBaseStructure.TIM_Period = PWM_PERIOD/2; // in CenterAligned mode the couter counts twice half a pwm period 
 	TIM8_TimeBaseStructure.TIM_ClockDivision = 0;// TIM_CKD_DIV2;
 	TIM8_TimeBaseStructure.TIM_RepetitionCounter = REP_RATE;
@@ -448,13 +422,13 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   TIM8_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
 	TIM_OC4Init(TIM8, &TIM8_OCInitStructure);
 
-/*	
+	
 	// Automatic Output enable, Break, dead time and lock configuration
 	TIM8_BDTRInitStructure.TIM_OSSRState = TIM_OSSRState_Enable;
 	TIM8_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
 	TIM8_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM8_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM8_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
+	TIM8_BDTRInitStructure.TIM_Break = TIM_Break_Disable;
 	TIM8_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_Low;
 	TIM8_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
@@ -462,7 +436,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 		
 	TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
 	TIM_ITConfig(TIM8, TIM_IT_Break, ENABLE);
-*/	
+	
 	
 	
 	TIM_SelectOutputTrigger(TIM1, TIM_TRGOSource_Update);

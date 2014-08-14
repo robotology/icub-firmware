@@ -67,7 +67,7 @@
 #define     HAL_USE_ETH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-#define     HAL_USE_SPI
+//#define     HAL_USE_SPI
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_ADC
