@@ -14,6 +14,8 @@
 	#include "brdcfg/hal_brdcfg_6sg_modules.h"
 #elif defined HAL_BOARD_2FOC
 	#include "brdcfg/hal_brdcfg_2foc_modules.h"
+#elif defined HAL_BOARD_2FOCAPPL
+	#include "brdcfg/hal_brdcfg_2focappl_modules.h"
 #else 
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif                      

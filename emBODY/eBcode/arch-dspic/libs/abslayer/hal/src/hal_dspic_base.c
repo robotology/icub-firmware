@@ -35,15 +35,37 @@
 #include "string.h"
 
 
-
+#ifdef HAL_USE_ARCH
 #include "hal_dspic_arch_hid.h"
+#endif
+
+#ifdef HAL_USE_CAN
 #include "hal_dspic_can_hid.h" 
+#endif
+
+#ifdef HAL_USE_GPIO
 #include "hal_dspic_gpio_hid.h" 
+#endif
+
+#ifdef HAL_USE_FLASH
 #include "hal_dspic_flash_hid.h"
+#endif
+
+#ifdef HAL_USE_LED
 #include "hal_dspic_led_hid.h" 
+#endif
+
+#ifdef HAL_USE_EEPROM
 #include "hal_dspic_eeprom_hid.h"
+#endif
+
+#ifdef HAL_USE_SYS
 #include "hal_dspic_sys_hid.h"
+#endif
+
+#ifdef HAL_USE_TIMER
 #include "hal_dspic_timer_hid.h"
+#endif
 
 
  
@@ -176,12 +198,14 @@ extern hal_result_t hal_base_initialise(const hal_cfg_t *cfg, uint32_t *data04al
     s_hal_fn_osal_system_scheduling_suspend = cfg->extfn.osal_system_scheduling_suspend;
     s_hal_fn_osal_system_scheduling_restart = cfg->extfn.osal_system_scheduling_restart;
 
-
+#ifdef HAL_USE_SYS
+    // marco.accame on 21aug14: cpu_freq and pll freq are used by sys ...
     if((80ul*1000ul*1000ul != cfg->cpu_freq) || (10ul*1000ul*1000ul != cfg->arch.pll_freq))
     {   
         hal_base_hid_on_fatalerror(hal_fatalerror_incorrectparameter, "hal_base_initialise(): incorrect frequency");
         return(hal_res_NOK_generic);
     }
+#endif
 
     
 #if 0 
