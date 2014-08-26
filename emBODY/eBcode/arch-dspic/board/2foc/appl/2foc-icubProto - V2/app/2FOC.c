@@ -103,7 +103,7 @@
 #include "crc16.h"
 
 #include "can_icubProto.h"
-#include "eEbasicStorage.h"
+
 #include "stdint.h"
 
 //
@@ -893,11 +893,7 @@ switchondisabled:
     // LED blinking velocity
     LED_status.GreenBlinkRate = BLINKRATE_ULTRAFAST;
 
-    if (ee_basicstrg_res_ok != ee_basicstrg_canaddress_get(&boardCanAddr))
-    {
-        //should never happen!!!
-        boardCanAddr = BOARD_CAN_ADDR_DEFAULT;
-    }
+    _memcpy_p2d16(&boardCanAddr, 0x15000, 4);
 
     CanIcubProtoInit(boardCanAddr);
 

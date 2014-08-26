@@ -33,7 +33,7 @@
 #include "EmuROM.h"
 #include "can_icubProto.h"
 #include "faults.h"
-
+#include "crc16.h"
 
 #define ICUBPROTO_PAYLOAD_ERROR_SET(txpayload_ptr, txlen_ptr, error_code)\
 { \
@@ -41,6 +41,18 @@
 	txpayload->b[0] = error_code; \
 }
 
+typedef struct              // size is 4+60+4+4 = 72
+{
+    uint32_t                canadr;
+    uint8_t                 filler60deviceinfo[60];
+
+    uint8_t         mode;
+    uint8_t         dummy0;       
+    uint16_t        dummy1;
+    uint32_t        crc;
+} s_deviceinfo_in_flash_t;
+
+static s_deviceinfo_in_flash_t s_devinfo = {1, {0}, 0, 0, 0, 0};
 
 __inline__ static void s_controlMode_reset(void)
 {
@@ -428,18 +440,19 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
 //            *txlen=0x1;
 //             txpayload->b[0] = CAN_PROTO_ERROR_COMMAND_NOT_INPLEMENTED;
-              *txlen=0x0;
-             return(0);
+              //*txlen=0;
+              //return(0);
             
             /* currently it is NOT possible change board can address, 
             so the code below is commented, but it is right. */
 
-//            if(2 != rxlen)
-//            {   // incorrect number of parameters
+            if(2 != rxlen)
+            {   // incorrect number of parameters
 //                *txlen = 0x1;
 //                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
-//                return(0);
-//            }
+                *txlen=0;
+                return(0);
+            }
 //#ifndef CAN_CMD_ALWAYS_ACCEPT
 //            if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
 //            {
@@ -448,10 +461,30 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 //              return(0);
 //            }
 //#endif
-//            ApplicationData.EepromHeader.EE_CAN_BoardAddress = rxpayload->b[1];
-//            canprotoparser_bid = rxpayload->b[1];
-//            CanIcubProtoTransmitterUpdateBoardId(canprotoparser_bid);
-//            CanIcubProtoSetFilters(canprotoparser_bid);
+              ApplicationData.EepromHeader.EE_CAN_BoardAddress = rxpayload->b[1];
+              canprotoparser_bid = rxpayload->b[1];
+              CanIcubProtoTransmitterUpdateBoardId(canprotoparser_bid);
+              CanIcubProtoSetFilters(canprotoparser_bid);
+
+              {
+                  int i;
+
+                  _memcpy_p2d16(&s_devinfo, 0x15000, sizeof(s_deviceinfo_in_flash_t));
+
+                  _erase_flash(0x15000);
+
+                  s_devinfo.canadr = canprotoparser_bid;
+
+                  s_devinfo.mode   = 1;
+                  s_devinfo.dummy0 = 0;
+                  s_devinfo.dummy1 = 0xcaac;
+                  s_devinfo.crc    = crc16(0xFFFF, &s_devinfo, 64);
+                  
+                  for (i=0; i<sizeof(s_deviceinfo_in_flash_t); i+=_FLASH_ROW)
+                  {
+                      _write_flash16(0x15000+i, ((int*)(&s_devinfo))+i/2);
+                  }
+              }
         }break;
         
         case ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY: 
@@ -476,7 +509,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             }
 		
 	          ////il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A 1310)
-            //il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A=2000)
+              //il dato che arriva è espresso in mA va trasformato in IAD della 2FOC (1A=2000)
 	          ApplicationData.CurLimit=(rxpayload->b[2] << 8 | rxpayload->b[1])*2;
         }break;
         
@@ -609,7 +642,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 	         IqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
 	         if (IqRef>ApplicationData.CurLimit)
                IqRef=ApplicationData.CurLimit;
-           else if (IqRef<-ApplicationData.CurLimit)
+             else if (IqRef<-ApplicationData.CurLimit)
                IqRef=-ApplicationData.CurLimit;
 	         CtrlReferences.qIqRef=IqRef;
            // set reference value for toggling torque
