@@ -41,13 +41,37 @@
 
 #include "osal.h"
 #include "ipal.h"
+#include "hal_sys.h"
 
+
+#define ARP_NEWMODE
+//#define TEST_ARP
+#undef TEST_ARP_EVIEW
+#undef TEST_ARP_PRINT
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "EOMtheIPnet.h"
+
+
+#if defined(TEST_ARP_EVIEW)
+
+#include "eventviewer.h"
+
+void fn_mark1(void){}
+void fn_mark2(void){}
+void fn_ipnetarp(void){}
+static evEntityId_t ev_mark1 = ev_ID_first_usrdef+1;    
+static evEntityId_t ev_mark2 = ev_ID_first_usrdef+2;   
+static evEntityId_t ev_ipnetarp = ev_ID_first_usrdef+3;
+
+evEntityId_t evprev_mark1;
+evEntityId_t evprev_mark2;
+evEntityId_t evprev_ipnetarp;
+   
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -134,6 +158,9 @@ static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n);
 static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t msg);
 
 static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+static eOresult_t s_eom_ipnet_non_blocking_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout);
+#endif
 static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s);
 static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s);
 static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t evt);
@@ -175,16 +202,21 @@ static EOMtheIPnet s_eom_theipnet =
     .tsktick                = NULL,                               // tsktick
     .cmd                    =
                             {
-                                .mtxcaller  = NULL, 
-                                .opcode     = cmdDoNONE, 
-                                .repeatcmd  = 0,
-                                .result     = 0,
-                                .par16b     = 0,
-                                .par32b     = 0,
-                                .tout       = 0, 
-                                .semaphore  = NULL, 
-                                .stoptmr    = NULL,
-                                .stopact    = NULL
+                                .mtxcaller      = NULL, 
+                                .opcode         = cmdDoNONE, 
+                                .repeatcmd      = 0,
+                                .result         = 0,
+                                .par16b         = 0,
+                                .par32b         = 0,
+                                .par32x         = 0,
+                                .par64x         = 0,
+                                .tout           = 0, 
+                                .blockingsemaphore = NULL, 
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                                .busysemaphore  = NULL,
+#endif
+                                .stoptmr        = NULL,
+                                .stopact        = NULL
                             },   // cmd
     .rxpacket               = NULL,                                
     .maxwaittime            = 0,                                  // maxwaittime 
@@ -255,10 +287,15 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                                     );
 
                                              
-    // i get cmd.semaphore, initted with zero tokens
-    s_eom_theipnet.cmd.semaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 0);
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.semaphore), s_eobj_ownname, "osal cannot give a sem");
+    // i get cmd.blockingsemaphore, initted with zero tokens
+    s_eom_theipnet.cmd.blockingsemaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 0);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.blockingsemaphore), s_eobj_ownname, "osal cannot give a sem");
 
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    s_eom_theipnet.cmd.busysemaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 1);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.busysemaphore), s_eobj_ownname, "osal cannot give a sem");
+#endif
+    
     s_eom_theipnet.cmd.mtxcaller = osal_mutex_new();
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.mtxcaller), s_eobj_ownname, "osal cannot give a mtx");
 
@@ -346,7 +383,11 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     s_eom_ipnet_ipal_start();
 #endif
 
-                                          
+#if defined(TEST_ARP_EVIEW)
+    eventviewer_load(ev_mark1, fn_mark1);
+    eventviewer_load(ev_mark2, fn_mark2);
+    eventviewer_load(ev_ipnetarp, fn_ipnetarp);
+#endif                                          
     return(&s_eom_theipnet);
 }    
 
@@ -381,6 +422,135 @@ extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
     return(eov_ipnet_Deactivate(s_eom_theipnet.ipnet));
 }
 
+#if defined(TEST_ARP)
+#include "hal.h"
+#include "osal.h"
+#include "stdio.h"
+
+#include "EOtheLEDpulser.h"
+
+    static uint64_t t0 =0;
+    static uint64_t t1 =0;
+#endif
+
+
+#if defined(TEST_ARP) 
+
+extern eOresult_t eom_ipnet_ResolveIP_TEST(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
+{
+    if(NULL == ip)
+    {
+        return(eores_NOK_nullpointer);
+    }
+ 
+    //tout *= 4;
+    tout = 40*1000*1000;
+    
+    eOresult_t r = eores_OK;
+#if defined(TEST_ARP_PRINT)    
+    char str[64];
+#endif
+    uint64_t tt = 0;
+    uint8_t mac[6] = {0};
+    uint8_t *ad = (uint8_t*)&ipaddr;
+    
+    //osal_task_wait(10000000);
+    
+    //osal_task_wait(10*eok_reltime1ms);
+    
+    //eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_five); //, 2*eok_reltime1sec, 0);
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 100*eok_reltime1ms, 0);
+    
+
+    
+//    if(ipal_res_OK == ipal_arp_iscached(ipaddr, mac))
+//    {
+//        snprintf(str, sizeof(str), "about IP %d.%d.%d.%d: we already have mac = %x:%x:%x:%x:%x:%x", 
+//                                    ad[0], ad[1], ad[2], ad[3],
+//                                    mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);    
+//        hal_trace_puts(str);        
+//    }
+    
+    //t0 = osal_system_abstime_get();
+    //osal_task_wait(1*1000*1000);
+
+#if defined(TEST_ARP_EVIEW)
+    evprev_mark1 = eventviewer_switch_to(ev_mark1);
+#endif    
+    t0 = osal_system_abstime_get();    
+    r = s_eom_ipnet_ARP(ip->ipnet, ipaddr, tout);
+    t1 = osal_system_abstime_get();
+#if defined(TEST_ARP_EVIEW)
+    eventviewer_switch_to(evprev_mark1);
+#endif    
+    tt = t1 - t0;
+    uint32_t s = tt/1000000;
+    uint32_t m = tt/1000;
+    m %= 1000;
+    uint32_t u = tt%1000;
+    uint32_t usec = (uint32_t)tt;
+
+#if defined(TEST_ARP_PRINT)
+    snprintf(str, sizeof(str), "doing ARP to %d.%d.%d.%d: res = %d in %d.%.3d sec + %.3d usec (usec = %d)", 
+                               ad[0], ad[1], ad[2], ad[3],
+                                r, s, m, u, usec);    
+    hal_trace_puts(str);
+#endif    
+    
+    // now switch leds one to four in on/off
+    if(eores_OK != r)
+    {   // if ko then they are all off and i pulse the number 
+        eo_ledpulser_Off(eo_ledpulser_GetHandle(), eo_ledpulser_led_five); 
+        eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 500*eok_reltime1ms, 0);            
+    }
+    else
+    {
+        eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 2000*eok_reltime1ms, 0);
+        
+        uint32_t ss = 1000*s+m;
+        ss /= 1000;
+        if(ss>=31)
+        {
+            eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
+            eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_one);
+            eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_two);
+            eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_three);
+            eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_four);
+        }
+        else
+        {
+        
+            if((ss&0x1))
+            {
+                eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_four);
+            }
+            if((ss&0x2))
+            {
+                eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
+            }
+            if((ss&0x4))
+            {
+                eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_one);
+            } 
+            if((ss&0x8))
+            {
+                eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_two);
+            }  
+            if((ss&0x10))
+            {
+                eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_three);
+            }             
+        }        
+        
+        
+    }
+    
+    return(r);
+
+}
+
+#endif
+
 
 extern eOresult_t eom_ipnet_ResolveIP(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
 {
@@ -391,6 +561,18 @@ extern eOresult_t eom_ipnet_ResolveIP(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOre
 
     return(s_eom_ipnet_ARP(ip->ipnet, ipaddr, tout));
 }
+
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+extern eOresult_t eom_ipnet_ResolveIPnonblocking(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
+{
+    if(NULL == ip)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    return(s_eom_ipnet_non_blocking_ARP(ip->ipnet, ipaddr, tout));
+}
+#endif
 
 
 extern eOresult_t eom_ipnet_IGMPgroupJoin(EOMtheIPnet *ip, eOipv4addr_t igmp)
@@ -479,12 +661,22 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
+
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)   
+    if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeINFINITE))
+    {   // the semaphore could not be decremented because someone else before has decremented it: quit
+        osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }    
+#endif
     
     // - build the command to be sent to the proc task
 
     // copy the wanted command: doarp
     s_eom_theipnet.cmd.par16b = maxarptx;
     s_eom_theipnet.cmd.par32b = ipaddr;
+    s_eom_theipnet.cmd.par32x = 100*1000;   // max frequency of tx of arp. the ipnet is called at every timeout or asynchronously at pkt rx or tx request
+    s_eom_theipnet.cmd.par64x = 0;          // time of last arp pkt sent
     s_eom_theipnet.cmd.result  = 0;
     s_eom_theipnet.cmd.tout  = tout;
     s_eom_theipnet.cmd.opcode = cmdDoARP;
@@ -495,7 +687,8 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
 
     // - now the calling task is placed in hold until this semaphore is incremented  
     // - by the ipnet task when it has finished executing the command or its time has expired
-    osal_semaphore_decrement(s_eom_theipnet.cmd.semaphore, osal_reltimeINFINITE);
+    osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
+    
 
     // - verify operation success
     if(1 == s_eom_theipnet.cmd.result)
@@ -512,6 +705,80 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
 
     return(res);
 }
+
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+static eOresult_t s_eom_ipnet_non_blocking_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
+{
+    eOresult_t res = eores_NOK_generic;
+
+    static const uint16_t maxarptx = 65000;
+    
+    if(NULL == ip) 
+    {
+        return(eores_NOK_nullpointer);    
+    } 
+
+    // verify we dont have a zero ip address
+    if(0x00000000 == ipaddr)
+    {
+        return(eores_NOK_generic);
+    } 
+
+    // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
+    osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
+    
+    // if in here, then it means that: no other task has asked arping. but the same task may have asked a arp not yet expired
+    
+    // i understand it by attempting to get the busysemaphore w/ 0 timeout
+    if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeZERO))
+    {   // the semaphore could not be decremented beacuse someone else before has decremented it: quit
+        osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }
+//    else
+//    {   // nobody has taken the semaphore, thus we can go on
+//        // in order to respect the same operations as in blocking mode, ... we increment
+//        osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+//    }
+    
+
+    // - build the command to be sent to the proc task
+
+    // copy the wanted command: doarp
+    s_eom_theipnet.cmd.par16b = maxarptx;
+    s_eom_theipnet.cmd.par32b = ipaddr;
+    s_eom_theipnet.cmd.par32x = 100*1000;   // max frequency of tx of arp. the ipnet is called at evry timeout or asynchronously at pkt rx or tx request
+    s_eom_theipnet.cmd.par64x = 0; // time of last arp pkt sent
+    s_eom_theipnet.cmd.result  = 0;
+    s_eom_theipnet.cmd.tout  = tout;
+    s_eom_theipnet.cmd.opcode = cmdDoARP;
+
+ 
+    // - tell the task that there is a command to process, so that a switch context is forced.
+    s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, eov_ipnet_evt_CMD2process);
+
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)    
+    // - now the calling task is placed in hold until this semaphore is incremented  
+    // - by the ipnet task when it has finished executing the command or its time has expired
+    osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
+
+    // - verify operation success
+    if(1 == s_eom_theipnet.cmd.result)
+    {
+        res = eores_OK;
+    }
+    else
+    {
+        res = eores_NOK_timeout;
+    }
+
+#endif    
+    // - enable again another task to send a command to the ipnet
+    osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+
+    return(eores_OK);
+}
+#endif
 
 /*  @brief      called by an external task, via some methods of a socket, to add a socket to the management of the ipnet
     @details    it sends a command to the tskproc, which adds the sockets and then unblocks the caller.
@@ -535,8 +802,13 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
-
-
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeINFINITE))
+    {   // the semaphore could not be decremented because someone else before has decremented it: quit
+        osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }    
+#endif
     // - fill the command and also verify if the socket can be attached
     canattach = s_eom_ipnet_attach_rqst_dtgsocket(ip, (EOsocketDatagram*)s);
  
@@ -549,7 +821,7 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
         // - now the calling task is placed in hold until this semaphore is incremented 
         // - by the ipnet task when it has finished executing the command or its time has expired
-        osal_semaphore_decrement(s_eom_theipnet.cmd.semaphore, osal_reltimeINFINITE);
+        osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
 
         // verify the success of the operation
         if(1 == s_eom_theipnet.cmd.result)
@@ -561,7 +833,12 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
             res = eores_NOK_timeout;
         }
     }
-
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    else
+    {
+        osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+    }
+#endif
 
     // - enable again another task to send a command to the ipnet
     osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
@@ -593,7 +870,13 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
 
-
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeINFINITE))
+    {   // the semaphore could not be decremented because someone else before has decremented it: quit
+        osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }  
+#endif        
     // - fill the command and also verify if the socket can be detached
     candetach = s_eom_ipnet_detach_rqst_dtgsocket(ip, (EOsocketDatagram*)s);
     
@@ -606,7 +889,7 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
         // - now the calling task is placed in hold until this semaphore is incremented 
         // - by the ipnet task when it has finished executing the command or its time has expired
-        osal_semaphore_decrement(s_eom_theipnet.cmd.semaphore, osal_reltimeINFINITE);
+        osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
 
         // verify the success of the operation
         if(1 == s_eom_theipnet.cmd.result)
@@ -618,8 +901,13 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
             res = eores_NOK_timeout;
         }
 
-    }    
-
+    } 
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)  
+    else
+    {
+        osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+    }
+#endif
 
     // - enable again another task to send a command to the ipnet
     osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
@@ -1004,7 +1292,19 @@ static void s_eom_ipnet_process_command(void)
                 s_eom_theipnet.cmd.par16b --;
                 s_eom_theipnet.cmd.repeatcmd = 1;
 
-                if(ipal_res_OK == ipal_arp_request(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently))
+                s_eom_theipnet.cmd.par64x = osal_system_abstime_get();
+#if defined(TEST_ARP_EVIEW)
+                evprev_ipnetarp = eventviewer_switch_to(ev_ipnetarp);
+                eventviewer_switch_to(evprev_ipnetarp);
+#endif 
+#if defined(TEST_ARP_PRINT)
+                char st[60] = {0};
+                uint32_t x = s_eom_theipnet.cmd.par64x/1000;
+                snprintf(st, sizeof(st), "arp@ms=%d", x);
+                hal_trace_puts(st);
+#endif
+                const uint8_t forcearpframe = 1;
+                if(ipal_res_OK == ipal_arp_resolve(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently, forcearpframe))
                 { 
                     // ok at the first time .....  
                     s_eom_theipnet.cmd.result = 1;
@@ -1012,14 +1312,51 @@ static void s_eom_ipnet_process_command(void)
                     s_eom_theipnet.cmd.repeatcmd = 0;
                     s_eom_theipnet.cmd.tout = 0;
                     // release the caller
-                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);
+#if defined(TEST_ARP_EVIEW)
+                    eventviewer_switch_to(ev_mark2);
+#endif
+                    osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                    osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#endif                    
                 }
                 else if(0 != s_eom_theipnet.cmd.tout)
                 {
+#if !defined(ARP_NEWMODE)
                     // unlucky. retry with a timeout
                     // start a one-shot timer with tout and which sends an event of stop to this task
                     eo_action_SetEvent(s_eom_theipnet.cmd.stopact, eov_ipnet_evt_CMD2stop, s_eom_theipnet.tskproc);
                     eo_timer_Start(s_eom_theipnet.cmd.stoptmr, eok_abstimeNOW, s_eom_theipnet.cmd.tout, eo_tmrmode_ONESHOT, s_eom_theipnet.cmd.stopact);
+#else          
+                    
+                    if(ipal_res_OK == ipal_arp_isresolved(s_eom_theipnet.cmd.par32b))
+                    {
+                        // ok at the seconf time .....  
+                        s_eom_theipnet.cmd.result = 1;
+                        s_eom_theipnet.cmd.par16b = 0;
+                        s_eom_theipnet.cmd.repeatcmd = 0;
+                        s_eom_theipnet.cmd.tout = 0;
+                        // release the caller
+#if defined(TEST_ARP_EVIEW)
+                        eventviewer_switch_to(ev_mark2);
+#endif
+                        osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);  
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)                        
+                        osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect); 
+#endif                        
+                    }
+                    else
+                    {                    
+                        // unlucky. retry with a timeout
+                        // start a one-shot timer with tout and which sends an event of stop to this task
+                        eo_action_SetEvent(s_eom_theipnet.cmd.stopact, eov_ipnet_evt_CMD2stop, s_eom_theipnet.tskproc);
+                        eo_timer_Start(s_eom_theipnet.cmd.stoptmr, eok_abstimeNOW, s_eom_theipnet.cmd.tout, eo_tmrmode_ONESHOT, s_eom_theipnet.cmd.stopact);
+                        
+                        // - tick the task in order to produce max throughput.
+                        //s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, eov_ipnet_evt_tick);
+
+                    }
+#endif                
                 }
 
             }
@@ -1032,12 +1369,14 @@ static void s_eom_ipnet_process_command(void)
             // get the derived socket
             sdrv = (((void*) s_eom_theipnet.cmd.par32b)); 
             
-            // initialise the base socket, commit the derived socket in proper data stratcure of ipnet
+            // initialise the base socket, commit the derived socket in proper data structure of ipnet
             s_eom_ipnet_attach_proc_dtgsocket((EOsocketDatagram*)sdrv);
 
             // increment the semaphore to allow execution of the caller
-            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK); 
-
+            osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK); 
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+            osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#endif
         } break;
 
         case cmdDetachDTG:
@@ -1068,8 +1407,10 @@ static void s_eom_ipnet_process_command(void)
 
 
             // increment the semaphore to allow execution of the caller
-            osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK); 
-                              
+            osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK); 
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+            osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#endif                              
         } break;
 
 
@@ -1082,7 +1423,10 @@ static void s_eom_ipnet_process_command(void)
 
 static void s_eom_ipnet_repeat_command(void)
 {
-
+#if defined(ARP_NEWMODE)
+    static uint8_t mux = 0;
+    uint8_t stopit = 0;
+#endif    
     switch(s_eom_theipnet.cmd.opcode)
     {
         case cmdDoARP:
@@ -1098,8 +1442,9 @@ static void s_eom_ipnet_repeat_command(void)
                     s_eom_theipnet.cmd.par16b --;
                 }
                 s_eom_theipnet.cmd.repeatcmd = 1;
-
-                if(ipal_res_OK == ipal_arp_request(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently))
+#if !defined(ARP_NEWMODE)
+                const uint8_t forcearpframe = 1;
+                if(ipal_res_OK == ipal_arp_resolve(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently, forcearpframe))
                 { 
                     // ok at the first time .....  
                     s_eom_theipnet.cmd.result = 1;
@@ -1113,8 +1458,77 @@ static void s_eom_ipnet_repeat_command(void)
                         s_eom_theipnet.cmd.tout = 0;
                     }
                     // release the caller
-                    osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);
+                    osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                    osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#endif
                 }
+#else
+
+                if(ipal_res_OK == ipal_arp_isresolved(s_eom_theipnet.cmd.par32b))
+                {
+                    stopit = 1;
+                }
+                else 
+                {
+                    uint64_t now = osal_system_abstime_get();
+                    uint32_t delta = now - s_eom_theipnet.cmd.par64x;
+                    if(now >= (s_eom_theipnet.cmd.par64x+s_eom_theipnet.cmd.par32x-10))
+                    {
+                        s_eom_theipnet.cmd.par64x = osal_system_abstime_get();   
+#if defined(TEST_ARP_EVIEW)
+                        evprev_ipnetarp = eventviewer_switch_to(ev_ipnetarp);
+                        eventviewer_switch_to(evprev_ipnetarp);
+#endif
+#if defined(TEST_ARP_PRINT)
+                        char st[60] = {0};
+                        uint32_t x = s_eom_theipnet.cmd.par64x/1000;
+                        snprintf(st, sizeof(st), "arp@ms=%d (d=%d)", x, delta/1000);
+                        hal_trace_puts(st);
+#endif
+                        const uint8_t forcearpframe = 1;
+                        if(ipal_res_OK == ipal_arp_resolve(s_eom_theipnet.cmd.par32b, ipal_arp_cache_permanently, forcearpframe))
+                        {
+                            stopit = 1;
+                        }
+                    }
+                }
+//                else if(0 != s_eom_theipnet.cmd.tout)
+//                {
+//                    // - tick the task in order to produce max throughput.
+//                    //s_eom_ipnet_Alert(s_eom_theipnet.ipnet, &s_eom_theipnet, eov_ipnet_evt_tick);
+//                    
+//                    // allow 1 ms of wait
+//                    //osal_task_wait(2000);
+//                    //hal_sys_delay(1000);
+//                }
+                
+                if(1 == stopit)
+                {
+#if defined(TEST_ARP_EVIEW)
+                    eventviewer_switch_to(ev_mark2);
+#endif
+                    // ok now .....  
+                    s_eom_theipnet.cmd.result = 1;
+                    s_eom_theipnet.cmd.par16b = 0;
+                    s_eom_theipnet.cmd.par32x = 0;
+                    s_eom_theipnet.cmd.par64x = 0;
+                    s_eom_theipnet.cmd.repeatcmd = 0;
+                    s_eom_theipnet.cmd.tout = 0;
+                    // release the timer (if any)
+                    if(0 != s_eom_theipnet.cmd.tout)
+                    {
+                        eo_timer_Stop(s_eom_theipnet.cmd.stoptmr);
+                        s_eom_theipnet.cmd.tout = 0;
+                    }
+                    
+                    // release the caller
+                    osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                    osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#endif
+                }
+#endif           
 
             }
             else
@@ -1124,6 +1538,8 @@ static void s_eom_ipnet_repeat_command(void)
                 s_eom_theipnet.cmd.par16b = 0;
                 s_eom_theipnet.cmd.opcode = cmdDoNONE;
                 s_eom_theipnet.cmd.par32b = 0;
+                s_eom_theipnet.cmd.par32x = 0;
+                s_eom_theipnet.cmd.par64x = 0;                
                 s_eom_theipnet.cmd.repeatcmd = 0;
  
                 // release the timer (if any)
@@ -1132,8 +1548,14 @@ static void s_eom_ipnet_repeat_command(void)
                     eo_timer_Stop(s_eom_theipnet.cmd.stoptmr);
                     s_eom_theipnet.cmd.tout = 0;
                 }
+#if defined(TEST_ARP_EVIEW)
+                    eventviewer_switch_to(ev_mark2);
+#endif
                 // release the caller
-                osal_semaphore_increment(s_eom_theipnet.cmd.semaphore, osal_callerTSK);                
+                osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK); 
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);                
+#endif
             } 
  
         } break;

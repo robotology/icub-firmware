@@ -71,8 +71,13 @@ typedef struct
     uint8_t                 result;         // the result of the command: 1 is OK
     uint16_t                par16b;         // first parameter
     uint32_t                par32b;         // second parameter
+    uint32_t                par32x;         // third parameter
+    uint64_t                par64x;         // fourth parameter
     uint32_t                tout;           // the timeout of the command 
-    osal_semaphore_t        *semaphore;     // used by the caller to block until the end of the command execution.
+    osal_semaphore_t        *blockingsemaphore;     // used by the caller to block until the end of the command execution.
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    osal_semaphore_t        *busysemaphore; // used by the caller to verify if another task (or the same task) is using the command
+#endif
     EOtimer                 *stoptmr;       // used to drop the command after tout microsec even if the executer hasnt finished it
     EOaction                *stopact;       // the action to be done at expiry of the stop timer
 } EOMtheIPnetCommand; 

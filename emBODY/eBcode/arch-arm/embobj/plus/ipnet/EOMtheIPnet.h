@@ -193,7 +193,8 @@ extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip);
 
 
 /** @fn         extern eOresult_t eom_ipnet_ResolveIP(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
-    @brief      Resolve the IP address using ARP.
+    @brief      It asks to IPnet.run to resolve IP (via ARP) in tout usec. The caller task is stopped until
+                IPnet.run resolves or exit by timeout. 
     @param      ip          The IP net
     @param      ipaddr      The IP address to be solved.
     @param      tout        The timeout. However, never more than 65000 ARP attempts.
@@ -202,6 +203,10 @@ extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip);
  **/
 extern eOresult_t eom_ipnet_ResolveIP(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout);
 
+ 
+#if defined(TEST_ARP)
+extern eOresult_t eom_ipnet_ResolveIP_TEST(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout);
+#endif
 
 /** @fn         extern eOresult_t eom_ipnet_IGMPgroupJoin(EOMtheIPnet *ip, eOipv4addr_t igmp)
     @brief      Joins an IGMP multicast group.
