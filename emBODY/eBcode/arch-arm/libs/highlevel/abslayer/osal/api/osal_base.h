@@ -162,6 +162,8 @@ typedef enum
     osal_error_internal3            = 0xF3,             
     osal_error_internal4            = 0xF4,
     osal_error_internal5            = 0xF5,
+    osal_error_internal6            = 0xF6,
+    osal_error_internal7            = 0xF7,
     osal_error_unknownfromrtos      = 0xD0
 } osal_fatalerror_t;
 

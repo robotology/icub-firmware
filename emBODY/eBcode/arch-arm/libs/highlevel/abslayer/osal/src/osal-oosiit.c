@@ -1685,6 +1685,11 @@ void oosiit_sys_error(oosiit_error_code_t errorcode)
     char str[100];
     switch(errorcode)
     {
+        case oosiit_error_unknown:
+        {
+            s_osal_error(osal_error_unknownfromrtos, "osal: unknown");    
+        } break;
+        
         case oosiit_error_stackoverflow:
         {
             s_osal_error(osal_error_stackoverflow, "osal: stack overflow");
@@ -1725,11 +1730,21 @@ void oosiit_sys_error(oosiit_error_code_t errorcode)
         {
             s_osal_error(osal_error_internal5, "osal: known error from rtos (used an invalid objptr)");
         } break;
+
+        case oosiit_error_invalid_param:
+        {
+            s_osal_error(osal_error_internal6, "osal: known error from rtos (used an invalid param)");
+        } break;
+        
+        case oosiit_error_invalid_call:
+        {
+            s_osal_error(osal_error_internal7, "osal: known error from rtos (used an invalid call)");
+        } break;
  
         default:
         {
             snprintf(str, sizeof(str), "osal: error 0x%x from rtos", errorcode);
-            s_osal_error(osal_error_unknownfromrtos, str);
+            s_osal_error(osal_error_generic, str);
         } break;
     }
 }
@@ -1865,7 +1880,7 @@ static void s_osal_fill_cfg(oosiit_cfg_t *oosiit_c, const osal_cfg_t *osal_c)
     oosiit_c->sizeof64alignedStack              = osal_c->globalstacksize; 
 #else
     #if defined(OSAL_CPUFAM_CM4 )
-    #define ISRQUEUESIZE 64
+    #define ISRQUEUESIZE 128
     #else
     #define ISRQUEUESIZE 16
     #endif
