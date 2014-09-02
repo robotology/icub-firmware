@@ -605,7 +605,7 @@ void rt_tsk_lock (void) {
 void rt_tsk_unlock (void) {
   /* Unlock scheduler and re-enable task switching */
   // IIT-EXT: added the execution of the systick if the timer was expired in the meantime.
-  // warning: the systick executes only one even if the lock lastd for more than one period
+  // warning: the systick executes only one even if the lock lasted for more than one period
   volatile U32 nvicstctrl = NVIC_ST_CTRL;
   					 
   if(0x00010000 == (nvicstctrl & 0x00010000))
@@ -1408,7 +1408,7 @@ void rt_init_context (P_TCB p_TCB, U8 priority, FUNCP task_body) {
   p_TCB->stack_frame    = 0;
 
   if ((p_TCB->stack == NULL) || (p_TCB->priv_stack == 0)) {
-    // stack must be passes ans non-NULL pointer and priv_stack must contain its non-zero size
+    // stack must be passes as non-NULL pointer and priv_stack must contain its non-zero size
     os_error(4); // invalid call
   }
   rt_init_stack (p_TCB, task_body);
@@ -1960,15 +1960,20 @@ void os_idle_demon (void) {
   /* HERE: include optional user code to be executed when no thread runs.*/
   }
 }
-
+//uint32_t oosiit_error_lastone = 0xffffffff;
 void os_error(uint32_t errorcode) 
 {
     if( (OS_ERR_STK_OVF == errorcode) || (OS_ERR_FIFO_OVF == errorcode) || (OS_ERR_MBX_OVF == errorcode) )
     {
         oosiit_sys_error((oosiit_error_code_t) errorcode);
     }
-    else
+    else if( 4 == errorcode )
     {
+        oosiit_sys_error(oosiit_error_invalid_call);
+    }
+    else 
+    {
+//        oosiit_error_lastone = errorcode;
         oosiit_sys_error(oosiit_error_unknown);
     }
 
