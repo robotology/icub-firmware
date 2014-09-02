@@ -195,10 +195,17 @@ __weak extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheE
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-
+//#if defined(TEST_ARP)
+//#include "EOMtheEMSapplCfg.h"
+//#include "EOMtheIPnet.h"
+//#endif
 static void s_eom_emsconfigurator_task_startup(EOMtask *p, uint32_t t)
 {
     // dont do anything. the ems-socket, ems-transceiver etc have been already initted by the EOMtheEMSappl
+//#if defined(TEST_ARP)    
+//    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+//    eom_ipnet_ResolveIP_TEST(eom_ipnet_GetHandle(), emscfg->applcfg.hostipv4addr, 5*EOK_reltime1sec);
+//#endif
 }
 
 
