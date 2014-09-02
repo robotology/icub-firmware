@@ -66,12 +66,38 @@ typedef enum
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern ipal_result_t ipal_arp_request(ipal_ipv4addr_t ip, ipal_arp_cachemode_t cm)
+/** @fn         extern ipal_result_t ipal_arp_resolve(ipal_ipv4addr_t ip, ipal_arp_cachemode_t cm, uint8_t forcearpframe)
     @brief      Issues an ARP request to map the IP address with the proper MAC address.
     @param      ip              The IP address
     @param      cm              The mode with which the IP-MAC pair is stored.
+    @param      forcearpframe   if 1: every call always sends an ARP request and in some cases it may send two frames (it sends an ARP 
+                                frame even if the pair IP-MAC is already cached); else if not 1: it sends an ARP frame only if
+                                the pair IP-MAC is not resolved yet and if the underlying IP stack has not recently sent a previous
+                                APR frame (the way the IP stack decides is implementation-dependent).
     @return     ipal_res_OK on success or ipal_res_NOK_generic if the IPAL has not been started yet or if the ARP request fails.
  **/
+extern ipal_result_t ipal_arp_resolve(ipal_ipv4addr_t ip, ipal_arp_cachemode_t cm, uint8_t forcearpframe);
+
+
+/** @fn         extern ipal_result_t ipal_arp_isresolved(ipal_ipv4addr_t ip)
+    @brief      tells the caller is the IP address in argument is already paired to a valid MAC address.
+    @param      ip              The IP address
+    @return     ipal_res_OK on success or ipal_res_NOK_generic if the IPAL has not been started yet or if the IP-MAC is not paired yet.
+ **/
+extern ipal_result_t ipal_arp_isresolved(ipal_ipv4addr_t ip);
+
+
+/** @fn         extern ipal_result_t ipal_arp_getmac(ipal_ipv4addr_t ip, uint8_t* mac)
+    @brief      gives to the caller the MAC address associated to the IP in argument. 
+    @param      ip              The IP address
+    @param      mac             The pointer where is it copied the 6-byte MAC address. It can be NULL.
+    @return     ipal_res_OK on success or ipal_res_NOK_generic if the IPAL has not been started yet or if IP-MAC is not paired yet.
+ **/
+extern ipal_result_t ipal_arp_getmac(ipal_ipv4addr_t ip, uint8_t* mac);
+
+
+// legacy:
+
 extern ipal_result_t ipal_arp_request(ipal_ipv4addr_t ip, ipal_arp_cachemode_t cm);
 
 
