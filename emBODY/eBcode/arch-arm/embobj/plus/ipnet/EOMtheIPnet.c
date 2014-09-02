@@ -438,10 +438,18 @@ extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
 
 extern eOresult_t eom_ipnet_ResolveIP_TEST(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOreltime_t tout)
 {
+    static uint8_t alreadycalled = 0;
     if(NULL == ip)
     {
         return(eores_NOK_nullpointer);
     }
+    
+    if(1 == alreadycalled)
+    {
+        return(eores_OK);
+    }
+    
+    alreadycalled = 1;
  
     //tout *= 4;
     tout = 40*1000*1000;
@@ -558,8 +566,11 @@ extern eOresult_t eom_ipnet_ResolveIP(EOMtheIPnet *ip, eOipv4addr_t ipaddr, eOre
     {
         return(eores_NOK_nullpointer);
     }
-
+#if defined(TEST_ARP)
+    eom_ipnet_ResolveIP_TEST(ip, ipaddr, tout);
+#else
     return(s_eom_ipnet_ARP(ip->ipnet, ipaddr, tout));
+#endif    
 }
 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
