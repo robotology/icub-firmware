@@ -202,7 +202,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     // 8. initialise the EOMtheEMSrunner,   
     s_eom_emsppl_theemsrunner_init();
 
-    // call usrdef initialise. it is the place where to start new services in init tasl 
+    // call usrdef initialise. it is the place where to start new services in init task 
     eom_emsappl_hid_userdef_initialise(&s_emsappl_singleton);
     
     // tell things  
