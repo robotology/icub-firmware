@@ -450,6 +450,30 @@ extern eOresult_t eom_ipnet_ResolveIP_TEST(EOMtheIPnet *ip, eOipv4addr_t ipaddr,
     }
     
     alreadycalled = 1;
+    
+    // blink a led at 1 hz
+
+    // init the ledpulser with leds 0 and 1 and 2 and 3
+    
+    eOledpulser_cfg_t ledpulsercfg = 
+    {
+        .led_enable_mask    = (1 << eo_ledpulser_led_zero)      | 
+                              (1 << eo_ledpulser_led_one)       | 
+                              (1 << eo_ledpulser_led_two)       |
+                              (1 << eo_ledpulser_led_three)     |
+                              (1 << eo_ledpulser_led_four)      |
+                              (1 << eo_ledpulser_led_five),
+        .led_init           = (eOint8_fp_uint8_cvoidp_t)hal_led_init,
+        .led_on             = (eOint8_fp_uint8_t)hal_led_on,
+        .led_off            = (eOint8_fp_uint8_t)hal_led_off,
+        .led_toggle         = (eOint8_fp_uint8_t)hal_led_toggle
+    };
+    
+    // each active led will have at timer. we can set it on, off, pulse. 
+    eo_ledpulser_Initialise(&ledpulsercfg);  
+        
+    // start a pulse on led0: infinite with 1 Hz period
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_five, 1*eok_reltime1sec, 0);       
  
     //tout *= 4;
     tout = 40*1000*1000;
