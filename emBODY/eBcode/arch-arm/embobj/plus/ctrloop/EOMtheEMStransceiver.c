@@ -205,6 +205,16 @@ extern EOMtheEMStransceiver* eom_emstransceiver_GetHandle(void)
     }
 }
 
+extern eOipv4addr_t eom_emstransceiver_GetIPhost(EOMtheEMStransceiver* p)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    
+    return(s_emstransceiver_singleton.transceiver->cfg.remipv4addr);    
+}
+
 extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p)
 {
     if(NULL == p)
