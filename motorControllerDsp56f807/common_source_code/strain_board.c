@@ -185,11 +185,8 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 	{
 		if (strain_num==-1)
 		{
-			put_motor_in_fault(jnt);	
-
-			#ifdef DEBUG_CAN_MSG					
-				can_printf("WARN:force control not allowed jnt:%d",jnt);
-			#endif
+			put_motor_in_fault(jnt);						
+			can_printf("ERR:force control not allowed jnt:%d",jnt);
 							
 			_strain_val[jnt]=0;
 			return false;				
@@ -197,10 +194,7 @@ bool read_force_data (byte jnt, byte strain_num, byte strain_chan)
 		if (_strain_wtd[strain_num]==0)
 		{
 			put_motor_in_fault(jnt);	
-				
-			#ifdef DEBUG_CAN_MSG
-				can_printf("WARN:strain watchdog disabling pwm jnt:%d",jnt);				
-			#endif	
+			can_printf("ERR:strain watchdog disabling pwm jnt:%d",jnt);					
 			
 			_strain_val[jnt]=0;
 			return false;
