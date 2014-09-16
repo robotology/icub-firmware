@@ -351,28 +351,31 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	//wrist J5 J6
 	if (type==CALIB_HARD_STOPS_DIFF) 
 	{	
-		byte channel1;
-	    byte channel2; 
+     	switch_interaction_mode(1,icubCanProto_interactionmode_stiff);
+	    switch_interaction_mode(2,icubCanProto_interactionmode_stiff); 
+	    _counter_calib = 0;
 		if (channel==1)
 		{
-			channel1=1; //maybe it could be change somehow 
-			channel2=2;
+	    	enable_motor_pwm(channel, MODE_POSITION); //this automatically enables two motors
+	    	switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+	    	switch_control_mode(1,MODE_CALIB_HARD_STOPS);
+	    	switch_control_mode(2,MODE_POSITION);
+			_pwm_calibration[1] = param1;
+			_pwm_calibration[2] = param1;
 		}
 		else
 		{
-			channel1=2; //maybe it could be change somehow 
-			channel2=1;
-		}
-		
-	    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
-	    enable_motor_pwm(channel, MODE_CALIB_HARD_STOPS);	    		    
-		_counter_calib = 0;
-		_pwm_calibration[channel1] = param1;
-		_pwm_calibration[channel2] = param1;
+	    	enable_motor_pwm(channel, MODE_POSITION); //this automatically enables two motors
+	    	switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+	    	switch_control_mode(1,MODE_POSITION);
+	    	switch_control_mode(2,MODE_CALIB_HARD_STOPS);
+			_pwm_calibration[1] = param1;
+			_pwm_calibration[2] = param1;
+		}			    		    
 		if (param2!=0)
-			_velocity_calibration[channel1]=param2;
+			_velocity_calibration[channel]=param2;
 		else
-			_velocity_calibration[channel1]=1;	
+			_velocity_calibration[channel]=1;	
 	}	
 	
 	if (type==CALIB_ABS_DIGITAL ) 
