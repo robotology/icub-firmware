@@ -234,7 +234,7 @@ void main(void)
 		_count=0;
 		led3_off;
 
-	// BUS_OFF check
+    	// BUS_OFF check
 		if (getCanBusOffstatus() )
 		{
 			for (i=0; i<JN; i++) put_motor_in_fault(i);
@@ -242,10 +242,6 @@ void main(void)
 		}
 		else
 			led1_on
-		
-		//DEBUG ADC
-		
-//		can_printf("adc %d",_adc_debug);
 		
 		can_interface();
 		
@@ -264,28 +260,26 @@ void main(void)
 	    for (i=0; i<JN; i++) 
 		{		
 			_position_old[i]=_position[i];
-//			
-
-#if VERSION==0x0162	
-		
-	    _position_enc_old[i]=_position_enc[i];	
-		_position[i]=Filter_Bit (get_position_abs_ssi(i));
-		_position_enc[i]=get_position_encoder(i);
-
+#if VERSION==0x0162		
+		    _position_enc_old[i]=_position_enc[i];	
+			_position[i]=Filter_Bit (get_position_abs_ssi(i));
+			_position_enc[i]=get_position_encoder(i);
 #elif VERSION==0x0161
-
 		_position[i]=get_position_encoder(i);
-
-#endif			
-
-		
-
+#endif					
 		}
 	
-		// decoupling the position
-		 	
+		// decoupling the position	 	
 		decouple_positions();
 
+	//#define TEST_I2C	
+	#ifdef TEST_I2C
+		if (_filt_current[0] < MAX_I2T_CURRENT)
+		can_printf("%f %f", _filt_current[0], MAX_I2T_CURRENT);
+		else
+		can_printf("%f %f ***", _filt_current[0], MAX_I2T_CURRENT);
+	#endif	
+		
 		
 		/* this can be useful to estimate speed later on */
 		if (_counter == 0)
