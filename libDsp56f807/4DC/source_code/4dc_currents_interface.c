@@ -9,7 +9,7 @@ Int32 MAX_I2T_CURRENT=1800000000; //300mA*300mA*20000ms
 Int32 _current[4] =		 {0,0,0,0};					/* current through the transistors*/
 Int32 _current_old[4] =  {0,0,0,0};					/* current at t-1*/
 Int32 _filt_current[4] = {0,0,0,0};     			/* filtered current through the transistors*/
-Int32 _max_allowed_current[4] = {1600000,1600000,1600000,1600000};	/* limit on the current in micro-ampere*/							
+Int32 _max_allowed_current[4] = {1600,1600,1600,1600};	/* limit on the current in mA*/
 float _conversion_factor[4] = {0.0488,0.0488,0.0488,0.0488} ;	// 484.85*3.3/32760	
 
 /*************************************************************************** 
@@ -110,6 +110,8 @@ void compute_i2t(byte jnt)
 	
 	_increment=current-_max_allowed_current[jnt];
 	
+	//max increment = 46300
+	//max 32 bit = 46340.95*46340.95 = 2147483647
 	if (_increment>0)
 	{
 		_filt_current[jnt]+=((_increment*_increment));	
