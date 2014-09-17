@@ -43,6 +43,8 @@
 
 extern void eupdater_cangtw_init(void);
 
+extern eOresult_t eupdater_cangtw_block_until_startup(void);
+
 extern void eupdater_cangtw_start(eOipv4addr_t remipaddr);
 
 extern eOipv4port_t eupdater_cangtw_get_remote_port(void);

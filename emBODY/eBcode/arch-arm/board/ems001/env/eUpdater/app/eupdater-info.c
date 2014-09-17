@@ -138,14 +138,14 @@ const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROM
             .version    = 
             { 
                 .major = 2, 
-                .minor = 11
+                .minor = 12
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 7,
-                .day   = 04,
-                .hour  = 12,
+                .month = 9,
+                .day   = 17,
+                .hour  = 16,
                 .min   = 00
             }
         },

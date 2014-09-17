@@ -42,6 +42,8 @@
 #include "EOtheErrormanager.h"
 #include "EOMtask.h"
 
+#include "osal_semaphore.h"
+
 #include "EOaction.h"
 #include "EOpacket.h"
 #include "EOMmutex.h"
@@ -114,9 +116,25 @@ static uint8_t s_status = 0;
 
 static EOsm*                    s_sm_cangtw                 = NULL;
 
+static osal_semaphore_t *startup_done_semaphore = NULL; 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+extern eOresult_t eupdater_cangtw_block_until_startup(void)
+{
+    if(NULL == startup_done_semaphore)
+    {
+        return(eores_NOK_generic);
+    }
+    // wait w/out timeout until s_cangateway_startup() has incremented it.  
+    osal_semaphore_decrement(startup_done_semaphore, osal_reltimeINFINITE); 
+    // increment it again so that next time you call it we dont stop forever
+    osal_semaphore_increment(startup_done_semaphore, osal_callerTSK);
+
+    return(eores_OK);    
+}
 
 extern void eupdater_cangtw_init(void)
 {
@@ -124,6 +142,8 @@ extern void eupdater_cangtw_init(void)
     {
         return;
     }
+    
+    startup_done_semaphore = osal_semaphore_new(2, 0); // but as it is used as a binary sempahore, 1 would be ok. what is important is the second arg: 0
     
     // init the gtw task
     eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, 100, 2*1024, s_cangateway_startup, s_cangateway_run,  32, 
@@ -144,7 +164,7 @@ extern void eupdater_cangtw_start(eOipv4addr_t remipaddr)
     snprintf(str, sizeof(str), "sending event_cangtw_start = %d", event_cangtw_start);
     hal_trace_puts(str); 
 
-    s_cangtw_remaddress = remipaddr;
+    eupdater_cangtw_set_remote_addr(remipaddr);
     
     // just emit the start event. the sm embedded in the can gateway task shall process it
     eom_task_SetEvent(eupdater_task_cangateway, event_cangtw_start);
@@ -280,7 +300,10 @@ static void s_cangateway_startup(EOMtask *p, uint32_t t)
     eo_sm_Start(s_sm_cangtw);
     eOsmDynamicDataCanGtw_t* smdata = (eOsmDynamicDataCanGtw_t*) eo_sm_GetDynamicData(s_sm_cangtw); 
     smdata->taskCANgtw = eupdater_task_cangateway;
-    smdata->sockCANgtw = eupdater_sock_cangateway;        
+    smdata->sockCANgtw = eupdater_sock_cangateway; 
+
+    // ok, now the startup is over.
+    osal_semaphore_increment(startup_done_semaphore, osal_callerTSK);
 }
 
 static void s_cangateway_run(EOMtask *p, uint32_t t)

@@ -284,7 +284,7 @@ static eObool_t s_eupdater_parser_process_ethcmd_alessandro(EOpacket *rxpkt, EOp
     eOipv4addr_t remaddr = 0;
     eOipv4port_t remport = 0;
     
-     eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
+    eo_packet_Addressing_Get(rxpkt, &remaddr, &remport);
     
     mostrecent_host_ipaddress = remaddr;
     
@@ -478,7 +478,7 @@ static void s_toggle_led(void *p)
 {
 #if !defined(_MAINTAINER_APPL_) 
     
-    hal_led_toggle(hal_led0);
+    //hal_led_toggle(hal_led0);
     hal_led_toggle(hal_led1);
     hal_led_toggle(hal_led2);
     hal_led_toggle(hal_led3);
@@ -490,7 +490,7 @@ static void s_toggle_led(void *p)
     
     switch(num)
     {
-        case 0:     hal_led_toggle(hal_led0); hal_led_toggle(hal_led1);     break; 
+        case 0:     /*hal_led_toggle(hal_led0);*/ hal_led_toggle(hal_led1);     break; 
         case 1:     hal_led_toggle(hal_led2); hal_led_toggle(hal_led3);     break;   
         case 2:     hal_led_toggle(hal_led4); hal_led_toggle(hal_led5);     break;        
     }
@@ -502,7 +502,7 @@ static void s_toggle_led(void *p)
 
 static void s_toggle_led_cangtw(void *p)
 {  
-    hal_led_toggle(hal_led0);
+    //hal_led_toggle(hal_led0);
     hal_led_toggle(hal_led1);
     hal_led_toggle(hal_led2);
     hal_led_toggle(hal_led3);
@@ -523,7 +523,7 @@ static void s_led_cangtw_start(void)
     
     eo_timer_Stop(s_timer_led);
     
-    hal_led_off(hal_led0);
+    //hal_led_off(hal_led0);
     hal_led_off(hal_led1);
     hal_led_off(hal_led2);
     hal_led_off(hal_led3);    

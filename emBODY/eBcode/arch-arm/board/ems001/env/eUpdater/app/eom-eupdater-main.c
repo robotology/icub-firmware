@@ -131,7 +131,7 @@ static void s_ethcommand_startup(EOMtask *p, uint32_t t);
 static void s_ethcommand_run(EOMtask *p, uint32_t t);
 
 
-static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt);
+extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec);
 
 #ifdef PARSE_ETH_ISR
 static void s_verify_eth_isr(uint8_t* pkt_ptr, uint32_t size);
@@ -165,6 +165,8 @@ static const eOmsystem_cfg_t* psyscfg = &eupdater_syscfg;
 #else
 static const eOmsystem_cfg_t* psyscfg = &emaintainer_syscfg;
 #endif
+
+static const eOipv4addr_t hostipaddr = EO_COMMON_IPV4ADDR(10, 0, 1, 104);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -232,11 +234,11 @@ static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taski
     for(;;);
 }
 
+static uint8_t *ipaddr = NULL;
 
 static void s_eom_eupdater_main_init(void)
 {
     const ipal_cfg_t* ipalcfg = NULL;
-    uint8_t *ipaddr = NULL;
     eOmipnet_cfg_addr_t* eomipnet_addr;
 #ifndef _USE_IPADDR_FROM_IPAL_CFG_
     const eEipnetwork_t *ipnet = NULL;
@@ -371,7 +373,14 @@ static void s_ethcommand_startup(EOMtask *p, uint32_t t)
     // set the rx action on socket to be a message s_message_from_skt_ethcmd to this task object
     eo_action_SetMessage(s_action_ethcmd, s_message_from_skt_ethcmd, p);
     eo_socketdtg_Open(s_skt_ethcmd, s_ethcmd_port, eo_sktdir_TXRX, eobool_false, NULL, s_action_ethcmd, NULL);
-      
+
+#if !defined(_MAINTAINER_APPL_)
+    // before we go on and start connection to server, we wait the task of cangateway is started and has initted its socket.
+    // if we dont wait, then the init of the socket will be stopped until arp connection to host is achieved. 
+    eupdater_cangtw_block_until_startup();
+#endif
+
+    eom_eupdater_main_connectsocket2host(hostipaddr, s_skt_ethcmd, 3000*eok_reltime1ms);    
 }
 
 static void s_ethcommand_run(EOMtask *p, uint32_t t)
@@ -409,39 +418,59 @@ static void s_ethcommand_run(EOMtask *p, uint32_t t)
     //hal_led_toggle(hal_led1);
 
     res = eo_socketdtg_Get(socket, s_rxpkt_ethcmd, eok_reltimeINFINITE);
+    
 
-    if((eores_OK == res) && (eobool_true == s_eom_eupdater_main_connected2host(s_rxpkt_ethcmd, socket)))
+    if(eores_OK == res)
     {
+        eOipv4addr_t remaddr = 0;
+        eOipv4port_t remport = 0;
+        eo_packet_Addressing_Get(s_rxpkt_ethcmd, &remaddr, &remport);   
 
+//        if(remaddr != hostipaddr)
+//        {   // dont want anybody else but the host (pc104)
+//            return;
+//        }
+        
         if(eobool_true == parser(s_rxpkt_ethcmd, s_txpkt_ethcmd))
-        {
-                // transmit a pkt back to the host
+        {   // if in here we have just stopped the countdown inside the parser
+            
+            // transmit a pkt back to the host. the call blocks until success or timeout expiry
+            if(eobool_true == eom_eupdater_main_connectsocket2host(remaddr, socket, 1000*eok_reltime1ms))
+            {
                 eo_socketdtg_Put(socket, s_txpkt_ethcmd);
+            }
         }
- 
+        else
+        {   
+            // this attempt is still-blocking, but it blocks for less time
+            eom_eupdater_main_connectsocket2host(remaddr, socket, 250*eok_reltime1ms);
+        } 
     }
 
 }
 
+static eObool_t     host_connected = eobool_false;
+static eOipv4addr_t host_ipaddress = 0;
 
-static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketDatagram *skt)
+// blocking
+extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec)
 {
-    static eObool_t     host_connected = eobool_false;
-    static eOipv4addr_t host_ipaddress = 0;
-
-    eOipv4addr_t remaddr = 0;
-    eOipv4port_t remport = 0;
+    //eOipv4addr_t remaddr = 0;
+    //eOipv4port_t remport = 0;
 
     // print stats of rx packet
-    eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
+    //eo_packet_Destination_Get(rxpkt, &remaddr, &remport);
     
     if((eobool_false == host_connected) || (remaddr != host_ipaddress))
     {
         host_ipaddress = remaddr;
         host_connected = eobool_false;
         
-        // attempt connection for 1 second. no more. 
-        if(eores_OK == eo_socketdtg_Connect(skt, remaddr, eok_reltime1sec))
+//        uint32_t waitime = 100*ipaddr[3];
+//        hal_sys_delay(waitime);
+        
+        // it is blocking
+        if(eores_OK == eo_socketdtg_Connect(skt, remaddr, usec)) 
         {
             host_connected = eobool_true;
         }
@@ -451,9 +480,15 @@ static eObool_t s_eom_eupdater_main_connected2host(EOpacket *rxpkt, EOsocketData
             //printf("not connecetd after %d ms. i shall try again at next reception\n\r", eok_reltime1sec/1000);
         }
     }
+    
+    if(eobool_true == host_connected)
+    {
+        hal_led_on(hal_led0);
+    }
 
     return(host_connected);
 }
+
 
 #ifdef PARSE_ETH_ISR
 

@@ -41,6 +41,8 @@
 #include "osal_task.h"
 #include "osal_system.h"
 
+extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -877,8 +879,11 @@ static void s_can_get(hal_can_port_t port)
             eOipv4addr_t remhostaddr = eupdater_cangtw_get_remote_addr();
             if(eok_ipv4addr_localhost != remhostaddr)
             {
-                eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
-                eo_socketdtg_Put(eupdater_sock_cangateway, s_txpkt_gtwcan);               
+                if(eobool_true == eom_eupdater_main_connectsocket2host(remhostaddr, eupdater_sock_cangateway, 1000*eok_reltime1ms))
+                {
+                    eo_packet_Addressing_Set(s_txpkt_gtwcan, remhostaddr, eupdater_cangtw_get_remote_port());
+                    eo_socketdtg_Put(eupdater_sock_cangateway, s_txpkt_gtwcan); 
+                }                    
             }
         }
         
