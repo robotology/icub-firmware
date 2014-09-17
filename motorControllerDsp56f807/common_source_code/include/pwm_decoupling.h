@@ -1,5 +1,5 @@
-#ifndef __decoupling_h__
-#define __decoupling_h__
+#ifndef __pwm_decoupling_h__
+#define __pwm_decoupling_h__
 
 #include "dsp56f807.h"
 
