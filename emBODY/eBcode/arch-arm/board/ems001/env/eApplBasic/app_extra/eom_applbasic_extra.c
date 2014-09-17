@@ -141,7 +141,7 @@ static void s_eom_applbasic_extra_echoer_receive(EOpacket* rxpkt)
 
     // at first attempt to connect.
 
-    if(eobool_false == eom_applbasic_specialise_connect(remaddr))
+    if(eobool_false == eom_applbasic_specialise_connect(remaddr, eok_reltime1sec))
     {
         return;
     }
@@ -163,7 +163,7 @@ static void s_eom_applbasic_extra_asimm_receive(EOpacket* rxpkt)
 
     // at first attempt to connect.
 
-    if(eobool_false == eom_applbasic_specialise_connect(remaddr))
+    if(eobool_false == eom_applbasic_specialise_connect(remaddr, eok_reltime1sec))
     {
         return;
     }

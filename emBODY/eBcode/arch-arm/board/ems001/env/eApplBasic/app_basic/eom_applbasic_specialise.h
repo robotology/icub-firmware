@@ -73,7 +73,7 @@ extern void eom_applbasic_specialise_otherthings(void);
 
 extern void eom_applbasic_specialise_transmit(EOpacket *txpkt);
 
-extern eObool_t eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr);
+extern eObool_t eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr, uint32_t tout);
  
 
 /** @}            

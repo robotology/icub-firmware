@@ -258,25 +258,12 @@ extern void eom_applbasic_specialise_transmit(EOpacket *txpkt)
 }
 
 
-extern eObool_t eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr)
+extern eObool_t eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr, uint32_t tout)
 {
-
-//    if((eobool_false == s_host_connected) || (remotehostaddr != s_host_ipaddress))
-//    {
-//        s_host_ipaddress = remotehostaddr;
-//        s_host_connected = eobool_false;
-//
-//        // alert the task upd server
-//        eom_task_SetEvent(s_task_udpserver, s_event_connect_to_host);
-//
-//        // decrement the semaphore to wait for end of operation
-//        osal_semaphore_decrement(s_sem_tx_pkt, OSAL_reltimeINFINITE); 
-//    }
-
     if((eobool_false == s_host_connected) || (remotehostaddr != s_host_ipaddress))
     {
         // attempt connection for 1 second. no more. 
-        if(eores_OK == eo_socketdtg_Connect(s_skt_rops, remotehostaddr, eok_reltime1sec))
+        if(eores_OK == eo_socketdtg_Connect(s_skt_rops, remotehostaddr, tout))
         {
             s_host_ipaddress = remotehostaddr;
             s_host_connected = eobool_true;
@@ -286,6 +273,15 @@ extern eObool_t eom_applbasic_specialise_connect(eOipv4addr_t remotehostaddr)
             s_host_connected = eobool_false;
             //printf("not connecetd after %d ms. i shall try again at next reception\n\r", eok_reltime1sec/1000);
         }
+    }
+    
+    if(eobool_true == s_host_connected)
+    {
+        hal_led_on(hal_led0);
+    }
+    else
+    {
+        hal_led_off(hal_led0);
     }
 
     return(s_host_connected);
@@ -331,7 +327,7 @@ static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *
 }
 
 
-
+static const eOipv4addr_t hostpc104ipaddr = EO_COMMON_IPV4ADDR(10, 0, 1, 104);
 
 static void s_udpserver_startup(EOMtask *p, uint32_t t)
 {
@@ -355,6 +351,8 @@ static void s_udpserver_startup(EOMtask *p, uint32_t t)
     // set the rx action on socket to be a message s_message_from_skt_rops to this task object
     eo_action_SetEvent(&s_fullaction, s_event_from_skt_rops, p);
     eo_socketdtg_Open(s_skt_rops, s_server_port, eo_sktdir_TXRX, eobool_false, NULL, &s_fullaction, NULL);
+    
+    eom_applbasic_specialise_connect(hostpc104ipaddr, 2*eok_reltime1sec);
 
     //eventviewer_load(ev_ID_first_usrdef+0, getfromEOsocket);
         
@@ -469,15 +467,15 @@ static void s_specialise_blink(void *param)
     
     switch(pos)
     {
-        case 0: hal_led_toggle(hal_led0); break;
-        case 1: hal_led_toggle(hal_led1); break;
-        case 2: hal_led_toggle(hal_led2); break;
-        case 3: hal_led_toggle(hal_led3); break;
+        case 0: hal_led_toggle(hal_led1); break;
+        case 1: hal_led_toggle(hal_led2); break;
+        case 2: hal_led_toggle(hal_led3); break;
+        //case 3: hal_led_toggle(hal_led3); break;
         //case 4: hal_led_toggle(hal_led4); break;
         //case 5: hal_led_toggle(hal_led5); break;
     }
     
-    pos = (pos+1)%4;
+    pos = (pos+1)%3;
 }
 
 

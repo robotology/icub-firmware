@@ -144,14 +144,14 @@ const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_MEMMAP_EA
             .version    = 
             { 
                 .major = 2, 
-                .minor = 5
+                .minor = 6
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 7,
-                .day   = 04,
-                .hour  = 12,
+                .month = 9,
+                .day   = 17,
+                .hour  = 16,
                 .min   = 00
             }
         },
