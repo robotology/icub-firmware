@@ -30,7 +30,8 @@
 
 #if     defined(HL_USE_UTIL_ETH)
 
-//#define HL_ETH_USE_EVENTVIEWER
+#undef HL_ETH_USE_EVENTVIEWER
+#undef HL_ETH_EXTRA_DEBUG
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -343,6 +344,27 @@
 // #define PHY_Isolate                     ((uint16_t)0x0400)      /* Isolate PHY from MII */
 
 
+#if defined(HL_ETH_EXTRA_DEBUG)
+
+typedef struct
+{
+    uint8_t     macdestination[6];
+    uint8_t     macsource[6];
+    uint16_t    type;       // arp is 0x0806 ne
+    uint16_t    hwtype;         // eth is 0x0001 ne
+    uint16_t    protocol;       // ip is 0x0800 ne
+    uint8_t     hwsize;         // 6
+    uint8_t     ipsize;         // 4
+    uint16_t    opc;            // rqst 0x0001, reply 0x0002
+    uint8_t     macsender[6];
+    uint8_t     ipsender[4];   
+    uint8_t     mactarget[6];
+    uint8_t     iptarget[4];   
+    uint8_t     padding[18];      
+} hal_arp_pkt_t;
+
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -354,7 +376,9 @@
 */
 void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size) = NULL;
 
-
+#if defined(HL_ETH_EXTRA_DEBUG)
+void hal_parse_arp(uint8_t* pkt_ptr, uint32_t size);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -471,6 +495,15 @@ static hl_eth_theinternals_t s_hl_eth_theinternals =
 #if     defined(HL_ETH_USE_EVENTVIEWER)
 
 #define hal_arch_arm_ETH_IRQn 0
+#if defined(HL_ETH_EXTRA_DEBUG)
+extern void eth_arp_whoelsehas104(void) {}; 
+extern void eth_arp_isthere104(void) {}; 
+extern void eth_arp_iam104reply(void) {}; 
+extern void eth_arp_iam104gratuitous(void) {}; 
+extern void eth_arp_rx(void) {}
+extern void eth_sendframe(void) {}
+extern void eth_sendarp(void) {}
+#endif
 extern void eth_irqhandler(void) {}
 extern void eth_moveframeup(void) {}
 extern void eth_alert(void) {}
@@ -491,12 +524,25 @@ const evEntityId_t id_eth_error2 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+6;
 const evEntityId_t id_eth_error3 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+7;
 const evEntityId_t id_eth_errorx = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+8;
 const evEntityId_t id_eth_error5 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+9;    
+#if defined(HL_ETH_EXTRA_DEBUG) 
+const evEntityId_t id_eth_sendframe = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+10;   
+const evEntityId_t id_eth_arp_rx = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+11;  
+const evEntityId_t id_eth_arp_whoelsehas104 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+12; 
+const evEntityId_t id_eth_arp_isthere104 = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+13; 
+const evEntityId_t id_eth_arp_iam104reply = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+14;
+const evEntityId_t id_eth_arp_iam104gratuitous = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+15;
+const evEntityId_t id_eth_sendarp = ev_ID_first_isr+hal_arch_arm_ETH_IRQn+16;
+#endif    
 #endif// defined(HL_ETH_USE_EVENTVIEWER)
 
 extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
 {
     hl_ethtrans_phymode_t usedphymode = hl_ethtrans_phymode_none;
     hl_eth_internal_item_t* intitem = s_hl_eth_theinternals.items[0];
+
+#if defined(HL_ETH_EXTRA_DEBUG)    
+    hal_eth_lowLevelUsePacket_ptr = hal_parse_arp;
+#endif
 
     if(hl_true != s_hl_eth_supported_is())
     {
@@ -600,6 +646,18 @@ extern hl_result_t hl_eth_init(const hl_eth_cfg_t *cfg)
     eventviewer_load(id_eth_error3, eth_error3);
     eventviewer_load(id_eth_errorx, eth_errorx);
     eventviewer_load(id_eth_error5, eth_error5);
+
+#if defined(HL_ETH_EXTRA_DEBUG)    
+    eventviewer_load(id_eth_sendframe, eth_sendframe);
+    eventviewer_load(id_eth_sendarp, eth_sendarp);
+    
+    eventviewer_load(id_eth_arp_rx, eth_arp_rx);
+    
+    eventviewer_load(id_eth_arp_whoelsehas104, eth_arp_whoelsehas104);
+    eventviewer_load(id_eth_arp_isthere104, eth_arp_isthere104);
+    eventviewer_load(id_eth_arp_iam104reply, eth_arp_iam104reply);
+    eventviewer_load(id_eth_arp_iam104gratuitous, eth_arp_iam104gratuitous);
+#endif    
 
 #endif//defined(HL_ETH_USE_EVENTVIEWER)
     
@@ -835,6 +893,29 @@ extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame)
     }
 #endif    
 
+#if defined(HL_ETH_EXTRA_DEBUG)
+#if	    defined(HL_ETH_USE_EVENTVIEWER)    
+    evEntityId_t prevsend = eventviewer_switch_to(id_eth_sendframe);
+#endif  
+    
+    hal_arp_pkt_t* arpkt = (hal_arp_pkt_t*)&frame->datafirstbyte[0];
+    if(arpkt->type == 0x0608)
+    {
+        evEntityId_t pr = eventviewer_switch_to(id_eth_sendarp);
+//        int k=0;
+//        char ss[8] = {0};
+//        
+//        snprintf(ss, sizeof(ss), "l=%d", frame->length);
+//        hl_sys_itm_puts(ss);
+//        for(k=0;k<frame->length;k++)
+//        {
+//            snprintf(ss, sizeof(ss), "%x", frame->datafirstbyte[k]);
+//            hl_sys_itm_puts(ss);
+//        }
+        eventviewer_switch_to(pr);        
+    }
+#endif
+    
     j = intitem->txbufindex; 
     /* Wait until previous packet transmitted. */
     while (intitem->tx_desc[j].CtrlStat & DMA_TX_OWN);
@@ -856,6 +937,11 @@ extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame)
     ETH->DMASR   = DSR_TPSS;
     ETH->DMATPDR = 0;
 
+#if defined(HL_ETH_EXTRA_DEBUG)    
+#if	    defined(HL_ETH_USE_EVENTVIEWER)    
+    eventviewer_switch_to(prevsend);
+#endif  
+#endif    
     return(hl_res_OK);    
 }
 #endif
@@ -897,6 +983,86 @@ __weak extern void hl_eth_alert(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
+#if defined(HL_ETH_EXTRA_DEBUG)
+
+static const uint8_t ip000[] = {0x0, 0x00, 0x00, 0x00};
+static const uint8_t ip104[] = {0x0a, 0x00, 0x01, 0x68};
+static const uint8_t ip002[] = {0x0a, 0x00, 0x01, 0x02};
+static const uint8_t mac104windows[] = {0xd4, 0xbe, 0xd9, 0x0a, 0x09, 0xaf};
+static const uint8_t mac104linux[] = {0xf0, 0x1f, 0xaf, 0x1f, 0x16, 0xfd};
+
+void hal_parse_arp(uint8_t* pkt_ptr, uint32_t size)
+{
+    hal_arp_pkt_t* arpkt = (hal_arp_pkt_t*)pkt_ptr;
+    
+    if(NULL == arpkt)
+    {
+        return;
+    }
+    
+    evEntityId_t previrq = 0;
+    
+    if(arpkt->type == 0x0608)
+    {
+        
+#if	    defined(HL_ETH_USE_EVENTVIEWER)    
+        previrq = eventviewer_switch_to(id_eth_arp_rx);
+        eventviewer_switch_to(previrq);
+#endif
+        
+        
+       if(0x0100 == arpkt->opc)
+       {    // rqst
+           if((0 == memcmp(arpkt->macsource, mac104windows, 6)) || (0 == memcmp(arpkt->macsource, mac104linux, 6)))
+           {    // from 104
+             
+                if(0 == memcmp(arpkt->ipsender, ip000, 4))
+                {   // tell 0000                    
+                    previrq = eventviewer_switch_to(id_eth_arp_whoelsehas104);
+                    eventviewer_switch_to(previrq);   
+                } 
+                else if(0 == memcmp(arpkt->ipsender, ip104, 4))  
+                {
+                    previrq = eventviewer_switch_to(id_eth_arp_iam104gratuitous);
+                    eventviewer_switch_to(previrq);   
+                } 
+               else
+               {
+                    previrq = eventviewer_switch_to(id_eth_error1);
+                    eventviewer_switch_to(previrq);                 
+               }                
+           }
+
+
+           
+       }
+       else if(0x0200 == arpkt->opc)
+       {    // reply
+           if((0 == memcmp(arpkt->macsource, mac104windows, 6)) || (0 == memcmp(arpkt->macsource, mac104linux, 6)))
+           {    // from 104
+               
+                if(0 == memcmp(arpkt->ipsender, ip104, 4))  
+                {
+                    previrq = eventviewer_switch_to(id_eth_arp_iam104reply);
+                    eventviewer_switch_to(previrq);   
+                } 
+            }  
+           else
+           {
+                previrq = eventviewer_switch_to(id_eth_error2);
+                eventviewer_switch_to(previrq);                 
+           }
+           
+       }
+        
+        
+        
+        
+    }
+    
+}
+
+#endif
 
 // ---- isr of the module: begin ----
 #undef USE_OLD
@@ -1280,7 +1446,8 @@ void ETH_IRQHandler (void) {
         /* Release this frame from ETH IO buffer. */
 rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
 
-
+#if defined(HL_ETH_EXTRA_DEBUG)
+#else
     if(0 != errormode)
     {
 #if	    defined(HL_ETH_USE_EVENTVIEWER)       
@@ -1325,6 +1492,7 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
         hl_sys_on_error(hl_error_warning, str);        
        
     }
+#endif
 
     
     if (++i == intitem->config.capacityofrxfifoofframes) { i = 0; };
@@ -1334,9 +1502,12 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
   intitem->rxbufindex = i;
 
   if (ETH->DMASR & INT_RBUIE) {
+#if defined(HL_ETH_EXTRA_DEBUG)
+#else
 #if	    defined(HL_ETH_USE_EVENTVIEWER)      
     evEntityId_t preverror = eventviewer_switch_to(id_eth_error5);
     eventviewer_switch_to(preverror); 
+#endif
 #endif   
     /* Rx DMA suspended, resume DMA reception. */
     //ETH->DMASR   = INT_RBUIE; // original but buggy: must reset INT_AISE as well
@@ -1357,12 +1528,16 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
 
   if(0 != receivedatleastone)
   {
+#if defined(HL_ETH_EXTRA_DEBUG)
+#else
 #if	    defined(HL_ETH_USE_EVENTVIEWER)
       evEntityId_t prevalert = eventviewer_switch_to(id_eth_alert);
 #endif
-      
+#endif      
       hl_eth_alert();
 
+#if defined(HL_ETH_EXTRA_DEBUG)
+#else
 #if	    defined(HL_ETH_USE_EVENTVIEWER)
       eventviewer_switch_to(prevalert);
       
@@ -1372,7 +1547,8 @@ rel:intitem->rx_desc[i].Stat = DMA_RX_OWN;
           evEntityId_t prevmorethanone = eventviewer_switch_to(id_eth_morethanone);
           eventviewer_switch_to(prevmorethanone);          
       }
-#endif           
+#endif 
+#endif          
   }  
   
 #if	    defined(HL_ETH_USE_EVENTVIEWER)  
