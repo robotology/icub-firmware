@@ -127,10 +127,16 @@
     // the micrel must be sw configured. we set it in autonegotiation for its port1 and port2. 
     // the mode for the rmii is read via sw from the micrel
     // for debug you can also use: hl_ethtrans_phymode_fullduplex10mbps // hl_ethtrans_phymode_halfduplex10mbps //hl_ethtrans_phymode_auto
-    #define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_auto
+    //#define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_auto
+    #define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_fullduplex100mbps
+    #define HL_ETHTRANS_XCOMODE_THEONE2USE              hl_ethtrans_xcorr_none_port2inverted
     
     // we also need to define a target phy mode for the hal-ethtransceiver, but that is dummy. i use auto
-    #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
+    //#define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
+    #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_fullduplex100mbps
+    
+    #define HL_CHIP_MICREL_RESET_TIME_USEC              (110*1000)
+    
     
     static hl_result_t s_switch_micrel_extclock_init(void)
     {   // the external clock is not managed by a mpu peripheral, thus i do nothing
@@ -143,7 +149,8 @@
         .resetpin           = { .port = hl_gpio_portB,     .pin = hl_gpio_pin2 },
         .resetval           = hl_gpio_valRESET,
         .extclockinit       = s_switch_micrel_extclock_init,
-        .targetphymode      = HL_ETHTRANS_PHYMODE_THEONE2USE
+        .targetphymode      = HL_ETHTRANS_PHYMODE_THEONE2USE,
+        .xcorrection        = HL_ETHTRANS_XCOMODE_THEONE2USE
     };    
     
     static hal_result_t s_switch_micrel_init(int32_t id, void* param)
@@ -1332,7 +1339,7 @@ extern void hl_system_stm32fx_before_setsysclock(void)
     const hl_gpio_t notethrst = {.port = hl_gpio_portH, .pin = hl_gpio_pin1};
     hl_gpio_pin_output_init(notethrst);
 
-    const hl_reltime_t resettime = 110*1000;    // 110 milli
+    const hl_reltime_t resettime = HL_CHIP_MICREL_RESET_TIME_USEC;   
     
     hl_gpio_pin_write(ethslv, hl_gpio_valSET);
     hl_gpio_pin_write(notethrst, hl_gpio_valRESET);
