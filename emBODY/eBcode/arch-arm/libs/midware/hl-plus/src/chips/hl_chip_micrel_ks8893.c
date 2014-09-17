@@ -67,7 +67,10 @@
 #define REG0x06             0x06  
 #define REG0x1C             0x1C    
 #define REG0x2C             0x2C
-
+#define REG0x1D             0x1D    
+#define REG0x2D             0x2D
+#define REG0x1F             0x1F    
+#define REG0x2F             0x2F
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,6 +113,8 @@ static hl_bool_t s_hl_chip_micrel_ks8893_initted_is(void);
 static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_cfg_t *cfg, hl_chip_micrel_ks8893_internal_item_t *intitem);
 
 static void s_hl_chip_micrel_ks8893_phymode_set(hl_ethtrans_phymode_t targetphymode);
+
+static void s_hl_chip_micrel_ks8893_xcorrection_set(hl_ethtrans_xcorr_t targetxcorr);
 
 static void s_hl_chip_micrel_ks8893_mii_phymode_get(hl_ethtrans_phymode_t* usedmiiphymode);
 
@@ -206,6 +211,7 @@ extern hl_result_t hl_chip_micrel_ks8893_start(hl_ethtrans_phymode_t* usedmiiphy
     }  
     
     hl_ethtrans_phymode_t targetphymode = intitem->config.targetphymode;
+    hl_ethtrans_xcorr_t targetxcorr = intitem->config.xcorrection;
 
     hl_i2c_t i2cid = intitem->config.i2cid;
 
@@ -235,6 +241,9 @@ extern hl_result_t hl_chip_micrel_ks8893_start(hl_ethtrans_phymode_t* usedmiiphy
 
     // 1. config the phy modes
     s_hl_chip_micrel_ks8893_phymode_set(targetphymode);
+    
+    // 1.bis and the xcorrection mode
+    s_hl_chip_micrel_ks8893_xcorrection_set(targetxcorr);
 
     // 2. start the switch
     s_hl_chip_micrel_ks8893_start(&intitem->config);
@@ -398,6 +407,9 @@ static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_c
     // impose the phy mode     
     s_hl_chip_micrel_ks8893_phymode_set(cfg->targetphymode); //hl_ethtrans_phymode_auto   
     
+    // and the xcorrection mode
+    s_hl_chip_micrel_ks8893_xcorrection_set(cfg->xcorrection);
+    
 //     // be sure the switch is stopped
 //     data = 0x0;  
 //     regaddr.bytes.one = REG0x01;    
@@ -435,10 +447,10 @@ static void s_hl_chip_micrel_ks8893_phymode_set(hl_ethtrans_phymode_t targetphym
     switch(targetphymode)
     {
         case hl_ethtrans_phymode_auto:                  buff_write = 0x9F; break;
-        case hl_ethtrans_phymode_halfduplex10mbps:      buff_write = 0x00; break;
-        case hl_ethtrans_phymode_halfduplex100mbps:     buff_write = 0x40; break;
-        case hl_ethtrans_phymode_fullduplex10mbps:      buff_write = 0x20; break;
-        case hl_ethtrans_phymode_fullduplex100mbps:     buff_write = 0x60; break;
+        case hl_ethtrans_phymode_halfduplex10mbps:      buff_write = 0x00+16+1; break; // marco.accame: added also bit 0, 4
+        case hl_ethtrans_phymode_halfduplex100mbps:     buff_write = 0x40+16+4; break; // marco.accame: added also bit 2, 4
+        case hl_ethtrans_phymode_fullduplex10mbps:      buff_write = 0x20+16+2; break; // marco.accame: added also bit 1, 4
+        case hl_ethtrans_phymode_fullduplex100mbps:     buff_write = 0x60+16+8; break; // marco.accame: added also bit 3, 4
         default:                                        buff_write = 0x00; break;
     }    
     
@@ -455,8 +467,88 @@ static void s_hl_chip_micrel_ks8893_phymode_set(hl_ethtrans_phymode_t targetphym
     regaddr.bytes.one = REG0x2C;
     hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
     hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write, 1);   
-    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);    
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);   
+
+#if 0
+    // port 1: mdi-x disable
+    regaddr.numofbytes = 1;
+    regaddr.bytes.one = REG0x1D;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+    buff_write = 4; // disable but dont cross: use crossed cable
+    //buff_write = 4+2; // disable and cross: use straigth cable
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write, 1);
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+     
+     // port 2: mdi-x disable 
+    regaddr.numofbytes = 1;
+    regaddr.bytes.one = REG0x2D;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+    //buff_write = 4; // disable but dont cross: use crossed cable
+    buff_write = 4+2; // disable and cross: use straigth cable
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write, 1);   
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);   
+#endif
+    
 }
+
+
+static void s_hl_chip_micrel_ks8893_xcorrection_set(hl_ethtrans_xcorr_t targetxcorr)
+{
+    hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
+    hl_i2c_t i2cid = intitem->config.i2cid;
+    hl_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0 };
+    uint8_t buff_write1 = 0;
+    uint8_t buff_write2 = 0;
+    uint8_t buff_read;
+    
+    if(hl_ethtrans_xcorr_auto == targetxcorr)
+    {
+        return;
+    }
+
+         
+    // 1. configure  switch's ports 1 and 2
+    switch(targetxcorr)
+    {
+        case hl_ethtrans_xcorr_none: 
+        {
+            buff_write1 = 4; // disable but dont cross: use crossed cable
+            buff_write2 = 4; // disable but dont cross: use crossed cable
+        } break;
+        case hl_ethtrans_xcorr_none_port1inverted:      
+        {
+            buff_write1 = 4+2;      // disable and invert tx w/ rx
+            buff_write2 = 4;        // disable but dont invert tx w/ rx
+        } break; 
+        case hl_ethtrans_xcorr_none_port2inverted:      
+        {
+            buff_write1 = 4;        // disable but dont invert tx w/ rx
+            buff_write2 = 4+2;      // disable and invert tx w/ rx
+        } break; 
+        case hl_ethtrans_xcorr_auto:
+        default:                                                        
+        {
+            return;
+        } break;
+    }    
+       
+
+    // port 1: mdi-x disable
+    regaddr.numofbytes = 1;
+    regaddr.bytes.one = REG0x1D;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write1, 1);
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+     
+     // port 2: mdi-x disable 
+    regaddr.numofbytes = 1;
+    regaddr.bytes.one = REG0x2D;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write2, 1);   
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);   
+    
+}
+
 
 
 static void s_hl_chip_micrel_ks8893_mii_phymode_get(hl_ethtrans_phymode_t* usedmiiphymode)

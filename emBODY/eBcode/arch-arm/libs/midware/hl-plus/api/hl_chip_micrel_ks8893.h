@@ -66,6 +66,7 @@ typedef struct
     hl_gpio_val_t           resetval;       /**< the value which puts the chip in reset mode */
     hl_res_fp_void_t        extclockinit;   /**< the function which initialises the external clock used by the chip */
     hl_ethtrans_phymode_t   targetphymode;
+    hl_ethtrans_xcorr_t     xcorrection;
 } hl_chip_micrel_ks8893_cfg_t;
 
 

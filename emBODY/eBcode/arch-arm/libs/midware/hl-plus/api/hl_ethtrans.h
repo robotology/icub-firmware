@@ -67,6 +67,14 @@ typedef struct
 
 typedef enum
 {
+    hl_ethtrans_xcorr_auto                  = 0,
+    hl_ethtrans_xcorr_none                  = 1,
+    hl_ethtrans_xcorr_none_port1inverted    = 2,
+    hl_ethtrans_xcorr_none_port2inverted    = 3   
+} hl_ethtrans_xcorr_t;
+
+typedef enum
+{
     hl_ethtrans_phymode_auto                = 0,
     hl_ethtrans_phymode_halfduplex10mbps    = 1,
     hl_ethtrans_phymode_halfduplex100mbps   = 2,
