@@ -120,17 +120,13 @@ const ipal_cfg_t ipal_cfg =
     { 
         .usr_on_fatal_error         = s_ipal_cfg_on_fatal_error,
 
-//         .osal_mutex_new             = NULL, 
-//         .osal_mutex_take            = NULL, 
-//         .osal_mutex_release         = NULL, 
-//         .osal_param_tout_forever    = 0, 
-       .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
-       .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
-       .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
-       .osal_param_tout_forever    = OSAL_reltimeINFINITE,
-       
-       .osal_system_scheduling_suspend = osal_system_scheduling_suspend,
-       .osal_system_scheduling_restart = osal_system_scheduling_restart,
+        .osal_mutex_new             = NULL, 
+        .osal_mutex_take            = NULL, 
+        .osal_mutex_release         = NULL, 
+        .osal_param_tout_forever    = 0, 
+    
+        .osal_system_scheduling_suspend = NULL,
+        .osal_system_scheduling_restart = NULL,
         
 
         .hal_eth_init               = (ipal_result_t (*)(void*)) hal_eth_init,

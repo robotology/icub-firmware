@@ -132,7 +132,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     
     hal_sys_irq_disable();
 
-    hal_led_off(hal_led0);
+    //hal_led_off(hal_led0);
     hal_led_off(hal_led1);
     hal_led_off(hal_led2);
     hal_led_off(hal_led3);
