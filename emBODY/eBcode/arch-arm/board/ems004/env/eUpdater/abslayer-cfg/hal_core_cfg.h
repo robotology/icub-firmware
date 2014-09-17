@@ -60,7 +60,7 @@
 //   <o> stack size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much stack you want.
 #ifndef HAL_SYS_CFG_STACKSIZE
- #define HAL_SYS_CFG_STACKSIZE      0x00002000
+ #define HAL_SYS_CFG_STACKSIZE      0x00003000
 #endif
 
 //   <o> heap size         <0x0-0xFFFFFFFF:8>

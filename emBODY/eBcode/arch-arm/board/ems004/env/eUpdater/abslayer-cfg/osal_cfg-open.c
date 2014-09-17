@@ -131,7 +131,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
     hal_trace_puts(str);
 
-    hal_led_off(hal_led0);
+    //hal_led_off(hal_led0);
     hal_led_off(hal_led1);
     hal_led_off(hal_led2);
     hal_led_off(hal_led3);

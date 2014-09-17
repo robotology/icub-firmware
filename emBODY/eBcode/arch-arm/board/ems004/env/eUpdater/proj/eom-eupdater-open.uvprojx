@@ -458,9 +458,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -848,7 +848,7 @@
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>0</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -957,7 +957,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\STM32_TP.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -1275,9 +1275,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2092,9 +2092,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
