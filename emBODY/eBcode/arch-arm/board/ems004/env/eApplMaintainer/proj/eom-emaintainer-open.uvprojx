@@ -453,9 +453,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1270,9 +1270,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2087,9 +2087,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>

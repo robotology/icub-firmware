@@ -76,16 +76,6 @@ const hal_core_cfg_t hal_cfg =
 const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
 
 
-// void SysTick_Handler(void)
-// {
-//     hal_void_fp_void_t systickhandler = hal_sys_systick_gethandler();
-
-//     if(NULL != systickhandler)
-//     {
-//         systickhandler();
-//     }
-// }
-
 #include "hal_trace.h"
 #include "hal_led.h"
 static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
@@ -105,8 +95,7 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
 
     for(;;)
     {
-        uint32_t volatile i = 0x100000;
-        for(;i--; i>0);
+        hal_sys_delay(200*1000);
         hal_led_toggle(hal_led3);
     }
 }
