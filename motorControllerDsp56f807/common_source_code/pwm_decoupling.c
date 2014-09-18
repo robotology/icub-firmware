@@ -1,4 +1,4 @@
-#include "decoupling.h"
+#include "pwm_decoupling.h"
 #include "abs_ssi_interface.h"
 #include "pwm_interface.h"
 #include "pid.h"

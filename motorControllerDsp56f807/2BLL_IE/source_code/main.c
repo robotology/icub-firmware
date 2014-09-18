@@ -24,7 +24,8 @@
 
 #include "encoders_interface.h"
 #include "filters.h" 
-#include "decoupling.h"
+#include "pwm_decoupling.h"
+#include "position_decoupling.h"
 #include "abs_ssi_interface.h"
 #include "2bllie_brushless_comm.h" 
 #include "phase_hall_sens.h"

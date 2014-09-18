@@ -29,7 +29,8 @@
 #include "abs_ssi_interface.h"
 #include "strain_board.h"
 #include "check_range.h"
-#include "decoupling.h"
+#include "pwm_decoupling.h"
+#include "position_decoupling.h"
 #include "control_enable.h"
 	
 byte	_board_ID = 15;	

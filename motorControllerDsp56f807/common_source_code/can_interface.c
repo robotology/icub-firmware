@@ -18,7 +18,8 @@
 #include "filters.h"
 #include "identification.h"
 #include "control_enable.h"
-#include "decoupling.h"
+#include "pwm_decoupling.h"
+#include "position_decoupling.h"
 
 #ifndef VERSION
 #	error "No valid version specified"

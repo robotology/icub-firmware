@@ -24,7 +24,8 @@
 #include "encoders_interface.h"
 #include "check_range.h"
 #include "filters.h"
-#include "decoupling.h"
+#include "pwm_decoupling.h"
+#include "position_decoupling.h"
 
 //#include "encoders_interface.h"
 //#include "abs_analog_interface.h"
@@ -113,7 +114,6 @@ void main(void)
 
 	Int32 PWMoutput [JN];
 	Int32 PWMoutput_old [JN];
-	word temporary;
 	byte i=0;
 	byte wi=0;
 	byte k=0;
