@@ -170,7 +170,15 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.ki*rescaler_trq,
                                     cfg->pidtorque.limitonintegral,
                                     cfg->pidtorque.limitonoutput, 
-                                    cfg->pidtorque.offset);
+                                    cfg->pidtorque.offset,
+                                    #if defined(EOM_USE_STICTION)
+                                    cfg->pidtorque.kff*rescaler_trq,
+                                    0.f//cfg->pidtorque.kbemf*rescaler_trq
+                                    #else
+                                    0.f,
+                                    0.f
+                                    #endif
+                                    );
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
 
@@ -226,13 +234,22 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
     eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
-
+    
     eo_emsController_SetTrqPid(jxx, pid_ptr->kp*rescaler, 
-	                                pid_ptr->kd*rescaler, 
-	                                pid_ptr->ki*rescaler, 
+		                            pid_ptr->kd*rescaler, 
+                                    pid_ptr->ki*rescaler,
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 
-	                                pid_ptr->offset);
+                                    pid_ptr->offset,
+                                    #if defined(EOM_USE_STICTION)
+                                    pippo
+                                    pid_ptr->kff*rescaler,
+                                    0.f //pid_ptr->kbemf*rescaler
+                                    #else
+                                    0.f,
+                                    0.f
+                                    #endif
+                                    );
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)

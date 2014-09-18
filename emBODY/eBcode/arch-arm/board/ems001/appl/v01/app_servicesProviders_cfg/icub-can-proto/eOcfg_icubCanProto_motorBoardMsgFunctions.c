@@ -621,8 +621,14 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE;
 
     /*3) set command's params */
-    *((icubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
-
+    //*((icubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
+    
+    canFrame->data[1] = ((uint8_t*)&(torque_setpoint_ptr->value))[0];
+    canFrame->data[2] = ((uint8_t*)&(torque_setpoint_ptr->value))[1];
+    
+    canFrame->data[3] = 0;
+    canFrame->data[4] = 0;
+    
     /* Note: the firware and icubcanproto expect torque value on 32bit. 
        Currently icubInterface and new eo-proto use 16 bits for torque */
     return(eores_OK);
