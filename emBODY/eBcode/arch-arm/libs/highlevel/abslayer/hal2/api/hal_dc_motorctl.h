@@ -58,7 +58,7 @@
 #define PWM_FREQ ((uint16_t) 25000) // in Hz  (N.b.: pattern type is center aligned)
 
 /****    Deadtime Value   ****/
-#define DEADTIME_NS	((uint16_t) 2400)  //in nsec; range is [0...3500] 
+#define DEADTIME_NS	((uint16_t) 1000)  //in nsec; range is [0...3500] 
 
 #define LOW_SIDE_POLARITY  TIM_OCIdleState_Reset
 

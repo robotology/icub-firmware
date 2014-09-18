@@ -232,6 +232,9 @@ static void test_periph_can(void);
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
 static void test_device_motorctl_1(void);
 static void test_device_motorctl_2(void);
+
+static int16_t current[4]={0,0,0,0};
+
 #endif//defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
 
 #if     defined(EXECUTE_TEST_ENCODER_SPI)    
@@ -420,16 +423,19 @@ int main(void)
     test_periph_can();
 #endif//defined(EXECUTE_TEST_CAN)
 
+#if     defined(EXECUTE_TEST_ADC)    
+    test_periph_adc();
+		
 #if     defined(EXECUTE_TEST_ENCODER_SPI)
 	test_encoder_spi();
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)
 
-#if     defined(EXECUTE_TEST_ADC)    
-    test_periph_adc();
+
 #endif//defined(EXECUTE_TEST_ADC)   
 
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
       test_device_motorctl_2();
+			
 //    	test_device_motorctl_1();
 #endif//defined(EXECUTE_TEST_DEVICE_MOTORCL) 
 
@@ -962,7 +968,7 @@ static void test_encoder_spi(void)
 	uint8_t remaining=0;
 	uint16_t angle[2]={0,0};
   int32_t enc[4]={0,0,0,0};
-  test_is_beginning("encoder as5048 : "); 
+  test_is_beginning("encoder as5048_as5055 : "); 
 
 	as5048_init(0);
 	as5048_init(1);
@@ -1009,11 +1015,11 @@ static void test_encoder_spi(void)
 		
 		res=hal_can_get(CAN_PERIPH, &canframe, &remaining);
 		
-		
+		send_adcTocan(canframe,CAN_PERIPH);
 		
 	  if (res==hal_res_OK ) message_received=1;		  
 	} 
-  
+  test_was_successful("encoder as5048-as5055"); 
 	    
 }
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)  
@@ -1529,7 +1535,7 @@ static void test_device_motorctl_2(void)
 
 {
 #if     defined(HAL_USE_DEVICE_MOTORCTL)
-  volatile int16_t current[4]={0,0,0,0};
+  
   volatile int16_t current_P[4]={0,0,0,0};
   volatile int16_t current_I[4]={0,0,0,0};  
 	// init the CAN
@@ -1554,7 +1560,11 @@ static void test_device_motorctl_2(void)
 	PID_Struct_t SpeedPID3;
 	int32_t enc[4]={0,0,0,0};
 	int16_t pwm[4]={0,0,0,0};
-
+	
+	TorquePID0.wLower_Limit_Integral=-16000;
+	TorquePID0.wUpper_Limit_Integral=+16000;
+	TorquePID0.hLower_Limit_Output=-3500;
+	TorquePID0.hUpper_Limit_Output=3500;
 	test_is_beginning("TEST MOTORS");
     
     
@@ -1641,6 +1651,7 @@ static void test_device_motorctl_2(void)
 		}
 		else
 		{
+			send_currentTocan(canframe,CAN_PERIPH);
 			if (CURRENT_MODE==1)
 			{
 			//	pwm[channel]=((current_P[channel]*(desired_current[channel]-current[channel]))>>4);
@@ -1674,7 +1685,7 @@ static void test_device_motorctl_2(void)
 		        hal_sys_delay(500*hal_RELTIME_1microsec);
 				
 			}
-			send_currentTocan(canframe,CAN_PERIPH);
+			
 		  enc[0]=hal_quad_enc_getCounter(0);
 			enc[1]=hal_quad_enc_getCounter(1); 
 			enc[2]=hal_quad_enc_getCounter(2);
@@ -1733,7 +1744,7 @@ static void test_periph_adc(void)
 
 	hal_adc_dma_init();
 
-	while(message_received==0)
+//	while(message_received==0)
 	{
 		res=hal_can_get(CAN_PERIPH, &canframe, &remaining); 
 		send_adcTocan(canframe,CAN_PERIPH);
@@ -1747,7 +1758,7 @@ static void test_periph_adc(void)
 #endif//defined(HAL_USE_ADC)
 
 static uint16_t ADC_result[9];
-volatile int16_t current[4]={0,0,0,0};
+//volatile int16_t current[4]={0,0,0,0};
 volatile int16_t current_P[4]={0,0,0,0};
 volatile int16_t current_I[4]={0,0,0,0};
 

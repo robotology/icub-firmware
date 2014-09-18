@@ -408,9 +408,19 @@
           <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>core-plus-stm32fx.c</FileName>
+              <FileName>core-plus-mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\core-plus-stm32fx.c</FilePath>
+              <FilePath>..\app-test\core-plus-mc4plus.c</FilePath>
+            </File>
+            <File>
+              <FileName>as5048.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\as5048.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\pid.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -547,11 +557,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_termometer.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_dc_motorctl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_dc_motorctl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
+            <File>
+              <FileName>hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_adc.c</FilePath>
+            </File>
             <File>
               <FileName>hal_can.c</FileName>
               <FileType>1</FileType>
@@ -596,6 +616,11 @@
               <FileName>hal_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_quad_enc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_quad_enc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1419,9 +1444,19 @@
           <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>core-plus-stm32fx.c</FileName>
+              <FileName>core-plus-mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\core-plus-stm32fx.c</FilePath>
+              <FilePath>..\app-test\core-plus-mc4plus.c</FilePath>
+            </File>
+            <File>
+              <FileName>as5048.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\as5048.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\pid.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1558,11 +1593,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_termometer.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_dc_motorctl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_dc_motorctl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
+            <File>
+              <FileName>hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_adc.c</FilePath>
+            </File>
             <File>
               <FileName>hal_can.c</FileName>
               <FileType>1</FileType>
@@ -1607,6 +1652,11 @@
               <FileName>hal_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_quad_enc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_quad_enc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2387,9 +2437,19 @@
           <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>core-plus-stm32fx.c</FileName>
+              <FileName>core-plus-mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app-test\core-plus-stm32fx.c</FilePath>
+              <FilePath>..\app-test\core-plus-mc4plus.c</FilePath>
+            </File>
+            <File>
+              <FileName>as5048.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\as5048.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app-test\pid.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2526,11 +2586,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_termometer.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_dc_motorctl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices\hal_dc_motorctl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>hal-extra-periphs</GroupName>
           <Files>
+            <File>
+              <FileName>hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_adc.c</FilePath>
+            </File>
             <File>
               <FileName>hal_can.c</FileName>
               <FileType>1</FileType>
@@ -2575,6 +2645,11 @@
               <FileName>hal_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_quad_enc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_quad_enc.c</FilePath>
             </File>
           </Files>
         </Group>

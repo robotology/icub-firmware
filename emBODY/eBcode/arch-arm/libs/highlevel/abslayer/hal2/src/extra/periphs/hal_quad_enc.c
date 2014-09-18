@@ -43,7 +43,7 @@
 #define ICx_FILTER          (u8) 8 // 8<-> 670nsec
 
 
-#define ENCODER_PPR 16000
+#define ENCODER_PPR 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
 #define ENCODER1_TIMER TIM2
 #define ENCODER2_TIMER TIM3
 #define ENCODER3_TIMER TIM4
@@ -106,7 +106,7 @@ void hal_quad_enc_Init(void)
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   
   TIM_TimeBaseStructure.TIM_Prescaler = 0x0;  // No prescaling 
-  TIM_TimeBaseStructure.TIM_Period = 0xFFFFFFFF;//(4*ENCODER_PPR)-1;  
+  TIM_TimeBaseStructure.TIM_Period = ENCODER_PPR;  
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   
   TIM_TimeBaseInit(ENCODER1_TIMER, &TIM_TimeBaseStructure);
@@ -162,7 +162,7 @@ void hal_quad_enc_Init(void)
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   
   TIM_TimeBaseStructure.TIM_Prescaler = 0x0;  // No prescaling 
-  TIM_TimeBaseStructure.TIM_Period = 0xFFFFFFFF;//(4*ENCODER_PPR)-1;  
+  TIM_TimeBaseStructure.TIM_Period = ENCODER_PPR;  
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   
   TIM_TimeBaseInit(ENCODER2_TIMER, &TIM_TimeBaseStructure);
@@ -210,7 +210,7 @@ void hal_quad_enc_Init(void)
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   
   TIM_TimeBaseStructure.TIM_Prescaler = 0x0;  // No prescaling 
-  TIM_TimeBaseStructure.TIM_Period = 0xFFFFFFFF;//(4*ENCODER_PPR)-1;  
+  TIM_TimeBaseStructure.TIM_Period = ENCODER_PPR;  
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   
   TIM_TimeBaseInit(ENCODER3_TIMER, &TIM_TimeBaseStructure);
@@ -259,7 +259,7 @@ void hal_quad_enc_Init(void)
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   
   TIM_TimeBaseStructure.TIM_Prescaler = 0x0;  // No prescaling 
-  TIM_TimeBaseStructure.TIM_Period = 0xFFFFFFFF;//(4*ENCODER_PPR)-1;  
+  TIM_TimeBaseStructure.TIM_Period = ENCODER_PPR;  
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   
   TIM_TimeBaseInit(ENCODER4_TIMER, &TIM_TimeBaseStructure);
@@ -364,36 +364,48 @@ void EXTI15_10_IRQHandler(void)
 {
   if(EXTI_GetITStatus(EXTI_Line12) != RESET)
   {
-    /* Reset Counter ENCODER1 -> TIM2 */
-    TIM_SetCounter(ENCODER1_TIMER,0x0);  
+		if (TIM_GetCounter(ENCODER1_TIMER)==0)
+			/* Reset Counter ENCODER1 -> TIM2 */
+			TIM_SetCounter(ENCODER1_TIMER,0x0);  
+    else
+			/* Reset Counter ENCODER1 -> TIM2 */
+			TIM_SetCounter(ENCODER1_TIMER,ENCODER_PPR);      
     
-    /* Clear the EXTI line 12 pending bit */
+		/* Clear the EXTI line 12 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line12);
   }
   if(EXTI_GetITStatus(EXTI_Line13) != RESET)
   {
-    /* Reset Counter ENCODER2 -> TIM3 */
-    TIM_SetCounter(ENCODER2_TIMER,0x0);  
-    
-   
-    /* Clear the EXTI line 13 pending bit */
+		/* Clear the EXTI line 13 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line13);
-  }
+		
+		if (TIM_GetCounter(ENCODER2_TIMER)==0)
+			/* Reset Counter ENCODER2 -> TIM3 */
+			TIM_SetCounter(ENCODER2_TIMER,0x0);  
+		else
+			TIM_SetCounter(ENCODER2_TIMER,ENCODER_PPR);  
+	}
+	
 	if(EXTI_GetITStatus(EXTI_Line14) != RESET)
   {
-    /* Reset Counter ENCODER3 -> TIM4 */
-    TIM_SetCounter(ENCODER3_TIMER,0x0);  
-   
-    /* Clear the EXTI line 14 pending bit */
+		 /* Clear the EXTI line 14 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line14);
+		if (TIM_GetCounter(ENCODER3_TIMER)==0)
+			/* Reset Counter ENCODER3 -> TIM4 */
+			TIM_SetCounter(ENCODER3_TIMER,0x0);  
+    else
+			TIM_SetCounter(ENCODER3_TIMER,ENCODER_PPR); 
+   
   }
 	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
   {
-    /* Reset Counter ENCODER4 -> TIM5 */
-    TIM_SetCounter(ENCODER4_TIMER,0x0);  
-   
-    /* Clear the EXTI line 15 pending bit */
+		 /* Clear the EXTI line 15 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line15);
+		if (TIM_GetCounter(ENCODER4_TIMER)==0)
+			/* Reset Counter ENCODER4 -> TIM5 */
+			TIM_SetCounter(ENCODER4_TIMER,0x0);  
+    else TIM_SetCounter(ENCODER4_TIMER,ENCODER_PPR);
+   
   }
 }
 

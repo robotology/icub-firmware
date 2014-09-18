@@ -78,7 +78,7 @@
 
 #define ADC_CDR_ADDRESS          ((uint32_t)0x40012308)
 
-#define SAMPLING_TIME_CK 		 ADC_SampleTime_3Cycles //	  ADC_SampleTime_15Cycles
+#define SAMPLING_TIME_CK 		 ADC_SampleTime_15Cycles //	  ADC_SampleTime_15Cycles
 #define NB_CONVERSIONS 32
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -198,13 +198,13 @@ extern hal_result_t hal_adc_dma_init()
 	  GPIO_Init(GPIOF, &GPIO_InitStructure);
 	
 	  /* ADC Common Init **********************************************************/
-	  ADC_CommonInitStructure.ADC_Mode =ADC_TripleMode_InjecSimult;//ADC_DualMode_RegSimult;
+	  ADC_CommonInitStructure.ADC_Mode =ADC_TripleMode_RegSimult;//ADC_DualMode_RegSimult;
 	  ADC_CommonInitStructure.ADC_Prescaler = ADC_Prescaler_Div2;
 	  ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_1;
-	  ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+	  ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_20Cycles ;
 	  ADC_CommonInit(&ADC_CommonInitStructure);
 	
-	  /* ADC3 Init ****************************************************************/	
+	  /* ADC123 Init ****************************************************************/	
 	  ADC_InitStructure.ADC_Resolution = ADC_Resolution_10b;
 	  ADC_InitStructure.ADC_ScanConvMode =ENABLE;
 	  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
@@ -212,7 +212,7 @@ extern hal_result_t hal_adc_dma_init()
 	  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
 	  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
 	  ADC_InitStructure.ADC_NbrOfConversion = 3;
-	  ADC_Init(ADC1, &ADC_InitStructure);
+	  ADC_Init(ADC1, &ADC_InitStructure);	
 	  ADC_Init(ADC2, &ADC_InitStructure);
 	  ADC_Init(ADC3, &ADC_InitStructure);
 
@@ -232,7 +232,7 @@ extern hal_result_t hal_adc_dma_init()
 	  ADC_RegularChannelConfig(ADC3, ADC_Channel_7 , 2, SAMPLING_TIME_CK);
 	  	  	   
 	   /* Enable VBAT channel */
-       ADC_VBATCmd(ENABLE); 
+     ADC_VBATCmd(ENABLE); 
 	   ADC_TempSensorVrefintCmd(ENABLE);
 	   ADC_RegularChannelConfig(ADC3, ADC_Channel_TempSensor, 3, SAMPLING_TIME_CK);
 	    
@@ -246,6 +246,8 @@ extern hal_result_t hal_adc_dma_init()
 	  ADC_Cmd(ADC3, ENABLE);
 
 	  ADC_SoftwareStartConv(ADC1);
+		ADC_SoftwareStartConv(ADC2);
+		ADC_SoftwareStartConv(ADC3);
 	  return hal_res_OK;
 }
 
@@ -328,8 +330,8 @@ extern hal_result_t hal_adc_inj_init()
 	  ADC_InjectedChannelConfig(ADC1, ADC_Channel_4 , 2, SAMPLING_TIME_CK);//CUR2
  	  
 	  /* ADC2 regular channel8 and 9 configuration *************************************/
-//	  ADC_InjectedChannelConfig(ADC2, ADC_Channel_8 , 1, SAMPLING_TIME_CK);//AN1
-//	  ADC_InjectedChannelConfig(ADC2, ADC_Channel_9 , 2, SAMPLING_TIME_CK);//AN2
+	  ADC_InjectedChannelConfig(ADC2, ADC_Channel_8 , 1, SAMPLING_TIME_CK);//AN1
+	  ADC_InjectedChannelConfig(ADC2, ADC_Channel_9 , 2, SAMPLING_TIME_CK);//AN2
 	  
 	  ADC_InjectedSequencerLengthConfig(ADC3,3);	
 	  /* ADC3 regular channel 6 and 7 configuration *************************************/
@@ -340,7 +342,7 @@ extern hal_result_t hal_adc_inj_init()
 	
 	  /* Enable ADC */
 	  ADC_Cmd(ADC1, ENABLE);
-//	  ADC_Cmd(ADC2, ENABLE);
+	  ADC_Cmd(ADC2, ENABLE);
 	  ADC_Cmd(ADC3, ENABLE);
 
 
@@ -361,7 +363,7 @@ void hal_adc_currentCalibration(void)
   
   /* ADC1 Injected group of conversions end interrupt disabling */
   ADC_ITConfig(ADC1, ADC_IT_JEOC, DISABLE);
-//  ADC_ITConfig(ADC2, ADC_IT_JEOC, DISABLE);
+  ADC_ITConfig(ADC2, ADC_IT_JEOC, DISABLE);
   ADC_ITConfig(ADC3, ADC_IT_JEOC, DISABLE);
 
   /* ADC1 Injected conversions trigger is given by software and enabled */ 
@@ -435,7 +437,7 @@ void hal_adc_currentConfig(void)
 void ADC_IRQHandler(void)
 {
   int32_t pwm[4]={0,0,0,0};
-  int16_t deadtime= MOTOR_DEADTIME;
+  int16_t deadtime= 0;//; MOTOR_DEADTIME+0;
   int16_t Cur[4]={0,0,0,0};	
   //if(ADC_GetITStatus(ADC1, ADC_IT_JEOC) == SET))
   if((ADC1->SR & ADC_FLAG_JEOC) == ADC_FLAG_JEOC)
@@ -454,27 +456,28 @@ void ADC_IRQHandler(void)
 		pwm[1]=TIM1->CCR3; //take the pwmvalue
 		if (pwm[1]==0) 	pwm[1]=TIM1->CCR4; //take the pwmvalue
 
-	//	if (pwm[0]>deadtime)
+		if (pwm[0]>deadtime)
 		{
 		 Cur[0]=(Cur[0]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_3)-hCurOffset[0])>>1) ;
-  //   uhCur[0]=(int16_t)(((pwm[0]-deadtime)*Cur[0])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
-	   	 uhCur[0]=Cur[0];
+//   uhCur[0]=(int16_t)(((pwm[0]-deadtime)*Cur[0])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+	   uhCur[0]=Cur[0];
 		}
-	//	else  uhCur[0]=0;
+		else  uhCur[0]=0;
 
-	//	if (pwm[1]>deadtime)
+		if (pwm[1]>deadtime)
 		{
-	    	Cur[1]=(Cur[1]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_2)-hCurOffset[1])>>1);
-	//	uhCur[1]=(int16_t)(((pwm[1]-deadtime)*Cur[1])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+	    Cur[1]=(Cur[1]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_2)-hCurOffset[1])>>1);
+//   uhCur[1]=(int16_t)(((pwm[1]-deadtime)*Cur[1])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
 		uhCur[1]=Cur[1];
 		}
-	//	else  uhCur[1]=0;
+		else  uhCur[1]=0;
 
     }
   }
   if((ADC2->SR & ADC_FLAG_JEOC) == ADC_FLAG_JEOC)
   {
-   
+  //It clear JEOC flag
+    ADC2->SR = ~(u32)ADC_FLAG_JEOC;
   }
   if((ADC3->SR & ADC_FLAG_JEOC) == ADC_FLAG_JEOC)
   {
@@ -490,21 +493,21 @@ void ADC_IRQHandler(void)
 		pwm[3]=TIM8->CCR3; //take the pwmvalue
 		if (pwm[3]==0) 	pwm[3]=TIM8->CCR4; //take the pwmvalue
 		
-	//	if (pwm[2]>deadtime)
+		if (pwm[2]>deadtime)
 		{
 		Cur[2]=(Cur[2]>>1)+((ADC_GetInjectedConversionValue(ADC3, ADC_InjectedChannel_3)-hCurOffset[2])>>1) ;
 //		uhCur[2]=(int16_t)(((pwm[2]-deadtime)*Cur[2])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
 	 	uhCur[2]=Cur[2];
 		}
-//		else  uhCur[2]=0;
+		else  uhCur[2]=0;
 
-//		if (pwm[3]>deadtime)
+		if (pwm[3]>deadtime)
 		{
 		Cur[3]=(Cur[3]>>1)+((ADC_GetInjectedConversionValue(ADC3, ADC_InjectedChannel_2)-hCurOffset[3])>>1);
-//		uhCur[3]=(int16_t)(((pwm[3]-deadtime)*Cur[3])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
-		uhCur[3]=Cur[3];
+//	uhCur[3]=(int16_t)(((pwm[3]-deadtime)*Cur[3])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+  uhCur[3]=Cur[3];
 		}
-//		else  uhCur[3]=0;
+		else  uhCur[3]=0;
 
     }
 
