@@ -61,13 +61,17 @@ extern uint8_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o);
 extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder*, int32_t offset);
+#ifndef USE_2FOC_FAST_ENCODER
+extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o);
+#endif
 
+#ifdef USE_2FOC_FAST_ENCODER
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void);
 extern void eo_axleVirtualEncoder_SetSign(EOaxleVirtualEncoder*, eObool_t inverted);
-
 extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder*, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel);
 extern int32_t eo_axleVirtualEncoder_GetPos(EOaxleVirtualEncoder*);
 extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder*);
+#endif
 
 /** @}            
     end of group eo_pid  

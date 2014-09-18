@@ -76,6 +76,10 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void)
         o->position_last = 0;
         o->position_sure = 0;
         
+        #ifndef USE_2FOC_FAST_ENCODER
+        o->velocity = 0;
+        #endif
+        
         o->offset = 0;
         o->sign = 0;
         
@@ -201,6 +205,10 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     {
         encoder_init(o, position, error_mask);
         
+        #ifndef USE_2FOC_FAST_ENCODER
+        o->velocity = 0;
+        #endif
+        
         return o->sign*o->distance;
     }
     
@@ -226,12 +234,43 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
                 {
                     o->distance += inc;
                 }
+                
+                #ifndef USE_2FOC_FAST_ENCODER
+                o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*inc) >> 3;
+                #endif
             }
+            #ifndef USE_2FOC_FAST_ENCODER
+            else
+            {
+                o->velocity = (7*o->velocity) >> 3;
+            }
+            #endif
         }
+        #ifndef USE_2FOC_FAST_ENCODER
+        else
+        {
+            o->velocity = (7*o->velocity) >> 3;
+        }
+        #endif
     }
     
     return o->sign*o->distance;
 }
+
+#ifndef USE_2FOC_FAST_ENCODER
+extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o)
+{
+    return o->velocity;
+}
+#endif
+
+
+
+
+
+
+
+#ifdef USE_2FOC_FAST_ENCODER
 
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
 {
@@ -296,6 +335,8 @@ extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder* o)
     return o->velocity;
 }
 
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -329,6 +370,10 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
         o->position_sure = position;
 
         o->distance = position;
+        
+        #ifndef USE_2FOC_FAST_ENCODER
+        o->velocity = 0;
+        #endif
         
         o->delta = 0;
 

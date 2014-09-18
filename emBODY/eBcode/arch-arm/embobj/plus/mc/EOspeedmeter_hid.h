@@ -46,6 +46,10 @@ struct EOabsCalibratedEncoder_hid
     int32_t distance;
     int32_t position_last;
     int32_t position_sure;
+    
+    #ifndef USE_2FOC_FAST_ENCODER
+    int32_t velocity;
+    #endif
 
     int32_t sign;
     int32_t offset;

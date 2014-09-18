@@ -14,7 +14,6 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "hal_led.h"
 
 #include <string.h>
 
@@ -105,8 +104,9 @@ extern EOemsController* eo_emsController_Init()
         {
             ems->axis_controller[j] = eo_axisController_New(j);
             ems->abs_calib_encoder[j] = eo_absCalibratedEncoder_New();
+            #ifdef USE_2FOC_FAST_ENCODER
             ems->axle_virt_encoder[j] = eo_axleVirtualEncoder_New();
-            
+            #endif
             ems->motor_current [j] = 0;
             ems->motor_velocity[j] = 0;
             ems->motor_position[j] = 0;
@@ -141,7 +141,23 @@ extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 #ifdef USE_2FOC_FAST_ENCODER
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position)
 {
-    ems->motor_current [motor] = current;
+    static int noise = -2;
+    
+    if (current>1500)
+    {
+        ems->motor_current [motor] = current-1500;
+    }
+    else if (current<-1500)
+    {
+        ems->motor_current [motor] = current+1500;
+    }
+    else
+    {
+        ems->motor_current [motor] = noise;
+
+        if (++noise == 3) noise = -2;
+    }
+
     ems->motor_velocity[motor] = velocity;
     ems->motor_position[motor] = position;
 }
@@ -150,15 +166,21 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
     //static int  enc_error_seq = 0;
-    static char enc_error_msg[31] = { "Enc(x):ERROR" } ;
+    //static char enc_error_msg[31] = { "Enc(x):ERROR" } ;
     
     static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
     
     int32_t axle_abs_pos[NAXLES];
+    #ifndef USE_2FOC_FAST_ENCODER
+    int32_t axle_abs_vel[NAXLES];
+    #endif
     
     ENCODERS(e)
     {
         axle_abs_pos[e] = eo_absCalibratedEncoder_Acquire(ems->abs_calib_encoder[e], abs_enc_pos[e], 0x03 & (error_mask>>(e<<1)));
+        #ifndef USE_2FOC_FAST_ENCODER
+        axle_abs_vel[e] = eo_absCalibratedEncoder_GetVel(ems->abs_calib_encoder[e]);
+        #endif
     }
     
     ////////////////////////////////////////////////////
@@ -170,7 +192,14 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
         if (ef0 || ef1 || ef2 || eo_motor_are_motors_in_fault(ems->motors, 0x15)) // hard fault
         {
-            
+            if (ef0 || ef1 || ef2)
+            {
+                static char msg[31];
+                snprintf(msg,sizeof(msg),"ENC ERROR %d %d %d",ef0,ef1,ef2);
+                send_diagnostics_to_server(msg, 0xffffffff, 1);        
+            }
+    
+            /*
             if (ef0)
             {
                 enc_error_msg[4] = '0';
@@ -186,7 +215,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 enc_error_msg[4] = '2';
                 send_diagnostics_to_server(enc_error_msg, 0xffffffff, 1);
             }
-            
+            */
             
             eo_axisController_SetHardwareFault(ems->axis_controller[0]);
             eo_axisController_SetHardwareFault(ems->axis_controller[1]);
@@ -266,6 +295,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         // |J1| = |  0     1    0   | * |E1|
         // |J2|   |  1    -1  40/65 |   |E2|
         axle_abs_pos[2] = axle_abs_pos[0]-axle_abs_pos[1]+(40*axle_abs_pos[2])/65;
+        #ifndef USE_2FOC_FAST_ENCODER
+        axle_abs_vel[2] = axle_abs_vel[0]-axle_abs_vel[1]+(40*axle_abs_vel[2])/65;
+        #endif
     #endif
     
 #ifdef USE_2FOC_FAST_ENCODER
@@ -338,6 +370,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else
             eo_axisController_SetEncPos(ems->axis_controller[j], axle_abs_pos[j]);
+            eo_axisController_SetEncVel(ems->axis_controller[j], axle_abs_vel[j]);
         #endif
     }
     
@@ -758,9 +791,9 @@ extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float 
         #endif
     }
 }   
-extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kbemf, float Kff)
 {
-    if (ems) eo_axisController_SetTrqPid(ems->axis_controller[joint], Kp, Kd,  Ki, Imax, Ymax, Yoff); 
+    if (ems) eo_axisController_SetTrqPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff, Kbemf, Kff);     
 }   
 // PID configurations
 ///////////////////////

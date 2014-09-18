@@ -37,14 +37,12 @@ extern "C" {
  
 struct EOpid_hid 
 {
-    //eObool_t moving;
-
     float Kp;
     float Kd;
     float Ki;
     
-    //float Kff;
-    //int32_t zero_rotation_torque;
+    float Kff;
+    float Kbemf;
     
     float Dn;
     float En;

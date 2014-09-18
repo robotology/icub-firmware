@@ -19,18 +19,22 @@ extern "C" {
  // - public #define  --------------------------------------------------------------------------------------------------
  
 //#define FORCE_ZERO_PWM_OUT
-
-#define CONTROL_II
-#define USE_2FOC_FAST_ENCODER
-    
-#ifdef USE_2FOC_FAST_ENCODER
-    //#define USE_4BIT_INC_ENC_PRECISION
-#endif
-    
-//#define V1_MECHANICS
-#define V2_MECHANICS
 //#define EXPERIMENTAL_MOTOR_TORQUE
+//#define USE_2FOC_FAST_ENCODER
+#define V1_MECHANICS    
     
+/*
+#ifdef ICUB_DARMSTADT01
+    #define USE_2FOC_FAST_ENCODER
+    #ifdef USE_2FOC_FAST_ENCODER
+        //#define USE_4BIT_INC_ENC_PRECISION
+    #endif
+    #define V2_MECHANICS
+#else
+    #define V1_MECHANICS
+#endif
+*/
+
 #define EMS_PERIOD           0.001f
 #define EMS_FREQUENCY_INT32  1000
 #define EMS_FREQUENCY_FLOAT  1000.0f
@@ -43,7 +47,7 @@ extern "C" {
 #define VELOCITY_CMD_TIMEOUT      100 // cycles
 #define TORQUE_CMD_TIMEOUT        100 // cycles
 #define TORQUE_SENSOR_TIMEOUT     100 // cycles
-#define ENCODER_TIMEOUT            10 // cycles
+#define ENCODER_TIMEOUT            50 // cycles
 
 #define NOMINAL_CURRENT     10000
 

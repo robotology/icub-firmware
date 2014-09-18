@@ -83,6 +83,7 @@ struct EOaxisController_hid
     
     int32_t pos_min;
     int32_t pos_max;
+    int8_t  rot_sign;
     
     int32_t err;
     
