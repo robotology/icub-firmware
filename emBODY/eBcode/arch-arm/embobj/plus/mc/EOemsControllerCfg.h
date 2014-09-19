@@ -21,9 +21,8 @@ extern "C" {
 //#define FORCE_ZERO_PWM_OUT
 //#define EXPERIMENTAL_MOTOR_TORQUE
 //#define USE_2FOC_FAST_ENCODER
-#define V1_MECHANICS    
+//#define V1_MECHANICS    
     
-/*
 #ifdef ICUB_DARMSTADT01
     #define USE_2FOC_FAST_ENCODER
     #ifdef USE_2FOC_FAST_ENCODER
@@ -33,7 +32,6 @@ extern "C" {
 #else
     #define V1_MECHANICS
 #endif
-*/
 
 #define EMS_PERIOD           0.001f
 #define EMS_FREQUENCY_INT32  1000
