@@ -14,8 +14,9 @@
 /**
  * this function decouples PWM.
  ***************************************************************************/
-void decouple_dutycycle(Int32 *pwm)
+void decouple_dutycycle_old(Int32 *pwm)
 {
+    #warning WARNING: using old function decouple_dutycycle_old()
     float tempf = 0;
     Int32 temp32 = 0;
     static UInt8 count=0;
@@ -52,14 +53,15 @@ void decouple_dutycycle(Int32 *pwm)
         pwm[0] = (pwm[0] + pwm[1]) >> 1;
         pwm[1] = (temp32 - pwm[1]) >> 1;
         
+        temp32 = _pd[0];
+        _pd[0] = (_pd[0] + _pd[1]) >> 1;
+        _pd[1] = (temp32 - _pd[1]) >> 1;
+
         if (mode_is_idle(0) || mode_is_idle(1))
         {
             pwm[0] = 0;
             pwm[1] = 0;
         }
-        temp32 = _pd[0];
-        _pd[0] = (_pd[0] + _pd[1]) >> 1;
-        _pd[1] = (temp32 - _pd[1]) >> 1;
     }        
 
     if (_control_mode[0] == MODE_CALIB_HARD_STOPS) pwm[1] = 0;
@@ -74,14 +76,17 @@ void decouple_dutycycle(Int32 *pwm)
         temp32      = pwm[2];
         pwm[2] = (pwm[2] + pwm[3]) >> 1;
         pwm[3] = (temp32    - pwm[3]) >> 1;
+
+        temp32 = _pd[2];
+        _pd[2] = (_pd[2] + _pd[3]) >> 1;
+        _pd[3] = (temp32 - _pd[3]) >> 1;
+
         if (mode_is_idle(2) || mode_is_idle(3))
         {
             pwm[2] = 0;
             pwm[3] = 0;
         }    
-        temp32 = _pd[2];
-        _pd[2] = (_pd[2] + _pd[3]) >> 1;
-        _pd[3] = (temp32 - _pd[3]) >> 1;
+
     }        
 
     if (_control_mode[2] == MODE_CALIB_HARD_STOPS) pwm[3] = 0;
@@ -92,13 +97,16 @@ void decouple_dutycycle(Int32 *pwm)
 
     //pwm[1] = pwm[1];    //omitted
     pwm[2] = (pwm[2] - pwm[1]);
+
+    //_pd[1] = _pd[1];                //omitted
+    _pd[2] = _pd[2] - _pd[1];
+
     if (mode_is_idle(1) || mode_is_idle(2))
     {
         pwm[1] = 0;
         pwm[2] = 0;
     }
-    //_pd[1] = _pd[1];                //omitted
-    _pd[2] = _pd[2] - _pd[1];
+
     
     if ((_control_mode[1] == MODE_CALIB_HARD_STOPS) || (_control_mode[2] == MODE_CALIB_HARD_STOPS))
     {

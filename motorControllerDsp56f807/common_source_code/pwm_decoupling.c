@@ -15,7 +15,7 @@
  * this function decouples PWM (new version joint version).
  ***************************************************************************/
  
-void decouple_dutycycle_new_joint(Int32 *pwm)
+void decouple_dutycycle(Int32 *pwm)
 {
     byte  pj=0;
     float tempf = 0;
@@ -60,14 +60,14 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
         pwm_out[0] = (pwm[0] + pwm[1]) >> 1;
         pwm_out[1] = (pwm[0] - pwm[1]) >> 1;
         
+        pd_out[0] = (_pd[0] + _pd[1]) >> 1;
+        pd_out[1] = (_pd[0] - _pd[1]) >> 1;
+
         if (mode_is_idle(0) || mode_is_idle(1))
         {
             pwm_out[0] = 0;
             pwm_out[1] = 0;
         }
-
-        _pd_out[0] = (_pd[0] + _pd[1]) >> 1;
-        _pd_out[1] = (_pd[0] - _pd[1]) >> 1;
     }        
 
     if (_control_mode[0] == MODE_CALIB_HARD_STOPS) pwm_out[1] = 0;
@@ -81,13 +81,15 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
     {        
         pwm_out[2] = (pwm[2] + pwm[3]) >> 1;
         pwm_out[3] = (pwm[2] - pwm[3]) >> 1;
+
+        pd_out[2] = (_pd[2] + _pd[3]) >> 1;
+        pd_out[3] = (_pd[2] - _pd[3]) >> 1;
+
         if (mode_is_idle(2) || mode_is_idle(3))
         {
             pwm_out[2] = 0;
             pwm_out[3] = 0;
         }    
-        pd_out[2] = (_pd[2] + _pd[3]) >> 1;
-        pd_out[3] = (_pd[2] - _pd[3]) >> 1;
     }        
 
     if (_control_mode[2] == MODE_CALIB_HARD_STOPS) pwm_out[3] = 0;
@@ -98,13 +100,15 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
 
     pwm_out[1] =  pwm[1];
     pwm_out[2] = (pwm[2] - pwm[1]);
+
+    pd_out[1] = _pd[1];
+    pd_out[2] = _pd[2] - _pd[1];
+
     if (mode_is_idle(1) || mode_is_idle(2))
     {
         pwm_out[1] = 0;
         pwm_out[2] = 0;
     }
-    pd_out[1] = _pd[1];
-    pd_out[2] = _pd[2] - _pd[1];
     
     if ((_control_mode[1] == MODE_CALIB_HARD_STOPS) || (_control_mode[2] == MODE_CALIB_HARD_STOPS))
     {
@@ -129,9 +133,9 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
         pwm_out[0] = pwm[0];
         pwm_out[1] = pwm[1] + pwm[0];
         pwm_out[2] = pwm[2];
-        _pd_out[0] = _pd[0];
-        _pd_out[1] = _pd[1] + _pd[0];
-        _pd_out[2] = _pd[2];
+        pd_out[0] = _pd[0];
+        pd_out[1] = _pd[1] + _pd[0];
+        pd_out[2] = _pd[2];
     }
     else
     {
@@ -139,9 +143,9 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
         pwm_out[0] = pwm[0];
         pwm_out[1] = pwm[1] - pwm[0];
         pwm_out[2] = pwm[2];
-        _pd_out[0] = _pd[0];
-        _pd_out[1] = _pd[1] - _pd[0];
-        _pd_out[2] = _pd[2];
+        pd_out[0] = _pd[0];
+        pd_out[1] = _pd[1] - _pd[0];
+        pd_out[2] = _pd[2];
     }
 
 //-----------------------------------------------------------------------------------
