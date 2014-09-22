@@ -10,11 +10,6 @@
 #define b_coeff 1.6455F
 #define t_coeff 0.6077F
 
-// UNDER TESTING
-//#define a_coeff 1.6455F
-//#define b_coeff 0.6077F
-
-#ifdef USE_NEW_DECOUPLING
 /***************************************************************************/
 /**
  * this function decouples PWM (new version joint version).
@@ -22,18 +17,20 @@
  
 void decouple_dutycycle_new_joint(Int32 *pwm)
 {
+    byte  pj=0;
     float tempf = 0;
     Int32 temp32 = 0;
     static UInt8 count=0;
     byte timeout_cpl_pid = 100;
     
-    Int32 pd_out [2]  = {0,0};
-    Int32 pwm_out [2] = {0,0};
+    Int32 pd_out  [JN] = INIT_ARRAY(0);
+    Int32 pwm_out [JN] = INIT_ARRAY(0);
        
-    pd_out[0]=_pd[0];
-    pd_out[1]=_pd[1];
-    pwm_out[0]=pwm[0];
-    pwm_out[1]=pwm[1];
+    for (pj=0; pj< JN; pj++)
+    {
+    	pd_out[pj]=_pd[pj];
+    	pwm_out[pj]=pwm[pj];
+    }
 
 //-----------------------------------------------------------------------------------
 #if VERSION == 0x0162
@@ -60,22 +57,21 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
     if ( ! ((_control_mode[0] == MODE_CALIB_HARD_STOPS ) ||
             (_control_mode[1] == MODE_CALIB_HARD_STOPS ) ) )
     {
-        temp32 = pwm[0];
-        pwm[0] = (pwm[0] + pwm[1]) >> 1;
-        pwm[1] = (temp32 - pwm[1]) >> 1;
+        pwm_out[0] = (pwm[0] + pwm[1]) >> 1;
+        pwm_out[1] = (pwm[0] - pwm[1]) >> 1;
         
         if (mode_is_idle(0) || mode_is_idle(1))
         {
-            pwm[0] = 0;
-            pwm[1] = 0;
+            pwm_out[0] = 0;
+            pwm_out[1] = 0;
         }
-        temp32 = _pd[0];
-        _pd[0] = (_pd[0] + _pd[1]) >> 1;
-        _pd[1] = (temp32 - _pd[1]) >> 1;
+
+        _pd_out[0] = (_pd[0] + _pd[1]) >> 1;
+        _pd_out[1] = (_pd[0] - _pd[1]) >> 1;
     }        
 
-    if (_control_mode[0] == MODE_CALIB_HARD_STOPS) pwm[1] = 0;
-    if (_control_mode[1] == MODE_CALIB_HARD_STOPS) pwm[0] = 0;
+    if (_control_mode[0] == MODE_CALIB_HARD_STOPS) pwm_out[1] = 0;
+    if (_control_mode[1] == MODE_CALIB_HARD_STOPS) pwm_out[0] = 0;
 
 //-----------------------------------------------------------------------------------
 #elif VERSION == 0x0215 
@@ -83,45 +79,43 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
     if ( ! ((_control_mode[2] == MODE_CALIB_HARD_STOPS ) ||
             (_control_mode[3] == MODE_CALIB_HARD_STOPS ) ) )
     {        
-        temp32      = pwm[2];
-        pwm[2] = (pwm[2] + pwm[3]) >> 1;
-        pwm[3] = (temp32    - pwm[3]) >> 1;            
+        pwm_out[2] = (pwm[2] + pwm[3]) >> 1;
+        pwm_out[3] = (pwm[2] - pwm[3]) >> 1;
         if (mode_is_idle(2) || mode_is_idle(3))
         {
-            pwm[2] = 0;
-            pwm[3] = 0;
+            pwm_out[2] = 0;
+            pwm_out[3] = 0;
         }    
-        temp32 = _pd[2];
-        _pd[2] = (_pd[2]     + _pd[3]) >> 1;
-        _pd[3] = (temp32 - _pd[3]) >> 1;        
+        pd_out[2] = (_pd[2] + _pd[3]) >> 1;
+        pd_out[3] = (_pd[2] - _pd[3]) >> 1;
     }        
 
-    if (_control_mode[2] == MODE_CALIB_HARD_STOPS) pwm[3] = 0;
-    if (_control_mode[3] == MODE_CALIB_HARD_STOPS) pwm[2] = 0;    
+    if (_control_mode[2] == MODE_CALIB_HARD_STOPS) pwm_out[3] = 0;
+    if (_control_mode[3] == MODE_CALIB_HARD_STOPS) pwm_out[2] = 0;
 
 //-----------------------------------------------------------------------------------
 #elif VERSION == 0x0119 || VERSION == 0x0219 
 
-    //pwm[1] = pwm[1];    //omitted
-    pwm[2] = (pwm[2] - pwm[1]);
+    pwm_out[1] =  pwm[1];
+    pwm_out[2] = (pwm[2] - pwm[1]);
     if (mode_is_idle(1) || mode_is_idle(2))
     {
-        pwm[1] = 0;
-        pwm[2] = 0;
+        pwm_out[1] = 0;
+        pwm_out[2] = 0;
     }
-    //_pd[1] = _pd[1];                //omitted
-    _pd[2] = _pd[2] - _pd[1];
+    pd_out[1] = _pd[1];
+    pd_out[2] = _pd[2] - _pd[1];
     
     if ((_control_mode[1] == MODE_CALIB_HARD_STOPS) || (_control_mode[2] == MODE_CALIB_HARD_STOPS))
     {
-        if (pwm[1] >  _pwm_calibration[1])
-            pwm[1] =  _pwm_calibration[1];
-        if (pwm[1] < -_pwm_calibration[1])
-            pwm[1] = -_pwm_calibration[1];
-        if (pwm[2] >  _pwm_calibration[2])
-            pwm[2] =  _pwm_calibration[2];
-        if (pwm[2] < -_pwm_calibration[2])
-            pwm[2] = -_pwm_calibration[2];
+        if (pwm_out[1] >  _pwm_calibration[1])
+            pwm_out[1] =  _pwm_calibration[1];
+        if (pwm_out[1] < -_pwm_calibration[1])
+            pwm_out[1] = -_pwm_calibration[1];
+        if (pwm_out[2] >  _pwm_calibration[2])
+            pwm_out[2] =  _pwm_calibration[2];
+        if (pwm_out[2] < -_pwm_calibration[2])
+            pwm_out[2] = -_pwm_calibration[2];
     }
     
 //-----------------------------------------------------------------------------------
@@ -132,22 +126,22 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
     if (_kp[0] > 0)
     {
         //right hand
-        //pwm[0] = pwm[0];
-           pwm[1] = pwm[1] + pwm[0];
-        //pwm[2] = pwm[2];
-        //_pd[0] = _pd[0];
-        _pd[1] = _pd[1] + _pd[0];
-        //_pd[2] = _pd[2];    
+        pwm_out[0] = pwm[0];
+        pwm_out[1] = pwm[1] + pwm[0];
+        pwm_out[2] = pwm[2];
+        _pd_out[0] = _pd[0];
+        _pd_out[1] = _pd[1] + _pd[0];
+        _pd_out[2] = _pd[2];
     }
     else
     {
         //left hand
-        //pwm[0] = pwm[0];
-        pwm[1] = pwm[1] - pwm[0];
-        //pwm[2] = pwm[2];
-        //_pd[0] = _pd[0];
-        _pd[1] = _pd[1] - _pd[0];
-        //_pd[2] = _pd[2];        
+        pwm_out[0] = pwm[0];
+        pwm_out[1] = pwm[1] - pwm[0];
+        pwm_out[2] = pwm[2];
+        _pd_out[0] = _pd[0];
+        _pd_out[1] = _pd[1] - _pd[0];
+        _pd_out[2] = _pd[2];
     }
 
 //-----------------------------------------------------------------------------------
@@ -413,20 +407,20 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
         //disable the joint if no PID data is receveived from the coupled joint
         if (!mode_is_idle(0))
         {
-            put_motor_in_fault(0);    
+            put_motor_in_fault(0);
             #ifdef DEBUG_CAN_MSG
-                if(count==255)
-                {
-                    can_printf("No cpl pid info");
-                    count=0;
-                }            
-                count++;                
-            #endif                
+            if(count==255)
+            {
+                can_printf("No cpl pid info");
+                count=0;
+            }
+            count++;
+            #endif
         }
     }
 #endif
 
-#ifdef DEBUG_CPL_BOARD
+    #ifdef DEBUG_CPL_BOARD
     if(count==255)
     {
         // before decoupling
@@ -434,18 +428,14 @@ void decouple_dutycycle_new_joint(Int32 *pwm)
         // after decoupling
         can_printf("cplPid:(%d,%d)", (Int16) pwm_out[0], (Int16) pwm_out[1]);
         count=0;
-    }            
+    }
     count++;
-#endif    
+    #endif
 
     //*** WRITE THE OUTPUT ***
-    pwm[0]=pwm_out[0];
-    pwm[1]=pwm_out[1];
-    _pd[0]=pd_out[0];
-    _pd[1]=pd_out[1];
-        
+    for (pj=0; pj< JN; pj++)
+    {
+        pwm[pj]=pwm_out[pj];
+        _pd[pj]=pd_out[pj];
+    }
 }
-
-#else  //USE_NEW_DECOUPLING
-
-#endif //USE_NEW_DECOUPLING
