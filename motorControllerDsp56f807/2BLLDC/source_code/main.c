@@ -330,13 +330,8 @@ void main(void)
 		for (i=0; i<JN; i++) PWMoutput[i] = compute_pwm(i);
 		
 	     
-
-//		decouple PWM	
-#ifdef USE_NEW_DECOUPLING
-		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
-#else
-		decouple_dutycycle_new_joint(PWMoutput);				
-#endif				
+		/* decouple PWM */	
+		decouple_dutycycle(PWMoutput); 		
 		
 //******************************************* SATURATES CONTROLS ***************************/                
 		/* saturates controls if necessary */
