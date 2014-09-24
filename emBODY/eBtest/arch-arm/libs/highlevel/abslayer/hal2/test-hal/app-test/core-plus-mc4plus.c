@@ -966,7 +966,7 @@ static void test_encoder_spi(void)
   hal_result_t res;
 	uint8_t message_received=0;
 	uint8_t remaining=0;
-	uint16_t angle[2]={0,0};
+	uint16_t angle[6]={0,0,0,0,0,0};
   int32_t enc[4]={0,0,0,0};
   test_is_beginning("encoder as5048_as5055 : "); 
 
@@ -984,13 +984,20 @@ static void test_encoder_spi(void)
 	{
 	  angle[0]=0; 
 	  angle[0]=1; 
-   	  angle[0]=as5048_read(0);
-	  angle[1]=as5048_read(1);	 
+   	angle[0]=as5048_read(0)[0];
+		angle[1]=as5048_read(0)[1];
+		angle[2]=as5048_read(0)[2];
+		angle[3]=as5048_read(1)[0];
+		angle[4]=as5048_read(1)[1];
+	  angle[5]=as5048_read(1)[2];	 
 		canframe.id = 0x1AA;
     canframe.data[1] = (angle[0] & 0xFF); 
 	  canframe.data[2] = (angle[0] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
 	  canframe.data[3] = (angle[1] & 0xFF); 
 	  canframe.data[4] = (angle[1] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
+		canframe.data[5] = (angle[2] & 0xFF); 
+	  canframe.data[6] = (angle[2] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
+
 //		  canframe.data[5] = (aRxBuffer[0] & 0x8000)>>8;	   //parity
 //		  canframe.data[6] = (aRxBuffer[0] & 0x4000)>>8;	   //error flag
     hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);	

@@ -41,4 +41,4 @@ void as5048_init(uint8_t sensorID);
 * Output         : None
 * Return         : the 14 bit value of the encoder 
 *******************************************************************************/
-uint16_t as5048_read(uint8_t sensorID); 
+uint16_t * as5048_read(uint8_t sensorID); 
