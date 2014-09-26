@@ -159,6 +159,24 @@ void decouple_dutycycle(Int32 *pwm)
     //pwm[2] = pwm[2] + tempf;
 
 //-----------------------------------------------------------------------------------
+#elif VERSION == 0x0252 || VERSION == 0x0152
+    //  Waist Differential coupling 
+    //    |Me1| |  1    -1 |  |Je1|
+    //    |Me2|=|  1     1 |* |Je2|
+    
+    pwm_out[0] = (pwm[0] - pwm[1])>>1;
+    pwm_out[1] = (pwm[0] + pwm[1])>>1;
+
+    pd_out[0] = (_pd[0] - _pd[1])>>1;
+    pd_out[1] = (_pd[0] + _pd[1])>>1;
+
+    if (mode_is_idle(0) || mode_is_idle(1))
+    {
+        pwm_out[0] = 0;
+        pwm_out[1] = 0;
+    }
+
+//-----------------------------------------------------------------------------------
 #elif VERSION == 0x0250 || VERSION == 0x0150
 
     /*
@@ -178,11 +196,11 @@ void decouple_dutycycle(Int32 *pwm)
      *             [ -Jm3/a,  Jm3/a,  Jm3/a]
      *
      *             [    R1/K1,      0,      0]
-     * u_m =     [        0,  R2/K2,      0] tau_m
+     * u_m =       [        0,  R2/K2,      0] tau_m
      *             [        0,      0,  R3/K3]
      *
      *            [    R1/K1*Jm1,            0,            0]                                [ 1         0         0     ]
-     * u_m =    [ -R2/K2*Jm2/a,  R2/K2*Jm2/a,            0] tau_j =  1.0e-03 * 0.1519 * [-1.6455    1.6455    0     ]
+     * u_m =      [ -R2/K2*Jm2/a,  R2/K2*Jm2/a,            0] tau_j =     1.0e-03 * 0.1519 * [-1.6455    1.6455    0     ]
      *            [ -R3/K3*Jm3/a,  R3/K3*Jm3/a,  R3/K3*Jm3/a]                                [-1.6455    1.6455    1.6455]
      *
      * where:
@@ -194,7 +212,7 @@ void decouple_dutycycle(Int32 *pwm)
      * 
      * This solution follows from the following coupling:
      *        [  1,  0,  0]
-     * qj =    [  1,  a,  0] qm = Tjm qm
+     * qj =   [  1,  a,  0] qm = Tjm qm
      *        [  0, -a,  a]
      * where:
      *
@@ -205,7 +223,7 @@ void decouple_dutycycle(Int32 *pwm)
      * effected by the kinematic coupling (due to high gear boxes):
      *
      *    [  Jm1,    0,    0]
-     *     [    0,  Jm2,    0] d2qm = tau_m
+     *    [    0,  Jm2,    0] d2qm = tau_m
      *    [    0,    0,  Jm3]
      *
      * where:
@@ -215,7 +233,7 @@ void decouple_dutycycle(Int32 *pwm)
      */
 
     // ----- JOINT 0 -----    
-    if (_control_mode[0] == MODE_POSITION)
+    if (mode_is_stiff(0))
     {
         // do nothing, alread decoupled
         //          [ 1  0  0]
@@ -223,9 +241,7 @@ void decouple_dutycycle(Int32 *pwm)
         //          [-t  t  t]   
 
     }
-    else if (_control_mode[0] == MODE_TORQUE ||
-             mode_is_impedance_position(0) ||
-             mode_is_impedance_velocity(0) )
+    else if (mode_is_force_controlled(0) )
     {    
         //          [ 1  1  0]
         //  tau_m = [ 0  b -b] tau_j
@@ -233,10 +249,18 @@ void decouple_dutycycle(Int32 *pwm)
         
         pd_out[0]  = (_pd[0] + _pd[1]);
         pwm_out[0] = (pwm[0] + pwm[1]);    
-    }    
-    
+    }
+    else if (mode_is_idle(0)
+    {
+        //empty
+    }
+    else
+    {
+        //empty
+    }
+
     // ----- JOINT 1 -----
-    if (_control_mode[1] == MODE_POSITION)
+    if (mode_is_stiff(1))
     {
         //          [ 1  0  0]
         //  tau_m = [-t  t  0] tau_j
@@ -250,12 +274,10 @@ void decouple_dutycycle(Int32 *pwm)
         tempf = tempf * a_coeff;
         pwm_out[1] = (Int32) tempf;
     }
-    else if (_control_mode[1] == MODE_TORQUE ||
-             mode_is_impedance_position(1) ||
-             mode_is_impedance_velocity(1) )
+    else if (mode_is_force_controlled(1))
     {
         //             [ 1  1  0]
-        //  tau_m = [ 0  b -b] tau_j
+        //  tau_m =    [ 0  b -b] tau_j
         //             [ 0  0  b]   
 
         tempf = (float)(_pd[1]) - (float)(_cpl_pid_prediction[0]);
@@ -267,6 +289,14 @@ void decouple_dutycycle(Int32 *pwm)
         tempf = tempf * b_coeff;
         temp32 = (Int32) (tempf);
         pwm_out[1] = temp32;            
+    }
+    else if (mode_is_idle(1)
+    {
+        //empty
+    }
+    else
+    {
+        //other
     }
 
     //update the prediction for coupled board duty
@@ -294,24 +324,6 @@ void decouple_dutycycle(Int32 *pwm)
         }
     }
 
-//-----------------------------------------------------------------------------------
-#elif VERSION == 0x0252 || VERSION == 0x0152
-    //  Waist Differential coupling 
-    //    |Me1| |  1    -1 |  |Je1|
-    //    |Me2|=|  1     1 |* |Je2|
-    
-    pwm_out[0] = (pwm[0] - pwm[1])>>1;
-    pwm_out[1] = (pwm[0] + pwm[1])>>1;
-
-    pd_out[0] = (_pd[0] - _pd[1])>>1;
-    pd_out[1] = (_pd[0] + _pd[1])>>1;
-
-    if (mode_is_idle(0) || mode_is_idle(1))
-    {
-        pwm_out[0] = 0;
-        pwm_out[1] = 0;
-    }
-
 //-----------------------------------------------------------------------------------        
 #elif VERSION == 0x0257 || VERSION == 0x0157
     /*
@@ -330,11 +342,11 @@ void decouple_dutycycle(Int32 *pwm)
      *             [ -Jm3/a,  Jm3/a,  Jm3/a]
      *
      *             [    R1/K1,      0,      0]
-     * u_m =     [        0,  R2/K2,      0] tau_m
+     * u_m =       [        0,  R2/K2,      0] tau_m
      *             [        0,      0,  R3/K3]
      *
      *            [    R1/K1*Jm1,            0,            0]                                [1          0              0]
-     * u_m =    [ -R2/K2*Jm2/a,  R2/K2*Jm2/a,            0] tau_j =  1.0e-03 * 0.1519 * [-1.6455    1.6455         0] tau_j
+     * u_m =      [ -R2/K2*Jm2/a,  R2/K2*Jm2/a,            0] tau_j =     1.0e-03 * 0.1519 * [-1.6455    1.6455         0] tau_j
      *            [ -R3/K3*Jm3/a,  R3/K3*Jm3/a,  R3/K3*Jm3/a]                                [-1.6455    1.6455    1.6455]
      *
      * where:
@@ -346,7 +358,7 @@ void decouple_dutycycle(Int32 *pwm)
      * 
      * This solution follows from the following coupling:
      *        [  1,  0,  0]
-     * qj =    [  1,  a,  0] qm = Tjm qm
+     * qj =   [  1,  a,  0] qm = Tjm qm
      *        [  0, -a,  a]
      * where:
      *
@@ -357,7 +369,7 @@ void decouple_dutycycle(Int32 *pwm)
      * effected by the kinematic coupling (due to high gear boxes):
      *
      *    [  Jm1,    0,    0]
-     *     [    0,  Jm2,    0] d2qm = tau_m
+     *    [    0,  Jm2,    0] d2qm = tau_m
      *    [    0,    0,  Jm3]
      *
      * where:
@@ -367,7 +379,7 @@ void decouple_dutycycle(Int32 *pwm)
      */
 
     // ----- JOINT 0 ONLY -----
-    if (_control_mode[0] == MODE_POSITION)
+    if (mode_is_stiff(0))
     {
         //          [ 1  0  0]
         //  tau_m = [-t  t  0] tau_j
@@ -383,9 +395,7 @@ void decouple_dutycycle(Int32 *pwm)
         temp32 = (Int32) (tempf);
         pwm_out[0] = temp32;        
     }
-    else if (_control_mode[0] == MODE_TORQUE ||
-             mode_is_impedance_position(0) ||
-             mode_is_impedance_velocity(0) )
+    else if (mode_is_force_controlled(0))
     {
         //          [ 1  1  0]
         //  tau_m = [ 0  s -s] tau_j
@@ -397,7 +407,15 @@ void decouple_dutycycle(Int32 *pwm)
         
         tempf = (float)(pwm[0]);
         tempf = tempf * b_coeff;
-        pwm_out[0] = (Int32) tempf;                    
+        pwm_out[0] = (Int32) tempf;
+    }
+    else if (mode_is_idle(0)
+    {
+        //empty
+    }
+    else
+    {
+        //other
     }
 
     //update the prediction for coupled board duty

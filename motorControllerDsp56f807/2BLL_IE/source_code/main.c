@@ -489,17 +489,8 @@ void main(void)
 			#endif //(VERSION != 0x0351)			
 		}
 
-//		decouple PWM	
-#ifdef USE_NEW_DECOUPLING
-		#ifdef USE_PARAMETRIC_DECOUPLING
-		decouple_dutycycle_new_joint_parametric(PWMoutput);  //parametric version
-		#else
-		decouple_dutycycle_new_joint(PWMoutput); //new version (july 2010) with torque decupling
-		#endif
-#else
-		decouple_dutycycle(PWMoutput);				
-#endif
-	
+        //decouple PWM	
+		decouple_dutycycle(PWMoutput);
 		
 //******************************************* SATURATES CONTROLS ***************************/                
 		/* back emf compensation + controls saturation (if necessary) */

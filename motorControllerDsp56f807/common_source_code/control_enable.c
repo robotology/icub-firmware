@@ -418,7 +418,7 @@ bool mode_is_stiff(byte axis)
 	if (_control_mode[axis] == MODE_IMPEDANCE_POS ) return false;
 	if (_control_mode[axis] == MODE_IMPEDANCE_VEL ) return false;
 	if (_control_mode[axis] == MODE_TORQUE )        return false;
-	if (_control_mode[axis] == MODE_OPENLOOP ) return false;
+	//NOTE: MODE_OPENLOOP is considered stiff
 	
 	if (_interaction_mode[axis] == icubCanProto_interactionmode_compliant) return false;
 	return true;

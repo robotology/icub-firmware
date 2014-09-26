@@ -157,6 +157,26 @@ void decouple_dutycycle_old(Int32 *pwm)
     //pwm[2] = pwm[2] + tempf;
 
 //-----------------------------------------------------------------------------------
+#elif VERSION == 0x0252 || VERSION == 0x0152
+    //  Waist Differential coupling 
+    //    |Me1| |  1    -1 |  |Je1|
+    //    |Me2|=|  1     1 |* |Je2|
+    
+    temp32 = pwm[0];
+    pwm[0] = (pwm[0] - pwm[1])>>1;
+    pwm[1] = (temp32 + pwm[1])>>1;
+
+    temp32   = _pd[0];
+    _pd[0] = (_pd[0] - _pd[1])>>1;
+    _pd[1] = (temp32 + _pd[1])>>1;
+
+    if (mode_is_idle(0) || mode_is_idle(1))
+    {
+        pwm[0] = 0;
+        pwm[1] = 0;
+    }
+
+//-----------------------------------------------------------------------------------
 #elif VERSION == 0x0250 || VERSION == 0x0150
 
     /*
@@ -237,25 +257,6 @@ void decouple_dutycycle_old(Int32 *pwm)
         pwm[1] = (Int32) tempf;
     }
 
-//-----------------------------------------------------------------------------------
-#elif VERSION == 0x0252 || VERSION == 0x0152
-    //  Waist Differential coupling 
-    //    |Me1| |  1    -1 |  |Je1|
-    //    |Me2|=|  1     1 |* |Je2|
-    
-    temp32 = pwm[0];
-    pwm[0] = (pwm[0] - pwm[1])>>1;
-    pwm[1] = (temp32 + pwm[1])>>1;
-    temp32   = _pd[0];
-    _pd[0] = (_pd[0] - _pd[1])>>1;
-    _pd[1] = (temp32 + _pd[1])>>1;
-
-    if (mode_is_idle(0) || mode_is_idle(1))
-    {
-        pwm[0] = 0;
-        pwm[1] = 0;
-    }
-
 //-----------------------------------------------------------------------------------        
 #elif VERSION == 0x0257 || VERSION == 0x0157
     /*
@@ -325,7 +326,7 @@ void decouple_dutycycle_old(Int32 *pwm)
         tempf = (float)(pwm[0]);
         tempf = tempf * a_coeff;
         temp32 = (Int32) _cpl_pid_prediction[1] + (Int32) (tempf);
-        pwm[0] = temp32;        
+        pwm[0] = temp32;
 
         //update the prediction for coupled board duty
         _cpl_pid_prediction[0] = _cpl_pid_prediction[0] + _cpl_pid_delta[0];
