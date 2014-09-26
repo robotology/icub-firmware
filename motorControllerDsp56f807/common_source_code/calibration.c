@@ -437,7 +437,10 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	{
 		set_current_as_middle_position(channel);
 		set_relative_position_abs_ssi_turns(channel, 0);
-		_position[channel] = get_relative_position_abs_ssi(channel);				
+		_position[channel] = get_relative_position_abs_ssi(channel);
+		//_calibrated[channel] = true;
+		//enable_motor_pwm(channel, MODE_POSITION); //this automatically enables two motors
+	    //switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);				
 	}
 
 //-----------------------------------	  

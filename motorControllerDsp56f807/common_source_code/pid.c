@@ -232,13 +232,7 @@ Int32 compute_pwm(byte j)
 		PWMoutput = compensate_bemf(j, _speed[j]);
 		_pd[j] = 0;
 	break;
-	
-    default:
-	    can_printf ("UNKNOWN CONTROLMODE PID");
-		put_motor_in_fault(j);	
-		PWMoutput=0;
-	break;
-    	
+	   	
 #elif VERSION == 0x0215 
    	case MODE_POSITION:
 	case MODE_VELOCITY:
@@ -419,6 +413,11 @@ Int32 compute_pwm(byte j)
 		PWMoutput=0;
 	break;
 	 
+	default:
+	    can_printf ("UNKNOWN CONTROLMODE PID");
+		put_motor_in_fault(j);	
+		PWMoutput=0;
+	break;
 	}
 	
 	return PWMoutput;
