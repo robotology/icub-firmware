@@ -250,7 +250,7 @@ void decouple_dutycycle(Int32 *pwm)
         pd_out[0]  = (_pd[0] + _pd[1]);
         pwm_out[0] = (pwm[0] + pwm[1]);    
     }
-    else if (mode_is_idle(0)
+    else if (mode_is_idle(0))
     {
         //empty
     }
@@ -290,7 +290,7 @@ void decouple_dutycycle(Int32 *pwm)
         temp32 = (Int32) (tempf);
         pwm_out[1] = temp32;            
     }
-    else if (mode_is_idle(1)
+    else if (mode_is_idle(1))
     {
         //empty
     }
@@ -409,7 +409,7 @@ void decouple_dutycycle(Int32 *pwm)
         tempf = tempf * b_coeff;
         pwm_out[0] = (Int32) tempf;
     }
-    else if (mode_is_idle(0)
+    else if (mode_is_idle(0))
     {
         //empty
     }
