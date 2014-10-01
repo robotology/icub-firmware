@@ -138,15 +138,15 @@ const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICAT
             .version    = 
             { 
                 .major = 2, 
-                .minor = 8
+                .minor = 9
             },  
             .builddate  = 
             {
                 .year  = 2014,
-                .month = 9,
-                .day   = 17,
-                .hour  = 16,
-                .min   = 00
+                .month = 10,
+                .day   = 1,
+                .hour  = 12,
+                .min   = 0
             }
         },
         .rom        = 

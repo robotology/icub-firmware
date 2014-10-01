@@ -135,9 +135,12 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         case CMD_SCAN:
         {
             //hal_trace_puts("CMD_SCAN");
-
+#if !defined(_MAINTAINER_APPL_ )
             eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
-
+#else
+            eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+#endif
+            
             *sizeout = 14;
 
             pktout[ 0] = CMD_SCAN;
