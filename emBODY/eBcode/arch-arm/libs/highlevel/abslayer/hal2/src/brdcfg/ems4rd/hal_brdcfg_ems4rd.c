@@ -127,11 +127,13 @@
     // the micrel must be sw configured. we set it in autonegotiation for its port1 and port2. 
     // the mode for the rmii is read via sw from the micrel
     // for debug you can also use: hl_ethtrans_phymode_fullduplex10mbps // hl_ethtrans_phymode_halfduplex10mbps //hl_ethtrans_phymode_auto
+    //#define HL_ETHTRANS_PHYMODE_THEONE2USE hl_ethtrans_phymode_fullduplex10mbps
     #define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_auto
     //#define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_fullduplex100mbps
     #define HL_ETHTRANS_XCOMODE_THEONE2USE              hl_ethtrans_xcorr_none_port2inverted
     
     // we also need to define a target phy mode for the hal-ethtransceiver, but that is dummy. i use auto
+    //#define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_fullduplex10mbps
     #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
     //#define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_fullduplex100mbps
     
