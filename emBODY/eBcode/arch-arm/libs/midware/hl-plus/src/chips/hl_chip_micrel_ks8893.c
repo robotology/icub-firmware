@@ -40,7 +40,7 @@
 #include "hl_core.h"        // contains the required stm32f10x_*.h or stm32f4xx*.h header files
 #include "hl_eth.h"
 #include "hl_arch.h"
-
+#include "hl_bits.h"
 
  
 // --------------------------------------------------------------------------------------------------------------------
@@ -447,10 +447,14 @@ static void s_hl_chip_micrel_ks8893_phymode_set(hl_ethtrans_phymode_t targetphym
     switch(targetphymode)
     {
         case hl_ethtrans_phymode_auto:                  buff_write = 0x9F; break;
-        case hl_ethtrans_phymode_halfduplex10mbps:      buff_write = 0x00+16+1; break; // marco.accame: added also bit 0, 4
-        case hl_ethtrans_phymode_halfduplex100mbps:     buff_write = 0x40+16+4; break; // marco.accame: added also bit 2, 4
-        case hl_ethtrans_phymode_fullduplex10mbps:      buff_write = 0x20+16+2; break; // marco.accame: added also bit 1, 4
-        case hl_ethtrans_phymode_fullduplex100mbps:     buff_write = 0x60+16+8; break; // marco.accame: added also bit 3, 4
+//        case hl_ethtrans_phymode_halfduplex10mbps:      buff_write = 0x00+16+1; break; // marco.accame: added also bit 0, 4
+//        case hl_ethtrans_phymode_halfduplex100mbps:     buff_write = 0x40+16+4; break; // marco.accame: added also bit 2, 4
+//        case hl_ethtrans_phymode_fullduplex10mbps:      buff_write = 0x20+16+2; break; // marco.accame: added also bit 1, 4
+//        case hl_ethtrans_phymode_fullduplex100mbps:     buff_write = 0x60+16+8; break; // marco.accame: added also bit 3, 4
+        case hl_ethtrans_phymode_halfduplex10mbps:      buff_write = 0x00; break; 
+        case hl_ethtrans_phymode_halfduplex100mbps:     buff_write = 0x40; break; 
+        case hl_ethtrans_phymode_fullduplex10mbps:      buff_write = 0x20; break; 
+        case hl_ethtrans_phymode_fullduplex100mbps:     buff_write = 0x60; break;        
         default:                                        buff_write = 0x00; break;
     }    
     
@@ -669,14 +673,23 @@ static void s_hl_chip_micrel_ks8893_phy_onestatus(hl_ethtrans_phystatus_t* physt
         regaddr.bytes.one = regaddr_status0;
         hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);           
         
-        if(buff_read&0x0040)    // autoneg completed
+        if(buff_read&0x40)  // bit 6: AN Done       -> 1 = Auto-negotiation completed, 0 = Auto-negotiation not completed
         {
             phystatus->autoNeg_done = 1;
         }
-        if(buff_read&0x0020)    // link is good
+        if(buff_read&0x20)  // bit 5: Link Good     -> 1 = Link good, 0 = Link not good
         {
             phystatus->linkisgood = 1;
         }
+        
+        phystatus->mdixisused                   = hl_bits_byte_bitcheck(buff_read, 7);
+        phystatus->autonegotiationdone          = hl_bits_byte_bitcheck(buff_read, 6);
+        phystatus->linkgood                     = hl_bits_byte_bitcheck(buff_read, 5);
+        phystatus->partnerflowcontrolcapable    = hl_bits_byte_bitcheck(buff_read, 4);
+        phystatus->partner100FDcapable          = hl_bits_byte_bitcheck(buff_read, 3);
+        phystatus->partner100HDcapable          = hl_bits_byte_bitcheck(buff_read, 2);
+        phystatus->partner010FDcapable          = hl_bits_byte_bitcheck(buff_read, 1);
+        phystatus->partner010HDcapable          = hl_bits_byte_bitcheck(buff_read, 0);        
     }
 
     buff_read = 0;
@@ -685,15 +698,21 @@ static void s_hl_chip_micrel_ks8893_phy_onestatus(hl_ethtrans_phystatus_t* physt
     regaddr.bytes.one = regaddr_status1;
     hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);       
     
-    if(buff_read&0x0004)        // link speed 1==>100
+    if(buff_read&0x04)        // link speed 1==>100
     {
         phystatus->linkspeed = 1;
     }
-    if(buff_read&0x0002)        // duplex 1==>full
+    if(buff_read&0x02)        // duplex 1==>full
     {
         phystatus->linkduplex = 1;
     }
     
+    phystatus->mdixHPisused                 = hl_bits_byte_bitcheck(buff_read, 7);
+    phystatus->polarityreversed             = hl_bits_byte_bitcheck(buff_read, 5);
+    phystatus->transmitflowcontrolactive    = hl_bits_byte_bitcheck(buff_read, 4);
+    phystatus->receiveflowcontrolactive     = hl_bits_byte_bitcheck(buff_read, 3);
+    phystatus->operationspeed100mbps        = hl_bits_byte_bitcheck(buff_read, 2);
+    phystatus->operationduplexFULL          = hl_bits_byte_bitcheck(buff_read, 1);
 }
 
 static hl_result_t s_hl_chip_micrel_ks8893_phy_status(hl_ethtrans_phystatus_t* phyarray, uint8_t arraysize)

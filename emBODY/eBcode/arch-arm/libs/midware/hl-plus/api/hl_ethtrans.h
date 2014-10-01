@@ -86,12 +86,29 @@ typedef enum
 
 typedef struct
 {
-    uint32_t linkisup           :1;
-    uint32_t autoNeg_done       :1;
-    uint32_t linkisgood         :1;
-    uint32_t linkspeed          :1;     // 1 -> 100Mb, 0 -> 10Mb
-    uint32_t linkduplex         :1;     // 1 -> full,  0 -> half
-    uint32_t dummy              :27;
+    uint32_t linkisup                       :1;     // not used
+    uint32_t autoNeg_done                   :1;     // 1 -> done,   0 -> not done
+    uint32_t linkisgood                     :1;     // 1 -> good,   0 -> bad
+    uint32_t linkspeed                      :1;     // 1 -> 100Mb,  0 -> 10Mb
+    uint32_t linkduplex                     :1;     // 1 -> full,   0 -> half
+
+    uint32_t mdixisused                     :1;     // 1 -> MDI-X, 0 -> MDI
+    uint32_t autonegotiationdone            :1;     // 1 -> Auto-negotiation completed
+    uint32_t linkgood                       :1;     // 1 -> Link good, 0 -> Link not good    
+    uint32_t partnerflowcontrolcapable      :1;     // 1 -> Link partner flow control (pause) capable
+    uint32_t partner100FDcapable            :1;     // 1 -> Link partner 100BT full duplex capable
+    uint32_t partner100HDcapable            :1;     // 1 -> Link partner 100BT half duplex capable
+    uint32_t partner010FDcapable            :1;     // 1 -> Link partner 10BT full duplex capable
+    uint32_t partner010HDcapable            :1;     // 1 -> Link partner 10BT half duplex capable
+    
+    uint32_t mdixHPisused                   :1;     // 1 -> HP Auto MDI/MDI-X mode, 0 -> Micrel Auto MDI/MDI-X mode
+    uint32_t polarityreversed               :1;     // 1 -> Polarity is reversed    
+    uint32_t transmitflowcontrolactive      :1;     // 1 -> Transmit flow control feature is active
+    uint32_t receiveflowcontrolactive       :1;     // 1 -> Receive flow control feature is active
+    uint32_t operationspeed100mbps          :1;     // 1 -> Link speed is , 0 -> Link speed is 10Mbps
+    uint32_t operationduplexFULL            :1;     // 1 -> Link duplex is full, 0 -> Link duplex is half
+   
+    uint32_t dummy                          :13;
 } hl_ethtrans_phystatus_t;
 
 typedef enum
