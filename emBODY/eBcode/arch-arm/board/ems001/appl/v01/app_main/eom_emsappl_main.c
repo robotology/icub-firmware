@@ -148,11 +148,20 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
  **/
 
 static void s_eom_emsappl_main_init(void)
-{
-   
+{  
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
     
     eom_emsappl_Initialise(&emscfg->applcfg);
+       
+    if(eores_OK == eom_ipnet_ResolveIP(eom_ipnet_GetHandle(), emscfg->applcfg.hostipv4addr, 5*EOK_reltime100ms))
+    {
+        // set led0 to ON
+        hal_led_on(hal_led0);
+    }
+    else
+    {
+        hal_led_off(hal_led0);
+    }
 }
 
 
