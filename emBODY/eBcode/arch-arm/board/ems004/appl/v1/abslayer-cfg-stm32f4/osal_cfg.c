@@ -48,34 +48,18 @@
 
 extern void* osal_ext_calloc(uint32_t s, uint32_t n)
 {
-//    char str[64];
-  
     void* ret = calloc(s, n);
-        
-//    snprintf(str, sizeof(str), "mycalloc %d bytes: [%x, %x]", n*s, (uint32_t)ret, (uint32_t)ret+n*s);
-//    hal_trace_puts(str);
-    
     return(ret);
 }
 
 extern void* osal_ext_realloc(void* m, uint32_t s)
 {
-//    char str[64];
-  
     void* ret = realloc(m, s);
-//        
-//    snprintf(str, sizeof(str), "mycalloc %d bytes: [%x, %x]", s, (uint32_t)ret, (uint32_t)ret+s);
-//    hal_trace_puts(str);
-    
     return(ret);
 }
 
 extern void osal_ext_free(void* m)
 {
-//    char str[64];
-//    snprintf(str, sizeof(str), "myfree %x", (uint32_t)m);
-//    hal_trace_puts(str);
-
     free(m);
 }
 
@@ -119,7 +103,7 @@ const osal_cfg_t osal_cfg =
 
 const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
 
-
+#warning --> marco.accame on 17sept2014: there is a function osal_cfg_on_fatal_error() and a s_osal_cfg_on_fatal_error(). the latter is used.
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
 {
     uint8_t tskid = 0;
