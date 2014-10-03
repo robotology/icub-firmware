@@ -122,12 +122,9 @@ const ipal_cfg_t ipal_cfg =
         .osal_mutex_take            = NULL, 
         .osal_mutex_release         = NULL, 
         .osal_param_tout_forever    = 0, 
-        .osal_system_scheduling_suspend = osal_system_scheduling_suspend,
-        .osal_system_scheduling_restart = osal_system_scheduling_restart,
-//        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
-//        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
-//        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
-//        .osal_param_tout_forever    = OSAL_timeINFINITE,
+        .osal_system_scheduling_suspend = NULL, //osal_system_scheduling_suspend,
+        .osal_system_scheduling_restart = NULL, //osal_system_scheduling_restart,
+
 
         .hal_eth_init               = (ipal_result_t (*)(void*)) hal_eth_init,
         .hal_eth_enable             = (ipal_result_t (*)(void))  hal_eth_enable,
@@ -160,18 +157,12 @@ const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
 
-// #ifdef _SETPOINT_TEST_
-// extern volatile uint8_t rec_pkts_isr;
-// #endif
+
 static void onethframerx(void)
 {
     static volatile uint8_t b = 0;
     b++;
     b = b;
-// #ifdef _SETPOINT_TEST_
-//     hal_led_toggle(hal_led0); //red led
-//     rec_pkts_isr ++;
-// #endif
 }
 
 
