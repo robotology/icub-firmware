@@ -34,6 +34,7 @@
 #include "string.h"
 
 #include "hal.h"
+#include "hal_sys.h"
 
 #include "EOMtheSystem.h"
 
@@ -95,20 +96,21 @@ static void error_base_fatal_manage(char *str);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern void ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
 {
-    char str[250];
+    char str[256];
     EOMtheEMSappl* the_appl = eom_emsappl_GetHandle();
     
    
     if(NULL != the_appl)
     {
-        snprintf(str, sizeof(str)-1, "errorcode= %d: %s\n", errorcode, errormsg);
+        snprintf(str, sizeof(str), "errorcode= %d: %s\n", errorcode, errormsg);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "stack-IPAL", str);
     }
     else
     {
-        snprintf(str, sizeof(str)-1, "stack-IPAL: errorcode= %d: %s\n", errorcode, errormsg);
+        snprintf(str, sizeof(str), "stack-IPAL: errorcode= %d: %s\n", errorcode, errormsg);
         error_base_fatal_manage(str);
     }
 }
@@ -126,12 +128,12 @@ extern void osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, con
     
     if(NULL != the_appl)
     {
-        snprintf(str, sizeof(str)-1, "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
+        snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "OSAL", str);
     }
     else
     {
-        snprintf(str, sizeof(str)-1, "OSAL: error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
+        snprintf(str, sizeof(str), "OSAL: error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
         error_base_fatal_manage(str);
     }
 }
@@ -143,13 +145,13 @@ extern void osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, con
 extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
 {
     const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[250];
+    char str[256];
 
 
     EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
 
 
-    snprintf(str, sizeof(str)-1, "userdef_OnError: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    snprintf(str, sizeof(str), "userdef_OnError: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
 
     if(errtype <= eo_errortype_weak)
     {
@@ -178,12 +180,18 @@ static void error_base_fatal_manage(char *str)
 {
     hal_led_cfg_t cfg = {.dummy=0};
     
-    hal_led_init(hal_led0, &cfg); //led red
-    hal_led_on(hal_led0);
+    hal_led_init(hal_led1, &cfg); 
+    hal_led_on(hal_led1);
 
     hal_trace_puts(str);
     
-    for(;;);
+    for(;;)
+    {
+        hal_led_on(hal_led1);
+        hal_sys_delay(300*1000);
+        hal_led_off(hal_led1);
+        hal_sys_delay(200*1000);
+    }
 
 }
 
