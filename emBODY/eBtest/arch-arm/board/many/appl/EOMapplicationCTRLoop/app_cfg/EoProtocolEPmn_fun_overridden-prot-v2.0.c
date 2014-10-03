@@ -235,30 +235,60 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
+extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
+{
+    // i init the application status to ...     
+    eOmn_appl_status_t status = {0};
+    status.currstate = applstate_config;
+    status.runmode = applrunMode__default; 
+    status.isvalid = 1;    
+    memset(&status.filler05, 0, sizeof(status.filler05));
+    eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
+}
+
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->ram;
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
 
+    eOresult_t res = eores_NOK_generic;
+    
     switch(*newstate_ptr)
     {
         case applstate_config:
         {
-            eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+            if(eores_OK == res)
+            {   
+                status->currstate = applstate_config;
+            }
         } break;
 
         case applstate_running:
         {
-            eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+            if(eores_OK == res)
+            {   
+                status->currstate = applstate_running;
+            }
         } break;
         
         case applstate_error:
         {
             //I don't expect to receive go to error cmd
-            eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
+            if(eores_OK == res)
+            {   
+                status->currstate = applstate_error;
+            }
         } break;
-
+        
+        default:
+        {
+        } break;
     }
 
 }
