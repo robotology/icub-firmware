@@ -159,7 +159,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\eventviewer-stm32f1-cfg.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -361,8 +361,8 @@
             <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
-              <Define>EOPROT_USE_MN_VERSION_2_0 EO_USE_EPROT_V2 HAL_IS_VERSION_2 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
+              <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubGenova04 -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
+              <Define>ICUB_GENOVA04 NOT_ICUB_DARMSTADT01 EOPROT_USE_MN_VERSION_2_0 EO_USE_EPROT_V2 HAL_IS_VERSION_2 USE_PROTO_PROXY</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\appl\v01\app_main;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\..\..\..\ems001\appl\v01\app_nvs_cfg;..\..\..\..\ems001\appl\v01\app_servicesProviders_obj;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\..\canProtocolLib;..\..\..\..\..\..\robotconfig\v1\eprotocol;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\app_cfg;..\..\..\..\..\..\robotconfig</IncludePath>
             </VariousControls>
@@ -428,9 +428,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
@@ -1696,9 +1696,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.ems4rd.lib</FileName>
+              <FileName>hal2.ems4rd.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.ems4rd.ethdbg.lib</FilePath>
             </File>
             <File>
               <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
