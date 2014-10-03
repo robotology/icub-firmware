@@ -166,7 +166,7 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
     //static int  enc_error_seq = 0;
-    //static char enc_error_msg[31] = { "Enc(x):ERROR" } ;
+    static char enc_error_msg[31] = { "Enc(x):ERROR" } ;
     
     static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
     
