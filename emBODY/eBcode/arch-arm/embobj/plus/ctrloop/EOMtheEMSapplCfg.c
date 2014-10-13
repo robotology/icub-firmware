@@ -343,7 +343,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .safeTXexecutiontime        = EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME,
         .maxnumofRXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_RX_MAXPACKETS,                // add a control that is is lower equal to inpdatagramnumber.
         .maxnumofTXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS,                // so far it can be only 0 or 1 
-        .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP    
+        .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP,
+        .TXdecimationfactor         = 1        
     }
 };
 
