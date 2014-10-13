@@ -103,6 +103,7 @@ typedef struct
     uint16_t            maxnumofRXpackets;      /**< It allows to receive and parse up to a given number of packets */ 
     uint16_t            maxnumofTXpackets;      /**< so far it can be only 0 or 1 */
     eOemsrunner_mode_t  modeatstartup;
+    uint16_t            TXdecimationfactor;
 } eOemsrunner_cfg_t;
 
 typedef struct

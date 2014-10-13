@@ -78,6 +78,7 @@ struct EOMtheEMSrunner_hid
     uint8_t             numofpacketsinsidesocket;
     osal_semaphore_t*   waitudptxisdone;
     osal_task_t*        osaltaskipnetexec;
+    uint64_t            iterationnumber;
 };
 
 

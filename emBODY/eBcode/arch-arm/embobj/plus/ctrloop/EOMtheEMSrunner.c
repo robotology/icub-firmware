@@ -101,6 +101,7 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
     EO_INIT(.maxnumofRXpackets)         3,
     EO_INIT(.maxnumofTXpackets)         1,
     EO_INIT(.modeatstartup)             eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
+    EO_INIT(.TXdecimationfactor)        1
 };
 
 
@@ -167,7 +168,8 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.mode)                  eo_emsrunner_mode_softrealtime,
     EO_INIT(.numofpacketsinsidesocket) 0,
     EO_INIT(.waitudptxisdone)       NULL,
-    EO_INIT(.osaltaskipnetexec)     NULL
+    EO_INIT(.osaltaskipnetexec)     NULL,
+    EO_INIT(.iterationnumber)       0
 };
 
 
@@ -618,7 +620,15 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
     if(0 == p->cfg.maxnumofTXpackets)
     {
         processtransmission = eobool_false;
-    }     
+    } 
+
+    if(p->cfg.TXdecimationfactor != 1)
+    {
+        if(0 != (s_theemsrunner.iterationnumber % p->cfg.TXdecimationfactor))
+        {
+            processtransmission = eobool_false;
+        }
+    }
     
         
     // the transmission section
@@ -792,6 +802,8 @@ static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
+    
+    s_theemsrunner.iterationnumber ++;
     
     eom_emsrunner_rxstart = osal_system_abstime_get();
     
