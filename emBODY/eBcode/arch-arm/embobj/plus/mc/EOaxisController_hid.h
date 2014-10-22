@@ -65,9 +65,9 @@ extern "C" {
 
 #define AC_NOT_READY           (AC_NOT_CALIBRATED|AC_NO_MIN_LIMIT|AC_NO_MAX_LIMIT|AC_NO_POS_PID|AC_NO_TRQ_PID/*|AC_NO_VEL_LIMIT|AC_NO_VEL_TOUT*/)
 
-#define AC_ENCODER_FAULT       0x2000
+//#define AC_ENCODER_FAULT       0x2000
 #define AC_TORQUE_SENS_FAULT   0x4000
-#define AC_INVALID_STATE       0x8000
+//#define AC_INVALID_STATE       0x8000
 
 struct EOaxisController_hid 
 {
@@ -107,11 +107,6 @@ struct EOaxisController_hid
 
     eOmc_controlmode_t control_mode;
     eOmc_interactionmode_t interact_mode;
-    //eObool_t stiff;
-
-    //uint8_t limits_mask;
-    
-    //eObool_t calibrated;
     
     uint16_t state_mask;
 }; 

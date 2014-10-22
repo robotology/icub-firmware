@@ -124,6 +124,11 @@ extern eObool_t eo_axisController_IsOk(EOaxisController* o)
     return o->state_mask == AC_OK;
 }
 
+extern eObool_t eo_axisController_IsTorqueSensorFault(EOaxisController* o)
+{
+    return (o->state_mask & AC_TORQUE_SENS_FAULT) != 0;
+}
+
 extern void eo_axisController_StartCalibration(EOaxisController *o)
 {
     if (!o) return;
@@ -531,7 +536,6 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         case eomc_controlmode_calib:
         {
             if (IS_CALIBRATED())
-            //if (!NOT_READY())
             {
                 eo_pid_Reset(o->pidP);
                 eo_trajectory_Init(o->trajectory, pos, vel, 0);
@@ -597,9 +601,12 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 o->err = err;
                 
                 //return eo_pid_PWM_piv(o->pidP, o->err, vel_ref-vel);
-                return eo_pid_PWM_pid(o->pidP, o->err);
                 
-                //return (int16_t)(vel_ref / 10 + err / 2);
+                #ifdef EXPERIMENTAL_SPEED_CONTROL
+                return (int16_t)(vel_ref / 10 + err / 2);
+                #else
+                return eo_pid_PWM_pid(o->pidP, o->err);
+                #endif
             }
             else // compliant
             {
@@ -733,23 +740,29 @@ extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o)
     return o ? o->pidT : NULL;
 }
 
+extern void eo_axisController_SetBemf(EOaxisController *o, float Kbemf)
+{
+    //eo_pid_SetPidBemf(o->pidP, Kbemf);
+    eo_pid_SetPidBemf(o->pidT, Kbemf);
+}
+
 extern void eo_axisController_SetPosPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
 {
-    if (!o) return;
+    //if (!o) return;
     
     RST_BITS(o->state_mask, AC_NO_POS_PID);
 
-    eo_pid_SetPid(o->pidP, Kp, Kd, Ki, Imax, Ymax, Yoff, 0.f, 0.f);
+    eo_pid_SetPidBase(o->pidP, Kp, Kd, Ki, Imax, Ymax, Yoff);
 }
-extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kbemf, float Kff)
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff)
 {
-    if (!o) return;
+    //if (!o) return;
     
     RST_BITS(o->state_mask, AC_NO_TRQ_PID);
 
     o->rot_sign = (Kp>=0.f)?1:-1;
     
-    eo_pid_SetPid(o->pidT, Kp, Kd, Ki, Imax, Ymax, Yoff, Kbemf, Kff);
+    eo_pid_SetPidTorq(o->pidT, Kp, Kd, Ki, Imax, Ymax, Yoff, Kff);
 }
 
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_t* jointStatus)
@@ -847,7 +860,6 @@ static void axisMotionReset(EOaxisController *o)
         eo_pid_Reset(o->pidT);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->torque_timer = 0;
-        //o->torque_wdog = 0;
         o->torque_ref = 0;
         o->err = 0;
 }

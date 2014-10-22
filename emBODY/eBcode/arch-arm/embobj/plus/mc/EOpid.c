@@ -104,11 +104,9 @@ extern EOpid* eo_pid_New(void)
     return o;
 }
 
-extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset, float Kbemf, float Kff)
+extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset)
 {
     static const float N=10.f;
-    
-    if (!o) return;
 
     o->pwm_max = pwm_max;
     o->pwm_offset = pwm_offset;
@@ -128,10 +126,20 @@ extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, in
     //o->B = (1.f - o->A)*Kd;
     o->A = Kd / (Kd + Kp*N*EMS_PERIOD);
     o->B = (1.f - o->A)*Kd*EMS_FREQUENCY_FLOAT;
-    
-    o->Kbemf = Kbemf;
+}
+
+extern void eo_pid_SetPidTorq(EOpid *o, float Kp, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset, float Kff)
+{    
+    eo_pid_SetPidBase(o, Kp, Kd, Ki, Imax, pwm_max, pwm_offset);
+   
     o->Kff = Kff;
 }
+
+extern void eo_pid_SetPidBemf(EOpid *o, float Kbemf)
+{
+    o->Kbemf = Kbemf;
+}
+
 
 extern int32_t eo_pid_PWM_p(EOpid *o, float En)
 {    

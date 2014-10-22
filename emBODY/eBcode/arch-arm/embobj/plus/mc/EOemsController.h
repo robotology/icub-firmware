@@ -93,7 +93,7 @@ extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
 extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode);
 //extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint);
 
-extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t motorerror, uint8_t canerror/*, eOmc_controlmode_t controlmode*/);
+extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state);
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status);
 
 extern void eo_emsController_CheckCalibrations(void);
@@ -108,8 +108,9 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* 
 extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 
 // configuration
+extern void eo_emsController_SetBemf(uint8_t joint, float Kbemf);
 extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
-extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kbemf, float Kff);
+extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff);
 
 extern void eo_emsController_SetImpedance(uint8_t joint, int32_t stiffness, int32_t damping, int32_t offset);
 extern void eo_emsController_GetImpedance(uint8_t joint, int32_t *stiffness, int32_t *damping, int32_t *offset);

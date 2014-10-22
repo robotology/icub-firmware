@@ -21,7 +21,7 @@ extern "C" {
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
 #include "EOdecoupler.h"
-
+#include "EOemsControllerCfg.h"
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
@@ -33,13 +33,11 @@ extern "C" {
                 used also by its derived objects.
  **/  
  
-#define MAX_MOTORS 4
+//#define MAX_MOTORS 4
  
 struct EOmotors_hid 
 {
-    uint8_t n_motors;
-    
-    uint8_t motor_fault_mask;
+    uint16_t motor_fault_mask2[NAXLES];
 }; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

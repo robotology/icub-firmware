@@ -29,8 +29,22 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-#define EMS_OK       0x0000
-#define EMS_FAULT    0x8000
+//#define EMS_OK          0x0000
+//#define EMS_FAULT       0x8000
+
+/*
+#define EMS_SPI_TIMEOUT 0x4000
+
+#define EMS_AEA_FAULT_0 0x0001
+#define EMS_AEA_FAULT_1 0x0002
+#define EMS_AEA_FAULT_2 0x0004
+#define EMS_AEA_FAULT_3 0x0008
+
+#define EMS_TRQ_FAULT_0 0x0010
+#define EMS_TRQ_FAULT_1 0x0020
+#define EMS_TRQ_FAULT_2 0x0040
+#define EMS_TRQ_FAULT_3 0x0080
+*/
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -44,7 +58,9 @@ struct EOemsController_hid
 {
     uint8_t n_calibrated;
     
-    uint16_t state_mask;
+    //uint16_t state_mask;
+    
+    //uint16_t motor_state_mask[4];
     
     EOmotors         *motors;
     EOaxisController *axis_controller[NAXLES];

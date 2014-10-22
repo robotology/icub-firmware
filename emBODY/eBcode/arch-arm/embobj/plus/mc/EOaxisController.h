@@ -99,6 +99,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff);
 extern void eo_axisController_Stop(EOaxisController *o);
 
 extern void eo_axisController_SetHardwareFault(EOaxisController *o);
+extern eObool_t eo_axisController_IsTorqueSensorFault(EOaxisController* o);
 extern eObool_t eo_axisController_IsHardwareFault(EOaxisController *o);
 extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_controlmode_command_t cmc);
 extern eOmc_controlmode_t eo_axisController_GetControlMode(EOaxisController *o);
@@ -122,8 +123,9 @@ extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
+extern void eo_axisController_SetBemf(EOaxisController *o, float Kbemf);
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
-extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kbemf, float Kff);
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff);
 
 extern void eo_axisController_StartCalibration(EOaxisController *o);
 extern void eo_axisController_SetCalibrated(EOaxisController *o);

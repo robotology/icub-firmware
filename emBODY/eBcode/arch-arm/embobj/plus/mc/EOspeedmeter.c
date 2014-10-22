@@ -317,7 +317,11 @@ extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_
     LIMIT(o->axle_inc_pos, N_BITS_PRECISION_BOUND);
     
     #ifdef USE_4BIT_INC_ENC_PRECISION
+    #ifdef EXPERIMENTAL_SPEED_CONTROL
+    o->position = axle_virt_pos/GEARBOX_REDUCTION;
+    #else
     o->position = axle_abs_pos + o->axle_inc_pos/GEARBOX_REDUCTION;
+    #endif
     #else
     o->position = axle_abs_pos;
     #endif
