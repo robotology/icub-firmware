@@ -171,11 +171,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.limitonintegral,
                                     cfg->pidtorque.limitonoutput, 
                                     cfg->pidtorque.offset,
-                                    #if defined(EOM_USE_STICTION)
                                     cfg->pidtorque.kff*rescaler_trq
-                                    #else
-                                    0.f
-                                    #endif
                                     );
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
@@ -243,11 +239,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 
                                     pid_ptr->offset,
-                                    #if defined(EOM_USE_STICTION)
                                     pid_ptr->kff*rescaler
-                                    #else
-                                    0.f
-                                    #endif
                                     );
 }
 
