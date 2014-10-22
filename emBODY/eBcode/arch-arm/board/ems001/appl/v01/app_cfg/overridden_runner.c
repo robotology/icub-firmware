@@ -476,6 +476,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         }
     }
     
+    /*
     static char msg[31];
     
     if (spi1 || spi3)
@@ -483,6 +484,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         snprintf(msg,sizeof(msg),"ENC TOUT %d %d",spi1,spi3);
         send_diagnostics_to_server(msg, 0xffffffff, 1);        
     }
+    */
     
     if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr)))
     {    
@@ -606,8 +608,12 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         return; //error
     }
     
-    if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
+    if (jstatus_ptr->basic.controlmodestatus == eomc_controlmode_position
+     || jstatus_ptr->basic.controlmodestatus == eomc_controlmode_velocity_pos
+     || jstatus_ptr->basic.controlmodestatus == eomc_controlmode_calib)
     {
+       if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
+       {
         /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
         - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
         message because the setpoint is alredy reached. this means that:
@@ -616,7 +622,8 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
         message because pc104 is not interested in getting motion done.
         */
-        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, motionDoneJoin2Use, msgCmd, NULL);
+            eo_appCanSP_SendCmd2Joint(appCanSP_ptr, motionDoneJoin2Use, msgCmd, NULL);
+        }
     }
     
     motionDoneJoin2Use++;

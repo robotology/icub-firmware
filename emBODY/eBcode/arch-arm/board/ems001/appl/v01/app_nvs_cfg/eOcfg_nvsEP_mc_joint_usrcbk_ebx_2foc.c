@@ -172,15 +172,17 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.limitonoutput, 
                                     cfg->pidtorque.offset,
                                     #if defined(EOM_USE_STICTION)
-                                    cfg->pidtorque.kff*rescaler_trq,
-                                    0.f//cfg->pidtorque.kbemf*rescaler_trq
+                                    cfg->pidtorque.kff*rescaler_trq
                                     #else
-                                    0.f,
                                     0.f
                                     #endif
                                     );
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
+    
+    #ifdef EOM_USE_STICTION
+    eo_emsController_SetBemf((uint8_t)jxx, ((float)cfg->bemf.value)/(float)(1<<cfg->bemf.offset));
+    #endif
 
     // 3) set velocity pid:    to be implemented
    
@@ -242,11 +244,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
                                     pid_ptr->limitonoutput, 
                                     pid_ptr->offset,
                                     #if defined(EOM_USE_STICTION)
-                                    pippo
-                                    pid_ptr->kff*rescaler,
-                                    0.f //pid_ptr->kbemf*rescaler
+                                    pid_ptr->kff*rescaler
                                     #else
-                                    0.f,
                                     0.f
                                     #endif
                                     );
@@ -505,7 +504,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    
+    #ifdef EXPERIMENTAL_SPEED_CONTROL
+    icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_velocity;
+    #else
     icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_openloop;
+    #endif
+    
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {

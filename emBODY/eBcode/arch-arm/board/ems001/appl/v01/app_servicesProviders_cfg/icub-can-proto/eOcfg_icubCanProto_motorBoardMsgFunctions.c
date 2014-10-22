@@ -606,6 +606,8 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setEncoderPosition(EOicubCa
 }
 
 
+//extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
+
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
     icubCanProto_setpoint_torque_t *torque_setpoint_ptr = (icubCanProto_setpoint_torque_t *)val_ptr;
@@ -622,6 +624,10 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
 
     /*3) set command's params */
     //*((icubCanProto_torque_t*)(&canFrame->data[1])) = torque_setpoint_ptr->value;
+    
+    //static char msg[31];
+    //snprintf(msg,sizeof(msg),"SET TRQ %d",torque_setpoint_ptr->value);
+    //send_diagnostics_to_server(msg, 0xffffffff, 1); 
     
     canFrame->data[1] = ((uint8_t*)&(torque_setpoint_ptr->value))[0];
     canFrame->data[2] = ((uint8_t*)&(torque_setpoint_ptr->value))[1];
@@ -666,7 +672,13 @@ eOresult_t                                  res = eores_OK;
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
     
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-    icubCanProto_torque_t icub_trq =  *((icubCanProto_torque_t*)(&frame->data[1]));
+    //icubCanProto_torque_t icub_trq =  *((icubCanProto_torque_t*)(&frame->data[1]));
+    
+    icubCanProto_torque_t icub_trq = ((icubCanProto_torque_t)frame->data[1]) | (((icubCanProto_torque_t)frame->data[2])<<8);
+    
+    //static char msg[31];
+    //snprintf(msg,sizeof(msg),"GET TRQ %d",icub_trq);
+    //send_diagnostics_to_server(msg, 0xffffffff, 1); 
     
     setpoint.type = eomc_setpoint_torque;
     setpoint.to.torque.value = eo_appMeasConv_torque_S2I(appMeasConv_ptr, jId, icub_trq);
@@ -2194,7 +2206,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         {
             return(res);
         }
-        eo_emsController_ReadMotorstatus(mId, frame->data[0], frame->data[4]/*, eomc_controlmode*/);
+        eo_emsController_ReadMotorstatus(mId, frame->data);
         //l'aggiornamento delle nv del giunto sara' fatto nel DO.
         //se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
         s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
