@@ -210,7 +210,7 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
         
         if(eores_OK == res)
         {
-            // perform an user-defined function
+            // perform a user-defined function
             eom_emserror_hid_userdef_DoJustAfterPacketReceived(&s_emserror_singleton, rxpkt);
         }
         
