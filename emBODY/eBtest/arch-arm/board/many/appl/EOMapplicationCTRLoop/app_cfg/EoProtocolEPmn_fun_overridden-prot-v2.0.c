@@ -96,6 +96,17 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command);
 extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
 {
     eOmn_comm_status_t* status = (eOmn_comm_status_t*)nv->ram;
+    
+    // 1. init the management protocol version
+    
+    eOmn_version_t* mnversion = &status->managementprotocolversion;
+    
+    mnversion->major = eoprot_version_mn_major;
+    mnversion->minor = eoprot_version_mn_minor;
+    
+    
+    // 2. init the transceiver
+    
     eOmn_transceiver_properties_t* transp = &status->transceiver;
     
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
@@ -235,14 +246,34 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
+
 extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 {
     // i init the application status to ...     
     eOmn_appl_status_t status = {0};
+    
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    // build date
+    status.buildate.year    = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
+    status.buildate.month   = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
+    status.buildate.day     = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
+    status.buildate.hour    = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
+    status.buildate.min     = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
+    
+    // version
+    status.version.major    = emscfg->applcfg.emsappinfo->info.entity.version.major;
+    status.version.minor    = emscfg->applcfg.emsappinfo->info.entity.version.minor;
+    
+    uint16_t min = EO_MIN(sizeof(status.name), sizeof(emscfg->applcfg.emsappinfo->info.name));
+    memcpy(status.name, emscfg->applcfg.emsappinfo->info.name, min);
+    
+    // curr state
     status.currstate = applstate_config;
-    status.runmode = applrunMode__default; 
-    status.isvalid = 1;    
-    memset(&status.filler05, 0, sizeof(status.filler05));
+    // run mode
+    status.runmode = applrunMode__default;    
+    
+    // set it
     eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
 }
 
