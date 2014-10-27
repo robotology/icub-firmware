@@ -783,63 +783,49 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
 {
-    if (!o)
+    if (o->control_mode == eomc_controlmode_idle)
     {
-        pidStatus->reference = 0;
+        pidStatus->positionreference = 0;
+        pidStatus->torquereference = 0;
         pidStatus->output    = 0;
         pidStatus->error     = 0;
         
         return;
     }
     
-    switch (o->control_mode)
+    if (o->control_mode == eomc_controlmode_openloop)
     {
-        case eomc_controlmode_idle:
-            pidStatus->reference = 0;
-            break;
-
-        case eomc_controlmode_openloop:
-            pidStatus->reference = o->openloop_out;
-            break;
-
-        case eomc_controlmode_velocity:
-        case eomc_controlmode_impedance_vel:
-            pidStatus->reference = eo_trajectory_GetVel(o->trajectory);
-            break;
-
-        case eomc_controlmode_position:
-        case eomc_controlmode_impedance_pos:
-            pidStatus->reference = eo_trajectory_GetPos(o->trajectory);
-            break;
-
-        case eomc_controlmode_torque:
-            pidStatus->reference = o->torque_ref;
-            break;
+        pidStatus->positionreference = 0;
+        pidStatus->torquereference = 0;
+        pidStatus->output    = o->openloop_out;
+        pidStatus->error     = 0;
+        
+        return;
     }
     
-    switch (o->control_mode)
+    if (o->control_mode == eomc_controlmode_torque)
     {
-        case eomc_controlmode_idle:
-            pidStatus->output    = 0;
-            pidStatus->error     = 0;
-            break;
-
-        case eomc_controlmode_openloop:
-            pidStatus->output    = o->openloop_out;
-            pidStatus->error     = 0;
-            break;
-
-        case eomc_controlmode_velocity:
-        case eomc_controlmode_position:
-            eo_pid_GetStatus(o->pidP, &(pidStatus->output), &(pidStatus->error));
-            break;
-
-        case eomc_controlmode_torque:
-        case eomc_controlmode_impedance_pos:
-        case eomc_controlmode_impedance_vel:
-            eo_pid_GetStatus(o->pidT, &(pidStatus->output), &(pidStatus->error));
-            break;
+        pidStatus->positionreference = 0;
+        pidStatus->torquereference = o->torque_ref;
+        eo_pid_GetStatus(o->pidT, &(pidStatus->output), &(pidStatus->error));
+        
+        return;
     }
+    
+    if (o->interact_mode == eOmc_interactionmode_compliant)
+    {
+        pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
+        pidStatus->torquereference = o->torque_ref;
+        eo_pid_GetStatus(o->pidT, &(pidStatus->output), &(pidStatus->error));
+        
+        return;
+    }
+    
+    // stiff position modes
+    
+    pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
+    pidStatus->torquereference = 0;
+    eo_pid_GetStatus(o->pidP, &(pidStatus->output), &(pidStatus->error));    
 }
 
 

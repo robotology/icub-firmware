@@ -60,7 +60,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
 #define MOTORS(m)   SCAN(m)
 #define ENCODERS(e) SCAN(e)
 
-#define AXIS_TORQUE_SENS_FAULT 0x0080
+#define AXIS_TORQUE_SENS_FAULT 0x0100
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -769,7 +769,8 @@ extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status
     {
         pidStatus->error     = 0;
         pidStatus->output    = 0;
-        pidStatus->reference = 0;
+        pidStatus->positionreference = 0;
+        pidStatus->torquereference = 0;
     }
 }
 
@@ -981,7 +982,6 @@ void set_2FOC_running(uint8_t motor)
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
     
     #ifdef EXPERIMENTAL_SPEED_CONTROL
-    #error
     controlmode_2foc = icubCanProto_controlmode_velocity;
     #else
     controlmode_2foc = icubCanProto_controlmode_openloop;

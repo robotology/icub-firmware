@@ -177,6 +177,23 @@ extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
 #endif
 }
 
+/*
+extern int32_t eo_pid_PWM_pid(EOpid *o, float En)
+{     
+    o->pwm += (int32_t)(o->Kp*(En-o->En) + o->Ki*(En+o->En));
+    
+    o->En = En;
+    
+    LIMIT(o->pwm, o->pwm_max);
+
+#ifdef FORCE_ZERO_PWM_OUT
+    return 0;
+#else
+    return o->pwm;
+#endif
+}
+*/
+
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn)
 {
     //if (!o) return 0;
