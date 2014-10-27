@@ -176,9 +176,9 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
     
-    #ifdef EOM_USE_STICTION
+    //#ifdef EOM_USE_STICTION
     eo_emsController_SetBemf((uint8_t)jxx, ((float)cfg->bemf.value)/(float)(1<<cfg->bemf.offset));
-    #endif
+    //#endif
 
     // 3) set velocity pid:    to be implemented
    
@@ -241,6 +241,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
                                     pid_ptr->offset,
                                     pid_ptr->kff*rescaler
                                     );
+}
+
+extern void eoprot_fun_UPDT_mc_joint_config_bemf(const EOnv* nv, const eOropdescriptor_t* rd) 
+{
+    eOmc_bemf_t     *bemf_ptr = (eOmc_bemf_t*)nv->ram;
+    eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
+    
+    eo_emsController_SetBemf((uint8_t)jxx, ((float)(bemf_ptr->value))/(float)(1<<bemf_ptr->offset));
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)

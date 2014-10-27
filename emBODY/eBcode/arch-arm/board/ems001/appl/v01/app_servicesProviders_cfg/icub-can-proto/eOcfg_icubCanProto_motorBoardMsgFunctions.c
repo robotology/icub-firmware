@@ -1957,7 +1957,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
         return(res);
     }
     
-    jstatus_ptr->ofpid.reference = *((int16_t*)&frame->data[1]);
+    jstatus_ptr->ofpid.positionreference = *((int16_t*)&frame->data[1]);
 
     return(eores_OK);
 }
