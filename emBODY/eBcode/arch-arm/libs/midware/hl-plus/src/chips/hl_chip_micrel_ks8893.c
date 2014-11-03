@@ -64,6 +64,7 @@
 #define I2CADDRESS          0xBE  
 
 #define REG0x01             0x01  
+#define REG0x04             0x04
 #define REG0x06             0x06  
 #define REG0x1C             0x1C    
 #define REG0x2C             0x2C
@@ -115,6 +116,8 @@ static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_c
 static void s_hl_chip_micrel_ks8893_phymode_set(hl_ethtrans_phymode_t targetphymode);
 
 static void s_hl_chip_micrel_ks8893_xcorrection_set(hl_ethtrans_xcorr_t targetxcorr);
+
+static void s_hl_chip_micrel_ks8893_maxpacket_set(uint8_t pktsizemode);
 
 static void s_hl_chip_micrel_ks8893_mii_phymode_get(hl_ethtrans_phymode_t* usedmiiphymode);
 
@@ -414,6 +417,12 @@ static hl_result_t s_hl_chip_micrel_ks8893_hw_init(const hl_chip_micrel_ks8893_c
 //     data = 0x0;  
 //     regaddr.bytes.one = REG0x01;    
 //     hl_i2c_write(i2cid, I2CADDRESS, regaddr, &data, 1);   
+
+
+    // impose the max size of accepted packets  
+    // marco.accame on 03 nov 2014: it is tested and it works.
+    // however i keep it comented out until hl_eth.c is changed and until IPAL supports bigger ETH frames  
+    //s_hl_chip_micrel_ks8893_maxpacket_set(2); //0: small 1518 max. 1: medium 1536. 2: large 1916
     
     
     // start the micrel
@@ -493,6 +502,61 @@ static void s_hl_chip_micrel_ks8893_phymode_set(hl_ethtrans_phymode_t targetphym
     hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);   
 #endif
     
+}
+
+
+
+static void s_hl_chip_micrel_ks8893_maxpacket_set(uint8_t pktsizemode)
+{    //0: small 1518 max. 1: medium 1536. 2: large 1916    
+    hl_chip_micrel_ks8893_internal_item_t *intitem = s_hl_chip_micrel_ks8893_theinternals.items[0];
+    hl_i2c_t i2cid = intitem->config.i2cid;
+    hl_i2c_regaddr_t regaddr = {.numofbytes = 1, .bytes.one = 0 };
+    uint8_t buff_write = 0;
+    uint8_t buff_read;
+    
+    if(pktsizemode > 2)
+    {
+        return;
+    }
+
+    
+    // read register 0x04
+    regaddr.numofbytes = 1;
+    regaddr.bytes.one = REG0x04;
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+
+    buff_write = buff_read;
+         
+    // change bits 2 and 1
+    switch(pktsizemode)
+    {
+        case 0: 
+        {   // bit2 = 0, bit1 = 1
+            hl_bits_byte_bitclear(&buff_write, 2); 
+            hl_bits_byte_bitset(&buff_write, 1); 
+        } break;
+        case 1:      
+        {   // bit2 = 0, bit1 = 0
+            hl_bits_byte_bitclear(&buff_write, 2); 
+            hl_bits_byte_bitclear(&buff_write, 1); 
+        } break; 
+        case 2:      
+        {   // bit2 = 1, bit1 = 0
+            hl_bits_byte_bitset(&buff_write, 2); 
+            hl_bits_byte_bitclear(&buff_write, 1); 
+        } break; 
+        default:                                                        
+        {
+            return;
+        } break;
+    }    
+       
+
+    // finally write it
+    
+    hl_i2c_write(i2cid, I2CADDRESS, regaddr, &buff_write, 1);
+    hl_i2c_read(i2cid, I2CADDRESS, regaddr, &buff_read, 1);
+    buff_read = buff_read;    
 }
 
 
