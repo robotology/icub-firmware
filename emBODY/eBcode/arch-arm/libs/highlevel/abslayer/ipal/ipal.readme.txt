@@ -1,6 +1,15 @@
 
-    ipal requires tcpnet v4.13, whcih is omitted from the distribution because for it it is required a direct
+    caveat:
+    ipal requires tcpnet v4.13, which is omitted from the distribution because for it it is required a direct
     license from www.keil.com
+    
+    fake library:
+    however, it is here included a fake library in ./lib/ipla.fake.cm4.lib which can be used to compile
+    application which require ipal. the applications can also run, but ... obviously the network will not work.
+    the project for the fake ipal is in ./ipal-fake.uvprojx
+    
+    
+        
     
 
 
