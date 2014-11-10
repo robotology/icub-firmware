@@ -906,6 +906,7 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     Tpad_palm=AD7147Registers[triangleN][ADCRESULT_S11];
     err[triangleN].error=error_ok;
     err[triangleN].error_outofrange=0;
+	unconnected=0;
     for (i=0;i<12;i++)
     {
         if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0)))) //reading error
