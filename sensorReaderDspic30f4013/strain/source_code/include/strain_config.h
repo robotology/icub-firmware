@@ -57,7 +57,7 @@ typedef struct
   int16_t  EE_TF_TorqueValue[3];      // Torque values
   int16_t  EE_TF_ForceValue[3];       // Force values
 
-  int16_t           EE_TF_TMatrix[6][6];       // SG2TF Transformation Matrix
+  int16_t           EE_TF_TMatrix_A[6][6];       // SG2TF Transformation Matrix
 
   // additional info
   uint8_t EE_AdditionalInfo[32]; 
@@ -74,6 +74,8 @@ typedef struct
   int16_t           EE_debug7[6];
   int16_t           EE_debug8[6];
   uint8_t EE_SerialNumber[8]; 
+  int16_t           EE_TF_TMatrix_B[6][6];       // SG2TF Transformation Matrix
+  int16_t           EE_TF_TMatrix_C[6][6];       // SG2TF Transformation Matrix
   uint16_t  EE_ChkSum;                 // data validation checksum
 
 }strain_eeprom_data_t;

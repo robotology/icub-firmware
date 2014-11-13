@@ -134,6 +134,22 @@ static const strain_eeprom_data_t strain_EE_cfg_default =
   {0,0,0,0,0,0},  //Debug7
   {0,0,0,0,0,0},  //Debug8
   {0,0,0,0,0,0,0,0},  //Serial number
+  {
+    {0x7FFF,0,0,0,0,0},  // TT_TF_TMatrix_B
+    {0,0x7FFF,0,0,0,0},
+    {0,0,0x7FFF,0,0,0},
+    {0,0,0,0x7FFF,0,0},
+    {0,0,0,0,0x7FFF,0},
+    {0,0,0,0,0,0x7FFF},
+  },
+  {
+    {0x7FFF,0,0,0,0,0},  // TT_TF_TMatrix_C
+    {0,0x7FFF,0,0,0,0},
+    {0,0,0x7FFF,0,0,0},
+    {0,0,0,0x7FFF,0,0},
+    {0,0,0,0,0x7FFF,0},
+    {0,0,0,0,0,0x7FFF},
+  },
   0x0000 // Checksum
 };
 
@@ -143,7 +159,7 @@ const version_srcCode_info_t strain_srcCode_info =
 	{
 		0x3, //version
 		0x0, //release
-		0x1  //build
+		0x2  //build
 	},
 	//canProtocol
 	{
