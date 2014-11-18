@@ -23,7 +23,8 @@ extern "C" {
 //#define USE_2FOC_FAST_ENCODER
 //#define EXPERIMENTAL_SPEED_CONTROL
 //#define USE_4BIT_INC_ENC_PRECISION
-
+//#define USE_ONLY_QE
+    
 //#define V1_MECHANICS
     
 #ifdef ICUB_DARMSTADT01

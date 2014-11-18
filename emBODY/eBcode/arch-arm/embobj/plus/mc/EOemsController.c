@@ -143,23 +143,7 @@ extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 #ifdef USE_2FOC_FAST_ENCODER
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position)
 {
-    static int noise = -2;
-    
-    if (current>1500)
-    {
-        ems->motor_current [motor] = current-1500;
-    }
-    else if (current<-1500)
-    {
-        ems->motor_current [motor] = current+1500;
-    }
-    else
-    {
-        ems->motor_current [motor] = noise;
-
-        if (++noise == 3) noise = -2;
-    }
-
+    ems->motor_current [motor] = current;
     ems->motor_velocity[motor] = velocity;
     ems->motor_position[motor] = position;
 }
@@ -327,7 +311,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
 #ifdef USE_2FOC_FAST_ENCODER
     
-    int16_t axle_virt_vel[NAXLES];
+    int32_t axle_virt_vel[NAXLES];
     int32_t axle_virt_pos[NAXLES];
     
     #if defined(SHOULDER_BOARD)
@@ -986,8 +970,9 @@ void set_2FOC_running(uint8_t motor)
     controlmode_2foc = icubCanProto_controlmode_velocity;
     #else
     controlmode_2foc = icubCanProto_controlmode_openloop;
-    #endif
     //controlmode_2foc = icubCanProto_controlmode_current;
+    #endif
+    
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
