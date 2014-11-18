@@ -989,11 +989,9 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     
     eOresult_t res = eores_NOK_generic;
 
-#if defined(USE_MNINFO_LARGE_STATUS)
+
     uint16_t maxlen = sizeof(infostatus.data)-1;
-#else
-    uint16_t maxlen = sizeof(infostatus.string)-1;
-#endif
+
     
     if((NULL == str) || (strlen(str) > maxlen))
     {
@@ -1025,9 +1023,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     
     uint16_t size = 0;
     eo_nv_Get(nv, eo_nv_strg_volatile, &infostatus, &size);
-
-#if defined(USE_MNINFO_LARGE_STATUS)
-   
+  
     infostatus.timestamp                = osal_system_abstime_get();
     
     infostatus.properties.source        = eomn_info_source_board;
@@ -1038,12 +1034,6 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     
     memcpy(&infostatus.data[0], str, strlen(str));
 
-#else
-
-    infostatus.type = 0x6;
-    memcpy(&infostatus.string[0], str, strlen(str));
-
-#endif 
    
     eo_nv_Set(nv, &infostatus, eobool_true, eo_nv_upd_dontdo);
        
