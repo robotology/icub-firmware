@@ -238,7 +238,8 @@ extern hal_result_t hal_can_disable(hal_can_t id);
     @param      id              identifies CAN id (CAN1 or CAN2)
     @param      frame           frame to put in queue
     @param      sm              indicates if transmit frames now or not.
-    @return     hal_res_NOK_generic in case queue is full or wrong port, else hal_res_OK
+    @return     hal_res_NOK_generic in case of or wrong port or parameter, hal_res_NOK_busy if output queue is full,
+                else hal_res_OK on success.
   */
 extern hal_result_t hal_can_put(hal_can_t id, hal_can_frame_t *frame, hal_can_send_mode_t sm);
 
