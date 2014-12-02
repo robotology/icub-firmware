@@ -124,7 +124,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMth
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p);
 
 
-extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid, uint64_t starttime, uint64_t nowtime);
 
 extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p);
 

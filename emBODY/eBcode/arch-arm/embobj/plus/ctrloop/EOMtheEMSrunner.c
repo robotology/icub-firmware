@@ -134,6 +134,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t);
 
 static void s_eom_emsrunner_enable_task(EOMtask *tsk, osal_caller_t osalcaller);
 
+static void s_eom_emsrunner_6HALTIMERS_stop(void);
 static void s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(void* arg);
 static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_t *tmr, void *arg);
 static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg);
@@ -219,9 +220,9 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     
     
  
-    eo_errman_Assert(eo_errman_GetHandle(), (eobool_true == s_eom_emsrunner_timing_is_compatible(cfg)), s_eobj_ownname, "timings of tasks are not compatible");
+    eo_errman_Assert(eo_errman_GetHandle(), (eobool_true == s_eom_emsrunner_timing_is_compatible(cfg)), "eom_emsrunner_Initialise(): timings of tasks not compatible", s_eobj_ownname, NULL);
 
-    eo_errman_Assert(eo_errman_GetHandle(), (cfg->maxnumofTXpackets <= 1), s_eobj_ownname, "cfg->maxnumofTXpackets must be 0 or 1");
+    eo_errman_Assert(eo_errman_GetHandle(), (cfg->maxnumofTXpackets <= 1), "eom_emsrunner_Initialise(): maxnumofTXpackets is > 1", s_eobj_ownname, NULL);
     
     memcpy(&s_theemsrunner.cfg, cfg, sizeof(eOemsrunner_cfg_t));
     
@@ -234,11 +235,13 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
     
     s_theemsrunner.osaltimer = osal_timer_new();
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), "eom_emsrunner_Initialise(): osaltimer is NULL", s_eobj_ownname, NULL);
     
     s_theemsrunner.numofpacketsinsidesocket = 0;
     
     s_theemsrunner.waitudptxisdone = osal_semaphore_new(255, 0);
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), s_eobj_ownname, "osaltimer is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.waitudptxisdone), "eom_emsrunner_Initialise(): waitudptxisdone is NULL", s_eobj_ownname, NULL);
+    
     
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runRX], 
@@ -313,8 +316,8 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     } 
     
 
-    // put in here with protection vs double iniytialisation. 
-    // we could put also in initialise, but i want to avoid that the runner is initisalised and ther eis not an osal task yet for ipnet
+    // put in here with protection vs double initialisation. 
+    // we could put also in initialise, but i want to avoid that the runner is initisalised and there is not an osal task yet for ipnet
     if(NULL == p->osaltaskipnetexec)
     {   // compute it only once in life
         EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
@@ -332,24 +335,43 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     return(eores_OK);
 }
 
-extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev)
+extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p)
 {
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }  
 
+
+    s_eom_emsrunner_6HALTIMERS_stop();    
+
+    return(eores_OK);    
+}
+
+extern eOresult_t eom_emsrunner_GracefulStopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev)
+{
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     } 
     
-    if((eo_sm_emsappl_EVdummy == ev) || (eo_sm_emsappl_EVgo2run == ev))
+    if(eo_sm_emsappl_EVdummy == ev)
     {   // cannot stop on dummy event or 
         return(eores_NOK_generic);
     }
 
+    if(eo_sm_emsappl_EVgo2run == ev)
+    {   // already in run state. nothing to do
+        return(eores_OK);
+    }
     
     s_theemsrunner.cycleisrunning = eobool_false;
     s_theemsrunner.event = ev;
     
-    // the hal timers are stopped within the ...
+    // the rest of the job is done inside the various tasks rx, do, and tx:
+    // in rx: hal timers for rx are stopped. do task is activated and enabled.
+    // in do: hal timers for do (and rx if not already) are stopped. tx task is activated and enabled.
+    // in tx: hal timers for tx (and rx and do if not already) are stopped and state machine is sent to new state (err or cfg). no activation / enabling is done anymore.
     
     return(eores_OK);
 }
@@ -386,7 +408,8 @@ extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t m
 
     s_theemsrunner.mode = mode;
     
-    eo_errman_Assert(eo_errman_GetHandle(), (eo_emsrunner_mode_hardrealtime != mode), s_eobj_ownname, "eo_emsrunner_mode_hardrealtime requires a change of policy in the parsing of a ropframe");
+    // note: "eo_emsrunner_mode_hardrealtime requires a change of policy in the parsing of a ropframe"
+    eo_errman_Assert(eo_errman_GetHandle(), (eo_emsrunner_mode_hardrealtime != mode), "eom_emsrunner_SetMode(): eo_emsrunner_mode_hardrealtime ... see note", s_eobj_ownname, NULL);
  
     
     return(eores_OK);
@@ -691,22 +714,34 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransm
 }
 
 
-__weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+__weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid, uint64_t starttime, uint64_t nowtime)
 {
     const char * tskname[] = {"tskRX", "tskDO", "tskTX"};
-    char str[48];
-    eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
-    snprintf(str, sizeof(str)-1, "exec overflow of %s", tskname[taskid]); 
-    eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
+    const uint32_t errcode[] = {eo_errman_code_sys_ctrloop_execoverflowRX, eo_errman_code_sys_ctrloop_execoverflowDO, eo_errman_code_sys_ctrloop_execoverflowTX};
+    char str[64];
+    eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_error) : (eo_errortype_warning);
+    snprintf(str, sizeof(str), "exec overflow of %s", tskname[taskid]); 
+    uint64_t delta = nowtime - starttime;
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = errcode[taskid];
+    errdes.param            = (delta > 0xffff) ? (0xffff) : (delta);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;    
+    eo_errman_Error(eo_errman_GetHandle(), errortype, str, s_eobj_ownname, &errdes); 
 }
 
 
 __weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
 {
-    char str[48];
-    eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_fatal) : (eo_errortype_warning);
-    snprintf(str, sizeof(str)-1, "failed to tx a packet, possibly because socket is full"); 
-    eo_errman_Error(eo_errman_GetHandle(), errortype, s_eobj_ownname, str); 
+    char str[64];
+    eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_error) : (eo_errortype_warning);
+    snprintf(str, sizeof(str), "failed tx of a packet"); 
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eo_errman_code_sys_ctrloop_udptxfailure;
+    errdes.param            = 0;
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;      
+    eo_errman_Error(eo_errman_GetHandle(), errortype, str, s_eobj_ownname, &errdes); 
 }
 
 
@@ -828,7 +863,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX))
     {
        s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
-       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX); 
+       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX, eom_emsrunner_rxstart, osal_system_abstime_get()); 
     }
     
     eom_emsrunner_rxprevduration = eom_emsrunner_rxduration;
@@ -862,6 +897,18 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     // Y. if someone has stopped the cycle...
     if(eobool_false == s_theemsrunner.cycleisrunning)
     {
+        
+        // better to stop also the rx timers if they are not stopped yet. that may happen if something inside task-rx has askd for a stop of running
+        if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]))
+        {
+            hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]); 
+        } 
+        if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]))
+        {        
+            hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
+        }
+        
+        // then .. stop do timers
         hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]);        
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
     }
@@ -869,7 +916,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {
        s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
-       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO);     
+       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO, eom_emsrunner_dostart, osal_system_abstime_get());     
     }
     
     eom_emsrunner_doprevduration = eom_emsrunner_doduration;
@@ -923,7 +970,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         {
             break;
         }
-        
+        #warning --> marco.accame: we wait for osal_reltimeINFINITE that the udp packet is sent ... can we think of a timeout???
         osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
         s_theemsrunner.numofpacketsinsidesocket--;
     }
@@ -937,24 +984,43 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX))
     {   // it is in this position so that ... it is still possible to send the EMS appl in ERROR state.
         s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
-        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX);
+        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX, eom_emsrunner_txstart, osal_system_abstime_get());
     } 
 
     if(eobool_false == s_theemsrunner.cycleisrunning)
-    {   
-        // stop the timers ...
+    {  
+
+        // better to stop also the rx and do timers if they are not stopped yet. that may happen if something inside task-do/tx has asked for a stop of running
+        if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]))
+        {
+            hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]); 
+        } 
+        if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]))
+        {        
+            hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
+        }
+        if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]))
+        {
+            hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]); 
+        } 
+        if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]))
+        {        
+            hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
+        }
+        
+        // stop the tx timers ...
         hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]);        
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX]);
         
+        // and now ... finally we sent the state machine into the new state
         // reset the event to the dummy value.
         eOsmEventsEMSappl_t ev = s_theemsrunner.event;
         s_theemsrunner.event = eo_sm_emsappl_EVdummy;
         // we process the event. it can be either eo_sm_emsappl_EVgo2err or eo_sm_emsappl_EVgo2cfg
-        eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), ev); 
+        eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), ev); 
     }
     else
-    {   
-        
+    {           
         eom_emsrunner_txprevduration = eom_emsrunner_txduration;
         eom_emsrunner_txduration = osal_system_abstime_get() - eom_emsrunner_txstart;
         // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
@@ -1009,6 +1075,40 @@ static void s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(voi
 }
 
 
+
+static void s_eom_emsrunner_6HALTIMERS_stop(void)
+{
+    // rx timers
+    if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]))
+    {
+        hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runRX]); 
+    } 
+    if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]))
+    {        
+        hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
+    }
+    
+    // do timers
+    if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]))
+    {
+        hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runDO]); 
+    } 
+    if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]))
+    {        
+        hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
+    }
+    
+    // tx timers
+    if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]))
+    {
+        hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]); 
+    } 
+    if(hal_timer_status_running == hal_timer_status_get(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX])) 
+    {        
+        hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX]);
+    }
+    
+}
 
 
 static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_t *tmr, void *arg)

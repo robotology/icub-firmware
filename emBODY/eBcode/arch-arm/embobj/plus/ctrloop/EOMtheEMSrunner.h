@@ -78,6 +78,7 @@ typedef enum
     eo_emsrunner_evt_udptxdone      = 0x00000004
 } eOemsrunner_event_t;
 
+
 typedef enum
 {
     eo_emsrunner_mode_besteffort        = 0,
@@ -143,10 +144,12 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *emsru
  **/
 extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 
-
+// start 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
 
-extern eOresult_t eom_emsrunner_StopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev);
+extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p);
+
+extern eOresult_t eom_emsrunner_GracefulStopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev);
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 
