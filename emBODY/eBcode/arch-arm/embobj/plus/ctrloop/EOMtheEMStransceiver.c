@@ -70,12 +70,7 @@
 
 const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg = 
 {
-#if     defined(EO_USE_EPROT_V2)
-    EO_INIT(.nvsetdevcfg)               NULL,
-#else
-    EO_INIT(.vectorof_endpoint_cfg)     NULL,
-    EO_INIT(.hashfunction_ep2index)     NULL,
-#endif    
+    EO_INIT(.nvsetdevcfg)               NULL,  
     EO_INIT(.hostipv4addr)              EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
     EO_INIT(.hostipv4port)              12345,
     EO_INIT(.sizes)
@@ -88,7 +83,6 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
         EO_INIT(.maxnumberofregularrops)            32     
     },
     EO_INIT(.transprotection)           eo_trans_protection_none,
-#if     defined(EO_USE_EPROT_V2)
     EO_INIT(.nvsetprotection)           eo_nvset_protection_none,
     EO_INIT(.proxycfg)
     {
@@ -97,10 +91,7 @@ const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg =
         EO_INIT(.replyroptimeout)                   10*1000,
         EO_INIT(.mutex_fn_new)                      NULL,
         EO_INIT(.transceiver)                       NULL
-    }
-#else    
-    EO_INIT(.nvscfgprotection)          eo_nvscfg_protection_none
-#endif    
+    }   
 };
 
 
@@ -161,29 +152,20 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     
     eOboardtransceiver_cfg_t brdtransceiver_cfg;
     
-#if     defined(EO_USE_EPROT_V2)
+
     brdtransceiver_cfg.nvsetdevcfg              = cfg->nvsetdevcfg;
-#else
-    brdtransceiver_cfg.vectorof_endpoint_cfg    = cfg->vectorof_endpoint_cfg;
-    brdtransceiver_cfg.hashfunction_ep2index    = cfg->hashfunction_ep2index;   
-#endif    
+
     brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
     brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port; // it is the remote port where to send packets to
     memcpy(&brdtransceiver_cfg.sizes, &cfg->sizes, sizeof(eOtransceiver_sizes_t));
     brdtransceiver_cfg.mutex_fn_new             = (eov_mutex_fn_mutexderived_new)eom_mutex_New;
-    brdtransceiver_cfg.transprotection          = cfg->transprotection;
-#if     defined(EO_USE_EPROT_V2)    
+    brdtransceiver_cfg.transprotection          = cfg->transprotection;    
     brdtransceiver_cfg.nvsetprotection          = cfg->nvsetprotection;
     brdtransceiver_cfg.proxycfg                 = (eOproxy_cfg_t*)&cfg->proxycfg;
     memset(&brdtransceiver_cfg.extfn, 0, sizeof(eOtransceiver_extfn_t));
     brdtransceiver_cfg.extfn.onerrorseqnumber   = eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived;
     eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
-#else       
-    brdtransceiver_cfg.nvscfgprotection         = cfg->nvscfgprotection;    
-    //s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(eom_emstransceiver_hid_userdef_get_cfg(cfg));
-    s_emstransceiver_singleton.transceiver = eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
-#endif
     
     s_eom_emstransceiver_update_diagnosticsinfo();
     
@@ -236,7 +218,6 @@ extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p)
     return(s_emstransceiver_singleton.transceiver);
 }
 
-#if     defined(EO_USE_EPROT_V2)
 extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p)
 {
     if(NULL == p)
@@ -245,16 +226,6 @@ extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p)
     }    
     return(eo_boardtransceiver_GetNVset(eo_boardtransceiver_GetHandle()));
 }
-#else
-extern EOnvsCfg* eom_emstransceiver_GetNVScfg(EOMtheEMStransceiver* p)
-{
-    if(NULL == p)
-    {
-        return(NULL);
-    }    
-    return(eo_boardtransceiver_hid_GetNvsCfg());
-}
-#endif
 
 
 extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rxpkt, uint16_t *numberofrops, eOabstime_t* txtime)

@@ -43,9 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
-#if     defined(EO_USE_EPROT_V2)
-#include "EOproxy.h"
-#endif
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -67,22 +65,13 @@ typedef struct EOMtheEMStransceiver_hid EOMtheEMStransceiver;
  **/
 typedef struct
 {
-#if     defined(EO_USE_EPROT_V2)
-    const eOnvset_DEVcfg_t*         nvsetdevcfg;
-#else
-    const EOconstvector*            vectorof_endpoint_cfg;
-    eOuint16_fp_uint16_t            hashfunction_ep2index;
-#endif    
+    const eOnvset_DEVcfg_t*         nvsetdevcfg;   
     eOipv4addr_t                    hostipv4addr;
     eOipv4port_t                    hostipv4port; 
     eOtransceiver_sizes_t           sizes; 
     eOtransceiver_protection_t      transprotection;
-#if     defined(EO_USE_EPROT_V2)
     eOnvset_protection_t            nvsetprotection;
-    eOproxy_cfg_t                   proxycfg;
-#else    
-    eOnvscfg_protection_t           nvscfgprotection; 
-#endif    
+    eOproxy_cfg_t                   proxycfg;   
 } eOemstransceiver_cfg_t;
 
 
@@ -132,11 +121,8 @@ extern eOipv4addr_t eom_emstransceiver_GetIPhost(EOMtheEMStransceiver* p);
  **/
 extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p);
 
-#if     defined(EO_USE_EPROT_V2)
+
 extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p);
-#else
-extern EOnvsCfg* eom_emstransceiver_GetNVScfg(EOMtheEMStransceiver* p);
-#endif
 
 extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rxpkt, uint16_t *numberofrops, eOabstime_t* txtime);
 

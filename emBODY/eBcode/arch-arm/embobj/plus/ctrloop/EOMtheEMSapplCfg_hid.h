@@ -37,9 +37,8 @@ extern "C" {
 
 #include "EOtheBOARDtransceiver.h"
 
-#if     defined(EO_USE_EPROT_V2)
 #include "EoProtocol.h"
-#endif
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
