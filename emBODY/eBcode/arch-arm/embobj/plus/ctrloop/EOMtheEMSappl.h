@@ -100,7 +100,7 @@ extern EOMtheEMSappl * eom_emsappl_GetHandle(void);
 //extern EOsm* eom_emsappl_GetStateMachine(EOMtheEMSappl *p) ;
 
 
-extern eOresult_t eom_emsappl_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t ev);
+extern eOresult_t eom_emsappl_SM_ProcessEvent(EOMtheEMSappl *p, eOsmEventsEMSappl_t ev);
 
 /** @fn         eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOemsappl_applstate_t newstate)
     @brief      say the application to go to new state as soon as possible. In some case the tarnsition can not be done immediatly,
@@ -120,6 +120,8 @@ extern eOresult_t eom_emsappl_ProcessGo2stateRequest(EOMtheEMSappl *p, eOsmState
  
 extern eOresult_t eom_emsappl_GetCurrentState(EOMtheEMSappl *p, eOsmStatesEMSappl_t *currentstate);
 
+
+extern eOresult_t eom_emsappl_SendTXRequest(EOMtheEMSappl *p);
 
 
 

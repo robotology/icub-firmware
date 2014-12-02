@@ -57,6 +57,7 @@ struct EOMtheEMSappl_hid
     EOsm*               sm;
 	eOemsappl_cfg_t     cfg;
     uint8_t             initted;
+    osal_semaphore_t*   blockingsemaphore;  // it is used to suspend the task that generate transistion to error state
 };
 
 
