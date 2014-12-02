@@ -20,8 +20,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdlib.h"
 #include "EoCommon.h"
+
+#include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
 
@@ -128,10 +129,10 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
     }
 
 
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg), s_eobj_ownname, "syscfg is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg), "eom_sys_Initialise(): NULL syscfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     // verify that we have a valid osalcfg and halcfg. fsalcfg can be NULL
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->halcfg), s_eobj_ownname, "syscfg->halcfg is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->osalcfg), s_eobj_ownname, "syscfg->osalcfg is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->halcfg), "eom_sys_Initialise(): NULL halcfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->osalcfg), "eom_sys_Initialise(): NULL osalcfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 
     // mpoolcfg can be NULL: in such a case we use eo_mempool_alloc_dynamic mode
     // errmancfg can be NULL
@@ -224,7 +225,7 @@ extern EOMtheSystem* eom_sys_GetHandle(void)
 extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn)
 {
 
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), s_eobj_ownname, "eom_sys_Start() uses a NULL handle");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), "eom_sys_Start(): NULL handle", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 
 
     s_eom_sys_start(userinit_fn);
@@ -269,7 +270,7 @@ static void s_eom_thecreation(void)
 {
     const uint16_t *myused = NULL;
     const uint16_t *myfree = NULL;
-    char str[128];
+    char str[64];
     // we are in osal, now
 
 
@@ -281,7 +282,8 @@ static void s_eom_thecreation(void)
 
     osal_info_entities_get_stats(&myused, &myfree);
 
-    snprintf(str, sizeof(str)-1, "uses %d task, %d stack, %d timers, %d mutexes, %d semaphores, %d messageboxes, %d messages", 
+#if 0    
+    snprintf(str, sizeof(str), "uses %d task, %d stack, %d timers, %d mutexes, %d semaphores, %d messageboxes, %d messages", 
                                     myused[osal_info_entity_task], 
                                     myused[osal_info_entity_globalstack], 
                                     myused[osal_info_entity_timer], 
@@ -290,7 +292,8 @@ static void s_eom_thecreation(void)
                                     myused[osal_info_entity_messagequeue],
                                     myused[osal_info_entity_message]);
 
-    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
+#endif
     
     // run user defined initialisation ...
     if(NULL != s_eom_system.user_init_fn)
@@ -298,8 +301,12 @@ static void s_eom_thecreation(void)
         s_eom_system.user_init_fn();
     }
     
-    snprintf(str, sizeof(str)-1, "quitting the init task");
-    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+    snprintf(str, sizeof(str), "EOMtheSystem: init task completed, system running");
+    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, &eo_errman_DescrRunningHappily);
+    //eOerrmanDescriptor_t desc = {0};
+    //memcpy(&desc, &eo_errman_DescrRunningHappily, sizeof(desc));
+    //desc.param = 0;
+    //eo_errman_Info(eo_errman_GetHandle(), NULL, s_eobj_ownname, &desc);
 }
 
 
