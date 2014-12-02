@@ -250,12 +250,12 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     }
    
     // trying to initialise with no ipcfg ?? error
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != ipcfg), s_eobj_ownname, "ipcfg is NULL");   
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != ipcfg), "eom_ipnet_Initialise(): NULL ipcfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);   
 
     // trying to initialise with wrong params error
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != ipnetcfg->procmaxidletime), s_eobj_ownname, "ipnetcfg->procmaxidletime is 0");
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != ipnetcfg->procstacksize), s_eobj_ownname, "ipnetcfg->procstacksize is 0");
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != ipnetcfg->procpriority), s_eobj_ownname, "ipnetcfg->procpriority is 0");
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != ipnetcfg->procmaxidletime), "eom_ipnet_Initialise(): 0 procmaxidletime", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != ipnetcfg->procstacksize), "eom_ipnet_Initialise(): 0 procstacksize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != ipnetcfg->procpriority), "eom_ipnet_Initialise(): procpriority", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     
     
         
@@ -268,8 +268,8 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     // cannot have maxdatagramenqueuedintx equal to zero if we have non-zero numberofsockets
     eo_errman_Assert(eo_errman_GetHandle(), 
                      (0 != dtgskcfg->maxdatagramenqueuedintx) || (0 == dtgskcfg->numberofsockets), 
-                     s_eobj_ownname, 
-                     "must have non-zero maxdatagramenqueuedintx if numberofsockets is non-zero"); 
+                     "eom_ipnet_Initialise(): 0 maxdatagramenqueuedintx",
+                     s_eobj_ownname, &eo_errman_DescrWrongParamLocal); 
 
 
    
@@ -289,15 +289,15 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                              
     // i get cmd.blockingsemaphore, initted with zero tokens
     s_eom_theipnet.cmd.blockingsemaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 0);
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.blockingsemaphore), s_eobj_ownname, "osal cannot give a sem");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.blockingsemaphore), "eom_ipnet_Initialise(): osal cant give blockingsemaphore", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
     s_eom_theipnet.cmd.busysemaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 1);
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.busysemaphore), s_eobj_ownname, "osal cannot give a sem");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.busysemaphore),  "eom_ipnet_Initialise(): osal cant give busysemaphore", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 #endif
     
     s_eom_theipnet.cmd.mtxcaller = osal_mutex_new();
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.mtxcaller), s_eobj_ownname, "osal cannot give a mtx");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.mtxcaller), "eom_ipnet_Initialise(): osal cant give mtxcaller", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
     s_eom_theipnet.cmd.stoptmr = eo_timer_New();
     s_eom_theipnet.cmd.stopact = eo_action_New();
@@ -307,7 +307,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     if(0 != dtgskcfg->maxdatagramenqueuedintx)
     {
         s_eom_theipnet.dgramsocketready2tx = osal_messagequeue_new(dtgskcfg->maxdatagramenqueuedintx);
-        eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.dgramsocketready2tx), s_eobj_ownname, "osal cannot give a mq");
+        eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.dgramsocketready2tx), "eom_ipnet_Initialise(): osal cant give a dgramsocketready2tx", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }
     else
     {
@@ -832,7 +832,7 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
     t = eo_socket_hid_derived_Get_Type(s);
     
     // for now i only do datagrams  ...
-    eo_errman_Assert(eo_errman_GetHandle(), (eo_skttyp_datagram == t), s_eobj_ownname, "only datagram sockets ...");
+    eo_errman_Assert(eo_errman_GetHandle(), (eo_skttyp_datagram == t), "s_eom_ipnet_AttachSocket(): only datagram socket", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
@@ -899,7 +899,7 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
     t = eo_socket_hid_derived_Get_Type(s);
     
     // for now i only do datagrams  ...
-    eo_errman_Assert(eo_errman_GetHandle(), (eo_skttyp_datagram == t), s_eobj_ownname, "only datagram sockets ...");
+    eo_errman_Assert(eo_errman_GetHandle(), (eo_skttyp_datagram == t), "s_eom_ipnet_DetachSocket(): only datagram socket", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
@@ -982,7 +982,7 @@ static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t
             else
             {
                 eom_ipnet_diagnosticsInfo.datagrams_failed_to_go_in_txosalqueue ++;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in tx fifo");  
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "s_eom_ipnet_Alert(): cant put in tx fifo", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);  
             }
 
         } break;
@@ -1017,7 +1017,7 @@ static eOresult_t s_eom_ipnet_WaitPacket(EOVtheIPnet* ip, EOsocketDerived *s, eO
 
     
     // for now i only do datagrams and synchros ...
-    eo_errman_Assert(eo_errman_GetHandle(), (eo_skttyp_datagram == t), s_eobj_ownname, "no stream sockets ...");
+    eo_errman_Assert(eo_errman_GetHandle(), (eo_skttyp_datagram == t), "s_eom_ipnet_WaitPacket(): only datagram socket", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
     
     // - waits in here but only if the semaphore really exists
@@ -1285,8 +1285,8 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
     if(eores_OK != res)
     {
         eom_ipnet_diagnosticsInfo.datagrams_failed_to_go_in_rxfifo ++;
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "cannot put a datagram in rx fifo");
-        // return because ... we did not put the message in teh queue and thus ... we dont want do any action on reception
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "s_eom_ipnet_OnReceptionDatagram(): cant put in rx fifo", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
+        // return because ... we did not put the message in the queue and thus ... we dont want do any action on reception
         return;
     }
 
@@ -1459,7 +1459,7 @@ static void s_eom_ipnet_process_command(void)
 static void s_eom_ipnet_repeat_command(void)
 {
 #if defined(ARP_NEWMODE)
-    static uint8_t mux = 0;
+    //static uint8_t mux = 0;
     uint8_t stopit = 0;
 #endif    
     switch(s_eom_theipnet.cmd.opcode)
@@ -1507,7 +1507,9 @@ static void s_eom_ipnet_repeat_command(void)
                 else 
                 {
                     uint64_t now = osal_system_abstime_get();
+#if defined(TEST_ARP_PRINT)
                     uint32_t delta = now - s_eom_theipnet.cmd.par64x;
+#endif                    
                     if(now >= (s_eom_theipnet.cmd.par64x+s_eom_theipnet.cmd.par32x-10))
                     {
                         s_eom_theipnet.cmd.par64x = osal_system_abstime_get();   
@@ -1673,14 +1675,14 @@ static void s_eom_ipnet_process_transmission_datagram(void)
                         eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
                         // but put a warning on it.
                         eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_sent_by_ipal ++;
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot send a datagram");
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "s_eom_ipnet_process_transmission_datagram(): ipal fails in tx", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
                     }
                 }
                 else
                 {
                     eom_ipnet_diagnosticsInfo.datagrams_failed_to_be_retrieved_from_txfifo ++;       
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "ipal cannot get datagram from txfifo");                    
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "s_eom_ipnet_process_transmission_datagram(): dgramfifooutput is empty", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);                    
                 }
             
             }
@@ -1741,7 +1743,7 @@ static eObool_t s_eom_ipnet_attach_rqst_dtgsocket(EOVtheIPnet *vip, EOsocketData
         eOsizecntnr_t maxtokens;
         eo_fifo_Capacity(dgmskt->dgramfifoinput, &maxtokens, eok_reltimeINFINITE);
         dgmskt->socket->blkgethandle = osal_semaphore_new(maxtokens+1, 0);
-        eo_errman_Assert(eo_errman_GetHandle(), (NULL != dgmskt->socket->blkgethandle), s_eobj_ownname, "no osal blocking semaphore ...");
+        eo_errman_Assert(eo_errman_GetHandle(), (NULL != dgmskt->socket->blkgethandle), "s_eom_ipnet_attach_rqst_dtgsocket(): blkgethandle is not created by osal", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }    
     
     // build the command
