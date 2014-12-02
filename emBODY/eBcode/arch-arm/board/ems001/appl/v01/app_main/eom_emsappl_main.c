@@ -114,15 +114,15 @@ int main(void)
 
 }
 
-#ifdef _TEST_SEQNUM_
-extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
-{
-    char str[80];
-    snprintf(str, sizeof(str)-1, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
-    hal_trace_puts(str);
-  
-}
-#endif
+//#ifdef _TEST_SEQNUM_
+//extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
+//{
+//    char str[80];
+//    snprintf(str, sizeof(str)-1, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
+//    hal_trace_puts(str);
+//  
+//}
+//#endif
 
 extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
 {
