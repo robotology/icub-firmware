@@ -103,6 +103,7 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcIn
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static const char s_eobj_ownname[] = "icubCanProto";
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -1662,7 +1663,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     {
         uint16_t buildNum = *((uint16_t*)&frame->data[2]);
         snprintf(str, sizeof(str), "getfwVer Id%d: bType=0x%x fw_ver=0x%x build=%d proto=%d.%d check=%d", frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6],frame->data[7]);   
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "parse can cmd", str);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, s_eobj_ownname, &eo_errman_DescrUnspecified);
     }
     
     
@@ -2099,8 +2100,9 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
         return(res);
     }
 
-    #warning VALE--> before use current, vel and pos of 2foc be sure to had configured 2foc periodic msg content!!!
-    
+    // note of marco.accame: the following code is ok as long as the 2foc has been configured to send up in its periodic message 
+    // current, velocity, and position. if so, frame->data contains: [current:2bytes, velocity:2bytes, position:4bytes]. 
+    // the following code extract these values. 
     mstatus_ptr->basic.current  = ((int16_t*)frame->data)[0];
     mstatus_ptr->basic.velocity = ((int16_t*)frame->data)[1];
     mstatus_ptr->basic.position = ((int32_t*)frame->data)[1];
