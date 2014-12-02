@@ -59,6 +59,7 @@ struct EOMtheEMSdiscoverytransceiver_hid
     EOpacket*   replypkt;
     eObool_t    transmit;
     EOtimer*    shutdowntmr;
+    EOtimer*    dbgshutdowntmr;
     eOemsdiscoverytransceiver_cfg_t cfg;
 };
 

@@ -69,7 +69,8 @@ const eOemsdiscoverytransceiver_cfg_t eom_emsdiscoverytransceiver_DefaultCfg =
     EO_INIT(.hostipv4addr)              EO_COMMON_IPV4ADDR_LOCALHOST, //EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
     EO_INIT(.hostipv4port)              3333,
     EO_INIT(.txpktcapacity)             64,
-    EO_INIT(.discoveryprotocol)         eodiscovery_protocol_ethloader_reduced
+    EO_INIT(.discoveryprotocol)         eodiscovery_protocol_ethloader_reduced,
+    EO_INIT(.dbgshutdowntime)           0
 };
 
 
@@ -107,6 +108,7 @@ static EOMtheEMSdiscoverytransceiver s_emsdiscoverytransceiver_singleton =
     EO_INIT(.replypkt)                  NULL,
     EO_INIT(.transmit)                  eobool_false,
     EO_INIT(.shutdowntmr)               NULL,
+    EO_INIT(.dbgshutdowntmr)            NULL,
     EO_INIT(.cfg)                       {0}
 };
 
@@ -135,7 +137,15 @@ extern EOMtheEMSdiscoverytransceiver * eom_emsdiscoverytransceiver_Initialise(co
     s_emsdiscoverytransceiver_singleton.transmit = eobool_false;
     
     s_emsdiscoverytransceiver_singleton.shutdowntmr = eo_timer_New();
-       
+    s_emsdiscoverytransceiver_singleton.dbgshutdowntmr = NULL;
+    
+    if(0 != s_emsdiscoverytransceiver_singleton.cfg.dbgshutdowntime)
+    {   // create and start the debugshutdown timer only if .... its time is non-zero. otherwise doent even create it
+        s_emsdiscoverytransceiver_singleton.dbgshutdowntmr = eo_timer_New();
+        EOaction action;
+        eo_action_SetCallback(&action, s_callback_shutdown2updater, NULL, NULL);
+        eo_timer_Start(s_emsdiscoverytransceiver_singleton.dbgshutdowntmr, eok_abstimeNOW, s_emsdiscoverytransceiver_singleton.cfg.dbgshutdowntime, eo_tmrmode_ONESHOT, &action);                             
+    }   
 
     return(&s_emsdiscoverytransceiver_singleton);
 }

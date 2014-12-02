@@ -147,7 +147,7 @@ extern EOMtheEMSdiscoverylistener * eom_emsdiscoverylistener_Initialise(const eO
     
     if(NULL == eom_ipnet_GetHandle())
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "the EOMtheIPnet has not started yet");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eom_emsdiscoverylistener_Initialise(): EOMtheIPnet not started yet", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }
 
     // create the socket    
@@ -164,6 +164,7 @@ extern EOMtheEMSdiscoverylistener * eom_emsdiscoverylistener_Initialise(const eO
     dtrcfg.hostipv4port  = cfg->remoteport;
     dtrcfg.txpktcapacity = cfg->outdatagramsizeof;
     dtrcfg.discoveryprotocol = cfg->discoveryprotocol;
+    dtrcfg.dbgshutdowntime = 0; // if 0 the shutdown timer is not started. otherwise it forces a got to updater. 3*60*eok_reltime1sec;
     eom_emsdiscoverytransceiver_Initialise(&dtrcfg);
     
     

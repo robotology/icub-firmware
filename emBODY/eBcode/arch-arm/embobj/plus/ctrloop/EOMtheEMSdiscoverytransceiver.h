@@ -75,6 +75,7 @@ typedef struct
     eOipv4port_t                hostipv4port; 
     uint16_t                    txpktcapacity;
     eOemsdiscovery_protocol_t   discoveryprotocol;
+    eOreltime_t                 dbgshutdowntime;
 } eOemsdiscoverytransceiver_cfg_t;
 
 
