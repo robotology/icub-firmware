@@ -28,6 +28,10 @@
 #include "EOprotocolMN.h"
 #include "EOnv_hid.h"
 
+#include "EoError.h"
+#include "EOtheErrorManager.h"
+
+
 extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
 //////////////////////////////////
 
@@ -87,6 +91,8 @@ void set_2FOC_running(uint8_t joint);
 // --------------------------------------------------------------------------------------------------------------------
 
 static EOemsController *ems = NULL;
+
+static const char s_eobj_ownname[] = "EOemsController";
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -151,7 +157,9 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
 
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
+#if defined(USE_2FOC_FAST_ENCODER)    
     static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
+#endif
     
     int32_t axle_abs_pos[NAXLES];
     #ifndef USE_2FOC_FAST_ENCODER
@@ -980,6 +988,24 @@ void set_2FOC_running(uint8_t motor)
 
 extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime)
 {
+#if 1
+    
+    #warning--> marco.accame: changed to use eo_errman_Error(). however, remove this function
+    
+    eOerrmanDescriptor_t descriptor = {0};
+    descriptor.code                 = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_first);
+    descriptor.param                = 0;
+    descriptor.sourcedevice         = eomn_info_source_board;
+    descriptor.sourceaddress        = 0;    
+  
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, str, s_eobj_ownname, &descriptor); 
+    
+    return(eores_OK);
+    
+#else
+    
+    #warning--> marco.accame: TODO: change to use eo_errman_Error()
+    
     static uint8_t initted = 0;
     static eOropdescriptor_t rd;
     static EOnv* nv = NULL;
@@ -990,7 +1016,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     eOresult_t res = eores_NOK_generic;
 
 
-    uint16_t maxlen = sizeof(infostatus.data)-1;
+    uint16_t maxlen = sizeof(infostatus.extra)-1;
 
     
     if((NULL == str) || (strlen(str) > maxlen))
@@ -1024,15 +1050,18 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     uint16_t size = 0;
     eo_nv_Get(nv, eo_nv_strg_volatile, &infostatus, &size);
   
-    infostatus.timestamp                = osal_system_abstime_get();
+    infostatus.basic.timestamp              = osal_system_abstime_get();    
+    infostatus.basic.properties.code        = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_first);
+    infostatus.basic.properties.param       = 0;
+    infostatus.basic.properties.flags       = 0;
+    EOMN_INFO_PROPERTIES_FLAGS_set_type(infostatus.basic.properties.flags, eomn_info_type_info);
+    EOMN_INFO_PROPERTIES_FLAGS_set_source(infostatus.basic.properties.flags, eomn_info_source_board);
+    EOMN_INFO_PROPERTIES_FLAGS_set_address(infostatus.basic.properties.flags, 0);
+    EOMN_INFO_PROPERTIES_FLAGS_set_extraformat(infostatus.basic.properties.flags, eomn_info_extraformat_verbal);
+    EOMN_INFO_PROPERTIES_FLAGS_set_futureuse(infostatus.basic.properties.flags, 0);
     
-    infostatus.properties.source        = eomn_info_source_board;
-    infostatus.properties.sourceaddr    = 0;
-    infostatus.properties.type          = eomn_info_type_info;
-    infostatus.properties.format        = eomn_info_format_verbal;
-    infostatus.properties.futureuse     = 0;
     
-    memcpy(&infostatus.data[0], str, strlen(str));
+    memcpy(&infostatus.extra[0], str, strlen(str));
 
    
     eo_nv_Set(nv, &infostatus, eobool_true, eo_nv_upd_dontdo);
@@ -1041,6 +1070,8 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     res  = eo_transceiver_OccasionalROP_Load(t, &rd);
   
     return(res);
+#endif
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------
