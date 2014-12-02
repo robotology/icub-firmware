@@ -145,7 +145,7 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default = 
+const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default = 
 {
     .hasdevice                      =
     {
@@ -203,7 +203,7 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p);
-static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
+//static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p);
@@ -250,24 +250,25 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t 
     
     //retptr->appRunMode = applrunMode__default;
     res = s_eo_emsapplBody_getRunMode(retptr); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in getting run mode");
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in getting run mode", s_eobj_ownname, &eo_errman_DescrTobedecided);
     
     retptr->canBoardsReady_timer = eo_timer_New();
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->canBoardsReady_timer), s_eobj_ownname, "error in creating canBoardsReady_timer");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->canBoardsReady_timer), "error in creating canBoardsReady_timer", s_eobj_ownname, &eo_errman_DescrTobedecided);
     
-    s_eo_emsapplBody_leds_init(retptr);
+    // marco.accame: teh leds are initted and managed in one place only. not here
+    //s_eo_emsapplBody_leds_init(retptr);
     
     s_eo_emsapplBody_objs_init(retptr); //if a obj init doesn't success, it calls errorManager with fatal error
-    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "obj-body inited OK");
+    //eo_errman_Info(eo_errman_GetHandle(), "obj-body inited OK", s_eobj_ownname, &eo_errman_DescrTobedecided);
 
     s_eo_emsapplBody_checkConfig(retptr); //check config: if somethig is wrong then go to error state.
     
     res = s_eo_emsapplBody_startCheckCanboards(retptr);
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in startCheckCanboards");
+    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in startCheckCanboards", s_eobj_ownname, &eo_errman_DescrTobedecided);
     
     retptr->st = eo_emsApplBody_st__inited;
         
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, s_eobj_ownname, "body appl init OK");
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "body appl init OK", s_eobj_ownname, &eo_errman_DescrTobedecided);
     return(retptr);
 }
 
@@ -555,22 +556,18 @@ extern void eo_emsapplBody_hid_canSP_cbkonrx(void *arg)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
- static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p)
- {
-    hal_led_cfg_t cfg = {.dummy=0};
 
-// //    p->ledtimer = eo_timer_New();
-    
-    hal_led_init(hal_led0, &cfg);
-    hal_led_off(hal_led0);
-    hal_led_init(hal_led1, &cfg); //led green
-    hal_led_off(hal_led1);
-    hal_led_init(hal_led2, &cfg);
-    hal_led_off(hal_led2);
-    hal_led_init(hal_led3, &cfg);
-    hal_led_off(hal_led3);
-
- }
+//static void s_eo_emsapplBody_leds_init(EOtheEMSapplBody *p)
+//{
+//    hal_led_init(hal_led0, NULL);
+//    hal_led_off(hal_led0);
+//    hal_led_init(hal_led1, NULL); //led green
+//    hal_led_off(hal_led1);
+//    hal_led_init(hal_led2, NULL);
+//    hal_led_off(hal_led2);
+//    hal_led_init(hal_led3, NULL);
+//    hal_led_off(hal_led3);
+//}
 
 static void s_eo_emsapplBody_objs_init(EOtheEMSapplBody *p)
 {
@@ -635,7 +632,7 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
 
     p->bodyobjs.appDB =  eo_appTheDB_Initialise(&cfg);
     
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appDB), s_eobj_ownname, "error in appTheDB_Initialise");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appDB), "error in appTheDB_Initialise", s_eobj_ownname, &eo_errman_DescrTobedecided);
     
 //     res = eo_appTheDB_SetjointsShiftValues(EOappTheDB *p, &shiftval);
 //     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appDB), s_eobj_ownname, "error in SetjointsShiftValues");
@@ -647,7 +644,7 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
     if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
         res = eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), 0, &shiftval_ptr);
-        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetShiftValuesOfJointPtr");
+        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in _GetShiftValuesOfJointPtr", s_eobj_ownname, &eo_errman_DescrTobedecided);
         
         //here i don't use memcpy because the two struct have different type
         shiftval_ptr->jointVelocityShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointVelocityShift;
@@ -655,7 +652,7 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
         shiftval_ptr->jointAccelerationEstimationShift = p->cfg_ptr->configdataofMC4boards.shiftvalues.jointAccelerationEstimationShift;  
         
         res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), 0, &bcastpolicy_ptr);
-        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), s_eobj_ownname, "error in _GetJointBcastpolicyPtr");
+        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in _GetJointBcastpolicyPtr", s_eobj_ownname, &eo_errman_DescrTobedecided);
         
         //set bacast value as mask
         memset(bcastpolicy_ptr, 0, sizeof(eOicubCanProto_bcastpolicy_t)); //reset
@@ -704,7 +701,7 @@ static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
     p->bodyobjs.appCanSP = eo_appCanSP_New(&cfg);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appCanSP), 
-                     s_eobj_ownname, "error in appCanSP_New");
+                     "error in appCanSP_New", s_eobj_ownname, &eo_errman_DescrTobedecided);
 }
 
 
@@ -720,7 +717,7 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
    p->bodyobjs.appEncReader = eo_appEncReader_New(&cfg);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appEncReader), 
-                     s_eobj_ownname, "error in appEncReader_New");
+                     "error in appEncReader_New", s_eobj_ownname, &eo_errman_DescrTobedecided);
 
 }
 
@@ -758,7 +755,7 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p)
     p->bodyobjs.appMeasConv = eo_appMeasConv_New(&cfg);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appMeasConv), 
-                     s_eobj_ownname, "error in appMeasConv_New");
+                     "error in appMeasConv_New", s_eobj_ownname, &eo_errman_DescrTobedecided);
 
 }
 
@@ -934,7 +931,7 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
         return(eores_OK);
     }
 
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "applrunmode is not valid");
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "applrunmode is not valid", s_eobj_ownname, &eo_errman_DescrTobedecided);
     return(eores_NOK_generic);
 }
 
@@ -1043,7 +1040,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
         numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
         if(numofjoint > 4)
         {
-             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "More then 4 motor for ems connected to 2foc!!");
+             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "More then 4 motor for ems connected to 2foc!!", s_eobj_ownname, &eo_errman_DescrTobedecided);
         }
         
         for(jid = 0; jid <numofjoint; jid++)
@@ -1051,11 +1048,11 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
             res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jid,  &canLoc, NULL);
             if(eores_OK != res)
             {
-                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "err in checkConfig");
+                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "err in checkConfig", s_eobj_ownname, &eo_errman_DescrTobedecided);
             }
             if(canLoc.addr > 4)
             {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "can address bigger than 4!!");
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "can address bigger than 4!!", s_eobj_ownname, &eo_errman_DescrTobedecided);
             }
         }
 
