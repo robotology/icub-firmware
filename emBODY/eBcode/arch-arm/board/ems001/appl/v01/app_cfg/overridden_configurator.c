@@ -33,6 +33,9 @@
 
 #include "EOtheEMSapplDiagnostics.h"
 
+#include "EoError.h"
+#include "EOtheErrorManager.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -50,7 +53,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define configurator_timeout_send_diagnostics 1000
+
+#define configurator_timeout_send_diagnostics   1000
+#define MAX_WAITFOR2FOC                         300
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,25 +71,29 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-#define MAX_WAITFOR2FOC     300
-static uint32_t waittimefor2foc=0;
+// empty-section
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+// marco.accame on Nov 26 2014: the user-defined emsconfigurator_evt_userdef is triggered by the EOtheEMSapplBody to
+// tell the EOMtheEMSconfigurator that has received a CAN frame.
+
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p)
 {
+    static uint32_t waittimefor2foc = 0;
     eOresult_t  res;
     uint8_t     numofRXcanframe = 0;
     uint32_t    canBoardsReady = 0;
@@ -98,9 +107,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     }
     
 #ifdef _GET_CANQUEUE_STATISTICS_
-   eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
+    eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
 #endif
-   eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
+    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
     
 
 
@@ -137,12 +146,22 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigu
     
 }
 
+// marco.accame on Nov 26 2014: this function is triggered if function eom_emssocket_Transmit() fails
+// to transmit a udp packet.
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
     eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , configurator_timeout_send_diagnostics);
+    // marco.accame: for now i remove the action of this object and i call the errormanager. for later we can have both the error handlers
+    // eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , configurator_timeout_send_diagnostics);    
     
- }
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_configurator_udptxfailure);
+    errdes.param            = 0;
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;    
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSconfigurator", &errdes); 
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
