@@ -1111,7 +1111,7 @@ extern eOresult_t eo_appTheDB_removeEthProtoRequest(EOappTheDB *p, eOprotEntity_
 {
     eo_list_Erase( s_appTheDB_getEthProtoReqList(p, eoprot_endpoint_motioncontrol, entity, index), li);
     return(eores_OK);
-    #warning VALE: mettre controllo in eo_appTheDB_removeEthProtoRequest????
+    #warning VALE: mettere controllo in eo_appTheDB_removeEthProtoRequest????
 }
 #endif
 
@@ -1136,30 +1136,30 @@ static eObool_t s_appTheDB_checkConfiguaration(eOappTheDB_cfg_t *cfg)
     //if(eo_cfg_nvsEP_mc_joint_numbermax_Get((eOcfg_nvsEP_mc_endpoint_t)cfg->mc_endpoint) != cfg->jointsList->size)
     if(eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint) != cfg->jointsList->size)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "joints cfg mismach ");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "joints cfg mismatch", s_eobj_ownname, &eo_errman_DescrTobedecided);
         return(0);
     }
 
     if(eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor) != cfg->motorsList->size)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "motors cfg mismach ");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "motors cfg mismatch", s_eobj_ownname, &eo_errman_DescrTobedecided);
         return(0);
     }
 
     if(eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais) != cfg->snsrMaisList->size)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "snr-mais cfg mismach ");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "snr-mais cfg mismatch", s_eobj_ownname, &eo_errman_DescrTobedecided);
         return(0);
     }
     
     if(eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain) != cfg->snsrStrainList->size)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "snr-strain cfg mismach ");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "snr-strain cfg mismach", s_eobj_ownname, &eo_errman_DescrTobedecided);
         return(0);
     }
     if(eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin) != cfg->skinList->size)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "skin cfg mismach ");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "skin cfg mismach", s_eobj_ownname, &eo_errman_DescrTobedecided);
         return(0);
     }
     
