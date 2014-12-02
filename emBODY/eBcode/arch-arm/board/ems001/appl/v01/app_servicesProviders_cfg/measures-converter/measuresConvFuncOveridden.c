@@ -304,7 +304,7 @@ extern icubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasC
     //inoltre lo divido per mille perche' su robot interface e' moltiplicato per 1000 per avere piu' precisione possibile
     //return((icubCanProto_stiffness_t)(((i_stiff / factor)) /1000.0) );
     
-    return((icubCanProto_stiffness_t)(((stiff / factor)) /1000.0) );
+    return((icubCanProto_stiffness_t)(((stiff / factor)) /1000.0f) );
 }
 
 extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
