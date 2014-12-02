@@ -250,17 +250,17 @@ extern void eoprot_fun_UPDT_sk_skin_commands_boardscfg(const EOnv* nv, const eOr
     }
     // I add this check at compile time to be sure i can assign values of eosk to icubcanProto
     #if (!(ICUBCANPROTO_SKINTYPE__WITHTEMPCOMP == EOSK_SKINTYPE_WITHTEMPCOMP))
-        #error _skinType__withtempcomp has change value in eth proto or can proto
+        #error _skinType__withtempcomp has changed its value in eth proto or can proto
     #endif
     
     #if (!(ICUBCANPROTO_SKINTYPE__PALMFINGERTIP == EOSK_SKINTYPE_PALMFINGERTIP))
         #error _skinType__palmfingertip has change value in eth proto or can proto
     #endif
     #if (!(ICUBCANPROTO_SKINTYPE__WITHOUTTEMPCOMP == EOSK_SKINTYPE_WITHOUTTEMPCOMP))
-        #error _skinType__withouttempcomp has change value in eth proto or can proto
+        #error _skinType__withouttempcomp has changed its value in eth proto or can proto
     #endif
     
-    canProto_skcfg.skintype = brdCfg->cfg.skintype;
+    canProto_skcfg.skintype = (icubCanProto_skinType_t)brdCfg->cfg.skintype; // the cast is safe as there are the asserts above
     canProto_skcfg.period   = brdCfg->cfg.period;
     canProto_skcfg.noload   = brdCfg->cfg.noload;
     
