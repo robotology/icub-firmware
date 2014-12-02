@@ -44,7 +44,7 @@
 #include "EOtheEMSapplDiagnostics.h"
 #include "emBODYrobot.h"
 
-
+#include "EOtheLEDpulser.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -148,19 +148,32 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
  **/
 
 static void s_eom_emsappl_main_init(void)
-{  
-    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+{      
+    // init leds via the EOtheLEDpulser object
+    eOledpulser_cfg_t ledpulsercfg =  
+    {
+        .led_enable_mask    = (1 << eo_ledpulser_led_zero | 1 << eo_ledpulser_led_one | 1 << eo_ledpulser_led_two | 1 << eo_ledpulser_led_three | 1 << eo_ledpulser_led_four | 1 << eo_ledpulser_led_five),
+        .led_init           = (eOint8_fp_uint8_cvoidp_t) hal_led_init,
+        .led_on             = (eOint8_fp_uint8_t) hal_led_on,
+        .led_off            = (eOint8_fp_uint8_t) hal_led_off,
+        .led_toggle         = (eOint8_fp_uint8_t) hal_led_toggle
+    };
+
+    eo_ledpulser_Initialise(&ledpulsercfg);
     
+    // init the ems application
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    
     eom_emsappl_Initialise(&emscfg->applcfg);
-       
+      
+    // set the led reserved for link
     if(eores_OK == eom_ipnet_ResolveIP(eom_ipnet_GetHandle(), emscfg->applcfg.hostipv4addr, 5*EOK_reltime100ms))
     {
         // set led0 to ON
-        hal_led_on(hal_led0);
+       eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
     }
     else
     {
-        hal_led_off(hal_led0);
+        eo_ledpulser_Off(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
     }
 }
 
