@@ -20,10 +20,13 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdio.h"
+
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 #include "EoCommon.h"
+
+
 #include "EOsm.h"
 #include "eOcfg_sm_EMSappl.h"
 
@@ -384,18 +387,22 @@ extern EOMtheEMSapplCfg* eom_emsapplcfg_GetHandle(void)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-__weak extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+__weak extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
-    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[128];
+    const char empty[] = "EO?";
+    const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
+    char str[64];
     EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
+    
+    const char *eobjstr = (NULL != caller) ? (caller->eobjstr) : (empty);
+    uint32_t taskid = (NULL != caller) ? (caller->taskid) : (0);
 
     if(emsapplcfg->errmng_haltrace_enabled)
     {
-        snprintf(str, sizeof(str), "startup: [eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+        snprintf(str, sizeof(str), "[%s] %s in tsk %d: %s", err, eobjstr, taskid, info);
         hal_trace_puts(str);
     }
-    if(errtype <= eo_errortype_warning)
+    if(errtype <= eo_errortype_error)
     {
         return;
     }

@@ -63,8 +63,8 @@ extern "C" {
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
-extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
 
+extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
