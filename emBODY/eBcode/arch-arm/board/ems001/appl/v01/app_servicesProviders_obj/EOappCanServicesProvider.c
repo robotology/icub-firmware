@@ -40,15 +40,17 @@
 #include "hal.h"
 
 #if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
-#warning --> this include is correct only if we use stm32f407
 #include "hal_mpu_name_stm32f407ig.h"
 #include "hal_core_cfg.h"
+#else
+#error --> hal version 1 is not supported anymore
 #endif
 
 //embobj
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
+#include "EoError.h"
 
 //embobj-icub
 #include "EOicubCanProto.h"
@@ -303,13 +305,22 @@ extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
     
     if(p->run_data.numoftxframe[port] != 0)
     {
-        osal_res = osal_semaphore_decrement(p->run_data.semafori[port], /*osal_reltimeINFINITE*/ eoappCanSP_onDemandMode_timeoutSendFrame);
-//         if(osal_res != osal_res_OK)
-//         {
-//             char str[100];
-//             snprintf(str, sizeof(str)-1, "Err osal decr = %d", osal_res );        
-//             hal_trace_puts(str); 
-//         }
+        //osal_res = osal_semaphore_decrement(p->run_data.semafori[port], /*osal_reltimeINFINITE*/ eoappCanSP_onDemandMode_timeoutSendFrame);
+        osal_res = osal_semaphore_decrement(p->run_data.semafori[port], 3*osal_reltime1ms); 
+        #warning marco.accame: in here i put a timeout of 3 ms as there were problems (before it was 17 ms)
+        if(osal_res != osal_res_OK)
+        {
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_cantxfailure);
+            errdes.param                = (eOcanport1 == port) ? (1) : (2);
+            errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress        = 0;  
+//            if(eOcanport1 == port)            
+//                hal_trace_puts("tout-c1"); 
+//            else 
+//                hal_trace_puts("tout-c2");                
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
+        }
     }
     return((eOresult_t)osal_res);
 }
@@ -453,7 +464,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         }
 
        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canport);
-        #warning remove comment and insert in diagnostics
+        #warning TODO: remove comment and insert diagnostics
 //         if(eores_OK != res) 
 //         {
 //             //return(res);                    
@@ -593,14 +604,33 @@ extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t c
     }
     
 
-    osal_res = osal_semaphore_decrement(p->run_data.semafori[canport], osal_reltimeINFINITE);
+//    osal_res = osal_semaphore_decrement(p->run_data.semafori[canport], osal_reltimeINFINITE);
+//    
+//    if(osal_res != osal_res_OK)
+//    {
+//        char str[100];
+//        snprintf(str, sizeof(str)-1, "Err osal decr = %d", osal_res );        
+//        hal_trace_puts(str); 
+//    }
     
-    if(osal_res != osal_res_OK)
+    #warning marco.accame: put a timeout of 5 ms (before it was infinite)
+    osal_result_t osalres = osal_semaphore_decrement(p->run_data.semafori[canport], 5*osal_reltime1ms);
+    
+    if(osal_res_OK != osalres)
     {
-        char str[100];
-        snprintf(str, sizeof(str)-1, "Err osal decr = %d", osal_res );        
-        hal_trace_puts(str); 
-    }
+        // manage error
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_cantxfailure);
+        errdes.param                = (eOcanport1 == canport) ? (1) : (2);
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;  
+        //if(eOcanport1 == canport)            
+        //    hal_trace_puts("tout-zz"); 
+        //else 
+        //    hal_trace_puts("tout-zz");                
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
+    }    
+    
     
     //if i'm here i wake up
 #if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)  
@@ -652,12 +682,29 @@ extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t ca
     
     hal_can_transmit((hal_can_port_t)canport);
 
-    osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
+//    osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
+    
+    #warning marco.accame: put a timeout of 5 ms (before it was infinite)
+    osal_result_t osalres = osal_semaphore_decrement(p->waittxdata[canport].semaphore, 5*osal_reltime1ms);
+    
+    if(osal_res_OK != osalres)
+    {
+        // manage error
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_cantxfailure);
+        errdes.param                = (eOcanport1 == canport) ? (1) : (2);
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;  
+        //if(eOcanport1 == canport)            
+        //    hal_trace_puts("tout-qq"); 
+        //else 
+        //    hal_trace_puts("tout-qq");                
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
+    }
     
     //if i'm here i just wake up
     hal_sys_irqn_disable(irqn);
-    p->waittxdata[canport].waitenable = eobool_false;
-    
+    p->waittxdata[canport].waitenable = eobool_false;    
     hal_can_out_get((hal_can_port_t)canport, &after);
   
     
@@ -705,13 +752,27 @@ extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t can
     hal_sys_irqn_enable(irqn);
     
     //wait until all can frame are sent
-
-    osal_semaphore_decrement(p->waittxdata[canport].semaphore, osal_reltimeINFINITE);
+    #warning --> put a timeout of 5 ms in here, otherwise there are errors when entering the RUN if the can does not have attached boards.
+    osal_result_t osalres = osal_semaphore_decrement(p->waittxdata[canport].semaphore, 5*osal_reltime1ms);
+    
+    if(osal_res_OK != osalres)
+    {
+        // manage error
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_cantxfailure);
+        errdes.param                = (eOcanport1 == canport) ? (1) : (2);
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;  
+        //if(eOcanport1 == canport)            
+        //    hal_trace_puts("tout-xx"); 
+        //else 
+        //    hal_trace_puts("tout-xx");                
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
+    }
  
     //if i'm here i just wake up
     hal_sys_irqn_disable(irqn);
-    p->waittxdata[canport].waitenable = eobool_false;    
-    
+    p->waittxdata[canport].waitenable = eobool_false;        
     hal_sys_irqn_enable(irqn);
     
     return(eores_OK);
@@ -1101,22 +1162,22 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
 {
     EOappCanSP *p = (EOappCanSP *)arg;
     
-    
-
     if(eobool_true == p->waittxdata[port].waitenable)
     {
         p->waittxdata[port].numoftxframe2send --;
         
         if(0 == p->waittxdata[port].numoftxframe2send)
         {
-            osal_result_t osal_res;
+            p->waittxdata[port].waitenable = eobool_false;
             
-            osal_res = osal_semaphore_increment(p->waittxdata[port].semaphore, osal_callerISR);
-            if(osal_res != osal_res_OK)
+            #warning --> marco.accame: i think that we should set p->waittxdata[port].waitenable to eobool_false in here and not inside user-level code
+            // reason is ... if we dont change it to false quick enough, it may be that numoftxframe2send is further decremented.    
+            
+            if(osal_res_OK != osal_semaphore_increment(p->waittxdata[port].semaphore, osal_callerISR))
             {
-                char str[100];
-                snprintf(str, sizeof(str)-1, "Err osal incr = %d", osal_res );        
-                hal_trace_puts(str); 
+                #warning --> marco.accame: shall we put any eo_errman_Error() in here ? we are inside an ISR. better NOOOOOOOOO
+                // but we may set a flag which will trigger an error later
+                hal_trace_puts("error in s_eo_appCanSP_callbackOnTx_portx_waittransmission"); 
             }
         }
     }
@@ -1179,6 +1240,8 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     eOresult_t          res;
     eOcanframe_t        canFrame;
     osal_result_t       osal_res;
+    hal_result_t        hal_res = hal_res_NOK_generic;
+    
 #ifdef _GET_CANQUEUE_STATISTICS_
     uint8_t             numofoutframe=0;
 #endif
@@ -1188,6 +1251,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     {
         return(res);
     }
+    
     if(eo_appCanSP_runMode__onEvent == p->runmode)
     {
         
@@ -1195,11 +1259,26 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         hal_can_out_get((hal_can_port_t)emscanport, &numofoutframe);
         eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(emscanport, numofoutframe+1);
 #endif
-        res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
-        if(eores_OK != res)
+        // marco.accame on nov 28, 2014
+        // i try to put a frame into the fifo-tx queue. the only good result is hal_res_OK. 
+        // other results can be:
+        // - hal_res_NOK_generic (wrong parameters), which it does not happen because the port is valid and frame is not NULL
+        // - hal_res_NOK_busy (full fifo-tx), which can happen.
+        hal_res = hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+        
+        if(hal_res_OK == hal_res)
         {
-            if(eores_NOK_busy == res)
-            {
+            // we all are happy: hal_can_put() succesfully accepts a canframe in its tx fifo.
+        }
+        else
+        {
+            // problems ...
+            
+            if(hal_res_NOK_busy == hal_res)
+            {   
+                // i try a small recovery in case of hal_res_NOK_busy: wait until one frame is sent (by semaphore wait),
+                // and then attempt again a hal_can_put().
+                
                 #if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)  
                     hal_irqn_t              irqn = (eOcanport1 == emscanport)? hal_mpu_name_stm32f407ig_CAN1_TX_IRQn : hal_mpu_name_stm32f407ig_CAN2_TX_IRQn;    
                 #else
@@ -1207,42 +1286,65 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
                 #endif  
                 
                 hal_sys_irqn_disable(irqn);
-                p->waittxdata[emscanport].waitenable = eobool_true;
-                p->waittxdata[emscanport].numoftxframe2send = 1;
+                p->waittxdata[emscanport].waitenable        = eobool_true;
+                p->waittxdata[emscanport].numoftxframe2send = 1; // one frame only
                 hal_sys_irqn_enable(irqn);
 
-                osal_res = osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, /*osal_reltimeINFINITE*/eoappCanSP_onEvtMode_timeoutSendFrame);
+                // wait for some time, but NOT FOREVER. otherwise the application hangs up
+                osal_res = osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, eoappCanSP_onEvtMode_timeoutSendFrame);
                 
-                //if i'm here i just wake up
+                // marco accame: i must reset these values only in case if osal_res is timed-out because otherwise teh isr did that/
+                // .... but for now i keep teh previous code and i reset them anyway
                 hal_sys_irqn_disable(irqn);
-                p->waittxdata[emscanport].waitenable = eobool_false;
+                p->waittxdata[emscanport].waitenable        = eobool_false;
+                p->waittxdata[emscanport].numoftxframe2send = 0; 
                 hal_sys_irqn_enable(irqn);
+                
                 if(osal_res_OK == osal_res)
                 {
-                    res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+                    // if the semaphore decremented succesfully, i can attempt a second attempt of hal_can_put()
+                    hal_res = hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
                     if(eores_OK != res)
                     {
-                       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "error in hal_can_put!(NOK_busy)"); 
+                       eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "hal_can_put() fails for txfifo full after 2nd attempt", s_eobj_ownname, &eo_errman_DescrTobedecided); 
                     }
+                }
+                else
+                {
+                    // the sempahore was not decremented correctly because the can-isr did not incremented anything. issue an error
+                    #warning --> marco.accame: this situation can happen many times inside the ctrl-loop. think of how to issue a very serious message only ONCE 
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_cantxfailure);
+                    errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
+                    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress        = 0;  
+                    //if(eOcanport1 == emscanport)            
+                    //    hal_trace_puts("tout-ccc1"); 
+                    //else 
+                    //    hal_trace_puts("tout-ccc2");    
+
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                                           
                 }
             }
             else
             {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, s_eobj_ownname, "error in hal_can_put");
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "very unlikely error in hal_can_put() returning hal_res_NOK_generic", s_eobj_ownname, &eo_errman_DescrTobedecided);
             }
+            
         }
+        
     }
     else // eo_appCanSP_runMode__onDemand
     {
-
-
-        res = (eOresult_t)hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
-        if(eores_NOK_busy == res)
+        hal_res = hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
+        
+        if(hal_res_NOK_busy == hal_res)
         {
             //Note: removed fatal error because in some case it ca be usefull disconnect can and going on with appl.
             //using emsbackdoor it is possible know if errors occur.
             //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "lost can frame (out-queue full)");
             //here don't update diagnostics because hal_can_put already done it.
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "hal_can_put() full tx fifo in eo_appCanSP_runMode__onDemand mode", s_eobj_ownname, &eo_errman_DescrTobedecided);
         }
     }
     
@@ -1252,6 +1354,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
         s_eo_appCanSP_clearDiagnosticValues(p, emscanport);
     }
+    
     return(res);
 }
 
