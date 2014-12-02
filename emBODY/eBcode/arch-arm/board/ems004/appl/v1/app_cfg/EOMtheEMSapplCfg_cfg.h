@@ -845,120 +845,58 @@ extern "C" {
 #if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB1
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB1"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b01.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg
-#else
-        #include    "eOcfg_EPs_eb1.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb1_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb1_hashfunction_ep2index
-#endif        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg     
 #elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB2
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB2"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b02.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb2.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb2_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb2_hashfunction_ep2index     
-#endif        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg       
 #elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB3
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB3"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b03.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb3.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb3_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb3_hashfunction_ep2index    
-#endif        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg       
 #elif   (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB4
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB4"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b04.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b04_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb4.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb4_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb4_hashfunction_ep2index  
-#endif
 #elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB5
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB5"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b05.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b05_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb5.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb5_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb5_hashfunction_ep2index  
-#endif
 #elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB6
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB6"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b06.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b06_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb6.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb6_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb6_hashfunction_ep2index  
-#endif
 #elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB7
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB7"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b07.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b07_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb7.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb7_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb7_hashfunction_ep2index  
-#endif
 #elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB8
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB8"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b08.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b08_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb8.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb8_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb8_hashfunction_ep2index  
-#endif
 #elif   (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB9
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB9"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b09.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b09_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb9.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb9_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb9_hashfunction_ep2index  
-#endif
 #elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB10
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB10"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b10.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b10_nvsetDEVcfg
-#else        
-       #error undefined netvars for board 10 in eth proto version  1
-#endif
 #elif   (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB11
         #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB11"
-#if defined(EO_USE_EPROT_V2)
         #include    "eOprot_b11.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b11_nvsetDEVcfg
-#else        
-       #error undefined netvars for board 11 in eth proto version  1
-#endif
 #endif
 
 
