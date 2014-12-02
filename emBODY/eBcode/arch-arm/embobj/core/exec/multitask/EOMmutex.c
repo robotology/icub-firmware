@@ -101,7 +101,7 @@ extern EOMmutex* eom_mutex_New(void)
     retptr->osalmutex = osal_mutex_new();
 
     // need to check because osal may return NULL
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osalmutex), s_eobj_ownname, "osal cannot give a mutex");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osalmutex), "eom_mutex_New(): osal_mutex_new() returns NULL", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     
     return(retptr);    
 }
