@@ -149,7 +149,7 @@ extern EOMtheEMSbackdoor * eom_emsbackdoor_Initialise(const eOemsbackdoor_cfg_t 
     
     if(NULL == eom_ipnet_GetHandle())
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "the EOMtheIPnet has not started yet");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eom_emsbackdoor_Initialise(): EOMtheIPnet not started yet", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }
 
     // create the socket    
@@ -162,15 +162,15 @@ extern EOMtheEMSbackdoor * eom_emsbackdoor_Initialise(const eOemsbackdoor_cfg_t 
     // create the tx packet
     s_emsbackdoor_singleton.txpkt = eo_packet_New(cfg->outdatagramsizeof);
     s_emsbackdoor_singleton.txsemaphore = osal_semaphore_new(_MAXTOKENS_TXSEM_, 1);
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_emsbackdoor_singleton.txsemaphore), s_eobj_ownname, "semaphore is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_emsbackdoor_singleton.txsemaphore), "eom_emsbackdoor_Initialise(): osal gives NULL txsemaphore", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     
     
     // initialise the transceiver
-   eOemsbackdoortransceiver_cfg_t dtrcfg;
-   dtrcfg.hostipv4port      = cfg->remoteport;
-   dtrcfg.replypktcapacity  = cfg->outdatagramsizeof;
-   dtrcfg.backdoorprotocol  = eobackdoor_protocol_userdef_opc;
-   eom_emsbackdoortransceiver_Initialise(&dtrcfg);
+    eOemsbackdoortransceiver_cfg_t dtrcfg;
+    dtrcfg.hostipv4port      = cfg->remoteport;
+    dtrcfg.replypktcapacity  = cfg->outdatagramsizeof;
+    dtrcfg.backdoorprotocol  = eobackdoor_protocol_userdef_opc;
+    eom_emsbackdoortransceiver_Initialise(&dtrcfg);
     
     
     // create the task
