@@ -27,6 +27,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+
 
 #include "ipal.h"
 
@@ -41,7 +44,7 @@
 
 #include "ipal_cfg.h"
 
-extern void ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);
+static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);
 
 static void onethframerx(void);
 
@@ -116,7 +119,7 @@ const ipal_cfg_t ipal_cfg =
 
     .extfn                  = 
     { 
-        .usr_on_fatal_error         =  ipal_cfg_on_fatal_error,
+        .usr_on_fatal_error         =  s_ipal_cfg_on_fatal_error,
 
         .osal_mutex_new             = NULL, 
         .osal_mutex_take            = NULL, 
@@ -157,7 +160,6 @@ const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
 
-
 static void onethframerx(void)
 {
     static volatile uint8_t b = 0;
@@ -166,6 +168,57 @@ static void onethframerx(void)
 }
 
 
+static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
+{
+
+    char str[256];
+    
+    if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
+    {
+        // ok ... use the error manager, either in its simple form or in its networked form
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_halerror);
+        errdes.param            = errorcode;
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        
+        snprintf(str, sizeof(str), "ipal_fatalerror_t %d: %s", errorcode, errormsg);
+
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "IPAL", &errdes);
+    }
+    else
+    {    
+        char str[256];
+        snprintf(str, sizeof(str), "ipal_fatalerror_t %d: %s", errorcode, errormsg);
+        
+        // in case of fatal error we blink all leds but led2
+        hal_led_init(hal_led0, NULL);
+        hal_led_init(hal_led1, NULL);
+        hal_led_init(hal_led2, NULL);
+        hal_led_init(hal_led3, NULL);
+        hal_led_init(hal_led4, NULL);
+        hal_led_init(hal_led5, NULL);
+    
+        hal_led_off(hal_led0);
+        hal_led_off(hal_led1);
+        hal_led_off(hal_led2);
+        hal_led_off(hal_led3);
+        hal_led_off(hal_led4);
+        hal_led_off(hal_led5);   
+
+        for(;;)
+        {
+            hal_sys_delay(100);
+            
+            hal_led_toggle(hal_led0);
+            hal_led_toggle(hal_led1);
+            //hal_led_toggle(hal_led2);
+            hal_led_toggle(hal_led3);
+            hal_led_toggle(hal_led4);
+            hal_led_toggle(hal_led5);  
+        }
+    }
+}
 
 
 
