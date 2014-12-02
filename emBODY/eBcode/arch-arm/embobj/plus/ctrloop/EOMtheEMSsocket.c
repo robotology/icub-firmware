@@ -130,7 +130,7 @@ extern EOMtheEMSsocket * eom_emssocket_Initialise(const eOemssocket_cfg_t *cfg)
     
     if(NULL == eom_ipnet_GetHandle())
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, s_eobj_ownname, "the EOMtheIPnet has not started yet");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "the EOMtheIPnet has not started yet", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }
 
     s_emssocket_singleton.socket = eo_socketdtg_New(    cfg->inpdatagramnumber, cfg->inpdatagramsizeof, (eobool_true == cfg->usemutex) ? (eom_mutex_New()) : (NULL), 
@@ -173,17 +173,24 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
         res = eo_socketdtg_SetActions(p->socket, withactiononrx, withactionontx);
     }
     else
-    {
-    
+    {    
         res = eo_socketdtg_Open(p->socket, p->cfg.localport, eo_sktdir_TXRX, eobool_false, 
                                 NULL, withactiononrx, withactionontx);
         
         if(eores_OK == res)
-        {
-            char str[96];
+        {            
             p->active = eobool_true;
-            snprintf(str, sizeof(str)-1, "started socket listening on local port %d\n\r", p->cfg.localport);
-            eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);                        
+        }
+        
+        if(eobool_true == p->active)
+        {
+            char str[32];
+            snprintf(str, sizeof(str), "main socket listens on %d", p->cfg.localport);
+            eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, &eo_errman_DescrRunningHappily);
+            //eOerrmanDescriptor_t desc = {0};
+            //memcpy(&desc, &eo_errman_DescrRunningHappily, sizeof(desc));
+            //desc.param = 0;
+            //eo_errman_Info(eo_errman_GetHandle(), NULL, s_eobj_ownname, &desc);                                             
         }
     }                        
                             
