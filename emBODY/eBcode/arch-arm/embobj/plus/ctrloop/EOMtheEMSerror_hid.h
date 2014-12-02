@@ -34,10 +34,10 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOMtheEMStransceiver.h"
-#include "EOMtheEMSsocket.h"
+#include "EOtheErrorManager.h"
 #include "EOMtask.h"
-#include "EOMmutex.h"
+#include "EOpacket.h"
+#include "EOtimer.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -56,8 +56,11 @@ extern "C" {
  **/  
 struct EOMtheEMSerror_hid 
 {
-    EOMtask*    task;
-    EOMmutex*   mutex; //it is used to suspend the task  that generate transistion to error state   
+    EOMtask*                task;
+    EOtimer*                timer;
+    uint16_t                numberoffatalerrors;
+    eOerrmanDescriptor_t    errordescriptor;
+    eOerrmanDescriptor_t    latesterrordesc;
 };
 
 

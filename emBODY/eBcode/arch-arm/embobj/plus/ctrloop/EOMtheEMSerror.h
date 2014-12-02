@@ -43,6 +43,9 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtheErrorManager.h"
+#include "EOMtask.h"
+
+#include "EOMtheEMSsocket.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -69,10 +72,15 @@ typedef struct
      uint16_t       taskstacksize;   
 } eOemserror_cfg_t;
 
-enum
+
+// no need of go2cfg and go2run because we dont exit from error state.
+typedef enum
 {
-    emserror_evt_error  = 0x40000000
-};
+    emserror_evt_packetreceived         =   emssocket_evt_packet_received,  // 0x00000001
+    emserror_evt_fatalerror             =   0x40000000,
+    emserror_evt_tick                   =   0x01000000,
+    emserror_evt_ropframeTx             =   0x20000000                      // emsconfigurator_evt_ropframeTx is 0x00000010
+} eOemserror_event_t;
 
 
     
@@ -102,10 +110,9 @@ extern EOMtheEMSerror * eom_emserror_GetHandle(void);
 
 extern EOMtask * eom_emserror_GetTask(EOMtheEMSerror *p);
 
-
-// weakly defined. it adds specific actions upon error 
-
-extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+extern eOresult_t eom_emserror_SetFatalError(EOMtheEMSerror *p, const eOerrmanDescriptor_t* fatalerror);
+ 
+extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
 
 
 
