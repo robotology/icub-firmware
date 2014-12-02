@@ -197,11 +197,11 @@ extern EOVtheEnvironment * eov_env_hid_Initialise(eOres_fp_voidp_t shareddata_sy
     }
 
 
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != shareddata_sync, s_eobj_ownname, "shareddata_sync() is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != proc_offset_get, s_eobj_ownname, "proc_offset_get() is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != ipnet_get, s_eobj_ownname, "ipnet_get() is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != cannets_get, s_eobj_ownname, "cannet_get() is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != eproc_get, s_eobj_ownname, "eproc_get() is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != shareddata_sync, "eov_env_hid_Initialise(): NULL shareddata_sync", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != proc_offset_get, "eov_env_hid_Initialise(): NULL proc_offset_get", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != ipnet_get, "eov_env_hid_Initialise(): NULL ipnet_get", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != cannets_get, "eov_env_hid_Initialise(): NULL cannet_get", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != eproc_get, "eov_env_hid_Initialise(): NULL eproc_get", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 
 
     s_eov_environment.vtable[VF00_env_shareddata_sync]          = shareddata_sync;
