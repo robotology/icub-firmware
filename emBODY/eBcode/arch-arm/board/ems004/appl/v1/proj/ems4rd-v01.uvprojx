@@ -14,6 +14,8 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
+          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
@@ -143,7 +145,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -362,9 +363,9 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubGenova04 -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
-              <Define>ICUB_GENOVA04 NOT_ICUB_DARMSTADT01 EOPROT_USE_MN_VERSION_2_0 EO_USE_EPROT_V2 HAL_IS_VERSION_2 USE_PROTO_PROXY</Define>
+              <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 EOPROT_USE_MN_VERSION_2_0 EO_USE_EPROT_V2 HAL_IS_VERSION_2 USE_PROTO_PROXY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\appl\v01\app_main;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\..\..\..\ems001\appl\v01\app_nvs_cfg;..\..\..\..\ems001\appl\v01\app_servicesProviders_obj;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\..\canProtocolLib;..\..\..\..\..\..\robotconfig\v1\eprotocol;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\app_cfg;..\..\..\..\..\..\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\embobj\core\core;..\..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\ems001\appl\v01\app_main;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\embobj\plus\comm-v2\icub;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\embobj\plus\comm-v2\transport;..\..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\embobj\plus\utils;.;..\..\..\..\ems001\appl\v01\app_nvs_cfg;..\..\..\..\ems001\appl\v01\app_servicesProviders_obj;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto;..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net;..\..\..\..\..\..\robotconfig\v1\backdoor;..\..\..\..\..\..\embobj\plus\comm-v1\opcprot;..\..\..\..\..\..\..\..\canProtocolLib;..\..\..\..\..\..\robotconfig\v1\eprotocol;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\app_cfg;..\..\..\..\..\..\robotconfig;..\..\..\..\..\libs\midware\hl-plus\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1082,6 +1083,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheInfoDispatcher.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheInfoDispatcher.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1196,6 +1202,11 @@
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoError.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\icub\EoError.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1411,7 +1422,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -2350,6 +2360,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtransmitter.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheInfoDispatcher.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\transport\EOtheInfoDispatcher.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2464,6 +2479,11 @@
               <FileName>EoProtocolSK_rom.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoError.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\icub\EoError.c</FilePath>
             </File>
           </Files>
         </Group>
