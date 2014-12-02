@@ -39,6 +39,7 @@
 #define HAL_USE_TIMER
 
 
+
 #endif
 
 //#include "hal_switch.h"
@@ -131,7 +132,7 @@
 #undef EXECUTE_TEST_SWITCH
 //#define EXECUTE_TEST_SWITCH
 
-#undef EXECUTE_TEST_ETH
+//#undef EXECUTE_TEST_ETH
 //#define EXECUTE_TEST_ETH
 
 #define EXECUTE_TEST_ADC
@@ -399,6 +400,15 @@ int main(void)
     test_device_eeprom();
 #endif//defined(EXECUTE_TEST_EEPROM)  
 
+#if     defined(EXECUTE_TEST_SWITCH)    
+    test_device_switch();
+#endif//defined(EXECUTE_TEST_SWITCH)   
+
+// keep it last, as it contains a forever loop
+
+#if     defined(EXECUTE_TEST_ETH)    
+    test_periph_eth();
+#endif//defined(EXECUTE_TEST_ETH)
     
 #if     defined(EXECUTE_TEST_TIMER)    
     test_periph_timer();
@@ -441,15 +451,7 @@ int main(void)
 
 // it also contains a forever loop. you cannot ping it. just use the two ports
 
-#if     defined(EXECUTE_TEST_SWITCH)    
-    test_device_switch();
-#endif//defined(EXECUTE_TEST_SWITCH)   
 
-// keep it last, as it contains a forever loop
-
-#if     defined(EXECUTE_TEST_ETH)    
-    test_periph_eth();
-#endif//defined(EXECUTE_TEST_ETH)
      
  
     test_message("");
@@ -951,7 +953,7 @@ static void test_periph_i2c(void)
 {
     hal_result_t res;
     res = hal_i2c_init(hal_i2c1, NULL);
-    res = hal_i2c_init(hal_i2c3, NULL);
+ //   res = hal_i2c_init(hal_i2c3, NULL);
     res = res;
     test_is_beginning("i2c: if test eeprom is OK then i2c works fine. if test eeprom fails ... i2c may work or not");
     
@@ -991,10 +993,10 @@ static void test_encoder_spi(void)
 		angle[4]=as5048_read(1)[1];
 	  angle[5]=as5048_read(1)[2];	 
 		canframe.id = 0x1AA;
-    canframe.data[1] = (angle[0] & 0xFF); 
-	  canframe.data[2] = (angle[0] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
-	  canframe.data[3] = (angle[1] & 0xFF); 
-	  canframe.data[4] = (angle[1] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
+    canframe.data[1] = (angle[1] & 0xFF); 
+	  canframe.data[2] = (angle[1] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
+	  canframe.data[3] = (angle[4] & 0xFF); 
+	  canframe.data[4] = (angle[4] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
 		canframe.data[5] = (angle[2] & 0xFF); 
 	  canframe.data[6] = (angle[2] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
 
@@ -1726,7 +1728,7 @@ static void test_device_motorctl_2(void)
 
 #if     defined(HAL_USE_ADC)
 
-static uint16_t ADC_result[9];
+static uint16_t ADC_result[12];
 
 
 
@@ -1764,7 +1766,7 @@ static void test_periph_adc(void)
 }
 #endif//defined(HAL_USE_ADC)
 
-static uint16_t ADC_result[9];
+static uint16_t ADC_result[12];
 //volatile int16_t current[4]={0,0,0,0};
 volatile int16_t current_P[4]={0,0,0,0};
 volatile int16_t current_I[4]={0,0,0,0};
@@ -1808,6 +1810,20 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 	canframe.data[6] = (ADC_result[8] & 0xFF00)>>8;
 	
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+	  
+	ADC_result[9]=hal_get_adc(1,3);
+	ADC_result[10]=hal_get_adc(2,3);
+	ADC_result[11]=hal_get_adc(3,3);
+	canframe.id = 0x1AC;
+	canframe.data[1] = ADC_result[9] & 0xFF;
+	canframe.data[2] = (ADC_result[9] & 0xFF00)>>8;
+ 	canframe.data[3] = ADC_result[10] & 0xFF;
+	canframe.data[4] = (ADC_result[10] & 0xFF00)>>8;
+	canframe.data[5] = ADC_result[11] & 0xFF;
+	canframe.data[6] = (ADC_result[11] & 0xFF00)>>8;
+	
+	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
+	
 	hal_sys_delay(1000*hal_RELTIME_1microsec);
 }
 

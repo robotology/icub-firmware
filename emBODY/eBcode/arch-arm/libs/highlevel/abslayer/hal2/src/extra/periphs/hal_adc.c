@@ -73,7 +73,7 @@
 //#define ADC3                     ADC3
 #define ADC3_CLK                 RCC_APB2Periph_ADC3
 #define DMA_CHANNEL2             DMA_Channel_2
-#define DMA_STREAM0              DMA2_Stream0
+//#define DMA_STREAM0              DMA2_Stream0
 #define ADC3_DR_ADDRESS          ((uint32_t)0x4001224C)
 
 #define ADC_CDR_ADDRESS          ((uint32_t)0x40012308)
@@ -105,7 +105,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-volatile uint16_t uhADCConvertedValue[9];
+volatile uint16_t uhADCConvertedValue[12];
 
 volatile uint16_t uhAN1 = 0;
 volatile uint16_t uhAN2 = 0;
@@ -125,12 +125,12 @@ volatile uint32_t uwVBATVoltage = 0;
 // --------------------------------------------------------------------------------------------------------------------
 
 /**
-  * @brief  ADC1 channels 3,4,5 ADC2 8,9,10 ADC3 channels 6,7,VBAT with DMA configuration
+  * @brief  ADC1 channels 3,4,5 ADC2 8,9,10 ADC3 channels 14,15,6,7,VBAT with DMA configuration
   * @note   This function Configure the ADC peripheral  
             1) Enable peripheral clocks
             2) DMA2_Stream0 channel2 configuration
             3) Configure ADC Channels pin as analog input
-            4) ADC1 channels 3,4,5 ADC2 8,9,10 ADC3 channels 6,7,VBAT with DMA configuration
+            4) ADC1 channels 3,4,5 ADC2 8,9,10 ADC3 channels 14,15,6,7,VBAT with DMA configuration
   * @param  None
   * @retval None
 
@@ -161,7 +161,7 @@ extern hal_result_t hal_adc_dma_init()
 	  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)ADC_CDR_ADDRESS; //ADC1_DR_ADDRESS;
 	  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) &uhADCConvertedValue;
 	  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
-	  DMA_InitStructure.DMA_BufferSize = 9;
+	  DMA_InitStructure.DMA_BufferSize = 12;
 	  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
@@ -192,7 +192,7 @@ extern hal_result_t hal_adc_dma_init()
 	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
 	  GPIO_Init(GPIOC, &GPIO_InitStructure);
 	  
-	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9  ;	  
+	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_8 | GPIO_Pin_9 ; 	  
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
 	  GPIO_Init(GPIOF, &GPIO_InitStructure);
@@ -205,13 +205,13 @@ extern hal_result_t hal_adc_dma_init()
 	  ADC_CommonInit(&ADC_CommonInitStructure);
 	
 	  /* ADC123 Init ****************************************************************/	
-	  ADC_InitStructure.ADC_Resolution = ADC_Resolution_10b;
+	  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
 	  ADC_InitStructure.ADC_ScanConvMode =ENABLE;
 	  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
 	  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
 	  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
 	  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	  ADC_InitStructure.ADC_NbrOfConversion = 3;
+	  ADC_InitStructure.ADC_NbrOfConversion = 4;
 	  ADC_Init(ADC1, &ADC_InitStructure);	
 	  ADC_Init(ADC2, &ADC_InitStructure);
 	  ADC_Init(ADC3, &ADC_InitStructure);
@@ -220,34 +220,38 @@ extern hal_result_t hal_adc_dma_init()
 	  ADC_RegularChannelConfig(ADC1, ADC_Channel_3 , 1, SAMPLING_TIME_CK);
 	  ADC_RegularChannelConfig(ADC1, ADC_Channel_4 , 2, SAMPLING_TIME_CK);
 	  ADC_RegularChannelConfig(ADC1, ADC_Channel_5 , 3, SAMPLING_TIME_CK);
+		ADC_RegularChannelConfig(ADC1, ADC_Channel_16 , 4, SAMPLING_TIME_CK); //DUMMY
 
 
 	  /* ADC2 regular channel3 4 and 5 configuration *************************************/
 	  ADC_RegularChannelConfig(ADC2, ADC_Channel_8 , 1, SAMPLING_TIME_CK);
    	ADC_RegularChannelConfig(ADC2, ADC_Channel_9 , 2, SAMPLING_TIME_CK);
   	ADC_RegularChannelConfig(ADC2, ADC_Channel_10, 3, SAMPLING_TIME_CK);
- 		
+ 	//	ADC_RegularChannelConfig(ADC2, ADC_Channel_13, 4, SAMPLING_TIME_CK); //Temp Sensor
 	  /* ADC3 regular channel3 4 and 5 configuration *************************************/
-	  ADC_RegularChannelConfig(ADC3, ADC_Channel_6 , 1, SAMPLING_TIME_CK);
-	  ADC_RegularChannelConfig(ADC3, ADC_Channel_7 , 2, SAMPLING_TIME_CK);
+	  ADC_RegularChannelConfig(ADC3, ADC_Channel_14 ,   1, SAMPLING_TIME_CK);
+	  ADC_RegularChannelConfig(ADC3, ADC_Channel_15 ,   2, SAMPLING_TIME_CK);
+		ADC_RegularChannelConfig(ADC3, ADC_Channel_6 ,    3, SAMPLING_TIME_CK);
+		ADC_RegularChannelConfig(ADC3, ADC_Channel_7 ,    4, SAMPLING_TIME_CK);
 	  	  	   
 	   /* Enable VBAT channel */
-     ADC_VBATCmd(ENABLE); 
-	   ADC_TempSensorVrefintCmd(ENABLE);
-	   ADC_RegularChannelConfig(ADC3, ADC_Channel_TempSensor, 3, SAMPLING_TIME_CK);
+    //ADC_VBATCmd(ENABLE); 
+	  ADC_TempSensorVrefintCmd(ENABLE);
+	  ADC_RegularChannelConfig(ADC2, ADC_Channel_TempSensor, 4, SAMPLING_TIME_CK);
 	    
 	 /* Enable DMA request after last transfer (Single-ADC mode) */
 //	  ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
 	  ADC_MultiModeDMARequestAfterLastTransferCmd(ENABLE);
-	
+		/* Enable ADC1 DMA since ADC1 is the Master*/
+ //   ADC_DMACmd(ADC1, ENABLE); 
 	  /* Enable ADC */
 	  ADC_Cmd(ADC1, ENABLE);
 	  ADC_Cmd(ADC2, ENABLE);
 	  ADC_Cmd(ADC3, ENABLE);
 
 	  ADC_SoftwareStartConv(ADC1);
-		ADC_SoftwareStartConv(ADC2);
-		ADC_SoftwareStartConv(ADC3);
+	//	ADC_SoftwareStartConv(ADC2);
+	//	ADC_SoftwareStartConv(ADC3);
 	  return hal_res_OK;
 }
 
@@ -354,7 +358,7 @@ extern hal_result_t hal_adc_inj_init()
 
 extern uint16_t hal_get_adc(uint16_t ADC_TYPE, uint16_t channel)
 {
-	return	uhADCConvertedValue[(ADC_TYPE-1)+(channel*3)];
+	return	uhADCConvertedValue[((ADC_TYPE-1))+(channel*3)];
 }
 
 void hal_adc_currentCalibration(void)

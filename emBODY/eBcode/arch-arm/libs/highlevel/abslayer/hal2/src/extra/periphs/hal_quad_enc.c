@@ -43,7 +43,7 @@
 #define ICx_FILTER          (u8) 8 // 8<-> 670nsec
 
 
-#define ENCODER_PPR 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
+#define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
 #define ENCODER1_TIMER TIM2
 #define ENCODER2_TIMER TIM3
 #define ENCODER3_TIMER TIM4
