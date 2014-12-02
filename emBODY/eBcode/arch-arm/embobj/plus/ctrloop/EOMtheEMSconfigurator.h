@@ -44,6 +44,9 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOMtask.h"
 
+#include "eOcfg_sm_EMSappl.h"
+#include "EOMtheEMSsocket.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -71,12 +74,14 @@ typedef struct
 
 
 
-
 typedef enum
 {
-    emsconfigurator_evt_go2runner      =   0x00000002,
-    emsconfigurator_evt_userdef        =   0x00000004,
-    emsconfigurator_evt_ropframeTx     =   0x00000008           //the configurator sends a ropframe by transceiver
+    emsconfigurator_evt_packetreceived  =   emssocket_evt_packet_received, // 0x00000001
+    emsconfigurator_evt_go2error        =   0x00000002,
+    emsconfigurator_evt_go2runner       =   0x00000004,
+    emsconfigurator_evt_userdef         =   0x00000008,
+    emsconfigurator_evt_ropframeTx      =   0x00000010,          // the configurator sends a ropframe by transceiver
+    emsconfigurator_evt_tick            =   0x00000020
 } eOemsconfigurator_event_t;
 
 
@@ -110,6 +115,7 @@ extern EOMtheEMSconfigurator * eom_emsconfigurator_GetHandle(void);
 extern EOMtask * eom_emsconfigurator_GetTask(EOMtheEMSconfigurator *p);
 
 
+extern eOresult_t eom_emsconfigurator_GracefulStopAndGoTo(EOMtheEMSconfigurator *p, eOsmEventsEMSappl_t ev);
 
 
 

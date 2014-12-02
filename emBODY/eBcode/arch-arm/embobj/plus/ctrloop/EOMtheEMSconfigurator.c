@@ -124,9 +124,11 @@ extern EOMtheEMSconfigurator * eom_emsconfigurator_Initialise(const eOemsconfigu
         cfg = &eom_emsconfigurator_DefaultCfg;
     }
     
+    const eOreltime_t timeout = eok_reltime10ms; //eok_reltimeINFINITE;
+    
     s_emsconfigurator_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
                                                     s_eom_emsconfigurator_task_startup, s_eom_emsconfigurator_task_run,  
-                                                    (eOevent_t)0, eok_reltimeINFINITE, NULL, 
+                                                    (eOevent_t)0, timeout, NULL, 
                                                     tskEMScfg, "tskEMScfg");
  
                                                    
@@ -158,6 +160,40 @@ extern EOMtask * eom_emsconfigurator_GetTask(EOMtheEMSconfigurator *p)
     }
     
     return(s_emsconfigurator_singleton.task);
+}
+
+
+
+extern eOresult_t eom_emsconfigurator_GracefulStopAndGoTo(EOMtheEMSconfigurator *p, eOsmEventsEMSappl_t ev)
+{
+    eOresult_t res = eores_NOK_generic;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+    if(eo_sm_emsappl_EVdummy == ev)
+    {   // cannot stop on dummy event or 
+        return(eores_NOK_generic);
+    }
+    
+    if(eo_sm_emsappl_EVgo2cfg == ev)
+    {   // i already am in cfg
+        return(eores_OK);
+    } 
+    
+    if(eo_sm_emsappl_EVgo2run == ev)
+    {   // i send an event to the configurato task. the task will go to runner at next iteration 
+        res = eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);        
+    }
+    else if(eo_sm_emsappl_EVgo2err == ev)
+    {
+        res = eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2error);
+    }
+    
+    
+    return(res);    
 }
 
 
@@ -209,7 +245,6 @@ static void s_eom_emsconfigurator_task_startup(EOMtask *p, uint32_t t)
 }
 
 
-
 static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 {
     // the event that we have received
@@ -221,24 +256,47 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     uint16_t numberoftxrops = 0;
     eOabstime_t txtimeofrxropframe = 0;
     eOresult_t res;
-    
 
+    // we have a tick event
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_tick))
+    {
+       
+    }    
+
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2error))
+    {
+        eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
+        // no other event is managed anymore:
+        // a possible received packet shall be managed by the error task
+        // a packet to be tx will be transmitted by the error task. 
+        return;
+    }     
+    
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
     {
-        eom_emsappl_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
-        // no other event is managed anymore. a possible received packet shall be managed by teh runner
+        eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+        // no other event is managed anymore:
+        // a possible received packet shall be managed by the runner as it reads all packet in rx fifo at each iteration
+        // a request to form and tx a packet will be managed by the runner. 
         return;
     }
+       
      
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_ropframeTx))
     {
         // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
         res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
         
-        // 2.  send a packet back. but only if the former gave us a good one.
+        // 2.  send a packet back. but only if the former gave us a good one 
         if(eores_OK == res)
         {
-            res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+            // we transmit even if there are no rops inside, so that the host can monitor teh presence of the board
+            // and because ... eom_emstransceiver_Form() increment teh sequence number. if we drop packet, then there
+            // is a hole in the sequence number.
+            //if(numberoftxrops > 0)
+            //{ 
+                res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+            //}
         }
         else
         {
@@ -249,6 +307,10 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
  
     if(eobool_true == eo_common_event_check(evt, emssocket_evt_packet_received))
     {   // process the reception of a packet. it must contain a ropframe and nothing else
+        
+        uint16_t replies = 0;
+        uint16_t occasionals = 0;
+        uint16_t regulars = 0;
         
         s_emsconfigurator_singleton.numofrxrops = 0;
     
@@ -280,22 +342,21 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         
 
         
-        // perform an user-defined function
+        // perform a user-defined function
         eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(&s_emsconfigurator_singleton);
+     
+        eom_emstransceiver_NumberofOutROPs(eom_emstransceiver_GetHandle(), &replies, &occasionals, &regulars);
         
-        // 3. send ropframe-tx evt to myself in order to send a ropframe
-        eom_task_SetEvent(p, emsconfigurator_evt_ropframeTx); 
+        //replies = 1; // keep commented. uncomment only for debug.
+        if((replies + occasionals) > 0)
+        {
+            // 3. send ropframe-tx evt to myself in order to send a ropframe.
+            // marco.accame on 25 nov 2014: when we receive a packet we may need to send imemdiately one packet back 
+            //                              in case there are any say<> rops. we prefer to send the emsconfigurator_evt_ropframeTx
+            //                              anyway so that the remote host can monitor the existence of the board. 
+            eom_task_SetEvent(p, emsconfigurator_evt_ropframeTx); 
+        }
         
-        // // 3. call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        // res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
-        
-        // // 4.  send a packet back. but only if the former gave us a good one.
-        // if(eores_OK == res)
-        // {
-            // res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
-        // }
-        
-               
         // 5. if another packet is in the rx fifo, send a new event to process its retrieval again        
         if(remainingrxpkts > 0)
         {
@@ -304,13 +365,12 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
      
     }
     
+    // we can process a user-defined event
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef))
     {
         eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(&s_emsconfigurator_singleton);
     }
     
-
-
 }
 
 
