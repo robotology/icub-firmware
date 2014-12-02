@@ -21,9 +21,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#include "stdlib.h"
-#include "stdio.h"
+//#include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
@@ -40,6 +40,9 @@
 #include "EOMmutex.h"
 
 #include "OPCprotocolManager_Cfg.h"
+
+#include "EOtheInfoDispatcher.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -184,10 +187,18 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     
     s_eom_emstransceiver_update_diagnosticsinfo();
     
-    char str[96];
+   
+    #warning --> so far the dispatcher uses capacity = 3. maybe we can increase the number to ... 4 or 8.
+    eOinfodispatcher_cfg_t config = {0};
+    config.capacity     = 3; // 8 or or eo_sizecntnr_dynamic ....
+    config.transmitter  = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));
+    eo_infodispatcher_Initialise(&config);    
+    
+    
+    char str[56];
     uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
-    snprintf(str, sizeof(str)-1, "initted with host: IP = %d.%d.%d.%d, port = %d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], cfg->hostipv4port);
-    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);    
+    snprintf(str, sizeof(str), "EOMtheEMStransceiver <-> %d.%d.%d.%d, %d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], cfg->hostipv4port);
+    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, &eo_errman_DescrRunningHappily);    
     
     return(&s_emstransceiver_singleton);
 }
@@ -263,15 +274,33 @@ extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rx
 }
 
 
+
+extern eOresult_t eom_emstransceiver_NumberofOutROPs(EOMtheEMStransceiver *p, uint16_t *numberofreplies, uint16_t *numberofoccasionals, uint16_t *numberofregulars)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }  
+    
+    return(eo_transceiver_NumberofOutROPs(s_emstransceiver_singleton.transceiver, numberofreplies, numberofoccasionals, numberofregulars));        
+}
+
+
+
 extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops)
 {
     eOresult_t res;
     uint16_t numofrops = 0;
+    //static int nn = 0;
     
     if((NULL == p) || (NULL == txpkt))
     {
         return(eores_NOK_nullpointer);
     }
+
+    
+    // call the info-dispatcher so that it may insert sig<info> rops in occasional ropframe.
+    eo_infodispatcher_Send(eo_infodispatcher_GetHandle(), eoinfodispatcher_sendnumber_all, NULL);
        
     res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops);
     if(eores_OK != res)

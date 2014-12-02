@@ -140,6 +140,8 @@ extern EOnvsCfg* eom_emstransceiver_GetNVScfg(EOMtheEMStransceiver* p);
 
 extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rxpkt, uint16_t *numberofrops, eOabstime_t* txtime);
 
+extern eOresult_t eom_emstransceiver_NumberofOutROPs(EOMtheEMStransceiver *p, uint16_t *numberofreplies, uint16_t *numberofoccasionals, uint16_t *numberofregulars);
+
 extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops);
 
 //this function copy internal data to dgn_ptr
