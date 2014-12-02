@@ -214,7 +214,7 @@ const eOmc_joint_t joint_default_value =
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
       #include    "eOcfg_nvsEP_mc_joint_usrcbk_ebx_2foc.c"
 #else
-    #warning --> no eth proto user callback defined!!!
+    #warning --> no eoprotocol callbacks for motion-control are defined
 #endif
 
 //this file is equal for all ems except eb10 and eb11
