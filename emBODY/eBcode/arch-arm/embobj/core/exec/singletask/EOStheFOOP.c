@@ -145,7 +145,7 @@ extern EOStheFOOP * eos_foop_Initialise(eOsfoop_cfg_t *cfg, eOsfoop_hal_fn_t *hf
         cfg = (eOsfoop_cfg_t*)&eos_foop_DefaultCfg;
     }
         
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != hfn), s_eobj_ownname, "eos_foop_Initialise(): invalid basic hal sys functions");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != hfn), s_eobj_ownname, "eos_foop_Initialise(): invalid basic hal sys functions", NULL);
     
     s_eos_the_foop.tsk = eov_task_hid_New();    
     memcpy(&s_eos_the_foop.cfg, cfg, sizeof(eOsfoop_cfg_t));
@@ -203,7 +203,7 @@ extern EOStheFOOP* eos_foop_GetHandle(void)
 
 extern void eos_foop_Start(EOStheFOOP *p)
 {
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), s_eobj_ownname, "eos_foop_Start() uses a NULL handle");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), s_eobj_ownname, "eos_foop_Start() uses a NULL handle", NULL);
 
     s_eos_foop_start();
 } 
@@ -528,7 +528,7 @@ static void s_eos_foop_process_message(void)
     
     if(NULL == s_eos_the_foop.message_fifo)
     {   // dont have a message fifo ... why are we in here?
-        eo_errman_Assert(eo_errman_GetHandle(), (NULL == s_eos_the_foop.message_fifo), s_eobj_ownname, "s_eos_foop_process_message() does not have a msg fifo"); 
+        eo_errman_Assert(eo_errman_GetHandle(), (NULL == s_eos_the_foop.message_fifo), s_eobj_ownname, "s_eos_foop_process_message() does not have a msg fifo", NULL); 
         // we reset
         bitwise_and(&s_eos_the_foop.flags, ~EOS_FOOP_FLAG_MESSAGE_AVAIL); 
         return;
@@ -580,7 +580,7 @@ static void s_eos_foop_process_callback(void)
     
     if(NULL == s_eos_the_foop.callback_fifo)
     {   // dont have a callback fifo ... why are we in here?
-        eo_errman_Assert(eo_errman_GetHandle(), (NULL == s_eos_the_foop.callback_fifo), s_eobj_ownname, "s_eos_foop_process_callback() does not have a msg fifo");
+        eo_errman_Assert(eo_errman_GetHandle(), (NULL == s_eos_the_foop.callback_fifo), s_eobj_ownname, "s_eos_foop_process_callback() does not have a msg fifo", NULL);
         // we reset
         bitwise_and(&s_eos_the_foop.flags, ~EOS_FOOP_FLAG_CALLBACK_AVAIL);  
         return;

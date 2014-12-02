@@ -135,21 +135,21 @@ extern EOStheSystem * eos_sys_Initialise(const eOssystem_cfg_t *syscfg,
                                                         syscfg->hal_fns.hal_sys_irq_disable
                                                      );
                                                   
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg), s_eobj_ownname, "eos_sys_Start() uses a NULL syscfg"); 
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg), s_eobj_ownname, "eos_sys_Start() uses a NULL syscfg", NULL); 
     
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_start), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_start()"); 
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_systick_sethandler), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_systick_sethandler()");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_atomic_bitwiseAND), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_atomic_bitwiseAND()");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_atomic_bitwiseOR), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_atomic_bitwiseOR()");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_criticalsection_take), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_criticalsection_take()");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_criticalsection_release), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_criticalsection_release()");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_irq_disable), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_irq_disable()");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_irq_enable), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_irq_enable()");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_start), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_start()", NULL); 
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_systick_sethandler), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_systick_sethandler()", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_atomic_bitwiseAND), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_atomic_bitwiseAND()", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_atomic_bitwiseOR), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_atomic_bitwiseOR()", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_criticalsection_take), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_criticalsection_take()", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_criticalsection_release), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_criticalsection_release()", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_irq_disable), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_irq_disable()", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->hal_fns.hal_sys_irq_enable), s_eobj_ownname, "eos_sys_Start() uses a NULL hal_sys_irq_enable()", NULL);
     
 
    
-    eo_errman_Assert(eo_errman_GetHandle(), (syscfg->userdef.systickperiod >= EOSSYS_min_systickperiod), s_eobj_ownname, "eos_sys_Start() uses systickperiod too small");
-    eo_errman_Assert(eo_errman_GetHandle(), (syscfg->userdef.systickperiod <= EOSSYS_max_systickperiod), s_eobj_ownname, "eos_sys_Start() uses systickperiod too high");
+    eo_errman_Assert(eo_errman_GetHandle(), (syscfg->userdef.systickperiod >= EOSSYS_min_systickperiod), s_eobj_ownname, "eos_sys_Start() uses systickperiod too small", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (syscfg->userdef.systickperiod <= EOSSYS_max_systickperiod), s_eobj_ownname, "eos_sys_Start() uses systickperiod too high", NULL);
     
     // after the previous assert() we are now sure that syscfg and foopcfg contain valid values. thus copy them
     
@@ -224,7 +224,7 @@ extern EOStheSystem* eos_sys_GetHandle(void)
 
 extern void eos_sys_Start(EOStheSystem *p, eOvoid_fp_void_t userinit_fn)
 {
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), s_eobj_ownname, "eos_sys_Start() uses a NULL handle");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), s_eobj_ownname, "eos_sys_Start() uses a NULL handle", NULL);
 
     s_eos_sys_start(userinit_fn);
 } 

@@ -112,9 +112,9 @@ extern EOMtheCallbackManager * eom_callbackman_Initialise(const eOmcallbackman_c
     }
     
     // trying to initialise with wrong params error
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->queuesize), s_eobj_ownname, "cbkmancfg->queuesize is 0");
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->stacksize), s_eobj_ownname, "cbkmancfg->stacksize is 0");
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->priority), s_eobj_ownname, "cbkmancfg->priority is 0");
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->queuesize), "eom_callbackman_Initialise(): 0 queuesize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->stacksize), "eom_callbackman_Initialise(): 0 stacksize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->priority), "eom_callbackman_Initialise() 0 priority", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 
     // i prepare the task able to execute callbacks actions associated to expiry of the timers or on gpio
     s_eom_callbackmanager.tsk = eom_task_New(eom_mtask_CallbackDriven, 

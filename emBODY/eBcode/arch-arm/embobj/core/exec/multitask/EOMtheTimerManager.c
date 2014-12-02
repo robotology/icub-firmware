@@ -98,8 +98,8 @@ static const char s_eobj_ownname[] = "EOMtheTimerManager";
  
 static EOMtheTimerManager s_eom_thetimermanager = 
 {
-    .tmrman     = NULL,           // tmrman
-    .tskproc    = NULL           // tskproc
+    .tmrman     = NULL,             // tmrman
+    .tskproc    = NULL              // tskproc
 }; 
 
 
@@ -124,9 +124,9 @@ extern EOMtheTimerManager * eom_timerman_Initialise(const eOmtimerman_cfg_t *tmr
     }
     
     // trying to initialise with wrong params error
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->messagequeuesize), s_eobj_ownname, "tmrmancfg->messagequeuesize is 0");
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->stacksize), s_eobj_ownname, "tmrmancfg->stacksize is 0");
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->priority), s_eobj_ownname, "tmrmancfg->priority is 0");
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->messagequeuesize), "eom_timerman_Initialise(): 0 messagequeuesize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->stacksize), "eom_timerman_Initialise(): 0 stacksize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->priority), "eom_timerman_Initialise(): 0 priority", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     
     // i get a basic timer manager with onnew, add and rem functions proper for osal. and an EOMmutex (by the way ... eom_mutex_New() never returns NULL).
     s_eom_thetimermanager.tmrman = eov_timerman_hid_Initialise(s_eom_timerman_OnNewTimer, s_eom_timerman_AddTimer, s_eom_timerman_RemTimer, eom_mutex_New()); 

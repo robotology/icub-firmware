@@ -106,12 +106,12 @@ extern EOStheCallbackManager * eos_callbackman_Initialise(const eOscallbackman_c
     }
     
     // trying to initialise with wrong params error
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->queuesize), s_eobj_ownname, "cbkmancfg->queuesize is 0");
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != cbkmancfg->queuesize), s_eobj_ownname, "cbkmancfg->queuesize is 0", NULL);
 
 
     // i prepare the task able to execute callbacks actions associated to expiry of the timers or on gpio
     s_eos_callbackmanager.tsk = eos_foop_GetHandle();
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eos_callbackmanager.tsk), s_eobj_ownname, "eos_callbackman_Initialise(): FOOP not yet initialised");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eos_callbackmanager.tsk), s_eobj_ownname, "eos_callbackman_Initialise(): FOOP not yet initialised", NULL);
 
     // i initialise the base callback manager
     eov_callbackman_hid_Initialise(s_eos_callbackman_execute, s_eos_callbackmanager.tsk);

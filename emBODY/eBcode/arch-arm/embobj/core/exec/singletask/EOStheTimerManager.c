@@ -147,7 +147,7 @@ extern EOStheTimerManager * eos_timerman_Initialise(const eOstimerman_cfg_t *tmr
     }
     
     // trying to initialise with wrong params error
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->timernum), s_eobj_ownname, "tmrmancfg->timernum is 0");
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->timernum), s_eobj_ownname, "tmrmancfg->timernum is 0", NULL);
     
     s_eos_thetimermanager.numtimers = tmrmancfg->timernum; 
 

@@ -85,8 +85,8 @@ extern EOSmutex* eos_mutex_New(eOres_fp_voidp_uint32_t hal_sys_criticalsection_t
     EOSmutex *retptr = NULL;   
     
     
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != hal_sys_criticalsection_take), s_eobj_ownname, "_take is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != hal_sys_criticalsection_release), s_eobj_ownname, "_release is NULL");     
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != hal_sys_criticalsection_take), s_eobj_ownname, "_take is NULL", NULL);
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != hal_sys_criticalsection_release), s_eobj_ownname, "_release is NULL", NULL);     
 
     // i get the memory for the mutex object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOSmutex), 1);
