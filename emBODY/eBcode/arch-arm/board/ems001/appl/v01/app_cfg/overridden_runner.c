@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
@@ -29,6 +28,7 @@
 #include "EoCommon.h"
 #include "EOarray.h"
 #include "EOtheErrorManager.h"
+#include "EoError.h"
 
 //appl
 #include "EOMtheEMSappl.h"
@@ -126,7 +126,8 @@ extern uint64_t eom_emsrunner_txprevduration;
 // --------------------------------------------------------------------------------------------------------------------
 
 //RX
-static void s_eom_emsrunner_hid_read_can_messages(eOcanport_t port, eObool_t all, uint8_t max);
+// marco.accame: commented it out on nov 26 2014 because it is not used and the compiler complains
+//static void s_eom_emsrunner_hid_read_can_messages(eOcanport_t port, eObool_t all, uint8_t max);
 
 
 //DO
@@ -208,7 +209,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         {
             //reset netvar
             res = eo_appTheDB_GetSkinStArray10CanFramesPtr(eo_appTheDB_GetHandle(), skId,  &arrayof10canframes_ptr);
-            eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetSkinStArray10CanFramesPtr");
+            eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "err in GetSkinStArray10CanFramesPtr", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
             
             eo_array_Reset((EOarray*)arrayof10canframes_ptr);
             
@@ -217,10 +218,10 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         else
         {
             res = eo_appCanSP_GetNumOfRecCanframe(cansp, (eOcanport_t)port, &numofRXcanframe);
-            eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
+            eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "err in GetNumOfRecCanframe", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
         }
     
-         #ifdef _GET_CANQUEUE_STATISTICS_
+        #ifdef _GET_CANQUEUE_STATISTICS_
         eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
         #endif
         eo_appCanSP_read(cansp, (eOcanport_t)port, numofRXcanframe, NULL); 
@@ -255,13 +256,13 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
         case applrunMode__2foc:
         {
             s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(p);
-        }break;
+        } break;
         
         case applrunMode__mc4Only:
         case applrunMode__skinAndMc4:
         {
             s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(p);
-        }break;
+        } break;
         
         case applrunMode__skinOnly:
         {
@@ -279,7 +280,6 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
-
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     uint8_t numoftxframe_p1, numoftxframe_p2;
     
@@ -290,7 +290,6 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
     eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport1, numoftxframe_p1);
     eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport2, numoftxframe_p2);
 #endif
-
 }
 
 
@@ -300,7 +299,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOresult_t res[2];
  
- //before wait can, check link status!!
+    // before wait can, check link status!!
     count_ethlink_status ++;
     if(runner_countmax_check_ethlink_status == count_ethlink_status)
     {
@@ -322,8 +321,8 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     if((eores_NOK_timeout ==  res[0]) || (eores_NOK_timeout ==  res[1]))
     {
         eo_dgn_emsapplcore.core.runst.cantxfailuretimeoutsemaphore++;
-        eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
-
+        // marco.accame: for now we dont use this but the error manager inside function eo_appCanSP_wait_XXX()
+        //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
     }
     
 }
@@ -331,28 +330,46 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 
 extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
 {
-    eOemsrunner_diagnosticsinfo_t *dgn_ptr = eom_emsrunner_GetDiagnosticsInfoHandle(p);
-    if(NULL == dgn_ptr)
-    {
-        return;
-    }
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runner_udptxfailure);
+    errdes.param            = 0;
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;    
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
+        
+// marco.accame: removed because it does nothing        
+//    eOemsrunner_diagnosticsinfo_t *dgn_ptr = eom_emsrunner_GetDiagnosticsInfoHandle(p);
+//    if(NULL == dgn_ptr)
+//    {
+//        return;
+//    }
+    
     eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
+    // marco.accame: for now i remove the action of this object and i call only the errormanager. for later we can have both the error handlers
+    //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
 
 }
 
 extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
 {
-    eOemstransceiver_diagnosticsinfo_t* dgn_ptr = eom_emstransceiver_GetDiagnosticsInfoHandle(p);
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runner_transceivererror);
+    errdes.param            = 0;
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;    
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
     
-    if(NULL == dgn_ptr)
-    {
-        return;
-    }
+// marco.accame: removed because it does nothing     
+//    eOemstransceiver_diagnosticsinfo_t* dgn_ptr = eom_emstransceiver_GetDiagnosticsInfoHandle(p);    
+//    if(NULL == dgn_ptr)
+//    {
+//        return;
+//    }
+    // marco.accame: for now i remove the action of this object and i call only the errormanager. for later we can have both the error handlers
     eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
-    
+    //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);    
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -784,28 +801,28 @@ static void s_checkEthLinks(void)
 }
 
 
-static void s_eom_emsrunner_hid_read_can_messages(eOcanport_t port, eObool_t all, uint8_t max)
-{
-    EOappCanSP*  cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    uint8_t      numofRXcanframe = 0;
-    eOresult_t   res;
-    
-    if(all)
-    {
-        res = eo_appCanSP_GetNumOfRecCanframe(cansp, port, &numofRXcanframe);
-        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "emsrunner_hid", "err in GetNumOfRecCanframe");
-    }
-    else
-    {
-        numofRXcanframe = max;
-    }
-    
-    #ifdef _GET_CANQUEUE_STATISTICS_
-        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
-    #endif
-    eo_appCanSP_read(cansp, port, numofRXcanframe, NULL); 
-
-}
+// marco.accame: commented it out on nov 26 2014 because it is not used and the compiler complains
+//static void s_eom_emsrunner_hid_read_can_messages(eOcanport_t port, eObool_t all, uint8_t max)
+//{
+//    EOappCanSP*  cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    uint8_t      numofRXcanframe = 0;
+//    eOresult_t   res;
+//    
+//    if(all)
+//    {
+//        res = eo_appCanSP_GetNumOfRecCanframe(cansp, port, &numofRXcanframe);
+//        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "err in GetNumOfRecCanframe", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
+//    }
+//    else
+//    {
+//        numofRXcanframe = max;
+//    }
+//    
+//    #ifdef _GET_CANQUEUE_STATISTICS_
+//        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
+//    #endif
+//    eo_appCanSP_read(cansp, port, numofRXcanframe, NULL); 
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
