@@ -329,14 +329,14 @@ extern EOVtheIPnet * eov_ipnet_hid_Initialise(uint8_t maxdgramsocks, EOVmutexDer
     // trying to initialise with no sockets ? we can do it ... but better to inform someone.
     if(0 == maxdgramsocks)
     {
-        eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, "... ZERO EOsocketDatagram are initted"); 
+        eo_errman_Info(eo_errman_GetHandle(), "eov_ipnet_hid_Initialise(): 0 maxdgramsocks", s_eobj_ownname, &eo_errman_DescrWrongParamLocal); 
     }
     
     // of the vtable alert can be NULL.
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != attach_fn, s_eobj_ownname, "attach_fn() is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != attach_fn, s_eobj_ownname, "detach_fn() is NULL");
-    eo_errman_Assert(eo_errman_GetHandle(), NULL != arp_fn, s_eobj_ownname, "arp_fn() is NULL");
-//    eo_errman_Assert(eo_errman_GetHandle(), NULL != gettask_fn, s_eobj_ownname, "gettask_fn() is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != attach_fn, "eov_ipnet_hid_Initialise(): NULL attach_fn", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != attach_fn, "eov_ipnet_hid_Initialise(): NULL detach_fn", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+    eo_errman_Assert(eo_errman_GetHandle(), NULL != arp_fn, "eov_ipnet_hid_Initialise(): NULL arp_fn", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+//    eo_errman_Assert(eo_errman_GetHandle(), NULL != gettask_fn, "gettask_fn() is NULL", s_eobj_ownname, NULL);
 
     // initialise vtable
     s_ipnet.vtable[VF00_attach]              = attach_fn;

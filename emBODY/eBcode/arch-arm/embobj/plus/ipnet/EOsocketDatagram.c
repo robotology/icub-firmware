@@ -113,7 +113,7 @@ extern EOsocketDatagram* eo_socketdtg_New(uint8_t dtg_in_num, uint16_t dtg_in_si
     // i get the memory for the object
     retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOsocketDatagram), 1);
 
-    eo_errman_Assert(eo_errman_GetHandle(), (0 != (dtg_in_num+dtg_out_num)), s_eobj_ownname, "at least one pkt queue");
+    eo_errman_Assert(eo_errman_GetHandle(), (0 != (dtg_in_num+dtg_out_num)), "eo_socketdtg_New() needs at least one pkt queue", s_eobj_ownname, NULL);
 
     // get the base object
     retptr->socket = eo_socket_New();
@@ -155,17 +155,17 @@ extern eOresult_t eo_socketdtg_Open(EOsocketDatagram *p, eOipv4port_t localport,
 
     if(((dir == eo_sktdir_TXonly) ||  (dir == eo_sktdir_TXRX)) && (NULL == p->dgramfifooutput))
     {
-        eo_errman_Assert(eo_errman_GetHandle(), 0, s_eobj_ownname, "eo_socketdtg_Open() needs an output queue");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eo_socketdtg_Open() needs an output queue", s_eobj_ownname, NULL);
     }
 
     if(((dir == eo_sktdir_RXonly) ||  (dir == eo_sktdir_TXRX)) && (NULL == p->dgramfifoinput))
     {
-        eo_errman_Assert(eo_errman_GetHandle(), 0, s_eobj_ownname, "eo_socketdtg_Open() needs an input queue");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eo_socketdtg_Open() needs an input queue", s_eobj_ownname, NULL);
     }
     
     if((NULL == p->dgramfifoinput) && (eobool_true == block2wait4packet))
     {
-        eo_errman_Assert(eo_errman_GetHandle(), 0, s_eobj_ownname, "eo_socketdtg_Open(): socket cannot be in blocking mode if tx only");
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eo_socketdtg_Open(): socket cannot be in blocking mode if tx only", s_eobj_ownname, NULL);
     }
     
     if(NULL != txmode)
