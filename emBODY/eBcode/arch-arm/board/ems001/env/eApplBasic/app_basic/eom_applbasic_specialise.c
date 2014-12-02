@@ -98,7 +98,7 @@ extern void task_periodic(void *p);
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+static void s_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t* caller, const eOerrmanDescriptor_t* des);
 
 static void s_udpserver_startup(EOMtask *p, uint32_t t);
 
@@ -177,7 +177,7 @@ extern void eom_applbasic_specialise_updserver_start(void)
 
     s_host_connected = eobool_false;
 
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_sem_tx_pkt), "applbasic_specialise", "semaphore is NULL");
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_sem_tx_pkt), "semaphore is NULL", "applbasic_specialise", NULL);
 
     s_task_udpserver = eom_task_New(eom_mtask_EventDriven, 100, 2*1024, s_udpserver_startup, s_udpserver_run,  6, 
                                     eok_reltimeINFINITE, NULL, 
@@ -310,12 +310,15 @@ extern void task_periodic(void *p)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+static void s_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t* caller, const eOerrmanDescriptor_t* des)
 {
-    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
+    const char err[5][16] = {"info", "debug", "warning", "error", "fatal"};
     char str[128];
 
-    snprintf(str, sizeof(str)-1, "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    if(NULL != caller)
+    {
+        snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", caller->eobjstr, caller->taskid, err[(uint8_t)errtype], info);
+    }
     hal_trace_puts(str);
 
     if(errtype <= eo_errortype_warning)
