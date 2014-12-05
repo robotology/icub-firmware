@@ -21,7 +21,8 @@
 #	error "No valid version specified"
 #endif
 
-Int16 _max_position_enc_tmp[JN] = INIT_ARRAY (0);
+Int16 _max_position_enc_tmp[JN]      = INIT_ARRAY (0);
+Int32 _position_of_some_time_ago[JN] = INIT_ARRAY (0);
 
 //helper functions
 void helper_calib_hard_stops(byte channel, Int16 param1,Int16 param2, Int16 param3);
@@ -38,23 +39,36 @@ void helper_calib_eyes(byte channel, Int16 param1,Int16 param2, Int16 param3);
 void check_in_position_calib(byte jnt)
 {
 	Int32 temporary_long;
-	bool temporary_cond1;
-	bool temporary_cond2; 
-	bool temporary_cond3; 
+	bool temporary_cond1 = true;
+	bool temporary_cond2 = true; 
+	bool temporary_cond3 = true; 
+	static int time_passed_counter = 0;
 	
 	// increase the counter for the calibration (wait for the movement to start)
 	_counter_calib +=1;
-	// final consideration reached? and ... 
+	
+	// time_passed_counter is used to obtain the position of some time ago and check if the joint moved
+	time_passed_counter +=1;
+	if (time_passed_counter > 20)
+	{
+		time_passed_counter = 0;
+		_position_of_some_time_ago[jnt] =_position[jnt] ;
+	}
+	
+	// three different type of calibration:
+	// 1: MODE_CALIB_ABS_POS_SENS
 	temporary_long = (Int32) extract_h(_filt_abs_pos[jnt]);
-	temporary_cond1 = (__abs( temporary_long - _abs_pos_calibration[jnt]) < INPOSITION_CALIB_THRESHOLD);
-	temporary_cond2 = (_position[jnt] == _position_old[jnt]);
-	// ... control mode is calibration? and ...
 	temporary_cond1 = temporary_cond1 && (_control_mode[jnt] == MODE_CALIB_ABS_POS_SENS);
-	temporary_cond2 = temporary_cond2 && (_control_mode[jnt] == MODE_CALIB_HARD_STOPS);
-	temporary_cond3 =                    (_control_mode[jnt] == MODE_CALIB_ABS_AND_INCREMENTAL);
-	// ... trajecotry ended? 
+	temporary_cond1 = temporary_cond1 && (__abs( temporary_long - _abs_pos_calibration[jnt]) < INPOSITION_CALIB_THRESHOLD);
 	temporary_cond1 = temporary_cond1 && _ended[jnt];
+
+	// 2: MODE_CALIB_HARD_STOPS		
+	temporary_cond2 = temporary_cond2 && (_control_mode[jnt] == MODE_CALIB_HARD_STOPS);
+	temporary_cond2 = temporary_cond2 &&(_position[jnt] == _position_of_some_time_ago[jnt]) && (time_passed_counter == 19);
 	temporary_cond2 = temporary_cond2 && (_counter_calib > 1200);
+	
+	// 3: MODE_CALIB_ABS_AND_INCREMENTAL
+	temporary_cond3 = temporary_cond3 && (_control_mode[jnt] == MODE_CALIB_ABS_AND_INCREMENTAL);
 	temporary_cond3 = temporary_cond3 && _ended[jnt];
 	
 	if (temporary_cond1 | temporary_cond2 | temporary_cond3)
