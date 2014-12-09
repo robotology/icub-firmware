@@ -123,7 +123,7 @@ extern void task_ethcommand(void *p);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
 
 static void s_eom_eupdater_main_init(void);
 
@@ -218,15 +218,18 @@ extern void task_ethcommand(void *p)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
+static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
-    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
+    //const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
     char str[128];
 
-    snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    const char EOu[] = "EO?";
+    const char *eobjstr = (NULL == caller) ? (EOu) : (caller->eobjstr);
+    eOid08_t taskid = (NULL == caller) ? (0) : (caller->taskid);
+    snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype), info);
     hal_trace_puts(str);
 
-    if(errtype <= eo_errortype_warning)
+    if(errtype <= eo_errortype_error)
     {
         return;
     }
