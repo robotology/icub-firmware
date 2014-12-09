@@ -1110,12 +1110,10 @@ else \
 	{ \
 		dword tmp; \
 		tmp = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		if (tmp<=MAX_CURRENT) _max_allowed_current[axis]=tmp;\
-		else can_printf("MAX CURRENT BIGGER THEN MAX:%d",axis);\
+		if  (tmp>0 && tmp<=MAX_CURRENT) _max_allowed_current[axis]=tmp;\
+		else can_printf("INVALID MAX CURRENT PARAM J%d",axis);\
 	} \
 }
-
-//	_conversion_factor[axis] = (tmp * 3.3) / 32760.0f; \
 
 //-------------------------------------------------------------------
 #define CAN_GET_ERROR_STATUS_HANDLER(x) \
