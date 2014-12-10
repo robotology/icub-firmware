@@ -411,6 +411,13 @@ bool mode_is_idle(byte axis)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
+bool mode_is_openloop(byte axis)
+{
+	if (_control_mode[axis] == MODE_OPENLOOP) return true;
+	return false;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
 bool mode_is_stiff(byte axis)
 {
 	if (_control_mode[axis] == MODE_IDLE)     return false;
