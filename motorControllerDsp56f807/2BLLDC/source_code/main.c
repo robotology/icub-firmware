@@ -291,8 +291,10 @@ void main(void)
 			for (i=0; i<JN; i++) _speed[i] = (Int16)(_position[i] - _position_old[i]);
 
 	#elif VERSION==0x0162	
-	
-			for (i=0; i<JN; i++) _speed[i] = (Int16)(_position_enc[i] - _position_enc_old[i]);	
+            _motor_speed[0] = (Int16)  (_position_enc[0] - _position_enc_old[0]);
+            _motor_speed[1] = (Int16)  (_position_enc[1] - _position_enc_old[1]);
+            _speed[0]       = (Int32)  (_motor_speed[0]  - _motor_speed[1]);
+            _speed[1]       = (Int32)  (_motor_speed[0]  + _motor_speed[1]);
 	#endif 
 			/* this can be useful to estimate acceleration later on */
 			for (i=0; i<JN; i++) _accel[i] = (_speed[i] - _speed_old[i]);

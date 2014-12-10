@@ -645,16 +645,16 @@ Int32 compute_pid2(byte j)
 		ProportionalPortion = -(-ProportionalPortion >> _kr[j]);
 	}
 	
-#if VERSION==0x162
+#if VERSION==0x0162
 	
 	/* Derivative */	
 	if (j==0)
 	{
-		DerivativePortion = ((Int32) -(_speed[0]-_speed[1])) * ((Int32) _kd[j]);	
+		DerivativePortion = ((Int32) -(_motor_speed[0]-_motor_speed[1])) * ((Int32) _kd[j]);	
 	}
 	else 
 	{
-		DerivativePortion = ((Int32) -(_speed[0]+_speed[1])) * ((Int32) _kd[j]);	
+		DerivativePortion = ((Int32) -(_motor_speed[0]+_motor_speed[1])) * ((Int32) _kd[j]);	
 	}
 
 	if (DerivativePortion>=0)
