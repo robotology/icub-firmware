@@ -548,6 +548,7 @@ int CAN1_handleRx (unsigned int board_id)
 
                     //new_board_MODE = board_MODE;
 					board_MODE = CALIB;
+					can_transmission_enabled=1;
 					//EnableIntT1;
                     if(can_transmission_enabled)
                         can_enaDisa_transmission_messages(1);
@@ -582,8 +583,6 @@ int CAN1_handleRx (unsigned int board_id)
 
                         LISInit(l3a);
 					}
-
-
 					board_MODE=CALIB;
 					EnableIntT1;
                 }

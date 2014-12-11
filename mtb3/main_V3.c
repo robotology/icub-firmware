@@ -714,7 +714,7 @@ if (DIG_GYRO || DIG_ACC)
             default: break;
             } //switch
         }//if (flag==1)
-        CAN1_handleRx(_board_ID);
+     CAN1_handleRx(_board_ID);
     	  
     }//for(;;)
 }//main
