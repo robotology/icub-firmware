@@ -8,6 +8,7 @@
 #include "can1.h"
 #include "identification.h"
 #include "check_range.h"
+#include "reference_decoupling.h"
 #include "control_enable.h"
 
 /* stable global data */
@@ -596,6 +597,102 @@ Int32 compute_pid_torque(byte j, Int16 strain_val)
 	_pi[j] = IntegralPortion;
 	PIDoutput = L_add(_pd[j], IntegralPortion);
 	
+	return PIDoutput;
+}
+
+/*
+ * compute PID control at motor level (integral is implemented).
+ */
+Int32 compute_pid2_motor(byte j)
+{
+	Int32 ProportionalPortion, DerivativePortion, IntegralPortion;
+	Int32 IntegralError;
+	
+	Int32 PIDoutput;
+	Int32 InputError;
+	byte i=0;
+	byte k=0;
+
+	static Int32 DerAccu[JN]=INIT_ARRAY(0);  
+	static byte headDerPor[JN]=INIT_ARRAY(0);  
+	static byte tailDerPor[JN]=INIT_ARRAY(0); 
+	static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
+	
+	/* the error @ previous cycle */
+	_error_position_old[j] = _error_position[j];
+
+	/* decouple the reference from the joint space to the motor space*/
+	decouple_reference();
+	
+	/* computes the error in the motor space"*/
+	InputError = L_sub(_desired[j], _position_enc[j]);
+		
+	if (InputError > MAX_16)
+		_error_position[j] = MAX_16;
+	else
+	if (InputError < MIN_16) 
+		_error_position[j] = MIN_16;
+	else
+	{
+		_error_position[j] = extract_l(InputError);
+	}
+			
+	/* Proportional */
+	ProportionalPortion = ((Int32) _error_position[j]) * ((Int32)_kp[j]);
+	
+	if (ProportionalPortion>=0)
+	{
+		ProportionalPortion = ProportionalPortion >> _kr[j]; 
+	}
+	else
+	{
+		ProportionalPortion = -(-ProportionalPortion >> _kr[j]);
+	}
+	
+	/* Derivative */	
+	DerivativePortion = ((Int32) (_error_position[j]-_error_position_old[j])) * ((Int32) _kd[j]);
+
+	if (DerivativePortion>=0)
+	{
+		DerivativePortion = DerivativePortion >> _kr[j]; 
+	}
+	else
+	{
+		DerivativePortion = -(-DerivativePortion >> _kr[j]);
+	}
+  
+	/* Integral */
+	IntegralError =  ( (Int32) _error_position[j]) * ((Int32) _ki[j]);
+
+	_integral[j] = _integral[j] + IntegralError;
+	IntegralPortion = _integral[j];
+	
+	if (IntegralPortion>=0)
+	{
+		IntegralPortion = (IntegralPortion >> _kr[j]); // integral reduction 
+	}
+	else
+	{
+		IntegralPortion = -((-IntegralPortion) >> _kr[j]); // integral reduction 
+	} 
+	
+	/* Accumulator saturation */
+	if (IntegralPortion >= _integral_limit[j])
+	{
+		IntegralPortion = _integral_limit[j];
+		_integral[j] =  _integral_limit[j];
+	}		
+	else if (IntegralPortion < - (_integral_limit[j]))
+	{
+		IntegralPortion = - (_integral_limit[j]);
+		_integral[j] = (-_integral_limit[j]);
+	}
+		
+	_pd[j] = L_add(ProportionalPortion, DerivativePortion);
+	_pi[j] = IntegralPortion;
+	PIDoutput = L_add(_pd[j], IntegralPortion);
+
+					
 	return PIDoutput;
 }
 
