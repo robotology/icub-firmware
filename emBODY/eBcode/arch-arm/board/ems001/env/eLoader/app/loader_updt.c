@@ -332,56 +332,114 @@ static eEboardInfo_t s_loader_boardinfo =
 
 #elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
 
-static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+
+
+static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
-    .info           =
+    .moduleinfo     =
     {
-        .entity     =
+        .info           =
         {
-            .type       = ee_entity_process,
-            .signature  = ee_procLoader,
-            .version    = 
-            { 
-                .major = 2, 
-                .minor = 9
-            },  
-            .builddate  = 
+            .entity     =
             {
-                .year  = 2014,
-                .month = 9,
-                .day   = 17,
-                .hour  = 16,
-                .min   = 0
-            }
+                .type       = ee_entity_process,
+                .signature  = ee_procLoader,
+                .version    = 
+                { 
+                    .major = 2, 
+                    .minor = 10
+                },  
+                .builddate  = 
+                {
+                    .year  = 2014,
+                    .month = 12,
+                    .day   = 11,
+                    .hour  = 14,
+                    .min   = 0
+                }
+            },
+            .rom        = 
+            {   
+                .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
+                .size   = EENV_MEMMAP_ELOADER_ROMSIZE
+            },
+            .ram        = 
+            {   
+                .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
+                .size   = EENV_MEMMAP_ELOADER_RAMSIZE
+            },
+            .storage    = 
+            {
+                .type   = ee_strg_none,
+                .size   = 0,
+                .addr   = 0
+            },
+            .communication  = ee_commtype_none,
+            .name           = "eLoader"
         },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
-        },
-        .storage    = 
+        .protocols  =
         {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
+            .udpprotversion  = { .major = 0, .minor = 0},
+            .can1protversion = { .major = 0, .minor = 0},
+            .can2protversion = { .major = 0, .minor = 0},
+            .gtwprotversion  = { .major = 0, .minor = 0}
         },
-        .communication  = ee_commtype_none,
-        .name           = "eLoader"
+        .extra      = {"EXT"}
     },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
+    .compilationdatetime    = __DATE__ " " __TIME__,
+    .userdefined            = {0}
 };
+
+//static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+//{
+//    .info           =
+//    {
+//        .entity     =
+//        {
+//            .type       = ee_entity_process,
+//            .signature  = ee_procLoader,
+//            .version    = 
+//            { 
+//                .major = 2, 
+//                .minor = 9
+//            },  
+//            .builddate  = 
+//            {
+//                .year  = 2014,
+//                .month = 9,
+//                .day   = 17,
+//                .hour  = 16,
+//                .min   = 0
+//            }
+//        },
+//        .rom        = 
+//        {   
+//            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
+//            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
+//        },
+//        .ram        = 
+//        {   
+//            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
+//            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
+//        },
+//        .storage    = 
+//        {
+//            .type   = ee_strg_none,
+//            .size   = 0,
+//            .addr   = 0
+//        },
+//        .communication  = ee_commtype_none,
+//        .name           = "eLoader"
+//    },
+//    .protocols  =
+//    {
+//        .udpprotversion  = { .major = 0, .minor = 0},
+//        .can1protversion = { .major = 0, .minor = 0},
+//        .can2protversion = { .major = 0, .minor = 0},
+//        .gtwprotversion  = { .major = 0, .minor = 0}
+//    },
+//    .extra      = {0}
+//};
 
 
 static eEboardInfo_t s_loader_boardinfo =                        
@@ -644,7 +702,7 @@ static void s_loader_shared_services_init(void)
     // now all are initted. then ...
 
     // put signature in partition table
-    if(ee_res_OK != ee_sharserv_part_proc_synchronise(ee_procLoader, &s_loader_info))
+    if(ee_res_OK != ee_sharserv_part_proc_synchronise(ee_procLoader, (const eEmoduleInfo_t *)&s_loader_info_extended))
     {
         s_loader_manage_error(20, 80);
     }    
