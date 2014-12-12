@@ -84,7 +84,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          46
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          47
 //  </h>version
 
 //  <h> build date
@@ -93,11 +93,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        12
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          2
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          11
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         17
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          30
 //  </h>build date
 
 // </h>Info 
@@ -841,60 +841,85 @@ extern "C" {
 // -------------------------------------------------------------------------------------------------------------------
 
 // in here we put only the macros required for the reference application
+#if defined(ICUB_GENOVA04)
+    #define NAME_PREFIX     aEMS
+    //#define NAME_POSTFIX    v1mec
+    #define NAME_POSTFIX    gen04
+#else
+    #define NAME_PREFIX     aEMS
+    #define NAME_POSTFIX    v2mec
+#endif    
+
+#define PPCAT_NX(A, B, C)   A ## B ## C
+#define PPCAT(A, B, C)      PPCAT_NX(A, B, C)
+
+#define STRINGIZE_NX(A)     #A
+#define STRINGIZE(A)        STRINGIZE_NX(A)
 
 #if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB1
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB1"
+        #define     NUM     01
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b01.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg     
 #elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB2
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB2"
+        #define     NUM     02
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b02.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg       
 #elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB3
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB3"
+        #define     NUM     03
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b03.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg       
 #elif   (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB4
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB4"
+        #define     NUM     04
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b04.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b04_nvsetDEVcfg
 #elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB5
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB5"
+        #define     NUM     05
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b05.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b05_nvsetDEVcfg
 #elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB6
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB6"
+        #define     NUM     06
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b06.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b06_nvsetDEVcfg
 #elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB7
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB7"
+        #define     NUM     07
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b07.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b07_nvsetDEVcfg
 #elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB8
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB8"
+        #define     NUM     08
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b08.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b08_nvsetDEVcfg
 #elif   (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB9
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB9"
+        #define     NUM     09
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b09.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b09_nvsetDEVcfg
 #elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB10
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB10"
+        #define     NUM     10
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b10.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b10_nvsetDEVcfg
 #elif   (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB11
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB11"
+        #define     NUM     11
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b11.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b11_nvsetDEVcfg
 #endif
