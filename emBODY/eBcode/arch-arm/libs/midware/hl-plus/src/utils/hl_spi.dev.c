@@ -442,7 +442,6 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id)
         
     SPI_InitTypeDef SPI_InitStructure;
 
-
     if(NULL != cfg->advcfg)
     {
         // use advcfg. it has the same layout as SPI_InitTypeDef

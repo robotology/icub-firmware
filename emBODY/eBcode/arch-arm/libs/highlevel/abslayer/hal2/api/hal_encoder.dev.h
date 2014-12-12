@@ -134,12 +134,13 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
 /** @fn			extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id)
     @brief  	This function starts reading of data from the encoder of type 2 (AMO board) in a non-blocking way.
               When reading is finished, then the callback on reception is invoked, which can
-              retrieve the value with hal_encoder_read().
+              retrieve the value with hal_encoder_get_value_t2.
     @param  	encoder 	    the encoder
 		@param  	reg_address 	address of the status register to be read to validate the sensor data
+		@param  	sdata_check 	boolean value to choose if it's possible to skip the sensor data status check (FALSE) or if it's needed (TRUE)
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id, uint8_t reg_address);
+extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id, uint8_t reg_address, hal_bool_t sdata_check);
 
 /** @fn				extern hal_result hal_encoder_get_value_t2(hal_encoder_t id, uint32_t* pos, hal_bool_t* validity, uint16_t* flags);
     @brief  	This function reads data previously acquired by a call of hal_encoder_read_start_t2().
@@ -153,14 +154,12 @@ extern hal_result_t hal_encoder_get_value_t2(hal_encoder_t id, uint32_t* pos, ha
 
 /** @fn				extern hal_result hal_encoder_get_frame(hal_encoder_t id, uint32_t* byte1, ...);
     @brief  	This function reads raw data previously acquired by a call of hal_encoder_read_start() or hal_encoder_read_start_t2().
-							In this way it's possible to read the single bytes written inside the structure for the received frame 
+							In this way it's possible to read the single bytes written inside the structure for the received frame of sensor data
     @param  	encoder 	    the encoder
-    @param  	byte1 	      keeps the first byte.
-		@param  	byte2 	    	keeps the second byte.
-		...
+    @param  	bytes 	      keeps the bytes received.
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t * rec_byte1, uint8_t * rec_byte2, uint8_t * rec_byte3, uint8_t * rec_byte4);
+extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes);
 
 /** @}            
     end of group doxy_group_hal_encoder  

@@ -175,7 +175,7 @@ void userdef1(void);
 void userdef2(void);
 void userdef3(void);
 void userdef4(void);
-void encoder_complete_read(void);
+void encoders_complete_read(void);
 static void brd_eventviewer_init(void);
 #endif//USE_EVENTVIEWER
 
@@ -451,7 +451,7 @@ void userdef2(void){}
 void userdef3(void){}
 void userdef4(void){}
 		
-void encoder_complete_read(void){}
+void encoders_complete_read(void){}
 
 // EventViewer Initialization
 static void brd_eventviewer_init(void)
@@ -467,8 +467,8 @@ static void brd_eventviewer_init(void)
     eventviewer_load(ev_ID_first_usrdef+3, userdef3);
     eventviewer_load(ev_ID_first_usrdef+4, userdef4);
 		
-		eventviewer_load(ev_ID_first_usrdef+5, encoder_complete_read);
-    
+		eventviewer_load(ev_ID_first_usrdef+5, encoders_complete_read);
+
     // the eventviewer shall stay most of time in idle
     // apart from some specific actions: systick, userdef1 and userdef2
     eventviewer_switch_to(ev_ID_idle);
@@ -1758,142 +1758,217 @@ static void test_periph_eth(void)
 #include "hal_encoder.h"
 
 // Callback variables
-/*
-static hal_encoder_position_t positioncbk = 0;
-static hal_bool_t val = hal_false;
-static uint16_t regs = 0x00;
-static uint8_t rstatus = 0x00;
-static uint8_t rdata = 0x00;
-static char str[256];
-*/
+static volatile hal_bool_t ready12 = hal_false;
+static volatile hal_bool_t ready34 = hal_false;
+static hal_bool_t sdata_check = hal_false;
+static uint8_t reg_to_read = 0x77;
 
-static void test_encoder_cbk(void* arg);
+// Callback functions
+static void test_encoder_cbk1(void* arg);
+static void test_encoder_cbk2(void* arg);
+static void test_encoder_cbk3(void* arg);
+static void test_encoder_cbk4(void* arg);
+static void test_encoder_cbk5(void* arg);
 
+//First two encoders mapped to P6 and P8 (ems4rd)
 static const hal_encoder_t hal_encoder_1 = hal_encoder1;
-// Encoder 2 is the number 4 (it's mapped to work on the other SPI, otherwise I have configurations conflict)
-static const hal_encoder_t hal_encoder_2 = hal_encoder4;
+static const hal_encoder_t hal_encoder_2 = hal_encoder2;
+
+//Other two encoders mapped to P7 and P9 (ems4rd)
+static const hal_encoder_t hal_encoder_3 = hal_encoder4;
+static const hal_encoder_t hal_encoder_4 = hal_encoder5;
+
+// Encoder of type 1 mapped on P10 (ems4rd)
+static const hal_encoder_t hal_encoder_5 = hal_encoder3;
 
 evEntityId_t prev_act;
 static void test_encoder(void)
 {
+		//Wait some time, for:
+		// - voltage stabilization of the ICMU chip (~2,7 ms)
+ 		// - power up time of the chip itself (EEPROM data valid) (typical = 20ms)
+		// For the sake of security, wait at least for 23/25 ms
+		hal_sys_delay(25*hal_RELTIME_1millisec);
+	
 		//Encoder struct config init: priority, callback function, arg
-		//Encoder 1 of type 2 (AMO)
-    static hal_encoder_cfg_t encodercfg1 =
+		//4 encoders of type 2 (AMO)
+		//only the callback changes in the config struct
+    static const hal_encoder_cfg_t encodercfg1 =
     {
         .priority           = hal_int_priority03,
-        .callback_on_rx     = NULL,
+				.callback_on_rx     = test_encoder_cbk1,
         .arg                = NULL,
 				.type								= hal_encoder_t2
     };
     
-		//Encoder 2 of type 1 (AEA)
-		static hal_encoder_cfg_t encodercfg2 =
+		static const hal_encoder_cfg_t encodercfg2 =
     {
         .priority           = hal_int_priority03,
-        .callback_on_rx     = NULL,
+				.callback_on_rx     = test_encoder_cbk2,
+        .arg                = NULL,
+				.type								= hal_encoder_t2
+    };
+    
+		static const hal_encoder_cfg_t encodercfg3 =
+    {
+        .priority           = hal_int_priority03,
+				.callback_on_rx     = test_encoder_cbk3,
+        .arg                = NULL,
+				.type								= hal_encoder_t2
+    };
+    
+		static const hal_encoder_cfg_t encodercfg4 =
+    {
+        .priority           = hal_int_priority03,
+				.callback_on_rx     = test_encoder_cbk4,
+        .arg                = NULL,
+				.type								= hal_encoder_t2
+    };
+		
+		// Encoder 5 of type 1
+		static const hal_encoder_cfg_t encodercfg5 =
+    {
+        .priority           = hal_int_priority03,
+				.callback_on_rx     = test_encoder_cbk5,
         .arg                = NULL,
 				.type								= hal_encoder_t1
     };
 		
-		// Initialize position to 0
-    hal_encoder_position_t position = 0;
-		
-		// Initialize test bytes for sensor data and reg status
-		uint8_t byte1;
-		uint8_t byte2;
-		uint8_t byte3;
-		uint8_t byte4;
-		
-		// Initialize array [256]  to 0 (trace string to be printed for debug)
+		//Initialize array [256]  to 0 (trace string to be printed for debug)
     char str[256] = {0};
 
     hal_result_t res = hal_res_NOK_generic;
 		
 		// Initialize the encoders with the config struct
+		// Actual config: 4 AMO ENCODERS on two different SPI
     res = hal_encoder_init(hal_encoder_1, &encodercfg1);
-    res = res;
+		res = res;
 		
 		res = hal_encoder_init(hal_encoder_2, &encodercfg2);
-    res = res;
+		res = res;
 		
-    //uint32_t tt = 0;
-    
+		res = hal_encoder_init(hal_encoder_3, &encodercfg3);
+		res = res;
+		
+		res = hal_encoder_init(hal_encoder_4, &encodercfg4);
+		res = res;
+		
+		//res = hal_encoder_init(hal_encoder_5, &encodercfg5);
+		//res = res;
+		
+		hal_encoder_position_t position = 0;
 		hal_bool_t val = hal_false;
 		uint16_t regs = 0x00;
 		uint8_t rstatus = 0x00;
 		uint8_t rdata = 0x00;
-		uint8_t switch_register = 0;
-		
-		hal_encoder_read_start_t2(hal_encoder_1, 0x77);
-		// Forever loop
+		uint8_t rec_bytes[4];
+				
+		//Start reading (encoder 1 and encoder 3 can start to read in parallel (different SPI))
+		prev_act = eventviewer_switch_to(ev_ID_first_usrdef+5);
+		//hal_encoder_read_start (hal_encoder_5);
+		hal_encoder_read_start_t2 (hal_encoder_1, reg_to_read, sdata_check);
+		hal_encoder_read_start_t2 (hal_encoder_3, reg_to_read, sdata_check);
+		//Forever loop
     for(;;)
     {
-				/* Encoder 1 */
-				/* new version */
-				hal_sys_delay(500*hal_RELTIME_1millisec);
-			  prev_act = eventviewer_switch_to(ev_ID_first_usrdef+5);
+			 // Reading the 4 encoders (using callbacks). Before reading I wait that both pairs are ready
+			 while ((ready12 != hal_true) || (ready34 != hal_true));
+			 eventviewer_switch_to(prev_act);
 			
-				if (switch_register >= 9)
-				{
-				hal_encoder_read_start_t2(hal_encoder_1, 0x76);	
-				}
-				else
-				{
-				hal_encoder_read_start_t2(hal_encoder_1, 0x77);
-				}
-				
-				hal_encoder_get_value_t2 (hal_encoder_1, &position, &val, &regs);
-				rstatus = (regs >> 8) & 0xFF;
-				rdata = regs & 0xFF;
-				snprintf(str, sizeof(str), "Encoder 1 reading: %d, Validity: %d, "
-																	 "Register Status: 0x%x, Register Data: 0x%x", position, val, rstatus, rdata);
-				hal_trace_puts(str);
-				
-				/* Encoder 2 */
-        hal_sys_delay(500*hal_RELTIME_1millisec);
+			 //Encoder 1
+			 hal_encoder_get_value_t2 (hal_encoder_1, &position, &val, &regs);
+			 rstatus = (regs >> 8) & 0xFF;
+			 rdata = regs & 0xFF;
+			 snprintf(str, sizeof(str),	"Encoder 1 reading: %d, Validity: %d, "
+																	"Register 0x%x Status: 0x%x, Register 0x%x Data: 0x%x", position, val, reg_to_read, rstatus, reg_to_read, rdata);
+			 
+		   hal_trace_puts(str);
+			 //hal_encoder_get_frame (hal_encoder_1, rec_bytes);
+			 //snprintf(str, sizeof(str), "Encoder 1 received Frame: Byte1: 0x%x, Byte2: 0x%x, Byte3: 0x%x, Byte4: 0x%x", rec_bytes[0],rec_bytes[1],rec_bytes[2],rec_bytes[3]);
+			 //hal_trace_puts(str);
+			 position = 0, val = hal_false, regs = 0x00, rstatus = 0x00, rdata = 0x00;
+			 
+			 // Other encoders...
+			 //Encoder 2
+			 hal_encoder_get_value_t2 (hal_encoder_2, &position, &val, &regs);
+			 rstatus = (regs >> 8) & 0xFF;
+			 rdata = regs & 0xFF;
+			 snprintf(str, sizeof(str),	"Encoder 2 reading: %d, Validity: %d, "
+																	"Register 0x%x Status: 0x%x, Register 0x%x Data: 0x%x", position, val, reg_to_read, rstatus, reg_to_read, rdata);
+		   hal_trace_puts(str);
+			 position = 0, val = hal_false, regs = 0x00, rstatus = 0x00, rdata = 0x00;
+			 
+			 //Encoder 3
+			 hal_encoder_get_value_t2 (hal_encoder_3, &position, &val, &regs);
+			 rstatus = (regs >> 8) & 0xFF;
+			 rdata = regs & 0xFF;
+			 snprintf(str, sizeof(str),	"Encoder 3 reading: %d, Validity: %d, "
+																	"Register 0x%x Status: 0x%x, Register 0x%x Data: 0x%x", position, val, reg_to_read, rstatus, reg_to_read, rdata);
+		   hal_trace_puts(str);
+			 position = 0, val = hal_false, regs = 0x00, rstatus = 0x00, rdata = 0x00;
+			 
+			 //Encoder 4
+			 hal_encoder_get_value_t2 (hal_encoder_4, &position, &val, &regs);
+			 rstatus = (regs >> 8) & 0xFF;
+			 rdata = regs & 0xFF;
+			 snprintf(str, sizeof(str),	"Encoder 4 reading: %d, Validity: %d, "
+																	"Register 0x%x Status: 0x%x, Register 0x%x Data: 0x%x", position, val, reg_to_read, rstatus, reg_to_read, rdata);
+		   hal_trace_puts(str);
+			 position = 0, val = hal_false, regs = 0x00, rstatus = 0x00, rdata = 0x00;
+			 
+			 //Encoder 5
+			 hal_encoder_get_value(hal_encoder_5, &position);
+			 snprintf(str, sizeof(str),	"Encoder 5 reading: %d", position);
+		   hal_trace_puts(str);
+			 position = 0;
+			 
+			 hal_trace_puts("\n");
 			
-				// Start to read from the encoder 2
-        res = hal_encoder_read_start(hal_encoder_2);
-        res = res;
-			
-				// Get of the last value read, saved in position (previously initialized to 0)
-				res = hal_encoder_get_value(hal_encoder_2, &position);
-        position = position;
-				
-        //tt = (position >> 2) & 0xfff0;
-				//snprintf(str, sizeof(str), "encoder reading: %d, orig = 0x%x", tt, position);
-				//hal_trace_puts(str);
-				snprintf(str, sizeof(str), "Encoder 2 reading: %d", position);
-        hal_trace_puts(str);
-				
-				hal_trace_puts("\n");
-				
-				switch_register ++;
-				if (switch_register > 18)
-				switch_register = 0;
+			 ready12 = hal_false;
+			 ready34 = hal_false;
+			 
+			 //200 ms delay
+			 hal_sys_delay(200*hal_RELTIME_1millisec);
+			 prev_act = eventviewer_switch_to(ev_ID_first_usrdef+5);
+			 //hal_encoder_read_start (hal_encoder_5);
+			 hal_encoder_read_start_t2 (hal_encoder_1, reg_to_read, sdata_check);
+			 hal_encoder_read_start_t2 (hal_encoder_3, reg_to_read, sdata_check);
     }
+} 
+
+/* Callback functions invoked when new encoder data is available, but only if specified in the config struct
+	 for the encoder */
+
+static void test_encoder_cbk1(void* arg)
+{
+		// Start encoder 2
+		hal_encoder_read_start_t2 (hal_encoder_2, reg_to_read, sdata_check);
 }
 
-/* Callback function invoked when new encoder data is available (at the moment is not set as a callback cause doing anything,
-	 the data is collected using the forever loop above)
-*/
-static void test_encoder_cbk(void* arg)
+static void test_encoder_cbk2(void* arg)
 {
-		eventviewer_switch_to(prev_act);
-		/*
-		hal_encoder_get_value_t2 (hal_encoder_1, &positioncbk, &val, &regs);
-		rstatus = (regs >> 8) & 0xFF;
-		rdata = regs & 0xFF;
-		snprintf(str, sizeof(str),"Encoder 1 reading: %d, Validity: %d, "
-															"Register Status: 0x%x, Register Data: 0x%x", positioncbk, val, rstatus, rdata);
-		hal_trace_puts(str);
-		hal_encoder_read_start_t2 (hal_encoder_1, 0x77);
-    //hal_result_t rr = hal_res_NOK_generic;
-    //rr = hal_encoder_get_value(hal_encoder, &positioncbk);  
-    //rr = rr;    
-    //positioncbk = positioncbk;
-		*/
+		// Set flag
+		ready12 = hal_true;
 }
+
+static void test_encoder_cbk3(void* arg)
+{
+		// Start encoder 4
+		hal_encoder_read_start_t2 (hal_encoder_4, reg_to_read, sdata_check);
+}
+
+static void test_encoder_cbk4(void* arg)
+{
+		// Set flag
+		ready34 = hal_true;
+}
+
+static void test_encoder_cbk5(void* arg)
+{
+		// Set flag
+		ready12 = hal_true;
+}
+
 
 #endif//defined(EXECUTE_TEST_ENCODER)  
 

@@ -132,8 +132,8 @@ typedef struct
     uint8_t                 sizeofframe;        /**< the size of the frame in the frame-based activity */
     uint8_t                 capacityoftxfifoofframes; /**< if direction is not hal_spi_dir_rxonly, it specifies the capacity of the fifo of frames to tx */
     uint8_t                 capacityofrxfifoofframes; /**< if direction is not hal_spi_dir_txonly, it specifies the capacity of the fifo of frames to rx */
-    uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */
-		uint8_t                 starttxvalue;	
+    //uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */
+		//uint8_t                 starttxvalue;	
     hal_callback_t          onframetransm;      /**< if not NULL and direction is not hal_spi_dir_rxonly it is called by the ISR when a frame is transmitted */
     void*                   argonframetransm;
     hal_callback_t          onframereceiv;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when a frame is received */

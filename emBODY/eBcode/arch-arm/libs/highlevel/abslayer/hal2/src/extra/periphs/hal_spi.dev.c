@@ -87,8 +87,8 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .sizeofframe                = 4,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
-    .dummytxvalue               = 0x00,	//removable?
-		.starttxvalue               = 0x00,	//removable?
+    //.dummytxvalue               = 0x00,	//removable?
+		//.starttxvalue               = 0x00,	//removable?
     .onframetransm              = NULL,
     .argonframetransm           = NULL,
     .onframereceiv              = NULL,
@@ -105,7 +105,8 @@ const hal_spi_cfg_t hal_spi_cfg_default =
 typedef struct
 {
     hal_spi_cfg_t       config;
-    uint8_t*            dummytxframe; //removable?
+		//hl_spi_cfg_t				adv_config;
+    //uint8_t*            dummytxframe; //removable?
     uint8_t*            isrrxframe;
     uint8_t             isrrxcounter;
 		uint8_t*            isrtxframe;
@@ -522,11 +523,10 @@ static void s_hal_spi_read_isr(hal_spi_t id)
      
     if(intitem->isrrxcounter == intitem->config.sizeofframe)
     {   // ok. the frame is finished
-    
         // 1. stop spi 
-        s_hal_spi_periph_disable(id);           // disable periph                                        	     
+        s_hal_spi_periph_disable(id);           // disable periph
 				s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
-        
+				
         // set back to zero the frame burst
         intitem->frameburstcountdown = 0;
         // set rx counter to zero again
@@ -549,12 +549,12 @@ static void s_hal_spi_read_isr(hal_spi_t id)
         if(NULL != onframereceiv)
         {
             onframereceiv(arg);
-        }        
+        }
     }
     else
     {
         // transmit one dummy byte to trigger yet another reception
-				//SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);
+				// SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);
 				// transmit the corresponding byte to trigger another reception
 				SPI_I2S_SendData(SPIx, intitem->isrtxframe[intitem->isrrxcounter]);
     }
@@ -619,7 +619,6 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // because if the spi is already initted and it detects mosi or miso low it sets
     // register SPI_SR2.BUSY to 1, which makes things hang up.
     
-
     //const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
 		hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
     {   
