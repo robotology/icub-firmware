@@ -19,6 +19,8 @@
 #include "eupdater_parser.h"
 
 
+#define USERAM_FOR_LOADER
+
 #include "updater-core.h"
 #include "eupdater_cangtw.h"
 
@@ -33,7 +35,118 @@
 #include "emBODYrobot.h"
 
 #include "eEmemorymap.h"
+
+const char extendstr[24] = "extend";
+
+static const eEmoduleInfo_t erasedappl = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procApplication,
+            .version    = 
+            { 
+                .major = 0, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {   // sept 13 1999: the moon was ejected out of earth orbit and into deep space, thus stranding the 311 personnel stationed on moonbase alpha
+                .year  = 1999,
+                .month = 9,
+                .day   = 13,
+                .hour  = 9,
+                .min   = 9
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
+            .size   = 0
+        },
+        .ram        = 
+        {   
+            .addr   = 0,
+            .size   = 0
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_none,  
+        .name           = "erasedApp"
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 0, .minor = 1},
+        .can1protversion = { .major = 0, .minor = 0},
+        .can2protversion = { .major = 0, .minor = 0},
+        .gtwprotversion  = { .major = 0, .minor = 0}
+    },
+    .extra      = {0}           
+};
  
+
+static const eEmoduleInfo_t erasedupdt = 
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_process,
+            .signature  = ee_procUpdater,
+            .version    = 
+            { 
+                .major = 0, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {   // sept 13 1999: the moon was ejected out of earth orbit and into deep space, thus stranding the 311 personnel stationed on moonbase alpha
+                .year  = 1999,
+                .month = 9,
+                .day   = 13,
+                .hour  = 9,
+                .min   = 9
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_MEMMAP_EUPDATER_ROMADDR,
+            .size   = 0
+        },
+        .ram        = 
+        {   
+            .addr   = 0,
+            .size   = 0
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_none,
+            .size   = 0,
+            .addr   = 0
+        },
+        .communication  = ee_commtype_none,  
+        .name           = "erasedUpd"
+    },
+    .protocols  =
+    {
+        .udpprotversion  = { .major = 0, .minor = 1},
+        .can1protversion = { .major = 0, .minor = 0},
+        .can2protversion = { .major = 0, .minor = 0},
+        .gtwprotversion  = { .major = 0, .minor = 0}
+    },
+    .extra      = {0}           
+};
+
+
+
+#if     defined(USERAM_FOR_LOADER) 
+static uint32_t s_ramforloader_maxoffset = 0;
+static uint8_t s_ramforloader_data[EENV_MEMMAP_ELOADER_ROMSIZE] = {0};
+#endif
 
 typedef enum {
     CMD_SCAN            = 0xFF,
@@ -71,7 +184,9 @@ enum {
 
 
 // static functions
+#if     !defined(_MAINTAINER_APPL_)
 static eEresult_t s_sys_eeprom_erase(void);
+#endif
 
 static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size);
 
@@ -94,6 +209,7 @@ void upd_core_init(void)
 #else
     hal_gpio_init(hal_gpio_portE, hal_gpio_pin13, hal_gpio_dirOUT, hal_gpio_speed_low);
 #endif
+    
 }
 
 #define PROGRAM_LOADER   0x55
@@ -107,6 +223,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
     static uint32_t s_prog_mem_size  = 0;
     static uint16_t s_download_packets = 0;
     static uint8_t  s_download_state = 0;
+    static uint8_t  s_erased_eeprom = 0;
     
     hal_result_t halres = hal_res_NOK_generic;
     
@@ -136,9 +253,9 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
         {
             //hal_trace_puts("CMD_SCAN");
 #if !defined(_MAINTAINER_APPL_ )
-            eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+            eEmoduleInfo_t* module = (eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
 #else
-            eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+            eEmoduleInfo_t* module = (eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
 #endif
             
             *sizeout = 14;
@@ -227,67 +344,114 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
 
             s_download_packets = 1;
             s_download_state = pktin[1];
+            s_erased_eeprom = 0;
             
             *sizeout = 2;
             pktout[0] = CMD_START;
 
             switch (s_download_state)
             {
-            case PROGRAM_LOADER:
-                s_prog_mem_start = EENV_MEMMAP_ELOADER_ROMADDR;
-                s_prog_mem_size  = EENV_MEMMAP_ELOADER_ROMSIZE;
-                break;
+                case PROGRAM_LOADER:
+                {
+                    s_prog_mem_start = EENV_MEMMAP_ELOADER_ROMADDR;
+                    s_prog_mem_size  = EENV_MEMMAP_ELOADER_ROMSIZE;
+                } break;
 
-            case PROGRAM_UPDATER:
-                s_prog_mem_start = EENV_MEMMAP_EUPDATER_ROMADDR;
-                s_prog_mem_size  = EENV_MEMMAP_EUPDATER_ROMSIZE;
-                break;
+                case PROGRAM_UPDATER:
+                {
+                    s_prog_mem_start = EENV_MEMMAP_EUPDATER_ROMADDR;
+                    s_prog_mem_size  = EENV_MEMMAP_EUPDATER_ROMSIZE;
+                } break;
 
-            case PROGRAM_APP:
-                s_prog_mem_start = EENV_MEMMAP_EAPPLICATION_ROMADDR;
-                s_prog_mem_size  = EENV_MEMMAP_EAPPLICATION_ROMSIZE;
-                break;
+                case PROGRAM_APP:
+                {
+                    s_prog_mem_start = EENV_MEMMAP_EAPPLICATION_ROMADDR;
+                    s_prog_mem_size  = EENV_MEMMAP_EAPPLICATION_ROMSIZE;
+                } break;
             
-#if defined(_MAINTAINER_APPL_)
-            case PROGRAM_SHARSERV: // only maintainer can do that.
-                s_prog_mem_start = EENV_MEMMAP_SHARSERV_ROMADDR;
-                s_prog_mem_size  = EENV_MEMMAP_SHARSERV_ROMSIZE;
-                break;            
-#endif
             
-            default:
-                s_download_state = 0;
-                pktout[1] = UPD_ERR_UNK;
-                return 1;    
+                default:
+                {
+                    s_download_state = 0;
+                    s_prog_mem_start = s_prog_mem_size = 0;
+                    pktout[1] = UPD_ERR_UNK;
+                } break;                
             }
             
+            // cannot accept a download of such a hex file
+            if(0 == s_download_state)
+            {
+                return 1;   
+            }
+            
+
+
             if(1 == s_overlapping_with_code_space(s_prog_mem_start, s_prog_mem_size))
             {
+                //hal_trace_puts("overlapping");
                 s_download_state = 0;
-                // XYX: uncomment next 2
-                //s_prog_mem_start = 0;
-                //s_prog_mem_size  = 0;
-                pktout[1] = UPD_ERR_UNK;
-                return 1;                    
-            }
-            
-            hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
-            halres = hal_flash_erase(s_prog_mem_start, s_prog_mem_size);
-            hal_sys_irq_enable();   //osal_system_scheduling_restart();
-            
-                
-            if(hal_res_OK != halres)
-            {
-                s_download_state = 0;
-                //hal_trace_puts("ERASE FAILED");
-                pktout[1] = UPD_ERR_FLASH;    
+                s_prog_mem_start = s_prog_mem_size = 0;
+                pktout[1] = UPD_ERR_UNK;               
             }
             else
             {
-                //hal_trace_puts("ERASE DONE");
+                //hal_trace_puts("not overlapping");   
                 pktout[1] = UPD_OK;
             }
-          
+            
+            // cannot accept a download of such a hex file
+            if(0 == s_download_state)
+            {
+                return 1;   
+            }            
+            
+            // if in here, it means that i am attempting to program something in a space memory different than
+            // the one of tthe running process, either updater or maintainer. 
+            // the important thing in case something fails in between the flash erase and the end of programming is that
+            // the START process is set at the one running now ... if so, anything that goes wrong is always recovered.
+            // HOWEVER: YOU MUST NOT ERASE EEPROM
+            
+#if     defined(_MAINTAINER_APPL_)
+            ee_sharserv_part_proc_startup_set(ee_procApplication);
+#else
+            ee_sharserv_part_proc_startup_set(ee_procUpdater);
+#endif            
+ 
+#if defined(ERASE_EARLY)
+ 
+            if(0 == s_erased_eeprom)
+            {
+                hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
+                halres = hal_flash_erase(s_prog_mem_start, s_prog_mem_size);
+                hal_sys_irq_enable();   //osal_system_scheduling_restart();
+                
+                    
+                if(hal_res_OK != halres)
+                {
+                    s_download_state = 0;
+                    //hal_trace_puts("ERASE FAILED");
+                    pktout[1] = UPD_ERR_FLASH;    
+                }
+                else
+                {
+                    s_erased_eeprom = s_download_state;
+                    //hal_trace_puts("ERASE DONE");
+                    pktout[1] = UPD_OK;
+                } 
+            }            
+
+#else
+            pktout[1] = UPD_OK;
+            
+#if defined(USERAM_FOR_LOADER) 
+            if(PROGRAM_LOADER == s_download_state)
+            {
+                s_ramforloader_maxoffset = 0;
+                memset(s_ramforloader_data, 0xff, s_prog_mem_size);
+            }
+#endif
+            
+#endif
             
             if(0 != s_download_state)
             {
@@ -300,15 +464,12 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             
         case CMD_DATA:
         {
-            if (!s_download_state)
+            if (0 == s_download_state)
             {
-                //#warning --> in next versions ... send back a nack packet. uncomment XYZ
-                // XYZ: uncomment next 3
-                //*sizeout = 2;
-                //pktout[0] = CMD_DATA;
-                //pktout[1] = UPD_ERR_UNK;
-                //return 1;
-                return 0;
+                *sizeout = 2;
+                pktout[0] = CMD_DATA;
+                pktout[1] = UPD_ERR_UNK;
+                return 1;
             }
 
             //hal_trace_puts("CMD_DATA");
@@ -328,20 +489,124 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                   
             if ((address >= s_prog_mem_start) && (address+size < s_prog_mem_start+s_prog_mem_size))
             {
-                hal_sys_irq_disable();
-                halres = hal_flash_write(address, size, data);
-                hal_sys_irq_enable();
                 
-                ++s_download_packets;
+#if !defined(ERASE_EARLY)
                 
-                if(hal_res_NOK_generic == halres)
+#if defined(USERAM_FOR_LOADER) 
+                
+                // erase only if not loader
+                
+                if((0 == s_erased_eeprom) && (PROGRAM_LOADER != s_download_state))
                 {
-                    pktout[1] = UPD_ERR_PROT;
+                    hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
+                    halres = hal_flash_erase(s_prog_mem_start, s_prog_mem_size);
+                    hal_sys_irq_enable();   //osal_system_scheduling_restart();
+                    
+                        
+                    if(hal_res_OK != halres)
+                    {
+                        s_download_state = 0;
+                        //hal_trace_puts("ERASE FAILED");
+                        pktout[1] = UPD_ERR_FLASH;    
+                    }
+                    else
+                    {
+                        s_erased_eeprom = s_download_state;
+                        //hal_trace_puts("ERASE DONE");
+                        //pktout[1] = UPD_OK;
+                    }  
+                }
+#else
+                // if not erased .... erase flash now
+                if(0 == s_erased_eeprom)
+                {
+                    hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
+                    halres = hal_flash_erase(s_prog_mem_start, s_prog_mem_size);
+                    hal_sys_irq_enable();   //osal_system_scheduling_restart();
+                    
+                        
+                    if(hal_res_OK != halres)
+                    {
+                        s_download_state = 0;
+                        //hal_trace_puts("ERASE FAILED");
+                        pktout[1] = UPD_ERR_FLASH;    
+                    }
+                    else
+                    {
+                        s_erased_eeprom = s_download_state;
+                        //hal_trace_puts("ERASE DONE");
+                        //pktout[1] = UPD_OK;
+                    }  
+                }
+#endif
+                
+#endif                
+
+
+#if defined(USERAM_FOR_LOADER) 
+                if(PROGRAM_LOADER == s_download_state)
+                {
+                    uint32_t position = address - s_prog_mem_start;
+                    if(position < s_prog_mem_size)
+                    {
+                        memcpy(&s_ramforloader_data[position], data, size);
+                        if((position+size)> s_ramforloader_maxoffset)
+                        {
+                            s_ramforloader_maxoffset = position+size;
+                        }
+                        pktout[1] = UPD_OK;
+                    }
+                    else
+                    {
+                        pktout[1] = UPD_ERR_PROT;
+                    }
+                    ++s_download_packets;
                 }
                 else
-                {    
-                    pktout[1] = UPD_OK;
+                {
+                    // write the chunk of received data only if it is inside the expected memory space and it is already erased
+                    if(0 != s_erased_eeprom)
+                    {
+                        
+                        hal_sys_irq_disable();
+                        halres = hal_flash_write(address, size, data);
+                        hal_sys_irq_enable();
+                        
+                        ++s_download_packets;
+                        
+                        if(hal_res_NOK_generic == halres)
+                        {
+                            pktout[1] = UPD_ERR_PROT;
+                        }
+                        else
+                        {    
+                            pktout[1] = UPD_OK;
+                        }
+                    }
                 }
+#else                
+                // write the chunk of received data only if it is inside the expected memory space and it is already erased
+                if(0 != s_erased_eeprom)
+                {
+                    
+                    hal_sys_irq_disable();
+                    halres = hal_flash_write(address, size, data);
+                    hal_sys_irq_enable();
+                    
+                    ++s_download_packets;
+                    
+                    if(hal_res_NOK_generic == halres)
+                    {
+                        pktout[1] = UPD_ERR_PROT;
+                    }
+                    else
+                    {    
+                        pktout[1] = UPD_OK;
+                    }
+                }
+                
+#endif
+                
             }
             else
             {
@@ -356,55 +621,121 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             
         case CMD_END:
         {
-            if (!s_download_state)
+            if (0 == s_download_state)
             {
-                return 0;
+                //hal_trace_puts("CMD_END received and s_download_state is 0"); 
+                if(0 !=  s_erased_eeprom)
+                {
+                    const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+                    ee_sharserv_part_proc_synchronise(ee_procUpdater, (const eEmoduleInfo_t*)updt);
+                    ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)appl);
+                    //hal_trace_puts("CMD_END received and s_download_state is 0 and s_erased_eeprom is not 0"); 
+                } 
+                
+                 
+                *sizeout = 2;
+                pktout[0] = CMD_DATA;
+                pktout[1] = UPD_ERR_UNK;
+                return 1;
             }
 
             //hal_trace_puts("CMD_END");
 
             *sizeout = 2;
             pktout[0] = CMD_END;
-
-            if ((pktin[2]<<8)|pktin[1] == s_download_packets)
+            
+            //char str[64] = {0};            
+            uint16_t sentpkts = (pktin[2]<<8)|pktin[1];
+            //snprintf(str, sizeof(str), "sent = %d, downloaded = %d", sentpkts, s_download_packets);
+            //hal_trace_puts(str);
+            
+            if (sentpkts == s_download_packets)
             {
                 pktout[1] = UPD_OK;
 
                 switch (s_download_state)
                 {
-                case PROGRAM_LOADER:
-                    ee_sharserv_part_proc_synchronise(ee_procLoader,(eEmoduleInfo_t*)(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET));
-                    break;    
-                case PROGRAM_UPDATER:
-                    ee_sharserv_part_proc_synchronise(ee_procUpdater,(eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET));
-                    ee_sharserv_part_proc_startup_set(ee_procApplication);
-                    //ee_sharserv_part_proc_def2run_set(ee_procApplication);
-                    break;
-                case PROGRAM_APP:
-                    ee_sharserv_part_proc_synchronise(ee_procApplication,(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET));
-                    ee_sharserv_part_proc_startup_set(ee_procUpdater);
-                    break;
-#if defined(_MAINTAINER_APPL_)                
-                case PROGRAM_SHARSERV:
-                    ee_sharserv_part_shal_synchronise(ee_shalSharServ,(eEmoduleInfo_t*)(EENV_MEMMAP_SHARSERV_ROMADDR+EENV_MODULEINFO_OFFSET));
-                    ee_sharserv_part_proc_startup_set(ee_procUpdater);
-                    break;  
-#endif                
+                    case PROGRAM_LOADER:
+                    {
+#if defined(USERAM_FOR_LOADER) 
+                        // 1. erase flash and write
+                        hal_sys_irq_disable();                   
+                        halres = hal_flash_erase(s_prog_mem_start, s_prog_mem_size);
+                        halres = hal_flash_write(s_prog_mem_start, s_prog_mem_size, s_ramforloader_data);
+                        hal_sys_irq_enable();  
+                        s_erased_eeprom = PROGRAM_LOADER;                        
+#endif                        
+                        const volatile eEmoduleInfo_t* lder = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                        ee_sharserv_part_proc_synchronise(ee_procLoader,(const eEmoduleInfo_t*)lder);
+                    } break;    
+                    case PROGRAM_UPDATER:
+                    {
+                        const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                        ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)updt);
+                        //ee_sharserv_part_proc_startup_set(ee_procApplication);
+                        //ee_sharserv_part_proc_def2run_set(ee_procApplication);
+                    } break;
+                    case PROGRAM_APP:
+                    {
+                        const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+                        ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)appl);
+                        //ee_sharserv_part_proc_startup_set(ee_procUpdater);
+                    }  break;
                 }
             }
             else
             {
                 pktout[1] = UPD_ERR_LOST;
+                
+#if defined(ERASE_EARLY)
+#else
+                if(0 !=  s_erased_eeprom)
+                {
+#endif
 
+                // must manage failure. we surely have erased eeprom in here and maybe we have written some sectors.
+                // thus we had better to erase eeprom fully, set the def2run and start to a safe process, and ... put in partition table message about erased process
                 if (s_download_state != PROGRAM_LOADER)
                 {
                     osal_system_scheduling_suspend();
-                    hal_flash_erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
+                    //hal_sys_irq_disable();
+                    if(PROGRAM_APP == s_download_state)
+                    {
+                        hal_flash_erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
+                        //hal_trace_puts("erased app and removed it from partition table"); 
+                        ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)&erasedappl);
+                        const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                        ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)updt);
+                        ee_sharserv_part_proc_startup_set(ee_procUpdater);
+                        ee_sharserv_part_proc_def2run_set(ee_procUpdater);
+                    }
+                    else if(PROGRAM_UPDATER == s_download_state)
+                    {
+                        hal_flash_erase(EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+                        // cannot remove updater so far .... ee_sharserv_part_proc_rem(ee_procUpdater);
+                        //hal_trace_puts("erased upt and removed it from partition table"); 
+                        //const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+                        ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)&erasedupdt);
+                        const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+                        ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)appl);
+                        ee_sharserv_part_proc_startup_set(ee_procApplication);
+                        ee_sharserv_part_proc_def2run_set(ee_procApplication);
+                    }
+                    
                     osal_system_scheduling_restart();
+                    //hal_sys_irq_disable();
                 }
+                
+#if defined(ERASE_EARLY)
+#else
+            }
+#endif
+              
             }
    
             s_download_state = 0;
+            s_prog_mem_start = s_prog_mem_size = 0;
 
             // download is over, thus resume the normal blinking of led
             eupdater_parser_download_blinkled_stop();
@@ -520,8 +851,18 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 
         case CMD_SYSEEPROMERASE:
         {   
-            eEresult_t ret = s_sys_eeprom_erase();
-
+            eEresult_t ret = ee_res_NOK_generic;
+            
+#if     defined(_MAINTAINER_APPL_)
+            // the maintainer cannot erase the eeprom
+            ret = ee_res_NOK_generic;       
+#else
+            // only the updater can do it. 
+            // because if eeprom is erased, the loader will set the START equal to updater.
+            // if we are not sure the updater is able to run, it is better not to risk a communication failure
+            ret = s_sys_eeprom_erase();      
+#endif
+            
             pktout[0] = CMD_SYSEEPROMERASE;
             pktout[1] = (ee_res_OK == ret) ? UPD_OK : UPD_ERR_UNK;
             
@@ -543,42 +884,51 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             uint16_t size = 2;            
             
             const eEmoduleInfo_t *sharserv = ee_sharserv_moduleinfo_get();
-            
-            size+=snprintf(data+size, MAX0(capacityout-size), "*** running e-proc uses sharserv\r\n");
-            size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
-                    sharserv->info.entity.version.major, 
-                    sharserv->info.entity.version.minor,
-                    sharserv->info.entity.builddate.month,
-                    sharserv->info.entity.builddate.day,
-                    sharserv->info.entity.builddate.year-2000,
-                    sharserv->info.entity.builddate.hour,
-                    sharserv->info.entity.builddate.min
-                );
-            size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", sharserv->info.rom.addr);
-            size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", sharserv->info.rom.size);
-            size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", sharserv->info.ram.addr);
-            size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", sharserv->info.ram.size);
+//            
+//            size+=snprintf(data+size, MAX0(capacityout-size), "*** running e-proc uses sharserv\r\n");
+//            size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+//                    sharserv->info.entity.version.major, 
+//                    sharserv->info.entity.version.minor,
+//                    sharserv->info.entity.builddate.month,
+//                    sharserv->info.entity.builddate.day,
+//                    sharserv->info.entity.builddate.year-2000,
+//                    sharserv->info.entity.builddate.hour,
+//                    sharserv->info.entity.builddate.min
+//                );
+//            size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", sharserv->info.rom.addr);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", sharserv->info.rom.size);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", sharserv->info.ram.addr);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", sharserv->info.ram.size);
 
-            size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == sharserv->info.storage.type) ? ("none") 
-                                                        : ((ee_strg_eflash==sharserv->info.storage.type) ? ("flash") : ("eeprom")));
-            size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", sharserv->info.storage.addr);
-            size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", sharserv->info.storage.size);                
-            size+=snprintf(data+size, MAX0(capacityout-size), "\n");
-            
+//            size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == sharserv->info.storage.type) ? ("none") 
+//                                                        : ((ee_strg_eflash==sharserv->info.storage.type) ? ("flash") : ("eeprom")));
+//            size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", sharserv->info.storage.addr);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", sharserv->info.storage.size);                
+//            size+=snprintf(data+size, MAX0(capacityout-size), "\n");
+//            
             const eEmoduleInfo_t *strsharserv = ee_sharserv_storage_moduleinfo_get();
             
             if((strsharserv->info.entity.version.major != sharserv->info.entity.version.major) || (strsharserv->info.entity.version.minor != sharserv->info.entity.version.minor))
             {
-                size+=snprintf(data+size, MAX0(capacityout-size), "*** BUT EEPROM keeps:\r\n");
-                size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                size+=snprintf(data+size, MAX0(capacityout-size), "EEPROM contains sharserv version different from that of this process. it has:\r\n");
+                size+=snprintf(data+size, MAX0(capacityout-size), "eeprom version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
                         strsharserv->info.entity.version.major, 
                         strsharserv->info.entity.version.minor,
                         strsharserv->info.entity.builddate.month,
                         strsharserv->info.entity.builddate.day,
-                        strsharserv->info.entity.builddate.year-2000,
+                        strsharserv->info.entity.builddate.year,
                         strsharserv->info.entity.builddate.hour,
                         strsharserv->info.entity.builddate.min
-                    );                
+                    );  
+                size+=snprintf(data+size, MAX0(capacityout-size), "process version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                        sharserv->info.entity.version.major, 
+                        sharserv->info.entity.version.minor,
+                        sharserv->info.entity.builddate.month,
+                        sharserv->info.entity.builddate.day,
+                        sharserv->info.entity.builddate.year,
+                        sharserv->info.entity.builddate.hour,
+                        sharserv->info.entity.builddate.min
+                    );                       
             }
             
             if(ee_res_NOK_generic == ee_sharserv_storage_isvalid())
@@ -593,7 +943,8 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 pktout[0] = CMD_PROCS;
                 pktout[1] = num_procs; 
                 
-                
+
+                volatile eEmoduleExtendedInfo_t* extinfo = NULL;    
                 eEprocess_t defproc;
                 eEprocess_t startup;
                 eEprocess_t running =
@@ -606,37 +957,57 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                 ee_sharserv_part_proc_def2run_get(&defproc);
                 ee_sharserv_part_proc_startup_get(&startup);
                             
-                
-                
-                
                 // processes
                 for (uint8_t i=0; i<num_procs; ++i)
                 {
                     ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
-                    size+=snprintf(data+size, MAX0(capacityout-size), "*** e-proc #%d ***\r\n", i);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "*** e-process #%d \r\n", i);
                     size+=snprintf(data+size, MAX0(capacityout-size), "props\t%s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", running==i?"RUNNING ":"" ) ;
 
                     size+=snprintf(data+size, MAX0(capacityout-size), "name\t%s\r\n", s_modinfo->info.name);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                    size+=snprintf(data+size, MAX0(capacityout-size), "vers\t%d.%d\r\n", 
                         s_modinfo->info.entity.version.major, 
-                        s_modinfo->info.entity.version.minor,
-                        s_modinfo->info.entity.builddate.month,
+                        s_modinfo->info.entity.version.minor
+                    );
+                    size+=snprintf(data+size, MAX0(capacityout-size), "date\t%s %.2d %d %d:%.2d\r\n", 
+                        ee_common_get_month_string(s_modinfo->info.entity.builddate),
                         s_modinfo->info.entity.builddate.day,                    
-                        s_modinfo->info.entity.builddate.year-2000,
+                        s_modinfo->info.entity.builddate.year,
                         s_modinfo->info.entity.builddate.hour,
                         s_modinfo->info.entity.builddate.min
                     );
-                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
+                    
+                    extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+                    
+                    //if(0 == strcmp((const char*)extinfo->moduleinfo.extra, extendstr))
+                    if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+                    {
+                        size+=snprintf(data+size, MAX0(capacityout-size), "built\t%s\r\n", 
+                            extinfo->compilationdatetime
+                        );                        
+                    }
+                    else
+                    {
+                        size+=snprintf(data+size, MAX0(capacityout-size), "built\tin unknown date\r\n"
+                        );    
+                    }
 
-                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
-                                                                : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
-                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "com.msk\t0x%0.8X\r\n\r", s_modinfo->info.communication);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "rom\t@+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "rom\t[0x%0.8X, 0x%0.8X)\r\n", s_modinfo->info.rom.addr, s_modinfo->info.rom.addr+s_modinfo->info.rom.size);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "ram\t[0x%0.8X, 0x%0.8X)\r\n", s_modinfo->info.ram.addr, s_modinfo->info.ram.addr+s_modinfo->info.ram.size);
+
+                    
+                    //                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
+
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
+//                                                                : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "com.msk\t0x%0.8X\r\n\r", s_modinfo->info.communication);
                     size+=snprintf(data+size, MAX0(capacityout-size), "\n");
                 }
 
@@ -645,59 +1016,6 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
             *sizeout = size + 1;
             return 1;
         }// break
-        /*
-        case CMD_SHALS:
-        {
-            eEresult_t shalres;
-            uint8_t num_shals = 3;
-            const eEmoduleInfo_t *s_modinfo = NULL;
-            const eEsharlib_t s_shartable[] = {ee_shalBASE, ee_shalPART, ee_shalINFO};  
-            
-            pktout[0] = CMD_SHALS;
-            pktout[1] = num_shals; 
-
-            char *data = (char*)pktout;
-            uint16_t size = 2;
-
-            for (uint8_t i=0; i<num_shals; ++i)
-            {
-                shalres = shalpart_shal_get(s_shartable[i], &s_modinfo);
-
-                size+=sprintf(data+size,"*** shal #%d ***\r\n",i);
-
-                if (shalres != ee_res_OK)
-                {
-                    size+=sprintf(data+size,"NOT PRESENT\r\n\r\n");
-                    continue;
-                }
-
-                size+=sprintf(data+size, "name\t%s\r\n", s_modinfo->info.name);
-                size+=sprintf(data+size, "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
-                    s_modinfo->info.entity.version.major, 
-                    s_modinfo->info.entity.version.minor,
-                    s_modinfo->info.entity.builddate.day,
-                    s_modinfo->info.entity.builddate.month,
-                    s_modinfo->info.entity.builddate.year,
-                    s_modinfo->info.entity.builddate.hour,
-                    s_modinfo->info.entity.builddate.min
-                );
-                size+=sprintf(data+size, "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
-                size+=sprintf(data+size, "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
-                size+=sprintf(data+size, "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
-                size+=sprintf(data+size, "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
-
-                size+=sprintf(data+size, "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
-                                                                : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
-                size+=sprintf(data+size, "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
-                size+=sprintf(data+size, "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
-                size+=sprintf(data+size, "com.msk\t0x%0.8X\r\n\r\n", s_modinfo->info.communication);
-            }
-
-            *sizeout = size + 1;
-          
-            return 1;
-        }
-        */
 
         case CMD_BLINK:
         {
@@ -728,7 +1046,7 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
     return 0;
 }
 
-
+#if     !defined(_MAINTAINER_APPL_)
 static eEresult_t s_sys_eeprom_erase(void)
 {
 #if 0    
@@ -756,7 +1074,7 @@ static eEresult_t s_sys_eeprom_erase(void)
     return(ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHARSERV_STGSIZE));
 #endif    
 }
-
+#endif
 
 static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
 {
@@ -771,7 +1089,15 @@ static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
     #define BEG     EENV_MEMMAP_EUPDATER_ROMADDR 
     #define END     (EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MEMMAP_EUPDATER_ROMSIZE)
 #endif    
-    
+ 
+//    char str[128] = {0};
+//    snprintf(str, sizeof(str), "addr = %x size = %d vs beg = %x siz = %x", addr, size, BEG, END-BEG); 
+//    hal_trace_puts(str);
+            
+    if((addr == BEG) || (end == END))
+    {   // addr or end are equal ...
+        return(1);
+    }
     
     if((addr > BEG) && (addr < END))
     {   // addr is within
