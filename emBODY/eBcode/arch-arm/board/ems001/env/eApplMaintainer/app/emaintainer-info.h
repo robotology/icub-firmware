@@ -43,6 +43,9 @@
 
 #include "eEcommon.h"
 
+#include "ipal_base.h"
+#include "EOMtheSystem.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -52,7 +55,9 @@
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eEmoduleInfo_t             emaintainer_modinfo;
+//extern const eEmoduleInfo_t             emaintainer_modinfo;
+
+extern const eEmoduleExtendedInfo_t     emaintainer_modinfo_extended;
 
 extern const eOmsystem_cfg_t            emaintainer_syscfg;
 
