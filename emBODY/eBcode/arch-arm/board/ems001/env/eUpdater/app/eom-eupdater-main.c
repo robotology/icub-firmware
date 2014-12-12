@@ -60,6 +60,8 @@
 #include "EOtheARMenvironment.h"
 #include "EOVtheEnvironment.h"
 
+#include "updater-core.h"
+
 
 #include "eupdater_parser.h"
 
@@ -283,9 +285,9 @@ static void s_eom_eupdater_main_init(void)
     
     
 #if !defined(_MAINTAINER_APPL_)    
-    eo_armenv_Initialise(&eupdater_modinfo, NULL);
+    eo_armenv_Initialise((const eEmoduleInfo_t*)&eupdater_modinfo_extended, NULL);
 #else
-    eo_armenv_Initialise(&emaintainer_modinfo, NULL);
+    eo_armenv_Initialise((const eEmoduleInfo_t*)&emaintainer_modinfo_extended, NULL);
 #endif    
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
     
@@ -338,6 +340,7 @@ static void s_eom_eupdater_main_init(void)
                                     task_ethcommand, "ethcommand");
     s_task_ethcommand = s_task_ethcommand;
     
+    upd_core_init();
     
 #if !defined(_MAINTAINER_APPL_)
     // there is also the can gateway
