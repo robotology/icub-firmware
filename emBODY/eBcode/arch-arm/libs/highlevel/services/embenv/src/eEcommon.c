@@ -104,6 +104,36 @@ extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid)
 }
 
 
+extern const char* ee_common_get_month_string(eEdate_t date)
+{ 
+    static const char * themonths[13] = 
+    {
+        "???",
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+    
+    if(date.month > 12)
+    {
+        return(themonths[0]);
+    }  
+    
+    return(themonths[date.month]);
+}
+
+extern eEresult_t ee_is_extendemoduleinfo_valid(eEmoduleExtendedInfo_t* extmodinfo)
+{
+    if(NULL == extmodinfo)
+    {
+        return(ee_res_NOK_generic);
+    }
+    
+    if(0 == strcmp((const char*)extmodinfo->moduleinfo.extra, "EXT"))
+    {
+        return(ee_res_OK);
+    }
+    return(ee_res_NOK_generic);
+}
 
 
 

@@ -135,6 +135,21 @@ typedef uint8_t     eEbool_t;
  **/
 typedef uint32_t    eEreltime_t; 
 
+typedef enum 
+{
+    ee_Jan      = 1,
+    ee_Feb      = 2,
+    ee_Mar      = 3,
+    ee_Apr      = 4,
+    ee_May      = 5,
+    ee_Jun      = 6,
+    ee_Jul      = 7,
+    ee_Aug      = 8,
+    ee_Sep      = 9,
+    ee_Oct      = 10,
+    ee_Nov      = 11,
+    ee_Dec      = 12
+} eEmonth_t;
 
 /** @typedef    typedef struct eEdate_t
     @brief      eEdate_t keeps the date of when a module is built or a board is made
@@ -143,7 +158,7 @@ typedef uint32_t    eEreltime_t;
 typedef struct                     
 {
     uint32_t            year  : 12;    /**< the year a.d. upto 2047 */
-    uint32_t            month : 4;     /**< the month, where jan is 1, dec is 12 */
+    uint32_t            month : 4;     /**< the month, where jan is 1, dec is 12. use eEmonth_t */
     uint32_t            day   : 5;     /**< the day from 1 to 31 */
     uint32_t            hour  : 5;     /**< the hour from 0 to 23 */
     uint32_t            min   : 6;     /**< the minute from 0 to 59 */
@@ -329,9 +344,16 @@ typedef struct
 {
     eEinfo_t            info;               /**< the extended info for the generic module                   */
     eEprotocolInfo_t    protocols;          /**< information on communication capabilities of the sw module */
-    uint8_t             extra[8];           /**< extra space for other information                          */
+    uint8_t             extra[8];           /**< extra space for other information.          */
 } eEmoduleInfo_t;       EECOMMON_VERIFYsizeof(eEmoduleInfo_t, 64);
 
+
+typedef struct                   
+{
+    eEmoduleInfo_t      moduleinfo;                 /**< normal moduleinfo. fill field extra[] with "EXT" to tell that it is a eEmoduleExtendedInfo_t object */
+    char                compilationdatetime[24];    // it must keep macro expansion __DATE__ " " __TIME__ which is in format: Dec 01 2001 16:32:59
+    uint8_t             userdefined[40];
+} eEmoduleExtendedInfo_t; EECOMMON_VERIFYsizeof(eEmoduleExtendedInfo_t, 128);
 
 /** @typedef    typedef enum eEprocess_t
     @brief      eEprocess_t keep the allowed eProcesses in embENV.
@@ -395,6 +417,10 @@ extern inline const eEentity_t * ee_common_moduleinfo_to_entity(const eEmoduleIn
 { 
     return((const eEentity_t*)&(mi->info.entity)); 
 }
+
+extern const char* ee_common_get_month_string(eEdate_t date);
+
+extern eEresult_t ee_is_extendemoduleinfo_valid(eEmoduleExtendedInfo_t* extmodinfo);
 
 extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid);
  
