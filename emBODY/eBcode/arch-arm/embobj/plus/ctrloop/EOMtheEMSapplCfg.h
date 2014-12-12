@@ -97,7 +97,7 @@ typedef const struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eEmoduleInfo_t eom_emsapplcfg_modinfo;
+extern const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended;
 
 //extern const uint32_t eom_emsapplcfg_extra;
 
