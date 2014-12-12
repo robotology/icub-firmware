@@ -105,55 +105,60 @@ extern const ipal_cfg_t    ipal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-const eEmoduleInfo_t eom_emsapplcfg_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
-    .info           =
+    .moduleinfo = 
     {
-        .entity     =
+        .info           =
         {
-            .type       = ee_entity_process,
-            .signature  = ee_procApplication,
-            .version    = 
-            { 
-                .major = EOMTHEEMSAPPLCFG_VERSION_MAJOR, 
-                .minor = EOMTHEEMSAPPLCFG_VERSION_MINOR
-            },  
-            .builddate  = 
+            .entity     =
             {
-                .year  = EOMTHEEMSAPPLCFG_BUILDDATE_YEAR,
-                .month = EOMTHEEMSAPPLCFG_BUILDDATE_MONTH,
-                .day   = EOMTHEEMSAPPLCFG_BUILDDATE_DAY,
-                .hour  = EOMTHEEMSAPPLCFG_BUILDDATE_HOUR,
-                .min   = EOMTHEEMSAPPLCFG_BUILDDATE_MIN
-            }
+                .type       = ee_entity_process,
+                .signature  = ee_procApplication,
+                .version    = 
+                { 
+                    .major = EOMTHEEMSAPPLCFG_VERSION_MAJOR, 
+                    .minor = EOMTHEEMSAPPLCFG_VERSION_MINOR
+                },  
+                .builddate  = 
+                {
+                    .year  = EOMTHEEMSAPPLCFG_BUILDDATE_YEAR,
+                    .month = EOMTHEEMSAPPLCFG_BUILDDATE_MONTH,
+                    .day   = EOMTHEEMSAPPLCFG_BUILDDATE_DAY,
+                    .hour  = EOMTHEEMSAPPLCFG_BUILDDATE_HOUR,
+                    .min   = EOMTHEEMSAPPLCFG_BUILDDATE_MIN
+                }
+            },
+            .rom        = 
+            {   
+                .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
+                .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
+            },
+            .ram        = 
+            {   
+                .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
+                .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
+            },
+            .storage    = 
+            {
+                .type   = ee_strg_none,
+                .size   = 0,
+                .addr   = 0
+            },
+            .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,  
+            .name           = EOMTHEEMSAPPLCFG_NAME
         },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
-            .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
-            .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
-        },
-        .storage    = 
+        .protocols  =
         {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
+            .udpprotversion  = { .major = 1, .minor = 0},
+            .can1protversion = { .major = 1, .minor = 0},
+            .can2protversion = { .major = 1, .minor = 0},
+            .gtwprotversion  = { .major = 0, .minor = 0}
         },
-        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,  
-        .name           = EOMTHEEMSAPPLCFG_NAME
+        .extra      = {"EXT"}
     },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 1, .minor = 0},
-        .can1protversion = { .major = 1, .minor = 0},
-        .can2protversion = { .major = 1, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
+    .compilationdatetime    = __DATE__ " " __TIME__,
+    .userdefined            = {0}
 };
 
 
@@ -214,7 +219,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .applcfg        =
     {
-        .emsappinfo             = &eom_emsapplcfg_modinfo, 
+        .emsappinfo             = (eEmoduleInfo_t*)&eom_emsapplcfg_modinfo_extended, 
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4)    
     },
     .wipnetcfg      =
