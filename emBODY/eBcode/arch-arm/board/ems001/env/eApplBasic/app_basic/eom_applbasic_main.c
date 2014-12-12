@@ -169,7 +169,7 @@ static void s_eom_applbasic_main_init(void)
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
       
-    eo_armenv_Initialise(&eom_applbasic_info_modinfo, NULL);
+    eo_armenv_Initialise((const eEmoduleInfo_t *)&eom_applbasic_info_modinfo_extended, NULL);
     eov_env_SharedData_Synchronise(eo_armenv_GetHandle());
 
 
