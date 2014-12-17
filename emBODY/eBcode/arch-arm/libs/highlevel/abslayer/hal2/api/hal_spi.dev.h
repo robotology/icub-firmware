@@ -222,18 +222,51 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
   */
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg); 
 
+/** @fn			extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
+    @brief  	this function enable the rx isr for the SPI
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
 extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id);
+
+/** @fn			extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
+    @brief  	this function disable the rx isr for the SPI
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
 extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id);
+
+/** @fn			extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
+    @brief  	this function enable the SPI peripherical
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
 extern hal_result_t hal_spi_periph_enable(hal_spi_t id);
+
+/** @fn			extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
+    @brief  	this function disable the SPI peripherical
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
 extern hal_result_t hal_spi_periph_disable(hal_spi_t id);
-extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe);
+
+/** @fn			extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
+    @brief  	this function set the size of frame to be used by the isr to call the callback function
+    @param  	id	                the id
+							framesize						number of bytes contained in the frame
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
 extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
 
-//Test to read a register for the encoder
-/*
-extern hal_result_t hal_spi_read_reg_init(hal_spi_t id, char address);
-extern hal_result_t hal_spi_read_reg_execute(hal_spi_t id);
-*/
+/** @fn			extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
+    @brief  	this function set the tx frame by copying the bytes array pointed by txframe 
+    @param  	id	                the id
+							txframe							pointer to the transmission frame
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe);
+
+
 /** @}            
     end of group doxy_group_hal_spi  
  **/

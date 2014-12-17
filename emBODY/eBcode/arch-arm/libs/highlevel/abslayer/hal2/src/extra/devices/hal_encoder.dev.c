@@ -39,7 +39,6 @@
 #include "hl_bits.h" 
 #include "hal_heap.h"
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,7 +63,15 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const hal_encoder_cfg_t hal_encoder_cfg_default = { .priority = hal_int_priority15, .callback_on_rx = NULL, .arg = NULL, .type = hal_encoder_tundefined};
+extern const hal_encoder_cfg_t hal_encoder_cfg_default =
+{ 
+	.priority = 			hal_int_priority15, 
+	.callback_on_rx = NULL,
+	.arg = 						NULL, 
+	.type = 					hal_encoder_tundefined, 
+	.reg_address = 		NULL, 
+	.sdata_precheck = hal_false
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -79,7 +86,6 @@ typedef struct
     hal_spi_t               spiid;
     hal_encoder_position_t  position;
     uint8_t                 rxframes[3][4]; //3 possible frames received. The size of everyone is the maximum possible
-		uint8_t									act_reg_add;
 } hal_encoder_internal_item_t;
 
 
@@ -200,7 +206,6 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     intitem->muxid  = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxid;
     intitem->muxsel = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
     intitem->position  = 0;
-		intitem->act_reg_add = 0x00;
     
     res = hal_mux_init(intitem->muxid, NULL);
     if(hal_res_OK != res)
@@ -235,44 +240,61 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     return(hal_res_OK);
 }
 
-//Start reading for encoder t1
+//Start reading for the encoders
 extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
 {  
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
-		static const uint8_t txframe_dummy[3] = {0x00, 0x00, 0x00};
-    
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_encoder_initted_is(id))
-    {
+			if(hal_false == s_hal_encoder_initted_is(id))
+			{
         return(hal_res_NOK_generic);
-    }
-		if (intitem->config.type != hal_encoder_t1)
-		{
-		return (hal_res_NOK_generic);
-		}
+			}
 #endif
-    // Mux enabled
-    hal_mux_enable(intitem->muxid, intitem->muxsel);
+		//Encoder type 1 (AEA)
+		if (intitem->config.type == hal_encoder_t1)
+		{
+			static const uint8_t txframe_dummy[3] = {0x00, 0x00, 0x00};
+			// Mux enabled
+			hal_mux_enable(intitem->muxid, intitem->muxsel);
     
-		// SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
+			// SPI: set the callback function
+			hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
     
-		//Added 26/11/2014
-		//----------------
-		// SPI: set the sizeofframe for this transmission (3)
-		hal_spi_set_sizeofframe(intitem->spiid, 3);
+			//Added 26/11/2014
+			//----------------
+			// SPI: set the sizeofframe for this transmission (3)
+			hal_spi_set_sizeofframe(intitem->spiid, 3);
 	
-		// SPI: set the isrtxframe
-		hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy);
-		//----------------
+			// SPI: set the isrtxframe
+			hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy);
+			//----------------
 		
-		// SPI start to receive (only one frame)
-    hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
+			// SPI start to receive (only one frame)
+			hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
     
-    // when the frame is received, then the isr will call s_hal_encoder_onreceiv() to copy the frame into local memory,
-    // so that hal_encoder_get_value() can be called to retrieve teh encoder value
-    
-    return(hal_res_OK);
+			// when the frame is received, then the isr will call s_hal_encoder_onreceiv() to copy the frame into local memory,
+			// so that hal_encoder_get_value() can be called to retrieve teh encoder value
+		}
+		//Encoder type 2 (AMO)
+		else if (intitem->config.type == hal_encoder_t2)
+		{		
+			//Enabling the MUX
+			hal_mux_enable(intitem->muxid, intitem->muxsel);
+			
+			//Precheck needed
+			if(hal_true == intitem->config.sdata_precheck)
+			{
+				s_hal_encoder_read_sdad_status_t2 (id);
+			}
+			//Precheck not needed
+			else
+			{
+				intitem->rxframes[0][0] = 0xF5;
+				intitem->rxframes[0][1] = UINT8_MAX;
+				s_hal_encoder_read_sensor_t2 (id);
+			}
+			}
+			return(hal_res_OK);
 }
 
 //Start reading for encoder t2
@@ -290,7 +312,7 @@ extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id, uint8_t reg_addr
 		}
 #endif
 		// Saving the status register address to be read in intitem
-		intitem->act_reg_add = reg_address;
+		//intitem->act_reg_address = reg_address;
 		
 		//Enabling the MUX
 		hal_mux_enable(intitem->muxid, intitem->muxsel);
@@ -313,33 +335,93 @@ extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id, uint8_t reg_addr
 }
 
 // Get the last value saved with a read_start
-extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value)
+extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* pos, hal_encoder_errors_flags* e_flags)
 {
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
-
+	
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
     if(hal_false == s_hal_encoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-		if(NULL == value)
+#endif
+		
+#if !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if((NULL == pos) || (NULL == e_flags))
     {
-        return(hal_res_NOK_generic); 
+        return(hal_res_NOK_nullpointer);
     }
 #endif
-		// Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
-		// Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
-		// - first 12 bits of positional data
-		// - last 6 bits of validity checks
-		// In particular I check OCF, COF and LIN, which must have particular values (1,0,0) to validate the frame
-		// Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
-		if((intitem->rxframes[1][1] & 0x07) != 0x04)
+		//Encoder type 1 (AEA)
+		if (intitem->config.type == hal_encoder_t1)
 		{
-			return(hal_res_NOK_generic); 
+			// Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
+			// Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
+			// - first 12 MSB bits of positional data
+			// - last 6 LSB bits of validity checks
+			// In particular I check OCF, COF and LIN, which must have particular values (1,0,0) to validate the frame
+			// Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
+			if((intitem->rxframes[1][1] & 0x07) != 0x04)
+			{
+				//Everything 0xFF, SPI is not working
+				if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF))
+				{	
+					e_flags->tx_error = 1;
+					return(hal_res_NOK_generic);
+				}
+				if (((intitem->rxframes[1][1] & 0x01) != 0x00) || ((intitem->rxframes[1][1] & 0x02) != 0x00))
+				{
+					e_flags->data_error = 1;
+				}
+				if ((intitem->rxframes[1][1] & 0x04) != 0x04)
+				{
+					e_flags->data_notready = 1;
+				}
+			}
+				// Leave out the control bits and output only the sensor data
+				*pos = (intitem->position >> 6) & 0x00FFF;
 		}
-
-		*value = (intitem->position >> 6) & 0x00FFF;
-    return(hal_res_OK);
+		//Encoder type 2 (AMO)
+		else if (intitem->config.type == hal_encoder_t2)
+		{
+			// Check if SPI connection is working
+			// Here I check only the first bytes received for all the communications, which should be = to the different
+			// opcode used
+			if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
+			{
+				if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF) && ((intitem->rxframes[1][3]) == 0xFF))
+				{
+					e_flags->tx_error = 1;
+					return(hal_res_NOK_generic);	
+				}
+			}
+			//Check errors for reg: 0x76
+			if ((intitem->config.reg_address) == 0x76)
+			{				
+				if(((intitem->rxframes[2][2]) & 0x0F) != 0x00)
+				{
+					e_flags->data_error = 1;
+				}
+				if(((intitem->rxframes[2][2]) & 0x10) != 0x00)
+				{
+					e_flags->data_notready = 1;
+				}
+			}
+			//Check errors for reg: 0x77
+			else if ((intitem->config.reg_address) == 0x77)
+			{
+				if(((intitem->rxframes[2][2]) & 0x08) != 0x00)
+				{
+					e_flags->data_error = 1;
+				}
+				if(((intitem->rxframes[2][2]) & 0xC0) != 0x00)
+				{
+					e_flags->chip_error = 1;
+				}
+			}
+				*pos= intitem->position;
+		}
+		return(hal_res_OK);		
 }
 
 // Get the last values saved with a read_start_t2
@@ -402,7 +484,6 @@ extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes)
 		return(hal_res_OK);
 }
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -462,8 +543,11 @@ static hal_result_t s_hal_encoder_read_register_init_t2(hal_encoder_t id)
 {
 		hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
 	
+		if (intitem->config.reg_address == NULL)
+				return (hal_res_NOK_generic);
+		
 		//Not const, cause it could change every time...
-		uint8_t txframe_rinit[2] = {0x97, intitem->act_reg_add};
+		uint8_t txframe_rinit[2] = {0x97, intitem->config.reg_address};
 	
 		//Enable CHIPSELECT
 		hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
@@ -554,7 +638,6 @@ static void s_hal_encoder_onreceiv_sdad_status(void* p)
     hal_encoder_t id = (hal_encoder_t)tmp;
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
     
-    //hal_mux_disable(intitem->muxid);
 		//Disable chip select
 		hal_gpio_setval(intitem->chip_sel, hal_gpio_valHIGH);
     
@@ -562,8 +645,7 @@ static void s_hal_encoder_onreceiv_sdad_status(void* p)
 		// hal_spi_get collects data directly from the fifo associated to the receveing packets
 		// gets all the items inside the fifo (in this case)
     hal_spi_get(intitem->spiid, intitem->rxframes[0], NULL);
-	
-		//phase = 2;
+
 		//Invoke the reading of the sensor data
 		s_hal_encoder_read_sensor_t2 (id);
 }

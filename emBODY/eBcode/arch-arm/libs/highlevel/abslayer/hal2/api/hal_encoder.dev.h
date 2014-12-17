@@ -78,12 +78,21 @@ typedef enum
 		hal_encoder_tundefined = -1
 } hal_encoder_type;
 
-
 /** @typedef    typedef uint32_t hal_encoder_position_t
-    @brief      contains value of encoder
+    @brief      contains postional value of encoder
  **/
 typedef uint32_t hal_encoder_position_t;
 
+/** @typedef    typedef struct hal_encoder_errors_flags
+    @brief      contains the flag denoting errors for the encoder
+ **/
+typedef struct
+{
+	uint8_t tx_error: 1;
+	uint8_t data_error: 1;
+	uint8_t data_notready: 1;
+	uint8_t chip_error: 1;
+} hal_encoder_errors_flags;
 
 /** @typedef    typedef struct hal_encoder_cfg_t;
     @brief      contains configuration data of encoder.
@@ -94,6 +103,8 @@ typedef struct
     void (*callback_on_rx)(void *arg);          /**< callback called when a new value for the encoder is available   */
     void*                       arg;            /**< argument of the callback: contains pointer to latest encoder value  */
 		hal_encoder_type						type;						/**< Encoder model. type 1: AEA, type 2: AMO Board */
+		uint8_t											reg_address;		/**< Address of the register to be read to validate the sensor data (not meaningful for AEA board) */
+		hal_bool_t									sdata_precheck;	/**< If TRUE, perform a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
 } hal_encoder_cfg_t;
 
  
@@ -112,7 +123,6 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default;   // = { .priority = hal
   */
 extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg);
 
-
 /** @fn			extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
     @brief  	This function starts reading of data from the encoder in a non-blocking way.
                 When reading is finished, then the callback on reception is invoked, which can
@@ -122,14 +132,16 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
   */
 extern hal_result_t hal_encoder_read_start(hal_encoder_t id);
 
-
-/** @fn			extern uint32_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value);
+/** @fn			  extern uint32_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value);
     @brief  	This function reads data previously acquired by a call of hal_encoder_start().
     @param  	encoder 	    the encoder
-    @param  	value 	        keeps the value.
+    @param  	pos 	        keeps the position value.
+		@param  	e_flags 	    keeps the flags which validate tha positional data
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
-extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* value);
+extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* pos, hal_encoder_errors_flags* e_flags);
+
+/* Testing API (only for AMO board). It's possible to use the functions above, without losing features */
 
 /** @fn			extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id)
     @brief  	This function starts reading of data from the encoder of type 2 (AMO board) in a non-blocking way.
