@@ -198,6 +198,30 @@ extern EOMtheEMStransceiver* eom_emstransceiver_GetHandle(void)
     }
 }
 
+
+extern void eom_emstransceiver_DeInitialise(EOMtheEMStransceiver* p)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+    
+    if(NULL == p->transceiver)
+    {
+        return;
+    }
+    
+    eo_infodispatcher_DeInitialise(eo_infodispatcher_GetHandle());
+    
+    eo_boardtransceiver_DeInitialise(eo_boardtransceiver_GetHandle());
+    
+
+    p->transceiver = NULL;
+    
+    return;
+}
+
+
 extern eOipv4addr_t eom_emstransceiver_GetIPhost(EOMtheEMStransceiver* p)
 {
     if(NULL == p)

@@ -111,13 +111,21 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
  **/
 extern EOMtheEMStransceiver * eom_emstransceiver_GetHandle(void);
 
+
+/** @fn         extern void eom_emstransceiver_DeInitialise(EOMtheEMStransceiver* p);
+    @brief      Deinitialise the EOMtheEMStransceiver 
+    @arg        p           The handle to the EOMtheEMStransceiver
+ **/
+extern void eom_emstransceiver_DeInitialise(EOMtheEMStransceiver* p);
+
+
 extern eOipv4addr_t eom_emstransceiver_GetIPhost(EOMtheEMStransceiver* p);
 
 
 /** @fn         extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p)
     @brief      Retrieves the handle to the transceiver instantiated in the EOMtheEMStransceiver 
     @arg        p                       The handle to the EOMtheEMStransceiver
-    @return     The requ    ired EOtransceiver
+    @return     The required EOtransceiver
  **/
 extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p);
 
