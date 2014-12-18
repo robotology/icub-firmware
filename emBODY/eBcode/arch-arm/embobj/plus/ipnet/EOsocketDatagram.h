@@ -123,6 +123,14 @@ extern EOsocketDatagram* eo_socketdtg_New(uint8_t dtg_in_num, uint16_t dtg_in_si
                                           uint8_t dtg_out_num, uint16_t dtg_out_size, EOVmutexDerived *mtx_fifo_out);
 
 
+/** @fn         extern void eo_socketdtg_Delete(EOsocketDatagram *p)
+    @brief      deletes a datagram socket object. before destroying the object, it internally calls eo_socketdtg_Close().
+    @param      p               The object pointer. 
+ **/
+extern void eo_socketdtg_Delete(EOsocketDatagram *p);
+    
+
+
 /** @fn         extern eOresult_t eo_socketdtg_Open(EOsocketDatagram *p, eOipv4port_t localport, eOsocketDirection_t dir, 
                                                     eObool_t block2wait4packet, eOsktdtgTXmode_t *txmode, 
                                                     EOaction *onrx, EOaction *ontx)

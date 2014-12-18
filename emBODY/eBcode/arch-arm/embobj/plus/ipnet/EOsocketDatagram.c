@@ -142,6 +142,43 @@ extern EOsocketDatagram* eo_socketdtg_New(uint8_t dtg_in_num, uint16_t dtg_in_si
 }
 
 
+extern void eo_socketdtg_Delete(EOsocketDatagram *p)
+{
+    if(NULL == p)
+    {
+        return;
+    } 
+    
+    if(NULL == p->actiontx)
+    {
+        return;
+    }
+    
+    // at first close it. this action also detaches the socket from the ipnet. the detach operation deletes the ipal udp socket 
+    eo_socketdtg_Close(p);
+
+    // then
+    eo_action_Delete(p->actiontx);
+    eo_timer_Delete(p->txtimer);
+    
+    if(NULL != p->dgramfifoinput)
+    {
+        eo_fifo_Delete(p->dgramfifoinput);
+    }
+    if(NULL != p->dgramfifooutput)
+    {
+        eo_fifo_Delete(p->dgramfifooutput);
+    }
+    eo_socket_Delete(p->socket);
+    
+    memset(p, 0, sizeof(EOsocketDatagram));
+    
+    eo_mempool_Delete(eo_mempool_GetHandle(), p);
+    return;
+       
+}
+
+
 extern eOresult_t eo_socketdtg_Open(EOsocketDatagram *p, eOipv4port_t localport, eOsocketDirection_t dir, eObool_t block2wait4packet, eOsktdtgTXmode_t *txmode, EOaction *onrx, EOaction *ontx)
 {
 
