@@ -97,7 +97,7 @@ evEntityId_t evprev_ipnetarp;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern eOmipnet_diagnosticsinfo_t eom_ipnet_diagnosticsInfo  =
+eOmipnet_diagnosticsinfo_t eom_ipnet_diagnosticsInfo  =
 {
     .datagrams_failed_to_go_in_rxfifo                       = 0,
     .datagrams_failed_to_go_in_txosalqueue                  = 0,
