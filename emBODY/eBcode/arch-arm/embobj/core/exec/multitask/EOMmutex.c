@@ -70,6 +70,8 @@
 static eOresult_t s_eom_mutex_take(void *p, eOreltime_t tout);
 // virtual
 static eOresult_t s_eom_mutex_release(void *p);
+// virtual
+static eOresult_t s_eom_mutex_delete(void *p); 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,7 +97,7 @@ extern EOMmutex* eom_mutex_New(void)
     retptr->mutex = eov_mutex_hid_New();
 
     // init its vtable
-    eov_mutex_hid_SetVTABLE(retptr->mutex, s_eom_mutex_take, s_eom_mutex_release); 
+    eov_mutex_hid_SetVTABLE(retptr->mutex, s_eom_mutex_take, s_eom_mutex_release, s_eom_mutex_delete); 
     
     // i get a new ral mutex
     retptr->osalmutex = osal_mutex_new();
@@ -104,6 +106,29 @@ extern EOMmutex* eom_mutex_New(void)
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osalmutex), "eom_mutex_New(): osal_mutex_new() returns NULL", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     
     return(retptr);    
+}
+
+
+extern void eom_mutex_Delete(EOMmutex *m) 
+{    
+    if(NULL == m)
+    {
+        return;
+    }
+    
+    if(NULL == m->osalmutex)
+    {
+        return;
+    }
+    
+    osal_mutex_delete(m->osalmutex);
+    
+    eov_mutex_hid_Delete(m->mutex);
+    
+    memset(m, 0, sizeof(EOMmutex));
+    
+    eo_mempool_Delete(eo_mempool_GetHandle(), m);
+    return;
 }
 
 
@@ -157,6 +182,13 @@ static eOresult_t s_eom_mutex_release(void *p)
     return((eOresult_t)osal_mutex_release(m->osalmutex));
 }
 
+static eOresult_t s_eom_mutex_delete(void *p) 
+{
+    EOMmutex *m = (EOMmutex *)p;
+    
+    eom_mutex_Delete(m);
+    return(eores_OK);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

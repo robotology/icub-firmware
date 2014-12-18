@@ -78,6 +78,13 @@ typedef struct EOMmutex_hid EOMmutex;
 extern EOMmutex * eom_mutex_New(void);
 
 
+/** @fn         extern void eom_mutex_Delete(EOMmutex *m)
+    @brief      Deletes a given EOMmutex object 
+    @param      m               The mutex
+ **/
+extern void eom_mutex_Delete(EOMmutex *m);
+
+
 /** @fn         extern eOresult_t eom_mutex_Take(EOMmutex *const m, eOreltime_t tout)
     @brief      It takes a multitask mutex with a given timeout. If the mutex is already taken by another task,
                 the function waits its release accoring to the value of @e tout. The mutex has priority inversion. 

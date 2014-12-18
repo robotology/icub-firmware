@@ -35,7 +35,8 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOVmutex.h"
-
+    
+#include "osal.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
