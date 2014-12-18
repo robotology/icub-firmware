@@ -97,6 +97,7 @@ typedef enum
 
 extern EOsocket* eo_socket_New(void);
 
+extern void eo_socket_Delete(EOsocket *p);
 
 
 /** @}            

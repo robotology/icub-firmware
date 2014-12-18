@@ -107,6 +107,29 @@ extern EOsocket* eo_socket_New(void)
     return(retptr);
 }
 
+
+extern void eo_socket_Delete(EOsocket *p)
+{
+    if(NULL == p)
+    {
+        return;
+    } 
+    
+    if(NULL == p->onreception)
+    {
+        return;
+    }
+    
+    eo_action_Delete(p->onreception);
+    eo_action_Delete(p->ontransmission);
+
+
+    memset(p, 0, sizeof(EOsocket));
+    
+    eo_mempool_Delete(eo_mempool_GetHandle(), p);
+    return;
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
