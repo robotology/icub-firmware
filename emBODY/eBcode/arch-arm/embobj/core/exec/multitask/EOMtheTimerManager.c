@@ -79,10 +79,11 @@ const eOmtimerman_cfg_t eom_timerman_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-void s_eom_timerman_tskproc_forever(EOMtask *rt, uint32_t msg);
+static void s_eom_timerman_tskproc_forever(EOMtask *rt, uint32_t msg);
 
 static void s_eom_timerman_ProcessExpiry(eOmessage_t msg);
 static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t);
+static eOresult_t s_eom_timerman_OnDelTimer(EOVtheTimerManager* tm, EOtimer *t);
 static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t);
 static eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t);
 
@@ -129,7 +130,7 @@ extern EOMtheTimerManager * eom_timerman_Initialise(const eOmtimerman_cfg_t *tmr
     eo_errman_Assert(eo_errman_GetHandle(), (0 != tmrmancfg->priority), "eom_timerman_Initialise(): 0 priority", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     
     // i get a basic timer manager with onnew, add and rem functions proper for osal. and an EOMmutex (by the way ... eom_mutex_New() never returns NULL).
-    s_eom_thetimermanager.tmrman = eov_timerman_hid_Initialise(s_eom_timerman_OnNewTimer, s_eom_timerman_AddTimer, s_eom_timerman_RemTimer, eom_mutex_New()); 
+    s_eom_thetimermanager.tmrman = eov_timerman_hid_Initialise(s_eom_timerman_OnNewTimer, s_eom_timerman_OnDelTimer, s_eom_timerman_AddTimer, s_eom_timerman_RemTimer, eom_mutex_New()); 
 
     // i prepare the task able to process actions associated to expiry of the timers 
     s_eom_thetimermanager.tskproc = eom_task_New(eom_mtask_MessageDriven,                          // type 
@@ -248,6 +249,42 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
 //    eom_mutex_Release(tm->mutex);
 
     return(res);  
+   
+}
+
+
+static eOresult_t s_eom_timerman_OnDelTimer(EOVtheTimerManager* tm, EOtimer *t) 
+{
+    eOresult_t res = eores_NOK_generic;
+    
+    if((NULL == tm) || (NULL == t)) 
+    {
+        return(eores_NOK_nullpointer);    
+    }
+    
+    if(NULL == t->envir.osaltimer)
+    {
+        // this timer has already been deleted 
+        return(eores_OK);
+    }
+
+// no need to protect data structures of the timer manager    
+//    if(eores_OK != eom_mutex_Take(tm->mutex, eok_reltimeINFINITE))
+//    {
+//        // cannot lock it ... bye bye
+//         return(eores_NOK_generic);
+//    }
+    
+    // delete the osal timer
+    osal_timer_delete(t->envir.osaltimer);
+    t->status = EOTIMER_STATUS_IDLE;
+    t->envir.osaltimer = NULL;
+        
+    
+//    // unlock the manager
+//    eom_mutex_Release(tm->mutex);
+
+    return(eores_OK);  
    
 }
 
