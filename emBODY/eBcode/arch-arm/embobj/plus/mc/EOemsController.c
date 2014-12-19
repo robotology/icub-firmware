@@ -27,6 +27,8 @@
 #include "EOrop.h"
 #include "EOprotocolMN.h"
 #include "EOnv_hid.h"
+#include "EoError.h"
+#include "EOtheErrorManager.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
@@ -65,7 +67,9 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
 #define MOTORS(m)   SCAN(m)
 #define ENCODERS(e) SCAN(e)
 
-#define AXIS_TORQUE_SENS_FAULT 0x0100
+#define AXIS_TORQUE_SENS_FAULT   0x0100
+#define AEA_ABS_ENC_INVALID_DATA 0x4000
+#define AEA_ABS_ENC_TIMEOUT      0x8000
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -177,22 +181,6 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     ////////////////////////////////////////////////////
     // CHECK HARDWARE AEA ENCODER & MOTOR FAULT
     
-    /*
-    #define MOTOR_EXTERNAL_FAULT     0x0001
-    #define MOTOR_OVERCURRENT_FAULT  0x0002
-    #define MOTOR_I2T_LIMIT_FAULT    0x0004
-    #define MOTOR_HALLSENSORS_FAULT  0x0008
-    #define MOTOR_QENCODER_FAULT     0x0010
-    #define MOTOR_CAN_INVALID_PROT   0x0020
-    #define MOTOR_CAN_GENERIC_FAULT  0x0040
-
-    #define AXIS_TORQUE_SENS_FAULT   0x0080
-
-    #define SM_INVALID_FAULT         0x40
-    #define SM_TIMEOUT_FAULT         0x80
-    #define SM_HARDWARE_FAULT        0xC0
-    */
-    
     static uint32_t ems_fault_mask_old[4];
            uint32_t ems_fault_mask_new[4];
     
@@ -278,32 +266,166 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         
     #endif
 
-    uint8_t faulted = 0;
-    uint8_t changed = 0;
+    //uint8_t changed = 0;
+        
+    static uint16_t transmit_time = 0;
+        
+    if (++transmit_time >= 5000)
+    {
+        transmit_time = 0;
+        
+        JOINTS(j) ems_fault_mask_old[j] = 0;
+    }
         
     JOINTS(j)
     {    
-        if (ems_fault_mask_new[j] != ems_fault_mask_old[j]) changed = 1;
-        
-        if (ems_fault_mask_new[j]) faulted = 1;
-        
-        ems_fault_mask_old[j] = ems_fault_mask_new[j];
+        if (ems_fault_mask_new[j] != ems_fault_mask_old[j])
+        {
+            ems_fault_mask_old[j] = ems_fault_mask_new[j];
+         
+            //changed = 1;
+            
+            if (ems_fault_mask_new[j])
+            {
+                /*
+                MOTOR_EXTERNAL_FAULT     0x0001
+                MOTOR_OVERCURRENT_FAULT  0x0002
+                MOTOR_I2T_LIMIT_FAULT    0x0004
+                MOTOR_HALLSENSORS_FAULT  0x0008
+                MOTOR_QENCODER_FAULT     0x0010
+                MOTOR_CAN_INVALID_PROT   0x0020
+                MOTOR_CAN_GENERIC_FAULT  0x0040
+                MOTOR_CAN_NOT_RESPONDING 0x0080
+                AXIS_TORQUE_SENS_FAULT   0x0100
+                AEA_ABS_ENC_INVALID_DATA 0x4000
+                AEA_ABS_ENC_TIMEOUT      0x8000
+                */
+                
+                // 2FOC ERRORS
+                if (ems_fault_mask_new[j] & MOTOR_EXTERNAL_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_external_fault);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_OVERCURRENT_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_overcurrent);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_I2T_LIMIT_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_i2t_limit);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_HALLSENSORS_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_hallsensors);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_QENCODER_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_CAN_INVALID_PROT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_invalid_prot);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_CAN_GENERIC_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_generic);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & MOTOR_CAN_NOT_RESPONDING)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_no_answer);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                // BOARD ERRORS
+                if (ems_fault_mask_new[j] & AXIS_TORQUE_SENS_FAULT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 0; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & AEA_ABS_ENC_INVALID_DATA)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 0; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_invalid);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+                
+                if (ems_fault_mask_new[j] & AEA_ABS_ENC_TIMEOUT)
+                {
+                    eOerrmanDescriptor_t descriptor;
+                    descriptor.param = j; // unless required
+                    descriptor.sourcedevice = 0; // 0 e' board, 1 can1, 2 can2
+                    descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
+                    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_timeout);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+                }
+            }
+        }
     }
     
+    /*
     if (changed)
     {
-        if (faulted)
-        {
-            static char msg[31];
-            sprintf(msg, "*** ERROR %04X %04X %04X %04X\n", ems_fault_mask_new[0], ems_fault_mask_new[1], ems_fault_mask_new[2], ems_fault_mask_new[3]);
-            send_diagnostics_to_server(msg, 0xffffffff, 1);
-        }
-        else
-        {
-            send_diagnostics_to_server("*** EMS BOARD IS NOW OK\n", 0xffffffff, 1);
-        }
+        static char msg[31];
+        sprintf(msg, "*** ERROR %04X %04X %04X %04X\n", ems_fault_mask_new[0], ems_fault_mask_new[1], ems_fault_mask_new[2], ems_fault_mask_new[3]);
+
+        send_diagnostics_to_server(msg, 0xffffffff, 1);
     }
-        
+    */
+    
     // CHECK HARDWARE AEA ENCODER & MOTOR FAULT
     ////////////////////////////////////////////////////
         
@@ -986,6 +1108,7 @@ void set_2FOC_running(uint8_t motor)
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
 }
 
+/*
 extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime)
 {
 #if 1
@@ -1073,6 +1196,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
 #endif
 
 }
+*/
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
