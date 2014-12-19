@@ -480,7 +480,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         }break;
 
         case eomc_setpoint_current:
-        {             
+        {
             eo_emsController_SetOutput(jxx, setPoint->to.current.value);
         }break;
 
@@ -509,6 +509,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_velocity;
     #else
     icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_openloop;
+    //icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_current;
     #endif
     
     eOicubCanProto_msgDestination_t         msgdest;

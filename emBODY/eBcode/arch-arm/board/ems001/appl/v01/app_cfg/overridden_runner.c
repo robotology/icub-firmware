@@ -459,7 +459,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
 }
 #endif
 
-extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
+//extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
