@@ -904,14 +904,14 @@
           <GroupName>eo-nvs-cfg-usrcbk</GroupName>
           <Files>
             <File>
+              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
+            </File>
+            <File>
               <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
             <File>
               <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
@@ -2181,14 +2181,14 @@
           <GroupName>eo-nvs-cfg-usrcbk</GroupName>
           <Files>
             <File>
+              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
+            </File>
+            <File>
               <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mn_comm_usrcbk_ebx.c</FilePath>
             </File>
             <File>
               <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
