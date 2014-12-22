@@ -616,7 +616,8 @@ if (DIG_GYRO || DIG_ACC)
             }
             break;
             case  (CALIB):
-            {
+            {	
+				EnableIntT1;
                 board_MODE=new_board_MODE;
                 switch (CONFIG_TYPE)
                 {

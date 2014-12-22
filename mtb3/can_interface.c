@@ -643,9 +643,9 @@ int CAN1_handleRx (unsigned int board_id)
                     
                     new_board_MODE = board_MODE;
                     board_MODE = CALIB;
-                    transmission_was_enabled = can_transmission_enabled;
+                    transmission_was_enabled = 1;
                     can_enaDisa_transmission_messages(1);
-                    //EnableIntT1;
+                   // EnableIntT1;
                 }break;
                 
                 case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE:
