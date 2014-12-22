@@ -963,14 +963,14 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                     ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
                     size+=snprintf(data+size, MAX0(capacityout-size), "*** e-process #%d \r\n", i);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "props\t%s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", running==i?"RUNNING ":"" ) ;
+                    size+=snprintf(data+size, MAX0(capacityout-size), "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", running==i?"RUNNING ":"" ) ;
 
-                    size+=snprintf(data+size, MAX0(capacityout-size), "name\t%s\r\n", s_modinfo->info.name);
-                    size+=snprintf(data+size, MAX0(capacityout-size), "vers\t%d.%d\r\n", 
+                    size+=snprintf(data+size, MAX0(capacityout-size), "name  %s\r\n", s_modinfo->info.name);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "vers  %d.%d\r\n", 
                         s_modinfo->info.entity.version.major, 
                         s_modinfo->info.entity.version.minor
                     );
-                    size+=snprintf(data+size, MAX0(capacityout-size), "date\t%s %.2d %d %d:%.2d\r\n", 
+                    size+=snprintf(data+size, MAX0(capacityout-size), "date  %s %.2d %d %d:%.2d\r\n", 
                         ee_common_get_month_string(s_modinfo->info.entity.builddate),
                         s_modinfo->info.entity.builddate.day,                    
                         s_modinfo->info.entity.builddate.year,
@@ -983,17 +983,17 @@ uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktou
                     //if(0 == strcmp((const char*)extinfo->moduleinfo.extra, extendstr))
                     if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
                     {
-                        size+=snprintf(data+size, MAX0(capacityout-size), "built\t%s\r\n", 
+                        size+=snprintf(data+size, MAX0(capacityout-size), "built %s\r\n", 
                             extinfo->compilationdatetime
                         );                        
                     }
                     else
                     {
-                        size+=snprintf(data+size, MAX0(capacityout-size), "built\tin unknown date\r\n"
+                        size+=snprintf(data+size, MAX0(capacityout-size), "built unknown date\r\n"
                         );    
                     }
 
-                    size+=snprintf(data+size, MAX0(capacityout-size), "rom\t@+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
 //                    size+=snprintf(data+size, MAX0(capacityout-size), "rom\t[0x%0.8X, 0x%0.8X)\r\n", s_modinfo->info.rom.addr, s_modinfo->info.rom.addr+s_modinfo->info.rom.size);
 //                    size+=snprintf(data+size, MAX0(capacityout-size), "ram\t[0x%0.8X, 0x%0.8X)\r\n", s_modinfo->info.ram.addr, s_modinfo->info.ram.addr+s_modinfo->info.ram.size);
 

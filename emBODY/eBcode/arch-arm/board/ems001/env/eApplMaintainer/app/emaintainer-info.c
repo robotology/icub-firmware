@@ -74,56 +74,56 @@ extern const ipal_cfg_t    ipal_cfg;
 
 #if (emBODYrobot_BOARD_NAME == boardEMS001)
 
-const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_process,
-            .signature  = ee_procApplication,
-            .version    = 
-            { 
-                .major = 2, 
-                .minor = 5
-            },  
-            .builddate  = 
-            {
-                .year  = 2014,
-                .month = 4,
-                .day   = 7,
-                .hour  = 16,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
-            .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
-            .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
-        },
-        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-        .name           = "EOMeMaintainer"
-    },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 0, .minor = 1},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
-};
+//const eEmoduleInfo_t emaintainer_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+//{
+//    .info           =
+//    {
+//        .entity     =
+//        {
+//            .type       = ee_entity_process,
+//            .signature  = ee_procApplication,
+//            .version    = 
+//            { 
+//                .major = 2, 
+//                .minor = 5
+//            },  
+//            .builddate  = 
+//            {
+//                .year  = 2014,
+//                .month = 4,
+//                .day   = 7,
+//                .hour  = 16,
+//                .min   = 0
+//            }
+//        },
+//        .rom        = 
+//        {   
+//            .addr   = EENV_MEMMAP_EAPPLICATION_ROMADDR,
+//            .size   = EENV_MEMMAP_EAPPLICATION_ROMSIZE
+//        },
+//        .ram        = 
+//        {   
+//            .addr   = EENV_MEMMAP_EAPPLICATION_RAMADDR,
+//            .size   = EENV_MEMMAP_EAPPLICATION_RAMSIZE
+//        },
+//        .storage    = 
+//        {
+//            .type   = ee_strg_none,
+//            .size   = 0,
+//            .addr   = 0
+//        },
+//        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
+//        .name           = "EOMeMaintainer"
+//    },
+//    .protocols  =
+//    {
+//        .udpprotversion  = { .major = 0, .minor = 1},
+//        .can1protversion = { .major = 0, .minor = 0},
+//        .can2protversion = { .major = 0, .minor = 0},
+//        .gtwprotversion  = { .major = 0, .minor = 0}
+//    },
+//    .extra      = {0}
+//};
 
 #elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
 
@@ -192,15 +192,15 @@ const eEmoduleExtendedInfo_t emaintainer_modinfo_extended __attribute__((at(EENV
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 10
+                    .minor = 11
                 },  
                 .builddate  = 
                 {
                     .year  = 2014,
                     .month = 12,
-                    .day   = 11,
-                    .hour  = 14,
-                    .min   = 0
+                    .day   = 22,
+                    .hour  = 11,
+                    .min   = 15
                 }
             },
             .rom        = 
