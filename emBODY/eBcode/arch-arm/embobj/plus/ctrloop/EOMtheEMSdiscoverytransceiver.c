@@ -87,14 +87,9 @@ const eOemsdiscoverytransceiver_cfg_t eom_emsdiscoverytransceiver_DefaultCfg =
 
 static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remaddr, eOipv4port_t remport);
 
-
 static void s_callback_shutdown2updater(void *p);
 
-
-
-//static void s_app_core_init(void);
-
-static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t pktoutcapacity, uint16_t *sizeout);
+static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -182,16 +177,14 @@ extern eOresult_t eom_emsdiscoverytransceiver_Parse(EOMtheEMSdiscoverytransceive
     eo_packet_Payload_Get(rxpkt, &data, &size);
     eo_packet_Addressing_Get(rxpkt, &remaddr, &remport);
     
-    if((EO_COMMON_IPV4ADDR_LOCALHOST != p->cfg.hostipv4addr) && (p->cfg.hostipv4addr != remaddr))
-    {   // p->cfg.hostipv4addr is not EO_COMMON_IPV4ADDR_LOCALHOST, then we can parse packets coming only from the host 
+    if((eok_ipv4addr_localhost != p->cfg.hostipv4addr) && (p->cfg.hostipv4addr != remaddr))
+    {   // p->cfg.hostipv4addr is not eok_ipv4addr_localhost, then we can parse packets coming only from the host 
         p->transmit = eobool_false;
         return(eores_NOK_generic);
     }
     else
-    {   // ok can parse the packet
-    
-        p->transmit = s_parse_and_form(data, size, remaddr, remport);
-        
+    {   // ok can parse the packet    
+        p->transmit = s_parse_and_form(data, size, remaddr, remport);        
         res = eores_OK;        
     }
      
@@ -290,7 +283,7 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
         if(eobool_true == transmit)
         {       
             eOipv4addr_t address = s_emsdiscoverytransceiver_singleton.cfg.hostipv4addr;
-            if(EO_COMMON_IPV4ADDR_LOCALHOST == address)
+            if(eok_ipv4addr_localhost == address)
             {
                 address = remaddr;
             }
@@ -402,16 +395,13 @@ enum {
 
 #define BOARD_TYPE_EMS 0x0A
 
-// static void s_app_core_init(void)
-// {
-//     // acemor: removed
-// //    hal_gpio_init(hal_gpio_portE, hal_gpio_pin13, hal_gpio_dirOUT, hal_gpio_speed_low); 
-// }
+#define MAX0(a) ( ((a)>0) ? (a) : (0) )
+
 
 
 // acemor: 0 error or nothing to do. 1 transmit back. 2 tx back and start countdown
 // acemor: bytes: CMD_SCAN 14, 
-static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t pktoutcapacity, uint16_t *sizeout)
+static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
 {
     uint8_t opcode = pktin[0]; // use 0 .... 1 only for debug
 //#warning --> to debug CHANGE IN 1 but then put 0 back !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -424,7 +414,7 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
         case CMD_SCAN:
         {
             
-            if(pktoutcapacity < 14)
+            if(capacityout < 14)
             {
                 *sizeout = 0;
                 retval = 2; 
@@ -487,6 +477,7 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
             {
                 pktout[0] = CMD_PROCS;
                 pktout[1] = num_procs; 
+                volatile eEmoduleExtendedInfo_t* extinfo = NULL;
 
                 char *data = (char*)pktout;
                 uint16_t size = 2;
@@ -495,28 +486,40 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t p
                 {
                     ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
 
-                    size+=sprintf(data+size,"*** e-proc #%d %s %s %s ***\r\n", i, defproc==i?"(def2run)":"", startup==i?"(startup)":"", running==i?"(RUNNING)":"" ) ;
+                    size+=snprintf(data+size, MAX0(capacityout-size), "*** e-process #%d \r\n", i);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", running==i?"RUNNING ":"" ) ;
 
-                    size+=sprintf(data+size, "name\t%s\r\n", s_modinfo->info.name);
-                    size+=sprintf(data+size, "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                    size+=snprintf(data+size, MAX0(capacityout-size), "name  %s\r\n", s_modinfo->info.name);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "vers  %d.%d\r\n", 
                         s_modinfo->info.entity.version.major, 
-                        s_modinfo->info.entity.version.minor,
-                        s_modinfo->info.entity.builddate.day,
-                        s_modinfo->info.entity.builddate.month,
+                        s_modinfo->info.entity.version.minor
+                    );
+                    size+=snprintf(data+size, MAX0(capacityout-size), "date  %s %.2d %d %d:%.2d\r\n", 
+                        ee_common_get_month_string(s_modinfo->info.entity.builddate),
+                        s_modinfo->info.entity.builddate.day,                    
                         s_modinfo->info.entity.builddate.year,
                         s_modinfo->info.entity.builddate.hour,
                         s_modinfo->info.entity.builddate.min
                     );
-                    size+=sprintf(data+size, "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
-                    size+=sprintf(data+size, "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
-                    size+=sprintf(data+size, "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
-                    size+=sprintf(data+size, "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
+                    
+                    extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+                    
+                    //if(0 == strcmp((const char*)extinfo->moduleinfo.extra, extendstr))
+                    if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+                    {
+                        size+=snprintf(data+size, MAX0(capacityout-size), "built %s\r\n", 
+                            extinfo->compilationdatetime
+                        );                        
+                    }
+                    else
+                    {
+                        size+=snprintf(data+size, MAX0(capacityout-size), "built unknown date\r\n"
+                        );    
+                    }
 
-                    size+=sprintf(data+size, "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
-                                                                : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
-                    size+=sprintf(data+size, "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
-                    size+=sprintf(data+size, "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
-                    size+=sprintf(data+size, "com.msk\t0x%0.8X\r\n\r\n", s_modinfo->info.communication);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+                    size+=snprintf(data+size, MAX0(capacityout-size), "\n");
+            
                 }
 
                 *sizeout = size + 1;

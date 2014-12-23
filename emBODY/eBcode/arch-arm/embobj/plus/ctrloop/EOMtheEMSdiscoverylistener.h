@@ -26,13 +26,17 @@ extern "C" {
 
 /** @file       EOMtheEMSdiscoverylistener.h
 	@brief      This header file implements public interface to the EMS discovery listener singleton.
+                     
  	@author     marco.accame@iit.it
 	@date       05/21/2012
  **/
 
 /** @defgroup eom_EOMtheEMSdiscoverylistener Singleton EOMtheEMSdiscoverylistener 
     
-    The .....  
+    The use of this object is to listen to UDP packets on a given port, so that some specific
+    actions are done. The commands are those sent by the ethLoader. The role of this object is just
+    to receive packets and sends replies in an event-based manner. The parsing of the packet and the forming of the
+    reply is done by teh companion object EOMtheEMSdiscoverytransceiver.
   
     @{		
  **/
@@ -53,9 +57,7 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef struct EOMtheEMSdiscoverylistener_hid EOMtheEMSdiscoverylistener
-    @brief      EOMtheEMSdiscoverylistener is an opaque struct. It is used to implement data abstraction for the 
-                object so that the user cannot see its private fields so that he/she is forced to manipulate the
-                object only with the proper public functions
+    @brief      EOMtheEMSdiscoverylistener is an opaque struct.
  **/  
 typedef struct EOMtheEMSdiscoverylistener_hid EOMtheEMSdiscoverylistener;
 

@@ -32,8 +32,10 @@ extern "C" {
 
 /** @defgroup eom_theemsdiscoverytransceiver Singleton EOMtheEMSdiscoverytransceiver 
     
-    The .....  
-  
+    The EOMtheEMSdiscoverytransceiver object works together with the EOMtheEMSdiscoverylistener to manage messages coming
+    from the ethLoader. Its main task is to shutdown and order execution of the eUpdater when a valid message received.  
+    The shutdown happens after 20 ms in order to allow a reply. TODO: make the 20ms a configuration parameter.
+    
     @{		
  **/
 
@@ -53,9 +55,7 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef struct EOMtheEMSdiscoverytransceiver_hid EOMtheEMSdiscoverytransceiver
-    @brief      EOMtheEMSdiscoverytransceiver is an opaque struct. It is used to implement data abstraction for the 
-                object so that the user cannot see its private fields so that he/she is forced to manipulate the
-                object only with the proper public functions
+    @brief      EOMtheEMSdiscoverytransceiver is an opaque struct. 
  **/  
 typedef struct EOMtheEMSdiscoverytransceiver_hid EOMtheEMSdiscoverytransceiver;
 
@@ -71,22 +71,19 @@ typedef enum
  **/
 typedef struct
 {
-    eOipv4addr_t                hostipv4addr;           /**< if EO_COMMON_IPV4ADDR_LOCALHOST, then we process packets from every ip address and reply to it */
-    eOipv4port_t                hostipv4port; 
-    uint16_t                    txpktcapacity;
-    eOemsdiscovery_protocol_t   discoveryprotocol;
-    eOreltime_t                 dbgshutdowntime;
+    eOipv4addr_t                hostipv4addr;       /**< if eok_ipv4addr_localhost, then we process packets from every ip address and reply to it */
+    eOipv4port_t                hostipv4port;       /**< the port is the same locally and in the host. the ethLoader uses port 3333 */ 
+    uint16_t                    txpktcapacity;      /**< the capacity of teh reply packet */
+    eOemsdiscovery_protocol_t   discoveryprotocol;  /**< the protocol to use */
+    eOreltime_t                 dbgshutdowntime;    /**< if non-0, then after the specified time a shutdown is forced and teh eUpdater is executed */
 } eOemsdiscoverytransceiver_cfg_t;
 
 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-// in here we shall place configuration of rop dimensione etc. now in defines such as EOK_BOARDDISCOVERYTRANSCEIVER_capacityofpacket etc.
-extern const eOemsdiscoverytransceiver_cfg_t eom_emsdiscoverytransceiver_DefaultCfg; // = { .hostipv4addr  = EO_COMMON_IPV4ADDR_LOCALHOST,
-                                                                                     //     .hostipv4port  = 3333,
-                                                                                     //     .txpktcapacity = 64
-                                                                                     //   };
+
+extern const eOemsdiscoverytransceiver_cfg_t eom_emsdiscoverytransceiver_DefaultCfg; 
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -110,6 +107,7 @@ extern EOMtheEMSdiscoverytransceiver * eom_emsdiscoverytransceiver_GetHandle(voi
 
 
 extern eOresult_t eom_emsdiscoverytransceiver_Parse(EOMtheEMSdiscoverytransceiver* p, EOpacket* rxpkt);
+
 
 extern eOresult_t eom_emsdiscoverytransceiver_GetReply(EOMtheEMSdiscoverytransceiver* p, EOpacket** txpkt);
 
