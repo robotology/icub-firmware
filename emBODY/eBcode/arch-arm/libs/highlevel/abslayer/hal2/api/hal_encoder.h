@@ -51,6 +51,15 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+
+typedef enum  
+{ 
+    hal_encoder_type1       = 0,
+	hal_encoder_type2       = 1,
+    hal_encoder_typeNONE    = 255
+} hal_encoder_type_t;
+
+
 /** @typedef    typedef enum hal_encoder_t 
     @brief      hal_encoder_t contains every possible encoder sensor. the way the encoder is read from the peripherals
                 of the MPU depends on internals of the encoder file. in case of encoders using spi and mux, then the mapping
@@ -63,7 +72,8 @@ typedef enum
     hal_encoder3 = 2,         
     hal_encoder4 = 3,
 	hal_encoder5 = 4,
-    hal_encoder6 = 5
+    hal_encoder6 = 5,
+    hal_encoderNONE = 255
 } hal_encoder_t;
 
 enum { hal_encoders_number = 6 };
