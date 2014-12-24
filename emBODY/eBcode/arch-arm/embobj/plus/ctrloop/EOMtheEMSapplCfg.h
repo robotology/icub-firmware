@@ -66,8 +66,14 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-// ok, but better move it elsewhere .... in the same place where we define the endpoint categories
-//enum {eom_emsappl_eptype_numberof = 3};
+/** @typedef    typedef struct EOVtheEMSapplCfgBody
+    @brief      It is used to hold the configuration of a specific application body ...
+ **/
+typedef struct
+{
+    uint32_t    type;
+    void*       thetrueconfig;
+} EOVtheEMSapplCfgBody;
 
 
 /** @typedef    typedef const struct EOMtheEMSapplCfg
@@ -88,6 +94,7 @@ typedef const struct
     eOemserror_cfg_t                errobjcfg;                  /**<   */
     eOemsconfigurator_cfg_t         cfgobjcfg;                  /**<   */
     eOemsrunner_cfg_t               runobjcfg;                  /**<   */
+    EOVtheEMSapplCfgBody*           applbodycfg;
 } EOMtheEMSapplCfg;        
 
 

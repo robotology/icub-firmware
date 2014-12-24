@@ -104,6 +104,7 @@ extern const ipal_cfg_t    ipal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+extern EOVtheEMSapplCfgBody theapplbodyconfig;
 
 const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -335,7 +336,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .maxnumofTXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS,                // so far it can be only 0 or 1 
         .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP,
         .TXdecimationfactor         = 1        
-    }
+    },
+    .applbodycfg    =  &theapplbodyconfig
 };
 
 
