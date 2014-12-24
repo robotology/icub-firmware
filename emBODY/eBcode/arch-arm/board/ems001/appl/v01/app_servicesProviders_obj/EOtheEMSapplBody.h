@@ -36,11 +36,13 @@
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
+
 #include "eOcommon.h"
-#include "EOnv.h"
 #include "EoManagement.h"
 
-//objs of app body
+#include "hal_encoder.h"
+
+
 #include "EOappTheDataBase.h"
 #include "EOappCanServicesProvider.h"
 #include "EOappEncodersReader.h"
@@ -65,50 +67,70 @@ typedef enum
 enum {eo_emsapplbody_deviceid_numberof = 3};
 
 
+/** @typedef    struct eo_emsapplbody_encoder_stream_t
+    @brief      contains representation of a stream of hal encoders. they all must be of the same type.
+ **/
+typedef struct 
+{
+    hal_encoder_type_t      type;                           /**< the type of encoders. they must be all homogeneous */
+    uint8_t                 numberof;                       /**< their number inside encoders[] */
+    hal_encoder_t           encoders[hal_encoders_number];  /**< the IDs of the encoders belonging to the stream without holes in the array */    
+} eo_emsapplbody_encoder_stream_t;
+
+
+// values of shifts to send to motor can board (MC4 only, because 2foc use a different way to coding data) 
 typedef struct
 {
+    uint8_t             jointVelocityShift;
+    uint8_t             jointVelocityEstimationShift;
+    uint8_t             jointAccelerationEstimationShift;
+} eo_emsapplbody_can_shiftvalues_t;   
+
+// broadcast policy to set to motor can boards (MC4 only, because 2FOC don't use icubCanProto)  
+typedef struct
+{
+    uint8_t             val2bcastList[4];
+} eo_emsapplbody_can_bcastpolicy_t;       
+    
+
+
+// marco.accame: comment by valentina.gaggero referred to the following struct, which earlier was un-named and inside eOemsapplbody_cfg_t
+// -->
+// in actual fact, all config data of mc4 boards are about joints: they should be one for each joint managed by mc4 board;
+// anyway these data are not configured by pc104, so we use one data for any joint. 
+
+typedef struct
+{
+    eo_emsapplbody_can_shiftvalues_t    shiftvalues;    /**< for mc4 */    
+    eo_emsapplbody_can_bcastpolicy_t    bcastpolicy;      
+} eo_emsapplbody_configMC4boards_t;
+    
+
+
+typedef struct
+{
+    eo_emsapplbody_encoder_stream_t     encoderstream0;
+    eo_emsapplbody_encoder_stream_t     encoderstream1;
     eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
     eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
-    uint16_t                            connectedEncodersMask;
-//     struct
-//     {
-//         eOnvEP8_t                        mc_endpoint;  /**<  motion control endopoint managed by the application    */
-//         eOnvEP8_t                        as_endpoint;  /**<  analog sensor endopoint managed by the application    */
-//         eOnvEP8_t                        sk_endpoint;  /**<  skin endopoint managed by the application    */
-
-//     } endpoints;
-    
-    struct
-    {
-        struct
-        {
-            uint8_t                     jointVelocityShift;
-            uint8_t                     jointVelocityEstimationShift;
-            uint8_t                     jointAccelerationEstimationShift;
-        } shiftvalues;       /**<  values of shifts to send to motor can board (MC4 only, because 2foc use a different way to coding data)    */  
-        
-        struct
-        {
-            uint8_t                     val2bcastList[4];
-        } bcastpolicy;       /**<  broadcast policy to set to motor can boards (MC4 only, because 2FOC don't use icubCanProto)    */
-    } configdataofMC4boards; /**<  in actual fact, all config data of mc4 boards are about joints: they should be one for each joint managed by mc4 board;
-                                   anyway these data are not configured by pc104, so we use one data for any joint.    */
-
-} eOtheEMSapplBody_cfg_t;
+    uint16_t                            connectedEncodersMask;    
+    eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
+} eOemsapplbody_cfg_t;
 
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 
-extern const eOtheEMSapplBody_cfg_t eOtheEMSappBody_cfg_default;
+extern const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOtheEMSapplBody_cfg_t *cfg);
+extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cfg);
+
 
 extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void);
 
-extern const eOtheEMSapplBody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
+extern const eOemsapplbody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
 
 extern EOappTheDB* eo_emsapplBody_GetDataBaseHandle(EOtheEMSapplBody *p);
 

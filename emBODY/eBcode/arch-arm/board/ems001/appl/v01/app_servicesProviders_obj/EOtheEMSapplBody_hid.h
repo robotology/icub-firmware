@@ -46,15 +46,15 @@
 
 typedef enum
 {
-    eo_emsApplBody_st__NOTinited   = 0,
-    eo_emsApplBody_st__inited      = 1,
+    eo_emsApplBody_st__NOTinitted   = 0,
+    eo_emsApplBody_st__initted      = 1,
 } eOtheEMSapplBody_hid_states_t;
 
 
 
 struct EOtheEMSapplBody_hid
 {
-    const eOtheEMSapplBody_cfg_t        *cfg_ptr;//tanto e' una sola la cfg!!! enon viene riutiolizzata
+    eOemsapplbody_cfg_t                 config; 
     eOtheEMSapplBody_hid_states_t       st;
     eOmn_appl_runMode_t                 appRunMode;
     EOtimer                             *canBoardsReady_timer;
