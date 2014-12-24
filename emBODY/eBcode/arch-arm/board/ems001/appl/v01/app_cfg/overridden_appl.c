@@ -35,23 +35,13 @@
 #include "EOaction_hid.h"
 #include "hl_bits.h"
 
+#include "EOMtheEMSapplCfg_cfg.h"
 
-//#ifdef _TEST_SEQNUM_
-//    #include "eOtheEthLowLevelParser.h"
-//    #include "eODeb_eoProtoParser.h"
-//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-//#ifdef _TEST_SEQNUM_
-//static void s_eom_emsappl_ethLowLevelParser_configure(void);
-//#endif
-
-//#ifdef _TEST_SEQNUM_
-//static void s_eom_emsrunner_emsappl_toogleallled(osal_timer_t* tmr, void* par);
-//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
@@ -63,17 +53,206 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define emsappl_ledred          hal_led0
-//#define emsappl_ledgreen        hal_led1 
-//#define emsappl_ledyellow       hal_led2
-//#define emsappl_ledorange       hal_led3
+
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
+    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
+    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
+    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
+    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
+    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
+    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
+    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
+#else
+    #error --> you must define an EBx
+#endif
 
 
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
+                                                        (1 << eOeOappEncReader_encoder1) |  \
+                                                        (1 << eOeOappEncReader_encoder2) |  \
+                                                        (1 << eOeOappEncReader_encoder3) |  \
+                                                        (0 << eOeOappEncReader_encoder4) |  \
+                                                        (0 << eOeOappEncReader_encoder5)    \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
+                                                        (1 << eOeOappEncReader_encoder1) |  \
+                                                        (0 << eOeOappEncReader_encoder2) |  \
+                                                        (0 << eOeOappEncReader_encoder3) |  \
+                                                        (0 << eOeOappEncReader_encoder4) |  \
+                                                        (0 << eOeOappEncReader_encoder5)    \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
+                                                        (1 << eOeOappEncReader_encoder1) |  \
+                                                        (1 << eOeOappEncReader_encoder2) |  \
+                                                        (0 << eOeOappEncReader_encoder3) |  \
+                                                        (0 << eOeOappEncReader_encoder4) |  \
+                                                        (0 << eOeOappEncReader_encoder5)    \
+                                                    )
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
+        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (0 << eOeOappEncReader_encoder0) |  \
+                                                        (0 << eOeOappEncReader_encoder1) |  \
+                                                        (0 << eOeOappEncReader_encoder2) |  \
+                                                        (0 << eOeOappEncReader_encoder3) |  \
+                                                        (0 << eOeOappEncReader_encoder4) |  \
+                                                        (0 << eOeOappEncReader_encoder5)    \
+                                                    )
+
+#else
+    #error --> you must define an EBx
+#endif
+
+
+// encoders
+#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
+ 
+    #define encstream0_type         hal_encoder_type1
+    #define encstream0_numberof     2
+    #define encstream0_encoders0    hal_encoder1
+    #define encstream0_encoders1    hal_encoder3
+    #define encstream0_encoders2    hal_encoderNONE
+    #define encstream0_encoders3    hal_encoderNONE
+    #define encstream0_encoders4    hal_encoderNONE
+    #define encstream0_encoders5    hal_encoderNONE
+
+    
+    #define encstream1_type         hal_encoder_type1
+    #define encstream1_numberof     2
+    #define encstream1_encoders0    hal_encoder2
+    #define encstream1_encoders1    hal_encoder4
+    #define encstream1_encoders2    hal_encoderNONE
+    #define encstream1_encoders3    hal_encoderNONE
+    #define encstream1_encoders4    hal_encoderNONE
+    #define encstream1_encoders5    hal_encoderNONE
+
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+
+    #define encstream0_type         hal_encoder_type1
+    #define encstream0_numberof     1
+    #define encstream0_encoders0    hal_encoder1
+    #define encstream0_encoders1    hal_encoderNONE
+    #define encstream0_encoders2    hal_encoderNONE
+    #define encstream0_encoders3    hal_encoderNONE
+    #define encstream0_encoders4    hal_encoderNONE
+    #define encstream0_encoders5    hal_encoderNONE
+
+    
+    #define encstream1_type         hal_encoder_type1
+    #define encstream1_numberof     1
+    #define encstream1_encoders0    hal_encoder2
+    #define encstream1_encoders1    hal_encoderNONE
+    #define encstream1_encoders2    hal_encoderNONE
+    #define encstream1_encoders3    hal_encoderNONE
+    #define encstream1_encoders4    hal_encoderNONE
+    #define encstream1_encoders5    hal_encoderNONE
+    
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+
+    #define encstream0_type         hal_encoder_type1
+    #define encstream0_numberof     2
+    #define encstream0_encoders0    hal_encoder1
+    #define encstream0_encoders1    hal_encoder3
+    #define encstream0_encoders2    hal_encoderNONE
+    #define encstream0_encoders3    hal_encoderNONE
+    #define encstream0_encoders4    hal_encoderNONE
+    #define encstream0_encoders5    hal_encoderNONE
+
+    
+    #define encstream1_type         hal_encoder_type1
+    #define encstream1_numberof     1
+    #define encstream1_encoders0    hal_encoder2
+    #define encstream1_encoders1    hal_encoderNONE
+    #define encstream1_encoders2    hal_encoderNONE
+    #define encstream1_encoders3    hal_encoderNONE
+    #define encstream1_encoders4    hal_encoderNONE
+    #define encstream1_encoders5    hal_encoderNONE
+                                                    
+#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
+
+    #define encstream0_type         hal_encoder_type1
+    #define encstream0_numberof     0
+    #define encstream0_encoders0    hal_encoderNONE
+    #define encstream0_encoders1    hal_encoderNONE
+    #define encstream0_encoders2    hal_encoderNONE
+    #define encstream0_encoders3    hal_encoderNONE
+    #define encstream0_encoders4    hal_encoderNONE
+    #define encstream0_encoders5    hal_encoderNONE
+
+    
+    #define encstream1_type         hal_encoder_type1
+    #define encstream1_numberof     0
+    #define encstream1_encoders0    hal_encoderNONE
+    #define encstream1_encoders1    hal_encoderNONE
+    #define encstream1_encoders2    hal_encoderNONE
+    #define encstream1_encoders3    hal_encoderNONE
+    #define encstream1_encoders4    hal_encoderNONE
+    #define encstream1_encoders5    hal_encoderNONE
+                                                    
+
+#else
+    #error --> you must define an EBx
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
+static const eOemsapplbody_cfg_t theemsapplbodycfg =
+{
+    .encoderstream0 =
+    {
+        .type       = encstream0_type,
+        .numberof   = encstream0_numberof,
+        .encoders   = { encstream0_encoders0, encstream0_encoders1, encstream0_encoders2, encstream0_encoders3, encstream0_encoders4, encstream0_encoders5 }        
+    },
+    .encoderstream1 =
+    {
+        .type       = encstream1_type,
+        .numberof   = encstream1_numberof,
+        .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
+    },
+    .hasdevice  =
+    {
+        EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
+    },
+    .icubcanprotoimplementedversion =
+    {
+        .major                      = 1,
+        .minor                      = 2
+    },
+    .connectedEncodersMask          = EOMTHEEMSAPPLCFG_EBX_encodersMASK,   
+    .configdataofMC4boards          =
+    {
+        .shiftvalues    =
+        {
+            .jointVelocityShift                 = 8,
+            .jointVelocityEstimationShift       = 8,
+            .jointAccelerationEstimationShift   = 5
+        },
+        .bcastpolicy            =
+        {
+            .val2bcastList      =
+            {
+            /* 0 */ ICUBCANPROTO_PER_MC_MSG__POSITION,
+            /* 1 */ ICUBCANPROTO_PER_MC_MSG__STATUS,
+            /* 2 */ ICUBCANPROTO_PER_MC_MSG__PRINT,
+            /* 3 */ 0
+            }
+        }
+    }       
+};
+
+const EOVtheEMSapplCfgBody theapplbodyconfig = 
+{
+    .type               =   0,
+    .thetrueconfig      =   (void*) &theemsapplbodycfg
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -91,11 +270,6 @@ static void overridden_appl_led_error_init(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static osal_timer_t* timer4led = NULL;     //this timer is used to blink led (orange) when application is in configuration state.
-
-//#ifdef _TEST_SEQNUM_
-//static uint8_t can_out_queue_full  = 0;
-//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -189,6 +363,7 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
 
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {  
+    EOMtheEMSapplCfg* emsapplcfg = eom_emsapplcfg_GetHandle();
     // the led-pulser is initted as first thing
      
     // pulse led3 forever at 20 hz.
@@ -198,11 +373,10 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     // initialise diagnostics
     eo_theEMSdgn_Initialize();
     
-    // start the services provider
-    // eOtheEMSapplBody_cfg_t *applbodycfg =  eo_emsapplbodycfg_GetHandle(); // it could be an object ...
-    // ... however, use NULL. it forces retrieval of eOtheEMSappBody_cfg_default which is initted with
-    //     defines taken from the applcfg
-    eo_emsapplBody_Initialise(NULL);   
+    // start the application body   
+    //const eOemsapplbody_cfg_t *applbodycfg = &theemsapplbodycfg;   
+    const eOemsapplbody_cfg_t * applbodycfg   = (const eOemsapplbody_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
+    eo_emsapplBody_Initialise(applbodycfg);       
 }
 
 
@@ -211,10 +385,7 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     
     // pulse led3 forever at 0.50 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
-    
-#ifdef _TEST_SEQNUM_    
-    s_eom_emsappl_ethLowLevelParser_configure();
-#endif        
+        
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appCanSP_SetRunMode(appCanSP_ptr, eo_appCanSP_runMode__onEvent);
@@ -262,30 +433,6 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
 {
-       
-//#ifdef   _TEST_SEQNUM_ 
-//
-//    osal_timer_timing_t timing;
-//    osal_timer_onexpiry_t onexpiry;
-//    
-//    timing.startat  = OSAL_abstimeNONE;
-//    timing.count    = 1000 * osal_info_get_tick(); 
-//    timing.mode     = osal_tmrmodeFOREVER; 
-//
-//    onexpiry.cbk    = s_eom_emsrunner_emsappl_toogleallled;
-//    onexpiry.par    = &s_emsappl_singleton;        
-//
-//
-//    if(NULL == s_emsappl_singleton.timer4led)
-//    {
-//        s_emsappl_singleton.timer4led = osal_timer_new(); 
-//    }
-//    osal_timer_start(s_emsappl_singleton.timer4led, &timing, &onexpiry, osal_callerTSK);
-//
-//#else
-//    hal_led_on(emsappl_ledred);
-//#endif   
-
     // pulse led3 forever at 4 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/4, 0);
    
