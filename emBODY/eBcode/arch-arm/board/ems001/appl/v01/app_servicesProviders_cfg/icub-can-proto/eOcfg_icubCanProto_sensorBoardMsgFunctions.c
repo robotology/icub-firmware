@@ -742,7 +742,7 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arr
 {
     eOresult_t res;
     eOropdescriptor_t ropdesc;
-    const eOtheEMSapplBody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());  
+    const eOemsapplbody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());  
     
     
     
