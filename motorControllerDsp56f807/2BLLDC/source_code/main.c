@@ -65,6 +65,8 @@ extern bool           _pad_enabled[2];
 Int16 _version = 0x0161;
 #elif VERSION == 0x0162
 Int16 _version = 0x0162;
+#elif VERSION == 0x0163
+Int16 _version = 0x0163;
 #endif
 #ifndef VERSION
 #	error "No valid version specified"
@@ -201,14 +203,14 @@ void main(void)
 	for (i=0; i<JN; i++) _calibrated[i] = true;
 #endif
 
-#if VERSION==0x0162		
+#if VERSION==0x0162	|| VERSION==0x0163
 	/* initialization */
 	for (i=0; i<JN; i++) _calibrated[i] = false;
 #endif	
 	/* reset trajectory generation */
 	for (i=0; i<JN; i++) abort_trajectory (i, 0);
 	
-#if VERSION==0x0162	
+#if VERSION==0x0162	|| VERSION==0x0163
    	for (i=0; i<JN; i++)	_position[i]=(Int32) Filter_Bit(get_position_abs_ssi(i));
    	for (i=0; i<JN; i++)    _max_real_position[i]=Filter_Bit(4095);
    	for (i=0; i<JN; i++)	_position_enc[i]=0;
@@ -261,12 +263,14 @@ void main(void)
 	    for (i=0; i<JN; i++) 
 		{		
 			_position_old[i]=_position[i];
-#if VERSION==0x0162		
+#if VERSION==0x0162	|| VERSION==0x0163	
 		    _position_enc_old[i]=_position_enc[i];	
 			_position[i]=Filter_Bit (get_position_abs_ssi(i));
-			_position_enc[i]=get_position_encoder(i);
+			_motor_position[i]=_position_enc[i]=get_position_encoder(i);
+			//can_printf("%f %f %f %f",_position_enc[0],_position_enc[1],_position[0],_position[1]);
+			
 #elif VERSION==0x0161
-		_position[i]=get_position_encoder(i);
+		_motor_position[i]=_position[i]=get_position_encoder(i);
 #endif					
 		}
 	
@@ -290,11 +294,12 @@ void main(void)
 		
 			for (i=0; i<JN; i++) _speed[i] = (Int16)(_position[i] - _position_old[i]);
 
-	#elif VERSION==0x0162	
+	#elif VERSION==0x0162 || VERSION==0x0163
             _motor_speed[0] = (Int16)  (_position_enc[0] - _position_enc_old[0]);
             _motor_speed[1] = (Int16)  (_position_enc[1] - _position_enc_old[1]);
             _speed[0]       = (Int32)  (_motor_speed[0]  - _motor_speed[1]);
             _speed[1]       = (Int32)  (_motor_speed[0]  + _motor_speed[1]);
+  
 	#endif 
 			/* this can be useful to estimate acceleration later on */
 			for (i=0; i<JN; i++) _accel[i] = (_speed[i] - _speed_old[i]);
@@ -358,7 +363,8 @@ void main(void)
 				
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
-		{ 
+		{
+//#define	DEBUG_FAULT_ON_LIMIT 
 #ifdef DEBUG_FAULT_ON_LIMIT
 			if (_calibrated[0]==true && _calibrated[1] == true)
 				if (_position[0]>_max_position[0] || _position[0]<_min_position[0] ||

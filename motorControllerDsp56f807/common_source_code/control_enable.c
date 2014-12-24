@@ -73,7 +73,7 @@ byte helper_controlmode_fw_to_api(byte mode)
 //=======================================================================================================================
 void disable_motor_pwm (byte axis) 
 {
-#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
+#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 || VERSION == 0x0163
 //this is for waist coupling
 	{  
 		helper_disable_coupled_motor(0,1);
@@ -226,7 +226,7 @@ void helper_enable_coupled_motor(byte j1, byte j2, byte with_control_mode)
 //---------------------------------------------------------------------------------------------------
 void enable_motor_pwm (byte axis, byte with_control_mode) 
 {		
-#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 
+#if VERSION == 0x0152 || VERSION == 0x0162 || VERSION==0x0252 || VERSION == 0x0163
 //this is for waist coupling
 	{   
 		helper_enable_coupled_motor(0,1, with_control_mode);

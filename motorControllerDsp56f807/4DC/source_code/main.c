@@ -72,6 +72,8 @@ Int16 hall_temp=0;
 // externs
 //**********************
 extern bool           _pad_enabled[JN];
+extern Int32          _current [JN];	
+extern Int32          _max_allowed_current [JN];	
 
 //********************
 // Local prototypes
@@ -616,7 +618,7 @@ void main(void)
 			{
 				put_motor_in_fault(i);	
 				highcurrent[i]=true;
-				can_printf("BIG CURR J%d %f!",i,_filt_current[i]);
+				//can_printf("BIGCURR J%d F%f C%f M%f",i,_filt_current[i],_current[i], _max_allowed_current[i]);
 			} 			
 			else
 			{

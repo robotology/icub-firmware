@@ -225,9 +225,24 @@ void helper_calib_hall_digital(byte channel, Int16 param1,Int16 param2, Int16 pa
 
 void helper_calib_abs_digital_coupled (byte channel, Int16 param1,Int16 param2, Int16 param3)
 {
+    float temp[2];
 	if (param3 >=0 && param3 <=4095) 
 	{
 		set_max_position(channel, param3);	
+		
+		#if (VERSION == 0x0163)
+			_position[0] = get_position_abs_ssi(0);
+			_position[1] = get_position_abs_ssi(1);	
+			 temp[0] = (float)(+ _position[0] + _position[1]);
+    		 temp[1] = (float)(- _position[0] + _position[1]);
+   			 temp[0] = temp[0] * 80.83788;
+    		 temp[1] = temp[1] * 80.83788;
+    		 set_position_encoder(0,(Int32)(temp[0]));
+             set_position_encoder(1,(Int32)(temp[1]));
+             _position_enc[0]=get_position_encoder(0);
+             _position_enc[1]=get_position_encoder(1);
+             can_printf("J%d %f %f %f %f",channel, _position_enc[0],_position_enc[1],_position[0],_position[1]);;
+		#endif
 	}
 	if (param2>0)
 	{
@@ -483,7 +498,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 //-----------------------------------	  
 // 1.62 2BLLDC 	 
 //-----------------------------------
-#elif VERSION==0x0162
+#elif VERSION==0x0162 || VERSION==0x0163
 
 	//neck V2
 	if (type==CALIB_ABS_DIGITAL)  helper_calib_abs_digital_coupled (channel, param1, param2,param3);

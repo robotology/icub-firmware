@@ -109,6 +109,7 @@ extern Int32 _position_enc_old[JN] ;	// do I need to add bits for taking into ac
 
 extern Int32 _real_position[JN];
 extern Int32 _real_position_old[JN];
+extern Int32 _desired_decoupled[JN];
 extern Int32 _desired[JN] ;				// PID ref value, computed by the trajectory generator 
 extern Int16 _desired_absolute[JN] ;	// PD ref value for the calibration 
 extern Int32 _set_point[JN] ;			// set point for position [user specified] 

@@ -3,6 +3,7 @@
 
 //#define VERSION 0x0161   				/* standard/basic implementation */
 //#define VERSION 0x0162   				/* differential joint in the head */
+//#define VERSION 0x0163   				/* differential joint in the head, new control */
 
 //#define SERIAL_MENU_OPTION    1       /* if on, enables serial menu interface */
 

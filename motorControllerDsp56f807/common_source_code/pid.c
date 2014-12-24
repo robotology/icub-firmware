@@ -80,7 +80,8 @@ Int32 _position_enc_old[JN] = INIT_ARRAY (0);	 // incremental encoder position
 
 Int32 _real_position[JN]= INIT_ARRAY (0);
 Int32 _real_position_old[JN]= INIT_ARRAY (0);
-Int32 _desired[JN] = INIT_ARRAY (0);		 
+Int32 _desired[JN] = INIT_ARRAY (0);
+Int32 _desired_decoupled[JN] = INIT_ARRAY (0);	 // _sdesired value decoupled by decouple_reference function
 Int16 _desired_absolute[JN] = INIT_ARRAY (0);    // PD ref value for the calibration 
 Int32 _set_point[JN] = INIT_ARRAY (0);  	     // set point for position [user specified] 
 
@@ -625,7 +626,7 @@ Int32 compute_pid2_motor(byte j)
 	decouple_reference();
 	
 	/* computes the error in the motor space"*/
-	InputError = L_sub(_desired[j], _position_enc[j]);
+	InputError = L_sub(_desired_decoupled[j], _position_enc[j]);
 		
 	if (InputError > MAX_16)
 		_error_position[j] = MAX_16;
@@ -714,8 +715,11 @@ Int32 compute_pid2(byte j)
 	static byte tailDerPor[JN]=INIT_ARRAY(0); 
 	static Int32 DerPort[2][10]={{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};	
 	
-	/* the error @ previous cycle */
-	
+	#if (VERSION == 0x0163)
+    	return compute_pid2_motor(j);
+	#endif
+
+	/* the error @ previous cycle */	
 	_error_position_old[j] = _error_position[j];
 
 	InputError = L_sub(_desired[j], _position[j]);
