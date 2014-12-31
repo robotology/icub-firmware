@@ -38,8 +38,6 @@
 #define HAL_USE_EEPROM
 #define HAL_USE_TIMER
 
-
-
 #endif
 
 //#include "hal_switch.h"
@@ -108,11 +106,13 @@
 //#define EXECUTE_TEST_ENCODER
 
 
-//#undef EXECUTE_TEST_CAN
-#define EXECUTE_TEST_CAN
+#undef EXECUTE_TEST_CAN
+//#define EXECUTE_TEST_CAN
 
-//#undef EXECUTE_TEST_ENCODER_SPI
-#define EXECUTE_TEST_ENCODER_SPI
+
+#undef EXECUTE_TEST_ENCODER_SPI
+//#define EXECUTE_TEST_ENCODER_SPI
+
 
 #define haLcAn1    hal_can1
 //#define haLcAn2    hal_can2
@@ -127,17 +127,22 @@
 
 //#define EXECUTE_TEST_CAN_TX1_RX2
 //#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
-#endif
+#endif//EXECUTE_TEST_CAN
 
+#define EXECUTE_TEST_SWITCH
 #undef EXECUTE_TEST_SWITCH
-//#define EXECUTE_TEST_SWITCH
 
+
+#define EXECUTE_TEST_ETH
 //#undef EXECUTE_TEST_ETH
-//#define EXECUTE_TEST_ETH
 
-//#define EXECUTE_TEST_ADC
+
+#define EXECUTE_TEST_ADC
+#undef EXECUTE_TEST_ADC
+
 
 #define EXECUTE_TEST_DEVICE_MOTORCTL
+#undef EXECUTE_TEST_DEVICE_MOTORCTL
 
 #ifdef EXECUTE_TEST_ETH
 #define EXECUTE_TEST_ETH_PING
@@ -189,8 +194,10 @@ static void test_was_successful(const char* msg);
 static void test_has_failed(const char* msg);
 static void test_message(const char* msg);
 
+#if defined(EXECUTE_TEST_ADC)
 static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH);
 static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH);
+#endif//defined(EXECUTE_TEST_ADC)
 
 static void info_about_core_plus_led(void);
 
@@ -233,9 +240,7 @@ static void test_periph_can(void);
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
 static void test_device_motorctl_1(void);
 static void test_device_motorctl_2(void);
-
 static int16_t current[4]={0,0,0,0};
-
 #endif//defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
 
 #if     defined(EXECUTE_TEST_ENCODER_SPI)    
@@ -435,13 +440,13 @@ int main(void)
 
 #if     defined(EXECUTE_TEST_ADC)    
     test_periph_adc();
+    
 		
 #if     defined(EXECUTE_TEST_ENCODER_SPI)
 	test_encoder_spi();
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)
-
-
-#endif//defined(EXECUTE_TEST_ADC)   
+ 
+#endif//defined(EXECUTE_TEST_ADC) 
 
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
       test_device_motorctl_2();
@@ -846,8 +851,8 @@ static void test_flash(void)
 }
 #endif//defined(EXECUTE_TEST_FLASH)    
 
-#if     defined(EXECUTE_TEST_SYS_DELAY)   
 
+#if     defined(EXECUTE_TEST_SYS_DELAY)   
 static void test_sys_delay(void)
 {
     evEntityId_t prev;
@@ -943,8 +948,7 @@ static void test_sys_delay(void)
 //     }        
     test_was_successful("sys-delay: ONLY IF the measures with eventviewer is OK");
 
-}    
-    
+}      
 #endif//defined(EXECUTE_TEST_SYS_DELAY)  
 
 
@@ -959,6 +963,7 @@ static void test_periph_i2c(void)
     
 }
 #endif//defined(EXECUTE_TEST_I2C)  
+
 
 #if     defined(EXECUTE_TEST_ENCODER_SPI)    
 static void test_encoder_spi(void)
@@ -1032,6 +1037,7 @@ static void test_encoder_spi(void)
 	    
 }
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)  
+
 
 
 #if     defined(EXECUTE_TEST_EEPROM)
@@ -1315,6 +1321,9 @@ typedef struct
 
 #endif
 
+
+#if     defined(EXECUTE_TEST_CAN) 
+
 #if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
 static hal_result_t can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
 {   
@@ -1439,9 +1448,10 @@ static void test_periph_can(void)
       test_message("Message received to can1"); 
 		test_was_successful("can"); 
       
-    
+#endif//defined(EXECUTE_TEST_CAN_TX1)      
 }
 
+  
 #endif//defined(EXECUTE_TEST_CAN)
 
 
@@ -1461,13 +1471,14 @@ static void test_device_switch(void)
     for(;;);
 }
 
-#endif//defined(EXECUTE_TEST_SWITCH)   
+#endif//defined(EXECUTE_TEST_SWITCH)  
+
+
+#if     defined(HAL_USE_DEVICE_MOTORCTL)
 
 static void test_device_motorctl_1(void)
-
-
 {
-#if     defined(HAL_USE_DEVICE_MOTORCTL)
+
     
 	// init the CAN
 	hal_can_frame_t canframe;
@@ -1537,13 +1548,12 @@ static void test_device_motorctl_1(void)
 
     
 
-#endif//defined(HAL_USE_DEVICE_MOTORCTL)
+
 }
 
-static void test_device_motorctl_2(void)
 
+static void test_device_motorctl_2(void)
 {
-#if     defined(HAL_USE_DEVICE_MOTORCTL)
   
   volatile int16_t current_P[4]={0,0,0,0};
   volatile int16_t current_I[4]={0,0,0,0};  
@@ -1722,11 +1732,12 @@ static void test_device_motorctl_2(void)
 
     
 
-#endif//defined(HAL_USE_DEVICE_MOTORCTL)
+
 }
 
+#endif//defined(HAL_USE_DEVICE_MOTORCTL)
 
-#if     defined(HAL_USE_ADC)
+#if     defined(EXECUTE_TEST_ADC)
 
 static uint16_t ADC_result[12];
 
@@ -1764,7 +1775,7 @@ static void test_periph_adc(void)
 
 
 }
-#endif//defined(HAL_USE_ADC)
+
 
 static uint16_t ADC_result[12];
 //volatile int16_t current[4]={0,0,0,0};
@@ -1855,6 +1866,7 @@ static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
 
 }
+#endif//defined(EXECUTE_TEST_ADC)
 
 
 #if     defined(EXECUTE_TEST_ETH)    
@@ -2179,6 +2191,7 @@ static void test_periph_eth(void)
 #endif//defined(EXECUTE_TEST_ETH_PING)||defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
     
 }
+
 #endif//defined(EXECUTE_TEST_ETH)
 
 
@@ -2240,6 +2253,7 @@ static void test_encoder_cbk(void* arg)
 
 
 #endif//defined(EXECUTE_TEST_ENCODER)  
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
