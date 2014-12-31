@@ -88,14 +88,14 @@
 //   <i> IEEE-assigned part of the MAC (first three octets).
 //   <i> Default: 0x010103
 #ifndef IPAL_MACOUI
- #define IPAL_MACOUI        1978476
+ #define IPAL_MACOUI        7379467
 #endif
 
 //   <o> MAC final 3 octets <0x00000000-0x00FFFFFF> 
 //   <i> Free-assigned part of the MAC (last three octets).
 //   <i> Default: 0x010103
 #ifndef IPAL_MAC3OCT
- #define IPAL_MAC3OCT        10634590
+ #define IPAL_MAC3OCT        10634579
 #endif
 
 //  </h>MAC address
@@ -108,30 +108,30 @@
 //     <o> Cache table size <4-100>
 //     <i> Number of cached hardware/IP addresses
 //     <i> Default: 10
-#define IPAL_ARP_CACHESIZE    4
+#define IPAL_ARP_CACHESIZE    32
 
 //     <o> Cache Timeout [sec] <5-255><#*1000000>
 //     <i> A timeout for a cached hardware/IP addresses
 //     <i> Default: 150
-#define IPAL_ARP_CACHETIMEOUT    150000000
+#define IPAL_ARP_CACHETIMEOUT    255000000
 
 //     <o> Number of retries <0-20>
 //     <i> Number of retries to resolve an IP address
 //     <i> before ARP module gives up
 //     <i> Default: 4
-#define IPAL_ARP_RETRYMAXNUM   4
+#define IPAL_ARP_RETRYMAXNUM   0
 
 //     <o> Retry Timeout [sec] <1-10><#*1000000>
 //     <i> A timeout to resend the ARP Request
 //     <i> Default: 2
-#define IPAL_ARP_RETRYTIMEOUT     2000000
+#define IPAL_ARP_RETRYTIMEOUT     0
 
 //     <q> Autonotify enabled
 //     <i> When this option is enabled, the embedded host
 //     <i> will send a gratuitous ARP notification at startup,
 //     <i> or when the device IP address has changed.
 //     <i> Default: Enabled
-#define IPAL_ARP_AUTONOTIFY     1
+#define IPAL_ARP_AUTONOTIFY     0
 
 
 //  </h>Address Resolution Protocol
