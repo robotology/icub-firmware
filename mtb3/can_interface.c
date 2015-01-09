@@ -32,8 +32,9 @@ extern unsigned char SHIFT_ALL;
 extern unsigned char NOLOAD;
 extern unsigned char ANALOG_ACC;
 extern unsigned int ANALOG_ID;
-extern unsigned char DIG_GYRO;
+extern unsigned char DIG_EXT_GYRO;
 extern unsigned char DIG_ACC;
+extern unsigned char DIG_EXT_ACC;
 extern 	tL3GI2COps l3g;
 extern 	tLISI2COps l3a;
 extern unsigned char TEMP_COMPENSATION;
@@ -560,7 +561,8 @@ int CAN1_handleRx (unsigned int board_id)
                 {
                     ANALOG_ACC   = 	 CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x01;
 					DIG_ACC      =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x02)>>1;
-					DIG_GYRO     =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x04)>>2;
+					DIG_EXT_GYRO     =	(CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x04)>>2;
+					DIG_EXT_ACC  =  (CANRxBuffer[canRxBufferIndex-1].CAN_data[1]&0x08)>>3;
                                         //data[7] time in ms of the accelerometers and gyroscope. From 1 to 255
 
 					if ((CANRxBuffer[canRxBufferIndex-1].CAN_data[2]) != 0)
@@ -575,14 +577,22 @@ int CAN1_handleRx (unsigned int board_id)
     					ANALOG_ID |= (BoardConfig.EE_CAN_BoardAddress<<4);
     				    ADC_Init();             //Initialize the A/D converter
 					}
-					if (DIG_GYRO || DIG_ACC)
+					if (DIG_EXT_GYRO || DIG_ACC || DIG_EXT_ACC)
 					{
 						EnableIntT2;
 						T2_Init(TIMER_VALUE2);
 						L3GInit(l3g);
-
-                        LISInit(l3a);
+                        
 					}
+					if (DIG_ACC)
+					{
+						LISInit(l3a,1,0);
+						DIG_EXT_ACC=0; // you can not use both the internal and external accelerometer
+					}
+					if (DIG_EXT_ACC)
+					{
+						LISInit(l3a,0,2);
+					}						
 					board_MODE=CALIB;
 					EnableIntT1;
                 }
@@ -643,9 +653,9 @@ int CAN1_handleRx (unsigned int board_id)
                     
                     new_board_MODE = board_MODE;
                     board_MODE = CALIB;
-                    transmission_was_enabled = 1;
-                    can_enaDisa_transmission_messages(1);
-                   // EnableIntT1;
+                    transmission_was_enabled = 0;
+                    can_enaDisa_transmission_messages(transmission_was_enabled);
+                    EnableIntT1;
                 }break;
                 
                 case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE:

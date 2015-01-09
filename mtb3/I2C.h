@@ -55,6 +55,7 @@
 #define I2CCLKPW		1             //This value define the CLK frequency
 #define REGISTER_LENGTH	16
 
+
 typedef enum
 {
     sda1 = 0,
@@ -62,6 +63,7 @@ typedef enum
     sda3 = 2,
     sda4 = 3,
 }i2c_sda_num_t;
+
 
 #define i2c_sda_num_max 4
 
@@ -75,9 +77,11 @@ void I2C_test(unsigned char Channel);
 unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
 extern unsigned char WriteByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
 unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
-unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
+unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
 extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1, unsigned int *DataBuffer2, unsigned int *DataBuffer3, unsigned int *DataBuffer4, const unsigned int OffsetInBuffer);
-unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+unsigned char ReadByteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+
 //Low level functions
 void InitialiseI2CMaster(unsigned char Channel);
 void StartI2CMaster(unsigned char Channel);

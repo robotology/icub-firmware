@@ -281,11 +281,11 @@ unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, un
 //back. The function returns "1" if successfull otherwise "0". If an error occurs,
 //Then the stop condition is sent.
 //--------------------------------------------------------------------------------
-unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer )
+unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer )
 {
 	
     unsigned char AcknError;
-    unsigned char SDA_number=0; //for the palm
+    unsigned char SDA_number=SDAnum; //for the palm
     unsigned char DeviceAddressHeader;
 
     AcknError=1; //No error on initialisation
@@ -483,12 +483,12 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, con
 //back. The function returns "1" if successfull otherwise "0". If an error occurs,
 //Then the stop condition is sent.
 //--------------------------------------------------------------------------------
-unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer)
+unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer)
 {
     unsigned char ByteAddress;
     unsigned char LowByteData, HighByteData;
     unsigned char r, AcknError;
-    unsigned char SDA_number=0;
+    unsigned char SDA_number=SDAnum;
     unsigned char DeviceAddressHeader;
 
     AcknError=1; //No error on initialisation
@@ -581,6 +581,12 @@ unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char DeviceAddress
 //---------------------------------
 //Function that configures the I2C port of the ADuC841 in master mode.
 //--------------------------------------------------------------------------------
+
+
+
+
+
+
 void InitialiseI2CMaster(unsigned char Channel)
 {
 	switch (Channel)

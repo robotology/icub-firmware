@@ -2,7 +2,7 @@
  *  MTB board - RBCS,  - 2012                     *
  *  Accelerometer LIS331DLH driver   				     *
  * 						     *
- *  adjusted by Marco Maggiali stolen from Merello			     *
+ *  Marco Maggiali 			     *
  *  <marco.maggiali@iit.it>			     *
  ****************************************************/
 
@@ -11,34 +11,39 @@
 
 tLISI2COps LISI2COps;
 
+unsigned char LIS_I2C_CHANNEL= 0x00; //for the MTB 1 for the palm
+unsigned char LIS_I2C_SDANUM=  0x02;
 
 
 void LISRegWrite( unsigned char reg, unsigned char val)
 {
  
-	LISI2COps.i2c_write(LIS_I2C_CHANNEL,LIS_I2C_ADDR, reg, val );
+	LISI2COps.i2c_write(LIS_I2C_CHANNEL, LIS_I2C_ADDR, reg, val );
 }
 
 
 char LISRegRead(char reg, unsigned char *rbuf)
 {
 	unsigned char ret;
-	ret = LISI2COps.i2c_read(LIS_I2C_CHANNEL,LIS_I2C_ADDR, reg, rbuf);
+	ret = LISI2COps.i2c_read(LIS_I2C_CHANNEL, LIS_I2C_SDANUM, LIS_I2C_ADDR, reg, rbuf);
 
 	return ret;
 }
 
 void LISRegBurst(char reg,char naxis, unsigned int *data )
 {
-	LISI2COps.i2c_burst(LIS_I2C_CHANNEL, LIS_I2C_ADDR,reg|0x80, naxis, data);
+	LISI2COps.i2c_burst(LIS_I2C_CHANNEL, LIS_I2C_SDANUM, LIS_I2C_ADDR,reg|0x80, naxis, data);
 }
 
-unsigned int LISInit(tLISI2COps ops)
+unsigned int LISInit(tLISI2COps ops, unsigned char CHANNEL, unsigned char SDAnum)
 {
 	unsigned char tmp;
 	LISI2COps = ops;
 	unsigned char id;
-
+	
+	 LIS_I2C_CHANNEL=CHANNEL;
+	 LIS_I2C_SDANUM= SDAnum;
+		
 //	if(LISRegRead(LIS_REG_WHOIAM, &id))
 //		return -2; /* i2c dead */
     LISRegRead(LIS_REG_WHOIAM, &id);

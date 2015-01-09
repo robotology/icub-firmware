@@ -243,7 +243,6 @@ const FlashAddress _pCapOffset_all[]={&CapOffset_all[0],&CapOffset_all[1],&CapOf
 							     }; 	
 unsigned int BitToSend;    // number of bit to be send
 //unsigned int stagecomplete;  
-
 unsigned int _board_ID=2;
 unsigned char board_MODE=EIGHT_BITS;
 unsigned char new_board_MODE=EIGHT_BITS;
@@ -257,8 +256,9 @@ unsigned char SHIFT_ALL=4; //shift of the CDC value for removing the noise
 unsigned char NOLOAD=245;
 unsigned char ANALOG_ACC=0; //analog accelerometer, if one 1 messsage is sent every 10ms
 unsigned int ANALOG_ID=0x552; // default value
-unsigned char DIG_GYRO=0; //gyro of the MMSP 
-unsigned char DIG_ACC=0; //accelerometer of the MMSP 
+unsigned char DIG_EXT_GYRO=0; //gyro of the MMSP (PALM)
+unsigned char DIG_EXT_ACC=0; //accelerometer of the MMSP (PALM) 
+unsigned char DIG_ACC=0; // internal accelerometer 
 unsigned char TEMP_COMPENSATION=1; //if 1 means internal temperature drift compensation 
 int Tpad_base; //initial value of the Tpad
 int Tpad;      //current value of the Tpad
@@ -371,6 +371,7 @@ int main(void)
 	int ax=0;
 	int ay=0;
 	int az=0;
+	int calib_timeout=0;
    	//
     // EEPROM Data Recovery
     // 
@@ -392,7 +393,7 @@ int main(void)
     l3a.i2c_write=WriteByteViaI2C;
 	l3a.i2c_read=ReadByteViaI2C;
 	l3a.i2c_burst=ReadBurstViaI2C;
-	LISInit(l3a);
+	LISInit(l3a,1,0);
 if (ANALOG_ACC)
 {
     T2_Init(TIMER_VALUE2);
@@ -402,7 +403,7 @@ if (ANALOG_ACC)
 }
 
 
-if (DIG_GYRO || DIG_ACC)
+if (DIG_EXT_GYRO || DIG_ACC || DIG_EXT_ACC)
 {
     T2_Init(TIMER_VALUE2);
 
@@ -528,10 +529,10 @@ if (DIG_GYRO || DIG_ACC)
 
     for (;;)
     {
-        if ((DIG_GYRO || DIG_ACC) && (flag2))
+        if ((DIG_EXT_GYRO || DIG_ACC || DIG_EXT_ACC) && (flag2))
         {
             flag2=0;
-            if (DIG_GYRO)
+            if (DIG_EXT_GYRO)
                 {
                 L3GAxisBurst(&gx, &gy, &gz);
                 gyro[0]=((gx &0xFF00) >>0x8); // axis X
@@ -546,7 +547,7 @@ if (DIG_GYRO || DIG_ACC)
                 CAN1SendMessage( (CAN_TX_SID(PMsgID)) & CAN_TX_EID_DIS & CAN_SUB_NOR_TX_REQ,
                         (CAN_TX_EID(0)) & CAN_NOR_TX_REQ, gyro, 6,2);
             }
-            if (DIG_ACC)
+            if (DIG_ACC || DIG_EXT_ACC)
             {
                 LISAxisBurst(&ax, &ay, &az);
                 acc[0]=((ax &0xFF00) >>0x8); // axis X
@@ -564,6 +565,7 @@ if (DIG_GYRO || DIG_ACC)
         }
         if (flag==1)
         {
+			calib_timeout=0;
             flag=0;
             i = 0;
             if (led_counter==20)
@@ -584,14 +586,18 @@ if (DIG_GYRO || DIG_ACC)
                 {
                     // Service routine for the triangles
                     ServiceAD7147Isr(CH0);
-                    for (i=0;i<16;i++)
-                    {
-                        if (TRIANGLE_MASK & (0x1<<i))
-                        {
-                            FillCanMessages8bit(CH0,i);
-                        }
-                        //FillCanMessages8bit_test(CH0, i);
-                    }
+
+					if(can_transmission_enabled)
+					{
+                    	for (i=0;i<16;i++)
+                    	{
+                        	if (TRIANGLE_MASK & (0x1<<i))
+                        	{
+                           	 	FillCanMessages8bit(CH0,i);
+                        	}
+                       		//FillCanMessages8bit_test(CH0, i);
+                    	}
+					}	
                 }
                 break;
                 case CONFIG_THREE:
@@ -617,8 +623,7 @@ if (DIG_GYRO || DIG_ACC)
             break;
             case  (CALIB):
             {	
-				EnableIntT1;
-                board_MODE=new_board_MODE;
+                board_MODE=EIGHT_BITS;
                 switch (CONFIG_TYPE)
                 {
                 case CONFIG_SINGLE:
@@ -640,16 +645,37 @@ if (DIG_GYRO || DIG_ACC)
                     init=0;
                     WriteTimer1(0);
                     counter=0;
-                    while (flag==0);
+					calib_timeout==0;
+                    while (flag==0)					
+					{
+/*						calib_timeout +=1;
+						if (calib_timeout>=10000) 
+						{
+							EnableIntT1;
+							calib_timeout=0;	
+							break;
+ 						}
+*/					}
+				
                     // Calibration
                     ServiceAD7147Isr(CH0);
-                    flag=0;
+                    flag=0;					
                     WriteTimer1(0);
-                    while (flag==0);
+                    while (flag==0)					
+					{
+/*						calib_timeout +=1;
+						if (calib_timeout>=10000) 
+						{
+							EnableIntT1;
+							calib_timeout=0;	
+							break;
+ 						}
+*/					}
+					
                     TrianglesInit(CH0);
                     
                     if(!transmission_was_enabled)
-                        can_enaDisa_transmission_messages(0);
+                        can_enaDisa_transmission_messages(1);
                 }
                 break;
                 case CONFIG_THREE:
