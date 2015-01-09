@@ -184,6 +184,9 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
         {   // ok only if the previously used config is the same as the current one
             return(hal_res_OK);
         }
+		// We could add the feature of changing dinamically the config
+		// instead of returning not ok and stop...
+		// TEST IT!
         else
         {
             return(hal_res_NOK_generic);
@@ -378,8 +381,7 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
 					e_flags->data_notready = 1;
 				}
 			}
-				// Leave out the control bits and output only the sensor data
-				*pos = (intitem->position >> 6) & 0x00FFF;
+				*pos = intitem->position;
 		}
 		//Encoder type 2 (AMO)
 		else if (intitem->config.type == hal_encoder_t2)
@@ -475,7 +477,7 @@ extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes)
     {
         return(hal_res_NOK_generic);
     }
-		if((NULL == bytes)
+		if((NULL == bytes))
 		{
         return(hal_res_NOK_generic); 
     }

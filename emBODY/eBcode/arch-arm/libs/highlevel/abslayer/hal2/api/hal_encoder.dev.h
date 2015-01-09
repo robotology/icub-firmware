@@ -104,7 +104,7 @@ typedef struct
     void*                       arg;            /**< argument of the callback: contains pointer to latest encoder value  */
 		hal_encoder_type						type;						/**< Encoder model. type 1: AEA, type 2: AMO Board */
 		uint8_t											reg_address;		/**< Address of the register to be read to validate the sensor data (not meaningful for AEA board) */
-		hal_bool_t									sdata_precheck;	/**< If TRUE, perform a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
+		hal_bool_t									sdata_precheck;	/**< If hal_true, performs a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
 } hal_encoder_cfg_t;
 
  
