@@ -53,12 +53,12 @@
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern    const EOconstvector* const      eo_cfg_appDB_constvec_boards__ptr; /**< list of CAN boars connected to ems by can */
-extern    const EOconstvector* const      eo_cfg_appDB_constvec_joints__ptr;    /**< list of joints managed by an EMS board */
-extern    const EOconstvector* const      eo_cfg_appDB_constvec_motors__ptr;    /**< list of motors managed by an EMS board */
-extern    const EOconstvector* const      eo_cfg_appDB_constvec_snsrMais__ptr;   /**< list of sensors managed by an EMS board */
-extern    const EOconstvector* const      eo_cfg_appDB_constvec_snsrStrain__ptr; /**< list of sensors managed by an EMS board */
-extern    const EOconstvector* const      eo_cfg_appDB_constvec_skin__ptr;      /**< list of skin managed by an EMS board */
+extern    const EOconstvector* const      eo_cfg_appDB_thecanboards;                    /**< item is a eOappTheDB_canboardinfo_t. it keeps the CAN boards on the ems */
+extern    const EOconstvector* const      eo_cfg_appDB_thejoints_mapping2canboards;     /**< item is a eOappTheDB_mapping2canboard_t. it keeps info of can location of the CAN joints managed by the ems */
+extern    const EOconstvector* const      eo_cfg_appDB_themotors_mapping2canboards;     /**< item is a eOappTheDB_mapping2canboard_t. it keeps info of can location of the CAN motors managed by the ems */
+extern    const EOconstvector* const      eo_cfg_appDB_themaises_mapping2canboards;     /**< item is a eOappTheDB_mapping2canboard_t. it keeps info of can location of the CAN mais sensors managed by the ems */
+extern    const EOconstvector* const      eo_cfg_appDB_thestrains_mapping2canboards;    /**< item is a eOappTheDB_mapping2canboard_t. it keeps info of can location of the CAN strain sensors managed by the ems */
+extern    const EOconstvector* const      eo_cfg_appDB_theskins_info;                   /**< item is a eOappTheDB_cfg_skinInfo_t. it keeps info of the set of can skin boards managed by an EMS board */
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
