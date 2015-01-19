@@ -287,7 +287,7 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
         {
             // 3. send ropframe-tx evt to myself in order to send a ropframe.
             // marco.accame on 25 nov 2014: when we receive a packet we may need to send imemdiately one packet back 
-            //                              in case there are any say<> rops. we prefer to send the emsconfigurator_evt_ropframeTx
+            //                              in case there are any say<> rops. we prefer to send the evt_ropframeTx
             //                              anyway so that the remote host can monitor the existence of the board. 
             eom_task_SetEvent(p, emserror_evt_ropframeTx); 
         }        
