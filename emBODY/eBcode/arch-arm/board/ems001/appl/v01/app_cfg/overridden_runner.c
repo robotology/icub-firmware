@@ -39,6 +39,8 @@
 #include "EoAnalogSensors.h"
 #include "EoManagement.h"
 
+#include "EOtheProtocolWrapper.h"
+
 #include "EOemsController_hid.h" 
 #include "OPCprotocolManager_Cfg.h" 
 #include "EOtheEMSapplDiagnostics.h"
@@ -198,7 +200,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
     EOappCanSP                      *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    EOarray_of_10canframes          *arrayof10canframes_ptr = NULL;
+    EOarray_of_10canframes          *arrayof10canframes = NULL;
         
     
     for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
@@ -207,11 +209,15 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), &skincanloc, &skId);
         if(eores_OK == res)
         {
-            //reset netvar
-            res = eo_appTheDB_GetSkinStArray10CanFramesPtr(eo_appTheDB_GetHandle(), skId,  &arrayof10canframes_ptr);
-            eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "err in GetSkinStArray10CanFramesPtr", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
+            // reset netvar
+            arrayof10canframes = eo_protocolwrapper_GetSkinStatusArray(eo_protocolwrapper_GetHandle(), skId);
+            if(arrayof10canframes == NULL)
+            {
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "cannot get a skin", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
+            }
             
-            eo_array_Reset((EOarray*)arrayof10canframes_ptr);
+            
+            eo_array_Reset((EOarray*)arrayof10canframes);
             
             numofRXcanframe = 10;//if skin is conencted i should read 10 messages max, because net var has size of 10 messages
         }
@@ -403,7 +409,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBo
     pwmList[1] = 0x12AA;
     pwmList[2] = 0x13AA;
     pwmList[3] = 0x14AA;
-    uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
 
     for (uint8_t jid = 0; jid <numofjoint; jid++)
     {
@@ -439,7 +445,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
     };
 
 
-    uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
     
     for (uint8_t jid = 0; jid <numofjoint; ++jid)
     {
@@ -470,7 +476,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     EOappEncReader      *app_enc_reader = eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr);
     uint8_t             error_mask = 0;
 
-    uint16_t numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
     
     //uint64_t start_read = osal_system_abstime_get();
     //uint64_t enc1_delta = start_read - eo_appEncReader_startSPI1(app_enc_reader);
@@ -541,29 +547,28 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 
 static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
 {
-    eOmc_joint_status_t             *jstatus_ptr;
-    eOmc_motor_status_t             *mstatus_ptr;
+    eOmc_joint_status_t             *jstatus = NULL;
+    eOmc_motor_status_t             *mstatus = NULL;
     eOmc_jointId_t                  jId;
-    eOresult_t                      res;
     uint16_t                        numofjoint;
     EOappTheDB                      *db = eo_appTheDB_GetHandle();
     uint16_t                        numofmotors;
     
-    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(db);
+    numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db);
     for(jId = 0; jId<numofjoint; jId++)
     {
-        res = eo_appTheDB_GetJointStatusPtr(db, jId, &jstatus_ptr);
-        if(eores_OK != res)
+        jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
+        if(NULL == jstatus)
         {
             return; //error
         }
         
         //eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
-        eo_emsController_GetJointStatus(jId, jstatus_ptr);
+        eo_emsController_GetJointStatus(jId, jstatus);
         
-        eo_emsController_GetActivePidStatus(jId, &jstatus_ptr->ofpid);
+        eo_emsController_GetActivePidStatus(jId, &jstatus->ofpid);
         
-        if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus_ptr->basic.motionmonitorstatus)
+        if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
         {
             /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
             - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
@@ -575,7 +580,7 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
             */
             if(eo_emsController_GetMotionDone(jId))
             {
-                jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
+                jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
             }
         }
         
@@ -584,16 +589,16 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     
     
     
-    numofmotors =  eo_appTheDB_GetNumeberOfConnectedMotors(db);
+    numofmotors =  eo_appTheDB_GetNumberOfConnectedMotors(db);
     for(jId = 0; jId<numofmotors; jId++)
     {
-        res = eo_appTheDB_GetMotorStatusPtr(db, jId,  &mstatus_ptr);
-        if(eores_OK != res)
+        mstatus = eo_protocolwrapper_GetMotorStatus(eo_protocolwrapper_GetHandle(), jId);
+        if(NULL == mstatus)
         {
             return; //error
         }
         
-        eo_emsController_GetMotorStatus(jId, mstatus_ptr);
+        eo_emsController_GetMotorStatus(jId, mstatus);
     }
 }
 
@@ -602,7 +607,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     eOresult_t                              res;
     uint8_t                                 send_virtualStrainData;
     uint16_t                                numofjoint;
-    eOmc_joint_status_t                     *jstatus_ptr;
+    eOmc_joint_status_t                     *jstatus = NULL;
     uint16_t                                *virtStrain_ptr;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     EOappTheDB                              *db_ptr; 
@@ -617,19 +622,19 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     
     db_ptr = eo_appTheDB_GetHandle();
     
-    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(db_ptr);
+    numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db_ptr);
 
-    res = eo_appTheDB_GetJointStatusPtr(db_ptr, motionDoneJoin2Use, &jstatus_ptr);
-    if(eores_OK != res)
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), motionDoneJoin2Use);
+    if(NULL == jstatus)
     {
         return; //error
     }
     
-    if (jstatus_ptr->basic.controlmodestatus == eomc_controlmode_position
-     || jstatus_ptr->basic.controlmodestatus == eomc_controlmode_velocity_pos
-     || jstatus_ptr->basic.controlmodestatus == eomc_controlmode_calib)
+    if (jstatus->basic.controlmodestatus == eomc_controlmode_position
+     || jstatus->basic.controlmodestatus == eomc_controlmode_velocity_pos
+     || jstatus->basic.controlmodestatus == eomc_controlmode_calib)
     {
-       if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
+       if(jstatus->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
        {
         /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
         - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
