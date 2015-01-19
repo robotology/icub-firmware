@@ -522,7 +522,7 @@ static eOresult_t s_eo_appMeasConv_TableCareateAndInit(EOappMeasConv *p)
     uint8_t i;
 
     /* 1) Create table */
-    p->totalnumofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    p->totalnumofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
     if(0 == p->totalnumofjoint)
     {
         return(eores_NOK_generic);
