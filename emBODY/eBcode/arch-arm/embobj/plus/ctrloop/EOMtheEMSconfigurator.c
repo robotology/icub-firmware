@@ -217,7 +217,12 @@ __weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMt
 
 } 
 
-__weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(EOMtheEMSconfigurator* p)
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfigurator* p)
+{
+
+} 
+
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
 {
 
 } 
@@ -365,10 +370,16 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
      
     }
     
-    // we can process a user-defined event
-    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef))
+    // we can process a user-defined event00
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef00))
     {
-        eom_emsconfigurator_hid_userdef_ProcessUserdefEvent(&s_emsconfigurator_singleton);
+        eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(&s_emsconfigurator_singleton);
+    }
+    
+    // we can process a user-defined event1
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef01))
+    {
+        eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(&s_emsconfigurator_singleton);
     }
     
 }
