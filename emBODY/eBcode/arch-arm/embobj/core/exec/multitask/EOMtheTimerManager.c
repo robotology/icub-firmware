@@ -255,7 +255,7 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
 
 static eOresult_t s_eom_timerman_OnDelTimer(EOVtheTimerManager* tm, EOtimer *t) 
 {
-    eOresult_t res = eores_NOK_generic;
+    //eOresult_t res = eores_NOK_generic;
     
     if((NULL == tm) || (NULL == t)) 
     {
