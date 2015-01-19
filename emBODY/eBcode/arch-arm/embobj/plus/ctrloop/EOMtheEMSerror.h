@@ -79,7 +79,7 @@ typedef enum
     emserror_evt_packetreceived         =   emssocket_evt_packet_received,  // 0x00000001
     emserror_evt_fatalerror             =   0x40000000,
     emserror_evt_tick                   =   0x01000000,
-    emserror_evt_ropframeTx             =   0x20000000                      // emsconfigurator_evt_ropframeTx is 0x00000010
+    emserror_evt_ropframeTx             =   0x20000000                      
 } eOemserror_event_t;
 
 
