@@ -27,8 +27,6 @@
 #include "EOrop.h"
 #include "EOprotocolMN.h"
 #include "EOnv_hid.h"
-#include "EoError.h"
-#include "EOtheErrorManager.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
@@ -1037,7 +1035,7 @@ void config_2FOC(uint8_t motor)
     
     eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
     
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
      
     pid.kp = 0x00C0;
     pid.ki = 0x0080;
@@ -1071,7 +1069,7 @@ void set_2FOC_idle(uint8_t motor)
     
     eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
     
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE; //+
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc); //+
@@ -1094,7 +1092,7 @@ void set_2FOC_running(uint8_t motor)
     
     eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
     
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     #ifdef EXPERIMENTAL_SPEED_CONTROL
     controlmode_2foc = icubCanProto_controlmode_velocity;
