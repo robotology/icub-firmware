@@ -44,6 +44,8 @@
 #include "EOtheEMSapplDiagnostics.h"
 #include "EOtheErrorManager.h"
 
+#include "EoError.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -267,6 +269,7 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 }
 
 
+
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->ram;
@@ -289,12 +292,17 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-            uint32_t canBoardsReady;
+            uint32_t canBoardsReady = 0;
             char str[60];
-            if(!eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady))
+            if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady))
             {
-                snprintf(str, sizeof(str), "not all boards are ready mask=%u", canBoardsReady);
+                #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
+                snprintf(str, sizeof(str), "only those canboards are ready: %u", canBoardsReady);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
+            }
+            else
+            {
+                // maybe in here we can put an info diagnostics message                
             }
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
             if(eores_OK == res)
