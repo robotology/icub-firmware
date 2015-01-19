@@ -288,7 +288,7 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanPr
 
 static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
 {
-    eOappTheDB_sensorCanLocation_t canloc = { .emscanport = eOcanport1, .addr = 0}; // default value 
+    eOappTheDB_board_canlocation_t canloc = { .emscanport = eOcanport1, .addr = 0}; // default value 
 //This msg is send by Mais board every time it has received an unknown msg.
 //on dspic30 there is a bug hw in filter can, so some motor msg are reveived by Mais and read as unknown message
 
