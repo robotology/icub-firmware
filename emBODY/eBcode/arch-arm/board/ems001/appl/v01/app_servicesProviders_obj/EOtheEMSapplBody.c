@@ -40,7 +40,7 @@
 
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
-//#include "EOtheBOARDtransceiver_hid.h" //==>in order to get nvcfg
+
 
 //icub
 #include "EoMotionControl.h"
@@ -48,7 +48,6 @@
 #include "EoManagement.h"
 #include "eOicubCanProto_specifications.h"
 
-//nv-cfg
 
 
 //application
@@ -56,6 +55,10 @@
 #include "eOcfg_appTheDataBase.h"
 
 #include "EOaction_hid.h"
+
+#include "EOtheProtocolWrapper.h"
+
+#include "EoError.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -75,97 +78,28 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-#define CANBOARDSRAEDY_CHECK_PERIOD         10000
-#define CANBOARDSRAEDY_CHECK_TIMEOUT_EVT    emsconfigurator_evt_userdef
-
-
-
-
-//#include "EOMtheEMSapplCfg_cfg.h"   // to see the macros
-
-
-
-//#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
-//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
-//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-//#else
-//    #error --> you must define an EBx
-//#endif
-
-
-
-// - encoders configuration
-
-//#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
-//                                                        (1 << eOeOappEncReader_encoder1) |  \
-//                                                        (1 << eOeOappEncReader_encoder2) |  \
-//                                                        (1 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
-//                                                        (1 << eOeOappEncReader_encoder1) |  \
-//                                                        (0 << eOeOappEncReader_encoder2) |  \
-//                                                        (0 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
-//                                                        (1 << eOeOappEncReader_encoder1) |  \
-//                                                        (1 << eOeOappEncReader_encoder2) |  \
-//                                                        (0 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (0 << eOeOappEncReader_encoder0) |  \
-//                                                        (0 << eOeOappEncReader_encoder1) |  \
-//                                                        (0 << eOeOappEncReader_encoder2) |  \
-//                                                        (0 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-
-//#else
-//    #error --> you must define an EBx
-//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 
-//#warning --> marco.accame: rimuovere di qui i riferimenti alle macro varie in modo che eo_emsapplbody_cfg_default sia generico e non specifico di ciascuna board
-// marco.accame: hasdevice potrebbe diventare qualcosa che dica se ci sono alcune feature: skin, mc4/2foc/pwm, ?
-//               alcune di tali features potrebbero essere esclusive: o mc4 o 2foc o pwm
-
-// se ci sono delle configurazioni di comportamento per una specifica feature, ad esempio mc4 metterle in ...
 
 const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default = 
 {
-    .encoderstream0 =
+    .encoderstreams =
     {
-        .type       = hal_encoder_type1,
-        .numberof   = 2,
-        .encoders   = { hal_encoder1, hal_encoder3, hal_encoderNONE }        
-    },
-    .encoderstream1 =
-    {
-        .type       = hal_encoder_type1,
-        .numberof   = 2,
-        .encoders   = { hal_encoder2, hal_encoder4, hal_encoderNONE }        
+        {
+            .type       = hal_encoder_type1,
+            .numberof   = 2,
+            .encoders   = { hal_encoder1, hal_encoder3, hal_encoderNONE }        
+        },
+        {
+            .type       = hal_encoder_type1,
+            .numberof   = 2,
+            .encoders   = { hal_encoder2, hal_encoder4, hal_encoderNONE }     
+        }        
     },
     .hasdevice  =
     {
@@ -225,8 +159,8 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t canBoardsMask);
-static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p);
+static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -235,9 +169,19 @@ static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p);
 
 static EOtheEMSapplBody s_applBody = 
 {
-    EO_INIT(.st)    eo_emsApplBody_st__NOTinitted
+    .config                 = {0},  // marco.accame on 12jan2015: the warning will be removed when a final version of the config is released.
+    .st                     = eo_emsApplBody_st__NOTinitted,
+    .appRunMode             = applrunMode__default,
+    .checkCanBoards_timer   = NULL,
+    .bodyobjs               =
+    {
+        .appDB              = NULL,
+        .appCanSP           = NULL,
+        .appEncReader       = NULL,
+        .emsController      = NULL,
+        .appMeasConv        = NULL
+    }
 };
-
 
 static const char s_eobj_ownname[] = "EOtheEMSapplBody";
 
@@ -245,6 +189,9 @@ static const char s_eobj_ownname[] = "EOtheEMSapplBody";
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+
+
 
 extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cfg)
 {
@@ -258,36 +205,38 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     
     p = &s_applBody;
 
-    //save in obj its configuration
+    // save in obj its configuration
     memcpy(&p->config, cfg, sizeof(eOemsapplbody_cfg_t));
     
-    //p->appRunMode = applrunMode__default;
-    res = s_eo_emsapplBody_getRunMode(p); //the run mode is depending on connected can board (mc4, 2foc, only skin, etc)
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in getting run mode", s_eobj_ownname, &eo_errman_DescrTobedecided);
+    s_eo_emsapplBody_getRunMode(p); // the run mode depends on connected can board (mc4, 2foc, only skin, etc)
     
-    p->canBoardsReady_timer = eo_timer_New();
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->canBoardsReady_timer), "error in creating canBoardsReady_timer", s_eobj_ownname, &eo_errman_DescrTobedecided);
+    p->checkCanBoards_timer = eo_timer_New();
     
-    
-    s_eo_emsapplBody_objs_init(p); //if a obj init doesn't success, it calls errorManager with fatal error
-    //eo_errman_Info(eo_errman_GetHandle(), "obj-body inited OK", s_eobj_ownname, &eo_errman_DescrTobedecided);
+    eo_protocolwrapper_Initialise();
+        
+    s_eo_emsapplBody_objs_init(p);      // if anything fails... it calls errormanager with fatal error
 
-    s_eo_emsapplBody_checkConfig(p); //check config: if somethig is wrong then go to error state.
+    s_eo_emsapplBody_checkConfig(p);    // check config: if anything is wrong .... it calls errormanager with fatal error
     
-    res = s_eo_emsapplBody_startCheckCanboards(p);
+    res = eo_emsapplBody_checkCanBoards_Start(p);
+    
     eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in startCheckCanboards", s_eobj_ownname, &eo_errman_DescrTobedecided);
     
     p->st = eo_emsApplBody_st__initted;
         
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "body appl init OK", s_eobj_ownname, &eo_errman_DescrTobedecided);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "EOtheEMSapplBody started", s_eobj_ownname, &eo_errman_DescrRunningHappily);
+    
+    
     return(p);
 }
+
 
 
 extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void)
 {
     return((s_applBody.st == eo_emsApplBody_st__initted) ? (&s_applBody) : (NULL));
 }
+
 
 extern const eOemsapplbody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p)
 {
@@ -327,14 +276,6 @@ extern EOappEncReader* eo_emsapplBody_GetEncoderReaderHandle(EOtheEMSapplBody *p
 }
 
 
-// extern EOemsController* eo_emsapplBody_GetEmsControllerHandle(EOtheEMSapplBody *p)
-// {
-//     if(NULL == p)
-//     {
-//         return(NULL);
-//     }
-//     return(p->bodyobjs.emsController);
-// }
 
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p)
 {
@@ -357,7 +298,6 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 }
 
 
-
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 {
     eOresult_t                          res;
@@ -375,32 +315,29 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
         return(res);
     }
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
-    {
-    
-    // 2) enable tx on mais
-    res = s_eo_emsapplBody_EnableTxMais(p);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-
-    // 3) config joints
-    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
-    
-    for(i=0; (i<numofjoint) && (eores_OK == res); i++)
-    {
-        //get bcast policy from db
-        res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
+    {   
+        res = s_eo_emsapplBody_EnableTxMais(p);
         if(eores_OK != res)
         {
             return(res);
         }
 
-        res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
-    }
-    
-    /* per ora non si e' verificato nessun problema se l'applicazione e' in cfg e la pelle spedisce a manetta*/
-    return(res);
+        numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+        
+        for(i=0; (i<numofjoint) && (eores_OK == res); i++)
+        {
+            //get bcast policy from db
+            res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
+            if(eores_OK != res)
+            {
+                return(res);
+            }
+
+            res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
+        }
+        
+        /* per ora non si e' verificato nessun problema se l'applicazione e' in cfg e la pelle spedisce a manetta*/
+        return(res);
     }
     else
     {
@@ -433,7 +370,7 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {    
         // 2) config joints
-        numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+        numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
         
         for(i=0; (i<numofjoint) && (eores_OK == res); i++)
         {
@@ -463,19 +400,22 @@ extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_dev
     return(p->config.hasdevice[dev]);
 }
 
-extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t canBoardsMask)
+
+extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask)
 {
-    return(s_eo_emsapplBody_sendGetFWVersion(p, canBoardsMask));
+    return(s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask));
 }
 
-extern eOresult_t eo_emsapplBody_setCanBoardsAreReady(EOtheEMSapplBody *p)
+
+extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p)
 {
     if(NULL == p)
     {
         return(eores_OK);
     }
-    return(eo_timer_Stop(p->canBoardsReady_timer));
+    return(eo_timer_Stop(p->checkCanBoards_timer));
 }
+
 
 extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
@@ -501,7 +441,6 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     
     return(res);
 }
-
 
 
 
@@ -554,13 +493,38 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
 
 }
 
+
+extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
+{
+    eOresult_t                              res = eores_OK;
+    EOaction                                action;
+    
+    //note: can protocol version check is done only for motor control
+    
+//     if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
+//     {
+//         return(eores_OK);
+//     }
+
+   
+    eo_action_SetEvent(&action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 10*eok_reltime1ms, eo_tmrmode_FOREVER, &action);
+    
+    uint32_t dontaskmask = 0; // the first time we ask to every board
+    res = s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask); 
+    
+    return(res);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
+
 extern void eo_emsapplBody_hid_canSP_cbkonrx(void *arg)
 {
     EOMtask *task = (EOMtask *)arg;
-    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef);
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
 }
 
 
@@ -600,17 +564,13 @@ static void s_eo_emsapplBody_theDataBase_init(EOtheEMSapplBody *p)
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
     
     eOappTheDB_cfg_t cfg = 
-    {
-        //EO_INIT(.nvsCfg)            eo_boardtransceiver_hid_GetNvsCfg(),
-//         EO_INIT(.mc_endpoint)       p->cfg_ptr->endpoints.mc_endpoint,                 
-//         EO_INIT(.as_endpoint)       p->cfg_ptr->endpoints.as_endpoint,   
-//         EO_INIT(.sk_endpoint)       p->cfg_ptr->endpoints.sk_endpoint,   
-        EO_INIT(.canboardsList)     eo_cfg_appDB_constvec_boards__ptr,
-        EO_INIT(.jointsList)        eo_cfg_appDB_constvec_joints__ptr,
-        EO_INIT(.motorsList)        eo_cfg_appDB_constvec_motors__ptr,
-        EO_INIT(.snsrMaisList)      eo_cfg_appDB_constvec_snsrMais__ptr,
-        EO_INIT(.snsrStrainList)    eo_cfg_appDB_constvec_snsrStrain__ptr,
-        EO_INIT(.skinList)          eo_cfg_appDB_constvec_skin__ptr
+    { 
+        EO_INIT(.canboardsList)     eo_cfg_appDB_thecanboards,
+        EO_INIT(.jointsList)        eo_cfg_appDB_thejoints_mapping2canboards,
+        EO_INIT(.motorsList)        eo_cfg_appDB_themotors_mapping2canboards,
+        EO_INIT(.snsrMaisList)      eo_cfg_appDB_themaises_mapping2canboards,
+        EO_INIT(.snsrStrainList)    eo_cfg_appDB_thestrains_mapping2canboards,
+        EO_INIT(.skinList)          eo_cfg_appDB_theskins_info
     };
     
 //     eOappTheDB_jointShiftValues_t shiftval = 
@@ -707,14 +667,14 @@ static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
 
 static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 {
-
-    eOappEncReader_cfg_t  cfg = 
-    {
-        EO_INIT(.connectedEncodersMask)     p->config.connectedEncodersMask,
-        EO_INIT(.callbackOnLastRead)        NULL
-    };
-
-   p->bodyobjs.appEncReader = eo_appEncReader_New(&cfg);
+    eOappEncReader_cfg_t cfg = { 0 }; // marco.accame on 12jan2015: the warning will be removed when a final version of the config is released.
+    
+    memcpy(&cfg.streams, &p->config.encoderstreams, sizeof(cfg.streams));
+    cfg.connectedEncodersMask = p->config.connectedEncodersMask;
+    cfg.callbackOnLastRead = NULL;
+    cfg.callback_arg = NULL;
+    
+    p->bodyobjs.appEncReader = eo_appEncReader_New(&cfg);
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.appEncReader), 
                      "error in appEncReader_New", s_eobj_ownname, &eo_errman_DescrTobedecided);
@@ -734,7 +694,7 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 //                      s_eobj_ownname, "error in emsController_init");
     
     /*
-    numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    numofjoint =  eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
     for(i=0; i<numofjoint; i++)
     {
         eo_emsController_AddAxis(i);
@@ -760,8 +720,7 @@ static void s_eo_emsapplBody_measuresConverter_init(EOtheEMSapplBody *p)
 }
 
 
-
-static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t canBoardsMask)
+static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask)
 {
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
@@ -770,35 +729,35 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
     };
 
     eOicubCanProto_msgDestination_t     msgdest;
-        //EOMtheEMSapplCfg                    *emsapplCfg_ptr = eom_emsapplcfg_GetHandle();
-    uint16_t                            numofboard = eo_appTheDB_GetNumeberOfCanboards(eo_appTheDB_GetHandle());
+    uint16_t                            numofboard = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
     uint16_t                            i;
     eOresult_t                          res;
-    eOappTheDB_cfg_canBoardInfo_t       *cfg_canbrd_ptr;
-    EOappTheDB                          *db= eo_appTheDB_GetHandle();
-    
+    eOappTheDB_canboardinfo_t           *canboardinfo;
+    EOappTheDB                          *db = eo_appTheDB_GetHandle();
+
     for(i=0; i<numofboard; i++)
     {
         
-        if( ((1<<i) & canBoardsMask) == (1<<i))
+        if( ((1<<i) & dontaskmask) == (1<<i))
         {
             continue;
         }
         
-        res = eo_appTheDB_GetCanBoardCfg(db, (eObrd_boardId_t)i, &cfg_canbrd_ptr);
+        res = eo_appTheDB_GetCanBoardInfo(db, (eObrd_boardId_t)i, &canboardinfo);
         if(eores_OK != res)
         {
             continue;
         }
         
-        if((eobrd_mc4 != cfg_canbrd_ptr->type) && (eobrd_1foc != cfg_canbrd_ptr->type))
+        if((eobrd_mc4 != canboardinfo->type) && (eobrd_1foc != canboardinfo->type))
         {
-            continue;
+            continue; // m.a: i dont process this board index and i go to the next one
         }
         
-        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, cfg_canbrd_ptr->canLoc.addr);
         
-        res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, cfg_canbrd_ptr->canLoc.emscanport, msgdest, msgCmd, (void*)&p->config.icubcanprotoimplementedversion);
+        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canboardinfo->addr);
+                        
+        res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, (eOcanport_t)canboardinfo->port, msgdest, msgCmd, (void*)&p->config.icubcanprotoimplementedversion);
         if(eores_OK != res)
         {
             return(res);
@@ -808,23 +767,6 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
     return(eores_OK);
 }
 
-static eOresult_t s_eo_emsapplBody_startCheckCanboards(EOtheEMSapplBody *p)
-{
-    eOresult_t                              res = eores_OK;
-    EOaction                                action;
-    
-    //note: can protocol version check is done only for motor control
-    
-//     if((applrunMode__skinAndMc4 != p->appRunMode) && (applrunMode__mc4Only != p->appRunMode))
-//     {
-//         return(eores_OK);
-//     }
-    
-    eo_action_SetEvent(&action, CANBOARDSRAEDY_CHECK_TIMEOUT_EVT, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-    eo_timer_Start(p->canBoardsReady_timer, eok_abstimeNOW, CANBOARDSRAEDY_CHECK_PERIOD, eo_tmrmode_FOREVER, &action);
-    //res = s_eo_emsapplBody_sendGetFWVersion(p, 0xFFFF); //here all boards are not ready, i.e. they didn't receive get_fw_ver can msg!
-    return(res);
-}
 
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
@@ -841,7 +783,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     
 
     // 2) config joints
-    numofjoint = eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+    numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
     
     for(i=0; i<numofjoint; i++)
     {
@@ -887,7 +829,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 //         for(i=8; i<15; i++)
 //         {
 //             eOicubCanProto_msgDestination_t msgdest;
-//             msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, i);
+//             msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, i);
 //             res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, canLoc.emscanport, msgdest, msgCmd, NULL);
 //             if(eores_OK != res)
 //             {
@@ -938,9 +880,9 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
 
 static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
 {
-    eOresult_t                  res;
+    eOresult_t                  res = eores_NOK_generic;
     eOas_maisId_t               sId = 0; //exist only one mais per ep
-    eOas_mais_config_t          *maiscfg;
+    eOas_mais_config_t          *maiscfg = NULL;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
@@ -948,11 +890,12 @@ static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
     };
 
     
-    res = eo_appTheDB_GetSnrMaisConfigPtr(eo_appTheDB_GetHandle(), sId,  &maiscfg);
-    if(eores_OK != res)
+    maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == maiscfg)
     {
-        return(res);
+        return(res); //error
     }
+      
     res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(maiscfg->mode));
 
     return(res);
@@ -980,9 +923,9 @@ static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
 
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 {
-    eOresult_t                  res;
+    eOresult_t                  res = eores_NOK_generic;
     eOas_strainId_t             sId = 0; //exist only one mais per ep
-    eOas_strain_config_t        *straincfg;
+    eOas_strain_config_t        *straincfg = NULL;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
@@ -990,16 +933,13 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
     };
 
     
-    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &straincfg);
-    if(eores_OK != res)
+    straincfg = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == straincfg)
     {
-        if(eores_NOK_nodata == res)
-        {
-            //if no strain is connected to ems ==> nothing to do ==>ok
-            res = eores_OK;
-        }
-        return(res);
-    }
+         //if no strain is connected to ems ==> nothing to do ==> ok
+        return(eores_OK); 
+    }    
+   
     
     res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(straincfg->mode));
 
@@ -1037,7 +977,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
     in order to evoid useless chack during controller loop  */
     if(applrunMode__2foc == p->appRunMode)
     {
-        numofjoint =  eo_appTheDB_GetNumeberOfConnectedJoints(eo_appTheDB_GetHandle());
+        numofjoint =  eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
         if(numofjoint > 4)
         {
              eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "More then 4 motor for ems connected to 2foc!!", s_eobj_ownname, &eo_errman_DescrTobedecided);
@@ -1065,7 +1005,7 @@ static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p)
 //     eOresult_t                          res;
 //     eOicubCanProto_msgDestination_t     msgdest;
 //     eOas_strain_status_t              *sstatus_ptr;
-//     eOappTheDB_sensorCanLocation_t      canLoc;
+//     eOappTheDB_board_canlocation_t      canLoc;
 //     eOicubCanProto_msgCommand_t         msgCmd = 
 //     {
 //         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,

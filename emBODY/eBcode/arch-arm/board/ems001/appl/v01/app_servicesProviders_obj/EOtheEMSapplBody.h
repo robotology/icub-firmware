@@ -40,7 +40,6 @@
 #include "eOcommon.h"
 #include "EoManagement.h"
 
-#include "hal_encoder.h"
 
 
 #include "EOappTheDataBase.h"
@@ -66,16 +65,6 @@ typedef enum
 
 enum {eo_emsapplbody_deviceid_numberof = 3};
 
-
-/** @typedef    struct eo_emsapplbody_encoder_stream_t
-    @brief      contains representation of a stream of hal encoders. they all must be of the same type.
- **/
-typedef struct 
-{
-    hal_encoder_type_t      type;                           /**< the type of encoders. they must be all homogeneous */
-    uint8_t                 numberof;                       /**< their number inside encoders[] */
-    hal_encoder_t           encoders[hal_encoders_number];  /**< the IDs of the encoders belonging to the stream without holes in the array */    
-} eo_emsapplbody_encoder_stream_t;
 
 
 // values of shifts to send to motor can board (MC4 only, because 2foc use a different way to coding data) 
@@ -109,8 +98,7 @@ typedef struct
 
 typedef struct
 {
-    eo_emsapplbody_encoder_stream_t     encoderstream0;
-    eo_emsapplbody_encoder_stream_t     encoderstream1;
+    eOappEncReader_stream_t             encoderstreams[eo_appEncReader_streams_numberof];
     eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
     eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
     uint16_t                            connectedEncodersMask;    
@@ -150,9 +138,12 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 
 extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev);
 
-extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t canBoardsMask);
+extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask);
 
-extern eOresult_t eo_emsapplBody_setCanBoardsAreReady(EOtheEMSapplBody *p);
+
+extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
+extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
+
 
 //Note: eo_emsapplBody_sendConfig2canboards function send only one time the configuration; so the second call of this func will send anything!
 extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
