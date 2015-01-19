@@ -119,7 +119,7 @@ extern const EOconstLookupTbl icubCanProto_pollingSensorBoardMsg_parser_LUTbl =
     EO_INIT(.itemsList)         &s_pollingSensorBoardMsg_parserFn_list[0]                          
 };
 
-extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_parser_LUTbl__ptr = &icubCanProto_pollingSensorBoardMsg_parser_LUTbl;
+const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_parser_LUTbl__ptr = &icubCanProto_pollingSensorBoardMsg_parser_LUTbl;
 
 
 
@@ -133,7 +133,7 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingSensorB
 
 
 /* DECLARATION OF POLLING SENSOR BOARD FORMER LOOKUP TBL */
-extern const EOconstLookupTbl icubCanProto_pollingSensorBoardMsg_former_LUTbl = 
+const EOconstLookupTbl icubCanProto_pollingSensorBoardMsg_former_LUTbl = 
 {
 
     EO_INIT(.capacity)          eo_icubCanProto_pollingSensorBoardMsg_inTbl_max,
@@ -142,7 +142,7 @@ extern const EOconstLookupTbl icubCanProto_pollingSensorBoardMsg_former_LUTbl =
     EO_INIT(.itemsList)         &s_pollingSensorBoardMsg_formerFn_list[0]  
 };
 
-extern const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_LUTbl__ptr = &icubCanProto_pollingSensorBoardMsg_former_LUTbl;
+const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_LUTbl__ptr = &icubCanProto_pollingSensorBoardMsg_former_LUTbl;
 
 
 

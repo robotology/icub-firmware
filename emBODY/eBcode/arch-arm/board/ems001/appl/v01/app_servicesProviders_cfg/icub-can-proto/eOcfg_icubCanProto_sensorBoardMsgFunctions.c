@@ -27,12 +27,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
 #include "string.h"
 #include "EOcommon.h"
+#include "EOtheErrorManager.h"
+
 #include "EOicubCanProto.h"
 #include "EOicubCanProto_specifications.h"
 #include "EOicubCanProto_hid.h"
 #include "EOtheEMSApplBody.h"
+
+#include "EOtheProtocolWrapper.h"
 
 
 //icub api
@@ -90,7 +95,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arrayofupto12bytes_t  *myfullscale);
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -196,15 +201,16 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProt
     return(eores_OK);
 }
 
-
+#warning --> marco.accame: review mechanism: in here the board receives the can frames about the full scales from strain. one at a time.
+#define TEST_EOARRAY
 extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     uint8_t                                     channel;
     eOresult_t                                  res;
-    eOappTheDB_sensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOas_strainId_t                             sId;
-    eOas_strain_config_t                        *sconfig_ptr;
-    eOas_strain_status_t                        *sstatus_ptr;
+    eOas_strain_config_t                        *config = NULL;
+    eOas_strain_status_t                        *status = NULL;
     eOicubCanProto_msgDestination_t             msgdest;
     eOsmStatesEMSappl_t                         appl_st;
     eOicubCanProto_msgCommand_t                 msgCmd = 
@@ -227,54 +233,56 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     }
 
     /* 2) get signaloncefullscale, contained in strain config nv. */
-    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &sconfig_ptr);
-    if(eores_OK != res)
+    config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == config)
     {
-        return(res);
-    }
-//     if(!sconfig_ptr->signaloncefullscale)
+        return(eores_NOK_generic); //error
+    } 
+//     if(!config->signaloncefullscale)
 //     {
 //         //some error occured
 //         return(eores_NOK_nodata);
 //     }
     
     /* 3) get pointer to nv var where save incoming force values */
-    res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
+
+    status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
     {
-        return(res);
-    }
-    channel = (sstatus_ptr->fullscale.head.size);
+        return(eores_NOK_generic); //error
+    }      
+    
+    
+#if defined(TEST_EOARRAY)
+    channel = eo_array_Size((EOarray*)&status->fullscale);
+#else
+    channel = (status->fullscale.head.size);
+#endif
+    
+    
     if(channel != frame->data[1])
     {
         //somithing wrong: befor i ask full scale for channel "channel" and i received channel for "frame.data[1]" 
         return(eores_NOK_generic);
     }
-    /* sstatus_ptr->fullscale.head.size*sstatus_ptr->fullscale.head.itemsize  == (sstatus_ptr->fullscale.head.size<<1) 
+    /* status->fullscale.head.size*status->fullscale.head.itemsize  == (status->fullscale.head.size<<1) 
      since itemsize is equal to 2 i used shift insted of moltiplication*/
-    memcpy(&(sstatus_ptr->fullscale.data[(sstatus_ptr->fullscale.head.size<<1)]), &(frame->data[2]), 2);
- 
+#if defined(TEST_EOARRAY)
+    eo_array_PushBack((EOarray*)&status->fullscale, &(frame->data[2]));
+#else    
+    memcpy(&(status->fullscale.data[(status->fullscale.head.size<<1)]), &(frame->data[2]), 2);
+    status->fullscale.head.size++;
+#endif
+    
     /* 4) if i received last channel's full scale i prepare a occasional rop to send
           else request full scale of next channel */
     if(5 == channel)
     {
-        eOas_arrayofupto12bytes_t     myfullscale;
-        
-        
-        sstatus_ptr->fullscale.head.size++;
-        memcpy(&myfullscale , &sstatus_ptr->fullscale, sizeof(eOas_arrayofupto12bytes_t));
-
         //prepare occasional rop to send
-        res = s_loadFullscalelikeoccasionalrop(sId, &myfullscale);
+        res = s_loadFullscalelikeoccasionalrop(sId);
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
         
-
-        // char str[128];
-        // snprintf(str, sizeof(str)-1, "recievd 6 getfullscale");
-        // eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        // eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-        
-        //if application is in cfg state, then request to configurator to send rop just prepared
+        //if application is in cfg state, then we send a request to configurator to send ropframe out
         if(eo_sm_emsappl_STcfg == appl_st)
         {
             eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
@@ -282,15 +290,9 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     }
     else
     {
-        // char str[128];
-        // snprintf(str, sizeof(str)-1, "recievd getfullscale until channel  = %d", channel);
-        // eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        // eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-        
         channel++;
-        sstatus_ptr->fullscale.head.size++;
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &channel);
+        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &channel);
     }
     return(eores_OK);
 }
@@ -314,10 +316,10 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__getFullScales(EOicubCanProt
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_sensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOas_strainId_t                             sId;
-    eOas_strain_config_t                        *sconfig_ptr;
-    eOas_strain_status_t                        *sstatus_ptr;
+    eOas_strain_config_t                        *config = NULL;
+    eOas_strain_status_t                        *status = NULL;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -330,34 +332,36 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
         return(res);
     }
 
-    /* 2) get strain transmission mode, contained in straion config nv.
+    /* 2) get strain transmission mode, contained in strain config nv.
           (parsing depends on transmission mode)*/
-    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &sconfig_ptr);
-    if(eores_OK != res)
+    config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == config)
     {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    } 
     /* 3) get pointer to nv var where save incoming force values */
-    res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
+    status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
     {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    } 
     
     
     /* 4) set incoming force values */    
-    switch(sconfig_ptr->mode)
+    switch(config->mode)
     {
         case eoas_strainmode_txcalibrateddatacontinuously:
         case eoas_strainmode_txalldatacontinuously:
         {
-            memcpy(&(sstatus_ptr->calibratedvalues.data[0]), &(frame->data[0]), 6);
-        }break;
+            eo_array_Assign((EOarray*)&status->calibratedvalues, 0, &(frame->data[0]), 6);
+            //memcpy(&(status->calibratedvalues.data[0]), &(frame->data[0]), 6);
+        } break;
 
         case eoas_strainmode_txuncalibrateddatacontinuously:
         {
-            memcpy(&(sstatus_ptr->uncalibratedvalues.data[0]), &(frame->data[0]), 6);
-        }break;
+            eo_array_Assign((EOarray*)&status->uncalibratedvalues, 0, &(frame->data[0]), 6);
+            //memcpy(&(status->uncalibratedvalues.data[0]), &(frame->data[0]), 6);
+        } break;
         
         default:
         {
@@ -372,10 +376,10 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_sensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOas_strainId_t                             sId;
-    eOas_strain_config_t                        *sconfig_ptr;
-    eOas_strain_status_t                        *sstatus_ptr;
+    eOas_strain_config_t                        *config = NULL;
+    eOas_strain_status_t                        *status = NULL;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -389,34 +393,36 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     }
 
     /* 2) get strain transmission mode, contained in straion config nv.
-          (parsing depends on transmission mode)*/
-    res = eo_appTheDB_GetSnrStrainConfigPtr(eo_appTheDB_GetHandle(), sId,  &sconfig_ptr);
-    if(eores_OK != res)
+          (parsing depends on transmission mode)*/    
+    config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == config)
     {
-        return(res);
-    }
-    /* 3) get pointer to nv var where save incoming force values */
-    res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    }     
     
+    /* 3) get pointer to nv var where save incoming force values */
+    status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
+    {
+        return(eores_NOK_generic); //error
+    }      
     
     /* 4) set incoming force values */
     
-    switch(sconfig_ptr->mode)
+    switch(config->mode)
     {
         case eoas_strainmode_txcalibrateddatacontinuously:
         case eoas_strainmode_txalldatacontinuously:
         {
-            memcpy(&(sstatus_ptr->calibratedvalues.data[6]), &(frame->data[0]), 6);
-        }break;
+            eo_array_Assign((EOarray*)&status->calibratedvalues, 6, &(frame->data[0]), 6);
+            //memcpy(&(status->calibratedvalues.data[6]), &(frame->data[0]), 6);
+        } break;
 
         case eoas_strainmode_txuncalibrateddatacontinuously:
         {
-            memcpy(&(sstatus_ptr->uncalibratedvalues.data[6]), &frame->data[0], 6);
-        }break;
+            eo_array_Assign((EOarray*)&status->uncalibratedvalues, 6, &(frame->data[0]), 6);
+            //memcpy(&(status->uncalibratedvalues.data[6]), &frame->data[0], 6);
+        } break;
         
         default:
         {
@@ -433,9 +439,9 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_sensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOas_strainId_t                             sId;
-    eOas_strain_status_t                        *sstatus_ptr;
+    eOas_strain_status_t                        *status = NULL;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -449,13 +455,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     }
 
     /* 1) get pointer to nv var where save incoming force values */
-    res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
+    status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
     {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    } 
 
-    memcpy(&(sstatus_ptr->uncalibratedvalues.data[0]), &frame->data[0], 6);
+    memcpy(&(status->uncalibratedvalues.data[0]), &frame->data[0], 6);
 
     return(eores_OK);
 }
@@ -463,9 +469,9 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmode(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_sensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOas_strainId_t                             sId;
-    eOas_strain_status_t                        *sstatus_ptr;
+    eOas_strain_status_t                        *status = NULL;
 
     /* 1) get can location */
     canLoc.emscanport = canPort;
@@ -479,13 +485,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
     }
 
     /* 1) get pointer to nv var where save incoming force values */
-    res = eo_appTheDB_GetSnrStrainStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
+    status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
     {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    } 
 
-    memcpy(&(sstatus_ptr->uncalibratedvalues.data[6]), &frame->data[0], 6);
+    memcpy(&(status->uncalibratedvalues.data[6]), &frame->data[0], 6);
 
     return(eores_OK);
 }
@@ -494,8 +500,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
 {
     eOresult_t                                  res;
     eOas_maisId_t                               sId;
-    eOappTheDB_sensorCanLocation_t              canLoc;
-    eOas_mais_status_t                          *sstatus_ptr;
+    eOappTheDB_board_canlocation_t              canLoc;
+    eOas_mais_status_t                          *status = NULL;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -505,21 +511,22 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
     {
         return(res);
     }
-    
-    res = eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
+
+    status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
     {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    }     
 
     // copy the canframe data values inside the array
-    #if 0
+    #if 1
     // not inserted juts to avoid too many changes on re-ordering of protocol v1 on date 6 dec 13, but it is the correct way to to it
-    EOarray* array = (EOarray*)&sstatus_ptr->the15values;
+    EOarray* array = (EOarray*)&status->the15values;
     eo_array_Assign(array, 0, &(frame->data[0]), 7); // 7 bytes of frame->data starting from array position 0
     #else
-    sstatus_ptr->the15values.head.size = 15;
-    memcpy(&(sstatus_ptr->the15values.data[0]), &(frame->data[0]), 7); 
+    #error -> old mode
+    status->the15values.head.size = 15;
+    memcpy(&(status->the15values.data[0]), &(frame->data[0]), 7); 
     #endif
 
     return(eores_OK);    
@@ -530,8 +537,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
 {
     eOresult_t                                  res;
     eOas_maisId_t                               sId;
-    eOappTheDB_sensorCanLocation_t              canLoc;
-    eOas_mais_status_t                          *sstatus_ptr;
+    eOappTheDB_board_canlocation_t              canLoc;
+    eOas_mais_status_t                          *status = NULL;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -542,20 +549,21 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
         return(res);
     }
     
-    res = eo_appTheDB_GetSnrMaisStatusPtr(eo_appTheDB_GetHandle(), sId,  &sstatus_ptr);
-    if(eores_OK != res)
+    status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == status)
     {
-        return(res);
-    }
+        return(eores_NOK_generic); //error
+    } 
     
     // copy the canframe data values inside the array
-    #if 0
+    #if 1
     // not inserted juts to avoid too many changes on re-ordering of protocol v1 on date 6 dec 13, but it is the correct way to to it
-    EOarray* array = (EOarray*)&sstatus_ptr->the15values;
+    EOarray* array = (EOarray*)&status->the15values;
     eo_array_Assign(array, 7, &(frame->data[0]), 8); // 8 bytes of frame->data starting from array position 8
     #else
-    sstatus_ptr->the15values.head.size = 15;
-    memcpy(&(sstatus_ptr->the15values.data[7]), &(frame->data[0]), 8); 
+    #error -> old mode
+    status->the15values.head.size = 15;
+    memcpy(&(status->the15values.data[7]), &(frame->data[0]), 8); 
     #endif
     
     return(eores_OK);
@@ -595,9 +603,9 @@ extern eOresult_t eo_icubCanProto_former_per_sb_cmd__torqueVector(EOicubCanProto
 
 extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    eOresult_t                      res;
+    eOresult_t                      res = eores_NOK_generic;
     eOsk_skinId_t                   skId = 0;
-    EOarray_of_10canframes          *arrayof10canframes_ptr = NULL;
+    EOarray_of_10canframes          *arrayof10canframes = NULL;
     EOappTheDB                      *db = eo_appTheDB_GetHandle();
     eOappTheDB_SkinCanLocation_t    canloc;
 
@@ -609,13 +617,14 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     }
     
     
-    res = eo_appTheDB_GetSkinStArray10CanFramesPtr(db, skId,  &arrayof10canframes_ptr);
-    if(eores_OK != res)
+    arrayof10canframes = eo_protocolwrapper_GetSkinStatusArray(eo_protocolwrapper_GetHandle(), skId);
+    
+    if(NULL == arrayof10canframes)
     {
         return(res);
     }
 
-    res =  eo_array_PushBack((EOarray*)arrayof10canframes_ptr, frame);
+    res = eo_array_PushBack((EOarray*)arrayof10canframes, frame);
 
     return(res);
 }
@@ -738,13 +747,12 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setTriangCfg(EOicubCanProto
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arrayofupto12bytes_t  *myfullscale)
+
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
 {
     eOresult_t res;
     eOropdescriptor_t ropdesc;
-    const eOemsapplbody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());  
-    
-    
+    const eOemsapplbody_cfg_t* bodycfg = eo_emsapplBody_GetConfig(eo_emsapplBody_GetHandle());    
     
     if(NULL == bodycfg)
     {
@@ -756,10 +764,14 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId, eOas_arr
     ropdesc.ropcode                 = eo_ropcode_sig;
     ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
     ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, sId, eoprot_tag_as_strain_status_fullscale); 
-    ropdesc.data                    = (void*)myfullscale;
+    ropdesc.data                    = NULL;
 
    
     res = eo_transceiver_OccasionalROP_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
+    if(eores_OK != res)
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
+    }
 
     if(eores_OK != res)
     {
