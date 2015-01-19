@@ -44,46 +44,40 @@ extern "C" {
 
 typedef struct
 {
-    eOappTheDB_cfg_canBoardInfo_t       *cfg_ptr;
-    struct
-    {
-        struct
-        {
-            eOmc_jointId_t              *connectedjoints;
-            eOmc_motorId_t              *connectedmotors;
-        } jm;
-    } s;
+    eOappTheDB_canboardinfo_t           basicboardinfo;
+    eOmc_jointId_t                      connectedjoints[eOicubCanProto_jm_indexInBoard_max];
+    eOmc_motorId_t                      connectedmotors[eOicubCanProto_jm_indexInBoard_max];
     eObool_t                            isready; // the board is ready when it responds to get_fw_ver can msg
 } eOappTheDB_hid_canBoardInfo_t;
 
 typedef struct
 {
-    eOappTheDB_cfg_jointInfo_t   		*cfg_ptr;
+    eOappTheDB_mapping2canboard_t 		mapping2canboard;
     eOappTheDB_jointShiftValues_t       *shiftvalues_ptr;   
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
 #ifdef USE_PROTO_PROXY
-    EOlist                              *ethProtoReq_list;
+    EOlist                              *ethProtoReq_list;  // list of eOappTheDB_hid_ethProtoRequest_t items
 #endif
 } eOappTheDB_hid_jointInfo_t;
 
 
 typedef struct
 {
-    eOappTheDB_cfg_motorInfo_t          *cfg_ptr;
+    eOappTheDB_mapping2canboard_t 		mapping2canboard;
 #ifdef USE_PROTO_PROXY
-    EOlist                              *ethProtoReq_list;
+    EOlist                              *ethProtoReq_list;  // list of eOappTheDB_hid_ethProtoRequest_t items
 #endif
 } eOappTheDB_hid_motorInfo_t;
 
 
 typedef struct
 {
-    eOappTheDB_cfg_snsrMaisInfo_t       *cfg_ptr;
+    eOappTheDB_mapping2canboard_t       *cfg_ptr;
 } eOappTheDB_hid_snsrMaisInfo_t;
 
 typedef struct
 {
-    eOappTheDB_cfg_snsrStrainInfo_t       *cfg_ptr;
+    eOappTheDB_mapping2canboard_t       *cfg_ptr;
 } eOappTheDB_hid_snsrStrainInfo_t;
 
 
@@ -111,28 +105,25 @@ typedef struct
     eOsk_skin_t             *skin_ptr;
 } eOappTheDB_hid_nvsRamRef_t;
 
+typedef struct
+{
+		eOsizecntnr_t 	    capacity;
+		eObrd_boardId_t		*tbl; // gli indici partono da zero, anche se l'indirizzo zero sara' sempre usato dalla ems
+} eOappTheDB_hid_canaddressLookuptbl;
 
 struct EOappTheDB_hid
 {
     eOappTheDB_cfg_t                    cfg;
-    eOboolvalues_t                      isinitted;
-    EOarray                             *canboardsList;
-    EOarray                             *jointsList;
-    EOarray                             *motorsList;
-    EOarray                             *snsrMaisList;
-    EOarray                             *snsrStrainList;
-    EOarray                             *skinList;
-    
-	struct
-	{
-		eOsizecntnr_t 	    capacity;
-		eObrd_boardId_t		*tbl; // gli indici partono da zero, anche se l'indirizzo zero sara' sempre usato dalla ems
-	} canaddressLookuptbl;
-
-    //eOappTheDB_hid_nvsRamRef_t          nvsram;
+    eObool_t                            isinitted;
+    EOarray                             *canboardsInfo;     // array of items eOappTheDB_hid_canBoardInfo_t
+    EOarray                             *jointsInfo;        // array of items eOappTheDB_hid_jointInfo_t. 
+    EOarray                             *motorsInfo;        // array of items eOappTheDB_hid_motorInfo_t  
+    EOarray                             *maisesInfo;        // array of items eOappTheDB_hid_snsrMaisInfo_t          
+    EOarray                             *strainsInfo;       // array of items eOappTheDB_hid_snsrStrainInfo_t
+    EOarray                             *skinsInfo;         // array of items eOappTheDB_hid_skinInfo_t
+	eOappTheDB_hid_canaddressLookuptbl  canaddressLookuptbl;
     eOappTheDB_hid_virtualStrainData_t  virtualStrainData;
 };
-
 
 
 
