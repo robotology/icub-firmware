@@ -164,7 +164,7 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eOcanport_t emscanport, eOi
                 eores_NOK_nullpointer if p is null, or eores_NOK_nodata the mid is not connected with this ems board,
                 or eores_NOK_generic something else error case. //TODO: check better error!!!
  **/
-extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofREADcanframe);
+extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofreadcanframes);
 
 
 /** @fn         extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t *numofRXcanframe)

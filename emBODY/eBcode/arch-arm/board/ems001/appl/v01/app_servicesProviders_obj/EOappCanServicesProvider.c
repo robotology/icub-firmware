@@ -66,6 +66,9 @@
 #include "EOtheEMSapplDiagnostics.h"
 
 
+#include "EOicubCanProto_hid.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -156,6 +159,7 @@ volatile uint8_t numtx[2] = {0,0};
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern EOappCanSP* eo_appCanSP_New(eOappCanSP_cfg_t *cfg)
 {
     eOresult_t      res;
@@ -346,7 +350,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, e
 
 
     //set destination of message
-    msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
    
     res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
     return(res);
@@ -371,7 +375,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
     }
 
     //set destination of message 
-    msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
     return(res);
@@ -381,7 +385,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
 extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t                                  res;
-    eOappTheDB_SensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOicubCanProto_msgDestination_t             msgdest;
 
     if(NULL == p)
@@ -396,7 +400,7 @@ extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, 
     }
 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr);
-    res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
+    res = s_eo_appCanSP_formAndSendFrame(p, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, val_ptr);
     
     return(res);
     
@@ -405,7 +409,7 @@ extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, 
 extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOas_strainId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t                                  res;
-    eOappTheDB_SensorCanLocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc;
     eOicubCanProto_msgDestination_t             msgdest;
 
     if(NULL == p)
@@ -420,7 +424,7 @@ extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOas_strainId_t s
     }
 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr);
-    res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
+    res = s_eo_appCanSP_formAndSendFrame(p, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, val_ptr);
     
     return(res);
     
@@ -440,12 +444,17 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eOcanport_t emscanport, eOi
     return(res);
 }
 
-extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofREADcanframe)
-{
-    eOresult_t          res;
-    hal_can_frame_t     rec_frame;
-    uint8_t             i;
 
+
+
+extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofreadcanframes)
+{
+    eOresult_t          res = eores_NOK_generic;
+    hal_result_t        halres = hal_res_NOK_nodata;
+    hal_can_frame_t     canframe = {0};
+    uint8_t             i;
+    uint8_t readcanframes = 0;
+    
 
     if(NULL == p)
     {
@@ -454,26 +463,29 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
 
     for(i=0; i<numofcanframe ; i++)
     {
-        memset(&rec_frame, 0, sizeof(hal_can_frame_t));
+        memset(&canframe, 0, sizeof(hal_can_frame_t));
         
-        res = (eOresult_t)hal_can_get((hal_can_port_t)canport, &rec_frame, NULL);
-        if( (eores_OK != res)  /*&& (hal_res_NOK_nodata != res)*/)
+        halres = hal_can_get((hal_can_port_t)canport, &canframe, NULL);
+        if(hal_res_OK != halres)
         {
-            //insert diagnostics
-            continue;                         
+            break;      // marco.accame on 12 jan 2015: changed the original continue in a break because:
+                        // if we have a NOK then we cannot go on because the fifo is surely empty.                     
         }
 
-       res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&rec_frame, (eOcanport_t)canport);
-        #warning TODO: remove comment and insert diagnostics
-//         if(eores_OK != res) 
-//         {
-//             //return(res);                    
-//         }
+        readcanframes ++;
+               
+        
+        res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&canframe, (eOcanport_t)canport);
+        res = res;
+        #warning marco.accame: if eo_icubCanProto_ParseCanFrame() does not recognise a canframe it must return an error code to be sent up via diagnostics
+//        if(eores_OK != res) 
+//        {                
+//        }
     }
     
-    if(NULL != numofREADcanframe)
+    if(NULL != numofreadcanframes)
     {
-        *numofREADcanframe = i;    
+        *numofreadcanframes = readcanframes;    
     }
 
     if(p->periphstatus[canport].isnewvalue)
@@ -484,7 +496,6 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
     }
     
     return(eores_OK);
-
 }
 
 extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofRXcanframe)
@@ -1175,7 +1186,7 @@ static void s_eo_appCanSP_callbackOnTx_portx_waittransmission(void *arg, hal_can
             
             if(osal_res_OK != osal_semaphore_increment(p->waittxdata[port].semaphore, osal_callerISR))
             {
-                #warning --> marco.accame: shall we put any eo_errman_Error() in here ? we are inside an ISR. better NOOOOOOOOO
+                #warning --> marco.accame: shall we put any eo_errman_Error() in here ? we are inside an ISR. better NO
                 // but we may set a flag which will trigger an error later
                 hal_trace_puts("error in s_eo_appCanSP_callbackOnTx_portx_waittransmission"); 
             }
