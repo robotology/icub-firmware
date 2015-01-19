@@ -205,17 +205,18 @@
 
 static const eOemsapplbody_cfg_t theemsapplbodycfg =
 {
-    .encoderstream0 =
-    {
-        .type       = encstream0_type,
-        .numberof   = encstream0_numberof,
-        .encoders   = { encstream0_encoders0, encstream0_encoders1, encstream0_encoders2, encstream0_encoders3, encstream0_encoders4, encstream0_encoders5 }        
-    },
-    .encoderstream1 =
-    {
-        .type       = encstream1_type,
-        .numberof   = encstream1_numberof,
-        .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
+    .encoderstreams =
+    {   
+        {   // stream 0
+            .type       = encstream0_type,
+            .numberof   = encstream0_numberof,
+            .encoders   = { encstream0_encoders0, encstream0_encoders1, encstream0_encoders2, encstream0_encoders3, encstream0_encoders4, encstream0_encoders5 }   
+        },
+        {   // stream 1
+            .type       = encstream1_type,
+            .numberof   = encstream1_numberof,
+            .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
+        }
     },
     .hasdevice  =
     {
@@ -396,6 +397,7 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
+    #warning -> marco.accame: maybe it is better enabling the tx on can for all joints not on exit-cfg but on enytry-run (i may go to err).
     eOresult_t res;
     res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if(eores_OK != res)
@@ -403,6 +405,7 @@ extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
         ; //gestisci errore
     }
 }
+
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
     // pulse led3 forever at 1 hz.
