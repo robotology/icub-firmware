@@ -35,7 +35,11 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
+
 #include "eOcommon.h"
+
+#include "hal_encoder.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -45,11 +49,26 @@
 typedef struct EOappEncReader_hid  EOappEncReader;
 
 
+/** @typedef    struct eo_emsapplbody_encoder_stream_t
+    @brief      contains representation of a stream of hal encoders. they all must be of the same type.
+ **/
+typedef struct 
+{
+    hal_encoder_type_t      type;                           /**< the type of encoders. they must be all homogeneous */
+    uint8_t                 numberof;                       /**< their number inside encoders[] */
+    hal_encoder_t           encoders[hal_encoders_number];  /**< the IDs of the encoders belonging to the stream without holes in the array */    
+} eOappEncReader_stream_t;
+
+
+enum { eo_appEncReader_streams_numberof = 2 };
+
+
 typedef struct
 {
+    eOappEncReader_stream_t     streams[eo_appEncReader_streams_numberof];     
     uint16_t                    connectedEncodersMask;  /**< bitmask that rappresents connected encoders*/
-    void (*callbackOnLastRead)(void *arg);              /**< callback called when the last encoder has been read     */
-    void* callback_arg;                                 /**< argument of callback */
+    eOcallback_t                callbackOnLastRead;     /**< callback called when the last encoder has been read     */
+    void*                       callback_arg;           /**< argument of callback */
 } eOappEncReader_cfg_t;
 
 typedef enum
@@ -102,6 +121,7 @@ extern uint32_t eo_appEncReader_deltaSPI3(EOappEncReader *p);
 extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value);
 
 extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p);
+
 /** @}            
     end of group eo_app_encodersReader
  **/
