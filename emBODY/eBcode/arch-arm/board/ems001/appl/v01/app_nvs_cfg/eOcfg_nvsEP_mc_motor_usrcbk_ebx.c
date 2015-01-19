@@ -148,7 +148,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 {
     eOresult_t                              res;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
-    eObrd_types_t                           boardType;
+    eObrd_cantype_t                         boardType;
     icubCanProto_velocity_t                 vel_icubCanProtValue;
     eOmc_motor_config_t                     *cfg_ptr = (eOmc_motor_config_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
@@ -170,8 +170,9 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     }
 
 	//set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
+    #warning --> eobrd_1foc non va bene qui .. usa eobrd_cantype_1foc POI: ... magari rimuovi eOappTheDB_jointOrMotorCanLocation_t ed usa la forma campatta per il solo can
     if(eobrd_1foc == boardType)
     {
         // 1) send current pid
@@ -216,7 +217,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
     }
 
   	//set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
 
     // send current pid
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;

@@ -46,6 +46,8 @@
 #include "EOicubCanProto_specifications.h"
 #include "EOappMeasuresConverter.h"
 
+#include "EOtheProtocolWrapper.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -142,11 +144,11 @@ extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
             
 extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOresult_t              res;
+    //eOresult_t              res;
     eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     float                   rescaler_pos;
     float                   rescaler_trq;
-    eOmc_joint_status_t     *jstatus_ptr = NULL;
+    eOmc_joint_status_t     *jstatus = NULL;
     eOmc_joint_config_t     *cfg = (eOmc_joint_config_t*)nv->ram;
 
     //currently no joint config param must be sent to 2foc board. (for us called 1foc :) )
@@ -195,19 +197,19 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
     
     // 8) set monitormode status
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
-    if(eores_OK != res)
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
-    }
-
+        return; //error
+    }    
+    
     if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
     {
-        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_notmonitored;  
     }
     else
     {
-        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_setpointnotreachedyet;
+        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
     }
 
 }
@@ -320,23 +322,24 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     /*NOTE: this function is equal to mc4 fucntion.*/
-    eOresult_t              res;
-    eOmc_joint_status_t     *jstatus_ptr;
+//    eOresult_t              res;
+    eOmc_joint_status_t     *jstatus = NULL;
     eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
-    if(eores_OK != res)
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
+        return; //error
     }
-
+    
+    #warning marco.accame: better using cast to eOmc_motionmonitormode_t
     if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->ram))
     {
-        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+        jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
     }
     else
     {
-        jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
     }
 }
 
@@ -346,33 +349,35 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
 // extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint);
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOresult_t                              res;
+//    eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
-    eOmc_joint_config_t                     *jconfig_ptr;
-    eOmc_joint_status_t                     *jstatus_ptr;
+    eOmc_joint_config_t                     *jconfig = NULL;
+    eOmc_joint_status_t                     *jstatus = NULL;
 
 
     //set monitor status = notreachedyet if monitormode is forever
-    res = eo_appTheDB_GetJointConfigPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jconfig_ptr);
-    if(eores_OK != res)
+    jconfig = eo_protocolwrapper_GetJointConfig(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jconfig)
     {
-        return; //i should never be here
-    }
+        return; //error
+    }  
     
-    if(eomc_motionmonitormode_forever == jconfig_ptr->motionmonitormode)
+    #warning -> cast to proper type
+    if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)
     {
-        res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
-        if(eores_OK != res)
+        jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+        if(NULL == jstatus)
         {
-            return; //i should never be here
+            return; //error
         }
         
+        #warning --> cast to proper type
         /* if monitorstatus values setpointreached means this is a new set point, 
         so i need to start to check is set point is reached because i'm in monitormode = forever */
-        if(eomc_motionmonitorstatus_setpointisreached == jstatus_ptr->basic.motionmonitorstatus)
+        if(eomc_motionmonitorstatus_setpointisreached == jstatus->basic.motionmonitorstatus)
         {
-            jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+            jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
         }
     }
     
@@ -503,13 +508,12 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {.emscanport = eOcanport1, .addr = 0, .indexinsidecanboard = eo_icubCanProto_jm_index_first};
     
     #ifdef EXPERIMENTAL_SPEED_CONTROL
     icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_velocity;
     #else
     icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_openloop;
-    //icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_current;
     #endif
     
     eOicubCanProto_msgDestination_t         msgdest;
@@ -527,9 +531,10 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     {
         return;
     }
+    
 
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);

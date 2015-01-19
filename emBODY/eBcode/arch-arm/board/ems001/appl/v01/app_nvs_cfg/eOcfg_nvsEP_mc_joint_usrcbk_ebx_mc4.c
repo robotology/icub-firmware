@@ -50,6 +50,8 @@
 
 #include "EOtheEMSapplDiagnostics.h"
 
+#include "EOtheProtocolWrapper.h"
+
 #ifdef USE_PROTO_PROXY
 #include "EOMtheEMSbackdoor.h"
 #endif
@@ -124,7 +126,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eOresult_t                              res;    
     eOmc_joint_config_t                     *cfg = (eOmc_joint_config_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOmc_joint_status_t                     *jstatus_ptr = NULL;
+    eOmc_joint_status_t                     *jstatus = NULL;
     icubCanProto_position_t                 pos_icubCanProtValue, minpos_icubCanProtValue, maxpos_icubCanProtValue;
     icubCanProto_impedance_t                impedence_icubCanProtValues;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -161,7 +163,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
 
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     // 1) send pid position 
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
@@ -212,21 +214,20 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
     eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues.offset);
     
-    
     // 7) set monitormode status
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
-    if(eores_OK != res)
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
-    }
+        return; //error
+    }    
 
     if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
     {
-        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+        jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
     }
     else
     {
-        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_setpointnotreachedyet;
+        jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_setpointnotreachedyet;
     }
 }
 
@@ -253,7 +254,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
     }
     
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     if(eo_ropcode_set == rd->ropcode)
     {
@@ -300,7 +301,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eObrd_types_t                           boardType;
+    eObrd_cantype_t                         boardType;
     eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -320,7 +321,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
     }
 
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
 
     
     if(eo_ropcode_set == rd->ropcode)
@@ -371,7 +372,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
-    eObrd_types_t                           boardType;
+    eObrd_cantype_t                         boardType;
     icubCanProto_impedance_t                impedence_icubCanProtValues;
     eOmc_impedance_t                        *impedance_ptr = (eOmc_impedance_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
@@ -396,7 +397,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
     }
 
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     
     if(eo_ropcode_set == rd->ropcode)
@@ -474,7 +475,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
     }
     
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
    
     
     
@@ -555,21 +556,21 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
 {
     eOresult_t              res;
     eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
-    eOmc_joint_status_t     *jstatus_ptr;
-    
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx,  &jstatus_ptr);
-    if(eores_OK != res)
+    eOmc_joint_status_t     *jstatus = NULL;
+
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
+        return; //error
     }
 
     if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->ram))
     {
-        jstatus_ptr->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
+        jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
     }
     else
     {
-        jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
     }
 }
 
@@ -614,8 +615,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     eOresult_t                              res;
     eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
     void                                    *val_ptr = NULL;
-    eOmc_joint_status_t                     *jstatus_ptr;
-    eOmc_joint_config_t                     *jconfig_ptr;
+    eOmc_joint_status_t                     *jstatus = NULL;
+    eOmc_joint_config_t                     *jconfig = NULL;
     icubCanProto_position_t                 pos;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
@@ -631,28 +632,30 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
     // 1) set monitor status = notreachedyet if monitormode is forever
-    res = eo_appTheDB_GetJointConfigPtr(db, (eOmc_jointId_t)jxx,  &jconfig_ptr);
-    if(eores_OK != res)
+    jconfig = eo_protocolwrapper_GetJointConfig(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jconfig)
     {
-        return; //i should never be here
-    }
+        return; //error
+    }    
     
     if(eo_ropcode_set == rd->ropcode)
     {
-        
-        if(eomc_motionmonitormode_forever == jconfig_ptr->motionmonitormode)
+        #warning marco.accame: i wrote if(eomc_motionmonitormode_forever == (eOmc_motionmonitormode_t)jconfig->motionmonitormode)
+        //if(eomc_motionmonitormode_forever == (eOmc_motionmonitormode_t)jconfig->motionmonitormode)
+        if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)        
         {
-            res = eo_appTheDB_GetJointStatusPtr(db, (eOmc_jointId_t)jxx,  &jstatus_ptr);
-            if(eores_OK != res)
+            jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+            if(NULL == jstatus)
             {
-                return; //i should never be here
+                return; //error
             }
             
             /* if monitorstatus values setpointreached means this is a new set point, 
             so i need to start to check is set point is reached because i'm in monitormode = forever */
-            if(eomc_motionmonitorstatus_setpointisreached == jstatus_ptr->basic.motionmonitorstatus)
+            if(eomc_motionmonitorstatus_setpointisreached == jstatus->basic.motionmonitorstatus)
+            //if(eomc_motionmonitorstatus_setpointisreached == (eOmc_motionmonitorstatus_t)jstatus->basic.motionmonitorstatus)
             {
-                jstatus_ptr->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+                jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
             }
         }
         
@@ -811,7 +814,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
     icubCanProto_calibrator_t               iCubCanProtCalibrator;
-    eOmc_joint_status_t                     *jstatus_ptr;
+    eOmc_joint_status_t                     *jstatus = NULL;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
@@ -825,10 +828,11 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
     // 1) set control mode in status nv (a mirror nv)
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &jstatus_ptr);
-    if(eores_OK != res)
+    #warning --> marco.accame: removed function as it is useless
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
+        return; //error
     }
     //jstatus_ptr->basic.controlmodestatus = eomc_controlmode_calib;
 
@@ -841,7 +845,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     }
 
     //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     
  
@@ -923,7 +927,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOmc_joint_status_t                     *jstatus_ptr;
+    eOmc_joint_status_t                     *jstatus = NULL;
     eOmc_controlmode_command_t              *controlmode_cmd_ptr = (eOmc_controlmode_command_t*)nv->ram;
     icubCanProto_controlmode_t              icubcanProto_controlmode;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -937,13 +941,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
-
-    // 1) ge control mode in status nv
-    res = eo_appTheDB_GetJointStatusPtr(db, (eOmc_jointId_t)jxx, &jstatus_ptr);
-    if(eores_OK != res)
+    #warning --> marco.accame: the following function is usesless, thus i remove it
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
+        return; //error
     }
+    
 
     // 2) get joint can location
     res = eo_appTheDB_GetJointCanLocation(db, jxx,  &canLoc, NULL);
@@ -953,7 +957,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     }
     
     // 4) set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinboard, canLoc.addr);
+    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
 
     
 //     #include "hal.h"
@@ -1083,17 +1087,18 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
     eOmc_interactionmode_t                  *interaction = (eOmc_interactionmode_t*)rd->data;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOresult_t                              res;
-    eOmc_joint_status_t                     *jstatus_ptr;
+    eOmc_joint_status_t                     *jstatus = NULL;
     EOappCanSP                              *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     icubCanProto_interactionmode_t          icub_interctmode;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
-    res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)jxx, &jstatus_ptr);
-    if(eores_OK != res)
+    #warning --> marco.accame: the following function is useless, thus i remove it
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    if(NULL == jstatus)
     {
-        return;
+        return; //error
     }
-    
+        
     
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
