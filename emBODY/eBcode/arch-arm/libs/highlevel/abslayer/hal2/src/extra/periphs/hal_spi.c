@@ -43,8 +43,6 @@
 #include "hal_sys.h"
 
 
-
-
 #include "hl_bits.h"
 #include "hl_fifo.h"
 #include "hal_heap.h"
@@ -89,11 +87,13 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .sizeofframe                = 4,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
-    .dummytxvalue               = 0x00,
+    //.dummytxvalue               = 0x00,	//removable?
+		//.starttxvalue               = 0x00,	//removable?
     .onframetransm              = NULL,
     .argonframetransm           = NULL,
     .onframereceiv              = NULL,
-    .argonframereceiv           = NULL        
+    .argonframereceiv           = NULL,
+		.cpolarity									= hal_spi_cpolarity_low,
 };
 
 
@@ -105,9 +105,11 @@ const hal_spi_cfg_t hal_spi_cfg_default =
 typedef struct
 {
     hal_spi_cfg_t       config;
-    uint8_t*            dummytxframe;
+		//hl_spi_cfg_t				adv_config;
+    //uint8_t*            dummytxframe; //removable?
     uint8_t*            isrrxframe;
     uint8_t             isrrxcounter;
+		uint8_t*            isrtxframe;
     hl_fifo_t*          fiforx;
     hal_spi_t           id;
     uint8_t             frameburstcountdown;
@@ -128,8 +130,8 @@ typedef struct
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_t id);
 
 static void s_hal_spi_initted_set(hal_spi_t id);
+static void s_hal_spi_initted_reset(hal_spi_t id);
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id);
-
 
 static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg);
 
@@ -158,8 +160,6 @@ static void s_hal_spi_prepare_hl_spi_map(void);
 
 static SPI_TypeDef* const s_hal_spi_stmSPImap[] = { SPI1, SPI2, SPI3 };
 
-  
-    
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -268,10 +268,13 @@ extern hal_result_t hal_spi_writeread(hal_spi_t id, uint8_t byte, uint8_t* readb
 extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
+	
+		//SPI low level identifier
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+	  //numberofframes is ignored. 1 is always used
     const uint8_t num2use = 1;
 
-#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
@@ -285,14 +288,13 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
     }    
 #endif
       
-
     // protect ... may be not needed
     s_hal_spi_rx_isr_disable(id);       
     
     // tells how many frames to use
     intitem->frameburstcountdown = num2use;
-    
-    // reset isrrxframe and its counter  
+		
+    // reset isrrxframe, isrtxframe and its counter  
     memset(intitem->isrrxframe, 0, intitem->config.sizeofframe);
     intitem->isrrxcounter = 0;
     
@@ -300,17 +302,15 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 
     s_hal_spi_periph_enable(id);        // enable spi peripheral
     
-	// in order to read data I have to write a dummy byte. the channel is configured in full duplex mode.
-	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-	
-	SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);    
-    
+		//Need to send the first value inside the isrtxframe array
+		while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+		SPI_I2S_SendData(SPIx, intitem->isrtxframe[0]);
+
     // ok, the isr shall read n frames of m bytes each and then issue a callback to me.
     // n = intitem->frameburstcountdown (=1 for encoder), and m = intitem->config.sizeofframe (=3 for encoder)
     
     return(hal_res_OK);    
 }
-
 
 extern hal_bool_t hal_spi_active_is(hal_spi_t id)
 {
@@ -350,6 +350,7 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
 //     @param  	id	            the id
 //     @return 	hal_res_OK or hal_res_NOK_generic on failure
 //   */
+/*
 // extern hal_result_t hal_spi_stop(hal_spi_t id);
 // extern hal_result_t hal_spi_stop(hal_spi_t id)
 // {
@@ -366,7 +367,7 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
 //            
 //     return(hal_res_OK);    
 // }
-
+*/
 
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
 {
@@ -385,7 +386,100 @@ extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onfr
     return(hal_res_OK);    
 }
 
+extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
+{
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+		s_hal_spi_rx_isr_enable(id);
+		return (hal_res_OK);
+}
 
+extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
+{
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+		s_hal_spi_rx_isr_disable(id);
+		return (hal_res_OK);
+}
+
+extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
+{
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+		s_hal_spi_periph_enable(id);
+		return (hal_res_OK);
+}
+
+extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
+{
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+		s_hal_spi_periph_disable(id);
+		return (hal_res_OK);
+}
+
+extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
+{
+		hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+		// Maybe to be changed
+		memcpy(intitem->isrtxframe, txframe, (intitem->config.sizeofframe)*sizeof(uint8_t));
+		return (hal_res_OK);
+}
+
+extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize)
+{
+		hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+		intitem->config.sizeofframe = framesize;
+		return (hal_res_OK);
+}
+
+extern hal_result_t hal_spi_deinit(hal_spi_t id){
+#if   !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+			if(hal_false == hal_spi_initted_is(id))
+			{
+        return(hal_res_NOK_generic);
+			}
+#endif
+			hl_result_t res;
+			res = hl_spi_deinit((hl_spi_t)id);
+			if ( hl_res_NOK_generic == res )
+				return hal_res_NOK_generic;
+			
+			s_hal_spi_initted_reset(id);
+			
+			hal_heap_delete((void**)&(s_hal_spi_theinternals.items[HAL_spi_id2index(id)]));
+			//hal_heap_delete((void**)&intitem);
+			
+			return (hal_res_OK);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -411,9 +505,6 @@ void SPI3_IRQHandler(void)
 }
 
 // ---- isr of the module: end ------
-
-
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -450,15 +541,17 @@ static void s_hal_spi_read_isr(hal_spi_t id)
      
     if(intitem->isrrxcounter == intitem->config.sizeofframe)
     {   // ok. the frame is finished
-    
         // 1. stop spi 
-        s_hal_spi_periph_disable(id);           // disable periph                                        	     
-		s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
-        
+        s_hal_spi_periph_disable(id);           // disable periph
+				s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
+				
         // set back to zero the frame burst
         intitem->frameburstcountdown = 0;
         // set rx counter to zero again
         intitem->isrrxcounter = 0;
+			
+				// Erase the isrtxframe
+				memset(intitem->isrtxframe, 0, intitem->config.sizeofframe);
         
         // copy the rxframe into the rx fifo
         
@@ -474,14 +567,15 @@ static void s_hal_spi_read_isr(hal_spi_t id)
         if(NULL != onframereceiv)
         {
             onframereceiv(arg);
-        }        
+        }
     }
     else
     {
         // transmit one dummy byte to trigger yet another reception
-        SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);    
+				// SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);
+				// transmit the corresponding byte to trigger another reception
+				SPI_I2S_SendData(SPIx, intitem->isrtxframe[intitem->isrrxcounter]);
     }
- 
 }
 
 static hal_boolval_t s_hal_spi_supported_is(hal_spi_t id)
@@ -494,8 +588,10 @@ static void s_hal_spi_initted_set(hal_spi_t id)
 {
     hl_bits_word_bitset(&s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id));
 }
-
-
+static void s_hal_spi_initted_reset(hal_spi_t id)
+{
+    hl_bits_word_bitclear(&s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id));
+}
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 {   
     return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id)));
@@ -506,16 +602,19 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     
+		// default config if cfg == NULL
     if(NULL == cfg)
     {
         cfg = &hal_spi_cfg_default;
     }
        
+		// if not supported, return unsupported code
     if(hal_true != s_hal_spi_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
     
+		// check if already initialized
     if(hal_true == hal_spi_initted_is(id))
     {
         if(0 == memcmp(cfg, &intitem->config, sizeof(hal_spi_cfg_t)))
@@ -535,14 +634,13 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         return(hal_res_NOK_generic);
     }
     
-
     // acemor: very important info.
     // init the miso and mosi gpio before calling hw_init. 
     // because if the spi is already initted and it detects mosi or miso low it sets
     // register SPI_SR2.BUSY to 1, which makes things hang up.
     
-
-    const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
+    //const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
+		hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
     {   
         .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
         .SPI_Mode               = SPI_Mode_Master,                              // param
@@ -554,7 +652,14 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .SPI_FirstBit           = SPI_FirstBit_MSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
         .SPI_CRCPolynomial      = 0x0007 // reset value
     };
-    
+		
+		if(intitem->config.cpolarity == hal_spi_cpolarity_low)
+		{
+			hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
+		}
+		
+		//We should set the correct baud rate also...?
+		//The prescaler used is the one defined in advcfg, if it's not null
     hl_spi_cfg_t hlcfg =
     {
         .mode       = hl_spi_mode_master,
@@ -562,8 +667,9 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .advcfg     = &hl_spi_advcfg_ems4rd                
     };
     hlcfg.mode = (hal_spi_ownership_master == cfg->ownership) ? (hl_spi_mode_master) : (hl_spi_mode_slave); 
+		
+		//Compute the prescaler and substitute it inside hlcfg structure
     hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);
-    
     
     hl_result_t r = hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
     if(hl_res_OK != r)
@@ -589,40 +695,35 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     hal_spi_cfg_t *usedcfg = NULL;
     usedcfg = &intitem->config;    
     
-
     // only frame-based
     
-    // - the isr rx frame  
+    // - the isr rx frame (heap allocation)  
     intitem->isrrxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
     intitem->isrrxcounter = 0;
+		
+		// - the isr tx frame (heap allocation)
+    intitem->isrtxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
  
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
     intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
-
-
- 
+		
     // - the id
     intitem->id = id;
 
     // - frameburstcountdown
     intitem->frameburstcountdown = 0;
-
    
     // -- locked
     intitem->isrisenabled = hal_false;
-
         
     // now ... init the isr (only for frame-based activity)
     s_hal_spi_isr_init(id, usedcfg);
-
               
     // ok, it is initted
     s_hal_spi_initted_set(id);
          
     return(hal_res_OK);
 }
-
-
 static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
     // mild verification of the config: ownership, activity, sizeofframe, direction, capacity of frames.
@@ -720,17 +821,12 @@ static hl_spi_prescaler_t s_hal_spi_get_hl_prescaler(hal_spi_t id, const hal_spi
     return(hlprescaler); 
 }
 
-
-
-
 static hal_result_t s_hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
 
     return((hal_result_t)hl_fifo_get(intitem->fiforx, rxframe, remainingrxframes));      
 }
-
-
 
 static void s_hal_spi_isr_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {

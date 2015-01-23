@@ -38,6 +38,7 @@
 #include "string.h"
 
 #include "hal_gpio.h"
+#include "hl_gpio.h"
 #include "hl_bits.h" 
 #include "hal_heap.h" 
 #include "hal_sys.h"
@@ -92,13 +93,13 @@ typedef struct
 } hal_mux_theinternals_t;
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
 static hal_boolval_t s_hal_mux_supported_is(hal_mux_t id);
 static void s_hal_mux_initted_set(hal_mux_t id);
+static void s_hal_mux_initted_reset(hal_mux_t id);
 static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id);
 
 
@@ -170,7 +171,6 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
     memcpy(&intitem->sel1,   &hal_mux__theboardconfig.gpiomap[HAL_mux_id2index(id)].gpio_sel1.gpio, sizeof(hal_gpio_t));
 
     
-    
     hal_gpio_init(intitem->enable, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
     
@@ -182,8 +182,6 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
     hal_gpio_init(intitem->sel1, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->sel1, hal_gpio_valHIGH);   
     
-        
-
     s_hal_mux_initted_set(id);
     return(hal_res_OK);
 }
@@ -246,7 +244,34 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
     return(hal_res_OK);
 }
 
+extern hal_result_t hal_mux_get_cs(hal_mux_t id, hal_gpio_t* cs)
+{
+		hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_mux_id2index(id)];
+    #if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
+    if(hal_false == s_hal_mux_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+		#endif
+	
+		*cs = intitem->enable;
+		return(hal_res_OK);
+}
 
+extern hal_result_t hal_mux_deinit(hal_mux_t id)
+{
+#if   !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+			if(hal_false == s_hal_mux_initted_is(id))
+			{
+        return(hal_res_NOK_generic);
+			}
+#endif
+		s_hal_mux_initted_reset(id);
+		hal_heap_delete((void**)&(s_hal_mux_theinternals.items[HAL_mux_id2index(id)]));
+		//hal_heap_delete((void**)&intitem);
+	
+		return(hal_res_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -273,14 +298,15 @@ static void s_hal_mux_initted_set(hal_mux_t id)
     hl_bits_word_bitset(&s_hal_mux_theinternals.inittedmask, HAL_mux_id2index(id));
 }
 
+static void s_hal_mux_initted_reset(hal_mux_t id)
+{
+    hl_bits_word_bitclear(&s_hal_mux_theinternals.inittedmask, HAL_mux_id2index(id));
+}
 
 static hal_boolval_t s_hal_mux_initted_is(hal_mux_t id)
 {
     return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_mux_theinternals.inittedmask, HAL_mux_id2index(id)));
 }
-
-
-
 
 #endif//HAL_USE_MUX
 

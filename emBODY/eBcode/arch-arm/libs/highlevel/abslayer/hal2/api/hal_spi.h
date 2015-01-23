@@ -95,9 +95,6 @@ typedef enum
     hal_spi_act_framebased      = 1     /**< the communication is done by frames */
 } hal_spi_activity_t;
 
-
-
-
 /** @typedef    typedef enum hal_spi_prescaler_t
     @brief      contains prescaler to be applied to fast sys bus to achieve the spi speed.
  **/
@@ -115,6 +112,13 @@ typedef enum
 } hal_spi_prescaler_t;
 
 
+typedef enum
+{
+    hal_spi_cpolarity_low             = 0,
+    hal_spi_cpolarity_high      			= 1
+} hal_spi_cpolarity_t;
+
+
 /** @typedef    typedef enum hal_spi_cfg_t 
     @brief      hal_spi_cfg_t contains the configuration for spi
  **/
@@ -128,11 +132,13 @@ typedef struct
     uint8_t                 sizeofframe;        /**< the size of the frame in the frame-based activity */
     uint8_t                 capacityoftxfifoofframes; /**< if direction is not hal_spi_dir_rxonly, it specifies the capacity of the fifo of frames to tx */
     uint8_t                 capacityofrxfifoofframes; /**< if direction is not hal_spi_dir_txonly, it specifies the capacity of the fifo of frames to rx */
-    uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */ 
+    //uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */
+		//uint8_t                 starttxvalue;	
     hal_callback_t          onframetransm;      /**< if not NULL and direction is not hal_spi_dir_rxonly it is called by the ISR when a frame is transmitted */
     void*                   argonframetransm;
     hal_callback_t          onframereceiv;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when a frame is received */
     void*                   argonframereceiv;
+		hal_spi_cpolarity_t			cpolarity;					// if 0 SPI_CPOL_Low, if 1 SPI_CPOL_High
 } hal_spi_cfg_t;
 
  
@@ -216,7 +222,56 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
   */
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg); 
 
+/** @fn			extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
+    @brief  	this function enable the rx isr for the SPI
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id);
 
+/** @fn			extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
+    @brief  	this function disable the rx isr for the SPI
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id);
+
+/** @fn			extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
+    @brief  	this function enable the SPI peripherical
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_periph_enable(hal_spi_t id);
+
+/** @fn			extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
+    @brief  	this function disable the SPI peripherical
+    @param  	id	                the id
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_periph_disable(hal_spi_t id);
+
+/** @fn			extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
+    @brief  	this function set the size of frame to be used by the isr to call the callback function
+    @param  	id	                the id
+							framesize						number of bytes contained in the frame
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
+
+/** @fn			extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
+    @brief  	this function set the tx frame by copying the bytes array pointed by txframe 
+    @param  	id	                the id
+							txframe							pointer to the transmission frame
+    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe);
+
+/** @fn			extern hal_result_t hal_spi_deinit(hal_spi_t id)
+    @brief  	this function deinitializes an SPI id and all the associated resources
+    @param  	id	        the id
+    @return 	hal_res_OK or hal_res_NOK_generic on failure
+  */
+extern hal_result_t hal_spi_deinit(hal_spi_t id);
 /** @}            
     end of group doxy_group_hal_spi  
  **/

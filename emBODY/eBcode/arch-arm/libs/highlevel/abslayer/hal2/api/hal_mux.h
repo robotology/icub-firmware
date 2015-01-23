@@ -43,6 +43,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_common.h"
+#include "hal_gpio.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -57,7 +58,7 @@
 typedef enum  
 { 
     hal_mux1   = 0,
-	hal_mux2   = 1,
+		hal_mux2   = 1,
     hal_mux3   = 2,         
     hal_mux4   = 3
 } hal_mux_t;
@@ -118,7 +119,20 @@ extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel);
   */
 extern hal_result_t hal_mux_disable(hal_mux_t id);
 
+/** @fn			 extern hal_result_t hal_mux_get_cs(hal_mux_t id, hal_gpio_t* cs)
+    @brief  	This function store inside a variable the chip select gpio struct for the specified mux
+    @param  	id              the mux id
+		@param  	cs              pointer  to chip select gpio struct
+    @return 	hal_res_NOK_generic on error else hal_res_OK
+  */
+extern hal_result_t hal_mux_get_cs(hal_mux_t id, hal_gpio_t* cs);
 
+/** @fn			extern hal_result_t hal_mux_deinit(hal_mux_t id)
+    @brief  	This function deinitializes the mux and all the associated resources.
+    @param  	id 	            the mux id
+    @return 	hal_res_NOK_generic in case of error, else hal_res_OK
+  */
+extern hal_result_t hal_mux_deinit(hal_mux_t id);
 
 /** @}            
     end of group doxy_group_hal_mux  
