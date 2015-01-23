@@ -14,6 +14,8 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
+          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
@@ -143,7 +145,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1179,7 +1180,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -2043,6 +2043,8 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
+          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
@@ -2172,7 +2174,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -2188,7 +2189,7 @@
             <CpuDllArguments></CpuDllArguments>
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>.\eventviewer-stm32f4x-cfg.ini</InitializationFile>
+            <InitializationFile>.\eventviewer-stm32-cfg.ini</InitializationFile>
             <Driver>BIN\ULP2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
@@ -2391,7 +2392,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>HAL_BOARD_MC4PLUS HL_CFG_PLUS_TARGET_BY_FILE NOT_MC4PLUS_ETHDBG</Define>
+              <Define>HAL_BOARD_MC4PLUS HL_CFG_PLUS_TARGET_BY_FILE MC4PLUS_ETHDBG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\core;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\brdcfg;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\chips;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\devices;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\extbrds;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\utilities;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\app-test\stm32f4;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
