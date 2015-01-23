@@ -127,10 +127,18 @@
     // the micrel must be sw configured. we set it in autonegotiation for its port1 and port2. 
     // the mode for the rmii is read via sw from the micrel
     // for debug you can also use: hl_ethtrans_phymode_fullduplex10mbps // hl_ethtrans_phymode_halfduplex10mbps //hl_ethtrans_phymode_auto
+    //#define HL_ETHTRANS_PHYMODE_THEONE2USE hl_ethtrans_phymode_fullduplex10mbps
     #define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_auto
+    //#define HL_ETHTRANS_PHYMODE_THEONE2USE              hl_ethtrans_phymode_fullduplex100mbps
+    #define HL_ETHTRANS_XCOMODE_THEONE2USE              hl_ethtrans_xcorr_none_port2inverted
     
     // we also need to define a target phy mode for the hal-ethtransceiver, but that is dummy. i use auto
+    //#define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_fullduplex10mbps
     #define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_auto
+    //#define HAL_ETHTRANSCEIVER_PHYMODE_THEONE2USE       hal_ethtransceiver_phymode_fullduplex100mbps
+    
+    #define HL_CHIP_MICREL_RESET_TIME_USEC              (110*1000)
+    
     
     static hl_result_t s_switch_micrel_extclock_init(void)
     {   // the external clock is not managed by a mpu peripheral, thus i do nothing
@@ -140,10 +148,11 @@
     extern const hl_chip_micrel_ks8893_cfg_t ks8893_config = 
     {
         .i2cid              = hl_i2c3,
-        .resetpin           = { .port = hl_gpio_portC,     .pin = hl_gpio_pin9 },
+        .resetpin           = { .port = hl_gpio_portC,     .pin = hl_gpio_pin8 }, // it is ETH_SLV in schematics
         .resetval           = hl_gpio_valRESET,
         .extclockinit       = s_switch_micrel_extclock_init,
-        .targetphymode      = HL_ETHTRANS_PHYMODE_THEONE2USE
+        .targetphymode      = HL_ETHTRANS_PHYMODE_THEONE2USE,
+        .xcorrection        = HL_ETHTRANS_XCOMODE_THEONE2USE
     };    
     
     static hal_result_t s_switch_micrel_init(int32_t id, void* param)
@@ -295,28 +304,28 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 			{   // hl_can1 
 				.rx = 
 				{
-					.gpio   = { .port = hal_gpio_portB,      .pin = hal_gpio_pin8 }, 
+					.gpio   = { .port = hal_gpio_portB,      .pin = hal_gpio_pin8 },
 					.af32   = GPIO_AF_CAN1       
 				}, 
 				.tx = 
 				{
-					.gpio   = { .port = hal_gpio_portB,      .pin = hal_gpio_pin9 }, 
+					.gpio   = { .port = hal_gpio_portB,      .pin = hal_gpio_pin9 },
 					.af32   = GPIO_AF_CAN1        
 				} 
 			}, 
 			{   // hl_can2 
 				.rx = 
 				{
-					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE }, 
+					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE },
 					.af32   = GPIO_AF_CAN2        
 				}, 
 				.tx = 
 				{
-					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE }, 
-					.af32   = GPIO_AF_CAN2             
+					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE },
+					.af32   = GPIO_AF_CAN2          
 				} 
 			}   
-		}  
+		} 
     };
     
 #endif//HAL_USE_CAN
@@ -422,45 +431,47 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
     
     extern const hal_i2c_boardconfig_t hal_i2c__theboardconfig =
     {
-    .supportedmask      = (1 << hal_i2c1) | (0 << hal_i2c2) | (1 << hal_i2c3),
-		.gpiomap            =
+    .supportedmask          = (1 << hal_i2c1) | (0 << hal_i2c2) | (1 << hal_i2c3),
+		.gpiomap                =
 		{   
 			{   // hal_i2c1 
-				.scl = 
+				.scl    =
 				{
-					.gpio   = { .port = hal_gpio_portB,      .pin = hal_gpio_pin6 },
-					.af32   = GPIO_AF_I2C1            
+					.gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin6 },
+					.af32   = GPIO_AF_I2C1
 				}, 
-				.sda = 
+				.sda   = 
 				{
-					.gpio   = { .port = hal_gpio_portB,      .pin = hal_gpio_pin7 },
-					.af32   = GPIO_AF_I2C1            
+					.gpio   = { .port = hal_gpio_portB,     .pin = hal_gpio_pin7 },
+					.af32   = GPIO_AF_I2C1
 				} 
 			}, 
+
 			{   // hal_i2c2 
-				.scl = 
+				.scl    =
 				{
-					.gpio   = { .port = hal_gpio_portNONE,   .pin = hal_gpio_pinNONE },
-					.af32   = hl_NA32             
+					.gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE },
+					.af32   = hal_NA32
 				}, 
-				.sda = 
+				.sda   = 
 				{
-					.gpio   = { .port = hal_gpio_portNONE,   .pin = hal_gpio_pinNONE },
-					.af32   = hl_NA32                    
+					.gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE },
+					.af32   = hal_NA32
 				} 
-			},  
+			}, 
+ 
 			{   // hal_i2c3 
-				.scl = 
+				.scl    =
 				{
 					.gpio   = { .port = hal_gpio_portH,      .pin = hal_gpio_pin7 },
 					.af32   = GPIO_AF_I2C3      
 				}, 
-				.sda = 
+				.sda    = 
 				{
 					.gpio   = { .port = hal_gpio_portH,      .pin = hal_gpio_pin8 },
 					.af32   = GPIO_AF_I2C3      
 				} 
-			}        
+			}     
 		}       
     }; 
     
@@ -469,29 +480,28 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
 #if     defined(HAL_USE_SPI) | defined(HAL_USE_SPI_DMA)
     
-    
     #include "hal_spi_hid.h"
 
     extern const hal_spi_boardconfig_t hal_spi__theboardconfig =
     {
-		.supportedmask      = (1 << hal_spi1) | (1 << hal_spi2) ,
+		.supportedmask      = (1 << hal_spi1) | (1 << hal_spi2) | (0 << hal_spi3),
 		.gpiomap            =
 		{ 
 		   {    // hl_spi1 
 				.sck = 
 				{
 					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin10 }, 
-					.af32   = hl_NA32        
+					.af32   = GPIO_AF_SPI1        
 				}, 
 				.miso = 
 				{
 					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin1 }, 
-					.af32   = hl_NA32               
+					.af32   = GPIO_AF_SPI1               
 				},
 				.mosi = 
 				{
 					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin12 }, 
-					.af32   = hl_NA32               
+					.af32   = GPIO_AF_SPI1               
 				}             
 			},         
 			{   // hl_spi2 
@@ -511,17 +521,34 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 					.af32   = GPIO_AF_SPI2               
 				}             
 			},         
-		} 
+            {   // hal_spi3
+                .sck    =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                     
+                },
+                .miso   =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                     
+                },
+                .mosi   =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                     
+                } 
+            }                   
+        }
+           
     };
     
 #endif//defined(HAL_USE_SPI)|defined(HAL_USE_SPI_DMA)
     
       
 #ifdef  HAL_USE_TIMER
- 
     
     #include "hal_timer_hid.h"
-    
+    #warning --> trovare alcuni timer hw per ...
     extern const hal_timer_boardconfig_t hal_timer__theboardconfig =
     {
         .supportedmask  = (1 << hal_timer6) | (1 << hal_timer7)  //(1 << hal_timer8) //(1 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) |
@@ -574,7 +601,9 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
     
     #include "hal_cantransceiver_hid.h" 
+
     
+    // the cantransceivers are hw enabled and cannot be driven
     static hal_result_t s_hal_cantransceiver_simple_init(hal_cantransceiver_t id, void* initpar);
     static hal_result_t s_hal_cantransceiver_simple_enable(hal_cantransceiver_t id);
     static hal_result_t s_hal_cantransceiver_simple_disable(hal_cantransceiver_t id);
@@ -600,10 +629,10 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
     static hal_result_t s_hal_cantransceiver_simple_init(hal_cantransceiver_t id, void* initpar)
     {
         initpar = initpar;
-        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];        
-        const hal_gpio_cfg_t* cfg = &s_hal_cantransceiver__gpiocfgof_enable[(uint8_t)id];   
-        hal_gpio_init(map->gpio, cfg);        
-        s_hal_cantransceiver_simple_disable(id);     
+//        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];        
+//        const hal_gpio_cfg_t* cfg = &s_hal_cantransceiver__gpiocfgof_enable[(uint8_t)id];   
+//        hal_gpio_init(map->gpio, cfg);        
+//        s_hal_cantransceiver_simple_disable(id);     
         s_hal_brdcfg_mc4plus_vaux_5v0_init();
         s_hal_brdcfg_mc4plus_vaux_5v0_on();
         return(hal_res_OK);
@@ -611,15 +640,15 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
     static hal_result_t s_hal_cantransceiver_simple_enable(hal_cantransceiver_t id)
     {  
-        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];          
-        hal_gpio_setval(map->gpio, hal_gpio_valLOW);
+//        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];          
+//        hal_gpio_setval(map->gpio, hal_gpio_valLOW);
         return(hal_res_OK);
     }
 
     static hal_result_t s_hal_cantransceiver_simple_disable(hal_cantransceiver_t id)
     {   
-        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];         
-        hal_gpio_setval(map->gpio, hal_gpio_valHIGH);
+//        const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];         
+//        hal_gpio_setval(map->gpio, hal_gpio_valHIGH);
         return(hal_res_OK);
     }
     
@@ -662,7 +691,6 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
 
 #ifdef  HAL_USE_EEPROM
-
     
     #include "hal_eeprom_hid.h" 
     #include "hl_chip_xx_eeprom.h"
@@ -745,7 +773,7 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
 #ifdef HAL_USE_ENCODER
  
-    #warning --> verificare mappatura di encoder
+    #warning --> verificare mappatura di encoder. ci sono?
     
     #include "hal_encoder_hid.h"
 
@@ -894,6 +922,34 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
                     .af32   = hal_NA32
                 }
             },            
+            {   // hal_led4 
+                .led    = 
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE}, 
+                    .af32   = hal_NA32
+                }
+            },            
+            {   // hal_led5 
+                .led    = 
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE}, 
+                    .af32   = hal_NA32
+                }
+            },                      
+            {   // hal_led6 
+                .led    = 
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE}, 
+                    .af32   = hal_NA32
+                }
+            },              
+            {   // hal_led7 
+                .led    = 
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE}, 
+                    .af32   = hal_NA32
+                }
+            }  
         }
     };
     
@@ -903,6 +959,7 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
     
 #ifdef HAL_USE_MUX
 
+#warning -> se non ci sono mux allora non c'e encoder?
     
 #endif//HAL_USE_MUX      
     
@@ -1038,13 +1095,13 @@ extern void hl_system_stm32fx_before_setsysclock(void)
     
     SystemCoreClockUpdate();    // required so that the hl_sys_delay(0 function works properly 
     
-    const hl_gpio_t ethslv = {.port = hl_gpio_portB, .pin = hl_gpio_pin2};
+    const hl_gpio_t ethslv = {.port = hl_gpio_portC, .pin = hl_gpio_pin8};      // it is 
     hl_gpio_pin_output_init(ethslv);
     
-    const hl_gpio_t notethrst = {.port = hl_gpio_portH, .pin = hl_gpio_pin1};
+    const hl_gpio_t notethrst = {.port = hl_gpio_portC, .pin = hl_gpio_pin9};   // it is ~ETH_RST in schematics
     hl_gpio_pin_output_init(notethrst);
 
-    const hl_reltime_t resettime = 110*1000;    // 110 milli
+    const hl_reltime_t resettime = HL_CHIP_MICREL_RESET_TIME_USEC;   
     
     hl_gpio_pin_write(ethslv, hl_gpio_valSET);
     hl_gpio_pin_write(notethrst, hl_gpio_valRESET);
@@ -1069,6 +1126,7 @@ extern void hl_system_stm32fx_before_setsysclock(void)
 // - definition of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#warning --> nella mc4plus c'e' un 5v0?
 
 static const hal_gpio_map_t s_hal_brdcfg_mc4plus_vaux_5v0_gpiomap = 
 {

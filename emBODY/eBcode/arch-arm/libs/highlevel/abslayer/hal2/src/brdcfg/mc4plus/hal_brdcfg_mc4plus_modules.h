@@ -67,7 +67,7 @@
 #define     HAL_USE_ETH
 #define     HAL_USE_GPIO
 #define     HAL_USE_I2C
-//#define     HAL_USE_SPI
+#define     HAL_USE_SPI
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_ADC
@@ -163,7 +163,6 @@
 #define MC4PLUS_USE_MICREL_AS_MANAGED_DEVICE
 #endif
 
-#define MC4PLUS_USE_MICREL_AS_MANAGED_DEVICE
 
 //#define HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK
 //#define HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK
