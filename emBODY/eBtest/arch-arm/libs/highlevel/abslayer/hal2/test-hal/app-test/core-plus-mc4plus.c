@@ -409,15 +409,18 @@ int main(void)
     test_device_switch();
 #endif//defined(EXECUTE_TEST_SWITCH)   
 
+
+#if     defined(EXECUTE_TEST_TIMER)    
+    test_periph_timer();
+#endif//defined(EXECUTE_TEST_TIMER)   
+
 // keep it last, as it contains a forever loop
 
 #if     defined(EXECUTE_TEST_ETH)    
     test_periph_eth();
 #endif//defined(EXECUTE_TEST_ETH)
     
-#if     defined(EXECUTE_TEST_TIMER)    
-    test_periph_timer();
-#endif//defined(EXECUTE_TEST_TIMER)    
+
 
 #if     defined(EXECUTE_TEST_WATCHDOG)    
     test_periph_watchdog();
@@ -1475,7 +1478,7 @@ static void test_device_switch(void)
 
 
 #if     defined(HAL_USE_DEVICE_MOTORCTL)
-
+#if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)
 static void test_device_motorctl_1(void)
 {
 
@@ -1735,7 +1738,9 @@ static void test_device_motorctl_2(void)
 
 }
 
+
 #endif//defined(HAL_USE_DEVICE_MOTORCTL)
+#endif//EXECUTE_TEST_DEVICE_MOTORCTL
 
 #if     defined(EXECUTE_TEST_ADC)
 
