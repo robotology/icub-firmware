@@ -104,8 +104,6 @@ const hl_spi_advcfg_t hl_spi_advcfg_default =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 typedef struct
 {
     hl_spi_cfg_t                config;
@@ -125,6 +123,7 @@ typedef struct
 
 static hl_boolval_t s_hl_spi_supported_is(hl_spi_t id);
 static void s_hl_spi_initted_set(hl_spi_t id);
+static void s_hl_spi_initted_reset(hl_spi_t id);
 static hl_boolval_t s_hl_spi_initted_is(hl_spi_t id);
 
 
@@ -142,9 +141,6 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
                                         );
 
 
-
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -160,8 +156,6 @@ static hl_spi_theinternals_t s_hl_spi_theinternals =
     .inittedmask        = 0,
     .items              = { NULL }   
 };
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -225,7 +219,6 @@ extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
     {
         hl_sys_on_error(hl_error_unsupportedbehaviour, "spi master mode is unsupported");
     }
-    
     
     // give memory to SPI internal item for this id ...   
     if(NULL == intitem)
@@ -309,6 +302,55 @@ extern hl_result_t hl_spi_disable(hl_spi_t id)
     return(hl_res_OK);
 }
 
+extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte)
+{
+	SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);
+	#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
+    if(hl_false == s_hl_spi_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+	#endif
+		
+	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+	SPI_I2S_SendData(SPIx, byte);
+	
+	return (hl_res_OK);
+}
+
+extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* value)
+{
+	SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);
+	#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
+    if(hl_false == s_hl_spi_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+		if (value == NULL)
+		{
+			  return(hl_res_NOK_generic);
+		}
+	#endif
+		
+	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET);
+	*value = SPI_I2S_ReceiveData(SPIx);
+	return hl_res_OK;
+}
+
+extern hl_result_t hl_spi_deinit (hl_spi_t id)
+{
+#if   !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
+			if(hl_false == hl_spi_initted_is(id))
+			{
+        return(hl_res_NOK_generic);
+			}
+#endif
+			
+			s_hl_spi_initted_reset(id);
+			hl_sys_heap_delete((void*)&(s_hl_spi_theinternals.items[HL_spi_id2index(id)]));
+			
+			return hl_res_OK;
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -339,6 +381,11 @@ static hl_boolval_t s_hl_spi_supported_is(hl_spi_t id)
 static void s_hl_spi_initted_set(hl_spi_t id)
 {
     hl_bits_word_bitset(&s_hl_spi_theinternals.inittedmask, HL_spi_id2index(id));
+}
+
+static void s_hl_spi_initted_reset(hl_spi_t id)
+{
+    hl_bits_word_bitclear(&s_hl_spi_theinternals.inittedmask, HL_spi_id2index(id));
 }
 
 static hl_boolval_t s_hl_spi_initted_is(hl_spi_t id)
@@ -416,7 +463,6 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id)
         
     SPI_InitTypeDef SPI_InitStructure;
 
-
     if(NULL != cfg->advcfg)
     {
         // use advcfg. it has the same layout as SPI_InitTypeDef
@@ -446,7 +492,7 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id)
     
     SPI_I2S_DeInit(SPIx);
 
-	SPI_Init(SPIx, init2use);
+		SPI_Init(SPIx, init2use);
     
     
 	return(hl_res_OK);

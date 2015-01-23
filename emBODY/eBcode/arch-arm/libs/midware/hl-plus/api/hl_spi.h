@@ -192,7 +192,28 @@ extern hl_result_t hl_spi_enable(hl_spi_t id);
   */
 extern hl_result_t hl_spi_disable(hl_spi_t id);
 
+/** @fn         extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte)
+    @brief      This function send a raw byte using an SPI bus.
+    @param      id              identifies SPI port
+		@param      byte            byte value to be sent 
+    @return     hl_res_NOK_generic in case of error, else hl_res_OK
+  */
+extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte);
 
+/** @fn         extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* byte)
+    @brief      This function receive a raw byte using an SPI bus. The value is written on the variable byte
+    @param      id              identifies SPI port
+		@param      byte            pointer to the variable in which the received bbyte will be stored
+    @return     hl_res_NOK_generic in case of error, else hl_res_OK
+  */
+extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* value);
+
+/** @fn         extern hl_result_t hl_spi_init(hl_spi_t id)
+    @brief      This function deinitalize the resources associated to the low-level abstraction of the spi
+    @param      id              identifies SPI id 
+    @return     hl_res_NOK_generic in case of error, else hl_res_OK
+  */
+extern hl_result_t hl_spi_deinit (hl_spi_t id);
 /** @}            
     end of group doxy_group_hl_spi  
  **/
