@@ -101,7 +101,7 @@ typedef struct
     eOappEncReader_stream_t             encoderstreams[eo_appEncReader_streams_numberof];
     eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
     eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
-    uint16_t                            connectedEncodersMask;    
+    //uint16_t                            connectedEncodersMask;    
     eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
 } eOemsapplbody_cfg_t;
 

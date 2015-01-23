@@ -91,12 +91,12 @@ const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default =
     .encoderstreams =
     {
         {
-            .type       = hal_encoder_type1,
+            .type       = hal_encoder_t1,
             .numberof   = 2,
             .encoders   = { hal_encoder1, hal_encoder3, hal_encoderNONE }        
         },
         {
-            .type       = hal_encoder_type1,
+            .type       = hal_encoder_t1,
             .numberof   = 2,
             .encoders   = { hal_encoder2, hal_encoder4, hal_encoderNONE }     
         }        
@@ -110,7 +110,7 @@ const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default =
         .major                      = 1,
         .minor                      = 2
     },
-    .connectedEncodersMask          = 0,   
+    //.connectedEncodersMask          = 0,   
     .configdataofMC4boards          =
     {
         .shiftvalues    =
@@ -670,7 +670,7 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
     eOappEncReader_cfg_t cfg = { 0 }; // marco.accame on 12jan2015: the warning will be removed when a final version of the config is released.
     
     memcpy(&cfg.streams, &p->config.encoderstreams, sizeof(cfg.streams));
-    cfg.connectedEncodersMask = p->config.connectedEncodersMask;
+    //cfg.connectedEncodersMask = p->config.connectedEncodersMask;
     cfg.callbackOnLastRead = NULL;
     cfg.callback_arg = NULL;
     
