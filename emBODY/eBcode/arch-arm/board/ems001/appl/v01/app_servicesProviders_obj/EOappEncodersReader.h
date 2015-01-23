@@ -54,7 +54,7 @@ typedef struct EOappEncReader_hid  EOappEncReader;
  **/
 typedef struct 
 {
-    hal_encoder_type_t      type;                           /**< the type of encoders. they must be all homogeneous */
+    hal_encoder_type      	type;                           /**< the type of encoders. they must be all homogeneous */
     uint8_t                 numberof;                       /**< their number inside encoders[] */
     hal_encoder_t           encoders[hal_encoders_number];  /**< the IDs of the encoders belonging to the stream without holes in the array */    
 } eOappEncReader_stream_t;
@@ -65,8 +65,8 @@ enum { eo_appEncReader_streams_numberof = 2 };
 
 typedef struct
 {
-    eOappEncReader_stream_t     streams[eo_appEncReader_streams_numberof];     
-    uint16_t                    connectedEncodersMask;  /**< bitmask that rappresents connected encoders*/
+    eOappEncReader_stream_t     streams[eo_appEncReader_streams_numberof]; /**< array of encoder streams, used to inizialize the sensors*/    
+    //uint16_t                    connectedEncodersMask;  /**< bitmask that rappresents connected encoders*/
     eOcallback_t                callbackOnLastRead;     /**< callback called when the last encoder has been read     */
     void*                       callback_arg;           /**< argument of callback */
 } eOappEncReader_cfg_t;
@@ -118,7 +118,7 @@ extern uint64_t eo_appEncReader_startSPI3(EOappEncReader *p);
 extern uint32_t eo_appEncReader_deltaSPI1(EOappEncReader *p);
 extern uint32_t eo_appEncReader_deltaSPI3(EOappEncReader *p);
 
-extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value);
+extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_encoder_errors_flags *flags);
 
 extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p);
 

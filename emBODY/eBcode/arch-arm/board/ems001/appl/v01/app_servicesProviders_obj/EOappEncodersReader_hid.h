@@ -79,7 +79,8 @@ typedef struct
 struct EOappEncReader_hid
 {
     eOappEncReader_cfg_t    cfg;
-    uint16_t                halConfigEncMask;
+    //uint16_t                halConfigEncMask;
+	  hal_encoder_type	halConfigEncMask[encodersNum];
 //    struct configEncSPIX    configuredEnc_SPI1;     /**< contains the sequence of reading of encoders connected to SPI1*/ 
 //    struct configEncSPIX    configuredEnc_SPI3;     /**< contains the sequence of reading of encoders connected to SPI3 */ 
     EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI1;
