@@ -112,20 +112,20 @@
 // encoders
 #if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
  
-    #define encstream0_type         hal_encoder_type1
+    #define encstream0_type         hal_encoder_t1
     #define encstream0_numberof     2
     #define encstream0_encoders0    hal_encoder1
-    #define encstream0_encoders1    hal_encoder3
+    #define encstream0_encoders1    hal_encoder2
     #define encstream0_encoders2    hal_encoderNONE
     #define encstream0_encoders3    hal_encoderNONE
     #define encstream0_encoders4    hal_encoderNONE
     #define encstream0_encoders5    hal_encoderNONE
 
     
-    #define encstream1_type         hal_encoder_type1
+    #define encstream1_type         hal_encoder_t1
     #define encstream1_numberof     2
-    #define encstream1_encoders0    hal_encoder2
-    #define encstream1_encoders1    hal_encoder4
+    #define encstream1_encoders0    hal_encoder4
+    #define encstream1_encoders1    hal_encoder5
     #define encstream1_encoders2    hal_encoderNONE
     #define encstream1_encoders3    hal_encoderNONE
     #define encstream1_encoders4    hal_encoderNONE
@@ -133,7 +133,8 @@
 
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
 
-    #define encstream0_type         hal_encoder_type1
+    #define encstream0_type         hal_encoder_t1
+		//#define encstream0_type     		hal_encoder_t2
     #define encstream0_numberof     1
     #define encstream0_encoders0    hal_encoder1
     #define encstream0_encoders1    hal_encoderNONE
@@ -143,9 +144,9 @@
     #define encstream0_encoders5    hal_encoderNONE
 
     
-    #define encstream1_type         hal_encoder_type1
+    #define encstream1_type         hal_encoder_t1
     #define encstream1_numberof     1
-    #define encstream1_encoders0    hal_encoder2
+    #define encstream1_encoders0    hal_encoder4
     #define encstream1_encoders1    hal_encoderNONE
     #define encstream1_encoders2    hal_encoderNONE
     #define encstream1_encoders3    hal_encoderNONE
@@ -154,19 +155,19 @@
     
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
 
-    #define encstream0_type         hal_encoder_type1
+    #define encstream0_type         hal_encoder_t1
     #define encstream0_numberof     2
     #define encstream0_encoders0    hal_encoder1
-    #define encstream0_encoders1    hal_encoder3
+    #define encstream0_encoders1    hal_encoder2
     #define encstream0_encoders2    hal_encoderNONE
     #define encstream0_encoders3    hal_encoderNONE
     #define encstream0_encoders4    hal_encoderNONE
     #define encstream0_encoders5    hal_encoderNONE
 
     
-    #define encstream1_type         hal_encoder_type1
+    #define encstream1_type         hal_encoder_t1
     #define encstream1_numberof     1
-    #define encstream1_encoders0    hal_encoder2
+    #define encstream1_encoders0    hal_encoder4
     #define encstream1_encoders1    hal_encoderNONE
     #define encstream1_encoders2    hal_encoderNONE
     #define encstream1_encoders3    hal_encoderNONE
@@ -175,7 +176,7 @@
                                                     
 #elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
 
-    #define encstream0_type         hal_encoder_type1
+    #define encstream0_type         hal_encoder_t1
     #define encstream0_numberof     0
     #define encstream0_encoders0    hal_encoderNONE
     #define encstream0_encoders1    hal_encoderNONE
@@ -185,7 +186,7 @@
     #define encstream0_encoders5    hal_encoderNONE
 
     
-    #define encstream1_type         hal_encoder_type1
+    #define encstream1_type         hal_encoder_t1
     #define encstream1_numberof     0
     #define encstream1_encoders0    hal_encoderNONE
     #define encstream1_encoders1    hal_encoderNONE
@@ -227,7 +228,7 @@ static const eOemsapplbody_cfg_t theemsapplbodycfg =
         .major                      = 1,
         .minor                      = 2
     },
-    .connectedEncodersMask          = EOMTHEEMSAPPLCFG_EBX_encodersMASK,   
+    //.connectedEncodersMask          = EOMTHEEMSAPPLCFG_EBX_encodersMASK,   
     .configdataofMC4boards          =
     {
         .shiftvalues    =
@@ -418,6 +419,9 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
  
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
+	
+	  // Start reading the encoders
+		eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
