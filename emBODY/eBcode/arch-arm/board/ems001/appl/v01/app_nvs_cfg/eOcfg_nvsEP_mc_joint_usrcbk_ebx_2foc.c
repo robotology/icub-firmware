@@ -48,6 +48,9 @@
 
 #include "EOtheProtocolWrapper.h"
 
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -641,6 +644,36 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->ram);
 }
 
+#if defined(EOMOTIONCONTROL_USE_VER_1_3)
+extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;
+    
+    //eOq17_14_t elemq00 = (*mat)[0][0];
+    //eOq17_14_t elemq23 = (*mat)[2][3];
+    
+    //float elemf00 = eo_common_Q17_14_to_float(elemq00);
+    //elemf00 = elemf00;
+    
+    
+    #warning --> marco.accame: put in here the debug messages for jointcoupling (and then remove them)
+        
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes.param                = 0;
+    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress        = 0;  
+    //char *str = NULL;
+    char str[eomn_info_status_extra_sizeof] = {0};
+ 
+    int i;
+    for(i=0; i<4; i++)
+    {
+      snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, eo_common_Q17_14_to_float((*mat)[i][0]),  eo_common_Q17_14_to_float((*mat)[i][1]), eo_common_Q17_14_to_float((*mat)[i][2]), eo_common_Q17_14_to_float((*mat)[i][3]));             
+      eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
+    }   
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
