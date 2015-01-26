@@ -68,7 +68,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // it must be defined in order to use hl_timer.
-extern const hl_timer_mapping_t* hl_timer_map = NULL;
+const hl_timer_mapping_t* hl_timer_map = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -102,6 +102,11 @@ static void s_hal_timer_prepare_hl_timer_map(void);
 
 extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
+
     if(hal_false == s_hal_timer_supported_is(id))
     {
         return(hal_res_NOK_generic);
@@ -136,6 +141,10 @@ extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, h
 
 extern hal_result_t hal_timer_start(hal_timer_t id)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
     return((hal_result_t)hl_timer_start((hl_timer_t)id));
 }
 
@@ -143,6 +152,10 @@ extern hal_result_t hal_timer_start(hal_timer_t id)
 
 extern hal_result_t hal_timer_stop(hal_timer_t id)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
     return((hal_result_t)hl_timer_stop((hl_timer_t)id));
 }
 
@@ -155,6 +168,11 @@ extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_reltime_t countd
     hal_timer_cfg_t *curcfg = NULL;
     hal_timer_cfg_t newcfg;
     uint8_t wasrunning = 0;
+    
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
 
     if(hal_false == s_hal_timer_initted_is(id))
     {
@@ -189,6 +207,11 @@ extern hal_result_t hal_timer_countdown_set(hal_timer_t id, hal_reltime_t countd
 #else
 extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priority_t prio)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
@@ -206,6 +229,11 @@ extern hal_result_t hal_timer_priority_set(hal_timer_t id, hal_interrupt_priorit
 #else
 extern hal_result_t hal_timer_interrupt_enable(hal_timer_t id)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
@@ -223,6 +251,11 @@ extern hal_result_t hal_timer_interrupt_enable(hal_timer_t id)
 #else
 extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
@@ -237,6 +270,11 @@ extern hal_result_t hal_timer_interrupt_disable(hal_timer_t id)
 
 extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *remaining_time)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     return((hal_result_t)hl_timer_remainingtime_get((hl_timer_t)id, remaining_time));
 }
 
@@ -246,6 +284,11 @@ extern hal_result_t hal_timer_remainingtime_get(hal_timer_t id, hal_reltime_t *r
 #else
 extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     if(hal_false == s_hal_timer_initted_is(id))
     {
         return(hal_res_NOK_generic);
@@ -260,6 +303,11 @@ extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset
 
 extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
 {
+    if(hal_timerNONE == id)
+    {
+        return(hal_timer_status_none);
+    }
+    
     return((hal_timer_status_t)hl_timer_status_get((hl_timer_t)id));
 }
 
