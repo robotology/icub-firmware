@@ -105,11 +105,11 @@ const hal_spi_cfg_t hal_spi_cfg_default =
 typedef struct
 {
     hal_spi_cfg_t       config;
-		//hl_spi_cfg_t				adv_config;
+    //hl_spi_cfg_t				adv_config;
     //uint8_t*            dummytxframe; //removable?
     uint8_t*            isrrxframe;
     uint8_t             isrrxcounter;
-		uint8_t*            isrtxframe;
+    uint8_t*            isrtxframe;
     hl_fifo_t*          fiforx;
     hal_spi_t           id;
     uint8_t             frameburstcountdown;
@@ -172,7 +172,7 @@ static hal_spi_theinternals_t s_hal_spi_theinternals =
 
 
 // it must be defined in order to use hl_spi.
-extern const hl_spi_mapping_t* hl_spi_map = NULL;
+const hl_spi_mapping_t* hl_spi_map = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -602,19 +602,19 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     
-		// default config if cfg == NULL
+    // default config if cfg == NULL
     if(NULL == cfg)
     {
         cfg = &hal_spi_cfg_default;
     }
        
-		// if not supported, return unsupported code
+    // if not supported, return unsupported code
     if(hal_true != s_hal_spi_supported_is(id))
     {
         return(hal_res_NOK_unsupported);
     }
     
-		// check if already initialized
+    // check if already initialized
     if(hal_true == hal_spi_initted_is(id))
     {
         if(0 == memcmp(cfg, &intitem->config, sizeof(hal_spi_cfg_t)))
@@ -640,7 +640,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // register SPI_SR2.BUSY to 1, which makes things hang up.
     
     //const hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
-		hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
+    hl_spi_advcfg_t hl_spi_advcfg_ems4rd =
     {   
         .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
         .SPI_Mode               = SPI_Mode_Master,                              // param
@@ -653,10 +653,10 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .SPI_CRCPolynomial      = 0x0007 // reset value
     };
 		
-		if(intitem->config.cpolarity == hal_spi_cpolarity_low)
-		{
-			hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
-		}
+    if(cfg->cpolarity == hal_spi_cpolarity_low)
+    {
+        hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
+    }
 		
 		//We should set the correct baud rate also...?
 		//The prescaler used is the one defined in advcfg, if it's not null
