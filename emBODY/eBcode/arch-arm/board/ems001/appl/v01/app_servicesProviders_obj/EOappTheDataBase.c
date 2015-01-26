@@ -981,7 +981,7 @@ static eObool_t s_appTheDB_checkConfiguration(eOappTheDB_cfg_t *cfg)
     
     if(eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain) != eo_constvector_Size(cfg->snsrStrainList))
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "strain cfg mismach", s_eobj_ownname, &eo_errman_DescrTobedecided);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, "strain cfg mismatch", s_eobj_ownname, &eo_errman_DescrTobedecided);
         return(eobool_false);
     }
     
