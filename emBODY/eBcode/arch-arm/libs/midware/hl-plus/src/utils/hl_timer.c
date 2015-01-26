@@ -86,8 +86,61 @@
     #define HL_TIMER_INTERNAL_HAS_TIMER06
     #define HL_TIMER_INTERNAL_HAS_TIMER07
     #define HL_TIMER_INTERNAL_HAS_TIMER08
+    #define HL_TIMER_INTERNAL_HAS_TIMER09
+    #define HL_TIMER_INTERNAL_HAS_TIMER10
+    #define HL_TIMER_INTERNAL_HAS_TIMER11
+    #define HL_TIMER_INTERNAL_HAS_TIMER12
+    #define HL_TIMER_INTERNAL_HAS_TIMER13
+    #define HL_TIMER_INTERNAL_HAS_TIMER14
 #else
     #error ERR: unrecognised MPU_NAME
+#endif
+
+
+// now i evaluate the HL_CFG_UTIL_TIMER_DONTUSE_TIMERxx macros and if any is true i undef the HL_TIMER_INTERNAL_HAS_TIMERxx
+// after that i just use HL_CFG_UTIL_TIMER_DONTUSE_TIMERxx .... 
+
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER01)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER01
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER02)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER02
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER03)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER03
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER04)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER04
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER05)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER05
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER06)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER06
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER07)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER07
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER08)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER08
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER09)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER09
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER10)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER10
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER11)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER11
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER12)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER12
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER13)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER13
+#endif
+#if defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER14)
+    #undef HL_TIMER_INTERNAL_HAS_TIMER14
 #endif
 
 
@@ -106,6 +159,18 @@
     #define TIM6_IRQHandler     TIM6_DAC_IRQHandler
     #define TIM8_IRQn           TIM8_UP_TIM13_IRQn
     #define TIM8_IRQHandler     TIM8_UP_TIM13_IRQHandler
+    #define TIM9_IRQn           TIM1_BRK_TIM9_IRQn
+    #define TIM9_IRQHandler     TIM1_BRK_TIM9_IRQHandler
+    #define TIM10_IRQn          TIM1_UP_TIM10_IRQn
+    #define TIM10_IRQHandler    TIM1_IRQHandler    
+    #define TIM11_IRQn          TIM1_TRG_COM_TIM11_IRQn
+    #define TIM11_IRQHandler    TIM1_TRG_COM_TIM11_IRQHandler       
+    #define TIM12_IRQn          TIM8_BRK_TIM12_IRQn
+    #define TIM12_IRQHandler    TIM8_BRK_TIM12_IRQHandler     
+    #define TIM13_IRQn          TIM8_UP_TIM13_IRQn
+    #define TIM13_IRQHandler    TIM8_UP_TIM13_IRQHandler    
+    #define TIM14_IRQn          TIM8_TRG_COM_TIM14_IRQn
+    #define TIM14_IRQHandler    TIM8_TRG_COM_TIM14_IRQHandler
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERR --> choose a HL_USE_MPU_ARCH_*
 #endif 
@@ -294,6 +359,77 @@ static const hl_timer_stm32_properties_t s_hl_timer_props_t08 =
 };
 #endif
 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER09)
+static const hl_timer_stm32_properties_t s_hl_timer_props_t09 =
+{
+    .referencespeedbus      = hl_timer_refspeed_cpu,
+    .periphclock            = hl_timer_stm32_periphclock_apb2,
+    .TIMx_IRQn              = TIM9_IRQn,
+    .dummy                  = 0,
+    .TIMx                   = TIM9,
+    .RCC_APBxPeriph_TIMx    = RCC_APB2Periph_TIM9
+};
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER10)
+static const hl_timer_stm32_properties_t s_hl_timer_props_t10 =
+{
+    .referencespeedbus      = hl_timer_refspeed_cpu,
+    .periphclock            = hl_timer_stm32_periphclock_apb2,
+    .TIMx_IRQn              = TIM10_IRQn,
+    .dummy                  = 0,
+    .TIMx                   = TIM10,
+    .RCC_APBxPeriph_TIMx    = RCC_APB2Periph_TIM10
+};
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER11)
+static const hl_timer_stm32_properties_t s_hl_timer_props_t11 =
+{
+    .referencespeedbus      = hl_timer_refspeed_cpu,
+    .periphclock            = hl_timer_stm32_periphclock_apb2,
+    .TIMx_IRQn              = TIM11_IRQn,
+    .dummy                  = 0,
+    .TIMx                   = TIM11,
+    .RCC_APBxPeriph_TIMx    = RCC_APB2Periph_TIM11
+};
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER12)
+static const hl_timer_stm32_properties_t s_hl_timer_props_t12 =
+{
+    .referencespeedbus      = hl_timer_refspeed_fastbus,
+    .periphclock            = hl_timer_stm32_periphclock_apb1,
+    .TIMx_IRQn              = TIM12_IRQn,
+    .dummy                  = 0,
+    .TIMx                   = TIM12,
+    .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM12
+};
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER13)
+static const hl_timer_stm32_properties_t s_hl_timer_props_t13 =
+{
+    .referencespeedbus      = hl_timer_refspeed_fastbus,
+    .periphclock            = hl_timer_stm32_periphclock_apb1,
+    .TIMx_IRQn              = TIM13_IRQn,
+    .dummy                  = 0,
+    .TIMx                   = TIM13,
+    .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM13
+};
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER14)
+static const hl_timer_stm32_properties_t s_hl_timer_props_t14 =
+{
+    .referencespeedbus      = hl_timer_refspeed_fastbus,
+    .periphclock            = hl_timer_stm32_periphclock_apb1,
+    .TIMx_IRQn              = TIM14_IRQn,
+    .dummy                  = 0,
+    .TIMx                   = TIM14,
+    .RCC_APBxPeriph_TIMx    = RCC_APB1Periph_TIM14
+};
+#endif
 
 
 static const hl_timer_stm32_properties_t * s_hl_timer_stm32_props[hl_timers_number] =
@@ -338,12 +474,36 @@ static const hl_timer_stm32_properties_t * s_hl_timer_stm32_props[hl_timers_numb
 #else
     NULL,
 #endif
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER09)
+    &s_hl_timer_props_t09,
+#else
     NULL,
+#endif
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER10)
+    &s_hl_timer_props_t10,
+#else
     NULL,
+#endif
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER11)
+    &s_hl_timer_props_t11,
+#else
     NULL,
+#endif
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER12)
+    &s_hl_timer_props_t12,
+#else
     NULL,
+#endif
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER13)
+    &s_hl_timer_props_t13,
+#else
     NULL,
+#endif
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER14)
+    &s_hl_timer_props_t14,
+#else
     NULL,
+#endif
     NULL,
     NULL
 };
@@ -368,6 +528,11 @@ static hl_timer_theinternals_t s_hl_timer_theinternals =
 
 extern hl_result_t hl_timer_init(hl_timer_t id, const hl_timer_cfg_t *cfg, hl_reltime_t *error)
 {
+    if(hl_timerNONE == id)
+    {
+        return(hl_res_NOK_generic);
+    }
+    
     hl_timer_internal_item_t *intitem = s_hl_timer_theinternals.items[HL_timer_id2index(id)];    
 
     if(hl_false == s_hl_timer_supported_is(id))
@@ -429,12 +594,22 @@ extern hl_result_t hl_timer_init(hl_timer_t id, const hl_timer_cfg_t *cfg, hl_re
 
 extern hl_bool_t hl_timer_initted_is(hl_timer_t id)
 {
+    if(hl_timerNONE == id)
+    {
+        return(hl_false);
+    }
+    
     return(s_hl_timer_initted_is(id));
 }
 
 
 extern hl_result_t hl_timer_start(hl_timer_t id)
 {
+    if(hl_timerNONE == id)
+    {
+        return(hl_res_NOK_generic);
+    } 
+
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_timer_initted_is(id))
     {
@@ -457,6 +632,11 @@ extern hl_result_t hl_timer_start(hl_timer_t id)
 
 extern hl_result_t hl_timer_stop(hl_timer_t id)
 {
+    if(hl_timerNONE == id)
+    {
+        return(hl_res_NOK_generic);
+    }
+
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK) 
     if(hl_false == s_hl_timer_initted_is(id))
     {
@@ -478,6 +658,10 @@ extern hl_result_t hl_timer_stop(hl_timer_t id)
 
 extern hl_timer_status_t hl_timer_status_get(hl_timer_t id)
 {
+    if(hl_timerNONE == id)
+    {
+        return(hl_timer_status_none);
+    }
 
     if(hl_false == s_hl_timer_initted_is(id))
     {
@@ -490,6 +674,11 @@ extern hl_timer_status_t hl_timer_status_get(hl_timer_t id)
 
 extern hl_result_t hl_timer_remainingtime_get(hl_timer_t id, hl_reltime_t *remaining_time)
 {
+    if(hl_timerNONE == id)
+    {
+        return(hl_res_NOK_generic);
+    }
+
     hl_timer_internal_item_t *intitem = s_hl_timer_theinternals.items[HL_timer_id2index(id)];
     const hl_timer_stm32_properties_t* props = s_hl_timer_stm32_props[HL_timer_id2index(id)];
 
@@ -528,78 +717,110 @@ extern hl_result_t hl_timer_remainingtime_get(hl_timer_t id, hl_reltime_t *remai
 
 // ---- isr of the module: begin ----
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER01) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER01)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+// marco.accame: 
+// use the following xxx_IRQHandlers only if xxx is in the mpu and if the user does not prefer using the handler for another purpose 
+
+
+#if     (defined(HL_TIMER_INTERNAL_HAS_TIMER01) || defined(HL_TIMER_INTERNAL_HAS_TIMER10))
 void TIM1_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer1);
+    if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Update))
+    {
+        // Clear TIMx update interrupt 
+        TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer1);
+    }
+    
+    if(SET == TIM_GetFlagStatus(TIM10, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM10, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer10);
+    }       
 }
+#else
+    #warning HL says: user, you must define your own TIM1_UP_TIM10_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER02) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER02)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER02)
 void TIM2_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer2);
+    if(SET == TIM_GetFlagStatus(TIM2, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer2);
+    }
 }
+#else
+    #warning HL says: user, you must define your own TIM2_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER03) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER03)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER03)
 void TIM3_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer3);
+    if(SET == TIM_GetFlagStatus(TIM3, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer3);
+    }
 }
+#else
+    #warning HL says: user, you must define your own TIM3_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER04) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER04)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER04)
 void TIM4_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer4);
+    if(SET == TIM_GetFlagStatus(TIM4, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer4);
+    }
 }
+#else
+    #warning HL says: user, you must define your own TIM4_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER05) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER05)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER05) 
 void TIM5_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer5);
+    if(SET == TIM_GetFlagStatus(TIM5, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM5, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer5);
+    }
 }
+#else
+    #warning HL says: user, you must define your own TIM5_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER06) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER06)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER06)
 void TIM6_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM6, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer6);
+    if(SET == TIM_GetFlagStatus(TIM6, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM6, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer6);
+    }
 }
+#else
+    #warning HL says: user, you must define your own TIM6_DAC_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER07) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER07)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER07)
 void TIM7_IRQHandler(void)
 {
-    // Clear TIMx update interrupt 
-    TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
-    s_hl_timer_callback(hl_timer7);
+    if(SET == TIM_GetFlagStatus(TIM7, TIM_FLAG_Update))
+    {        
+        TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer7);
+    }
 }
+#else
+    #warning HL says: user, you must define your own TIM7_IRQHandler()
 #endif
 
-#if     defined(HL_TIMER_INTERNAL_HAS_TIMER08) &&  !defined(HL_CFG_UTIL_TIMER_DONTUSE_TIMER08)
-// use the isr only if there is in the mpu and if the user does not prefer using it for another purpose 
+
+#if     (defined(HL_TIMER_INTERNAL_HAS_TIMER08) || defined(HL_TIMER_INTERNAL_HAS_TIMER13))
 void TIM8_IRQHandler(void)
 { 
     // Clear TIMx update interrupt 
@@ -608,9 +829,71 @@ void TIM8_IRQHandler(void)
         TIM_ClearITPendingBit(TIM8, TIM_IT_Update);
         s_hl_timer_callback(hl_timer8);
     }   
+    
+    // Clear TIMx update interrupt 
+    if(SET == TIM_GetFlagStatus(TIM13, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM13, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer13);
+    }      
 }
+#else
+    #warning HL says: user, you must define your own TIM8_UP_TIM13_IRQHandler()
 #endif
 
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER09) 
+void TIM9_IRQHandler(void)
+{ 
+    // Clear TIMx update interrupt 
+    if(SET == TIM_GetFlagStatus(TIM9, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer9);
+    }   
+}
+#else
+    #warning HL says: user, you must define your own TIM1_BRK_TIM9_IRQHandler()
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER11) 
+void TIM11_IRQHandler(void)
+{
+    if(SET == TIM_GetFlagStatus(TIM11, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM11, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer11);
+    }
+}
+#else
+    #warning HL says: user, you must define your own TIM1_TRG_COM_TIM11_IRQHandler()
+#endif
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER12) 
+void TIM12_IRQHandler(void)
+{
+    if(SET == TIM_GetFlagStatus(TIM12, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM12, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer12);
+    }
+}
+#else
+    #warning HL says: user, you must define your own TIM8_BRK_TIM12_IRQHandler()
+#endif
+
+
+#if     defined(HL_TIMER_INTERNAL_HAS_TIMER14) 
+void TIM14_IRQHandler(void)
+{
+    if(SET == TIM_GetFlagStatus(TIM14, TIM_FLAG_Update))
+    {
+        TIM_ClearITPendingBit(TIM14, TIM_IT_Update);
+        s_hl_timer_callback(hl_timer14);
+    }
+}
+#else
+    #warning HL says: user, you must define your own TIM8_TRG_COM_TIM14_IRQHandler()
+#endif
 
 
 // ---- isr of the module: end ------
