@@ -950,8 +950,8 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
 {
     eOresult_t                  res;
-    eOas_strainId_t           sId = 0; //exist only one mais per ep
-    eOas_strainmode_t         mode = eoas_strainmode_acquirebutdonttx;
+    eOas_strainId_t             sId = 0; //exist only one mais per ep
+    eOas_strainmode_t           mode = eoas_strainmode_acquirebutdonttx;
     eOicubCanProto_msgCommand_t msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
