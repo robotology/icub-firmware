@@ -195,6 +195,10 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProt
             canFrame->data[1] = 1;
         }break;
 #endif
+        default:
+        {
+            
+        } break;
 
     }
     
@@ -353,13 +357,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
         case eoas_strainmode_txcalibrateddatacontinuously:
         case eoas_strainmode_txalldatacontinuously:
         {
-            eo_array_Assign((EOarray*)&status->calibratedvalues, 0, &(frame->data[0]), 6);
+            eo_array_Assign((EOarray*)(&status->calibratedvalues), 0, &(frame->data[0]), 3);
             //memcpy(&(status->calibratedvalues.data[0]), &(frame->data[0]), 6);
         } break;
 
         case eoas_strainmode_txuncalibrateddatacontinuously:
         {
-            eo_array_Assign((EOarray*)&status->uncalibratedvalues, 0, &(frame->data[0]), 6);
+            eo_array_Assign((EOarray*)(&status->uncalibratedvalues), 0, &(frame->data[0]), 3);
             //memcpy(&(status->uncalibratedvalues.data[0]), &(frame->data[0]), 6);
         } break;
         
@@ -414,13 +418,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
         case eoas_strainmode_txcalibrateddatacontinuously:
         case eoas_strainmode_txalldatacontinuously:
         {
-            eo_array_Assign((EOarray*)&status->calibratedvalues, 6, &(frame->data[0]), 6);
+            eo_array_Assign((EOarray*)(&status->calibratedvalues), 3, &(frame->data[0]), 3);
             //memcpy(&(status->calibratedvalues.data[6]), &(frame->data[0]), 6);
         } break;
 
         case eoas_strainmode_txuncalibrateddatacontinuously:
         {
-            eo_array_Assign((EOarray*)&status->uncalibratedvalues, 6, &(frame->data[0]), 6);
+            eo_array_Assign((EOarray*)(&status->uncalibratedvalues), 3, &(frame->data[0]), 3);
             //memcpy(&(status->uncalibratedvalues.data[6]), &frame->data[0], 6);
         } break;
         
