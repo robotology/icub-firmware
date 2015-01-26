@@ -57,22 +57,23 @@
  **/
 typedef enum
 {
-    hl_timer1  = 0,
-    hl_timer2  = 1,
-    hl_timer3  = 2,
-    hl_timer4  = 3,
-	hl_timer5  = 4,
-    hl_timer6  = 5,
-    hl_timer7  = 6,
-    hl_timer8  = 7,
-    hl_timer9  = 8,
-    hl_timer10 = 9,
-    hl_timer11 = 10,
-    hl_timer12 = 11,
-    hl_timer13 = 12,
-    hl_timer14 = 13,
-    hl_timer15 = 14,
-    hl_timer16 = 15     
+    hl_timer1       = 0,
+    hl_timer2       = 1,
+    hl_timer3       = 2,
+    hl_timer4       = 3,
+	hl_timer5       = 4,
+    hl_timer6       = 5,
+    hl_timer7       = 6,
+    hl_timer8       = 7,
+    hl_timer9       = 8,
+    hl_timer10      = 9,
+    hl_timer11      = 10,
+    hl_timer12      = 11,
+    hl_timer13      = 12,
+    hl_timer14      = 13,
+    hl_timer15      = 14,
+    hl_timer16      = 15,
+    hl_timerNONE    = hl_NA08   
 } hl_timer_t;
 
 enum { hl_timers_number = 16 };
