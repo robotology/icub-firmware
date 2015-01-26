@@ -324,7 +324,15 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .taskstacksize              = 
         {
             EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof, EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof, EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof
-        },   
+        }, 
+        .haltimerstart                 = 
+        {
+            EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTRX, EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTDO, EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTTX
+        },  
+        .haltimeralert                 = 
+        {
+            EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_ALERTRX, EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_ALERTDO, EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_ALERTTX
+        },        
         .period                     = EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD,
         .execRXafter                = EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER,            
         .safeRXexecutiontime        = EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME,

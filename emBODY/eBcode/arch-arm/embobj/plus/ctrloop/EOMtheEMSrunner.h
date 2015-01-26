@@ -44,6 +44,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOtransceiver.h"
 #include "EOMtask.h"
+#include "hal_timer.h"
 
 #include "eOcfg_sm_EMSappl.h"
 
@@ -93,7 +94,9 @@ typedef enum
 typedef struct
 {
     uint8_t             taskpriority[eo_emsrunner_task_numberof];
-    uint16_t            taskstacksize[eo_emsrunner_task_numberof];   
+    uint16_t            taskstacksize[eo_emsrunner_task_numberof];  
+    hal_timer_t         haltimerstart[eo_emsrunner_task_numberof];    
+    hal_timer_t         haltimeralert[eo_emsrunner_task_numberof]; 
     eOreltime_t         period;                 /**< The period of the cycle rx-do-tx. The rx task receive the execute evt at beginning of the cycle.*/
     eOreltime_t         execRXafter;            /**< time of execution of RX task, measured in usec after beginning of period  */            
     eOreltime_t         safeRXexecutiontime;    /**< safe execution time for RX task. If the task is not completed at execRXafter+safeRXexecutiontime it is issued a safe duration expired flag  */
