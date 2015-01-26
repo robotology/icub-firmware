@@ -118,10 +118,10 @@ extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
     eOas_mais_status_t *status = eo_nv_RAM(nv);  
     
     // marco.accame: i init as for eoas_maisresolution_08 
-    //               the array the15values can be initted for size 0 or 16 as i now use teh proper eo_array_Assign() method
-    uint8_t capacity    = 16;
+    //               the array the15values can be initted for size 0 or 15 as i now use teh proper eo_array_Assign() method
+    uint8_t capacity    = 15;
     uint8_t itemsize    = 1;
-    uint8_t size        = 16;
+    uint8_t size        = 15;
     EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
     eo_array_Resize(array, size);
 }
@@ -408,23 +408,24 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
     
     if(eoas_maisresolution_08 == resolution)
     {
-        capacity    = 16;
+        capacity    = 15;
         itemsize    = 1;
-        size        = 16;
+        size        = 15;
         //#warning acemor-> nella mais nel caso di risoluzione a 8 bit perche' la capacity di the15values e' 16 e non 15?
+        // penso sia un errore. metto a 15. anche perche' nel parser dei pacchetti can la size viene messa a 15
         //status->the15values.head.capacity = 16;
         //status->the15values.head.itemsize = 1;
         //status->the15values.head.size = 16;
     }
     else if(eoas_maisresolution_16 == resolution)
     {
-        capacity    = 16;
+        capacity    = 15;
         itemsize    = 2;
-        size        = 16;
-        //#warning acemor-> nella mais ho messo la capacity di the15values a 16 anche nel caso di risoluzione a 32 bit
+        size        = 15;
+        //#warning acemor-> nella mais ho messo la capacity di the15values a 15 anche nel caso di risoluzione a 16 bit
         //status->the15values.head.capacity = 16;
         //status->the15values.head.itemsize = 2;
-        status->the15values.head.size = 16;
+        //status->the15values.head.size = 16;
     } 
 
     EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
