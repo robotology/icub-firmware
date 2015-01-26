@@ -171,9 +171,9 @@ extern inline eObool_t eom_runner_hid_signaloverflow(EOMtheEMSrunner *p, eOemsru
     switch(p->mode)
     {
         case eo_emsrunner_mode_besteffort:
-        {
-            ret = eobool_false;
-        } break;
+//        {
+//            ret = eobool_false;
+//        } break;
         
         case eo_emsrunner_mode_softrealtime:
         case eo_emsrunner_mode_hardrealtime:
