@@ -190,7 +190,7 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
     icubCanProto_msgCommand_cmdId_t                     cmdId;
     icubCanProto_msgCommand_class_t                     msgClass;
-    eOappTheDB_SkinCanLocation_t                        skincanloc;
+    eOappTheDB_SkinCanLocation_t                        skincanloc = {0};
     eOresult_t                                          res;
     eOsk_skinId_t                                       skId;
     
@@ -205,7 +205,7 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     //remove following if-else and leave only eo_icubCanProto_hid_getMsgClassFromFrameId function
     
     //if skin is connected to canPortRx, then no aother boards are connetcted to the same port
-    res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), &skincanloc, &skId);
+    res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), skincanloc, &skId);
     if(eores_OK == res)
     {
         msgClass = icubCanProto_msgCmdClass_skinBoard;

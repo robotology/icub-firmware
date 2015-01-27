@@ -94,7 +94,7 @@ void set_2FOC_running(uint8_t joint);
 
 static EOemsController *ems = NULL;
 
-static const char s_eobj_ownname[] = "EOemsController";
+//static const char s_eobj_ownname[] = "EOemsController";
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -1042,16 +1042,16 @@ void config_2FOC(uint8_t motor)
     pid.kd = 0x3500; // it is integral anti windup
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &pid);
     
     i2t.time  = 668;
     i2t.tresh = 12000;
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &i2t);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &i2t);
     
     max_current = 5000; // 5A
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &max_current);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &max_current);
 }
 
 void set_2FOC_idle(uint8_t motor)
@@ -1072,7 +1072,7 @@ void set_2FOC_idle(uint8_t motor)
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE; //+
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc); //+
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc); //+
     
     eo_motor_set_motor_status(ems->motors, motor, 0);
 }
@@ -1103,7 +1103,7 @@ void set_2FOC_running(uint8_t motor)
     
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
 }
 
 /*

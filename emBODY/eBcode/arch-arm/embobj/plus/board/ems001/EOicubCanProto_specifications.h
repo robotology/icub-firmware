@@ -58,7 +58,8 @@ extern "C" {
 typedef enum
 {
     eo_icubCanProto_jm_index_first      = 0,
-    eo_icubCanProto_jm_index_second     = 1
+    eo_icubCanProto_jm_index_second     = 1,
+    eo_icubCanProto_jm_index_none       = 3
 } eOicubCanProto_jm_indexinBoard_t;
 
 
