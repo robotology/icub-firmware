@@ -90,11 +90,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr);
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode, eOmc_controlmode_t *eomc_controlmode);
 //static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode_old(icubCanProto_controlmode_t icubcanProto_controlmode, eOmc_jointId_t jId, uint8_t hw_error_flags, eOmc_controlmode_t *eomc_controlmode);
 static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode);
@@ -378,14 +378,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
 {
     eOresult_t                              res = eores_NOK_generic;
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     eOmc_joint_status_t                     *jstatus = NULL;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -423,7 +423,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__motionDone(EOicubCanProto* 
 {
     eOresult_t                              res = eores_NOK_generic;
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     eOmc_joint_status_t                     *jstatus = NULL;
     
 
@@ -431,7 +431,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__motionDone(EOicubCanProto* 
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -643,10 +643,10 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-eOresult_t                                  res = eores_OK;
+    eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     eOmc_setpoint_t                         setpoint;
     
@@ -654,7 +654,7 @@ eOresult_t                                  res = eores_OK;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -772,7 +772,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMinPosition(EOicubCanPro
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     canLoc.emscanport = canPort;
@@ -780,7 +780,7 @@ eOresult_t                                  res = eores_OK;
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -871,7 +871,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMaxPosition(EOicubCanPro
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     canLoc.emscanport = canPort;
@@ -879,7 +879,7 @@ eOresult_t                                  res = eores_OK;
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1062,7 +1062,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePid(EOicubCanProto
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     canLoc.emscanport = canPort;
@@ -1070,7 +1070,7 @@ eOresult_t                                  res = eores_OK;
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1164,14 +1164,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCa
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1263,7 +1263,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
 
     
@@ -1272,7 +1272,7 @@ eOresult_t                                  res = eores_OK;
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1367,14 +1367,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1474,14 +1474,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCa
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1568,14 +1568,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCa
 eOresult_t                                  res = eores_OK;
 #ifdef USE_PROTO_PROXY
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -1639,10 +1639,12 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getImpedanceOffset(EOicubCa
 
 }
 
+// marco.accame.todo: mettere qui info sulle board ricevute.
+
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                              res;
-    eOappTheDB_board_canlocation_t          canLoc;
+    eOappTheDB_board_canlocation_t          canLoc = {0};
     eObrd_boardId_t                         bid;
     char                                    str[120];
     uint32_t                                canBoardsReady = 0;
@@ -1652,7 +1654,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id); 
     
 
-    res = eo_appTheDB_GetCanBoardId_ByCanLocation(db, &canLoc, &bid); 
+    res = eo_appTheDB_GetCanBoardId_ByCanLocation(db, canLoc, &bid); 
     if(eores_OK != res)
     {
         return(res);
@@ -1669,7 +1671,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     else
     {
         // ok: we impose that the board with the passed can location is ready ...
-        eo_appTheDB_setCanBoardReady(db, &canLoc);
+        eo_appTheDB_setCanBoardReady(db, canLoc);
     }
 
     
@@ -1941,7 +1943,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
 {
     eOresult_t                              res = eores_OK;
     eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     eOmc_joint_status_t                     *jstatus = NULL;
     
@@ -1949,7 +1951,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2082,7 +2084,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
 {
     /* 2foc sends: current (2 bytes), velocity(2 bytes), position(4 bytes)*/
     eOresult_t                              res;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     eOmc_motorId_t   		                mId;
     eOmc_motor_status_t                     *mstatus = NULL;
 
@@ -2092,7 +2094,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;    
     
-    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
         return(res);
@@ -2123,7 +2125,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                              res;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
 
     
     // set position about the first joint in board
@@ -2131,7 +2133,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, canLoc);
     if(eores_OK != res)
     {
         return(res);
@@ -2141,7 +2143,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, canLoc);
 
     return(res);
 }
@@ -2150,7 +2152,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                              res;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
 
     
     // set position about the first joint in board
@@ -2158,7 +2160,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;    
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, canLoc);
     if(eores_OK != res)
     {
         return(res);
@@ -2167,7 +2169,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, canLoc);
     
     return(res);
 }
@@ -2179,7 +2181,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     eOmc_jointId_t   		                jId;
     eOmc_motorId_t   		                mId;
     eOmc_joint_status_t                     *jstatus = NULL;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     eOmc_controlmode_t                      eomc_controlmode;
     eOmn_appl_runMode_t                     runmode; 
    
@@ -2199,7 +2201,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     }
     
     //get mId
-    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
         return(res);
@@ -2223,7 +2225,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     else
     {
         // first joint
-        res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+        res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
         if(eores_OK != res)
         {
             return(res);
@@ -2252,14 +2254,14 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         // second joint
         canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
     
-        res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+        res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
         if(eores_OK != res)
         {
             return(res);
         }
         
         //get mId
-        res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &mId);
+        res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
         if(eores_OK != res)
         {
             return(res);
@@ -2296,7 +2298,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t        canLoc = {0};
 
     
     // set position about the first motor in board
@@ -2304,7 +2306,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;    
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
     if(eores_OK != res)
     {
         return(res);
@@ -2314,7 +2316,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     // set position about the second motor in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
-    res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
     
     return(res);
 }
@@ -2335,7 +2337,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__print(EOicubCanProto* p, eO
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t        canLoc = {0};
 
     
     // set position about the first motor in board
@@ -2343,7 +2345,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;    
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, canLoc);
     if(eores_OK != res)
     {
         return(res);
@@ -2352,7 +2354,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
-    res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, canLoc);
 
     return(res);
 }
@@ -2361,7 +2363,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t        canLoc = {0};
 
     
     // set position about the first motor in board
@@ -2369,7 +2371,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;    
     
-    res = s_eo_icubCanProto_parser_per_mb_cmd__pidError(p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__pidError(p, frame, canLoc);
     if(eores_OK != res)
     {
         return(res);
@@ -2378,7 +2380,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
-    res = s_eo_icubCanProto_parser_per_mb_cmd__pidError( p, frame, &canLoc);
+    res = s_eo_icubCanProto_parser_per_mb_cmd__pidError( p, frame, canLoc);
 
     return(res);
 
@@ -2405,7 +2407,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
 {
 
     eOresult_t                                  res;
-    eOappTheDB_jointOrMotorCanLocation_t        canLoc;
+    eOappTheDB_jointOrMotorCanLocation_t        canLoc = {0};
     eOmc_joint_status_t                         *jstatus = NULL;
     eOmc_jointId_t                              jId;
 
@@ -2416,7 +2418,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;    
     
     //first joint
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2440,7 +2442,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
     //first joint
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), &canLoc, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2491,7 +2493,7 @@ extern eOresult_t eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent(EO
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr)
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
@@ -2500,7 +2502,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
     eOmc_joint_status_t                     *jstatus = NULL;
 
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2515,7 +2517,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
 	appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
     
-    if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinsidecanboard)
+    if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
 	{
         pos_icubCanProtValue = *((icubCanProto_position_t*)&(frame->data[0])); 
     }
@@ -2532,13 +2534,13 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
 }
 
 
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr)
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
     eOmc_joint_status_t                     *jstatus = NULL;
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2550,7 +2552,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p,
         return(eores_NOK_generic); //error
     }
    
-    if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinsidecanboard)
+    if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
 	{
         jstatus->ofpid.output = *((uint16_t*)&(frame->data[0]));
     }
@@ -2563,13 +2565,13 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p,
 
 }
 
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr)
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t res;
     eOmc_motorId_t   		                mId;
     eOmc_motor_status_t                     *mstatus = NULL;
     
-    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &mId);
+    res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canloc, &mId);
     if(eores_OK != res)
     {
         return(res);
@@ -2581,7 +2583,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
         return(eores_NOK_generic); //error
     }      
     
-    if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinsidecanboard)
+    if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
     {
         mstatus->basic.current = *((uint16_t*)&(frame->data[0]));
     }
@@ -2593,7 +2595,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
 }
 
 
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr)
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
@@ -2602,7 +2604,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
 	icubCanProto_velocity_t                 vel_icubCanProtValue;
     icubCanProto_acceleration_t             acc_icubCanProtValue;
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2618,7 +2620,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
 	appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
     
     //get measures from can frame
-    if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinsidecanboard)
+    if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
 	{
         vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[0]));
         acc_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[2]));
@@ -2641,14 +2643,14 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
 
 
 
-static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr)
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
     eOmc_joint_status_t                     *jstatus = NULL;
     uint16_t                                pidpos_error, pidtrq_error;
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc_ptr, &jId);
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
     if(eores_OK != res)
     {
         return(res);
@@ -2661,7 +2663,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* 
     }
     
     //get measures from can frame
-    if(eo_icubCanProto_jm_index_first == canloc_ptr->indexinsidecanboard)
+    if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
 	{
         pidpos_error = *((uint16_t*)&(frame->data[0]));
         pidtrq_error = *((uint16_t*)&(frame->data[4]));
@@ -2778,44 +2780,48 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* 
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode,
                                                                                       eOmc_controlmode_t *eomc_controlmode)
 {
+    eOresult_t res = eores_OK;
 
     switch(icubcanProto_controlmode)
     {
         case icubCanProto_controlmode_idle:
         {
             *eomc_controlmode = eomc_controlmode_idle;
-        }break;
+        } break;
+        
         case icubCanProto_controlmode_position:
         {
             *eomc_controlmode = eomc_controlmode_position;
-        }break;
+        } break;
+        
         case icubCanProto_controlmode_velocity:
         {
             *eomc_controlmode = eomc_controlmode_velocity;
-        }break;
+        } break;
+        
         case icubCanProto_controlmode_torque:
         {
             *eomc_controlmode = eomc_controlmode_torque;
-        }break;
+        } break;
         
         case icubCanProto_controlmode_impedance_pos:
         {
             *eomc_controlmode = eomc_controlmode_impedance_pos;
-        }break;
+        } break;
 
         case icubCanProto_controlmode_impedance_vel:
         {
             *eomc_controlmode = eomc_controlmode_impedance_vel;
-        }break;
+        } break;
 
         case icubCanProto_controlmode_current:
         {
             *eomc_controlmode = eomc_controlmode_current;
-        }break;
+        } break;
         case icubCanProto_controlmode_mixed:
         {
             *eomc_controlmode = eomc_controlmode_mixed;
-        }break;
+        } break;
         
         case icubCanProto_controlmode_direct:
         {
@@ -2825,39 +2831,40 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
         case icubCanProto_controlmode_openloop:
         {
             *eomc_controlmode = eomc_controlmode_openloop;
-        }break;
+        } break;
         
         case  icubCanProto_controlmode_calibration:
         {
             *eomc_controlmode = eomc_controlmode_calib;
-        }break;
+        } break;
         
         case icubCanProto_controlmode_hwFault:
         {
             *eomc_controlmode = eomc_controlmode_hwFault;
-        }break;
+        } break;
         
         case icubCanProto_controlmode_notConfigured:
         {
             *eomc_controlmode = eomc_controlmode_notConfigured;
-        }break;
+        } break;
         
         case icubCanProto_controlmode_configured:
         {
             *eomc_controlmode = eomc_controlmode_configured;
-        }break;
+        } break;
         
         case icubCanProto_controlmode_unknownError:
         {
             *eomc_controlmode = eomc_controlmode_unknownError;
-        }break;
+        } break;
         
         default:
         {
-            return(eores_NOK_generic);
-        }//break;
+            res = eores_NOK_generic;
+        } break;
     }
-    return(eores_OK);
+    
+    return(res);
 }
 
 
@@ -2865,26 +2872,27 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode(icubCanProto_interactionmode_t icubcanProto_intermode,
                                                                                       eOmc_interactionmode_t *eomc_intermode)
 {
-
+    eOresult_t res = eores_OK;
+    
     switch(icubcanProto_intermode)
     {
         case icubCanProto_interactionmode_stiff:
         {
             *eomc_intermode = eOmc_interactionmode_stiff;
-        }break;
+        } break;
         
         case icubCanProto_interactionmode_compliant:
         {
             *eomc_intermode = eOmc_interactionmode_compliant;
-        }break;
+        } break;
     
         default:
         {
-            return(eores_NOK_generic);
-        }
-    };
+            res = eores_NOK_generic;
+        } break;
+    }
     
-    return(eores_OK);
+    return(res);
 }
 
 static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode)
@@ -2959,9 +2967,11 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
         eo_theEMSdgn_Signalerror(dgn_ptr, eodgn_nvidbdoor_motorstatus , 0);
         eo_theEMSdgn_ClearMotorStFlags(dgn_ptr);
     }
+    
     return(eores_OK);
     
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

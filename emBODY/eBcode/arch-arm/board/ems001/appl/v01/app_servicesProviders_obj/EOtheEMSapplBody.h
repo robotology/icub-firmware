@@ -100,8 +100,7 @@ typedef struct
 {
     eOappEncReader_stream_t             encoderstreams[eo_appEncReader_streams_numberof];
     eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
-    eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;
-    //uint16_t                            connectedEncodersMask;    
+    eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;  
     eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
 } eOemsapplbody_cfg_t;
 
@@ -110,6 +109,7 @@ typedef struct
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 
 extern const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default;
+
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
@@ -126,8 +126,6 @@ extern EOappCanSP* eo_emsapplBody_GetCanServiceHandle(EOtheEMSapplBody *p);
     
 extern EOappEncReader* eo_emsapplBody_GetEncoderReaderHandle(EOtheEMSapplBody *p);
 
-//extern EOemsController* eo_emsapplBody_GetEmsControllerHandle(EOtheEMSapplBody *p);
-
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
 extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody *p);
@@ -142,6 +140,7 @@ extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uin
 
 
 extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
+
 extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
 
 

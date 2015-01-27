@@ -211,7 +211,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
 {
     uint8_t                                     channel;
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_strainId_t                             sId;
     eOas_strain_config_t                        *config = NULL;
     eOas_strain_status_t                        *status = NULL;
@@ -230,7 +230,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
     
-    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -320,7 +320,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__getFullScales(EOicubCanProt
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_strainId_t                             sId;
     eOas_strain_config_t                        *config = NULL;
     eOas_strain_status_t                        *status = NULL;
@@ -330,7 +330,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
     
-    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -380,7 +380,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_strainId_t                             sId;
     eOas_strain_config_t                        *config = NULL;
     eOas_strain_status_t                        *status = NULL;
@@ -390,7 +390,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
     
-    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -443,7 +443,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_strainId_t                             sId;
     eOas_strain_status_t                        *status = NULL;
 
@@ -452,7 +452,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
     
-    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -473,7 +473,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmode(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_strainId_t                             sId;
     eOas_strain_status_t                        *status = NULL;
 
@@ -482,7 +482,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
     
-    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -504,13 +504,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
 {
     eOresult_t                                  res;
     eOas_maisId_t                               sId;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_mais_status_t                          *status = NULL;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
-    res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -541,13 +541,13 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
 {
     eOresult_t                                  res;
     eOas_maisId_t                               sId;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOas_mais_status_t                          *status = NULL;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     
-    res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), &canLoc, &sId);
+    res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
         return(res);
@@ -611,10 +611,10 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     eOsk_skinId_t                   skId = 0;
     EOarray_of_10canframes          *arrayof10canframes = NULL;
     EOappTheDB                      *db = eo_appTheDB_GetHandle();
-    eOappTheDB_SkinCanLocation_t    canloc;
+    eOappTheDB_SkinCanLocation_t    canloc = {0};
 
     canloc.emscanport = canPort;
-    res = eo_appTheDB_GetSkinId_BySkinCanLocation(db, &canloc, &skId);
+    res = eo_appTheDB_GetSkinId_BySkinCanLocation(db, canloc, &skId);
     if(eores_OK != res)
     {
         return(res);

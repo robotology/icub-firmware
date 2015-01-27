@@ -62,12 +62,11 @@ extern "C" {
 
 enum { eOappTheDB_canboard_maxnumberof = 30, eOappTheDB_canboard_none = 31 };
 
-enum { eOappTheDB_canboard_noindex = 3 };
 
 typedef struct
 {
     uint8_t indexofcanboard : 6;            /**< use values from 0 to eOappTheDB_canboard_maxnumberof */
-    uint8_t indexinsidecanboard : 2;        /**< use eOicubCanProto_jm_indexinBoard_t or eOappTheDB_canboard_noindex*/
+    uint8_t indexinsidecanboard : 2;        /**< use eOicubCanProto_jm_indexinBoard_t with even eo_icubCanProto_jm_index_none */
 } eOappTheDB_mapping2canboard_t; 
 
 
@@ -80,21 +79,37 @@ typedef struct
 } eOappTheDB_board_canlocation_t; //EO_VERIFYsizeof(eOappTheDB_board_canlocation_t, 1);
 
 
+typedef struct
+{
+    uint8_t emscanport : 1;                 /**< use eOcanport_t */
+    uint8_t addr : 4;                       /**< use icubCanProto_canBoardAddress_t */ 
+    uint8_t indexinsidecanboard : 2;        /**< use eOicubCanProto_jm_indexinBoard_t */
+    uint8_t unused : 1;
+} eOappTheDB_jointOrMotorCanLocation_t;
 
 typedef struct
 {
-    uint8_t port : 1;               /**< use eOcanport_t */
-    uint8_t addr : 4;               /**< use icubCanProto_canBoardAddress_t */ 
-    uint8_t type : 3;               /**< use eObrd_cantypes_t */
-} eOappTheDB_canboardinfo_t;        //EO_VERIFYsizeof(eOappTheDB_canboardinfo_t, 1);
+    uint8_t emscanport : 1;                 /**< use eOcanport_t */
+    uint8_t addr : 4;                       /**< use icubCanProto_canBoardAddress_t */ 
+    uint8_t unused : 3;
+} eOappTheDB_SkinCanLocation_t;
 
 
 typedef struct
-{   //  experimental: not used for far
-    const eOappTheDB_canboardinfo_t*  brd;
-    uint8_t indexofcanboard : 6;            /**< use values from 0 to eOappTheDB_canboard_maxnumberof */
-    uint8_t indexinsidecanboard : 2;        /**< use eOicubCanProto_jm_indexinBoard_t or eOappTheDB_canboard_noindex*/
-} eOappTheDB_mapping2canboard2_t;
+{
+    uint16_t port : 1;               /**< use eOcanport_t */
+    uint16_t addr : 4;               /**< use icubCanProto_canBoardAddress_t */ 
+    uint16_t ffu3 : 3;               /**< for future use */
+    uint16_t type : 8;               /**< use eObrd_cantypes_t */
+} eOappTheDB_canboardinfo_t;        EO_VERIFYsizeof(eOappTheDB_canboardinfo_t, 2);
+
+
+//typedef struct
+//{   //  experimental: not used for far
+//    const eOappTheDB_canboardinfo_t*  brd;
+//    uint8_t indexofcanboard : 6;            /**< use values from 0 to eOappTheDB_canboard_maxnumberof */
+//    uint8_t indexinsidecanboard : 2;        /**< use eOicubCanProto_jm_indexinBoard_t */
+//} eOappTheDB_mapping2canboard2_t;
 
 typedef struct
 {
@@ -139,13 +154,6 @@ typedef struct
 } eOappTheDB_cfg_t;
 
 
-typedef struct
-{
-    eOcanport_t                             emscanport;
-    icubCanProto_canBoardAddress_t          addr;
-    eOicubCanProto_jm_indexinBoard_t        indexinsidecanboard;
-} eOappTheDB_jointOrMotorCanLocation_t;
-
 
 typedef enum 
 {
@@ -154,11 +162,6 @@ typedef enum
 } eOappTheDB_sensortype_t;
 
 
-
-typedef struct
-{
-    eOcanport_t                             emscanport;
-} eOappTheDB_SkinCanLocation_t;
 
 
 typedef struct EOappTheDB_hid                  EOappTheDB;
@@ -180,7 +183,7 @@ extern EOappTheDB* eo_appTheDB_GetHandle(void);
 
 extern uint16_t eo_appTheDB_GetNumberOfConnectedJoints(EOappTheDB *p);
 
-// ok, ma can we get this number from the protocol ????
+// ok, but we get this number from the protocol !!!!!
 extern uint16_t eo_appTheDB_GetNumberOfConnectedMotors(EOappTheDB *p);
 
 extern uint16_t eo_appTheDB_GetNumberOfCanboards(EOappTheDB *p);
@@ -190,31 +193,29 @@ extern eObool_t	eo_appTheDB_isSkinConnected(EOappTheDB *p);
 
 extern eOresult_t eo_appTheDB_GetTypeOfCanboard(EOappTheDB *p, eObrd_boardId_t bid, eObrd_cantype_t *type_ptr);
 
-//extern eOappEncReader_encoder_t eo_appTheDB_GetEncoderConnected2Joint(EOappTheDB *p, eOmc_jointId_t jId);
-
-extern eOresult_t eo_appTheDB_GetJointId_ByJointCanLocation(EOappTheDB *p, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eOmc_jointId_t *jId_ptr);
+extern eOresult_t eo_appTheDB_GetJointId_ByJointCanLocation(EOappTheDB *p, eOappTheDB_jointOrMotorCanLocation_t canloc, eOmc_jointId_t *jId_ptr);
 
 extern eOresult_t eo_appTheDB_GetJointCanLocation(EOappTheDB *p, eOmc_jointId_t jId,  eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eObrd_cantype_t *type_ptr);
 
 extern eOresult_t eo_appTheDB_GetMotorCanLocation(EOappTheDB *p, eOmc_motorId_t mId,  eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eObrd_cantype_t *type_ptr);
 
-extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOappTheDB_jointOrMotorCanLocation_t *canloc_ptr, eOmc_motorId_t *mId_ptr);
+extern eOresult_t eo_appTheDB_GetMotorId_ByMotorCanLocation(EOappTheDB *p, eOappTheDB_jointOrMotorCanLocation_t canloc, eOmc_motorId_t *mId_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_board_canlocation_t *canloc_ptr, eOas_maisId_t *sId_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eOas_maisId_t *sId_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOas_maisId_t sId, eOappTheDB_board_canlocation_t *canloc_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrMaisCanLocation(EOappTheDB *p, eOas_maisId_t sId, eOappTheDB_board_canlocation_t *canlocptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_board_canlocation_t *canloc_ptr, eOas_strainId_t *sId_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eOas_strainId_t *sId_ptr);
 
-extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strainId_t sId, eOappTheDB_board_canlocation_t *canloc_ptr);
+extern eOresult_t eo_appTheDB_GetSnsrStrainCanLocation(EOappTheDB *p, eOas_strainId_t sId, eOappTheDB_board_canlocation_t *canlocptr);
 
-extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_SkinCanLocation_t *canloc_ptr);
+extern eOresult_t eo_appTheDB_GetSkinCanLocation(EOappTheDB *p, eOsk_skinId_t skId, eOappTheDB_SkinCanLocation_t *canlocptr);
 
-extern eOresult_t eo_appTheDB_GetSkinId_BySkinCanLocation(EOappTheDB *p, eOappTheDB_SkinCanLocation_t *canloc_ptr, eOsk_skinId_t *skId_ptr);
+extern eOresult_t eo_appTheDB_GetSkinId_BySkinCanLocation(EOappTheDB *p, eOappTheDB_SkinCanLocation_t canloc, eOsk_skinId_t *skId_ptr);
 
 extern eOresult_t eo_appTheDB_GetCanBoardInfo(EOappTheDB *p, eObrd_boardId_t bid,  eOappTheDB_canboardinfo_t **ppcanboardinfo);
 
-extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTheDB_board_canlocation_t *canloc_ptr, eObrd_boardId_t *bid_ptr); 
+extern eOresult_t eo_appTheDB_GetCanBoardId_ByCanLocation(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eObrd_boardId_t *bid_ptr); 
 
 
 extern eOresult_t eo_appTheDB_GetShiftValuesOfJointPtr(EOappTheDB *p, eOmc_jointId_t jId, eOappTheDB_jointShiftValues_t **shiftval_ptr);
@@ -236,7 +237,7 @@ extern void eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(EOappTheDB *p);
 extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue);
 
 
-extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t *canloc_ptr);
+extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc);
 extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady);
 
 #ifdef USE_PROTO_PROXY

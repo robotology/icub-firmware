@@ -366,7 +366,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         return; //error
     }  
     
-    #warning -> cast to proper type
+    #warning -> marco.accame: cast to proper type
     if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)
     {
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
@@ -375,7 +375,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             return; //error
         }
         
-        #warning --> cast to proper type
+        #warning --> marco.accame: cast to proper type
         /* if monitorstatus values setpointreached means this is a new set point, 
         so i need to start to check is set point is reached because i'm in monitormode = forever */
         if(eomc_motionmonitorstatus_setpointisreached == jstatus->basic.motionmonitorstatus)
@@ -540,13 +540,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
 
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
     
 
 
@@ -591,10 +591,10 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
         case eomc_controlmode_cmd_switch_everything_off:
         {
             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+            eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
 
             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+            eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
         }break;
         
         default: //2foc control mode is always current
@@ -607,16 +607,16 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
                 pid_open_loop.ki = 0;
                 
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &pid_open_loop);
+                eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &pid_open_loop);
                 
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+                eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
                 
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+                eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
             
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-                eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, NULL);
+                eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
             }
         }
         
@@ -669,8 +669,8 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
     int i;
     for(i=0; i<4; i++)
     {
-      snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, eo_common_Q17_14_to_float((*mat)[i][0]),  eo_common_Q17_14_to_float((*mat)[i][1]), eo_common_Q17_14_to_float((*mat)[i][2]), eo_common_Q17_14_to_float((*mat)[i][3]));             
-      eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
+//      snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, eo_common_Q17_14_to_float((*mat)[i][0]),  eo_common_Q17_14_to_float((*mat)[i][1]), eo_common_Q17_14_to_float((*mat)[i][2]), eo_common_Q17_14_to_float((*mat)[i][3]));             
+//      eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
     }   
 }
 #endif

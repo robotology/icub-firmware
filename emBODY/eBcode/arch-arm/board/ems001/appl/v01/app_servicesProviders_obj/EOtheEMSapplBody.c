@@ -110,7 +110,6 @@ const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default =
         .major                      = 1,
         .minor                      = 2
     },
-    //.connectedEncodersMask          = 0,   
     .configdataofMC4boards          =
     {
         .shiftvalues    =
@@ -422,18 +421,18 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     static eObool_t already_send = eobool_false;
     eOresult_t res;
     
-    if(already_send)
+    if(eobool_true == already_send)
     {
         return(eores_OK);
     }
-    
-    
+        
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
     res = s_eo_emsapplBody_sendConfig2canboards(p);
+    
     if(eores_OK == res)
     {
         already_send = eobool_true;
@@ -749,7 +748,7 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
             continue;
         }
         
-        if((eobrd_mc4 != canboardinfo->type) && (eobrd_1foc != canboardinfo->type))
+        if((eobrd_cantype_mc4 != canboardinfo->type) && (eobrd_cantype_1foc != canboardinfo->type))
         {
             continue; // m.a: i dont process this board index and i go to the next one
         }
@@ -770,7 +769,6 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
 
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 {
-    //eOresult_t                              res;
     uint16_t                                numofjoint, i;
     eOappTheDB_jointShiftValues_t           *shiftval_ptr;
     eOicubCanProto_estimShift_t             estimshift;
@@ -789,7 +787,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
     {
         if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
         {            
-            //get shift values from DB
+            // get shift values from DB
             eo_appTheDB_GetShiftValuesOfJointPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &shiftval_ptr);
             
             msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;

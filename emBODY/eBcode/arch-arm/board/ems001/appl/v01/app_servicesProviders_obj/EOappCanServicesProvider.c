@@ -352,7 +352,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Joint(EOappCanSP *p, eOmc_jointId_t jId, e
     //set destination of message
     msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
    
-    res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
+    res = s_eo_appCanSP_formAndSendFrame(p, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, val_ptr);
     return(res);
 }
 
@@ -377,7 +377,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
     //set destination of message 
     msgdest.dest =ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
-    res = s_eo_appCanSP_formAndSendFrame(p, canLoc.emscanport, msgdest, msgCmd, val_ptr);
+    res = s_eo_appCanSP_formAndSendFrame(p, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, val_ptr);
     return(res);
 }
 
@@ -385,7 +385,7 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
 extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOicubCanProto_msgDestination_t             msgdest;
 
     if(NULL == p)
@@ -409,7 +409,7 @@ extern eOresult_t eo_appCanSP_SendCmd2SnrMais(EOappCanSP *p, eOas_maisId_t sId, 
 extern eOresult_t eo_appCanSP_SendCmd2SnrStrain(EOappCanSP *p, eOas_strainId_t sId, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t                                  res;
-    eOappTheDB_board_canlocation_t              canLoc;
+    eOappTheDB_board_canlocation_t              canLoc = {0};
     eOicubCanProto_msgDestination_t             msgdest;
 
     if(NULL == p)

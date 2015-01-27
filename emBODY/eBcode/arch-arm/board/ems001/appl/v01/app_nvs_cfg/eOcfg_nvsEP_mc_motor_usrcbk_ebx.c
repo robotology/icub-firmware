@@ -153,7 +153,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t                     *cfg_ptr = (eOmc_motor_config_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
-    eOicubCanProto_msgCommand_t            msgCmd = 
+    eOicubCanProto_msgCommand_t             msgCmd = 
     {
         EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
         EO_INIT(.cmdId) 0
@@ -172,26 +172,26 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 	//set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
     
-    #warning --> eobrd_1foc non va bene qui .. usa eobrd_cantype_1foc POI: ... magari rimuovi eOappTheDB_jointOrMotorCanLocation_t ed usa la forma campatta per il solo can
-    if(eobrd_1foc == boardType)
+
+    if(eobrd_cantype_1foc == boardType)
     {
         // 1) send current pid
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
 
         // 2) send current pid limits
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
     }
     
     // 2) set max velocity  
     vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, mxx, cfg_ptr->maxvelocityofmotor);           
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&vel_icubCanProtValue);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&vel_icubCanProtValue);
 
     // 3) set current limit  
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->maxcurrentofmotor);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->maxcurrentofmotor);
 
 }
 
@@ -221,10 +221,10 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
     // send current pid
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
-    eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 
 }
 

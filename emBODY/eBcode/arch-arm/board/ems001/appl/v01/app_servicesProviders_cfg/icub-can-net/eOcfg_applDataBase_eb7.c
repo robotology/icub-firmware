@@ -81,18 +81,18 @@ static const eOappTheDB_canboardinfo_t s_cfg_appDB_boards[] =
     { // 0 == FOC_ADDRCAN_1_BID 
         .port   = eOcanport1,
         .addr   = 1,
-        .type   = eobrd_1foc,
+        .type   = eobrd_cantype_1foc,
     },
     { // 1 == FOC_ADDRCAN_2_BID 
         .port   = eOcanport1,
         .addr   = 2,
-        .type   = eobrd_1foc,
+        .type   = eobrd_cantype_1foc,
     }
 #if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )       
     ,{// 2 == STRAIN_ADDRCAN_1_BID
         .port   = eOcanport2,
         .addr   = 1,
-        .type   = eobrd_strain,
+        .type   = eobrd_cantype_strain,
     }     
 #endif
 };    

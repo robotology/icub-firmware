@@ -83,43 +83,43 @@ static const eOappTheDB_canboardinfo_t s_cfg_appDB_boards[] =
     { // 0 == MC4_ADDRCAN_3_BID 
         .port   = eOcanport1,
         .addr   = 3,
-        .type   = eobrd_mc4,
+        .type   = eobrd_cantype_mc4,
     },
     
     { // 1 == MC4_ADDRCAN_4_BID
         .port   = eOcanport1,
         .addr   = 4,
-        .type   = eobrd_mc4,
+        .type   = eobrd_cantype_mc4,
     },   
 
     { // 2  == MC4_ADDRCAN_5_BID
         .port   = eOcanport1,
         .addr   = 5,
-        .type   = eobrd_mc4,
+        .type   = eobrd_cantype_mc4,
     },
 
     { // 3 == MC4_ADDRCAN_6_BID
         .port   = eOcanport1,
         .addr   = 6,
-        .type   = eobrd_mc4,
+        .type   = eobrd_cantype_mc4,
     },
        
     { // 4  == MC4_ADDRCAN_7_BID
         .port   = eOcanport1,
         .addr   = 7,
-        .type   = eobrd_mc4,
+        .type   = eobrd_cantype_mc4,
     },
     
     { // 5 == MC4_ADDRCAN_8_BID
         .port   = eOcanport1,
         .addr   = 8,
-        .type   = eobrd_mc4,
+        .type   = eobrd_cantype_mc4,
     },    
 
     { // 6  == MAIS_ADDRCAN_14_BID
         .port   = eOcanport1,
         .addr   = 14,
-        .type   = eobrd_mais,
+        .type   = eobrd_cantype_mais,
     }  
      
 };

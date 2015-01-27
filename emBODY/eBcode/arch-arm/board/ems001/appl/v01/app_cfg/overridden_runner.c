@@ -196,7 +196,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 {
     eOresult_t                      res;
     EOappTheDB                      *db_ptr = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_SkinCanLocation_t    skincanloc;
+    eOappTheDB_SkinCanLocation_t    skincanloc = {0};
     eOsk_skinId_t                   skId;
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
@@ -207,7 +207,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
     {
         skincanloc.emscanport = (eOcanport_t)port;
-        res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), &skincanloc, &skId);
+        res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), skincanloc, &skId);
         if(eores_OK == res)
         {
             // reset netvar
@@ -460,7 +460,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
     }
     //since msg is periodic, all 2foc received it so dest is useless.
     dest.dest = 0;
-    eo_appCanSP_SendCmd(eo_emsapplBody_GetCanServiceHandle(p), canLoc.emscanport, dest, msgCmd, (void*)pwm_aux);
+    eo_appCanSP_SendCmd(eo_emsapplBody_GetCanServiceHandle(p), (eOcanport_t)canLoc.emscanport, dest, msgCmd, (void*)pwm_aux);
     
     return(res);    
 }
@@ -717,10 +717,10 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         //set command (calss + id) and send it
         msgCmd.class = icubCanProto_msgCmdClass_periodicAnalogSensor;
         msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
+        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
         
         msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR;
-        eo_appCanSP_SendCmd(appCanSP_ptr, canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
+        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
     }
     s_checkEthLinks();
     
