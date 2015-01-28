@@ -80,11 +80,13 @@
 #undef  HAL_USE_ACCELEROMETER
 #define     HAL_USE_CANTRANSCEIVER
 #define     HAL_USE_EEPROM
-#undef     HAL_USE_ENCODER
+//#undef     HAL_USE_ENCODER
+#define     HAL_USE_ENCODER
 #define     HAL_USE_ETHTRANSCEIVER
 #undef  HAL_USE_GYROSCOPE
 #define     HAL_USE_LED
-#undef     HAL_USE_MUX
+//#undef     HAL_USE_MUX
+#define     HAL_USE_MUX
 #define     HAL_USE_SWITCH
 #undef  HAL_USE_TERMOMETER
 #define HAL_USE_DEVICE_MOTORCTL

@@ -479,28 +479,30 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
 
 #if     defined(HAL_USE_SPI) | defined(HAL_USE_SPI_DMA)
-    
+		
+		#warning --> mappatura attuale basata sullo schema circuitale di MC4Plus. spi1 disabilitata
+		
     #include "hal_spi_hid.h"
 
     extern const hal_spi_boardconfig_t hal_spi__theboardconfig =
     {
-		.supportedmask      = (1 << hal_spi1) | (1 << hal_spi2) | (0 << hal_spi3),
+		.supportedmask      = (0 << hal_spi1) | (1 << hal_spi2) | (1 << hal_spi3),
 		.gpiomap            =
 		{ 
 		   {    // hl_spi1 
 				.sck = 
 				{
-					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin10 }, 
+					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE }, 
 					.af32   = GPIO_AF_SPI1        
 				}, 
 				.miso = 
 				{
-					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin1 }, 
+					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE }, 
 					.af32   = GPIO_AF_SPI1               
 				},
 				.mosi = 
 				{
-					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin12 }, 
+					.gpio   = { .port = hal_gpio_portNONE,      .pin = hal_gpio_pinNONE }, 
 					.af32   = GPIO_AF_SPI1               
 				}             
 			},         
@@ -521,24 +523,24 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 					.af32   = GPIO_AF_SPI2               
 				}             
 			},         
-            {   // hal_spi3
-                .sck    =
-                {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                    .af32   = hal_NA32                     
-                },
-                .miso   =
-                {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                    .af32   = hal_NA32                     
-                },
-                .mosi   =
-                {
-                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
-                    .af32   = hal_NA32                     
-                } 
-            }                   
-        }
+			{   // hal_spi3
+				.sck = 
+				{
+					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin10 }, 
+					.af32   = GPIO_AF_SPI3       
+				}, 
+				.miso = 
+				{
+					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin11 }, 
+					.af32   = GPIO_AF_SPI3               
+				},
+				.mosi = 
+				{
+					.gpio   = { .port = hal_gpio_portC,      .pin = hal_gpio_pin12 }, 
+					.af32   = GPIO_AF_SPI3               
+				} 
+			}                   
+    }
            
     };
     
@@ -773,21 +775,19 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
 #ifdef HAL_USE_ENCODER
  
-    #warning --> verificare mappatura di encoder. ci sono?
-    
     #include "hal_encoder_hid.h"
 
     extern const hal_encoder_boardconfig_t hal_encoder__theboardconfig =
     {
-        .supportedmask              = (1 << hal_encoder1) | (1 << hal_encoder2),  
+        .supportedmask              =  (1 << hal_encoder1) | (1 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6),  
         .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
         .spimap                     =
         {
-            {   // hal_encoder1:    P6 on mc4plus
-                .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selA                
+            {   // hal_encoder1:    P10 on mc4plus
+                .spiid = hal_spi3,  .muxid = hal_mux1,  .muxsel = hal_mux_selNONE                
             },
-            {   // hal_encoder2:    P8 on mc4plus
-                .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selB                
+            {   // hal_encoder2:    P11 on mc4plus
+                .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selNONE               
             }                   
         }
 
@@ -959,8 +959,85 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
     
 #ifdef HAL_USE_MUX
 
-#warning -> se non ci sono mux allora non c'e encoder?
+		#warning 2 mux (virtuali) supportati
+		
+    #include "hal_mux_hid.h"
     
+    extern const hal_mux_boardconfig_t hal_mux__theboardconfig =
+    {
+        .supportedmask      = (1 << hal_mux1) | (1 << hal_mux2) | (0 << hal_mux3) | (0 << hal_mux4), 
+        .gpiomap            =
+        {
+            {   // hal_mux1   
+                .gpio_sel0              =                
+                {    
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                },                      
+                .gpio_sel1              =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                    
+                },
+                .gpio_enable            =
+                {
+                    .gpio   = { .port = hal_gpio_portC,  .pin = hal_gpio_pin13 }, 
+                    .af32   = hal_NA32                    
+                }
+            }, 
+            {   // hal_mux2   
+								.gpio_sel0              =                
+                {    
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                },                      
+                .gpio_sel1              =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                    
+                },
+                .gpio_enable            =
+                {
+                    .gpio   = { .port = hal_gpio_portI,  .pin = hal_gpio_pin0 }, 
+                    .af32   = hal_NA32                    
+                }
+            },
+            {   // hal_mux3   
+								.gpio_sel0              =                
+                {    
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                },                      
+                .gpio_sel1              =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                    
+                },
+                .gpio_enable            =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                    
+                }
+            }, 
+            {   // hal_mux4   
+                .gpio_sel0              =                
+                {    
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32
+                },                      
+                .gpio_sel1              =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                    
+                },
+                .gpio_enable            =
+                {
+                    .gpio   = { .port = hal_gpio_portNONE,  .pin = hal_gpio_pinNONE }, 
+                    .af32   = hal_NA32                    
+                }
+            }            
+        }
+    };
 #endif//HAL_USE_MUX      
     
 
