@@ -46,6 +46,7 @@
 
 #include "hl_arch.h"
 
+#include "hal_heap.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -347,8 +348,8 @@ extern hl_result_t hl_spi_deinit (hl_spi_t id)
 #endif
 			
 			s_hl_spi_initted_reset(id);
-			hl_sys_heap_delete((void*)&(s_hl_spi_theinternals.items[HL_spi_id2index(id)]));
-			
+			hal_heap_delete((void**)&(s_hl_spi_theinternals.items[HL_spi_id2index(id)]));
+			//hl_sys_heap_delete((void*)s_hl_spi_theinternals.items[HL_spi_id2index(id)]);
 			return hl_res_OK;
 }
 
