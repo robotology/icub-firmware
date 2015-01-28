@@ -93,7 +93,7 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .argonframetransm           = NULL,
     .onframereceiv              = NULL,
     .argonframereceiv           = NULL,
-		.cpolarity									= hal_spi_cpolarity_low,
+		.cpolarity									= hal_spi_cpolarity_high,
 };
 
 
@@ -657,6 +657,12 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     {
         hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
     }
+
+		//SPI1 has a different clock
+		if (hal_spi1 == id)
+		{
+			hl_spi_advcfg_ems4rd.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
+		}
 		
 		//We should set the correct baud rate also...?
 		//The prescaler used is the one defined in advcfg, if it's not null

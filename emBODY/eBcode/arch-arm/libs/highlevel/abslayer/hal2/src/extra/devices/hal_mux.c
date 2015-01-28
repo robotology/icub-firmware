@@ -174,6 +174,13 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
     hal_gpio_init(intitem->enable, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
     
+		//If virtual mux, do nothing and return OK
+		if((intitem->sel0.port == hal_gpio_portNONE) || (intitem->sel1.port == hal_gpio_portNONE))
+		{
+			  s_hal_mux_initted_set(id);
+				return (hal_res_OK);
+		}
+		
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
     
     hal_gpio_init(intitem->sel0, &s_hal_mux_gpio_config);
@@ -202,10 +209,18 @@ extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
     }
 #endif
     
-    if(hal_mux_selNONE == muxsel)
+		//If not virtual mux
+    if((hal_mux_selNONE == muxsel) && ((intitem->sel0.port != hal_gpio_portNONE) || (intitem->sel1.port != hal_gpio_portNONE)))
     {
         return(hal_mux_disable(id));
     }
+		//the mux is virtual, we must enable only one GPIO, the NSEL
+		else if ((hal_mux_selNONE == muxsel) && (intitem->sel0.port == hal_gpio_portNONE) && (intitem->sel1.port == hal_gpio_portNONE))
+		{
+				 hal_gpio_setval(intitem->enable, hal_gpio_valLOW);
+				 return(hal_res_OK);
+		}
+			
     
     // do something 
         
@@ -237,6 +252,10 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
     // do something 
     
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
+		//If virtual mux, do nothing and return OK
+		if((intitem->sel0.port == hal_gpio_portNONE) || (intitem->sel1.port == hal_gpio_portNONE))
+				return (hal_res_OK);
+		
     hal_sys_delay(delay);   
     hal_gpio_setval(intitem->sel0, hal_gpio_valHIGH);    
     hal_gpio_setval(intitem->sel1, hal_gpio_valHIGH);   
