@@ -834,6 +834,11 @@
           <GroupName>appl-services-provider</GroupName>
           <Files>
             <File>
+              <FileName>EOtheEMSapplBody.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</FilePath>
+            </File>
+            <File>
               <FileName>EOappCanServicesProvider.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappCanServicesProvider.c</FilePath>
@@ -852,11 +857,6 @@
               <FileName>EOappTheDataBase.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappTheDataBase.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheEMSapplBody.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</FilePath>
             </File>
             <File>
               <FileName>EOtheProtocolWrapper.c</FileName>
@@ -902,36 +902,6 @@
               <FileName>eOcfg_appTheDataBase_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net\eOcfg_appTheDataBase_ebx.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-nvs-cfg-usrcbk</GroupName>
-          <Files>
-            <File>
-              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>rxtools.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1016,7 +986,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-comm-v2-transport</GroupName>
+          <GroupName>eo-comm-transport</GroupName>
           <Files>
             <File>
               <FileName>EOagent.c</FileName>
@@ -1096,7 +1066,67 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-comm-v2-protocol-boards</GroupName>
+          <GroupName>eo-comm-protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>EoProtocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolAS_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolAS_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolEPs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMN_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMN_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolSK_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolSK_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoError.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\icub\EoError.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-comm-protocol-cfg-boards</GroupName>
           <Files>
             <File>
               <FileName>eOprot_b01.c</FileName>
@@ -1156,62 +1186,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-comm-v2-protocol</GroupName>
+          <GroupName>eo-comm-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocol.c</FileName>
+              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolAS_fun.c</FileName>
+              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolAS_rom.c</FileName>
+              <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolEPs.c</FileName>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun.c</FileName>
+              <FileName>rxtools.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMC_rom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMN_fun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMN_rom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolSK_fun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolSK_rom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoError.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\icub\EoError.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1298,6 +1298,8 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
+          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
@@ -2116,6 +2118,11 @@
           <GroupName>appl-services-provider</GroupName>
           <Files>
             <File>
+              <FileName>EOtheEMSapplBody.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</FilePath>
+            </File>
+            <File>
               <FileName>EOappCanServicesProvider.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappCanServicesProvider.c</FilePath>
@@ -2134,11 +2141,6 @@
               <FileName>EOappTheDataBase.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappTheDataBase.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheEMSapplBody.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</FilePath>
             </File>
             <File>
               <FileName>EOtheProtocolWrapper.c</FileName>
@@ -2184,36 +2186,6 @@
               <FileName>eOcfg_appTheDataBase_ebx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net\eOcfg_appTheDataBase_ebx.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-nvs-cfg-usrcbk</GroupName>
-          <Files>
-            <File>
-              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
-            </File>
-            <File>
-              <FileName>rxtools.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2298,7 +2270,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-comm-v2-transport</GroupName>
+          <GroupName>eo-comm-transport</GroupName>
           <Files>
             <File>
               <FileName>EOagent.c</FileName>
@@ -2378,7 +2350,67 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-comm-v2-protocol-boards</GroupName>
+          <GroupName>eo-comm-protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>EoProtocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolAS_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolAS_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolEPs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMN_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMN_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolSK_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolSK_rom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoError.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\icub\EoError.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-comm-protocol-cfg-boards</GroupName>
           <Files>
             <File>
               <FileName>eOprot_b01.c</FileName>
@@ -2438,62 +2470,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-comm-v2-protocol</GroupName>
+          <GroupName>eo-comm-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocol.c</FileName>
+              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocol.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolAS_fun.c</FileName>
+              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_fun.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolAS_rom.c</FileName>
+              <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolAS_rom.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolEPs.c</FileName>
+              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolEPs.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun.c</FileName>
+              <FileName>rxtools.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_fun.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMC_rom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMC_rom.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMN_fun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_fun.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMN_rom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolMN_rom.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolSK_fun.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_fun.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolSK_rom.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoError.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\embobj\plus\comm-v2\icub\EoError.c</FilePath>
+              <FilePath>..\..\..\..\ems001\appl\v01\app_nvs_cfg\rxtools.c</FilePath>
             </File>
           </Files>
         </Group>
