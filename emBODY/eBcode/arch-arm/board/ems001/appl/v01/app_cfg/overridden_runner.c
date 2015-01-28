@@ -174,6 +174,14 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
+    static uint32_t count = 0;
+    count ++;
+    
+    if(1 == count)
+    {
+        eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
+    }
+    
     eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
 		/*
     if(applrunMode__2foc == runmode)

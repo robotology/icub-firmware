@@ -138,12 +138,12 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
 {
     uint32_t readyCanBoardsMask = 0;    // keeps the boards that are ready. if bit pos i-th is 1, then the board in list i-th is OK   
-
-    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
-
+    uint32_t checkedmask = 0;           // keeps the boards that are checked
+    
+    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());      
 
     // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiamo mandato la loro fw version
-    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &readyCanBoardsMask))
+    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &readyCanBoardsMask, &checkedmask))
     {
         // se tutte le 1foc e le mc4 sono ready, allora setto che lo sono (stoppo il timer canBoardsReady_timer da 10 milli)
         // e poi mando la configurazione alle board can

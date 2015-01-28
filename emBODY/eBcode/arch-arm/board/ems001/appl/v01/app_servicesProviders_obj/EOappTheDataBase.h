@@ -100,7 +100,7 @@ typedef struct
     uint16_t port : 1;               /**< use eOcanport_t */
     uint16_t addr : 4;               /**< use icubCanProto_canBoardAddress_t */ 
     uint16_t ffu3 : 3;               /**< for future use */
-    uint16_t type : 8;               /**< use eObrd_cantypes_t */
+    uint16_t type : 8;               /**< use eObrd_cantype_t */
 } eOappTheDB_canboardinfo_t;        EO_VERIFYsizeof(eOappTheDB_canboardinfo_t, 2);
 
 
@@ -188,6 +188,8 @@ extern uint16_t eo_appTheDB_GetNumberOfConnectedMotors(EOappTheDB *p);
 
 extern uint16_t eo_appTheDB_GetNumberOfCanboards(EOappTheDB *p);
 
+extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_board_canlocation_t *loc,  eObrd_cantype_t *expectedtype, eObrd_typeandversions_t *detectedtypever);
+
 extern eObool_t	eo_appTheDB_isSkinConnected(EOappTheDB *p);
 
 
@@ -236,9 +238,10 @@ extern uint8_t eo_appTheDB_IsVirtualStrainDataUpdated(EOappTheDB *p);
 extern void eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(EOappTheDB *p);
 extern eOresult_t eo_appTheDB_SetVirtualStrainValue(EOappTheDB *p, eOmc_jointId_t jId, uint16_t torquevalue);
 
-
-extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc);
-extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady);
+extern eOresult_t eo_appTheDB_FillCanTypeVersion(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eObrd_typeandversions_t *typeversion);
+    
+extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eObrd_typeandversions_t *typeversion);
+extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
 
 #ifdef USE_PROTO_PROXY
 //eth proto request

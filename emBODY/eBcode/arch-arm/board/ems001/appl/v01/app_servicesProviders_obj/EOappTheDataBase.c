@@ -38,6 +38,8 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
 
+#include "EOtheEMSApplBody.h"
+
 
 
 #include "EOconstvector.h" 
@@ -265,6 +267,33 @@ extern eOresult_t eo_appTheDB_GetTypeOfCanboard(EOappTheDB *p, eObrd_boardId_t b
     b_ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsInfo, bid);
     
     *type_ptr = (eObrd_cantype_t)b_ptr->basicboardinfo.type;
+    
+    return(eores_OK);
+}
+
+
+// it is the information received from a board in position bid with that (port, addr)
+extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_board_canlocation_t *loc,  eObrd_cantype_t *expectedtype, eObrd_typeandversions_t *detectedtypever)
+{
+    eOappTheDB_hid_canBoardInfo_t   *ptr;
+    
+    if((NULL == p) || (NULL == loc) || (NULL == expectedtype) || (NULL == detectedtypever))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(bid >= eo_array_Size(p->canboardsInfo))
+    {
+        return(eores_NOK_nodata);
+    }
+    
+    ptr = (eOappTheDB_hid_canBoardInfo_t *)eo_array_At(p->canboardsInfo, bid);
+    
+    loc->emscanport = ptr->basicboardinfo.port;
+    loc->addr       = ptr->basicboardinfo.addr;
+    loc->unused     = 0;
+    *expectedtype   = ptr->basicboardinfo.type;
+    memcpy(detectedtypever, &(ptr->typeandversion), sizeof(eObrd_typeandversions_t));
     
     return(eores_OK);
 }
@@ -812,7 +841,7 @@ extern void eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(EOappTheDB *p)
 }
 
 
-extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc)
+extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eObrd_typeandversions_t *typeversion)
 {
     if(NULL == p)
     {
@@ -827,6 +856,10 @@ extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_c
         if( (b_ptr->basicboardinfo.port == canloc.emscanport) && (b_ptr->basicboardinfo.addr == canloc.addr) )
         {
             b_ptr->isready = eobool_true; 
+            if(NULL != typeversion)
+            {
+                memcpy(&b_ptr->typeandversion, typeversion, sizeof(b_ptr->typeandversion));
+            }
             return(eores_OK);
         }
     }
@@ -835,7 +868,30 @@ extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_c
 }
 
 
-extern eObool_t eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady)
+extern eOresult_t eo_appTheDB_FillCanTypeVersion(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eObrd_typeandversions_t *typeversion)
+{
+    if((NULL == p) || (NULL != typeversion))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    uint16_t i;
+    uint16_t numofboard = eo_array_Size(p->canboardsInfo);
+    for(i=0; i<numofboard; i++)
+    {
+        eOappTheDB_hid_canBoardInfo_t *b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsInfo, i);
+        if( (b_ptr->basicboardinfo.port == canloc.emscanport) && (b_ptr->basicboardinfo.addr == canloc.addr) )
+        {
+            memcpy(&b_ptr->typeandversion, typeversion, sizeof(b_ptr->typeandversion));
+            return(eores_OK);
+        }
+    }
+    
+    return(eores_NOK_nodata);    
+}
+
+
+extern eObool_t eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked)
 {
     eObool_t res = eobool_true;
     
@@ -851,9 +907,19 @@ extern eObool_t eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *
     for(i=0; i<eo_array_Size(p->canboardsInfo); i++)
     {        
         eOappTheDB_hid_canBoardInfo_t *b_ptr = (eOappTheDB_hid_canBoardInfo_t*)eo_array_At(p->canboardsInfo, i);
-        if((eobrd_cantype_mc4 != b_ptr->basicboardinfo.type) && (eobrd_cantype_1foc != b_ptr->basicboardinfo.type))
+//        if((eobrd_cantype_mc4 != b_ptr->basicboardinfo.type) && (eobrd_cantype_1foc != b_ptr->basicboardinfo.type))
+//        {
+//            continue;
+//        }
+        if(eobool_false == eom_emsapplBody_IsCANboardToBeChecked(eo_emsapplBody_GetHandle(), b_ptr->basicboardinfo.type))
         {
             continue;
+        }
+
+        
+        if(NULL != canBoardsChecked)
+        {
+            *canBoardsChecked |= (1<<i);
         }
 
         res &= b_ptr->isready;
@@ -1023,6 +1089,14 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
         item.basicboardinfo.addr    = p2canboardinfo->addr;
         item.basicboardinfo.port    = p2canboardinfo->port;
         item.basicboardinfo.type    = p2canboardinfo->type;
+        
+        item.typeandversion.boardtype               = eobrd_cantype_unknown;
+        item.typeandversion.protocolversion.major   = 0;    // this value and the others must be told by the board
+        item.typeandversion.protocolversion.minor   = 0;
+        item.typeandversion.firmwarebuildnumber     = 0;
+        item.typeandversion.firmwareversion.major   = 0;
+        item.typeandversion.firmwareversion.minor   = 0;
+        
 
         // create array of "connected stuff" (joints or sensors)
         if((eobrd_cantype_mc4 == p2canboardinfo->type) || (eobrd_cantype_1foc == p2canboardinfo->type))

@@ -1646,9 +1646,10 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     eOresult_t                              res;
     eOappTheDB_board_canlocation_t          canLoc = {0};
     eObrd_boardId_t                         bid;
-    char                                    str[120];
+    char                                    str[64];
     uint32_t                                canBoardsReady = 0;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
+    eObrd_typeandversions_t                 typeversion = {0};
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id); 
@@ -1659,24 +1660,33 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     {
         return(res);
     }
+    
+    typeversion.boardtype                   = frame->data[1];
+    typeversion.firmwareversion.major       = frame->data[2];
+    typeversion.firmwareversion.minor       = frame->data[3];
+    typeversion.firmwarebuildnumber         = frame->data[4];
+    typeversion.protocolversion.major       = frame->data[5];
+    typeversion.protocolversion.minor       = frame->data[6];
      
     if(1 != frame->data[7])
     {
-        #warning --> marco.accame: the expected protocol fw version is different ... tell robotinterface with a proper message
-        uint16_t buildNum = *((uint16_t*)&frame->data[2]);
-        snprintf(str, sizeof(str), "getfwVer Id%d: bType=0x%x fw_ver=0x%x build=%d proto=%d.%d check=%d", frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6],frame->data[7]); 
-        //snprintf(str, sizeof(str), "protFWver mismatch: CAN%d ID=%d BRD=0x%x FW=0x%x BLD=%d PROTVER=%d.%d", canPort+1, frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6]);   
+        eo_appTheDB_FillCanTypeVersion(db, canLoc, &typeversion);
+       
+//        #warning --> marco.accame: the expected protocol fw version is different ... tell robotinterface with a proper message
+//        uint16_t buildNum = *((uint16_t*)&frame->data[2]);
+//        snprintf(str, sizeof(str), "getfwVer id%d: type=0x%x fw_ver=0x%x build=%d prot=%d.%d check=%d", frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6],frame->data[7]); 
+//        //snprintf(str, sizeof(str), "protFWver mismatch: CAN%d ID=%d BRD=0x%x FW=0x%x BLD=%d PROTVER=%d.%d", canPort+1, frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6]);   
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &eo_errman_DescrUnspecified);
     }
     else
     {
         // ok: we impose that the board with the passed can location is ready ...
-        eo_appTheDB_setCanBoardReady(db, canLoc);
+        eo_appTheDB_setCanBoardReady(db, canLoc, &typeversion);
     }
 
     
     // if all connected can boards are ready, then we stop the request procedure
-    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &canBoardsReady))
+    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &canBoardsReady, NULL))
     {
         eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
         eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());

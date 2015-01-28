@@ -45,6 +45,7 @@ extern "C" {
 typedef struct
 {
     eOappTheDB_canboardinfo_t           basicboardinfo;
+    eObrd_typeandversions_t             typeandversion;
     eOmc_jointId_t                      connectedjoints[eOicubCanProto_jm_indexInBoard_max];
     eOmc_motorId_t                      connectedmotors[eOicubCanProto_jm_indexInBoard_max];
     eObool_t                            isready; // the board is ready when it responds to get_fw_ver can msg

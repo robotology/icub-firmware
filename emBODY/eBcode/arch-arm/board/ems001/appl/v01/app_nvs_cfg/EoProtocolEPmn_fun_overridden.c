@@ -293,17 +293,43 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         case applstate_running:
         {
             uint32_t canBoardsReady = 0;
+            uint32_t canBoardsChecked = 0;
             char str[60];
-            if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady))
+            if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
             {
                 #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
-                snprintf(str, sizeof(str), "only those canboards are ready: %u", canBoardsReady);
+                snprintf(str, sizeof(str), "canboards ready: only 0x%x out of 0x%x.", canBoardsReady, canBoardsChecked);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
+//                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
             }
             else
             {
-                // maybe in here we can put an info diagnostics message                
+                // marco.accame: if i send diagnostics messages just before going to running mode ... the application crashes. TO BE UNDERSTOOD WHY !
+                //eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
+//                // maybe in here we can put an info diagnostics message    
+//                // send message about the ready boards
+//                uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
+//                uint8_t i = 0;
+//                eOappTheDB_board_canlocation_t loc = {0};
+//                eObrd_cantype_t exptype = eobrd_cantype_unknown;
+//                eObrd_typeandversions_t detected = {0};
+//                
+//                eOerrmanDescriptor_t des = {0};
+//                des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+//                
+//                for(i=0; i<numcanboards; i++)
+//                {
+//                    if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &exptype, &detected))
+//                    {
+//                        // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
+//                        des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//                        des.sourceaddress   = loc.addr;
+//                        des.param           = (exptype << 8) | (detected.boardtype); 
+//                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
+//                    }                    
+//                }
             }
+            
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
             if(eores_OK == res)
             {   

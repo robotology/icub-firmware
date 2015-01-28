@@ -60,6 +60,8 @@
 
 #include "EoError.h"
 
+#include "EOVtheSystem.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -412,6 +414,7 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p)
     {
         return(eores_OK);
     }
+    eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
     return(eo_timer_Stop(p->checkCanBoards_timer));
 }
 
@@ -513,6 +516,65 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
     res = s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask); 
     
     return(res);
+}
+
+
+extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
+{
+    // maybe in here we can put an info diagnostics message    
+    // send message about the ready boards
+    uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
+    uint8_t i = 0;
+    eOappTheDB_board_canlocation_t loc = {0};
+    eObrd_cantype_t exptype = eobrd_cantype_unknown;
+    eObrd_typeandversions_t detected = {0};
+    
+    eOerrmanDescriptor_t des = {0};
+    des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+    
+    for(i=0; i<numcanboards; i++)
+    {
+        if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &exptype, &detected))
+        {
+            // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
+            des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+            des.sourceaddress   = loc.addr;
+            des.param           = (exptype << 8) | ((detected.boardtype) & 0xff); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
+        }                    
+    }
+    
+    return(eores_OK);
+}
+
+
+extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type)
+{
+    eObool_t ret = eobool_true;
+    
+    switch(type)
+    {
+        case eobrd_cantype_mc4: 
+        case eobrd_cantype_1foc:
+        { 
+            ret = eobool_true; 
+        } break;
+        
+        case eobrd_cantype_strain:
+        { 
+            ret = eobool_false; 
+        } break;            
+        
+        case eobrd_cantype_mais:
+        case eobrd_cantype_skin:            
+        case eobrd_cantype_unknown:
+        default:
+        {
+            ret = eobool_false; 
+        } break;                    
+    }
+ 
+    return(ret);
 }
 
 
@@ -748,11 +810,28 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
             continue;
         }
         
-        if((eobrd_cantype_mc4 != canboardinfo->type) && (eobrd_cantype_1foc != canboardinfo->type))
+//        if((eobrd_cantype_mc4 != canboardinfo->type) && (eobrd_cantype_1foc != canboardinfo->type))
+//        {
+//            continue; // m.a: i dont process this board index and i go to the next one
+//        }
+
+        if(eobool_false == eom_emsapplBody_IsCANboardToBeChecked(eo_emsapplBody_GetHandle(), canboardinfo->type))
         {
-            continue; // m.a: i dont process this board index and i go to the next one
+            continue;
         }
         
+        // marco.accame: dont know why if i add the strain to the types of board to be checked, then the strain (orn can2) does not reply
+        // maybe it is because it exits the bootloader 5 seconds after the application starts ... so, i have tried to delay the query about 6-7 seconds
+        // but it does not solve. 
+        //if(eobrd_cantype_strain == canboardinfo->type)
+        //{
+        //    eOabstime_t timefromboot = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+        //    
+        //    if(timefromboot < 7*eok_reltime1sec)
+        //    {
+        //        continue;
+        //    }
+        //}
         
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canboardinfo->addr);
                         
