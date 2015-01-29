@@ -235,7 +235,7 @@ static const eOappTheDB_mapping2canboard_t  s_cfg_appDB_snsrMais[] =
 {
     {// 0
         .indexofcanboard        = MAIS_ADDRCAN_14_BID,
-        .indexinsidecanboard    = eOappTheDB_canboard_noindex
+        .indexinsidecanboard    = eo_icubCanProto_jm_index_none
     }
 };
 

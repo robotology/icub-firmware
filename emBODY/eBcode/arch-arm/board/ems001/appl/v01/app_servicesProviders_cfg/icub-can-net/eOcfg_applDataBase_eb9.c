@@ -166,7 +166,7 @@ static const eOappTheDB_mapping2canboard_t  s_cfg_appDB_snsrStrain[] =
 {
     {// 0
         .indexofcanboard        =   STRAIN_ADDRCAN_1_BID,
-        .indexinsidecanboard    =   eOappTheDB_canboard_noindex 
+        .indexinsidecanboard    =   eo_icubCanProto_jm_index_none 
     }
 };
 

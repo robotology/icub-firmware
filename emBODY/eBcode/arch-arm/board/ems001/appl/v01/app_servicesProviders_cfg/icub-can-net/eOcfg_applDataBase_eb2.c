@@ -221,20 +221,6 @@ const EOconstvector  s_eo_cfg_appDB_constvec_joints =
 extern const EOconstvector* const eo_cfg_appDB_thejoints_mapping2canboards = &s_eo_cfg_appDB_constvec_joints;
 
 
-static const eOappTheDB_mapping2canboard2_t jointsmapping[] = 
-{
-    {
-        .brd                    = &s_cfg_appDB_boards[0],
-        .indexofcanboard        = 0,
-        .indexinsidecanboard    = 1        
-    },
-    {
-        .brd                    = &s_cfg_appDB_boards[1],
-        .indexofcanboard        = 1,
-        .indexinsidecanboard    = 1          
-    }   
-};
-
 
 // - in here we have the mapping of the motors into a given can board and its internal index (0, 1). 
 // - the same as joints
@@ -249,7 +235,7 @@ static const eOappTheDB_mapping2canboard_t  s_cfg_appDB_snsrMais[] =
 {
     {// 0
         .indexofcanboard        = MAIS_ADDRCAN_14_BID,
-        .indexinsidecanboard    = eOappTheDB_canboard_noindex
+        .indexinsidecanboard    = eo_icubCanProto_jm_index_none
     }
 };
 
