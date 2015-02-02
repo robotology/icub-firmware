@@ -67,7 +67,8 @@ extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o);
 
 #ifdef USE_2FOC_FAST_ENCODER
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void);
-extern void eo_axleVirtualEncoder_SetSign(EOaxleVirtualEncoder*, eObool_t inverted);
+extern void eo_axleVirtualEncoder_SetSlowEncSign(EOaxleVirtualEncoder*, eObool_t inverted);
+extern void eo_axleVirtualEncoder_SetMotorSign(EOaxleVirtualEncoder*, eObool_t inverted);
 extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder*, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel);
 extern int32_t eo_axleVirtualEncoder_GetPos(EOaxleVirtualEncoder*);
 extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder*);

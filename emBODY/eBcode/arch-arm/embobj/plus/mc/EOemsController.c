@@ -131,6 +131,10 @@ extern EOemsController* eo_emsController_Init()
 extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 {
     eo_absCalibratedEncoder_SetSign(ems->abs_calib_encoder[joint], sign);
+    
+    #ifdef USE_2FOC_FAST_ENCODER
+        eo_axleVirtualEncoder_SetSlowEncSign(ems->axle_virt_encoder[joint], (sign<0));
+    #endif
 }
 
 //             | 1     0       0   |
@@ -933,7 +937,7 @@ extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float 
         eo_axisController_SetPosPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff);
         
         #ifdef USE_2FOC_FAST_ENCODER
-            eo_axleVirtualEncoder_SetSign(ems->axle_virt_encoder[joint], (Kp >= 0.0f ? 1:-1));
+            eo_axleVirtualEncoder_SetMotorSign(ems->axle_virt_encoder[joint], (Kp < 0.0f));
         #endif
     }
 }   

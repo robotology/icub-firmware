@@ -104,7 +104,7 @@ extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder* o, int32_t s
     else 
         o->sign =  0;
 		
-    o->sign = (sign > 0) ? 1 : -1;
+    //o->sign = (sign > 0) ? 1 : -1;
     RST_BITS(o->state_mask, SM_ENC_SIGN_NOT_SET);
 }
 
@@ -277,7 +277,9 @@ extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
     EOaxleVirtualEncoder *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOaxleVirtualEncoder), 1);
 
     if (o)
-    {        
+    {   
+        o->slow_enc_inverted = eobool_false;
+        o->motor_inverted = eobool_false;        
         o->inverted = eobool_false;
         o->axle_virt_pos = 0;
         o->axle_abs_pos = 0;
@@ -287,14 +289,21 @@ extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
     return o;
 }
 
-extern void eo_axleVirtualEncoder_SetSign(EOaxleVirtualEncoder* o, eObool_t inverted)
+extern void eo_axleVirtualEncoder_SetSlowEncSign(EOaxleVirtualEncoder* o, eObool_t slow_enc_inverted)
 {
-    o->inverted = inverted;
+    o->slow_enc_inverted = slow_enc_inverted;
+    o->inverted = (o->slow_enc_inverted) ^ (o->motor_inverted);
 }
 
-extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel)
+extern void eo_axleVirtualEncoder_SetMotorSign(EOaxleVirtualEncoder* o, eObool_t motor_inverted)
 {
-    
+    o->motor_inverted = motor_inverted;
+    o->inverted = (o->slow_enc_inverted) ^ (o->motor_inverted);
+}
+
+
+extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel)
+{    
     static const int32_t N_BITS_PRECISION_BOUND = GEARBOX_REDUCTION * ENCODER_QUANTIZATION;
                         
     int32_t inc = axle_abs_pos - o->axle_abs_pos;
@@ -303,13 +312,13 @@ extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_
     
     if (o->inverted)
     {
-        o->velocity = -axle_virt_vel;    
-        o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
+        o->velocity =  axle_virt_vel;    
+        o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
     }
     else
     {
-        o->velocity =  axle_virt_vel;
-        o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
+        o->velocity = -axle_virt_vel;
+        o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
     }
 
     o->axle_inc_pos -= inc*GEARBOX_REDUCTION;

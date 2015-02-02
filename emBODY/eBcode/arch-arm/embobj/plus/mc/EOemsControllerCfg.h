@@ -26,6 +26,8 @@ extern "C" {
 //#define USE_ONLY_QE
     
 //#define V1_MECHANICS
+
+//#define SHOULDER_3rd_JOINT_COUPLING
     
 #ifdef ICUB_DARMSTADT01
     #define USE_2FOC_FAST_ENCODER

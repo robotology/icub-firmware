@@ -223,8 +223,11 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             if (stiff[0])
             {    
                 pwm_motor[1] = (int16_t)((-65*pwm_joint[0])/40);
+                #ifdef SHOULDER_3rd_JOINT_COUPLING
+                pwm_motor[2] = pwm_motor[1];
+                #else
                 pwm_motor[2] = 0;
-                //pwm_motor[2] = pwm_motor[1];
+                #endif
             }
             else
             {
@@ -235,7 +238,9 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             {
                 buff = (int16_t)((65*pwm_joint[1])/40);
                 pwm_motor[1] += buff;
-                //pwm_motor[2] += buff;
+                #ifdef SHOULDER_3rd_JOINT_COUPLING
+                pwm_motor[2] += buff;
+                #endif
             }
             else
             {
@@ -337,14 +342,15 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
     #elif defined(UPPERLEG_BOARD)
         
         {
-            if (stiff[0])
-            {
-                pwm_motor[0] = (75*pwm_joint[0])/50;
-            }
-            else
-            {
-                pwm_motor[0] = (50*pwm_joint[0])/75;
-            }
+            //if (stiff[0])
+            //{
+            //    pwm_motor[0] = (75*pwm_joint[0])/50;
+            //}
+            //else
+            //{
+            //    pwm_motor[0] = (50*pwm_joint[0])/75;
+            //}
+            pwm_motor[0] = pwm_joint[0];
             pwm_motor[1] = pwm_joint[1];
             pwm_motor[2] = pwm_joint[2];
             pwm_motor[3] = pwm_joint[3];

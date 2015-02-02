@@ -64,6 +64,8 @@ struct EOabsCalibratedEncoder_hid
 
 struct EOaxleVirtualEncoder_hid
 {
+    eObool_t slow_enc_inverted;
+    eObool_t motor_inverted;
     eObool_t inverted;
     
     int32_t velocity;
