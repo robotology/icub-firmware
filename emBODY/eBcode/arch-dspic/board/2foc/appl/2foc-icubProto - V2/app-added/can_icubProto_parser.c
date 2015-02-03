@@ -227,8 +227,6 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-                //*txlen = 0x1;
-                //txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
                 *txlen=0;
                 return 0;
             }
@@ -236,8 +234,6 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             // Command can be accepted only if current ststus is SWITCH ON DISABLED 
             if(1 != DS402_Statusword.Flags.ReadyToSwitchOn )
             {
-                //*txlen = 0x1;
-                //txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
                 *txlen=0;
                 return 0;
             }
@@ -258,16 +254,12 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             if(1 != rxlen)
             {   // incorrect number of parameters
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_ERROR_INCORRECT_NUMBER_OF_PARAMETERS;
                 *txlen = 0x0;
                 return(0);
             }
             // Command can be accepted only if current ststus is OPERATION ENABLE or SWITCHED ON 
             if ( (1 != DS402_Statusword.Flags.OperationEnabled ) && (1 != DS402_Statusword.Flags.SwitchedOn ) )
             {
-//                *txlen = 0x1;
-//                txpayload->b[0] = CAN_DS402_INVALID_STATUS_CHANGE;
                 *txlen = 0x0;
                 return(0);
             }
@@ -356,6 +348,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 }break;
                 case icubCanProto_controlmode_idle:
                 {
+                    FaultReset();
                     DS402_Controlword.Flags.EnableOperation = 0; // go to Switched On state
                 }break;
                 case icubCanProto_controlmode_position:
@@ -478,7 +471,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                   s_devinfo.mode   = 1;
                   s_devinfo.dummy0 = 0;
                   s_devinfo.dummy1 = 0xcaac;
-                  s_devinfo.crc    = crc16(0xFFFF, &s_devinfo, 64);
+                  s_devinfo.crc    = crc16(0xFFFF, (const unsigned char*)&s_devinfo, 64);
                   
                   for (i=0; i<sizeof(s_deviceinfo_in_flash_t); i+=_FLASH_ROW)
                   {

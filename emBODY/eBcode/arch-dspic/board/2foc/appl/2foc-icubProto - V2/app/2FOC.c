@@ -169,7 +169,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     //extern tPID2 CurrentQPID;
 
     static const int PWM_CENTER = LOOPINTCY / 2;
-    static const int PWM_MAX = (18*PWM_CENTER)/20; // 25%
+    static const int PWM_MAX = (18*(LOOPINTCY/2))/20; // 25%
 
     static int hes_state_stored = 0;
     static int *ppwmH = NULL, *ppwmL = NULL, *ppwm0 = NULL;
