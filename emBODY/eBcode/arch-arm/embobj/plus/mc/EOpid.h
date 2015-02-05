@@ -86,7 +86,7 @@ extern int32_t eo_pid_PWM_pid(EOpid *o, float En);
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn);
 
 // torque
-extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm, float vel);
 extern int32_t eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);
 extern int32_t eo_pid_PWM_pi_0_8Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);
 extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);

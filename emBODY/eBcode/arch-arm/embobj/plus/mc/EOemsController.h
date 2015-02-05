@@ -109,6 +109,7 @@ extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 
 // configuration
 extern void eo_emsController_SetBemf(uint8_t joint, float Kbemf);
+extern void eo_emsController_SetTcFilterType(uint8_t joint, uint8_t filterType);
 extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff);
 

@@ -98,6 +98,7 @@ struct EOaxisController_hid
     int32_t torque_ref;
     int32_t torque_out;
     int32_t torque_off;
+    uint8_t tcFilterType;
 
     // parameters
     int32_t stiffness;

@@ -105,6 +105,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
 
         o->control_mode  = eomc_controlmode_notConfigured;
         o->interact_mode = eOmc_interactionmode_stiff;
+        o->tcFilterType  = 3;
 
         o->err = 0;
         
@@ -628,6 +629,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
 
                 o->err = err;
                 
+            #if 0
                 #if defined(ANKLE_BOARD) 
                     int16_t pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
                 #elif defined(SHOULDER_BOARD) 
@@ -637,6 +639,22 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 #else
                     int16_t pwm_out = 0;
                 #endif
+            #else
+                int16_t pwm_out = 0;
+                if      (o->tcFilterType==3) 
+                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else if (o->tcFilterType==1) 
+                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else if (o->tcFilterType==2) 
+                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else if (o->tcFilterType==0)
+                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else
+                    {
+                        //invalid tcFilterType, do not use it
+                        int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
+                    }
+            #endif
                 
                 if (pos < o->pos_min)
                 {
@@ -683,14 +701,31 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //return 0;
             }
             
-            #if defined(ANKLE_BOARD) 
-                int16_t pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-            #elif defined(SHOULDER_BOARD) 
-                int16_t pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-            #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
-                int16_t pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+            #if 0
+                #if defined(ANKLE_BOARD) 
+                    int16_t pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                #elif defined(SHOULDER_BOARD) 
+                    int16_t pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
+                    int16_t pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                #else
+                    int16_t pwm_out = 0;
+                #endif
             #else
                 int16_t pwm_out = 0;
+                if      (o->tcFilterType==3) 
+                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else if (o->tcFilterType==1) 
+                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else if (o->tcFilterType==2) 
+                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else if (o->tcFilterType==0)
+                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
+                else
+                    {
+                        //invalid tcFilterType, do not use it
+                        int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
+                    }
             #endif
             
             if (pos < o->pos_min)
@@ -744,6 +779,14 @@ extern void eo_axisController_SetBemf(EOaxisController *o, float Kbemf)
 {
     //eo_pid_SetPidBemf(o->pidP, Kbemf);
     eo_pid_SetPidBemf(o->pidT, Kbemf);
+}
+
+extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filterType)
+{
+    if (o)
+    {
+        o->tcFilterType=filterType;
+    }
 }
 
 extern void eo_axisController_SetPosPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)

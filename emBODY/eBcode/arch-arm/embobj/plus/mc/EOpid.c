@@ -241,7 +241,7 @@ extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err)
     *err = (int32_t)o->En;
 }
 
-extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm)
+extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm, float vel)
 {
     //if (!o) return 0;
     
