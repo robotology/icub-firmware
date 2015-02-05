@@ -48,7 +48,8 @@
 
 #include "EOtheProtocolWrapper.h"
 
-
+#include "EoError.h"
+#include "EOtheErrorManager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -82,6 +83,8 @@
 static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status);
 static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncefullscale);
 
+// useful for any debug activity. comment it out if not used
+//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -325,14 +328,22 @@ extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescript
     if(eo_sm_emsappl_STrun == currentstate)
     {
         msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));        
+        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));  
+
+        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 0); 
+    }
+    else
+    {
+        //s_send_diagnostics(eo_errortype_error, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 0);
     }
 
     msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
     
-    s_signalGetFullScales(strainId, straincfg->signaloncefullscale);
+    //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 1);
 
+    s_signalGetFullScales(strainId, straincfg->signaloncefullscale);
+    
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -462,11 +473,30 @@ static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncef
             channel = 0;
             msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
             eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, &channel);
+             
+            //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 2);                     
         }
+    }
+    else
+    {
+        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 4);
+        //#warning FORSE PROVOCA CRASH
     }
 
 }
 
+
+// useful for any debug activity. comment it out if not used
+//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param)
+//{
+//    eOerrmanDescriptor_t des = {0};
+//    des.code = code;
+//    des.param = param;
+//    des.sourceaddress = 0;
+//    des.sourcedevice = eo_errman_sourcedevice_localboard;
+
+//    eo_errman_Error(eo_errman_GetHandle(), type, NULL, NULL, &des);
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
