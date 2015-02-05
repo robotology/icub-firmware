@@ -284,10 +284,11 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         case applstate_config:
         {
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
-            if(eores_OK == res)
-            {   
-                status->currstate = applstate_config;
-            }
+            // the new currstate is set inside the on-entry of the state machine
+            //if(eores_OK == res)
+            //{   
+            //    status->currstate = applstate_config;
+            //}
         } break;
 
         case applstate_running:
@@ -299,7 +300,13 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             {
                 #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
                 snprintf(str, sizeof(str), "canboards ready: only 0x%x out of 0x%x.", canBoardsReady, canBoardsChecked);
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
+                
+                 
+                // the new currstate is set inside the on-entry of the state machine               
+                //status->currstate = applstate_error;
+                // it MUST NOT be fatal error because we want to give the ems time to find the boards ready
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
+                return;
 //                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
             }
             else
@@ -331,20 +338,22 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             }
             
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-            if(eores_OK == res)
-            {   
-                status->currstate = applstate_running;
-            }
+            // the new currstate is set inside the on-entry of the state machine
+            //if(eores_OK == res)
+            //{   
+            //    status->currstate = applstate_running;
+            //}
         } break;
         
         case applstate_error:
         {
             //I don't expect to receive go to error cmd
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
-            if(eores_OK == res)
-            {   
-                status->currstate = applstate_error;
-            }
+            // the new currstate is set inside the on-entry of the state machine
+            //if(eores_OK == res)
+            //{   
+            //    status->currstate = applstate_error;
+            //}
         } break;
         
         default:
