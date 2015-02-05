@@ -47,6 +47,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "EOemsController.h"
+#include "EOdecoupler.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,7 +114,7 @@ extern EOemsController* eo_emsController_Init()
         JOINTS(j)
         {
             ems->axis_controller[j] = eo_axisController_New(j);
-            ems->abs_calib_encoder[j] = eo_absCalibratedEncoder_New();
+            ems->abs_calib_encoder[j] = eo_absCalibratedEncoder_New(j);
             #ifdef USE_2FOC_FAST_ENCODER
             ems->axle_virt_encoder[j] = eo_axleVirtualEncoder_New();
             #endif
@@ -126,6 +127,11 @@ extern EOemsController* eo_emsController_Init()
     }
     
     return ems;
+}
+
+extern void eo_emsController_set_Jacobian(int32_t **Ji32)
+{
+    eo_motors_set_Jacobian(ems->motors, Ji32);
 }
 
 extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
@@ -446,7 +452,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     int32_t axle_virt_vel[NAXLES];
     int32_t axle_virt_pos[NAXLES];
     
-    #if defined(SHOULDER_BOARD)
+    #if defined(USE_JACOBIAN)
+    
+    #elif defined(SHOULDER_BOARD)
     
         //             | 1     0       0    0 |
         // J = dq/dm = | 1   40/65     0    0 |
@@ -533,72 +541,28 @@ extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measu
 #endif
 }
 
-extern void eo_emsController_PWM(int16_t* pwm_motor)
+extern void eo_emsController_PWM(int16_t* pwm_motor_16)
 {
     if ((!ems))// || (ems->state_mask != EMS_OK) /*|| (ems->n_calibrated != NAXLES)*/)
     {
-        MOTORS(m) pwm_motor[m] = 0;
+        MOTORS(m) pwm_motor_16[m] = 0;
         return;
     }
-        
-#ifdef EXPERIMENTAL_MOTOR_TORQUE
-    #if defined(SHOULDER_BOARD)
-        //         |    1       0       0   |
-        // J^-1  = | -65/40   65/40     0   |
-        //         | -65/40   65/40   65/40 |
-    
-        //         | 1  -65/40  -65/40 |
-        // Jt^-1 = | 0   65/40   65/40 |
-        //         | 0     0     65/40 |
-    
-        int16_t axle_trq_2 = (65*ems->motor_current[2])/40;
-        int16_t axle_trq_1 = axle_trq_2 + (65*ems->motor_current[1])/40;
-    
-        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0] - axle_trq_1);
-        eo_axisController_SetTorque(ems->axis_controller[1], axle_trq_1);
-        eo_axisController_SetTorque(ems->axis_controller[2], axle_trq_2);
-        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
-    
-    #elif defined(WAIST_BOARD)
-        //         | 1/2  -1/2    0   |
-        // J^-1 =  | 1/2   1/2    0   |
-        //         | -1     0   80/44 |
-
-        //         |  1/2  1/2   -1   |
-        // Jt^-1 = | -1/2  1/2    0   |
-        //         |   0    0   80/44 |
-        
-        eo_axisController_SetTorque(ems->axis_controller[0], (ems->motor_current[0]+ems->motor_current[1])/2 - ems->motor_current[2]);
-        eo_axisController_SetTorque(ems->axis_controller[1], (ems->motor_current[1]-ems->motor_current[0])/2);
-        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[2])/44);
-        
-    #elif defined(UPPERLEG_BOARD)
-    
-        eo_axisController_SetTorque(ems->axis_controller[0], (75*ems->motor_current[0])/50);
-        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
-        eo_axisController_SetTorque(ems->axis_controller[2], ems->motor_current[2]);
-        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
-    
-    #elif defined(ANKLE_BOARD)
-    
-        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0]);
-        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
-    
-    #else
-        #error undefined board type
-    #endif
-#endif
     
     int32_t pwm_joint[NAXLES];
-
+    
     eObool_t stiffness[NAXLES];
     
     JOINTS(j)
     {
         pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
     }
-     
-    eo_motors_PWM(pwm_joint, pwm_motor, stiffness);
+ 
+    int32_t pwm_motor[NAXLES];
+    
+    eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
+    
+    MOTORS(m) pwm_motor_16[m] = (int16_t)pwm_motor[m];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1207,6 +1171,54 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
 
 }
 */
+
+#ifdef EXPERIMENTAL_MOTOR_TORQUE
+    #if defined(SHOULDER_BOARD)
+        //         |    1       0       0   |
+        // J^-1  = | -65/40   65/40     0   |
+        //         | -65/40   65/40   65/40 |
+    
+        //         | 1  -65/40  -65/40 |
+        // Jt^-1 = | 0   65/40   65/40 |
+        //         | 0     0     65/40 |
+    
+        int16_t axle_trq_2 = (65*ems->motor_current[2])/40;
+        int16_t axle_trq_1 = axle_trq_2 + (65*ems->motor_current[1])/40;
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0] - axle_trq_1);
+        eo_axisController_SetTorque(ems->axis_controller[1], axle_trq_1);
+        eo_axisController_SetTorque(ems->axis_controller[2], axle_trq_2);
+        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
+    
+    #elif defined(WAIST_BOARD)
+        //         | 1/2  -1/2    0   |
+        // J^-1 =  | 1/2   1/2    0   |
+        //         | -1     0   80/44 |
+
+        //         |  1/2  1/2   -1   |
+        // Jt^-1 = | -1/2  1/2    0   |
+        //         |   0    0   80/44 |
+        
+        eo_axisController_SetTorque(ems->axis_controller[0], (ems->motor_current[0]+ems->motor_current[1])/2 - ems->motor_current[2]);
+        eo_axisController_SetTorque(ems->axis_controller[1], (ems->motor_current[1]-ems->motor_current[0])/2);
+        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[2])/44);
+        
+    #elif defined(UPPERLEG_BOARD)
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], (75*ems->motor_current[0])/50);
+        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
+        eo_axisController_SetTorque(ems->axis_controller[2], ems->motor_current[2]);
+        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
+    
+    #elif defined(ANKLE_BOARD)
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0]);
+        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
+    
+    #else
+        #error undefined board type
+    #endif
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

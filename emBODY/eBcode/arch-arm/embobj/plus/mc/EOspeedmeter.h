@@ -52,7 +52,7 @@ typedef struct EOaxleVirtualEncoder_hid EOaxleVirtualEncoder;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void);
+extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID);
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder*, int32_t sign);
 extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder*, int32_t pos, uint8_t error_mask);
 extern uint8_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);

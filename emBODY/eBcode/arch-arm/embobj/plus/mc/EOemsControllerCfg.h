@@ -29,6 +29,8 @@ extern "C" {
 
 //#define SHOULDER_3rd_JOINT_COUPLING
     
+//#define USE_JACOBIAN
+    
 #ifdef ICUB_DARMSTADT01
     #define USE_2FOC_FAST_ENCODER
     #ifdef USE_2FOC_FAST_ENCODER

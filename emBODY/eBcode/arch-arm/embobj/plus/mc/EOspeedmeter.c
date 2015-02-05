@@ -11,9 +11,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
+#include <string.h>
+
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
+#include "EoError.h"
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 //#include "hal_led.h"
@@ -66,12 +69,13 @@ static int32_t normalize_angle(int32_t a);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(void)
+extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
 {
     EOabsCalibratedEncoder *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOabsCalibratedEncoder), 1);
 
     if (o)
     {        
+        o->ID = ID;
         o->distance = 0;
         o->position_last = 0;
         o->position_sure = 0;
@@ -246,12 +250,20 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
             }
             #endif
         }
-        #ifndef USE_2FOC_FAST_ENCODER
+        
         else
         {
+            eOerrmanDescriptor_t descriptor;
+            descriptor.param = check; // unless required
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
+            descriptor.sourceaddress = o->ID; // oppure l'id del can che ha dato errore
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);     
+        
+            #ifndef USE_2FOC_FAST_ENCODER
             o->velocity = (7*o->velocity) >> 3;
+            #endif
         }
-        #endif
     }
     
     return o->sign*o->distance;

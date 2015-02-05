@@ -124,6 +124,7 @@ extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
 extern void eo_axisController_SetBemf(EOaxisController *o, float Kbemf);
+extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filterType);
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff);
 

@@ -37,7 +37,12 @@ extern "C" {
  
 struct EOmotors_hid 
 {
+    uint8_t nMotors;
+    
+    eObool_t Jok;
     uint16_t motor_fault_mask2[NAXLES];
+    int32_t J[NAXLES][NAXLES];
+    int32_t Ji[NAXLES][NAXLES];
 }; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

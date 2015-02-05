@@ -23,7 +23,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-
+#include "EOemsControllerCfg.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -64,9 +64,9 @@ typedef struct EOmotors_hid EOmotors;
     @return     The pointer to the required object.
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors);
-
-extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t *stiff);
-
+extern void eo_motors_set_Jacobian(EOmotors *o, int32_t **Ji32);
+    
+extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int32_t *pwm_motor, eObool_t* stiff);
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 
 extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t* state);

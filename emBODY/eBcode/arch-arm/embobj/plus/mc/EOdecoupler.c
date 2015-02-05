@@ -39,6 +39,7 @@
 #define CABLE_WARNING_x_100  2000
 
 #define MOTORS(m) for (uint8_t m=0; m<NAXLES; ++m)
+#define JOINTS(j) MOTORS(j) 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -56,8 +57,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
+static char invert_matrix(float** M, float** I, char n);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -68,15 +68,26 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOmotors* eo_motors_New(uint8_t n_motors) 
+extern EOmotors* eo_motors_New(uint8_t nMotors) 
 {
-    if (!n_motors) return NULL;
+    if (!nMotors) return NULL;
     
     EOmotors *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
 
     if (o)
     {
-        MOTORS(m) o->motor_fault_mask2[m] = 0;
+        o->nMotors = nMotors;
+        o->Jok = eobool_false;
+        
+        MOTORS(m)
+        {
+            o->motor_fault_mask2[m] = 0;
+
+            JOINTS(j)
+            {
+                o->J[m][j] = o->Ji[m][j] = 0;
+            }
+        }
     }
 
     return o;
@@ -197,7 +208,29 @@ extern eObool_t eo_is_motor_hard_fault(EOmotors *o, uint8_t m)
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
-extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stiff)
+
+#if defined(USE_JACOBIAN)
+
+extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int32_t *pwm_motor, eObool_t* stiff)
+{
+    MOTORS(m)
+    {
+        pwm_motor[m] = 0;
+
+        JOINTS(j)
+        {
+            pwm_motor[m] += ((stiff[j]?o->Ji[m][j]:o->J[j][m])*pwm_joint[j]);
+        }
+        
+        pwm_motor[m] >>= 14;
+        
+        LIMIT(pwm_motor[m], NOMINAL_CURRENT);
+    }
+}
+
+#else
+
+extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int32_t *pwm_motor, eObool_t* stiff)
 {
     //if (!o) return;
     
@@ -216,13 +249,13 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
         //      | 0     0     40/65 | 
     
         {
-            int16_t buff;
+            int32_t buff;
             
-            pwm_motor[0] = (int16_t)(pwm_joint[0]);
+            pwm_motor[0] = pwm_joint[0];
             
             if (stiff[0])
             {    
-                pwm_motor[1] = (int16_t)((-65*pwm_joint[0])/40);
+                pwm_motor[1] = (-65*pwm_joint[0])/40;
                 #ifdef SHOULDER_3rd_JOINT_COUPLING
                 pwm_motor[2] = pwm_motor[1];
                 #else
@@ -236,7 +269,7 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             
             if (stiff[1])
             {
-                buff = (int16_t)((65*pwm_joint[1])/40);
+                buff = (65*pwm_joint[1])/40;
                 pwm_motor[1] += buff;
                 #ifdef SHOULDER_3rd_JOINT_COUPLING
                 pwm_motor[2] += buff;
@@ -244,17 +277,17 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             }
             else
             {
-                pwm_motor[0] += (int16_t)(pwm_joint[1]);
-                pwm_motor[1] += (int16_t)((40*pwm_joint[1])/65);
+                pwm_motor[0] += pwm_joint[1];
+                pwm_motor[1] += (40*pwm_joint[1])/65;
             }
             
             if (stiff[2])
             {
-                pwm_motor[2] += (int16_t)((65*pwm_joint[2])/40);
+                pwm_motor[2] += (65*pwm_joint[2])/40;
             }
             else
             {
-                buff = (int16_t)((40*pwm_joint[2])/65);
+                buff = (40*pwm_joint[2])/65;
                 pwm_motor[1] -= buff;
                 pwm_motor[2] += buff;
             }
@@ -269,7 +302,7 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             //pwm_motor[1] = (int16_t)((40*(pwm_joint[1]-pwm_joint[2]))/65);
             //pwm_motor[2] = (int16_t)((40*pwm_joint[2])/65);
         
-            pwm_motor[3] = (int16_t)pwm_joint[3];
+            pwm_motor[3] = pwm_joint[3];
         }
         
     #elif defined(WAIST_BOARD)
@@ -334,9 +367,9 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             //pwm_motor[2] = (int16_t)                           (44*pwm_joint[2])/80);
             
             // original
-            pwm_motor[0] = (int16_t)((pwm_joint[0]-pwm_joint[1])/2);
-            pwm_motor[1] = (int16_t)((pwm_joint[0]+pwm_joint[1])/2);
-            pwm_motor[2] = (int16_t)  pwm_joint[2];
+            pwm_motor[0] = (pwm_joint[0]-pwm_joint[1])/2;
+            pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;
+            pwm_motor[2] =  pwm_joint[2];
         }
         
     #elif defined(UPPERLEG_BOARD)
@@ -369,6 +402,8 @@ extern void eo_motors_PWM(int32_t *pwm_joint, int16_t *pwm_motor, eObool_t* stif
             
     MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
 }
+
+#endif
 
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2)
 {
@@ -404,6 +439,26 @@ extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2)
     return eobool_false;
 }
 
+extern void eo_motors_set_Jacobian(EOmotors *o, int32_t **Ji32)
+{
+    float Ji[4][4];
+    MOTORS(m) JOINTS(j)
+    {
+        o->Ji[m][j] = Ji32[m][j];
+        Ji[m][j] = ((float)(Ji32[m][j]))/16384.0f;
+    }
+    
+    float J[4][4];
+    if (!invert_matrix((float**)Ji, (float**)J, o->nMotors)) return;
+    
+    o->Jok = eobool_true;
+    
+    MOTORS(m) JOINTS(j)
+    {
+        o->J[m][j]=(int32_t)(0.5f+Ji[m][j]*16348.0f);
+    }
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -413,8 +468,85 @@ extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+#define FOR(i) for (int i=0; i<n; ++i)
+#define SCAN(r,c) FOR(r) FOR(c)
+
+static char invert_matrix(float** M, float** I, char n)
+{
+    float B[4][4];
+    SCAN(r,c) { B[r][c]=M[r][c]; I[r][c]=0.0f; }
+    FOR(i) I[i][i]=1.0f;
+    
+    for (int r=0; r<n-1; ++r)
+    {
+        int pivot=-1;
+        float max2=0.0f;
+        
+        for (int d=r; d<n; ++d)
+        {
+            float m2=B[d][r]*B[d][r];
+
+            if (m2>max2)
+            {
+                max2=m2;
+                pivot=d;
+            }
+        }
+
+        if (pivot==-1)
+        {
+            return 0;
+        }
+
+        if (pivot!=r)
+        {
+            FOR(c)
+            {
+                float tb=B[r][c]; B[r][c]=B[pivot][c]; B[pivot][c]=tb;
+                float ti=I[r][c]; I[r][c]=I[pivot][c]; I[pivot][c]=ti;
+            }
+        }
+
+        float P=-1.0f/B[r][r];
+
+        for (int rr=r+1; rr<n; ++rr)
+        {
+            float D=P*B[rr][r]; 
+
+            FOR(c)
+            {
+                B[rr][c]+=D*B[r][c];
+                I[rr][c]+=D*I[r][c];
+            }
+        }
+    }
+
+    for (int r=n-1; r>0; --r)
+    {
+        float P=-1.0f/B[r][r];
+
+        for (int rr=r-1; rr>=0; --rr)
+        {
+            float D=P*B[rr][r]; 
+
+            FOR(c)
+            {
+                B[rr][c]+=D*B[r][c];
+                I[rr][c]+=D*I[r][c];
+            }
+        }
+    }
+
+    FOR(r)
+    {
+        float D=1.0f/B[r][r];
+
+        FOR(c) I[r][c]*=D;
+    }
+    
+    return 1;
+}    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

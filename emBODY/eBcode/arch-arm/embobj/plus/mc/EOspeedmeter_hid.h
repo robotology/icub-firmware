@@ -56,6 +56,7 @@ struct EOabsCalibratedEncoder_hid
 
     int32_t delta;
 
+    uint8_t  ID;
     uint8_t  state_mask;
     uint8_t  first_valid_data;
     uint16_t invalid_fault_cnt;
