@@ -253,7 +253,7 @@ extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm, float vel)
     
     o->En = En;
     
-    o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In /*+ o->Kff*Tr*/);
+    o->pwm = o->pwm_offset + (int32_t)(o->Kp*En + o->In + o->Kbemf*vel + o->Kff*Tr);
     LIMIT(o->pwm, o->pwm_max);
 
 #ifdef FORCE_ZERO_PWM_OUT
