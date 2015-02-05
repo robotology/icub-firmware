@@ -648,13 +648,20 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
 {
     eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;
     
-    //eOq17_14_t elemq00 = (*mat)[0][0];
-    //eOq17_14_t elemq23 = (*mat)[2][3];
+    /*
+    float Ji[4][4];
     
-    //float elemf00 = eo_common_Q17_14_to_float(elemq00);
-    //elemf00 = elemf00;
+    for (int i=0; i<4; ++i)
+    {
+        for (int j=0; j<4; ++j)
+        {
+            Ji[i][j]=(float)((*mat)[i][j])/16384.0f;
+        }
+    }
+    */
     
-    
+    eo_emsController_set_Jacobian(*mat);
+        
     #warning --> marco.accame: put in here the debug messages for jointcoupling (and then remove them)
         
     eOerrmanDescriptor_t errdes = {0};
@@ -665,11 +672,10 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
     //char *str = NULL;
     char str[eomn_info_status_extra_sizeof] = {0};
  
-    int i;
-    for(i=0; i<4; i++)
+    for (int i=0; i<4; ++i)
     {
-//      snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, eo_common_Q17_14_to_float((*mat)[i][0]),  eo_common_Q17_14_to_float((*mat)[i][1]), eo_common_Q17_14_to_float((*mat)[i][2]), eo_common_Q17_14_to_float((*mat)[i][3]));             
-//      eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
+        snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, Ji[i][0], Ji[i][1], Ji[i][2], Ji[i][3]);             
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
     }   
 }
 #endif
