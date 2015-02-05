@@ -154,6 +154,13 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p);
 
 extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
+extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type);
+
+extern eObool_t eom_emsapplBody_IsCANboard_usedbyAS(EOtheEMSapplBody *p, eObrd_cantype_t type);
+
+extern eObool_t eom_emsapplBody_IsCANboard_usedbySK(EOtheEMSapplBody *p, eObrd_cantype_t type);
+
+
 /** @}            
     end of group eo_TheEmsAppBody
  **/

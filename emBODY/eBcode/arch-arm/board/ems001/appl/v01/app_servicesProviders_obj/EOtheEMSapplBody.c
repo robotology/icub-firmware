@@ -512,8 +512,10 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
     eo_action_SetEvent(&action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 10*eok_reltime1ms, eo_tmrmode_FOREVER, &action);
     
-    uint32_t dontaskmask = 0; // the first time we ask to every board
-    res = s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask); 
+    // marco.accame: better asking the callback of the timer to manage the sending og get-fw-version.
+    // so that we van decide to apply a delay to the first request (or to ask it just after the first 10 ms)
+//    uint32_t dontaskmask = 0; // the first time we ask to every board
+//    res = s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask); 
     
     return(res);
 }
@@ -548,6 +550,102 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
 }
 
 
+extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type)
+{
+    eObool_t ret = eobool_true;
+    
+    switch(type)
+    {
+        case eobrd_cantype_mc4: 
+        case eobrd_cantype_1foc:
+        { 
+            ret = eobool_true; 
+        } break;
+        
+        case eobrd_cantype_strain:
+        { 
+            ret = eobool_false; 
+        } break;            
+        
+        case eobrd_cantype_mais:
+        case eobrd_cantype_skin:            
+        case eobrd_cantype_unknown:
+        default:
+        {
+            ret = eobool_false; 
+        } break;                    
+    }
+ 
+    return(ret);
+}
+
+
+extern eObool_t eom_emsapplBody_IsCANboard_usedbyAS(EOtheEMSapplBody *p, eObrd_cantype_t type)
+{
+    eObool_t ret = eobool_true;
+    
+    switch(type)
+    {
+        case eobrd_cantype_mc4: 
+        case eobrd_cantype_1foc:
+        { 
+            ret = eobool_false; 
+        } break;
+        
+        case eobrd_cantype_mais:
+        case eobrd_cantype_strain:
+        { 
+            ret = eobool_true; 
+        } break;            
+        
+        
+        case eobrd_cantype_skin:            
+        case eobrd_cantype_unknown:
+        default:
+        {
+            ret = eobool_false; 
+        } break;                    
+    }
+ 
+    return(ret);
+}
+
+
+extern eObool_t eom_emsapplBody_IsCANboard_usedbySK(EOtheEMSapplBody *p, eObrd_cantype_t type)
+{
+    eObool_t ret = eobool_true;
+    
+    switch(type)
+    {
+        case eobrd_cantype_mc4: 
+        case eobrd_cantype_1foc:
+        { 
+            ret = eobool_false; 
+        } break;
+        
+        case eobrd_cantype_mais:
+        case eobrd_cantype_strain:
+        { 
+            ret = eobool_false; 
+        } break;            
+        
+        
+        case eobrd_cantype_skin:  
+        {
+            ret = eobool_true;
+        } break;
+        
+        case eobrd_cantype_unknown:
+        default:
+        {
+            ret = eobool_false; 
+        } break;                    
+    }
+ 
+    return(ret);
+}
+
+// for now it is the same as eom_emsapplBody_IsCANboard_usedbyMC()
 extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type)
 {
     eObool_t ret = eobool_true;
