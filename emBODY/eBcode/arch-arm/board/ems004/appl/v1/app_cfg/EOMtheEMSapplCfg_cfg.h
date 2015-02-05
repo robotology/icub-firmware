@@ -78,7 +78,7 @@ extern "C" {
 // <i> It holds configuration for ...
 
 //  <o> name           <0=> EOMemsApplEBx, where x is the same number of the chosen EBx  
-#define EOMTHEEMSAPPLCFG_xcwd3254385r3r432      3
+#define EOMTHEEMSAPPLCFG_xcwd3254385r3r432      0
 
 //  <h> version
 //  <o> major           <0-255> 
