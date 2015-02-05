@@ -162,28 +162,27 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     // 1) set pid position 
     rescaler_pos = 1.0f/(float)(1<<cfg->pidposition.scale);
     eo_emsController_SetPosPid(jxx, cfg->pidposition.kp*rescaler_pos, 
-	                                cfg->pidposition.kd*rescaler_pos, 
-	                                cfg->pidposition.ki*rescaler_pos, 
-	                                cfg->pidposition.limitonintegral,
+                                    cfg->pidposition.kd*rescaler_pos, 
+                                    cfg->pidposition.ki*rescaler_pos, 
+                                    cfg->pidposition.limitonintegral,
                                     cfg->pidposition.limitonoutput,
-	                                cfg->pidposition.offset);
+                                    cfg->pidposition.offset);
 
     // 2) set torque pid    
     rescaler_trq = 1.0f/(float)(1<<cfg->pidtorque.scale);
     eo_emsController_SetTrqPid(jxx, cfg->pidtorque.kp*rescaler_trq, 
-		                            cfg->pidtorque.kd*rescaler_trq, 
+                                    cfg->pidtorque.kd*rescaler_trq, 
                                     cfg->pidtorque.ki*rescaler_trq,
                                     cfg->pidtorque.limitonintegral,
                                     cfg->pidtorque.limitonoutput, 
                                     cfg->pidtorque.offset,
-                                    cfg->pidtorque.kff*rescaler_trq
-                                    );
+                                    cfg->pidtorque.kff*rescaler_trq);
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
     
-    //#ifdef EOM_USE_STICTION
-    eo_emsController_SetBemf((uint8_t)jxx, ((float)cfg->bemf.value)/(float)(1<<cfg->bemf.offset));
-    //#endif
+    eo_emsController_SetBemf((uint8_t)jxx, ((float)cfg->bemf.value)/(float)(1<<cfg->bemf.scale));
+    
+    eo_emsController_SetTcFilterType((uint8_t)jxx, (uint8_t) cfg->tcfiltertype);
 
     // 3) set velocity pid:    to be implemented
    
@@ -253,7 +252,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_bemf(const EOnv* nv, const eOropdesc
     eOmc_bemf_t     *bemf_ptr = (eOmc_bemf_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     
-    eo_emsController_SetBemf((uint8_t)jxx, ((float)(bemf_ptr->value))/(float)(1<<bemf_ptr->offset));
+    eo_emsController_SetBemf((uint8_t)jxx, ((float)(bemf_ptr->value))/(float)(1<<bemf_ptr->scale));
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
