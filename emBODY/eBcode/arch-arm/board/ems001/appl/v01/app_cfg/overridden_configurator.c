@@ -140,6 +140,31 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     uint32_t readyCanBoardsMask = 0;    // keeps the boards that are ready. if bit pos i-th is 1, then the board in list i-th is OK   
     uint32_t checkedmask = 0;           // keeps the boards that are checked
     
+    static uint32_t times = 0;
+    // marco.accame on 4 feb 2014:
+    // if the 2foc receives a get-fw-version request in initial period of life of the application then it remains silent forever.
+    // in the meantime that this bug is fixed in the 2foc application, we introduce the following work-around.
+    // we wait for 500 ticks, each of 10 ms for a total of 5 seconds before we send the can message.
+    // it is a lot of time (maybe 3 seconds is enough), but in this way we are sure that the the 2foc is surely out of the bootloader
+    // and beyond its first second of life (the timer starts after not before 1-2 seconds of bootstrap after the ipnet has connected
+    // the sockets with ip address 10.0.1.104)
+    // to remove the delay: just change onlyAFTER to value 1 (not 0!!!)
+    static const uint32_t onlyAFTER = 500; 
+    
+    times++;
+    
+    if(times < onlyAFTER)
+    {
+        return;
+    }    
+    else if(times == onlyAFTER)
+    {
+        uint32_t dontaskmask = 0; // the first time we ask to every board
+        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask); 
+        
+        return;        
+    }
+    
     EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());      
 
     // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiamo mandato la loro fw version
