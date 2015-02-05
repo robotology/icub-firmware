@@ -59,7 +59,8 @@
 
 #include "EOtheInfoDispatcher.h"
 
-
+#include "EoProtocol.h"
+#include "EoProtocolMN.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -716,28 +717,47 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
     }
     
     //#warning --> marco.accame: in case of fatal error, shall we: (1) go smoothly to error state, (2) force immediate transition to error state?
- 
-#if 1        
+    
+    // i am going to error state, thus i set the correct state in eOmn_appl_status_t variable, which is used by robotInterface
+    // to understand the status of the ems: cfg, run, err.
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    status->currstate = applstate_error;
+    
+//#if 1        
     // this call forces immediate transition to error state. then we stop the calling task, so that 
     // it does not do anything damaging anymore.
     // it seems a good approach because we should immediately stop upon fatal error. 
+
     eom_emserror_SetFatalError(eom_emserror_GetHandle(), des);
     eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);  
     eom_task_SetEvent(eom_emserror_GetTask(eom_emserror_GetHandle()), emserror_evt_fatalerror);    
     
-    // this call makes the calling task wait in here forever.
-    osal_semaphore_decrement(s_emsappl_singleton.blockingsemaphore, OSAL_reltimeINFINITE);
-    // the forever loop should not be necessary.
-    for(;;);
+
+    // if the caller is not the error state, then we block it execution.
+    // however, we cannot block the execution of the error state otherwise ... we lose operativity
+    // of error task and amongst others we lose communication with the remote host.
+    // when we are in error state the remote host must be able to know it.
+ 
+    eOsmStatesEMSappl_t state = eo_sm_emsappl_STcfg;
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &state);
     
-#else
-    // in this situation, the transition to error state is done by the active task, thus we require that the execution
-    // continues. the good thing is that we exit in a clean way from the state, but the high risk is to execute dangerous instructions.
-    // example: some object inside the runner detects that some pointer that is going to be used is NULL. if we keep on running this
-    // code, then teh NULL pointer is deferenced and teh application crashes....    
-    eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
-    return;
-#endif    
+    if(eo_sm_emsappl_STerr != state)
+    {
+        // this call makes the calling task wait in here forever.
+        osal_semaphore_decrement(s_emsappl_singleton.blockingsemaphore, OSAL_reltimeINFINITE);
+        // the forever loop should not be necessary.
+        for(;;);
+    }
+    
+//#else
+//    // in this situation, the transition to error state is done by the active task, thus we require that the execution
+//    // continues. the good thing is that we exit in a clean way from the state, but the high risk is to execute dangerous instructions.
+//    // example: some object inside the runner detects that some pointer that is going to be used is NULL. if we keep on running this
+//    // code, then teh NULL pointer is deferenced and teh application crashes....    
+//    eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
+//    return;
+//#endif    
 }
 
 
