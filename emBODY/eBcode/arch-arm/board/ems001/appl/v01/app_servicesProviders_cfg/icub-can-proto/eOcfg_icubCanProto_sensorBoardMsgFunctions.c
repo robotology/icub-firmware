@@ -58,10 +58,13 @@
 
 #include "EOtransceiver.h"
 
-//#include "hal_debugPin.h"
+#include "EoError.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
+
 #include "eOcfg_icubCanProto_sensorBoardMsgFunctions.h"
 
 
@@ -74,6 +77,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
 #define EMS_CAN_ADDR                                            0
 #define ICUBCANPROTO_POL_AS_ID_DEFAULT                          ((ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR << 8) | (0x0<<4))
 #define ICUBCANPROTO_POL_AS_CREATE_ID(destBoardAddr)            ((ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR << 8) | (EMS_CAN_ADDR<<4) | (destBoardAddr&0xF))
@@ -95,6 +99,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
 static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 
 
@@ -263,12 +268,27 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     channel = (status->fullscale.head.size);
 #endif
     
-    
+    //eOerrmanDescriptor_t des = {0};
+         
     if(channel != frame->data[1])
     {
-        //somithing wrong: befor i ask full scale for channel "channel" and i received channel for "frame.data[1]" 
+        // something wrong: i asked full scale for channel "channel" and i have instead received channel for "frame.data[1]" 
+        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+        //des.param = channel | (frame->data[1] << 8);
+        //des.sourceaddress = 0;
+        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);
         return(eores_NOK_generic);
     }
+    else
+    {
+        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+        //des.param = channel | (frame->data[1] << 8);
+        //des.sourceaddress = 0;
+        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);        
+    }
+    
     /* status->fullscale.head.size*status->fullscale.head.itemsize  == (status->fullscale.head.size<<1) 
      since itemsize is equal to 2 i used shift insted of moltiplication*/
 #if defined(TEST_EOARRAY)
@@ -282,11 +302,11 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
           else request full scale of next channel */
     if(5 == channel)
     {
-        //prepare occasional rop to send
+        // prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId);
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
         
-        //if application is in cfg state, then we send a request to configurator to send ropframe out
+        // if application is in cfg state, then we send a request to configurator to send ropframe out
         if(eo_sm_emsappl_STcfg == appl_st)
         {
             eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
@@ -298,6 +318,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
         eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &channel);
     }
+    
     return(eores_OK);
 }
 
@@ -763,7 +784,9 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
         return(eores_NOK_generic);
     }
 
-    memset(&ropdesc, 0, sizeof(eOropdescriptor_t));
+    // marco.accame on 3 feb 15: better using the eok_ropdesc_basic instead of all 0s.
+    // memset(&ropdesc, 0, sizeof(eOropdescriptor_t));
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
 
     ropdesc.ropcode                 = eo_ropcode_sig;
     ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
@@ -776,13 +799,22 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
     }
+    else
+    {
+        //eOerrmanDescriptor_t des = {0};
+        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+        //des.param = 0x1111;
+        //des.sourceaddress = 0;
+        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+    }
 
     if(eores_OK != res)
     {
         eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
         eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
-
     }
+    
     return(res);
 };
 
