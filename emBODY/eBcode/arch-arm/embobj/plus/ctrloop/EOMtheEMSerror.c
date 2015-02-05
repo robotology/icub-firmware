@@ -309,7 +309,7 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
             EOaction_strg actionstg = {0};
             
             eo_action_SetEvent((EOaction*)&actionstg, emserror_evt_tick, s_emserror_singleton.task);
-            eo_timer_Start(s_emserror_singleton.timer, eok_abstimeNOW, 10*eok_reltime1sec, eo_tmrmode_FOREVER, (EOaction*)&actionstg);         
+            eo_timer_Start(s_emserror_singleton.timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_FOREVER, (EOaction*)&actionstg);         
         }
     }
 }
