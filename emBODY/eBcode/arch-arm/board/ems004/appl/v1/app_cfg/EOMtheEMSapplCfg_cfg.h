@@ -78,13 +78,13 @@ extern "C" {
 // <i> It holds configuration for ...
 
 //  <o> name           <0=> EOMemsApplEBx, where x is the same number of the chosen EBx  
-#define EOMTHEEMSAPPLCFG_xcwd3254385r3r432      0
+#define EOMTHEEMSAPPLCFG_xcwd3254385r3r432      3
 
 //  <h> version
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          51
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          52
 //  </h>version
 
 //  <h> build date
@@ -93,11 +93,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        2
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          4
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          5
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         18
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         11
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          11
 //  </h>build date
 
 // </h>Info 
