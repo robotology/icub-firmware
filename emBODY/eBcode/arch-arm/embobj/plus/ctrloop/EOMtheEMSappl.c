@@ -766,6 +766,11 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 {
+    // set the correct state 
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    status->currstate = applstate_config;      
+    
     EOaction onrx;
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task for any newly received packet
@@ -790,9 +795,14 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
 
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
-{
-    EOaction onrx;
+{    
+    // set the correct state 
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    status->currstate = applstate_error;    
    
+    // redirect the socket
+    EOaction onrx;
     eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task for any newly received packets
     eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
@@ -816,6 +826,11 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 
 extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
+    // set the correct state 
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    status->currstate = applstate_running;       
+    
     EOaction ontxdone;
     //eo_action_Clear(&ontxdone);
 
