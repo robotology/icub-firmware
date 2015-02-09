@@ -503,7 +503,15 @@ void main(void)
 				#if (VERSION != 0x0351)
 				// Back emf compensation			
 			
-				PWMoutput[i]+=compensate_bemf(i, _comm_speed[i]);
+				//PWMoutput[i]+=compensate_bemf(i, _comm_speed[i]); //use the motor speed
+				PWMoutput[i]+=compensate_bemf(i, _speed[i]); //use the joint speed
+				
+				//add the coulomb friction compensation term
+				if (_kstp_torque[i] != 0 ||
+				    _kstn_torque[i] != 0)
+				//PWMoutput[i]+=compensate_friction(i, _comm_speed[i]); //use the motor speed
+				PWMoutput[i]+=compensate_friction(i, _speed[i]); //use the joint speed
+				
 				// Protection for joints out of the admissible range during force control
 				check_range_torque(i, _safeband[i], PWMoutput);
 				// PWM saturation

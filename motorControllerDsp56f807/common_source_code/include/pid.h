@@ -361,7 +361,7 @@ inline Int32 compensate_friction(byte j, Int16 motor_speed)
 	shift = (float)(1<<_jntVel_est_shift[j]);
 	
 	f_motor_speed =  (float)(motor_speed);
-	f_motor_speed /= (shift * 0.056888889); //this value corresponds is computed as: 5deg/s * 4096/360/1000
+	f_motor_speed /= (shift * 0.056888889); //this value is computed as: 5deg/s * 4096/360/1000
 	f_motor_speed *= f_motor_speed; 
 	f_motor_speed *= f_motor_speed;
 	f_motor_speed *= f_motor_speed;
@@ -376,10 +376,7 @@ inline Int32 compensate_friction(byte j, Int16 motor_speed)
     //eventually change the sign
     if (_kp[j]<0) PWM_frict = -PWM_frict;
     
-    if (j==1) can_printf("%f", PWM_frict); // int32
-    
-    return 0;
-	//return PWM_frict;
+    return PWM_frict;
 }
 
 #endif //__pidh__
