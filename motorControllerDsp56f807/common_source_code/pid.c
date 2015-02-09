@@ -201,6 +201,7 @@ Int32 compute_pwm(byte j)
 	Int32 speed_damping =0;
 	#if NO_OPENLOOP
 	_ko[j] = 0;
+	_ko_torque [j] = 0;
 	#endif 
 
 	/*watchdog check for strain messages in torque control mode + input selection*/
