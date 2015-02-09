@@ -189,6 +189,7 @@ extern Int16  _kr_torque[JN] ;				// scale factor (negative power of two)
 extern Int16  _kstp_torque[JN] ;            // stiction compensation: positive val
 extern Int16  _kstn_torque[JN] ;            // stiction compensation: negative val
 extern Int16  _kff_torque[JN] ;             // feedforward gain
+extern byte   _useFilter[JN] ; 
 
 // OPENLOOP
 extern Int16  _ko_openloop[JN] ;	        // offset 

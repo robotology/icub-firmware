@@ -13,7 +13,7 @@
 #define BUILD_4DC      82
 
 #define CAN_PROTOCOL_MAJOR 1
-#define CAN_PROTOCOL_MINOR 2
+#define CAN_PROTOCOL_MINOR 3
 
 #endif
 

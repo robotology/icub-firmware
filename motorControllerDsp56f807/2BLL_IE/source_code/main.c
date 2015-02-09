@@ -478,7 +478,7 @@ void main(void)
 			 	_control_mode[i] == MODE_IMPEDANCE_POS ||
 			 	_control_mode[i] == MODE_IMPEDANCE_VEL)
 				{
-					if (_kff_torque[i] == 0) PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
+					if (_useFilter[i] == 3) PWMoutput[i] = lpf_ord1_3hz (PWMoutput[i], i);
 				}	
 			// saving the PWM value before the decoupling					
 			_bfc_PWMoutput[i] = PWMoutput_old[i] = PWMoutput[i];

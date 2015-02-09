@@ -102,6 +102,17 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_SET_TCFILTER_TYPE_HANDLER(x) \
+{ \
+	byte value = 0; \
+	if (CAN_LEN == 2) \
+	{ \
+		value = (CAN_DATA[1]); \
+		if (value>=0 && value <=255) _useFilter[axis] = value; \
+	} \
+}
+
+//-------------------------------------------------------------------
 #define CAN_SET_VEL_TIMEOUT_HANDLER(x) \
 { \
 	byte value = 0; \

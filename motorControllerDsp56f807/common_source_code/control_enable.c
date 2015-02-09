@@ -294,7 +294,10 @@ void can_set_control_mode(byte axis)
 {
     byte api_value = CAN_DATA[1];
     byte value = helper_controlmode_api_to_fw(CAN_DATA[1]);
-
+    #if NO_OPENLOOP
+    if (value == MODE_OPENLOOP) return;
+	#endif
+	
 	//special case, from IDLE you can go anywhere, execept IDLE
 	if (_control_mode[axis]==MODE_IDLE)
 	{

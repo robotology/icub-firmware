@@ -153,6 +153,7 @@ Int16  _kr_torque[JN] = INIT_ARRAY (10);		// scale factor (negative power of two
 Int16  _kstp_torque[JN] = INIT_ARRAY (0);       // stiction compensation: positive val
 Int16  _kstn_torque[JN] = INIT_ARRAY (0);       // stiction compensation: negative val
 Int16  _kff_torque[JN] = INIT_ARRAY (0);        // feedforward gain
+byte   _useFilter[JN] = INIT_ARRAY (0); 
 
 // OPENLOOP
 Int16  _ko_openloop[JN] = INIT_ARRAY (0);		// offset 
@@ -198,6 +199,9 @@ Int32 compute_pwm(byte j)
 	Int32 PWMoutput = 0;
 	Int32 Ioutput = 0;
 	Int32 speed_damping =0;
+	#if NO_OPENLOOP
+	_ko[j] = 0;
+	#endif 
 
 	/*watchdog check for strain messages in torque control mode + input selection*/
 	//the function turns off pwm of joint <jnt> if <strain_num> watchdog is triggered
