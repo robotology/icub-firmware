@@ -51,13 +51,13 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EoProtocolSK.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-
-//#include "eOcfg_nvsEP_mngmnt_usr_hid.h"
+// empty-section 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -97,11 +97,10 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//sk-init
 
 extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
 {
-    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->ram;
+    eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)nv->ram;
     
     *sigmode = eosk_sigmode_signal;
 }
@@ -111,11 +110,13 @@ extern void eoprot_fun_INIT_sk_skin_status_arrayof10canframes(const EOnv* nv)
 {
     EOarray_of_10canframes *array_ptr = (EOarray_of_10canframes *)nv->ram;
     
+    #warning -> marco.accame: use the EOarray functions instead. see in strain etc
     array_ptr->head.capacity = 10;       
     array_ptr->head.itemsize = sizeof(eOutil_canframe_t);
     array_ptr->head.size = 0;   
 
 }
+
 //sk-update
 extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -162,7 +163,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
                     return;
                 }
             }
-        }break;
+        } break;
         
         case eosk_sigmode_signal:
         {
@@ -182,7 +183,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
                     return;
                 }
             }
-        }break;
+        } break;
 
         case eosk_sigmode_signal_oldway:
         {
@@ -218,8 +219,12 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
                     }
                 }
             }
-        }
-        break;
+        } break;
+        
+        default:
+        {
+            return;
+        } break;
     };
 
 }
@@ -248,17 +253,7 @@ extern void eoprot_fun_UPDT_sk_skin_commands_boardscfg(const EOnv* nv, const eOr
     {
         return;
     }
-    // I add this check at compile time to be sure i can assign values of eosk to icubcanProto
-    #if (!(ICUBCANPROTO_SKINTYPE__WITHTEMPCOMP == EOSK_SKINTYPE_WITHTEMPCOMP))
-        #error _skinType__withtempcomp has changed its value in eth proto or can proto
-    #endif
-    
-    #if (!(ICUBCANPROTO_SKINTYPE__PALMFINGERTIP == EOSK_SKINTYPE_PALMFINGERTIP))
-        #error _skinType__palmfingertip has change value in eth proto or can proto
-    #endif
-    #if (!(ICUBCANPROTO_SKINTYPE__WITHOUTTEMPCOMP == EOSK_SKINTYPE_WITHOUTTEMPCOMP))
-        #error _skinType__withouttempcomp has changed its value in eth proto or can proto
-    #endif
+
     
     canProto_skcfg.skintype = (icubCanProto_skinType_t)brdCfg->cfg.skintype; // the cast is safe as there are the asserts above
     canProto_skcfg.period   = brdCfg->cfg.period;
@@ -320,6 +315,7 @@ extern void eoprot_fun_UPDT_sk_skin_commands_trianglescfg(const EOnv* nv, const 
     }
 
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
