@@ -228,7 +228,11 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
             
             eo_array_Reset((EOarray*)arrayof10canframes);
             
-            numofRXcanframe = 10;//if skin is conencted i should read 10 messages max, because net var has size of 10 messages
+            
+            // if skin is connected i should read as many messages maximum as the capacity of arrayof10canframes
+            //numofRXcanframe = 10;
+            // marco.accame: better using its capacity and not a magic number
+            numofRXcanframe = eo_array_Capacity((EOarray*)arrayof10canframes); 
         }
         else
         {
