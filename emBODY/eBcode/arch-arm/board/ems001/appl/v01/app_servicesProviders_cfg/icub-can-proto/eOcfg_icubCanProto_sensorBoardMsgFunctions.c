@@ -641,7 +641,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
         return(res);
     }
     
-    
+    //#warning -> marco.accame: we have only two skins (at most), thus we could pre-compute the skin0 and skin1 pointers onece for all.
+    //            maybe as static values.   
     arrayof10canframes = eo_protocolwrapper_GetSkinStatusArray(eo_protocolwrapper_GetHandle(), skId);
     
     if(NULL == arrayof10canframes)
