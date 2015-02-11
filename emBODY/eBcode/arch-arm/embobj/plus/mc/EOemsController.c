@@ -204,6 +204,45 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         }
     }
     
+    #if defined(USE_JACOBIAN)
+    
+    uint8_t  ef[NAXLES];
+    uint16_t mf[NAXLES];
+    
+    JOINTS(j)
+    {
+        ef[j] = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[j]);
+        mf[j] = eo_get_motor_fault_mask(ems->motors, j);
+    }
+    
+    JOINTS(f)
+    {
+        if (ef[f] || (mf[f] & MOTOR_HARDWARE_FAULT))
+        {    
+            JOINTS(j)
+            {
+                if (eo_motors_are_coupled(ems->motors, f, j)) 
+                {
+                    eo_axisController_SetHardwareFault(ems->axis_controller[j]);
+                    if (!mf[j]) set_2FOC_idle(j);
+                    ems_fault_mask_new[j] |= ((uint16_t)ef[j]) << 8;
+                    ems_fault_mask_new[j] |= mf[j];
+                }
+            }
+        }
+    }
+    
+    JOINTS(f)
+    {
+        if (mf[f] & MOTOR_EXTERNAL_FAULT)
+        {    
+            eo_axisController_SetControlMode(ems->axis_controller[f], eomc_controlmode_cmd_idle);
+            ems_fault_mask_new[f] |= mf[f];
+        }
+    }
+    
+    #else
+    
     #if defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
     
         uint8_t  ef0 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[0]);
@@ -272,6 +311,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             }
         }
         
+    #endif
     #endif
 
     //uint8_t changed = 0;
@@ -454,6 +494,22 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
     #if defined(USE_JACOBIAN)
     
+        JOINTS(j)
+        {
+            axle_virt_pos[j] = 0;
+            axle_virt_vel[j] = 0;
+            
+            MOTORS(m)
+            {
+                axle_virt_pos[j] += ems->motors->J[j][m]*ems->motor_position[m];
+                axle_virt_vel[j] += ems->motors->J[j][m]*ems->motor_velocity[m];
+            }
+                
+            axle_virt_pos[j] >>= 14;
+            axle_virt_vel[j] >>= 14;
+            axle_virt_vel[j] *= FOC_2_EMS_SPEED;
+        }
+    
     #elif defined(SHOULDER_BOARD)
     
         //             | 1     0       0    0 |
@@ -622,6 +678,27 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     if (mode == eomc_controlmode_cmd_force_idle)
     {
+        #if defined(USE_JACOBIAN)
+        
+        if (eo_axisController_IsHardwareFault(ems->axis_controller[joint]))
+        {
+            JOINTS(j)
+            {
+                if (eo_motors_are_coupled(ems->motors, joint, j))
+                {
+                    set_2FOC_idle(j);
+                    eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[j]);
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_force_idle);
+                }
+            }
+        }
+        else
+        {
+            eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_force_idle);
+        }
+        
+        #else // ! USE_JACOBIAN
+        
         #if defined(SHOULDER_BOARD)
         
             if (joint == 3)
@@ -667,10 +744,41 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             }
             
         #endif
+        #endif // ! USE_JACOBIAN
     }
     else if ((mode == eomc_controlmode_cmd_idle) || (mode == eomc_controlmode_cmd_switch_everything_off))
     {
         eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_idle);
+        
+        #if defined(USE_JACOBIAN)
+        
+        eObool_t all_idle = eobool_true;
+        
+        JOINTS(j)
+        {
+            if (eo_motors_are_coupled(ems->motors, joint, j))
+            {
+                if (eo_emsController_GetControlMode(j) != eomc_controlmode_idle && 
+                    eo_emsController_GetControlMode(j) != eomc_controlmode_hwFault)
+                {
+                    all_idle = eobool_false;
+                    break;
+                }
+            }
+        }
+        
+        if (all_idle)
+        {
+            JOINTS(j)
+            {
+                if (eo_motors_are_coupled(ems->motors, joint, j))
+                {
+                    set_2FOC_idle(j);
+                }
+            }
+        }
+        
+        #else // ! USE_JACOBIAN
         
         #if   defined(SHOULDER_BOARD)
         
@@ -700,11 +808,26 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             }
             
         #endif
+        #endif // ! USE_JACOBIAN
     }
     else // not an idle mode
     {
+        
         if (eo_axisController_SetControlMode(ems->axis_controller[joint], mode))
         {
+        #if defined(USE_JACOBIAN)
+        
+        JOINTS(j)
+        {
+            if (eo_motors_are_coupled(ems->motors, joint, j))
+            {
+                if (eo_is_motor_ext_fault(ems->motors, j)) set_2FOC_idle(j);  
+                set_2FOC_running(j);
+            }
+        }
+        
+        #else // ! USE_JACOBIAN
+            
         #if   defined(SHOULDER_BOARD)
             
             if (joint == 3)
@@ -739,6 +862,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             }
             
         #endif
+        #endif // ! USE_JACOBIAN
         }
     }
     
@@ -786,6 +910,38 @@ extern void eo_emsController_CheckCalibrations(void)
     
     ems->n_calibrated = 0;
     
+    #if defined(USE_JACOBIAN)
+    
+    eObool_t joint_ok[NAXLES];
+    
+    JOINTS(j)
+    {
+        joint_ok[j] = eobool_true;
+        
+        ENCODERS(e)
+        {
+            if (eo_motors_are_coupled(ems->motors, j, e))
+            {
+                if (!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[e]))
+                {
+                    joint_ok[j] = eobool_false;
+                    break;
+                }
+            }
+        }
+    }
+    
+    JOINTS(j)
+    {
+        if (joint_ok[j])
+        {
+            eo_axisController_SetCalibrated(ems->axis_controller[j]);
+            ems->n_calibrated++;
+        }
+    }
+    
+    #else // ! USE_JACOBIAN
+    
     #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) //|| defined(WAIST_BOARD) || defined(V2_MECHANICS)
         JOINTS(j)
         {
@@ -827,7 +983,8 @@ extern void eo_emsController_CheckCalibrations(void)
             ems->n_calibrated++;
             eo_axisController_SetCalibrated(ems->axis_controller[3]);
         }
-    #endif  
+    #endif
+    #endif // ! USE_JACOBIAN        
 }
 
 extern void eo_emsController_Stop(uint8_t joint)

@@ -93,6 +93,11 @@ extern EOmotors* eo_motors_New(uint8_t nMotors)
     return o;
 }
 
+extern eObool_t eo_motors_are_coupled(EOmotors *o, uint8_t ma, uint8_t mb)
+{
+    return o->J[ma][mb] || o->J[mb][ma];
+}
+
 /*
     candata.b[0] = SysError.b[0];    
     //candata.b[0] |= SysError.AS5045CalcError << 5; //adjust some values;
