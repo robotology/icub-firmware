@@ -192,6 +192,16 @@ extern inline eObool_t eom_runner_hid_signaloverflow(EOMtheEMSrunner *p, eOemsru
     
 }
 
+extern inline void eom_runner_hid_overflow_set(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    p->overflownToNextTask[taskid] = eobool_true;
+}
+
+extern inline void eom_runner_hid_overflow_reset(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
+{
+    p->overflownToNextTask[taskid] = eobool_false;
+}
+
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

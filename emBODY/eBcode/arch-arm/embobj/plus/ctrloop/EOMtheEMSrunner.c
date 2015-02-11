@@ -200,8 +200,6 @@ uint64_t eom_emsrunner_rxprevduration = 0;
 uint64_t eom_emsrunner_doprevduration = 0;
 uint64_t eom_emsrunner_txprevduration = 0;
 
-//static const hal_timer_t s_eom_runner_timers_task[3] = {hal_timer2, hal_timer3, hal_timer4};
-//static const hal_timer_t s_eom_runner_timers_warn[3] = {hal_timer5, hal_timer6, hal_timer7};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -850,7 +848,6 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
     eom_emsrunner_rxstart = osal_system_abstime_get();
     
-    //eov_ipnet_Activate(eov_ipnet_GetHandle());
     
     // perform the rx activity    
     if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runRX))
@@ -858,7 +855,6 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
         eom_emsrunner_hid_userdef_taskRX_activity(&s_theemsrunner);
     }
       
-    //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
     
 
     // Y. if someone has stopped the cycle...
@@ -869,9 +865,10 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     }
     
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX))
-    {
-       s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
-       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX, eom_emsrunner_rxstart, osal_system_abstime_get()); 
+    {   // overflow-management-tag
+        // marco.accame: we may reset it in here instead of inside timer-callback: eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runRX);
+        s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
+        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX, eom_emsrunner_rxstart, osal_system_abstime_get()); 
     }
     
     eom_emsrunner_rxprevduration = eom_emsrunner_rxduration;
@@ -922,9 +919,10 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
     }
 
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO))
-    {
-       s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
-       eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO, eom_emsrunner_dostart, osal_system_abstime_get());     
+    {   // overflow-management-tag
+        // marco.accame: we may reset it in here instead of inside timer-callback: eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runDO);
+        s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
+        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO, eom_emsrunner_dostart, osal_system_abstime_get());     
     }
     
     eom_emsrunner_doprevduration = eom_emsrunner_doduration;
@@ -941,7 +939,6 @@ static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
 }
 
 
-
 static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 {
     // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
@@ -949,48 +946,31 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     
     s_theemsrunner.numoftxpackets = 0;
     
-    //eov_ipnet_Activate(eov_ipnet_GetHandle());
-
-#if 0    
-//    if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runTX))
-    if(1) // always execute the transmission
-    {
-        eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
-        
-        if(0 != s_theemsrunner.numofpacketsinsidesocket)
-        {
-            uint8_t i;            
-            for(i=0; i<s_theemsrunner.numofpacketsinsidesocket; i++)
-            {   // must decrement a number of times equal to the number of pkts given to the socket    
-                osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
-            }
-            s_theemsrunner.numofpacketsinsidesocket = 0;
-        }
-        
-    }
-#else
 
     eom_emsrunner_hid_userdef_taskTX_activity(&s_theemsrunner);
     
+    
     for(;;)
     {
+        // after the function eom_emsrunner_hid_userdef_taskTX_activity(), the variable numofpacketsinsidesocket is surely updated
+        // the function eo_emsrunner_mode_besteffort() always regturn true with eo_emsrunner_mode_besteffort
+        // THUS: we wait with the semaphore only if there are packets to be tx and we can wait
         if((0 == s_theemsrunner.numofpacketsinsidesocket) || (eobool_false == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runTX)))
         {
             break;
         }
-        #warning --> marco.accame: we wait for osal_reltimeINFINITE that the udp packet is sent ... can we think of a timeout???
+       
+        // the semaphore is incremented when the task IPnet gives the packet to the IPAL, which in turns directly writes into ETH peripheral
         osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
         s_theemsrunner.numofpacketsinsidesocket--;
+        //#warning --> marco.accame: we wait for osal_reltimeINFINITE that the udp packet is sent ... can we think of a timeout???
     }
 
-
-
-#endif    
-    //eov_ipnet_Deactivate(eov_ipnet_GetHandle());
-    
+   
     
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX))
-    {   // it is in this position so that ... it is still possible to send the EMS appl in ERROR state.
+    {   // overflow-management-tag
+        // marco.accame: we may reset it in here instead of inside timer-callback: eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runTX);
         s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
         eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX, eom_emsrunner_txstart, osal_system_abstime_get());
     } 
@@ -1069,9 +1049,9 @@ static void s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(voi
     s_theemsrunner.safeDurationExpired[eo_emsrunner_taskid_runDO] = eobool_false;
     s_theemsrunner.safeDurationExpired[eo_emsrunner_taskid_runTX] = eobool_false; 
 
-    s_theemsrunner.overflownToNextTask[eo_emsrunner_taskid_runRX] = eobool_false;
-    s_theemsrunner.overflownToNextTask[eo_emsrunner_taskid_runDO] = eobool_false;
-    s_theemsrunner.overflownToNextTask[eo_emsrunner_taskid_runTX] = eobool_false; 
+    eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runRX);
+    eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runDO);
+    eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runTX);
     
     osal_timer_start(s_theemsrunner.osaltimer, &timing, &onexpiry, osal_callerTSK);
 
@@ -1118,7 +1098,7 @@ static void s_eom_emsrunner_6HALTIMERS_stop(void)
     
 }
 
-// asfidanken
+
 static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_t *tmr, void *arg)
 {
     
@@ -1135,18 +1115,8 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
         .callback_on_exp    = NULL,
         .arg                = NULL
     }; 
+       
     
-//     hal_timer_cfg_t periodic_cfg  = 
-//     {
-//         .prescaler          = hal_timer_prescalerAUTO,         
-//         .countdown          = 0,
-//         .priority           = hal_int_priority02,
-//         .mode               = hal_timer_mode_periodic,
-//         .callback_on_exp    = NULL,
-//         .arg                = NULL
-//     };     
-    
-
     
     // start of task rx:
     oneshot_cfg.countdown         = cfg->period + cfg->execRXafter;
@@ -1222,13 +1192,15 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
 
     
     // set to false the safety gap touched for curr task
-    s_theemsrunner.safeDurationExpired[currtaskid] = eobool_false;
-    s_theemsrunner.overflownToNextTask[currtaskid] = eobool_false;
+    s_theemsrunner.safeDurationExpired[currtaskid] = eobool_false;   
+    // if we dont reset the overflow in here we must reset it after each task rx, do, tx has entered the overflow-management-tag    
+    eom_runner_hid_overflow_reset(&s_theemsrunner, currtaskid); 
+    
     
  
     if(prevtask->osaltask == scheduledosaltask) 
     {
-        s_theemsrunner.overflownToNextTask[prevtaskid] = eobool_true;
+        eom_runner_hid_overflow_set(&s_theemsrunner, prevtaskid);
     }
     else if(eo_emsrunner_taskid_runTX == prevtaskid) 
     {
@@ -1242,7 +1214,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
         
         if(s_theemsrunner.osaltaskipnetexec == scheduledosaltask)
         {
-            s_theemsrunner.overflownToNextTask[prevtaskid] = eobool_true;
+            eom_runner_hid_overflow_set(&s_theemsrunner, prevtaskid);
         }
     }    
       
