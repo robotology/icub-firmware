@@ -106,18 +106,16 @@ extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
 }
 
 
-extern void eoprot_fun_INIT_sk_skin_status_arrayof10canframes(const EOnv* nv)
+extern void eoprot_fun_INIT_sk_skin_status_arrayofcandata(const EOnv* nv)
 {
-    EOarray_of_10canframes *array_ptr = (EOarray_of_10canframes *)nv->ram;
-    
-    #warning -> marco.accame: use the EOarray functions instead. see in strain etc
-    array_ptr->head.capacity = 10;       
-    array_ptr->head.itemsize = sizeof(eOutil_canframe_t);
-    array_ptr->head.size = 0;   
-
+    EOarray_of_skincandata_t *tmp = (EOarray_of_skincandata_t*)nv->ram;
+    // marco.accame: items of array are eOsk_candata_t. its capacity is:
+    uint16_t capacity = sizeof(tmp->data) / sizeof(eOsk_candata_t);    
+    // eo_array_New() initialises capacity and itemsize and also sets size to 0 
+    EOarray *array = eo_array_New(capacity, sizeof(eOsk_candata_t), nv->ram);
 }
 
-//sk-update
+
 extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                      res;
@@ -147,7 +145,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
         {
             //in old way it not exist
             //in new way:
-           icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
+            icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
             
             for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
             {
@@ -231,7 +229,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
 
 
 
-extern void eoprot_fun_UPDT_sk_skin_commands_boardscfg(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                      res;
     uint8_t                         i;
@@ -272,7 +270,7 @@ extern void eoprot_fun_UPDT_sk_skin_commands_boardscfg(const EOnv* nv, const eOr
 }
 
 
-extern void eoprot_fun_UPDT_sk_skin_commands_trianglescfg(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_sk_skin_cmmnds_trianglescfg(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                          res;
     eOsk_skinId_t                       skId = eoprot_ID2index(rd->id32);

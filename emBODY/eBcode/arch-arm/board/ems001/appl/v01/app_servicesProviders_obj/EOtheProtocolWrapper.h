@@ -77,7 +77,7 @@ extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrappe
 extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWrapper *p, eOas_strainId_t id);
 extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWrapper *p, eOas_strainId_t id);
 
-extern EOarray_of_10canframes * eo_protocolwrapper_GetSkinStatusArray(EOtheProtocolWrapper *p, eOsk_skinId_t id);
+extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOsk_skinId_t id);
 
 
 

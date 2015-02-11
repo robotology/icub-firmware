@@ -630,9 +630,10 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
 {
     eOresult_t                      res = eores_NOK_generic;
     eOsk_skinId_t                   skId = 0;
-    EOarray_of_10canframes          *arrayof10canframes = NULL;
+    eOsk_status_t                   *skinstatus = NULL;
     EOappTheDB                      *db = eo_appTheDB_GetHandle();
     eOappTheDB_SkinCanLocation_t    canloc = {0};
+    eOsk_candata_t                  candata = {0};
 
     canloc.emscanport = canPort;
     res = eo_appTheDB_GetSkinId_BySkinCanLocation(db, canloc, &skId);
@@ -643,14 +644,19 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     
     //#warning -> marco.accame: we have only two skins (at most), thus we could pre-compute the skin0 and skin1 pointers onece for all.
     //            maybe as static values.   
-    arrayof10canframes = eo_protocolwrapper_GetSkinStatusArray(eo_protocolwrapper_GetHandle(), skId);
+    skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), skId);
     
-    if(NULL == arrayof10canframes)
+    if(NULL == skinstatus)
     {
         return(res);
     }
 
-    res = eo_array_PushBack((EOarray*)arrayof10canframes, frame);
+
+    uint16_t info = EOSK_CANDATA_INFO(frame->size, frame->id);
+    candata.info = info;    
+    memcpy(candata.data, frame->data, sizeof(candata.data));
+    
+    res = eo_array_PushBack((EOarray*)(&skinstatus->arrayofcandata), &candata);
 
     return(res);
 }

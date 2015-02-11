@@ -209,8 +209,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
     EOappCanSP                      *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    EOarray_of_10canframes          *arrayof10canframes = NULL;
-        
+    eOsk_status_t                   *skinstatus = NULL;
+ 
     
     for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
     {
@@ -218,21 +218,20 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), skincanloc, &skId);
         if(eores_OK == res)
         {
-            // reset netvar
-            arrayof10canframes = eo_protocolwrapper_GetSkinStatusArray(eo_protocolwrapper_GetHandle(), skId);
-            if(arrayof10canframes == NULL)
+            // reset the skin status
+            skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), skId);
+            if(skinstatus == NULL)
             {
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "cannot get a skin", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
             }
             
             
-            eo_array_Reset((EOarray*)arrayof10canframes);
+            eo_array_Reset((EOarray*)(&skinstatus->arrayofcandata));
             
             
-            // if skin is connected i should read as many messages maximum as the capacity of arrayof10canframes
-            //numofRXcanframe = 10;
-            // marco.accame: better using its capacity and not a magic number
-            numofRXcanframe = eo_array_Capacity((EOarray*)arrayof10canframes); 
+            // if skin is connected i should read at maximum as many messages as the capacity of the array
+            // the can callback shall copy the canframe into the array
+            numofRXcanframe = eo_array_Capacity((EOarray*)(&skinstatus->arrayofcandata)); 
         }
         else
         {

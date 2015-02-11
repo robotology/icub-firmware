@@ -198,15 +198,15 @@ extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWr
     return(ret);
 }
 
-extern EOarray_of_10canframes * eo_protocolwrapper_GetSkinStatusArray(EOtheProtocolWrapper *p, eOsk_skinId_t id)
+extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOsk_skinId_t id)
 {
     // don't do any control on p, as ... it is a dummy object
-    EOarray_of_10canframes *ret = NULL;    
+    eOsk_status_t *ret = NULL;    
     eOsk_skin_t *sk = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)id);
     
     if(NULL != sk)
     {
-        ret = &(sk->status.arrayof10canframes);
+        ret = &(sk->status);
     }
 
     return(ret);
