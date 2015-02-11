@@ -752,21 +752,21 @@ extern "C" {
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //                           <255=> hal_timerNONE
 //  <i> default: hal_timer12
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTRX   5
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTRX   255
 
 //  <o> hal_timer for alert do
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //                           <255=> hal_timerNONE
 //  <i> default: hal_timer13
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTDO   6
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTDO   255
 
 //  <o> hal_timer for alert tx
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //                           <255=> hal_timerNONE
 //  <i> default: hal_timer14
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTTX   7
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTTX   255
 
 
 #define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTRX   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX))
