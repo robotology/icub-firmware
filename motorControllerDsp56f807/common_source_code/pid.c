@@ -60,6 +60,8 @@ byte  _t1c =0;
 // BACK-EMF COMPENSATION
 Int16 _backemf_gain[JN]  = INIT_ARRAY (0);
 byte  _backemf_shift[JN] = INIT_ARRAY (0);
+Int16 _ktau[JN]          = INIT_ARRAY (0);
+byte  _ktau_shift[JN]    = INIT_ARRAY (0);
 
 // DECOUPLING PARAMETERS
 float _param_a10_coeff = -1.6455F;
@@ -153,6 +155,7 @@ Int16  _kr_torque[JN] = INIT_ARRAY (10);		// scale factor (negative power of two
 Int16  _kstp_torque[JN] = INIT_ARRAY (0);       // stiction compensation: positive val
 Int16  _kstn_torque[JN] = INIT_ARRAY (0);       // stiction compensation: negative val
 Int16  _kff_torque[JN] = INIT_ARRAY (0);        // feedforward gain
+byte   _kff_shift[JN] = INIT_ARRAY (0);   
 byte   _useFilter[JN] = INIT_ARRAY (0); 
 
 // OPENLOOP

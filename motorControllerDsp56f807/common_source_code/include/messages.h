@@ -814,6 +814,9 @@ else \
 	if (CAN_LEN == 8) \
 	{ \
 		_kff_torque[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
+		_kff_shift[axis] = CAN_DATA[3]; \
+		_ktau[axis] = BYTE_W(CAN_DATA[4], CAN_DATA[5]); \
+		_ktau_shift[axis] = CAN_DATA[6]; \
 	} \
 }
 
@@ -824,10 +827,10 @@ else \
 		CAN_LEN = 8; \
 		CAN_DATA[1] = BYTE_H(_kff_torque[axis]); \
 		CAN_DATA[2] = BYTE_L(_kff_torque[axis]); \
-		CAN_DATA[3] = 0; \
-		CAN_DATA[4] = 0; \
-		CAN_DATA[5] = 0; \
-		CAN_DATA[6] = 0; \
+		CAN_DATA[3] = _kff_shift[axis]; \
+		CAN_DATA[4] = BYTE_H(_ktau[axis]); \
+		CAN_DATA[5] = BYTE_L(_ktau[axis]); \
+		CAN_DATA[6] = _ktau_shift[axis]; \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }

@@ -96,6 +96,9 @@ extern Int16 _sacc2[JN] ;
 // BACK-EMF COMPENSATION
 extern Int16 _backemf_gain[JN];
 extern byte  _backemf_shift[JN];
+extern Int16 _ktau[JN];
+extern byte  _ktau_shift[JN];
+
 
 // POSITION VARIABLES											
 extern Int32 _abs_pos_calibration[JN] ;	// absolute position to be reached during calibration
@@ -189,6 +192,7 @@ extern Int16  _kr_torque[JN] ;				// scale factor (negative power of two)
 extern Int16  _kstp_torque[JN] ;            // stiction compensation: positive val
 extern Int16  _kstn_torque[JN] ;            // stiction compensation: negative val
 extern Int16  _kff_torque[JN] ;             // feedforward gain
+extern byte   _kff_shift[JN] ;             // feedforward gain
 extern byte   _useFilter[JN] ; 
 
 // OPENLOOP
