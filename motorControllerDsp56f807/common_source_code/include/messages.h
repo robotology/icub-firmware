@@ -766,26 +766,28 @@ else \
 }
 
 //-------------------------------------------------------------------
-#define CAN_SET_BACKEMF_PARAMS_HANDLER(x) \
+#define CAN_SET_MOTOR_PARAMS_HANDLER(x) \
 { \
 	if (CAN_LEN == 8) \
 	{ \
 		_backemf_gain[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_backemf_shift[axis] = CAN_DATA[3]; \
+		_ktau[axis] = BYTE_W(CAN_DATA[4], CAN_DATA[5]); \
+		_ktau_shift[axis] = CAN_DATA[6]; \
 	} \
 }
 
 //-------------------------------------------------------------------
-#define CAN_GET_BACKEMF_PARAMS_HANDLER(x) \
+#define CAN_GET_MOTOR_PARAMS_HANDLER(x) \
 { \
 	PREPARE_HEADER; \
 		CAN_LEN = 8; \
 		CAN_DATA[1] = BYTE_H(_backemf_gain[axis]); \
 		CAN_DATA[2] = BYTE_L(_backemf_gain[axis]); \
 		CAN_DATA[3] = _backemf_shift[axis]; \
-		CAN_DATA[4] = 0; \
-		CAN_DATA[5] = 0; \
-		CAN_DATA[6] = 0; \
+		CAN_DATA[4] = BYTE_H(_ktau[axis]); \
+		CAN_DATA[5] = BYTE_L(_ktau[axis]); \
+		CAN_DATA[6] = _ktau_shift[axis]; \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
@@ -815,8 +817,6 @@ else \
 	{ \
 		_kff_torque[axis] = BYTE_W(CAN_DATA[1], CAN_DATA[2]); \
 		_kff_shift[axis] = CAN_DATA[3]; \
-		_ktau[axis] = BYTE_W(CAN_DATA[4], CAN_DATA[5]); \
-		_ktau_shift[axis] = CAN_DATA[6]; \
 	} \
 }
 
@@ -828,9 +828,9 @@ else \
 		CAN_DATA[1] = BYTE_H(_kff_torque[axis]); \
 		CAN_DATA[2] = BYTE_L(_kff_torque[axis]); \
 		CAN_DATA[3] = _kff_shift[axis]; \
-		CAN_DATA[4] = BYTE_H(_ktau[axis]); \
-		CAN_DATA[5] = BYTE_L(_ktau[axis]); \
-		CAN_DATA[6] = _ktau_shift[axis]; \
+		CAN_DATA[4] = 0; \
+		CAN_DATA[5] = 0; \
+		CAN_DATA[6] = 0; \
 		CAN_DATA[7] = 0; \
 		CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
