@@ -554,6 +554,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
  
     /* 4) update joint status */
     s_eom_emsrunner_hid_UpdateJointstatus(p);
+
     /*Note: motor status is updated with data sent by 2foc by can */
 
     s_checkEthLinks();
@@ -569,6 +570,7 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     uint16_t                        numofjoint;
     EOappTheDB                      *db = eo_appTheDB_GetHandle();
     uint16_t                        numofmotors;
+    uint8_t                         transmit_decoupled_pwms = 1;
     
     numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db);
     for(jId = 0; jId<numofjoint; jId++)
@@ -583,6 +585,12 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
         eo_emsController_GetJointStatus(jId, jstatus);
         
         eo_emsController_GetActivePidStatus(jId, &jstatus->ofpid);
+        
+        if (transmit_decoupled_pwms) 
+        {  
+            //this functions is used to get the motor PWM after the decoupling matrix
+            eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.output);
+        }
         
         if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
         {

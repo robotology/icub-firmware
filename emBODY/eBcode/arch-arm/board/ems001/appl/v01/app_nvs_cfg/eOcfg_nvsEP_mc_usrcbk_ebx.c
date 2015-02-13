@@ -153,7 +153,14 @@ const eOmc_joint_t joint_default_value =
         EO_INIT(.filler01)                 0xe0,
         EO_INIT(.encoderconversionfactor)   EOUTIL_EMULFLOAT32_ONE,
         EO_INIT(.encoderconversionoffset)   EOUTIL_EMULFLOAT32_ZERO,
-        EO_INIT(.bemf)                      {0, 0, 0},
+        EO_INIT(.motor_params)
+        {
+            EO_INIT(.bemf_value)            0,
+            EO_INIT(.ktau_value)            0,
+            EO_INIT(.bemf_scale)            0,
+            EO_INIT(.ktau_scale)            0,
+            EO_INIT(.filler02)              {0xf1, 0xf2}
+        },
         EO_INIT(.tcfiltertype)              0,
         EO_INIT(.filler03)                  {0xf1, 0xf2, 0xf3}
     },

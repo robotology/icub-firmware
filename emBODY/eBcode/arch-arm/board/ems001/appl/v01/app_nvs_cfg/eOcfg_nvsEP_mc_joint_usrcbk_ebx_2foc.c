@@ -180,7 +180,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
     
-    eo_emsController_SetBemf((uint8_t)jxx, ((float)cfg->bemf.value)/(float)(1<<cfg->bemf.scale));
+    eo_emsController_SetMotorParams((uint8_t)jxx, cfg->motor_params);
     
     eo_emsController_SetTcFilterType((uint8_t)jxx, (uint8_t) cfg->tcfiltertype);
 
@@ -247,12 +247,12 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
                                     );
 }
 
-extern void eoprot_fun_UPDT_mc_joint_config_bemf(const EOnv* nv, const eOropdescriptor_t* rd) 
+extern void eoprot_fun_UPDT_mc_joint_config_motorParams(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmc_bemf_t     *bemf_ptr = (eOmc_bemf_t*)nv->ram;
+    eOmc_motor_params_t   *params_ptr = (eOmc_motor_params_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     
-    eo_emsController_SetBemf((uint8_t)jxx, ((float)(bemf_ptr->value))/(float)(1<<bemf_ptr->scale));
+    eo_emsController_SetMotorParams ((uint8_t)jxx, *params_ptr);
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
