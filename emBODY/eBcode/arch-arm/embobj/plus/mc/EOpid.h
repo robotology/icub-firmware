@@ -68,6 +68,7 @@ extern EOpid* eo_pid_New(void);
 extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset);
 extern void eo_pid_SetPidTorq(EOpid *o, float Kp, float Kd, float Ki, float Imax, int32_t pwm_max, int32_t pwm_offset, float Kff);
 extern void eo_pid_SetPidBemf(EOpid *o, float Kbemf);
+extern void eo_pid_SetPidKtau(EOpid *o, float Ktau);
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err);
 
@@ -86,11 +87,12 @@ extern int32_t eo_pid_PWM_pid(EOpid *o, float En);
 extern int32_t eo_pid_PWM_piv(EOpid *o, float En, float Vn);
 
 // torque
-extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm, float vel);
-extern int32_t eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);
-extern int32_t eo_pid_PWM_pi_0_8Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);
-extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);
-extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm, float vel);
+extern int32_t eo_pid_PWM_pi(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi_0_8Hz_1stLPF(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi_1_1Hz_1stLPF(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_pi_3_0Hz_1stLPF(EOpid *o, float Tr, float Tm);
+extern int32_t eo_pid_PWM_friction(EOpid *o, int32_t pwm_input, float vel, float Tr);
 //extern int32_t eo_pid_PWM_pi_1_1Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 //extern int32_t eo_pid_PWM_pi_3_0Hz_2ndLPF(EOpid *o, float Tr, float Tm);
 

@@ -609,14 +609,45 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     
     eObool_t stiffness[NAXLES];
     
+    //PWM computation (PID ecc)
     JOINTS(j)
     {
         pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
     }
  
+    //PWM decoupling
     int32_t pwm_motor[NAXLES];
-    
     eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
+    
+    //////////////////////
+    /*static int16_t count=0; 
+    if (count == 1000)
+    {eOerrmanDescriptor_t errdes = {0};
+    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes.param                = 0;
+    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress        = 0;  
+    //char *str = NULL;
+    char str[eomn_info_status_extra_sizeof] = {0};
+    snprintf(str, sizeof(str), "%d %d %d ---> %d %d %d",
+    pwm_joint[0], pwm_joint[1], pwm_joint[2],
+    pwm_motor[0], pwm_motor[1], pwm_motor[2]);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+    count=0;}
+    count++;
+    */
+    ////////////////
+    
+    //Friction compensation after joints decoupling
+    MOTORS(m)
+    {
+        pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m]);
+    }
+    
+    MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
+    
+    //save the pwm data after the decoupling
+    MOTORS(m)  ems->axis_controller[m]->controller_output=pwm_motor[m];
     
     MOTORS(m) pwm_motor_16[m] = (int16_t)pwm_motor[m];
 }
@@ -997,6 +1028,14 @@ extern void eo_emsController_ResetTrqPid(uint8_t joint)
     if (ems) eo_pid_Reset(eo_axisController_GetTrqPidPtr(ems->axis_controller[joint]));
 }
 
+extern void eo_emsController_GetPWMOutput(uint8_t joint, int32_t* pwm)
+{
+    if (ems && ems->axis_controller[joint])
+    {
+        *pwm = ems->axis_controller[joint]->controller_output;
+    }
+}
+
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
 {
     if (ems && ems->axis_controller[joint])
@@ -1043,11 +1082,12 @@ extern eObool_t eo_emsController_GetMotionDone(uint8_t joint)
 
 ///////////////////////
 // PID configurations
-extern void eo_emsController_SetBemf(uint8_t joint, float Kbemf)
+extern void eo_emsController_SetMotorParams(uint8_t joint, eOmc_motor_params_t params)
 {
     if (ems)
     {
-        eo_axisController_SetBemf(ems->axis_controller[joint], Kbemf);
+        eo_axisController_SetBemf(ems->axis_controller[joint], params.bemf_value/(float)(1<<params.bemf_scale));
+        eo_axisController_SetKtau(ems->axis_controller[joint], params.ktau_value/(float)(1<<params.ktau_scale));
     }
 }
 

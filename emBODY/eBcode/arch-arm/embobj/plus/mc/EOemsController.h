@@ -103,12 +103,13 @@ extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 
+extern void eo_emsController_GetPWMOutput(uint8_t joint, int32_t* pwm);
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
 extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* jointStatus);
 extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
 
 // configuration
-extern void eo_emsController_SetBemf(uint8_t joint, float Kbemf);
+extern void eo_emsController_SetMotorParams(uint8_t joint, eOmc_motor_params_t params);
 extern void eo_emsController_SetTcFilterType(uint8_t joint, uint8_t filterType);
 extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
 extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff);

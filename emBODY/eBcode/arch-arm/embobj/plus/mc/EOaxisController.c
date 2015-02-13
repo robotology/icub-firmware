@@ -102,6 +102,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         ///////////////////////////
         
         o->openloop_out = 0;
+        o->controller_output = 0;
 
         o->control_mode  = eomc_controlmode_notConfigured;
         o->interact_mode = eOmc_interactionmode_stiff;
@@ -522,6 +523,22 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_false;
 }
 
+extern int16_t eo_axisController_FrictionCompensation(EOaxisController *o, int16_t input_pwm )
+{
+    int16_t pwm_out = input_pwm;
+    if ((o->control_mode==eomc_controlmode_torque) ||
+        (o->interact_mode==eOmc_interactionmode_compliant &&
+        (o->control_mode==eomc_controlmode_position ||
+         o->control_mode==eomc_controlmode_velocity ||
+         o->control_mode==eomc_controlmode_mixed ||
+         o->control_mode==eomc_controlmode_direct)))
+    {
+      int32_t vel = GET_AXIS_VELOCITY();
+      pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, vel, o->torque_ref);
+    }
+    return pwm_out;
+}
+
 extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
 {
     //if (!o) return 0;
@@ -629,43 +646,29 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
 
                 o->err = err;
                 
-            #if 0
-                #if defined(ANKLE_BOARD) 
-                    int16_t pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                #elif defined(SHOULDER_BOARD) 
-                    int16_t pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
-                    int16_t pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                #else
-                    int16_t pwm_out = 0;
-                #endif
-            #else
                 int16_t pwm_out = 0;
                 if      (o->tcFilterType==3) 
-                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
                 else if (o->tcFilterType==1) 
-                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
                 else if (o->tcFilterType==2) 
-                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
+                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
                 else if (o->tcFilterType==0)
-                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
+                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
                 else
                     {
                         //invalid tcFilterType, do not use it
-                        int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
+                        int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
                     }
-            #endif
                 
                 if (pos < o->pos_min)
                 {
                     int16_t pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_min - pos);
-                    
                     if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
                 }
                 else if (pos > o->pos_max)
                 {
                     int16_t pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_max - pos);
-                    
                     if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
                 }
                 
@@ -701,32 +704,20 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //return 0;
             }
             
-            #if 0
-                #if defined(ANKLE_BOARD) 
-                    int16_t pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                #elif defined(SHOULDER_BOARD) 
-                    int16_t pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                #elif defined(UPPERLEG_BOARD) || defined(WAIST_BOARD)
-                    int16_t pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                #else
-                    int16_t pwm_out = 0;
-                #endif
-            #else
-                int16_t pwm_out = 0;
-                if      (o->tcFilterType==3) 
-                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                else if (o->tcFilterType==1) 
-                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                else if (o->tcFilterType==2) 
-                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas, vel);
-                else if (o->tcFilterType==0)
-                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
-                else
-                    {
-                        //invalid tcFilterType, do not use it
-                        int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas, vel);
-                    }
-            #endif
+            int16_t pwm_out = 0;
+            if      (o->tcFilterType==3) 
+                pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            else if (o->tcFilterType==1) 
+                pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            else if (o->tcFilterType==2) 
+                pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+            else if (o->tcFilterType==0)
+                pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+            else
+                {
+                    //invalid tcFilterType, do not use it
+                    int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                }
             
             if (pos < o->pos_min)
             {
@@ -779,6 +770,12 @@ extern void eo_axisController_SetBemf(EOaxisController *o, float Kbemf)
 {
     //eo_pid_SetPidBemf(o->pidP, Kbemf);
     eo_pid_SetPidBemf(o->pidT, Kbemf);
+}
+
+extern void eo_axisController_SetKtau(EOaxisController *o, float Ktau)
+{
+    //eo_pid_SetPidKtau(o->pidP, Ktau);
+    eo_pid_SetPidKtau(o->pidT, Ktau);
 }
 
 extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filterType)

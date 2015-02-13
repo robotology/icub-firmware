@@ -105,6 +105,7 @@ struct EOaxisController_hid
     int32_t damping;
 
     int16_t openloop_out;
+    int16_t controller_output;
 
     eOmc_controlmode_t control_mode;
     eOmc_interactionmode_t interact_mode;
