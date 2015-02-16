@@ -150,7 +150,7 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
 
 extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_t position, uint8_t error_mask)
 {
-    static const int16_t MAX_ENC_CHANGE = 3*ENCODER_QUANTIZATION;
+    static const int16_t MAX_ENC_CHANGE = 7*ENCODER_QUANTIZATION;
     
     if (!o->sign) return 0;
 	
