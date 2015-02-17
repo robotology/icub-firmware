@@ -247,7 +247,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
                                     );
 }
 
-extern void eoprot_fun_UPDT_mc_joint_config_motorParams(const EOnv* nv, const eOropdescriptor_t* rd) 
+extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     eOmc_motor_params_t   *params_ptr = (eOmc_motor_params_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
