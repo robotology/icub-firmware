@@ -147,7 +147,7 @@ static const EOconstLookupTbl s_msgClasses_LUTbl =
     EO_INIT(.itemsList)                   &s_msgClasses_tblsReference_list[0]
 };
 
-extern const EOconstLookupTbl* const icubCanProto_msgClasses_lookupTbl__ptr = &s_msgClasses_LUTbl;
+const EOconstLookupTbl* const icubCanProto_msgClasses_lookupTbl__ptr = &s_msgClasses_LUTbl;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
