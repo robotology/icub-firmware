@@ -37,18 +37,20 @@
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
+
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoSkin.h"
 #include "EoAnalogSensors.h"
 #include "EoBoards.h"
 #include "EOicubCanProto_specifications.h"
-#include "osal.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
+
 typedef struct EOappCanSP_hid   EOappCanSP;
 
 
@@ -56,24 +58,18 @@ enum { eo_appCanSP_emscanportnum = 2 };
 
 typedef struct
 {
-   eOcallbackData_t     cbkonrx[eo_appCanSP_emscanportnum];
+   eOcallbackData_t cbkonrx[eo_appCanSP_emscanportnum];
 } eOappCanSP_cfg_t;
-
 
 
 typedef enum
 {
-    eo_appCanSP_runMode__onEvent    = 0,
-    eo_appCanSP_runMode__onDemand   = 1    
+    eo_appCanSP_runMode__onEvent    = 0,    /**< the canframe is put in can tx buffer and transmitted straigth away */
+    eo_appCanSP_runMode__onDemand   = 1     /**< the canframe is put in can tx buffer but transmitted only later */     
 } eo_appCanSP_runMode_t;
 
 
-typedef struct
-{
-    uint8_t isrunning;
-    uint8_t numoftxframe[2];
-    osal_semaphore_t*   semafori[2];
-}runnning_data_t;
+
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 

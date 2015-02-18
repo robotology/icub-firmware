@@ -29,10 +29,13 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
+
 #include "osal.h"
 #include "hal.h"
 
 #include "EoCommon.h"
+
+#include "EOicubCanProto.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
