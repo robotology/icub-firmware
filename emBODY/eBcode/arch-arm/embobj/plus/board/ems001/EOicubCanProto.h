@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-/** @file       EoicubCanProto.h
+/** @file       EOicubCanProto.h
 	@brief      This header implements public interface to iCub CAN protocol
 	@author     valentina.gaggero@iit.it
 	@date       03/08/2012
