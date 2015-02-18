@@ -90,7 +90,7 @@
 const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
     EO_INIT(.taskpriority)              {250,   251,    252},  
-    EO_INIT(.taskstacksize)             {1024,  1024,   1024},
+    EO_INIT(.taskstacksize)             {2048,  1024,   2048},
     EO_INIT(.haltimerstart)             {hal_timer2, hal_timer3, hal_timer4},    
     EO_INIT(.haltimeralert)             {hal_timer5, hal_timer6, hal_timer7},  
     EO_INIT(.period)                    1000,  
