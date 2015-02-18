@@ -380,6 +380,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
     eOmc_jointId_t                          jId;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     eOmc_joint_status_t                     *jstatus = NULL;
+    eOerrmanDescriptor_t des = {0};    
+    static uint8_t calledonce = 0;
 
     canLoc.emscanport = canPort;
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -397,7 +399,29 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
         return(res); //error
     }
 
+
+    if(0 == calledonce)
+    {
+        calledonce = 1;
+                
+        des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag06);
+        des.param = (frame->data[1] << 8) | jstatus->basic.controlmodestatus;
+        des.sourceaddress = jId;
+        des.sourcedevice = eo_errman_sourcedevice_localboard;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);       
+        
+    }
+
     jstatus->basic.controlmodestatus = ((eOmc_controlmode_t)frame->data[1]);
+
+    if(eomc_controlmode_hwFault == jstatus->basic.controlmodestatus)
+    {   
+        des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault1);
+        des.param = (frame->data[1] << 8) | jstatus->basic.controlmodestatus;
+        des.sourceaddress = jId;
+        des.sourcedevice = eo_errman_sourcedevice_localboard;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);               
+    }
     
     return(eores_OK);
 }
@@ -2187,13 +2211,15 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
 
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    eOresult_t                              res;
+    eOresult_t                              res = eores_OK;
     eOmc_jointId_t   		                jId;
     eOmc_motorId_t   		                mId;
     eOmc_joint_status_t                     *jstatus = NULL;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
     eOmc_controlmode_t                      eomc_controlmode;
     eOmn_appl_runMode_t                     runmode; 
+        
+    eOerrmanDescriptor_t des = {0};
    
 
     
@@ -2207,10 +2233,10 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     
     if(applrunMode__default == runmode)
     {
-        return(eores_OK); //ignore error
+        return(eores_OK); // ignore error
     }
     
-    //get mId
+    // get mId
     res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
@@ -2244,18 +2270,36 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == jstatus)
         {
-            return(eores_NOK_generic); //error
+            return(eores_NOK_generic); // error
         }
 
     
-        //set control mode status
+        // set control mode status
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
         if(eores_OK != res)
-        {
+        {      
+            des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.sourceaddress = jId;
+            des.sourcedevice = eo_errman_sourcedevice_localboard;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);           
+
             return(res);
         }
-        
+ 
+
+        if(eomc_controlmode_hwFault == eomc_controlmode)
+        {        
+            des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault2);
+            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.sourceaddress = jId;
+            des.sourcedevice = eo_errman_sourcedevice_localboard;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
+        }
+    
         jstatus->basic.controlmodestatus = eomc_controlmode;
+             
+        
         
         //update motor status flag
         s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
@@ -2285,13 +2329,26 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         }
 
     
-        //set control mode status
+        // set control mode status
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[3], &eomc_controlmode);
         if(eores_OK != res)
         {
+            des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.sourceaddress = jId;
+            des.sourcedevice = eo_errman_sourcedevice_localboard;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);            
             return(res);
         }
         
+        if(eomc_controlmode_hwFault == eomc_controlmode)
+        {        
+            des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault3);
+            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.sourceaddress = jId;
+            des.sourcedevice = eo_errman_sourcedevice_localboard;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
+        }
         
         jstatus->basic.controlmodestatus = eomc_controlmode;
         
