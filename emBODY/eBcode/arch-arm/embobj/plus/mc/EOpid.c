@@ -21,7 +21,8 @@
 
 #include "EOspeedmeter.h"
 
-
+#include "EoError.h"
+#include "EOtheErrorManager.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -302,14 +303,12 @@ extern int32_t eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm)
 
 extern int32_t eo_pid_PWM_friction(EOpid *o, int32_t pwm_input, float vel, float Tr)
 {
-    /*
     //viscous friction
     pwm_input=pwm_input+ o->Kbemf*vel;
-    //torque feedforard term
-    pwm_input=pwm_input+ o->Kff*Tr;
     //coulomb friction
     //...
-    */
+    //motor torque constant
+    pwm_input=pwm_input * o->Ktau;
 
     return pwm_input;
 }
