@@ -730,8 +730,9 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
             return;
         }
 
+        #warning marco.accame: ecco qui il messaggio verso il can address 12 ...........................
         //set destination of all messages 
-        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); //virtual ft sensor has address 12
+        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); // virtual ft sensor has address 12
         
         //set command (calss + id) and send it
         msgCmd.class = icubCanProto_msgCmdClass_periodicAnalogSensor;
