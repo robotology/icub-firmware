@@ -235,7 +235,7 @@ extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int32_t *pwm_motor, e
 
 #else
 
-extern void eo_motors_PWM(EOmotors *o, int32_t *pwm_joint, int32_t *pwm_motor, eObool_t* stiff)
+extern void eo_motors_PWM(EOmotors *o, float *pwm_joint, float *pwm_motor, eObool_t* stiff)
 {
     //if (!o) return;
     

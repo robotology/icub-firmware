@@ -14,10 +14,11 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-//#include "EOtheErrorManager.h"
+#include "EOtheErrorManager.h"
 //#include "EOVtheSystem.h"
 #include "EOemsControllerCfg.h"
 //#include "hal_led.h"
+#include "EoError.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -523,9 +524,9 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_false;
 }
 
-extern int16_t eo_axisController_FrictionCompensation(EOaxisController *o, int16_t input_pwm )
+extern float eo_axisController_FrictionCompensation(EOaxisController *o, float input_pwm )
 {
-    int16_t pwm_out = input_pwm;
+    float pwm_out = input_pwm;
     if ((o->control_mode==eomc_controlmode_torque) ||
         (o->interact_mode==eOmc_interactionmode_compliant &&
         (o->control_mode==eomc_controlmode_position ||
@@ -534,12 +535,32 @@ extern int16_t eo_axisController_FrictionCompensation(EOaxisController *o, int16
          o->control_mode==eomc_controlmode_direct)))
     {
       int32_t vel = GET_AXIS_VELOCITY();
+      int32_t pos = GET_AXIS_POSITION();
       pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, vel, o->torque_ref);
+      //torque control limits protection mechanism
+      if (pos < o->pos_min)
+      {
+          float pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_min - pos);
+          if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
+      }
+      else if (pos > o->pos_max)
+      {
+          float pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_max - pos);
+          if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
+      }
+      //limit the PWM with the torque pid
+      LIMIT(pwm_out,eo_pid_GetPwmMax(o->pidT));
+    
+    }
+    else
+    {
+      //limit the PWM with the position pid
+      LIMIT(pwm_out,eo_pid_GetPwmMax(o->pidP));
     }
     return pwm_out;
 }
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
+extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
 {
     //if (!o) return 0;
     
@@ -646,7 +667,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
 
                 o->err = err;
                 
-                int16_t pwm_out = 0;
+                float pwm_out = 0;
                 if      (o->tcFilterType==3) 
                     pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
                 else if (o->tcFilterType==1) 
@@ -658,19 +679,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 else
                     {
                         //invalid tcFilterType, do not use it
-                        int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                        pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
                     }
-                
-                if (pos < o->pos_min)
-                {
-                    int16_t pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_min - pos);
-                    if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
-                }
-                else if (pos > o->pos_max)
-                {
-                    int16_t pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_max - pos);
-                    if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
-                }
                 
                 return pwm_out;
             }
@@ -704,7 +714,7 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //return 0;
             }
             
-            int16_t pwm_out = 0;
+            float pwm_out = 0;
             if      (o->tcFilterType==3) 
                 pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
             else if (o->tcFilterType==1) 
@@ -716,21 +726,8 @@ extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             else
                 {
                     //invalid tcFilterType, do not use it
-                    int16_t pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
                 }
-            
-            if (pos < o->pos_min)
-            {
-                int16_t pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_min - pos);
-                    
-                if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
-            }
-            else if (pos > o->pos_max)
-            {
-                int16_t pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_max - pos);
-                    
-                if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
-            }
             
             return pwm_out;
         } 
@@ -847,7 +844,8 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     {
         pidStatus->positionreference = 0;
         pidStatus->torquereference = o->torque_ref;
-        eo_pid_GetStatus(o->pidT, &(pidStatus->output), &(pidStatus->error));
+        #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->output), &(pidStatus->error));
         
         return;
     }
@@ -856,7 +854,8 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     {
         pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
         pidStatus->torquereference = o->torque_ref;
-        eo_pid_GetStatus(o->pidT, &(pidStatus->output), &(pidStatus->error));
+        #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->output), &(pidStatus->error));
         
         return;
     }
@@ -865,7 +864,8 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     
     pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
     pidStatus->torquereference = 0;
-    eo_pid_GetStatus(o->pidP, &(pidStatus->output), &(pidStatus->error));    
+    #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
+    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->output), &(pidStatus->error));    
 }
 
 

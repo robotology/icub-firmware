@@ -605,7 +605,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
         return;
     }
     
-    int32_t pwm_joint[NAXLES];
+    float pwm_joint[NAXLES];
     
     eObool_t stiffness[NAXLES];
     
@@ -616,27 +616,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     }
  
     //PWM decoupling
-    int32_t pwm_motor[NAXLES];
+    float pwm_motor[NAXLES];
     eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
-    
-    //////////////////////
-    /*static int16_t count=0; 
-    if (count == 1000)
-    {eOerrmanDescriptor_t errdes = {0};
-    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-    errdes.param                = 0;
-    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress        = 0;  
-    //char *str = NULL;
-    char str[eomn_info_status_extra_sizeof] = {0};
-    snprintf(str, sizeof(str), "%d %d %d ---> %d %d %d",
-    pwm_joint[0], pwm_joint[1], pwm_joint[2],
-    pwm_motor[0], pwm_motor[1], pwm_motor[2]);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
-    count=0;}
-    count++;
-    */
-    ////////////////
     
     //Friction compensation after joints decoupling
     MOTORS(m)

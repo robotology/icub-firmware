@@ -94,8 +94,8 @@ extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 extern eObool_t eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
 extern eObool_t eo_axisController_SetOutput(EOaxisController *o, int16_t out);
 
-extern int16_t eo_axisController_PWM(EOaxisController *o, eObool_t *stiff);
-extern int16_t eo_axisController_FrictionCompensation(EOaxisController *o, int16_t input_pwm);
+extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff);
+extern float eo_axisController_FrictionCompensation(EOaxisController *o, float input_pwm);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 

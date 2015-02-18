@@ -55,9 +55,9 @@ struct EOpid_hid
     
     float A,B;
     
-    int32_t pwm_offset;
-    int32_t pwm_max;
-    int32_t pwm;
+    float pwm_offset;
+    float pwm_max;
+    float pwm;
 }; 
 
 
