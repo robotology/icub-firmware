@@ -84,7 +84,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          55
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          56
 //  </h>version
 
 //  <h> build date
@@ -93,9 +93,9 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        2
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          13
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          18
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         19
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
 //  <o> minute          <0-59> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          00
 //  </h>build date
@@ -674,17 +674,17 @@ extern "C" {
 
 //  <h> stack sizes 
 
-//  <o> RX task stack size <256-1024:128>
+//  <o> RX task stack size <256-2048:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   2048
 
-//  <o> DO task stack size <256-1024:128>
+//  <o> DO task stack size <256-2048:128>
 //  <i> default: 1024
 #define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof   1024
 
-//  <o> TX task stack size <256-1024:128>
+//  <o> TX task stack size <256-2048:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   2048
 
 //  </h>stack sizes
 
