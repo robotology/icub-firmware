@@ -71,7 +71,8 @@ extern void eo_pid_SetPidBemf(EOpid *o, float Kbemf);
 extern void eo_pid_SetPidKtau(EOpid *o, float Ktau);
 
 extern void eo_pid_GetStatus(EOpid *o, int32_t *pwm, int32_t *err);
-
+extern int32_t eo_pid_GetPwmMax(EOpid *o);
+  
 extern void eo_pid_Reset(EOpid *o);
 
 /** @fn         extern float eo_pid_PWM(EOpid *o, float En)

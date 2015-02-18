@@ -147,6 +147,11 @@ extern void eo_pid_SetPidKtau(EOpid *o, float Ktau)
     o->Ktau = Ktau;
 }
 
+extern int32_t eo_pid_GetPwmMax(EOpid *o)
+{
+    return o->pwm_max;
+}
+
 extern int32_t eo_pid_PWM_p(EOpid *o, float En)
 {    
     o->pwm = (int32_t)(o->Kp*En);
