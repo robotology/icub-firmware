@@ -119,7 +119,11 @@ typedef struct
     uint32_t    maxabsoluteerrorinperiod;
     uint32_t    minabsoluteerrorinperiod;  
     uint32_t    executionoverflows[eo_emsrunner_task_numberof];
-    uint32_t    datagrams_failed_to_go_in_txsocket;    
+    uint32_t    datagrams_failed_to_go_in_txsocket;
+	uint32_t 	average_et[eo_emsrunner_task_numberof];
+	uint32_t 	max_et[eo_emsrunner_task_numberof];
+	uint32_t 	min_et[eo_emsrunner_task_numberof];
+	
 } eOemsrunner_diagnosticsinfo_t;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------

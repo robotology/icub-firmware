@@ -52,6 +52,10 @@
 
 #include "OPCprotocolManager_Cfg.h"
 
+#include "EoError.h"
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -81,7 +85,12 @@
 //#define EVIEWER_userDef_CFGRecRopframe     (EVIEWER_userDef_IDbase +2) see definition in EOMtheEMSconfigurator.c
 #endif
 
+#define SEND_STATISTICS_INFO
+#undef 	SEND_STATISTICS_INFO
 
+#ifdef SEND_STATISTICS_INFO
+	#define	STATISTICS_PERIOD 							10000
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -119,9 +128,12 @@ uint64_t startofcycletime = 0;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emsrunner_update_diagnosticsinfo_timing(void);
+static void s_eom_emsrunner_update_diagnosticsinfo_error_timing(void);
 static void s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid);
 static void s_eom_emsrunner_update_diagnosticsinfo_txfailure(void);
+static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_taskid_t taskid);
+static void s_eom_emsrunner_send_diagnosticsinfo_average_timing(void);
+static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void);
 
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg);
 
@@ -185,7 +197,10 @@ static eOemsrunner_diagnosticsinfo_t s_eom_emsrunner_diagnosticsinfo   =
     .maxabsoluteerrorinperiod                   = 0,
     .minabsoluteerrorinperiod                   = 1000000000,
     .executionoverflows                         = {0, 0, 0},
-    .datagrams_failed_to_go_in_txsocket         = 0  
+    .datagrams_failed_to_go_in_txsocket         = 0,
+	.average_et									= {0, 0, 0},
+	.max_et										= {0, 0, 0},
+	.min_et										= {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF}
 };
 
 uint64_t eom_emsrunner_rxstart = 0;
@@ -478,7 +493,7 @@ __weak extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStran
 
 /*__weak*/ extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p)
 {   
-    s_eom_emsrunner_update_diagnosticsinfo_timing();
+    s_eom_emsrunner_update_diagnosticsinfo_error_timing();
     
     p->numofrxrops = 0;
     p->numofrxpackets = 0;
@@ -756,7 +771,7 @@ __weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunne
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eom_emsrunner_update_diagnosticsinfo_timing(void) 
+static void s_eom_emsrunner_update_diagnosticsinfo_error_timing(void) 
 {
     static uint64_t prevtime = 0;
     uint64_t currtime = osal_system_abstime_get();
@@ -864,16 +879,27 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runRX]);
     }
     
+	/* No more used...
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX))
     {   // overflow-management-tag
         // marco.accame: we may reset it in here instead of inside timer-callback: eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runRX);
         s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
-        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX, eom_emsrunner_rxstart, osal_system_abstime_get()); 
+    eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runRX, eom_emsrunner_rxstart, osal_system_abstime_get());
+	eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runRX);
     }
-    
+    */
     eom_emsrunner_rxprevduration = eom_emsrunner_rxduration;
     eom_emsrunner_rxduration = osal_system_abstime_get() - eom_emsrunner_rxstart;
     
+	//update diagnostics info
+	s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eo_emsrunner_taskid_runRX);
+
+	s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX] = ((s_theemsrunner.iterationnumber - 1)*(s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX]) + eom_emsrunner_rxduration)/s_theemsrunner.iterationnumber;
+	if (eom_emsrunner_rxduration > s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX])
+		s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX] = eom_emsrunner_rxduration;
+	if (eom_emsrunner_rxduration < s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX])
+		s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX] = eom_emsrunner_rxduration;
+	
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runDO], osal_callerTSK);
 }
@@ -918,16 +944,27 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runDO]);
     }
 
+	/* No more used...
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {   // overflow-management-tag
         // marco.accame: we may reset it in here instead of inside timer-callback: eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runDO);
         s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
-        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO, eom_emsrunner_dostart, osal_system_abstime_get());     
+        eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runDO, eom_emsrunner_dostart, osal_system_abstime_get());
+		eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runDO);
     }
-    
+    */
     eom_emsrunner_doprevduration = eom_emsrunner_doduration;
     eom_emsrunner_doduration = osal_system_abstime_get() - eom_emsrunner_dostart;
-    
+		
+    //update diagnostics info
+	s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eo_emsrunner_taskid_runDO);
+	
+	s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO] = ((s_theemsrunner.iterationnumber - 1)*(s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO]) + eom_emsrunner_doduration)/s_theemsrunner.iterationnumber;
+	if (eom_emsrunner_doduration > s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO])
+		s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO] = eom_emsrunner_doduration;
+	if (eom_emsrunner_doduration < s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO])
+		s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO] = eom_emsrunner_doduration;
+		
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runTX], osal_callerTSK);
 }
@@ -967,14 +1004,16 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     }
 
    
-    
+    /* No more used...
     if(eobool_true == eom_runner_hid_signaloverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX))
     {   // overflow-management-tag
         // marco.accame: we may reset it in here instead of inside timer-callback: eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runTX);
         s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
         eom_emsrunner_hid_userdef_onexecutionoverflow(&s_theemsrunner, eo_emsrunner_taskid_runTX, eom_emsrunner_txstart, osal_system_abstime_get());
+		eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runTX);
     } 
-
+	*/
+		
     if(eobool_false == s_theemsrunner.cycleisrunning)
     {  
 
@@ -1011,6 +1050,24 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
     {           
         eom_emsrunner_txprevduration = eom_emsrunner_txduration;
         eom_emsrunner_txduration = osal_system_abstime_get() - eom_emsrunner_txstart;
+			
+		//update diagnostics info
+		s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eo_emsrunner_taskid_runTX);
+			
+		s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX] = ((s_theemsrunner.iterationnumber - 1)*(s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX]) + eom_emsrunner_txduration)/s_theemsrunner.iterationnumber;
+		if (eom_emsrunner_txduration > s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX])
+			s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX] = eom_emsrunner_txduration;
+		if (eom_emsrunner_txduration < s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX])
+			s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX] = eom_emsrunner_txduration;
+#ifdef SEND_STATISTICS_INFO
+		//Send up to PC104 some diagnostics every 5seconds
+		#warning davide: dispatcher must have a capacity >= 9
+		if(s_theemsrunner.iterationnumber%STATISTICS_PERIOD == 0)
+		{
+			s_eom_emsrunner_send_diagnosticsinfo_average_timing();
+			s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing();
+		}
+#endif								
         // at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
         s_eom_emsrunner_enable_task(s_theemsrunner.task[eo_emsrunner_taskid_runRX], osal_callerTSK);
     }
@@ -1186,6 +1243,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
     evEntityId_t preventityid = eventviewer_switch_to(EVIEWER_IDofTSKstart(currtaskid));
 #endif
     EOMtask *currtask = s_theemsrunner.task[currtaskid];
+	/* Below checks are no more used
     EOMtask* prevtask = s_theemsrunner.task[prevtaskid];
     osal_task_t *scheduledosaltask = osal_task_get(osal_callerISR);
 //    static osal_task_t *osaltaskipnetexec = NULL;
@@ -1217,7 +1275,8 @@ static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
             eom_runner_hid_overflow_set(&s_theemsrunner, prevtaskid);
         }
     }    
-      
+	*/
+		 
     // send event to activate the task in argument
     eom_task_isrSetEvent(currtask, eo_emsrunner_evt_execute);
 
@@ -1325,7 +1384,129 @@ static void s_eom_emsrunner_update_diagnosticsinfo_txfailure(void)
      s_eom_emsrunner_diagnosticsinfo.datagrams_failed_to_go_in_txsocket ++;
 }
 
+static void s_eom_emsrunner_send_diagnosticsinfo_average_timing(void)
+{
+	eOerrmanDescriptor_t errdes = {0};
+	errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+		
+	/* Average Times */
+	//RX
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_rxphaseaverage);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX]; 
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+		
+	//DO
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_dophaseaverage);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+		
+	//TX
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_txphaseaverage);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
+		
+	s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX] = 0, s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO] = 0, s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX] = 0;
+	}
 
+static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void)
+{
+	eOerrmanDescriptor_t errdes = {0};
+	errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+
+	/* Max Times */
+	//RX
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_rxphasemax);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+		
+	//DO
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_dophasemax);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+		
+	//TX
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_txphasemax);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
+		
+	s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX] = 0, s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO] = 0, s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX] = 0;
+		
+	/* Min Times */
+	//RX
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_rxphasemin);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+		
+	//DO
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_dophasemin);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+		
+	//TX
+    errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_txphasemin);
+    errdes.param            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX];
+	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
+		
+	s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX] = 0xFFFFFFFF, s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO] = 0xFFFFFFFF, s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX] = 0xFFFFFFFF;
+	
+	//reset the iteration counter
+	s_theemsrunner.iterationnumber = 0;
+	}
+
+static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_taskid_t taskid)
+{
+	eOerrmanDescriptor_t errdes = {0};
+	errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+  	errdes.sourceaddress    = 0;
+	eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == s_theemsrunner.mode) ? (eo_errortype_error) : (eo_errortype_warning);
+	switch (taskid)
+	{
+		case eo_emsrunner_taskid_runRX:
+			if (eom_emsrunner_rxduration > s_theemsrunner.cfg.execDOafter)
+			{
+				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runRX);
+				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
+				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowRX);
+				errdes.param            = eom_emsrunner_rxduration;
+				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
+			}
+			else
+			{
+				eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runRX);
+			}
+			break;
+		case eo_emsrunner_taskid_runDO:
+			if (eom_emsrunner_doduration > (s_theemsrunner.cfg.execTXafter - s_theemsrunner.cfg.execDOafter))
+			{
+				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runDO);
+				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
+				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowDO);
+				errdes.param            = eom_emsrunner_doduration;
+				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
+			}
+			else
+			{
+				eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runDO);
+			}
+			break;
+		case eo_emsrunner_taskid_runTX:
+			if (eom_emsrunner_txduration > (s_theemsrunner.cfg.period - s_theemsrunner.cfg.execTXafter))
+			{
+				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runTX);
+				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
+				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowTX);
+				errdes.param            = eom_emsrunner_txduration;
+				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
+			}
+			else
+			{
+				eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runTX);
+			}
+			break;
+	}
+}
 #if defined(EVIEWER_ENABLED)
 void evRXstart(void){}
 void evRXalert(void){}
