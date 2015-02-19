@@ -93,11 +93,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        2
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          18
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          19
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         22
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         10
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          00
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          0
 //  </h>build date
 
 // </h>Info 
@@ -688,41 +688,64 @@ extern "C" {
 
 //  </h>stack sizes
 
-//  <h> timings
+//  <e0> enable custom timings
+//	<i> If checked, the timings defined below will be used. If not, the default (adaptive) values will be used in the control loop
 
+#define EOMTHEEMSAPPLCFG_RUNOBJ_CUSTOMIZED 0
 
-//  <o> period [usec] <100-10000:100>
-//  <i> default: 1000
-#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD   1000
+#if (EOMTHEEMSAPPLCFG_RUNOBJ_CUSTOMIZED == 1)
+	//  <o> period [usec] <100-10000:100>
+	//  <i> default: 1000
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD         1000
 
-//  <o> RX start after [usec] <0-10000:10>
-//  <i> default: 0
-#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER   0
+	//  <o> RX start after [usec] <0-10000:10>
+	//  <i> default: 0
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER       0
 
-//  <o> RX safe execution [usec] <0-10000:10>
-//  <i> default: 300
-#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME   300
+	//  <o> RX safe execution [usec] <0-10000:10>
+	//  <i> default: 300
+	//  <i> B2/B4: 	 350
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME    300
 
-//  <o> DO start after [usec] <0-10000:10>
-//  <i> default: 400
-#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   400
+	//  <o> DO start after [usec] <0-10000:10>
+	//  <i> default: 400
+	//  <i> B2/B4: 	 450
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER       400
 
-//  <o> DO safe execution [usec] <0-10000:10>
-//  <i> default: 200
-#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME   200
+	//  <o> DO safe execution [usec] <0-10000:10>
+	//  <i> default: 200
+	//  <i> B2/B4: 	 50
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME    200
 
-//  <o> TX start after [usec] <0-10000:10>
-//  <i> default: 700
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   700
+	//  <o> TX start after [usec] <0-10000:10>
+	//  <i> default: 700
+	//  <i> B2/B4: 	 550
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER       700
 
-//  <o> TX safe execution [usec] <0-10000:10>
-//  <i> default: 250
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME   250
+	//  <o> TX safe execution [usec] <0-10000:10>
+	//  <i> default: 250
+	//  <i> B2/B4: 	 350
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME    250
+#else
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD      1000
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER    0
+	
+	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     350
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   	    450
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     50
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		550
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     350
+	#else
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     300
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   		400
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     200
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		700
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     250
+	#endif
+#endif
 
-
-
-//  </h>timings
-
+//  </e> enable custom timings
 
 //  <h> hardware timers
 //  <i> specify the hal timers used for triggering the phases of the runner plus the safetime alerts
