@@ -255,6 +255,11 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     // version
     status.version.major    = emscfg->applcfg.emsappinfo->info.entity.version.major;
     status.version.minor    = emscfg->applcfg.emsappinfo->info.entity.version.minor;
+		
+	// control loop timings 
+    status.cloop_timings[0] = emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[1] = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[2] = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
     
     uint16_t min = EO_MIN(sizeof(status.name), sizeof(emscfg->applcfg.emsappinfo->info.name));
     memcpy(status.name, emscfg->applcfg.emsappinfo->info.name, min);
