@@ -44,7 +44,7 @@ UInt8    mainLoopOVF = 0;
 int     _countBoardStatus[2] ={0,0};
 UInt8   highcurrent[4]={false,false,false,false};
 Int16   _flash_version=0; 
-UInt8   mais_counter=0;
+UInt16   mais_counter=0;
 UInt16  mais_init_request=0;
 #define  MAX_MAIS_COUNTER 100
 
@@ -337,9 +337,12 @@ void main(void)
 			for (i=0; i<JN; i++)
 			{
 			    if (!mode_is_idle(i))
-					put_motor_in_fault(i);	    
+			    {
+			    	can_printf("MAIS fault %d", mais_counter);
+			    	put_motor_in_fault(i);	    
+			    }
 			}
-			if (msec==0) can_printf("MAIS error");	
+			if (msec==0) can_printf("MAIS error %d", mais_counter);	
 		}
 		else
 		    mais_counter++; //this variable is set to zero whenever a message from the MAIS is received

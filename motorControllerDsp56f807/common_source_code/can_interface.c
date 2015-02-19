@@ -44,7 +44,7 @@ extern canmsg_t can_fifo[];
 extern Int16 write_p;
 extern Int16 read_p;
 
-extern UInt8 mais_counter;
+extern UInt16 mais_counter;
 canmsg_t _canmsg;					// buffer to prepare messages for send 
 
 byte  can_channels = 0; 
