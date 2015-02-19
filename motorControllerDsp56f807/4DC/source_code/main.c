@@ -46,7 +46,7 @@ UInt8   highcurrent[4]={false,false,false,false};
 Int16   _flash_version=0; 
 UInt8   mais_counter=0;
 UInt16  mais_init_request=0;
-#define  MAX_MAIS_COUNTER 15
+#define  MAX_MAIS_COUNTER 100
 
 //#define  MAIS_INIT_REQUEST 500
 
@@ -446,6 +446,14 @@ void main(void)
 	    	can_printf("ABS error %d",1);	
 			#endif
 	    }					
+#endif
+
+#if 0
+        //use this block here to debug motor optical encoders on fw version x.28 and x.30
+        if (test==1000)
+        {
+            can_printf("%f %f %f %f",_position_enc[0],_position_enc[1],_position_enc[2],_position_enc[3]);	
+        }
 #endif
 
 //-------------------------------------------------------------------------------------------
