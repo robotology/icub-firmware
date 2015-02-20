@@ -54,7 +54,7 @@
 #include "EOMtheEMSapplCfg.h"
 #include "eOcfg_appTheDataBase.h"
 
-#include "EOaction_hid.h"
+#include "EOaction.h"
 
 #include "EOtheProtocolWrapper.h"
 
@@ -154,8 +154,11 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p);
-static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p);
+//static eOresult_t s_eo_emsapplBody_MaisTXenable(EOtheEMSapplBody *p);
+// marco.accame on 19feb15: we dont want to disable mais transmission unless robotinterface does that.
+//static eOresult_t s_eo_emsapplBody_MaisTXdisable(EOtheEMSapplBody *p);
+
+static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
@@ -196,7 +199,7 @@ static const char s_eobj_ownname[] = "EOtheEMSapplBody";
 
 extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cfg)
 {
-    eOresult_t res;
+    //eOresult_t res;
     EOtheEMSapplBody *p = NULL;
 
     if(NULL == cfg)
@@ -219,15 +222,17 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
 
     s_eo_emsapplBody_checkConfig(p);    // check config: if anything is wrong .... it calls errormanager with fatal error
     
-    res = eo_emsapplBody_checkCanBoards_Start(p);
+      
+    eo_emsapplBody_discovery_Mais_Start(p);
     
-    eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "error in startCheckCanboards", s_eobj_ownname, &eo_errman_DescrTobedecided);
+    eo_emsapplBody_checkCanBoards_Start(p);
+    
     
     p->st = eo_emsApplBody_st__initted;
         
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "EOtheEMSapplBody started", s_eobj_ownname, &eo_errman_DescrRunningHappily);
     
-    
+   
     return(p);
 }
 
@@ -301,6 +306,11 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 {
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     eOresult_t                          res;
     uint16_t                            numofjoint, i;
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
@@ -317,11 +327,12 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     }
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
     {   
-        res = s_eo_emsapplBody_EnableTxMais(p);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
+        #warning marco.accame: removed mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
+//        res = s_eo_emsapplBody_MaisTXenable(p);
+//        if(eores_OK != res)
+//        {
+//            return(res);
+//        }
 
         numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
         
@@ -349,6 +360,11 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 
 extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
 {
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     eOresult_t                          res;
     uint16_t                            numofjoint, i;
     eOicubCanProto_bcastpolicy_t        bcastpolicy =
@@ -378,8 +394,10 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
             res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy.val2bcastList[0]));
         }
         
-        // 3) disable tx on mais
-        res = s_eo_emsapplBody_DisableTxMais(p);
+        #warning marco.accame asks: shall we send the mc4 to idle in here? the 2foc boards are sent to idle.
+        
+        // marco.accame on 19feb15: we dont want to disable mais transmission unless robotinterface does that.
+        // res = s_eo_emsapplBody_MaisTXdisable(p);
         
         return(res);
     }
@@ -404,6 +422,11 @@ extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_dev
 
 extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask)
 {
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     return(s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask));
 }
 
@@ -412,15 +435,21 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p)
 {
     if(NULL == p)
     {
-        return(eores_OK);
+        return(eores_NOK_nullpointer);
     }
+    
     eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
     return(eo_timer_Stop(p->checkCanBoards_timer));
 }
 
 
 extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
-{
+{    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     static eObool_t already_send = eobool_false;
     eOresult_t res;
     
@@ -429,10 +458,6 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         return(eores_OK);
     }
         
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
     
     res = s_eo_emsapplBody_sendConfig2canboards(p);
     
@@ -447,59 +472,116 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 
 
 extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
-{
-    eOresult_t                      res;
-    uint8_t                         i, j;
-    EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
-    uint8_t                         boardEndAddr;
-    eOicubCanProto_msgDestination_t msgdest;
-    
-    uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-    
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-    };
-    
+{  
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
-    for(j=0; j<numofskin; j++) //for each skid
+    uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+            
+    if(numofskin > 0)
     {
-        res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
-        if(eores_OK != res)
+        eOresult_t                      res;
+        uint8_t                         i, j;
+        EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+        eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
+        uint8_t                         boardEndAddr;
+        eOicubCanProto_msgDestination_t msgdest;
+        
+        uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+        
+        eOicubCanProto_msgCommand_t msgCmd = 
         {
-            return(eores_NOK_generic);
-        }
-            
-        boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
-    
-        icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-            
-        for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) //for each skid 
+            EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+            EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+        };
+        
+        
+        for(j=0; j<numofskin; j++) //for each skid
         {
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-            
-            res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
+            res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
             if(eores_OK != res)
             {
                 return(eores_NOK_generic);
             }
-        }
+                
+            boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
+        
+            icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
+                
+            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) //for each skid 
+            {
+                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+                
+                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
+                if(eores_OK != res)
+                {
+                    return(eores_NOK_generic);
+                }
+            }
+        }    
     }
+    
     return(eores_OK);
+}
 
+// maro.accame: at the date of 20feb2015 it highly temporary.
+
+static eObool_t maisfound = eobool_false;
+
+extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    // marco.accame: in here is should start a discovery procedure about mais board.
+    // proposal:
+    // we instantiate a timer with a callback that checks its fw version by sending a can frame
+    // when the mais sends it back, the callback call eo_emsapplBody_discovery_Mais_Stop()
+    // whcih in turns call s_eo_emsapplBody_MaisStart().
+    
+    
+    // this variable or a similar one will be set to true by the can callback upon rx of the correct fw version
+    maisfound = eobool_true;
+    
+    eo_emsapplBody_discovery_Mais_Stop(p);
+        
+        
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    // after i have found the mais, then i start it.
+    // this 
+    
+    if(eobool_true == maisfound)
+    {
+        s_eo_emsapplBody_MaisStart(p);
+    }
+    
+    return(eores_OK);   
 }
 
 
 extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
 {
-    eOresult_t                              res = eores_OK;
-    EOaction                                action;
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    EOaction_strg astg = {0};
+    EOaction *action = (EOaction*)&astg;
     
     //note: can protocol version check is done only for motor control
     
@@ -509,20 +591,25 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
 //     }
 
    
-    eo_action_SetEvent(&action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 10*eok_reltime1ms, eo_tmrmode_FOREVER, &action);
+    eo_action_SetEvent(action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 10*eok_reltime1ms, eo_tmrmode_FOREVER, action);
     
     // marco.accame: better asking the callback of the timer to manage the sending og get-fw-version.
     // so that we van decide to apply a delay to the first request (or to ask it just after the first 10 ms)
 //    uint32_t dontaskmask = 0; // the first time we ask to every board
 //    res = s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask); 
     
-    return(res);
+    return(eores_OK);
 }
 
 
 extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
 {
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     // maybe in here we can put an info diagnostics message    
     // send message about the ready boards
     uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
@@ -541,7 +628,7 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
             // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
             des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
             des.sourceaddress   = loc.addr;
-            des.param           = (exptype << 8) | ((detected.boardtype) & 0xff); 
+            des.par16           = (exptype << 8) | ((detected.boardtype) & 0xff); 
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
         }                    
     }
@@ -1053,47 +1140,86 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
 }
 
 
-static eOresult_t s_eo_emsapplBody_EnableTxMais(EOtheEMSapplBody *p)
-{
-    eOresult_t                  res = eores_NOK_generic;
-    eOas_maisId_t               sId = 0; //exist only one mais per ep
-    eOas_mais_config_t          *maiscfg = NULL;
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-    };
 
+// marco.accame on 19feb15: we dont want to disable mais transmission unless robotinterface does that.
+//static eOresult_t s_eo_emsapplBody_MaisTXdisable(EOtheEMSapplBody *p)
+//{
+//    eOresult_t                  res;
+//    eOas_maisId_t               sId = 0; //exist only one mais per ep
+//    eOas_maismode_t             mode = eoas_maismode_acquirebutdonttx;
+//    eOicubCanProto_msgCommand_t msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+//    };
+//    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&mode);
+//    return(res);
+//}
+
+#warning marco.accame: see THIS...
+
+//static eOresult_t s_eo_emsapplBody_MaisTXenable(EOtheEMSapplBody *p)
+//{
+//    eOresult_t                  res = eores_NOK_generic;
+//    eOas_maisId_t               sId = 0; //exist only one mais per ep
+//    eOas_mais_config_t          *maiscfg = NULL;
+//    eOicubCanProto_msgCommand_t msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+//    };
+//    
+//    maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), sId);
+//    if(NULL == maiscfg)
+//    {
+//        return(res); //error
+//    }
+//      
+//    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(maiscfg->mode));
+//
+//    return(res);
+//}
+
+static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
+{
+    // we start the mais with the values inside the mais.config data structure.
+    eOresult_t res = eores_NOK_generic;
+    const eOas_maisId_t maisId = 0; 
+    eOas_mais_config_t *maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), maisId);
     
-    maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == maiscfg)
-    {
-        return(res); //error
+    {   // we dont have mais
+        return(eores_OK);
     }
-      
-    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(maiscfg->mode));
-
-    return(res);
-}
-
-
-static eOresult_t s_eo_emsapplBody_DisableTxMais(EOtheEMSapplBody *p)
-{
-    eOresult_t                  res;
-    eOas_maisId_t               sId = 0; //exist only one mais per ep
-    eOas_maismode_t             mode = eoas_maismode_acquirebutdonttx;
-    eOicubCanProto_msgCommand_t msgCmd = 
+    
+    uint8_t datarate = maiscfg->datarate;       // it must be 10
+    eOenum08_t mode = maiscfg->mode;            // it must be eoas_maismode_txdatacontinuously
+    
+    // ok, now i go on
+    
+    eOicubCanProto_msgCommand_t msgCmd = {0};
+    EOappCanSP *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    
+    // set datarate    
+    msgCmd.class = icubCanProto_msgCmdClass_pollingAnalogSensor;
+    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&datarate); 
+    if(eores_OK != res)
     {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-    };
-
-
-    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&mode);
-
-    return(res);
+        return(res);
+    }
+          
+    // set txmode       
+    msgCmd.class = icubCanProto_msgCmdClass_pollingAnalogSensor;
+    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&mode);     
+    if(eores_OK != res)
+    {
+        return(res);
+    }    
+        
+    return(res);       
 }
-
 
 
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)

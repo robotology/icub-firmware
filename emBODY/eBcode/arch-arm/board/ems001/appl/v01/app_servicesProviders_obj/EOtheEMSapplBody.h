@@ -137,11 +137,12 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev);
 
 extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask);
-
-
 extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
-
 extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
+
+extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
+extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p);
+
 
 
 //Note: eo_emsapplBody_sendConfig2canboards function send only one time the configuration; so the second call of this func will send anything!
