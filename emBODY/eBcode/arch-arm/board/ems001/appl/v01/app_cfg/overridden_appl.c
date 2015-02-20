@@ -32,7 +32,7 @@
 #include "EOtheEMSapplBody.h"
 
 #include "EOtheEMSapplDiagnostics.h"
-#include "EOaction_hid.h"
+#include "EOaction.h"
 #include "hl_bits.h"
 
 #include "EOMtheEMSapplCfg_cfg.h"
