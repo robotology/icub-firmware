@@ -330,11 +330,11 @@ extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
             hal_can_out_get((hal_can_port_t)port, &sizeoftxfifo);
             eOerrmanDescriptor_t errdes = {0};
             errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-            errdes.param                = (eOcanport1 == port) ? (1) : (2);
-            errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-            errdes.param                |= 0x0010;
-            errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress        = 0;                
+            errdes.par16                = 0x0001;
+            errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+            errdes.par64                = 0; // dont knw what to send up           
+            errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+            errdes.sourceaddress        = 0;                                   
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
         }
     }
@@ -492,9 +492,10 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
         {  
             eOerrmanDescriptor_t errdes = {0};
             errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
-            errdes.param                = (eOcanport1 == canport) ? (1) : (2);
-            errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress        = 0;                
+            errdes.par16                = (canframe.id & 0x0fff) | ((canframe.size & 0x000f) << 12);
+            errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&canframe);
+            errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+            errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);                
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);             
         }
     }
@@ -636,11 +637,11 @@ extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t c
         uint8_t sizeoftxfifo = 0;
         hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);       
         errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-        errdes.param                = (eOcanport1 == canport) ? (1) : (2);
-        errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-        errdes.param                |= 0x0020;
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;              
+        errdes.par16                = 0x0002;
+        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+        errdes.par64                = 0; // dont knw what to send up
+        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = 0;                         
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
     }    
     
@@ -697,11 +698,11 @@ extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t ca
         uint8_t sizeoftxfifo = 0;
         hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
         errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-        errdes.param                = (eOcanport1 == canport) ? (1) : (2);
-        errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-        errdes.param                |= 0x0030;
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;               
+        errdes.par16                = 0x0003;
+        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+        errdes.par64                = 0; // dont knw what to send up
+        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = 0;                  
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
     }
     
@@ -759,11 +760,11 @@ extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t can
         uint8_t sizeoftxfifo = 0;
         hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
         errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-        errdes.param                = (eOcanport1 == canport) ? (1) : (2);
-        errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-        errdes.param                |= 0x0040;
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;                
+        errdes.par16                = 0x0004;
+        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+        errdes.par64                = 0; // dont knw what to send up
+        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = 0;                   
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
     }
  
@@ -993,10 +994,10 @@ static void s_eo_appCanSP_callbackOnRx_portx_alertOnReception(void *arg, hal_can
     p->cfg.cbkonrx[port].fn(p->cfg.cbkonrx[port].argoffn);
 }
 
-static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emscanport, eOicubCanProto_msgDestination_t dest, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
+static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t canport, eOicubCanProto_msgDestination_t dest, eOicubCanProto_msgCommand_t msgCmd, void *val_ptr)
 {
     eOresult_t          res;
-    eOcanframe_t        canFrame;
+    eOcanframe_t        canframe = {0};
     osal_result_t       osal_res;
     hal_result_t        hal_res = hal_res_NOK_generic;
     
@@ -1007,13 +1008,14 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
     eOerrmanDescriptor_t errdes = {0};  
     uint8_t sizeoftxfifo = 0;    
     
-    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, val_ptr, &canFrame);
+    res = eo_icubCanProto_FormCanFrame(p->icubCanProto_ptr, msgCmd, dest, val_ptr, &canframe);
     if(eores_OK != res)
     {
         errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
-        errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;  
+        errdes.par16                = (msgCmd.class << 8) | (msgCmd.cmdId);
+        errdes.par64                = 0;
+        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = dest.s.canAddr;           
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
         
         return(res);
@@ -1030,15 +1032,15 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         // in here there is an attempt of recovery but i believe that is hardy successful. i keep it nevertheless.
         
 #ifdef _GET_CANQUEUE_STATISTICS_
-        hal_can_out_get((hal_can_port_t)emscanport, &numofoutframe);
-        eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(emscanport, numofoutframe+1);
+        hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
+        eo_theEMSdgn_updateCanTXqueueStatisticsOnConfigMode(canport, numofoutframe+1);
 #endif
         // marco.accame on nov 28, 2014
         // i try to put a frame into the fifo-tx queue. the only good result is hal_res_OK. 
         // other results can be:
         // - hal_res_NOK_generic (wrong parameters), which it does not happen because the port is valid and frame is not NULL
         // - hal_res_NOK_busy (full fifo-tx), which can happen.
-        hal_res = hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+        hal_res = hal_can_put((hal_can_port_t)canport, (hal_can_frame_t*)&canframe, hal_can_send_normprio_now );
         
         if(hal_res_OK == hal_res)
         {
@@ -1047,13 +1049,13 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         else
         {
             // problems ... it is worth send at least a warning.
-            hal_can_out_get((hal_can_port_t)emscanport, &sizeoftxfifo);
+            //hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
             errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txfifooverflow);
-            errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-            errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-            errdes.param                |= 0x0010;
-            errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress        = 0;  
+            errdes.par16                = (canframe.id & 0x0fff) | ((canframe.size & 0x000f) << 12);
+            errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&canframe);
+            errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+            errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);                             
+            
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, s_eobj_ownname, &errdes);               
              
             
@@ -1061,38 +1063,37 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
             {   // marco.accame: it is the normal case in which the tx fifo is full    
                 // i try a small recovery: wait until one frame is sent (by semaphore wait), and then attempt again with hal_can_put()
                 
-                hal_irqn_t irqn = (eOcanport1 == emscanport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;                
+                hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;                
                 
                 hal_sys_irqn_disable(irqn);
-                p->waittxdata[emscanport].waitenable        = eobool_true;
-                p->waittxdata[emscanport].numoftxframe2send = 1; // one frame only
+                p->waittxdata[canport].waitenable        = eobool_true;
+                p->waittxdata[canport].numoftxframe2send = 1; // one frame only
                 hal_sys_irqn_enable(irqn);
 
                 // wait for some time, but NOT FOREVER. otherwise the application hangs up
-                osal_res = osal_semaphore_decrement(p->waittxdata[emscanport].semaphore, eoappCanSP_onEvtMode_timeoutSendFrame);
+                osal_res = osal_semaphore_decrement(p->waittxdata[canport].semaphore, eoappCanSP_onEvtMode_timeoutSendFrame);
                 
                 // marco accame: i must reset these values only in case if osal_res is timed-out because otherwise the isr did that
                 // .... but for now i keep the code as i have found it and i reset them anyway
                 hal_sys_irqn_disable(irqn);
-                p->waittxdata[emscanport].waitenable = eobool_false;
-                p->waittxdata[emscanport].numoftxframe2send = 0; 
+                p->waittxdata[canport].waitenable = eobool_false;
+                p->waittxdata[canport].numoftxframe2send = 0; 
                 hal_sys_irqn_enable(irqn);
                 
                 if(osal_res_OK == osal_res)
                 {
                     // if the semaphore decremented succesfully, it means that the isr has removed at least one frame, 
-                    // thusi can attempt a second trial of hal_can_put()
-                    hal_res = hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_now );
+                    // thus i can attempt a second trial of hal_can_put()
+                    hal_res = hal_can_put((hal_can_port_t)canport, (hal_can_frame_t*)&canframe, hal_can_send_normprio_now );
                     if(eores_OK != res)
                     {
                         // marco.accame: it should not happen ... but we issue an error anyway.                        
-                        hal_can_out_get((hal_can_port_t)emscanport, &sizeoftxfifo);
+                        //hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);                        
                         errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txfifooverflow);
-                        errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-                        errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-                        errdes.param                |= 0x0020;
-                        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-                        errdes.sourceaddress        = 0;  
+                        errdes.par16                = (canframe.id & 0x0fff) | ((canframe.size & 0x000f) << 12);
+                        errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&canframe);
+                        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                        errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);                         
                         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
                     }
                 }
@@ -1100,28 +1101,24 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
                 {
                     // the semaphore was not decremented correctly because the can-isr did not send a frame out
                     // issue an error of tx can bus failure
-                    hal_can_out_get((hal_can_port_t)emscanport, &sizeoftxfifo);
+                    hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
                     errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-                    errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-                    errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-                    errdes.param                |= 0x0050;
-                    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-                    errdes.sourceaddress        = 0;  
+                    errdes.par16                = 0x0005;
+                    errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+                    errdes.par64                = 0; // dont knw what to send up
+                    errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                    errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id); ;                     
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                                           
                 }
             }
             else
             {   // marco.accame: unlikely error which happens only in case of invalid parameters inside hal_can_put()
-                // i still use eoerror_value_SYS_canservices_txfifooverflow istead of eoerror_value_SYS_wrongparam so that i know if it ever happens
-                //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "very unlikely error in hal_can_put() returning hal_res_NOK_generic", s_eobj_ownname, &eo_errman_DescrTobedecided);
-                hal_can_out_get((hal_can_port_t)emscanport, &sizeoftxfifo);
-                errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txfifooverflow);
-                errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-                errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-                errdes.param                |= 0x0030;
-                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress        = 0;  
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                   
+                errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+                errdes.par16                = 0x0001;
+                errdes.par64                = 0;
+                errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);    
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);                   
             }
             
         }
@@ -1135,7 +1132,7 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         // this situation can happens, expecially if a received udp packet contains several ROPs which all produce many can-frames each.
         // that is the case of configuring joints/motors on mc4 boards or the skin boards
         
-        hal_res = hal_can_put((hal_can_port_t)emscanport, (hal_can_frame_t*)&canFrame, hal_can_send_normprio_later);
+        hal_res = hal_can_put((hal_can_port_t)canport, (hal_can_frame_t*)&canframe, hal_can_send_normprio_later);
         
         //#warning --> capita qui il problema del can con skin-cfg... vedere di aumentare la dimensione del buffer se accade. cercare di capire sull skin-cfg
        
@@ -1143,10 +1140,11 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
         {
             // marco.accame: we all are happy as hal_can_put() succesfully accepts a canframe in its tx fifo.       
 //            static uint16_t count = 0;
-//            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txwasok);
-//            errdes.param                = count++;
-//            errdes.sourcedevice         = (eOcanport1 == emscanport) ? (1) : (2);
-//            errdes.sourceaddress        = dest.s.canAddr;  
+//            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txfifoputisok);
+//            errdes.par16                = (canframe.id & 0x0fff) | ((canframe.size & 0x000f) << 12);
+//            errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&canframe);
+//            errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//            errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);  
 //            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
         }
         else
@@ -1154,37 +1152,32 @@ static eOresult_t s_eo_appCanSP_formAndSendFrame(EOappCanSP *p, eOcanport_t emsc
             if(hal_res_NOK_busy == hal_res)
             {
                 // marco.accame: it is the normal case in which the tx fifo is full. we cannot do much but tell to increase capacity of tx fifo
-                hal_can_out_get((hal_can_port_t)emscanport, &sizeoftxfifo);
+                //hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
                 errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txfifooverflow);
-                errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-                errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-                errdes.param                |= 0x0040;
-                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress        = 0;  
+                errdes.par16                = (canframe.id & 0x0fff) | ((canframe.size & 0x000f) << 12);
+                errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&canframe);
+                errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);                  
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);  
             }
             else
             {
                 // marco.accame: unlikely error which happens only in case of invalid parameters inside hal_can_put()
-                // i still use eoerror_value_SYS_canservices_txfifooverflow istead of eoerror_value_SYS_wrongparam so that i know if it ever happens
-                //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "very unlikely error in hal_can_put() returning hal_res_NOK_generic", s_eobj_ownname, &eo_errman_DescrTobedecided);
-                hal_can_out_get((hal_can_port_t)emscanport, &sizeoftxfifo);
-                errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-                errdes.param                = (eOcanport1 == emscanport) ? (1) : (2);
-                errdes.param                |= ((uint16_t)sizeoftxfifo << 8);
-                errdes.param                |= 0x0060;
-                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress        = 0;  
+                errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+                errdes.par16                = 0x0002;
+                errdes.par64                = 0;
+                errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);                  
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                   
             }
         }
     }
     
-    if(p->periphstatus[emscanport].isnewvalue)
+    if(p->periphstatus[canport].isnewvalue)
     {
-        s_eo_appCanSP_updateDiagnosticValues(p, emscanport);
+        s_eo_appCanSP_updateDiagnosticValues(p, canport);
         eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , eoappCanSP_timeoutsenddiagnostics);
-        s_eo_appCanSP_clearDiagnosticValues(p, emscanport);
+        s_eo_appCanSP_clearDiagnosticValues(p, canport);
     }
     
     res = (hal_res == hal_res_OK) ? (eores_OK) : (eores_NOK_generic);
@@ -1216,12 +1209,12 @@ static void s_eo_appCanSP_callbackOnErr_portx(void *arg, eOcanport_t port)
         // send msg about rx-fifo-overflow
         eOerrmanDescriptor_t errdes = {0};  
         uint8_t sizeofrxfifo = (eOcanport1 == port) ? (HALCAN1capacityofrxfifoofframes) : (HALCAN2capacityofrxfifoofframes);
-        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxfifooverflow);
-        errdes.param                = (eOcanport1 == port) ? (1) : (2);
-        errdes.param                |= ((uint16_t)sizeofrxfifo << 8);
-        errdes.param                |= 0x0010;
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;  
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxfifooverflow);       
+        errdes.par16                = 0x0001;
+        errdes.par16                |= ((uint16_t)sizeofrxfifo << 8);
+        errdes.par64                = 0; // dont knw what to send up           
+        errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = 0;          
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);           
     }    
 
