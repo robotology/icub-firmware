@@ -193,7 +193,8 @@ extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStrans
     
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_configurator_udptxfailure);
-    errdes.param            = 0;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSconfigurator", &errdes); 
