@@ -85,7 +85,7 @@ static const eOappTheDB_canboardinfo_t s_cfg_appDB_boards[] =
     // marco.accame: this board is not used by the joints. however in the application it is present inside the list of boards.
     //               its address is used to ask the fw-version ... we could change the type to eobrd_none so that no fw-version can message is sent.  
         .port   = eOcanport1,       
-        .addr   = 2,
+        .addr   = 2,        // if you ever change this address ............ change also function s_eo_icubCanProto_isUnused2FOCinTorso()
         .type   = eobrd_cantype_1foc,
     }, 
     { // 2  == FOC_ADDRCAN_3_BID
