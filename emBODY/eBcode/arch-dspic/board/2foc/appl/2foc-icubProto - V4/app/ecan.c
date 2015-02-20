@@ -369,7 +369,10 @@ int ECANRxFilterAdd(unsigned long id, unsigned long mask)
 
 void ECANStart()
 {
-	
+    // put the module in normal mode
+  C1CTRL1bits.REQOP=1;
+  while(C1CTRL1bits.OPMODE != 1);
+
   // put the module in normal mode
   C1CTRL1bits.REQOP=0;
   while(C1CTRL1bits.OPMODE != 0);

@@ -8,6 +8,9 @@
 #include <dsp.h>
 #include <libpic30.h>  //__delay32
 #include <timer.h>
+//#define USE_AND_OR
+//#include <i2c.h>
+#include "i2cTsens.h"
 
 #include "UserParms.h"
 #include "System.h"
@@ -142,18 +145,38 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
     IFS0bits.T3IF = 0; // clear flag
 }
 
+void __attribute__((interrupt, no_auto_psv)) _MI2C1Interrupt(void)
+{
+        //IFS1bits.MI2C1IF = 0;		//Clear the DMA0 Interrupt Flag;
+}
+
+//#define WAITFOR(flag,errcode,jump) for (wdog=12800; wdog && (flag); --wdog); if (!wdog) { gTemperature=errcode; goto jump; }
+
 void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
 //
 // TIMER 1 IRQ Service Routine
 // used for  low frequency operation (LED toggling reference....)
 //
 {
+  extern int gTemperature;
+  extern unsigned int i2cERRORS;
+
   // polls for recovered can error in order to reset status flags
   ECANCheckState();
   // blink leds according to the desired blinking rate
   BlinkLed();
   // light the leds
   ActuateMuxLed();
+
+  static int cycle = 0;
+  if (++cycle>=20)
+  {
+        cycle = 0;
+
+        gTemperature = readI2CTsens();
+
+        if (gTemperature < 0) ++i2cERRORS;
+  }
 
   IFS0bits.T1IF = 0; // clear flag
 }
@@ -522,6 +545,11 @@ void SetupPorts_DHES(void)
   // No particular init needed, pins already inputs
 }
 
+void SetupPorts_I2C(void)
+{
+    setupI2CTsens();
+}
+
 void SetupPorts( void )
 //
 //  init dsPic ports and peripheral mapping
@@ -569,6 +597,9 @@ void SetupPorts( void )
   // Digital Hall Effect Sensors
   SetupPorts_DHES();
 #endif
+
+  // I2C port
+  SetupPorts_I2C();
 
   // issue an LOCK sequence
   __builtin_write_OSCCONL( OSCCON | 0x40 );

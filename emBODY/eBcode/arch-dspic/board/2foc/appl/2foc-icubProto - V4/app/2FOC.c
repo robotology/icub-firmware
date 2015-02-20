@@ -77,6 +77,8 @@
 #include <stdio.h>
 #include <libpic30.h>  //__delay32
 
+#include <i2c.h>
+
 #include "UserTypes.h"
 #include "MeasCurr.h"
 #include "UserParms.h"
@@ -137,6 +139,8 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 volatile static char QEisOk = 0;
 volatile static char sZeroCrossed = 0;
 volatile static char sAlignInProgress = 1;
+volatile int gTemperature = 0;
+volatile unsigned int i2cERRORS = 0;
 
 unsigned int poscnt_max = 0, poscnt_min = 0xFFFF;
 unsigned int dirty_cws = 0, dirty_ccw = 0;
@@ -214,12 +218,14 @@ bool updateOdometry()
             {
                 // QE is broken
                 qe_watchdog = 0;
+/*
 #ifndef CALIBRATION
                 sAlignInProgress = 1;
                 encoder_error |= 2;
                 SysError.EncoderFault = 1;
                 FaultConditionsHandler();
 #endif
+*/
             }
         }
     }
@@ -762,16 +768,17 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     ////////////////////////////////////////////////////////////////////////////
     // Invoke the I2T integrator with new current values
-    static const long I2T_LIMIT = ((long)(UDEF_CURRENT_MAX/100)*(long)(UDEF_CURRENT_MAX/100))*(UDEF_I2T_LIMIT*UDEF_I2T_LIMIT);
+    //static const long I2T_LIMIT = ((long)(UDEF_CURRENT_MAX/100)*(long)(UDEF_CURRENT_MAX/100))*(UDEF_I2T_LIMIT*UDEF_I2T_LIMIT);
 
-    static long I2Tacc = 0;
-    long I2 = __builtin_mulss(I2Tdata.IQMeasured,I2Tdata.IQMeasured);
+    //static long I2Tacc = 0;
+    //long I2 = __builtin_mulss(I2Tdata.IQMeasured,I2Tdata.IQMeasured);
 
-    I2 -= I2Tacc;
-    I2 >>= 15;
-    I2Tacc += I2;
+    //I2 -= I2Tacc;
+    //I2 >>= 15;
+    //I2Tacc += I2;
 
-    if (I2Tacc > I2T_LIMIT)
+    //if (I2Tacc > I2T_LIMIT)
+    if (gTemperature > 3468) // = 100 C   T = 0.0297*i2c - 3;
     {
         //The I2T grew too much. Protect!
         SysError.I2TFailure = 1;
@@ -796,9 +803,9 @@ void updateGulp(void)
     if (!gulp_update_request) return;
 
     Gulp.W[0] = I2Tdata.IQMeasured;
-    Gulp.W[1] = encoder_error;
-    Gulp.W[2] = overf_cnt; // gQEPosition & 0xFFFF;
-    Gulp.W[3] = POSCNT;    // gQEPosition>>16;
+    Gulp.W[1] = POSCNT; //gQEVelocity;//gTemperature; //encoder_error;
+    Gulp.W[2] = gTemperature;//overf_cnt; // gQEPosition & 0xFFFF;
+    Gulp.W[3] = i2cERRORS;    // gQEPosition>>16;
 
     //Gulp.W[0] = *gulpadr1;
     //Gulp.W[1] = *gulpadr2;
@@ -1012,9 +1019,7 @@ int main(void)
 //
 // drive functions are controlled according to DS402 standard (when possible)
 //
-{
-    uint32_t boardCanAddr;
-
+{    
     // Configure Oscillator Clock Source, PLL
     oscConfig();
     // set up port direction and peripheral pin mapping
@@ -1037,6 +1042,7 @@ int main(void)
     Timer1Config();
     // Setup timer for I2T (when 2foc loop is not running)
     Timer3Config();
+    EnableAuxServiceTimer();
     // enable timer1 interrupt
     EnableIntT1;
 
@@ -1108,7 +1114,7 @@ notrreadytoswitchon:
     // LED blinking velocity
     LED_status.GreenBlinkRate = BLINKRATE_ULTRAFAST;
 
-    boardCanAddr = BOARD_CAN_ADDR_DEFAULT;
+    uint32_t boardCanAddr = BOARD_CAN_ADDR_DEFAULT;
     _memcpy_p2d16(&boardCanAddr, 0x15000, 4);
     CanIcubProtoInit(boardCanAddr);
 

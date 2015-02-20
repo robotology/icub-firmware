@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../../app/2FOC.c ../../app/ADC.c ../../app/DCLink.c ../../app/Encoder.c ../../app/Faults.c ../../app/PWM.c ../../app/System.c ../../app/crc16.c ../../app/ecan.c ../../app/qep.c ../../app/traps.c ../../app/MeasCurr.s ../../app-added/can_icubProto.c ../../app-added/can_icubProto_parser.c ../../app-added/can_icubProto_trasmitter.c
+SOURCEFILES_QUOTED_IF_SPACED=../../app/2FOC.c ../../app/ADC.c ../../app/DCLink.c ../../app/Encoder.c ../../app/Faults.c ../../app/PWM.c ../../app/System.c ../../app/crc16.c ../../app/ecan.c ../../app/qep.c ../../app/traps.c ../../app/i2cTsens.c ../../app/MeasCurr.s ../../app-added/can_icubProto.c ../../app-added/can_icubProto_parser.c ../../app-added/can_icubProto_trasmitter.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1445257345/2FOC.o ${OBJECTDIR}/_ext/1445257345/ADC.o ${OBJECTDIR}/_ext/1445257345/DCLink.o ${OBJECTDIR}/_ext/1445257345/Encoder.o ${OBJECTDIR}/_ext/1445257345/Faults.o ${OBJECTDIR}/_ext/1445257345/PWM.o ${OBJECTDIR}/_ext/1445257345/System.o ${OBJECTDIR}/_ext/1445257345/crc16.o ${OBJECTDIR}/_ext/1445257345/ecan.o ${OBJECTDIR}/_ext/1445257345/qep.o ${OBJECTDIR}/_ext/1445257345/traps.o ${OBJECTDIR}/_ext/1445257345/MeasCurr.o ${OBJECTDIR}/_ext/1722765132/can_icubProto.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_parser.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_trasmitter.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1445257345/2FOC.o.d ${OBJECTDIR}/_ext/1445257345/ADC.o.d ${OBJECTDIR}/_ext/1445257345/DCLink.o.d ${OBJECTDIR}/_ext/1445257345/Encoder.o.d ${OBJECTDIR}/_ext/1445257345/Faults.o.d ${OBJECTDIR}/_ext/1445257345/PWM.o.d ${OBJECTDIR}/_ext/1445257345/System.o.d ${OBJECTDIR}/_ext/1445257345/crc16.o.d ${OBJECTDIR}/_ext/1445257345/ecan.o.d ${OBJECTDIR}/_ext/1445257345/qep.o.d ${OBJECTDIR}/_ext/1445257345/traps.o.d ${OBJECTDIR}/_ext/1445257345/MeasCurr.o.d ${OBJECTDIR}/_ext/1722765132/can_icubProto.o.d ${OBJECTDIR}/_ext/1722765132/can_icubProto_parser.o.d ${OBJECTDIR}/_ext/1722765132/can_icubProto_trasmitter.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1445257345/2FOC.o ${OBJECTDIR}/_ext/1445257345/ADC.o ${OBJECTDIR}/_ext/1445257345/DCLink.o ${OBJECTDIR}/_ext/1445257345/Encoder.o ${OBJECTDIR}/_ext/1445257345/Faults.o ${OBJECTDIR}/_ext/1445257345/PWM.o ${OBJECTDIR}/_ext/1445257345/System.o ${OBJECTDIR}/_ext/1445257345/crc16.o ${OBJECTDIR}/_ext/1445257345/ecan.o ${OBJECTDIR}/_ext/1445257345/qep.o ${OBJECTDIR}/_ext/1445257345/traps.o ${OBJECTDIR}/_ext/1445257345/i2cTsens.o ${OBJECTDIR}/_ext/1445257345/MeasCurr.o ${OBJECTDIR}/_ext/1722765132/can_icubProto.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_parser.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_trasmitter.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1445257345/2FOC.o.d ${OBJECTDIR}/_ext/1445257345/ADC.o.d ${OBJECTDIR}/_ext/1445257345/DCLink.o.d ${OBJECTDIR}/_ext/1445257345/Encoder.o.d ${OBJECTDIR}/_ext/1445257345/Faults.o.d ${OBJECTDIR}/_ext/1445257345/PWM.o.d ${OBJECTDIR}/_ext/1445257345/System.o.d ${OBJECTDIR}/_ext/1445257345/crc16.o.d ${OBJECTDIR}/_ext/1445257345/ecan.o.d ${OBJECTDIR}/_ext/1445257345/qep.o.d ${OBJECTDIR}/_ext/1445257345/traps.o.d ${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d ${OBJECTDIR}/_ext/1445257345/MeasCurr.o.d ${OBJECTDIR}/_ext/1722765132/can_icubProto.o.d ${OBJECTDIR}/_ext/1722765132/can_icubProto_parser.o.d ${OBJECTDIR}/_ext/1722765132/can_icubProto_trasmitter.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1445257345/2FOC.o ${OBJECTDIR}/_ext/1445257345/ADC.o ${OBJECTDIR}/_ext/1445257345/DCLink.o ${OBJECTDIR}/_ext/1445257345/Encoder.o ${OBJECTDIR}/_ext/1445257345/Faults.o ${OBJECTDIR}/_ext/1445257345/PWM.o ${OBJECTDIR}/_ext/1445257345/System.o ${OBJECTDIR}/_ext/1445257345/crc16.o ${OBJECTDIR}/_ext/1445257345/ecan.o ${OBJECTDIR}/_ext/1445257345/qep.o ${OBJECTDIR}/_ext/1445257345/traps.o ${OBJECTDIR}/_ext/1445257345/MeasCurr.o ${OBJECTDIR}/_ext/1722765132/can_icubProto.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_parser.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_trasmitter.o
+OBJECTFILES=${OBJECTDIR}/_ext/1445257345/2FOC.o ${OBJECTDIR}/_ext/1445257345/ADC.o ${OBJECTDIR}/_ext/1445257345/DCLink.o ${OBJECTDIR}/_ext/1445257345/Encoder.o ${OBJECTDIR}/_ext/1445257345/Faults.o ${OBJECTDIR}/_ext/1445257345/PWM.o ${OBJECTDIR}/_ext/1445257345/System.o ${OBJECTDIR}/_ext/1445257345/crc16.o ${OBJECTDIR}/_ext/1445257345/ecan.o ${OBJECTDIR}/_ext/1445257345/qep.o ${OBJECTDIR}/_ext/1445257345/traps.o ${OBJECTDIR}/_ext/1445257345/i2cTsens.o ${OBJECTDIR}/_ext/1445257345/MeasCurr.o ${OBJECTDIR}/_ext/1722765132/can_icubProto.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_parser.o ${OBJECTDIR}/_ext/1722765132/can_icubProto_trasmitter.o
 
 # Source Files
-SOURCEFILES=../../app/2FOC.c ../../app/ADC.c ../../app/DCLink.c ../../app/Encoder.c ../../app/Faults.c ../../app/PWM.c ../../app/System.c ../../app/crc16.c ../../app/ecan.c ../../app/qep.c ../../app/traps.c ../../app/MeasCurr.s ../../app-added/can_icubProto.c ../../app-added/can_icubProto_parser.c ../../app-added/can_icubProto_trasmitter.c
+SOURCEFILES=../../app/2FOC.c ../../app/ADC.c ../../app/DCLink.c ../../app/Encoder.c ../../app/Faults.c ../../app/PWM.c ../../app/System.c ../../app/crc16.c ../../app/ecan.c ../../app/qep.c ../../app/traps.c ../../app/i2cTsens.c ../../app/MeasCurr.s ../../app-added/can_icubProto.c ../../app-added/can_icubProto_parser.c ../../app-added/can_icubProto_trasmitter.c
 
 
 CFLAGS=
@@ -156,6 +156,13 @@ ${OBJECTDIR}/_ext/1445257345/traps.o: ../../app/traps.c  nbproject/Makefile-${CN
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/traps.c  -o ${OBJECTDIR}/_ext/1445257345/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/traps.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -mlarge-data -O2 -I"../../app-added" -I"C:/Users/Alessandro Scalzo/Documents/Progetti/IIT/iCub/firmware/canProtocolLib" -I"../../app" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/traps.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/_ext/1445257345/i2cTsens.o: ../../app/i2cTsens.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1445257345 
+	@${RM} ${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1445257345/i2cTsens.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/i2cTsens.c  -o ${OBJECTDIR}/_ext/1445257345/i2cTsens.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -mlarge-data -O2 -I"../../app-added" -I"C:/Users/Alessandro Scalzo/Documents/Progetti/IIT/iCub/firmware/canProtocolLib" -I"../../app" -msmart-io=1 -Wall -msfr-warn=off
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/_ext/1722765132/can_icubProto.o: ../../app-added/can_icubProto.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1722765132 
 	@${RM} ${OBJECTDIR}/_ext/1722765132/can_icubProto.o.d 
@@ -255,6 +262,13 @@ ${OBJECTDIR}/_ext/1445257345/traps.o: ../../app/traps.c  nbproject/Makefile-${CN
 	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/traps.c  -o ${OBJECTDIR}/_ext/1445257345/traps.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/traps.o.d"      -omf=elf -mlarge-data -O2 -I"../../app-added" -I"C:/Users/Alessandro Scalzo/Documents/Progetti/IIT/iCub/firmware/canProtocolLib" -I"../../app" -msmart-io=1 -Wall -msfr-warn=off
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/traps.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/_ext/1445257345/i2cTsens.o: ../../app/i2cTsens.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1445257345 
+	@${RM} ${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1445257345/i2cTsens.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  ../../app/i2cTsens.c  -o ${OBJECTDIR}/_ext/1445257345/i2cTsens.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d"      -omf=elf -mlarge-data -O2 -I"../../app-added" -I"C:/Users/Alessandro Scalzo/Documents/Progetti/IIT/iCub/firmware/canProtocolLib" -I"../../app" -msmart-io=1 -Wall -msfr-warn=off
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1445257345/i2cTsens.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 ${OBJECTDIR}/_ext/1722765132/can_icubProto.o: ../../app-added/can_icubProto.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1722765132 
 	@${RM} ${OBJECTDIR}/_ext/1722765132/can_icubProto.o.d 
@@ -307,14 +321,14 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../../../../../../libs/midware/microchip/libdsp-elf.a ../../../../../../libs/midware/microchip/libq-elf.a  ../eElinkerscript_appl_2FOC.gld
+dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../../libdsp-elf.a  ../eElinkerscript_appl_2FOC.gld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\..\..\..\..\libs\midware\microchip\libdsp-elf.a ..\..\..\..\..\..\libs\midware\microchip\libq-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--gc-sections,--fill-upper=0,--stackguard=16,--library-path="C:/Program Files/Microchip/MPLAB C30/lib",--library-path="..",--no-force-link,--smart-io,-Map="${DISTDIR}/2FOC.X.${IMAGE_TYPE}.map",--report-mem,--warn-section-align$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\libdsp-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG -D__MPLAB_DEBUGGER_ICD3=1  -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_ICD3=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--gc-sections,--fill-upper=0,--stackguard=16,-s,--library-path="..",--no-force-link,--smart-io,-Map="${DISTDIR}/2FOC.X.${IMAGE_TYPE}.map",--report-mem,--warn-section-align$(MP_EXTRA_LD_POST) 
 	
 else
-dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../../../../../../libs/midware/microchip/libdsp-elf.a ../../../../../../libs/midware/microchip/libq-elf.a ../eElinkerscript_appl_2FOC.gld
+dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk  ../../libdsp-elf.a ../eElinkerscript_appl_2FOC.gld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\..\..\..\..\libs\midware\microchip\libdsp-elf.a ..\..\..\..\..\..\libs\midware\microchip\libq-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--gc-sections,--fill-upper=0,--stackguard=16,--library-path="C:/Program Files/Microchip/MPLAB C30/lib",--library-path="..",--no-force-link,--smart-io,-Map="${DISTDIR}/2FOC.X.${IMAGE_TYPE}.map",--report-mem,--warn-section-align$(MP_EXTRA_LD_POST) 
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -o dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}    ..\..\libdsp-elf.a  -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -Wl,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--gc-sections,--fill-upper=0,--stackguard=16,-s,--library-path="..",--no-force-link,--smart-io,-Map="${DISTDIR}/2FOC.X.${IMAGE_TYPE}.map",--report-mem,--warn-section-align$(MP_EXTRA_LD_POST) 
 	${MP_CC_DIR}\\xc16-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/2FOC.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} -a  -omf=elf 
 	
 endif

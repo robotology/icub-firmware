@@ -24,6 +24,7 @@
         <itemPath>../../app/ecan.h</itemPath>
         <itemPath>../../app/park.h</itemPath>
         <itemPath>../../app/qep.h</itemPath>
+        <itemPath>../../app/i2cTsens.h</itemPath>
       </logicalFolder>
       <logicalFolder name=".INC" displayName=".INC" projectFiles="true">
         <itemPath>../../app/MeasCurr.inc</itemPath>
@@ -54,6 +55,7 @@
         <itemPath>../../app/ecan.c</itemPath>
         <itemPath>../../app/qep.c</itemPath>
         <itemPath>../../app/traps.c</itemPath>
+        <itemPath>../../app/i2cTsens.c</itemPath>
       </logicalFolder>
       <logicalFolder name=".S" displayName=".S" projectFiles="true">
         <itemPath>../../app/MeasCurr.s</itemPath>
@@ -72,7 +74,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>../../app</Elem>
-    <Elem>../</Elem>
+    <Elem>..</Elem>
     <Elem>../../app-added</Elem>
     <Elem>../../../../../body/embenv/envshalib</Elem>
   </sourceRootList>
@@ -92,8 +94,7 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../../../../../../libs/midware/microchip/libdsp-elf.a</linkerLibFileItem>
-            <linkerLibFileItem>../../../../../../libs/midware/microchip/libq-elf.a</linkerLibFileItem>
+            <linkerLibFileItem>../../libdsp-elf.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <loading>
@@ -181,8 +182,7 @@
         <property key="enable-default-isr" value="true"/>
         <property key="enable-handles" value="true"/>
         <property key="enable-pack-data" value="true"/>
-        <property key="extra-lib-directories"
-                  value="C:\Program Files\Microchip\MPLAB C30\lib;.."/>
+        <property key="extra-lib-directories" value=".."/>
         <property key="general-code-protect" value="no_code_protect"/>
         <property key="general-write-protect" value="no_write_protect"/>
         <property key="generate-cross-reference-file" value="false"/>
@@ -204,7 +204,7 @@
         <property key="secure-ram" value="no_ram"/>
         <property key="secure-write-protect" value="no_write_protect"/>
         <property key="stack-size" value="16"/>
-        <property key="symbol-stripping" value=""/>
+        <property key="symbol-stripping" value="s"/>
         <property key="trace-symbols" value=""/>
         <property key="warn-section-align" value="true"/>
       </C30-LD>
