@@ -409,6 +409,13 @@ extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
+//    eOresult_t res;
+//    res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+//    if(eores_OK != res)
+//    {
+//        ; //gestisci errore
+//    }    
+    
     // pulse led3 forever at 1 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0); 
         

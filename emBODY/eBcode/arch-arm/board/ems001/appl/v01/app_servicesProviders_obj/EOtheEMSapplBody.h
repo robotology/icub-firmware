@@ -143,6 +143,7 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p);
 
+extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
 
 //Note: eo_emsapplBody_sendConfig2canboards function send only one time the configuration; so the second call of this func will send anything!

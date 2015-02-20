@@ -457,7 +457,26 @@ extern eOresult_t eo_appCanSP_SendCmd(EOappCanSP *p, eOcanport_t emscanport, eOi
 }
 
 
-
+static eObool_t s_eoapp_cansp_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t canPortRX)
+{
+    eOprotBRD_t localboard = eoprot_board_local_get();
+    const eOprotBRD_t eb5board = 4;
+    
+    if(localboard != eb5board)
+    {
+        return(eobool_false);
+    }
+    
+    if( (eOcanport1 == canPortRX) &&  (2 == eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id)) )
+    {
+        return(eobool_true);
+    }
+    else
+    {
+        return(eobool_false);
+    }    
+    
+}
 
 extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t numofcanframe, uint8_t *numofreadcanframes)
 {
@@ -488,7 +507,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
                       
         res = eo_icubCanProto_ParseCanFrame(p->icubCanProto_ptr, (eOcanframe_t*)&canframe, (eOcanport_t)canport);
 
-        if(eores_OK != res) 
+        if((eores_OK != res) && (eobool_false == s_eoapp_cansp_is_from_unused2foc_in_eb5((eOcanframe_t*)&canframe, (eOcanport_t)canport))) 
         {  
             eOerrmanDescriptor_t errdes = {0};
             errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);

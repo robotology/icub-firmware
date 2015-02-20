@@ -62,6 +62,8 @@
 
 #include "EOVtheSystem.h"
 
+#include "EOicubCanProto_hid.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -154,7 +156,7 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_checkConfig(EOtheEMSapplBody *p);
 
-//static eOresult_t s_eo_emsapplBody_MaisTXenable(EOtheEMSapplBody *p);
+static eOresult_t s_eo_emsapplBody_MaisTXenable(EOtheEMSapplBody *p);
 // marco.accame on 19feb15: we dont want to disable mais transmission unless robotinterface does that.
 //static eOresult_t s_eo_emsapplBody_MaisTXdisable(EOtheEMSapplBody *p);
 
@@ -219,17 +221,18 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     eo_protocolwrapper_Initialise();
         
     s_eo_emsapplBody_objs_init(p);      // if anything fails... it calls errormanager with fatal error
+    
+    // now i set the appl body as initted
+    p->st = eo_emsApplBody_st__initted;
+    
+    // and i start some services
 
     s_eo_emsapplBody_checkConfig(p);    // check config: if anything is wrong .... it calls errormanager with fatal error
-    
-      
-    eo_emsapplBody_discovery_Mais_Start(p);
+          
+    //eo_emsapplBody_discovery_Mais_Start(p);
     
     eo_emsapplBody_checkCanBoards_Start(p);
-    
-    
-    p->st = eo_emsApplBody_st__initted;
-        
+            
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "EOtheEMSapplBody started", s_eobj_ownname, &eo_errman_DescrRunningHappily);
     
    
@@ -241,6 +244,7 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
 extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void)
 {
     return((s_applBody.st == eo_emsApplBody_st__initted) ? (&s_applBody) : (NULL));
+    //return(&s_applBody);
 }
 
 
@@ -303,6 +307,16 @@ extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody
 
 }
 
+extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }    
+    
+    return(s_eo_emsapplBody_MaisTXenable(p));
+    
+}
 
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 {
@@ -327,12 +341,13 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     }
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
     {   
-        #warning marco.accame: removed mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
-//        res = s_eo_emsapplBody_MaisTXenable(p);
-//        if(eores_OK != res)
-//        {
-//            return(res);
-//        }
+        #warning marco.accame: remove mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
+        res = s_eo_emsapplBody_MaisTXenable(p);
+        if(eores_OK != res)
+        {
+            return(res);
+        }
+        
 
         numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
         
@@ -346,6 +361,15 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
             }
 
             res = eo_appCanSP_SendCmd2Joint(p->bodyobjs.appCanSP, (eOmc_jointId_t)i, msgCmd, (void*)&(bcastpolicy_ptr->val2bcastList[0]));
+            
+            
+//            eOerrmanDescriptor_t errdes = {0};
+//            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag00);
+//            errdes.par16                = (i & 0x000f) | (0xc1a0);
+//            errdes.par64                = (eores_OK == res) ? 0x11 : 0x10;
+//            errdes.sourcedevice         = 0;
+//            errdes.sourceaddress        = 0;                
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);            
         }
         
         /* per ora non si e' verificato nessun problema se l'applicazione e' in cfg e la pelle spedisce a manetta*/
@@ -1158,30 +1182,32 @@ static eOresult_t s_eo_emsapplBody_getRunMode(EOtheEMSapplBody *p)
 
 #warning marco.accame: see THIS...
 
-//static eOresult_t s_eo_emsapplBody_MaisTXenable(EOtheEMSapplBody *p)
-//{
-//    eOresult_t                  res = eores_NOK_generic;
-//    eOas_maisId_t               sId = 0; //exist only one mais per ep
-//    eOas_mais_config_t          *maiscfg = NULL;
-//    eOicubCanProto_msgCommand_t msgCmd = 
-//    {
-//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-//    };
-//    
-//    maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), sId);
-//    if(NULL == maiscfg)
-//    {
-//        return(res); //error
-//    }
-//      
-//    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(maiscfg->mode));
-//
-//    return(res);
-//}
+static eOresult_t s_eo_emsapplBody_MaisTXenable(EOtheEMSapplBody *p)
+{
+    eOresult_t                  res = eores_NOK_generic;
+    eOas_maisId_t               sId = 0; //exist only one mais per ep
+    eOas_mais_config_t          *maiscfg = NULL;
+    eOicubCanProto_msgCommand_t msgCmd = 
+    {
+        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+    };
+    
+    maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), sId);
+    if(NULL == maiscfg)
+    {
+        return(res); //error
+    }
+      
+    res = eo_appCanSP_SendCmd2SnrMais(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(maiscfg->mode));
+
+    return(res);
+}
 
 static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
 {
+//    eOerrmanDescriptor_t errdes = {0};
+            
     // we start the mais with the values inside the mais.config data structure.
     eOresult_t res = eores_NOK_generic;
     const eOas_maisId_t maisId = 0; 
@@ -1200,14 +1226,14 @@ static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
     eOicubCanProto_msgCommand_t msgCmd = {0};
     EOappCanSP *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    // set datarate    
-    msgCmd.class = icubCanProto_msgCmdClass_pollingAnalogSensor;
-    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&datarate); 
-    if(eores_OK != res)
-    {
-        return(res);
-    }
+
+//    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
+//    errdes.par16                = 1;
+//    errdes.par64                = 0x112233;
+//    errdes.sourcedevice         = 0;
+//    errdes.sourceaddress        = 0;                
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);  
+    
           
     // set txmode       
     msgCmd.class = icubCanProto_msgCmdClass_pollingAnalogSensor;
@@ -1216,7 +1242,30 @@ static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
     if(eores_OK != res)
     {
         return(res);
+    }  
+
+//    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
+//    errdes.par16                = 2;
+//    errdes.par64                = 0x112233;
+//    errdes.sourcedevice         = 0;
+//    errdes.sourceaddress        = 0;                
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);   
+
+    // set datarate    
+    msgCmd.class = icubCanProto_msgCmdClass_pollingAnalogSensor;
+    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&datarate); 
+    if(eores_OK != res)
+    {
+        return(res);
     }    
+
+//    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
+//    errdes.par16                = 3;
+//    errdes.par64                = 0x112233;
+//    errdes.sourcedevice         = 0;
+//    errdes.sourceaddress        = 0;                
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);    
         
     return(res);       
 }
