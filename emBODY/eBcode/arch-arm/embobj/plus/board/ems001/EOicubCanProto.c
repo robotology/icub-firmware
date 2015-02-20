@@ -202,10 +202,10 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
         return(eores_OK);
     }
     
-    if(eobool_true == s_eo_icubCanProto_isUnused2FOCinTorso(p, frame, canPortRX))
-    {
-        return(eores_OK);
-    }
+//    if(eobool_true == s_eo_icubCanProto_isUnused2FOCinTorso(p, frame, canPortRX))
+//    {
+//        return(eores_OK);
+//    }
     
     
     skincanloc.emscanport = canPortRX;
