@@ -405,7 +405,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
         calledonce = 1;
                 
         des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag06);
-        des.param = (frame->data[1] << 8) | jstatus->basic.controlmodestatus;
+        des.par16 = (frame->data[1] << 8) | jstatus->basic.controlmodestatus;
         des.sourceaddress = jId;
         des.sourcedevice = eo_errman_sourcedevice_localboard;
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);       
@@ -417,7 +417,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
     if(eomc_controlmode_hwFault == jstatus->basic.controlmodestatus)
     {   
         des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault1);
-        des.param = (frame->data[1] << 8) | jstatus->basic.controlmodestatus;
+        des.par16 = (frame->data[1] << 8) | jstatus->basic.controlmodestatus;
         des.sourceaddress = jId;
         des.sourcedevice = eo_errman_sourcedevice_localboard;
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);               
@@ -2279,7 +2279,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         if(eores_OK != res)
         {      
             des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.par16 = (frame->data[1] << 8) | eomc_controlmode;
             des.sourceaddress = jId;
             des.sourcedevice = eo_errman_sourcedevice_localboard;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);           
@@ -2291,7 +2291,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         if(eomc_controlmode_hwFault == eomc_controlmode)
         {        
             des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault2);
-            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.par16 = (frame->data[1] << 8) | eomc_controlmode;
             des.sourceaddress = jId;
             des.sourcedevice = eo_errman_sourcedevice_localboard;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
@@ -2334,7 +2334,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         if(eores_OK != res)
         {
             des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.par16 = (frame->data[1] << 8) | eomc_controlmode;
             des.sourceaddress = jId;
             des.sourcedevice = eo_errman_sourcedevice_localboard;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);            
@@ -2344,7 +2344,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         if(eomc_controlmode_hwFault == eomc_controlmode)
         {        
             des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault3);
-            des.param = (frame->data[1] << 8) | eomc_controlmode;
+            des.par16 = (frame->data[1] << 8) | eomc_controlmode;
             des.sourceaddress = jId;
             des.sourcedevice = eo_errman_sourcedevice_localboard;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               

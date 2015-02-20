@@ -178,7 +178,8 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
         // ok ... use the error manager, either in its simple form or in its networked form
         eOerrmanDescriptor_t errdes = {0};
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_halerror);
-        errdes.param            = errorcode;
+        errdes.par16            = errorcode;
+        errdes.par64            = 0;
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         

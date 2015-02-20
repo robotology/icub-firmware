@@ -120,7 +120,8 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
         // ok ... use the error manager, either in its simple form or in its networked form
         eOerrmanDescriptor_t errdes = {0};
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_osalerror);
-        errdes.param            = errorcode;
+        errdes.par16            = errorcode;
+        errdes.par64            = 0;
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;    
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "OSAL", &errdes);                

@@ -99,7 +99,8 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
         // ok ... use the error manager, either in its simple form or in its networked form
         eOerrmanDescriptor_t errdes = {0};
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_halerror);
-        errdes.param            = errorcode;
+        errdes.par16            = errorcode;
+        errdes.par64            = 0;
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;    
         eo_errman_Error(eo_errman_GetHandle(), (hal_fatalerror_warning == errorcode) ? eo_errortype_warning : eo_errortype_fatal, errormsg, "HAL", &errdes);                
