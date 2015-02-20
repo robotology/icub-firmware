@@ -78,6 +78,8 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanPr
 
 static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
+static eObool_t s_eo_icubCanProto_isUnused2FOCinTorso(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
+
 static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
 
@@ -184,6 +186,7 @@ extern eOresult_t eo_icubCanProto_ParseSkinCanFrame(EOicubCanProto* p, eOcanfram
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
 static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
 {
     const EOconstLookupTbl                             *tbl;
@@ -194,7 +197,12 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     eOresult_t                                          res;
     eOsk_skinId_t                                       skId;
     
-    if(s_eo_icubCanProto_isMaisBUGmsg(p, frame, canPortRX))
+    if(eobool_true == s_eo_icubCanProto_isMaisBUGmsg(p, frame, canPortRX))
+    {
+        return(eores_OK);
+    }
+    
+    if(eobool_true == s_eo_icubCanProto_isUnused2FOCinTorso(p, frame, canPortRX))
     {
         return(eores_OK);
     }
@@ -286,6 +294,28 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanPr
     }
 }
 
+static eObool_t s_eo_icubCanProto_isUnused2FOCinTorso(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
+{
+    eOprotBRD_t localboard = eoprot_board_local_get();
+    const eOprotBRD_t eb5board = 4;
+    
+    if(localboard != eb5board)
+    {
+        return(eobool_false);
+    }
+    
+    if( (eOcanport1 == canPortRX) &&  (2 == eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id)) )
+    {
+        return(eobool_true);
+    }
+    else
+    {
+        return(eobool_false);
+    }    
+   
+}
+
+ 
 static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
 {
     eOappTheDB_board_canlocation_t canloc = { .emscanport = eOcanport1, .addr = 0}; // default value 
@@ -296,7 +326,7 @@ static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *
     eOmn_appl_runMode_t apprunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
     if((applrunMode__2foc == apprunmode) || (applrunMode__default == apprunmode))
     {
-        return (0);
+        return (eobool_false);
     }
     
     eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), 0, &canloc);
@@ -305,11 +335,11 @@ static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *
         ((frame->id & 0x700) >> 8 == 0x0 ) &&  //if message class is motor polling
         (((frame->id &0x0f0) >> 4) == canloc.addr)) //if sender adress is of mais board
     {
-        return(1);
+        return(eobool_true);
     }
     else
     {
-        return(0);
+        return(eobool_false);
     }
 }
 

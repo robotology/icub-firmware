@@ -178,7 +178,9 @@ extern eOresult_t eom_emserror_SetFatalError(EOMtheEMSerror *p, const eOerrmanDe
     memcpy(&s_emserror_singleton.latesterrordesc, fatalerror, sizeof(eOerrmanDescriptor_t));        
     memcpy(&s_emserror_singleton.errordescriptor, &eo_errman_DescrRuntimeFatalErrorState, sizeof(eOerrmanDescriptor_t));
     
-    s_emserror_singleton.errordescriptor.param = s_emserror_singleton.numberoffatalerrors;
+    s_emserror_singleton.errordescriptor.par16 = s_emserror_singleton.numberoffatalerrors;
+    s_emserror_singleton.errordescriptor.par64 = 0;
+    #warning marco.accame: we could use a par64 to send to robotinterface some more info about the fatal error. think of it
     // send fatal error event.
    
     return(eores_OK);    
@@ -306,10 +308,11 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
         if(eo_tmrstat_Running != eo_timer_GetStatus(s_emserror_singleton.timer))
         {
             // start it
-            EOaction_strg actionstg = {0};
+            EOaction_strg astg = {0};
+            EOaction *act = (EOaction*)&astg;
             
-            eo_action_SetEvent((EOaction*)&actionstg, emserror_evt_tick, s_emserror_singleton.task);
-            eo_timer_Start(s_emserror_singleton.timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_FOREVER, (EOaction*)&actionstg);         
+            eo_action_SetEvent(act, emserror_evt_tick, s_emserror_singleton.task);
+            eo_timer_Start(s_emserror_singleton.timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_FOREVER, act);         
         }
     }
 }

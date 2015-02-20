@@ -51,7 +51,7 @@
 
 #include "EOMtheEMSrunner.h"
 
-#include "EOaction_hid.h"
+#include "EOaction.h"
 
 #include "EOMtheEMSapplCfg.h"
 
@@ -241,6 +241,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
 //    eOerrmanDescriptor_t desc = {0};
 //    memcpy(&desc, &eo_errman_DescrRunningHappily, sizeof(desc));
 //    desc.param = 1;
+//    desc.par64 = 0;
 //    eo_errman_Info(eo_errman_GetHandle(), NULL, s_eobj_ownname, &desc); 
     
   
@@ -601,10 +602,11 @@ static void s_eom_emsappl_theemssocket_init(void)
 static void s_eom_emsappl_theemssocket_defaultopen(void)
 {   
     // we also open the socket, so that we can tx or rx straight away. for now we direct towards the configurator task
-    EOaction onrx;
-    eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    EOaction_strg astg = {0};
+    EOaction *onrx = (EOaction*)&astg;
+    eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task for any newly received packet
-    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL);
 }
 
 static void s_eom_emsappl_theemstransceiver_init(void)
@@ -673,7 +675,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         char strdes[64] = {0};
         if(NULL != des)
         {
-            snprintf(strdes, sizeof(strdes), "code = 0x%x, param = %d, dev = %d, adr = %d", des->code, des->param, des->sourcedevice, des->sourceaddress);
+            snprintf(strdes, sizeof(strdes), "code 0x%x, p16 %d, p64 %lld, dev %d, adr %d", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress);
         }
         if(NULL != info)
         {
@@ -696,7 +698,8 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
     
     eOmn_info_properties_t props = {0};
     props.code          = (NULL != des) ? (des->code) : (0);
-    props.param         = (NULL != des) ? (des->param) : (0);
+    props.par16         = (NULL != des) ? (des->par16) : (0);
+    props.par64         = (NULL != des) ? (des->par64) : (0);
 
     EOMN_INFO_PROPERTIES_FLAGS_set_type(props.flags, type);
     EOMN_INFO_PROPERTIES_FLAGS_set_source(props.flags, source);
@@ -771,10 +774,11 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
     status->currstate = applstate_config;      
     
-    EOaction onrx;
-    eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    EOaction_strg astg = {0};
+    EOaction *onrx = (EOaction*)&astg;
+    eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task for any newly received packet
-    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL);
     
     // if any rx packets already in socket then alert the cfg task
     if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
@@ -802,10 +806,11 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
     status->currstate = applstate_error;    
    
     // redirect the socket
-    EOaction onrx;
-    eo_action_SetEvent(&onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
+    EOaction_strg astg = {0};
+    EOaction *onrx = (EOaction*)&astg;
+    eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task for any newly received packets
-    eom_emssocket_Open(eom_emssocket_GetHandle(), &onrx, NULL);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL);
     
     // if any rx packets already in socket then alert the err task
     if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
@@ -831,12 +836,13 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
     status->currstate = applstate_running;       
     
-    EOaction ontxdone;
+    EOaction_strg astg = {0};
+    EOaction *ontxdone = (EOaction*)&astg;
     //eo_action_Clear(&ontxdone);
 
-    eo_action_SetCallback(&ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
+    eo_action_SetCallback(ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
     // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait
-    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, &ontxdone);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone);
     
     // we activate the runner
     eom_emsrunner_Start(eom_emsrunner_GetHandle());

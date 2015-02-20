@@ -29,7 +29,7 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrormanager.h"
 
-#include "EOaction_hid.h"
+#include "EOaction.h"
 
 #include "osal.h"
 #include "eEsharedServices.h" 
@@ -137,9 +137,10 @@ extern EOMtheEMSdiscoverytransceiver * eom_emsdiscoverytransceiver_Initialise(co
     if(0 != s_emsdiscoverytransceiver_singleton.cfg.dbgshutdowntime)
     {   // create and start the debugshutdown timer only if .... its time is non-zero. otherwise doent even create it
         s_emsdiscoverytransceiver_singleton.dbgshutdowntmr = eo_timer_New();
-        EOaction action;
-        eo_action_SetCallback(&action, s_callback_shutdown2updater, NULL, NULL);
-        eo_timer_Start(s_emsdiscoverytransceiver_singleton.dbgshutdowntmr, eok_abstimeNOW, s_emsdiscoverytransceiver_singleton.cfg.dbgshutdowntime, eo_tmrmode_ONESHOT, &action);                             
+        EOaction_strg astg = {0};
+        EOaction *action = (EOaction*)&astg;
+        eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, NULL);
+        eo_timer_Start(s_emsdiscoverytransceiver_singleton.dbgshutdowntmr, eok_abstimeNOW, s_emsdiscoverytransceiver_singleton.cfg.dbgshutdowntime, eo_tmrmode_ONESHOT, action);                             
     }   
 
     return(&s_emsdiscoverytransceiver_singleton);
@@ -234,7 +235,8 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
 {
 //    eOresult_t res = eores_NOK_generic;
     eObool_t transmit = eobool_false;
-    EOaction action;
+    EOaction_strg astg = {0};
+    EOaction *action = (EOaction*)&astg;
 
     uint8_t *txdata;
     uint16_t txsize = 0;
@@ -260,8 +262,8 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
                 }
                 
                 // timer di shutdown
-                eo_action_SetCallback(&action, s_callback_shutdown2updater, NULL, NULL);
-                eo_timer_Start(s_emsdiscoverytransceiver_singleton.shutdowntmr, eok_abstimeNOW, 50*eok_reltime1ms, eo_tmrmode_ONESHOT, &action);                             
+                eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, NULL);
+                eo_timer_Start(s_emsdiscoverytransceiver_singleton.shutdowntmr, eok_abstimeNOW, 50*eok_reltime1ms, eo_tmrmode_ONESHOT, action);                             
             
             } break;
             

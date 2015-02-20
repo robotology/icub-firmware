@@ -352,9 +352,10 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 // 2FOC ERRORS
                 if (ems_fault_mask_new[j] & MOTOR_EXTERNAL_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
-                    descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j;
+                    descriptor.par64 = 0;
+                    descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; 
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_external_fault);
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
@@ -362,8 +363,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_OVERCURRENT_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_overcurrent);
@@ -372,8 +374,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_I2T_LIMIT_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_i2t_limit);
@@ -382,8 +385,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_HALLSENSORS_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_hallsensors);
@@ -392,8 +396,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_QENCODER_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder);
@@ -402,8 +407,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_CAN_INVALID_PROT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_invalid_prot);
@@ -412,8 +418,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_CAN_GENERIC_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_generic);
@@ -422,8 +429,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & MOTOR_CAN_NOT_RESPONDING)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_no_answer);
@@ -433,8 +441,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 // BOARD ERRORS
                 if (ems_fault_mask_new[j] & AXIS_TORQUE_SENS_FAULT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
@@ -443,8 +452,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & AEA_ABS_ENC_INVALID_DATA)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_invalid);
@@ -453,8 +463,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 
                 if (ems_fault_mask_new[j] & AEA_ABS_ENC_TIMEOUT)
                 {
-                    eOerrmanDescriptor_t descriptor;
-                    descriptor.param = j; // unless required
+                    eOerrmanDescriptor_t descriptor = {0};
+                    descriptor.par16 = j; // unless required
+                    descriptor.par64 = 0;
                     descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
                     descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
                     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_timeout);
@@ -1269,7 +1280,7 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     
     eOerrmanDescriptor_t descriptor = {0};
     descriptor.code                 = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_first);
-    descriptor.param                = 0;
+    descriptor.par16                = 0;
     descriptor.sourcedevice         = eomn_info_source_board;
     descriptor.sourceaddress        = 0;    
   

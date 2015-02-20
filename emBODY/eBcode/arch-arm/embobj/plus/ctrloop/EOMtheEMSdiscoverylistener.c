@@ -34,7 +34,7 @@
 #include "EOMtheIPnet.h"
 
 #include "EOMmutex.h"
-#include "EOaction_hid.h"
+#include "EOaction.h"
 #include "string.h"
 #include "EOMtheEMSdiscoverytransceiver.h"
 
@@ -229,11 +229,12 @@ extern void tskEMSlis(void *p)
 static void s_eom_emsdiscoverylistener_task_startup(EOMtask *p, uint32_t t)
 {
     // open the socket
-    EOaction onrx;
-    eo_action_SetEvent(&onrx, emsdiscoverylistener_evt_packet_received, p);
+    EOaction_strg astg = {0};
+    EOaction *onrx = (EOaction*)&astg;
+    eo_action_SetEvent(onrx, emsdiscoverylistener_evt_packet_received, p);
     
     eo_socketdtg_Open(s_emsdiscoverylistener_singleton.socket, s_emsdiscoverylistener_singleton.cfg.localport, eo_sktdir_TXRX, eobool_false, 
-                      NULL, &onrx, NULL);   
+                      NULL, onrx, NULL);   
                                 
 }
 

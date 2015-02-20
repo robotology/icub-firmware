@@ -45,7 +45,7 @@
 
 #include "EOMtheEMSappl.h"
 
-#include "EOaction_hid.h"
+#include "EOaction.h"
 #include "EOMtheCallbackManager.h"
 
 #include "eventviewer.h"
@@ -744,7 +744,9 @@ __weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner
     uint64_t delta = nowtime - starttime;
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = errcode[taskid];
-    errdes.param            = (delta > 0xffff) ? (0xffff) : (delta);
+    errdes.par16            = (delta > 0xffff) ? (0xffff) : (delta);
+    errdes.par64            = 0;
+    #warning marco.accame: think about putting in par64 also other timings ... 
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;    
     //eo_errman_Error(eo_errman_GetHandle(), errortype, str, s_eobj_ownname, &errdes); 
@@ -759,7 +761,8 @@ __weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunne
     snprintf(str, sizeof(str), "failed tx of a packet"); 
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eo_errman_code_sys_ctrloop_udptxfailure;
-    errdes.param            = 0;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;      
     eo_errman_Error(eo_errman_GetHandle(), errortype, str, s_eobj_ownname, &errdes); 
@@ -1393,17 +1396,20 @@ static void s_eom_emsrunner_send_diagnosticsinfo_average_timing(void)
 	/* Average Times */
 	//RX
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_rxphaseaverage);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX]; 
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX]; 
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 		
 	//DO
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_dophaseaverage);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 		
 	//TX
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_txphaseaverage);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
 		
 	s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX] = 0, s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO] = 0, s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX] = 0;
@@ -1418,17 +1424,20 @@ static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void)
 	/* Max Times */
 	//RX
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_rxphasemax);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 		
 	//DO
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_dophasemax);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 		
 	//TX
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_txphasemax);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
 		
 	s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runRX] = 0, s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runDO] = 0, s_eom_emsrunner_diagnosticsinfo.max_et[eo_emsrunner_taskid_runTX] = 0;
@@ -1436,17 +1445,20 @@ static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void)
 	/* Min Times */
 	//RX
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_rxphasemin);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 		
 	//DO
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_dophasemin);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 		
 	//TX
     errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_txphasemin);
-    errdes.param            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX];
+    errdes.par16            = s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX];
+    errdes.par64            = 0; 
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
 		
 	s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runRX] = 0xFFFFFFFF, s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runDO] = 0xFFFFFFFF, s_eom_emsrunner_diagnosticsinfo.min_et[eo_emsrunner_taskid_runTX] = 0xFFFFFFFF;
@@ -1469,7 +1481,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_t
 				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runRX);
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowRX);
-				errdes.param            = eom_emsrunner_rxduration;
+				errdes.par16            = eom_emsrunner_rxduration;
+                errdes.par64            = 0; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
@@ -1483,7 +1496,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_t
 				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runDO);
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowDO);
-				errdes.param            = eom_emsrunner_doduration;
+				errdes.par16            = eom_emsrunner_doduration;
+                errdes.par64            = 0; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
@@ -1497,7 +1511,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_t
 				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runTX);
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowTX);
-				errdes.param            = eom_emsrunner_txduration;
+				errdes.par16            = eom_emsrunner_txduration;
+                errdes.par64            = 0; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
