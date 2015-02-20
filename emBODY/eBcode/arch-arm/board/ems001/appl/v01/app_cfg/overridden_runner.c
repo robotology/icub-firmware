@@ -350,7 +350,8 @@ extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
 {
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runner_udptxfailure);
-    errdes.param            = 0;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
@@ -372,7 +373,8 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 {
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runner_transceivererror);
-    errdes.param            = 0;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
