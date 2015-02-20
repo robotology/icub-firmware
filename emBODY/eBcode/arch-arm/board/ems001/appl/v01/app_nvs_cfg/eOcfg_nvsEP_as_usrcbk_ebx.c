@@ -84,7 +84,7 @@ static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mai
 static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncefullscale);
 
 // useful for any debug activity. comment it out if not used
-//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param);
+//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param, uint64_t par64);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -487,11 +487,12 @@ static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncef
 
 
 // useful for any debug activity. comment it out if not used
-//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param)
+//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param, uint64_t par64)
 //{
 //    eOerrmanDescriptor_t des = {0};
 //    des.code = code;
 //    des.param = param;
+//    des.par64 = par64; 
 //    des.sourceaddress = 0;
 //    des.sourcedevice = eo_errman_sourcedevice_localboard;
 
