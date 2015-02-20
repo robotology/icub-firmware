@@ -109,6 +109,7 @@ extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
 extern void eoprot_fun_INIT_sk_skin_status_arrayofcandata(const EOnv* nv)
 {
     EOarray_of_skincandata_t *tmp = (EOarray_of_skincandata_t*)nv->ram;
+    tmp = tmp;
     // marco.accame: items of array are eOsk_candata_t. its capacity is:
     uint16_t capacity = sizeof(tmp->data) / sizeof(eOsk_candata_t);    
     // eo_array_New() initialises capacity and itemsize and also sets size to 0 
@@ -137,8 +138,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
             
     boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
     
-    
-    
+   
     switch(*sigmode)
     {
         case eosk_sigmode_dontsignal:
@@ -185,7 +185,6 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
 
         case eosk_sigmode_signal_oldway:
         {
-
             eOicubCanProto_msgCommand_t msgCmd = 
             {
                 EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
@@ -202,7 +201,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
                     return;
                 }
                 
-                if(i == 0xE)
+                if(0xE == i)
                 {
                     eOicubCanProto_msgCommand_t msgCmd2 = 
                     {
@@ -221,9 +220,8 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
         
         default:
         {
-            return;
         } break;
-    };
+    }
 
 }
 
