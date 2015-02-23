@@ -88,6 +88,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info);
+static void s_OnError_new(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -160,7 +161,7 @@ static const eOmempool_cfg_t memcfg =
 
 static const eOerrman_cfg_t  errcfg = 
 {
-    .extfn.usr_on_error = s_OnError
+    .extfn.usr_on_error = s_OnError_new
 };
 
 
@@ -203,6 +204,23 @@ static void s_OnError(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *
     char str[128];
 
     snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, err[(uint8_t)errtype], info);
+    hal_trace_puts(str);
+
+    if(errtype <= eo_errortype_warning)
+    {
+        return;
+    }
+
+    for(;;);
+}
+
+// it is the function called by the EOtheErrorManager (new updated version)
+static void s_OnError_new(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
+{
+    const char err[5][16] = {"info", "debug", "warning", "error", "fatal error"};
+    char str[128];
+
+    snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", caller->eobjstr, caller->taskid, err[(uint8_t)errtype], info);
     hal_trace_puts(str);
 
     if(errtype <= eo_errortype_warning)

@@ -302,8 +302,8 @@ extern void eom_applbasic_specialise_system(void)
     
     char str[64] = "";
     snprintf(str, sizeof(str), "EOtheMemoryPool has used %d bytes so far", eo_mempool_SizeOfAllocated(eo_mempool_GetHandle()));
-    eo_errman_Info(eo_errman_GetHandle(),  "init task", str);
-
+    eOerrmanDescriptor_t errdes = {0};
+    eo_errman_Info(eo_errman_GetHandle(),str,s_eobj_ownname, &errdes);
 }
 
 
@@ -446,7 +446,8 @@ static void s_periodic_run(EOMtask *p, uint32_t t)
     char str[64];
     
     snprintf(str, sizeof(str), "periodic task executed %d times", ++num);
-    eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+    eOerrmanDescriptor_t errdes = {0};
+    eo_errman_Info(eo_errman_GetHandle(),str,s_eobj_ownname, &errdes);
 
 #if     defined(MINIMAL_BEHAVIOUR)
     hal_led_toggle(hal_led1);
@@ -493,7 +494,8 @@ static void s_eventdriven_run(EOMtask *p, uint32_t t)
         char str[64];
         
         snprintf(str, sizeof(str), "event-driven task executed %d times", ++num);
-        eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+        eOerrmanDescriptor_t errdes = {0};
+        eo_errman_Info(eo_errman_GetHandle(),str,s_eobj_ownname, &errdes);
         
         // now send a message to task message driven
         eom_task_SendMessage(s_task_messagedriven, s_message_from_task_eventbased, eok_reltimeINFINITE);
@@ -519,7 +521,8 @@ static void s_messagedriven_run(EOMtask *p, uint32_t t)
         char str[64];
         
         snprintf(str, sizeof(str), "message-driven task executed %d times", ++num);
-        eo_errman_Info(eo_errman_GetHandle(), s_eobj_ownname, str);
+        eOerrmanDescriptor_t errdes = {0};
+        eo_errman_Info(eo_errman_GetHandle(),str,s_eobj_ownname, &errdes);
     }
     
 }
