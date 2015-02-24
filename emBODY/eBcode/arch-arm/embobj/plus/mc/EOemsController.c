@@ -158,14 +158,14 @@ extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 // speed_motor  = J^-1 * speed_axis
 // torque_motor = Jt   * torque_axis
 
-#ifdef USE_2FOC_FAST_ENCODER
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position)
 {
+    eo_motors_reset_wdog(ems->motors, motor);
+    
     ems->motor_current [motor] = current;
     ems->motor_velocity[motor] = velocity;
     ems->motor_position[motor] = position;
 }
-#endif
 
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
@@ -619,6 +619,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     float pwm_joint[NAXLES];
     
     eObool_t stiffness[NAXLES];
+    
+    eo_motors_check_wdog(ems->motors);
     
     //PWM computation (PID ecc)
     JOINTS(j)

@@ -30,17 +30,22 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 #define MOTOR_EXTERNAL_FAULT     0x0001
+
 #define MOTOR_OVERCURRENT_FAULT  0x0002
 #define MOTOR_I2T_LIMIT_FAULT    0x0004
 #define MOTOR_HALLSENSORS_FAULT  0x0008
+
 #define MOTOR_QENCODER_FAULT     0x0010
 #define MOTOR_CAN_INVALID_PROT   0x0020
 #define MOTOR_CAN_GENERIC_FAULT  0x0040
 #define MOTOR_CAN_NOT_RESPONDING 0x0080
 
-//#define AXIS_AEA_TOUT_FAULT     0x1000
-//#define AXIS_AEA_HARD_FAULT     0x2000
-//#define AXIS_TORQUE_SENS_FAULT  0x4000
+#define MOTOR_UNDEROVERVOLTAGE   0x0100
+#define MOTOR_AS5045ERROR        0x0200
+
+//#define AXIS_AEA_TOUT_FAULT    0x1000
+//#define AXIS_AEA_HARD_FAULT    0x2000
+//#define AXIS_TORQUE_SENS_FAULT 0x4000
 
 #define MOTOR_HARDWARE_FAULT     0xFFFE
 
@@ -64,6 +69,8 @@ typedef struct EOmotors_hid EOmotors;
     @return     The pointer to the required object.
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors);
+extern void eo_motors_reset_wdog(EOmotors *o, uint8_t motor);
+extern void eo_motors_check_wdog(EOmotors *o);
 extern void eo_motors_set_Jacobian(EOmotors *o, int32_t **Ji32);
 extern eObool_t eo_motors_are_coupled(EOmotors *o, uint8_t ma, uint8_t mb);
     

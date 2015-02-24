@@ -81,6 +81,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors)
         
         MOTORS(m)
         {
+            o->motor_state_watchdog[m] = 0;
             o->motor_fault_mask2[m] = 0;
 
             JOINTS(j)
@@ -91,6 +92,26 @@ extern EOmotors* eo_motors_New(uint8_t nMotors)
     }
 
     return o;
+}
+
+extern void eo_motors_reset_wdog(EOmotors *o, uint8_t motor)
+{
+    o->motor_state_watchdog[motor] = 0;
+}
+
+extern void eo_motors_check_wdog(EOmotors *o)
+{
+    MOTORS(m)
+    {
+        if (o->motor_state_watchdog[m]>100)
+        {
+            o->motor_fault_mask2[m] |= MOTOR_CAN_NOT_RESPONDING;
+        }
+        else
+        {
+            ++o->motor_state_watchdog[m];
+        }
+    }
 }
 
 extern eObool_t eo_motors_are_coupled(EOmotors *o, uint8_t ma, uint8_t mb)
@@ -162,6 +183,36 @@ extern eObool_t eo_motors_are_coupled(EOmotors *o, uint8_t ma, uint8_t mb)
     candata.b[6] = SysStatus.b[3];
 */
 
+/* from 2FOC
+extern void CanIcubProtoTrasmitter_SendStatusMsg()
+{
+    memset(&candata.b[0], 0, 8);
+       
+    //prapare the payload
+    candata.b[0] = SysError.b[0];    
+    b0  unsigned UnderVoltageFailure:1;     Undervoltage       
+    b1  unsigned OverVoltageFailure:1;      Overvoltage
+    b2  unsigned ExternalFaultAsserted:1;   External Fault
+    b3  unsigned OverCurrentFailure:1;      OverCurrent                                        
+    b4  unsigned DHESInvalidValue:1;        an invalid value of HES has been detected 
+    b5  unsigned AS5045CSumError:1;         | AS5045CalcError:1;
+    b6  unsigned DHESInvalidSequence:1;     an invalid sequence of HES activation has been detected
+    b7  unsigned CANInvalidProtocol:1;      can protocol incompatible with EMS
+    
+    candata.b[4] = SysError.b[1];
+    b0  unsigned CAN_BufferOverRun:1;        A CAN fifo full event has happened. 
+    b1  unsigned unused1:1;                  UNUSED: put here for mad in msg       
+    b2  unsigned CAN_TXIsPasv:1;             can IS is TX passive mode
+    b3  unsigned CAN_RXIsPasv:1;             can IS in RX passive mode
+    b4  unsigned CAN_IsWarnTX:1;             can IS in bus warn in tx (exist only one error for rx and tx, so the bits are used together)
+    b5  unsigned CAN_IsWarnRX:1;             can IS in bus warn in rx
+    b6  unsigned unused3:1;                  UNUSED: put here for mad in msg
+    b7  unsigned unused4:1;                  UNUSED: put here for mad in msg
+    
+    candata.b[5] = SysError.I2TFailure << 5;
+}
+*/
+
 extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)//uint8_t motor_error, uint8_t can_error)
 {
     o->motor_fault_mask2[m] = 0; // 
@@ -172,10 +223,13 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)//u
         
         if (motor_error1)
         {
+            if (motor_error1 & 0x03) o->motor_fault_mask2[m] |= MOTOR_UNDEROVERVOLTAGE;
             if (motor_error1 & 0x04) o->motor_fault_mask2[m] |= MOTOR_EXTERNAL_FAULT;
             if (motor_error1 & 0x08) o->motor_fault_mask2[m] |= MOTOR_OVERCURRENT_FAULT;
+            
             if (motor_error1 & 0x50) o->motor_fault_mask2[m] |= MOTOR_HALLSENSORS_FAULT;
-            if (motor_error1 & 0x80) o->motor_fault_mask2[m] |= MOTOR_CAN_INVALID_PROT;
+            if (motor_error1 & 0x20) o->motor_fault_mask2[m] |= MOTOR_AS5045ERROR;
+            if (motor_error1 & 0x80) o->motor_fault_mask2[m] |= MOTOR_CAN_INVALID_PROT;    
         }
         
         uint8_t motor_error2 = state[2];
@@ -191,6 +245,14 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)//u
         if (can_error)
         {
             o->motor_fault_mask2[m] |= MOTOR_CAN_GENERIC_FAULT;
+        }
+        
+        // old 2FOC fw compatibility
+        motor_error2 = state[5];
+        
+        if (motor_error2)
+        {
+            if (motor_error2 & 0x20) o->motor_fault_mask2[m] |= MOTOR_I2T_LIMIT_FAULT;
         }
     }
 }

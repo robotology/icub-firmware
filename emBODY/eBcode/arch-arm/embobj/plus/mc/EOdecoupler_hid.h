@@ -39,6 +39,8 @@ struct EOmotors_hid
 {
     uint8_t nMotors;
     
+    uint16_t motor_state_watchdog[NAXLES];
+    
     eObool_t Jok;
     uint16_t motor_fault_mask2[NAXLES];
     int32_t J[NAXLES][NAXLES];
