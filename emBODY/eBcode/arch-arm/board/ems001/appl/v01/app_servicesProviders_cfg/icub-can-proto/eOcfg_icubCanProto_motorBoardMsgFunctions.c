@@ -688,11 +688,17 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanP
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-        
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);       
         return(eores_NOK_generic);
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -718,15 +724,16 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanP
         //send back response
         EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &setpoint);
-        if(eores_OK != res)
-        {            
-            char str[128];
-            snprintf(str, sizeof(str), "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &setpoint);
+//        if(eores_OK != res)
+//        {
+//            #warning --> add a proxy error inside eo_proxy_ReplyROP()          
+//            char str[128];
+//            snprintf(str, sizeof(str), "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
     }
 #endif    
@@ -815,10 +822,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -848,15 +862,15 @@ eOresult_t                                  res = eores_OK;
             memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
         }
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &limits_aux);
+//        if(eores_OK != res)
+//        {
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
         
     }
@@ -914,10 +928,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -947,15 +968,15 @@ eOresult_t                                  res = eores_OK;
             memcpy(&limits_aux, limits_ptr, sizeof(eOmeas_position_limits_t));
         }
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &limits_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &limits_aux);
+//        if(eores_OK != res)
+//        {
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
         
     }
@@ -1104,10 +1125,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_limitsofjoint );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
 
     }
@@ -1128,15 +1156,15 @@ eOresult_t                                  res = eores_OK;
         eOmc_PID_t pid_aux;
         memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &pid_aux);
+//        if(eores_OK != res)
+//        {
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
         
     }
@@ -1205,10 +1233,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidtorque );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidtorque );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
 
     }
@@ -1225,20 +1260,20 @@ eOresult_t                                  res = eores_OK;
     
     if(req->numOfREceivedResp == req->numOfExpectedResp)
     {
-        //send back response
+        // send back response
         EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
         eOmc_PID_t pid_aux;
         memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &pid_aux);
+//        if(eores_OK != res)
+//        {
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
     }
 #endif
@@ -1307,10 +1342,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidposition );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidposition );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
 
     }
@@ -1331,15 +1373,15 @@ eOresult_t                                  res = eores_OK;
         eOmc_PID_t pid_aux;
         memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &pid_aux);
+//        if(eores_OK != res)
+//        {   
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
         
     }
@@ -1408,10 +1450,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidposition );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_pidposition );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -1429,18 +1478,19 @@ eOresult_t                                  res = eores_OK;
     {
         //send back response
         EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-        eOmc_PID_t pid_aux;
+        eOmc_PID_t pid_aux = {0};
         memcpy(&pid_aux, pid_ptr, sizeof(eOmc_PID_t));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &pid_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &pid_aux);
+//        if(eores_OK != res)
+//        {             
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
+                      
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
     }
 #endif    
@@ -1515,10 +1565,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -1544,15 +1601,15 @@ eOresult_t                                  res = eores_OK;
         eOmc_impedance_t imp_aux;
         memcpy(&imp_aux, impedance_ptr, sizeof(eOmc_impedance_t));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &imp_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &imp_aux);
+//        if(eores_OK != res)
+//        {
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
     }
 #endif    
@@ -1609,10 +1666,17 @@ eOresult_t                                  res = eores_OK;
     EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
     if(NULL == li)
     {
-        char str[128];
-        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
-        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+//        char str[128];
+//        snprintf(str, sizeof(str)-1, "rec msg da can ma non ce ethreq j=%d tag=%d!!",jId, eoprot_tag_mc_joint_config_impedance );
+//        eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//        eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
         return(eores_NOK_generic);
     }
     eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -1634,15 +1698,15 @@ eOresult_t                                  res = eores_OK;
         eOmc_impedance_t imp_aux;
         memcpy(&imp_aux, impedance_ptr, sizeof(eOmc_impedance_t));
         
-        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &imp_aux);
-        if(eores_OK != res)
-        {
-            char str[128];
-            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
-            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-            res = res;
-        }
+        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &imp_aux);
+//        if(eores_OK != res)
+//        {
+//            char str[128];
+//            snprintf(str, sizeof(str)-1, "errore in proxy_ReplyROP_Load res=%d",res );
+//            eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+//            eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//            res = res;
+//        }
         res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
     }
 #endif    
@@ -2031,10 +2095,17 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
 //    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
 //    if(NULL == li)
 //    {
-//           char str[128];
-//           snprintf(str, sizeof(str)-1, "in ask openLoop errrore j=%d res=%d",jId, res);
-//           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-//           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+//        eOerrmanDescriptor_t errdes = {0};
+//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//        errdes.sourceaddress    = 0;
+//        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+//        errdes.par16            = 0; 
+//        errdes.par64            = id32; 
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+////           char str[128];
+////           snprintf(str, sizeof(str)-1, "in ask openLoop errrore j=%d res=%d",jId, res);
+////           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
+////           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
 //           return(eores_NOK_generic);
 //    }
 //    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
@@ -2050,7 +2121,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
 //        //send back response
 //        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
 //        
-//        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, EOK_uint32dummy, &setpoint);
+//        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, req->signature, &setpoint);
 //        if(eores_OK != res)
 //        {
 //           char str[128];

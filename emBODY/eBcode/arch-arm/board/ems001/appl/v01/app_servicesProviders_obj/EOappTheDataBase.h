@@ -137,6 +137,7 @@ typedef struct
 typedef struct
 {
     eOprotID32_t    id32;
+    uint32_t        signature;
     void            *nvRam_ptr;
     uint8_t         numOfExpectedResp;
     uint8_t         numOfREceivedResp;

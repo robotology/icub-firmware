@@ -615,7 +615,7 @@ extern "C" {
 //  <o> maximum time a reply can be contained (in ms)       <0-100000>
 //  <i> default: 10. 
 //  <i> it is the max time a reply can be stored in the container before the say<> is considered lost
-#define EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC     10000
+#define EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC     1000
 
 //  </h> reply container
 

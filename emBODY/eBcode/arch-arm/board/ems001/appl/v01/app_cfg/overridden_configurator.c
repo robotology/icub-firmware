@@ -168,6 +168,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         uint32_t dontaskmask = 0; // the first time we ask to every board
         eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask); 
         
+        // marco.accame on 24feb14: if we launch it only in here then it is not OK.
+        // redmine issue #494
+        // eo_emsapplBody_discovery_Mais_Start(eo_emsapplBody_GetHandle());
         
         //eo_emsapplBody_discovery_Mais_Start(eo_emsapplBody_GetHandle());
         //eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());

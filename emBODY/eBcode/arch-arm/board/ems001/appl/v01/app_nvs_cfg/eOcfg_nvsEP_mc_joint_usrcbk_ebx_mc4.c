@@ -55,6 +55,11 @@
 #ifdef USE_PROTO_PROXY
 #include "EOMtheEMSbackdoor.h"
 #endif
+
+
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -274,6 +279,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
         eOappTheDB_hid_ethProtoRequest_t req = 
         {
             .id32 = rd->id32,
+            .signature = rd->signature,
             .nvRam_ptr = nv->ram,
             .numOfExpectedResp = 2,
             .numOfREceivedResp = 0
@@ -282,11 +288,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-           char str[128];
-           snprintf(str, sizeof(str)-1, "in ask pospid errrore j=%d res=%d",jxx, res);
-           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-           return;
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+            errdes.par16            = 0; 
+            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+            return;
         }
         // send pid position 
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_POS_PID;
@@ -342,6 +351,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
         eOappTheDB_hid_ethProtoRequest_t req = 
         {
             .id32 = rd->id32,
+            .signature = rd->signature,
             .nvRam_ptr = nv->ram,
             .numOfExpectedResp = 2,
             .numOfREceivedResp = 0
@@ -350,10 +360,13 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-           char str[128];
-           snprintf(str, sizeof(str)-1, "in ask pidtrq errore j=%d res=%d",jxx, res);
-           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+            errdes.par16            = 0; 
+            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
             return;
         }
         // send pid position 
@@ -420,6 +433,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
         eOappTheDB_hid_ethProtoRequest_t req = 
         {
             .id32 = rd->id32,
+            .signature = rd->signature,
             .nvRam_ptr = nv->ram,
             .numOfExpectedResp = 2,
             .numOfREceivedResp = 0
@@ -427,11 +441,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
         
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
-        {
-           char str[128];
-           snprintf(str, sizeof(str)-1, "in ask impedance errore j=%d res=%d",jxx, res);
-           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
+        {            
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+            errdes.par16            = 0; 
+            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
             return;
         }
         // send pid position 
@@ -511,6 +528,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
         eOappTheDB_hid_ethProtoRequest_t req = 
         {
             .id32 = rd->id32,
+            .signature = rd->signature,
             .nvRam_ptr = nv->ram,
             .numOfExpectedResp = 2,
             .numOfREceivedResp = 0
@@ -519,11 +537,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-           char str[128];
-           snprintf(str, sizeof(str)-1, "in ask setpoint errore j=%d res=%d",jxx, res);
-           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-           return;
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+            errdes.par16            = 0; 
+            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+            return;
         }
 
         msgCmd.cmdId =     ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION;
@@ -747,6 +768,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         eOappTheDB_hid_ethProtoRequest_t req = 
         {
             .id32 = rd->id32,
+            .signature = rd->signature,
             .nvRam_ptr = nv->ram,
             .numOfExpectedResp = 1,
             .numOfREceivedResp = 0
@@ -775,11 +797,14 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
         if(eores_OK != res)
         {
-           char str[128];
-           snprintf(str, sizeof(str)-1, "in ask setpoint errore j=%d res=%d",jxx, res);
-           eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-           eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);
-           return;
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+            errdes.par16            = 0; 
+            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+            return;
         }
         eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
         
