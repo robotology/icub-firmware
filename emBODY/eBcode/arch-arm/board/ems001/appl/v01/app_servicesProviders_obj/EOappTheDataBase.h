@@ -133,16 +133,16 @@ typedef struct
     */
 } eOappTheDB_jointShiftValues_t;       //thi values are usefull only for joint connected to MC4
 
-#ifdef USE_PROTO_PROXY
-typedef struct
-{
-    eOprotID32_t    id32;
-    uint32_t        signature;
-    void            *nvRam_ptr;
-    uint8_t         numOfExpectedResp;
-    uint8_t         numOfREceivedResp;
-} eOappTheDB_hid_ethProtoRequest_t;
-#endif
+//#ifdef USE_PROTO_PROXY
+//typedef struct
+//{
+//    eOprotID32_t    id32;
+//    uint32_t        signature;
+//    void            *nvRam_ptr;
+//    uint8_t         numOfExpectedResp;
+//    uint8_t         numOfREceivedResp;
+//} eOappTheDB_hid_ethProtoRequest_t;
+//#endif
 
 typedef struct
 {
@@ -244,12 +244,12 @@ extern eOresult_t eo_appTheDB_FillCanTypeVersion(EOappTheDB *p, eOappTheDB_board
 extern eOresult_t eo_appTheDB_setCanBoardReady(EOappTheDB *p, eOappTheDB_board_canlocation_t canloc, eObrd_typeandversions_t *typeversion);
 extern eObool_t  eo_appTheDB_areConnectedCanBoardsReady(EOappTheDB *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
 
-#ifdef USE_PROTO_PROXY
-//eth proto request
-extern eOresult_t eo_appTheDB_appendEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, eOappTheDB_hid_ethProtoRequest_t *req);
-extern EOlistIter * eo_appTheDB_searchEthProtoRequest(EOappTheDB *p, eOprotID32_t id32);
-extern eOresult_t eo_appTheDB_removeEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, EOlistIter* li);
-#endif
+//#ifdef USE_PROTO_PROXY
+////eth proto request
+//extern eOresult_t eo_appTheDB_appendEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, eOappTheDB_hid_ethProtoRequest_t *req);
+//extern EOlistIter * eo_appTheDB_searchEthProtoRequest(EOappTheDB *p, eOprotID32_t id32);
+//extern eOresult_t eo_appTheDB_removeEthProtoRequest(EOappTheDB *p, eOprotEntity_t entity, eOprotIndex_t index, EOlistIter* li);
+//#endif
 
 /** @}            
     end of group eo_app_encodersReader
