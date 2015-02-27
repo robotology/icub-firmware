@@ -129,7 +129,7 @@ const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default =
             /* 0 */ ICUBCANPROTO_PER_MC_MSG__POSITION,
             /* 1 */ ICUBCANPROTO_PER_MC_MSG__STATUS,
             /* 2 */ ICUBCANPROTO_PER_MC_MSG__PRINT,
-            /* 3 */ 0
+            /* 3 */ ICUBCANPROTO_PER_MC_MSG__PID_VAL
             }
         }
     }        
@@ -341,7 +341,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     }
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
     {   
-        #warning marco.accame: remove mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
+        //#warning marco.accame: remove mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
         res = s_eo_emsapplBody_MaisTXenable(p);
         if(eores_OK != res)
         {
