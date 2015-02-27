@@ -616,7 +616,7 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
 
    
     eo_action_SetEvent(action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 10*eok_reltime1ms, eo_tmrmode_FOREVER, action);
+    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 250*eok_reltime1ms, eo_tmrmode_FOREVER, action);
     
     // marco.accame: better asking the callback of the timer to manage the sending og get-fw-version.
     // so that we van decide to apply a delay to the first request (or to ask it just after the first 10 ms)

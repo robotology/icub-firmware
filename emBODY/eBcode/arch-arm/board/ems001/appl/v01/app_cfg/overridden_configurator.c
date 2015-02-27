@@ -139,8 +139,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
 {
     uint32_t readyCanBoardsMask = 0;    // keeps the boards that are ready. if bit pos i-th is 1, then the board in list i-th is OK   
     uint32_t checkedmask = 0;           // keeps the boards that are checked
-    
-    static uint32_t times = 0;
+    static uint32_t count_times = 0;
+    count_times++;
+    /*
     // marco.accame on 4 feb 2014:
     // if the 2foc receives a get-fw-version request in initial period of life of the application then it remains silent forever.
     // in the meantime that this bug is fixed in the 2foc application, we introduce the following work-around.
@@ -149,6 +150,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     // and beyond its first second of life (the timer starts after not before 1-2 seconds of bootstrap after the ipnet has connected
     // the sockets with ip address 10.0.1.104)
     // to remove the delay: just change onlyAFTER to value 1 (not 0!!!)
+    static uint32_t times = 0;
     static const uint32_t onlyAFTER = 500; 
     
     times++;
@@ -177,7 +179,21 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         
         return;        
     }
+    */
+    //  davide on 25 feb 2015:
+    //  it seems that the problem of the 2foc is due to the high frequency of the messages sent via CAN.
+    //  Now the messages are sent with a frequency of 4HZ (timer countdown = 250ms), and the problem should be fixed without
+    //  a fixed delay of 5 seconds from the beginning of the application
     
+    // The first time I only send the request...from that point on, I continue to check if the boards are ready, and if
+    // not I re-send the request for the firmware version
+    if(count_times == 1)
+    {
+        uint32_t dontaskmask = 0; // the first time we ask to every board
+        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask);
+        return;
+    }
+        
     EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());      
 
     // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiamo mandato la loro fw version
