@@ -228,7 +228,6 @@ static const eOemsapplbody_cfg_t theemsapplbodycfg =
         .major                      = 1,
         .minor                      = 2
     },
-    //.connectedEncodersMask          = EOMTHEEMSAPPLCFG_EBX_encodersMASK,   
     .configdataofMC4boards          =
     {
         .shiftvalues    =
@@ -238,13 +237,13 @@ static const eOemsapplbody_cfg_t theemsapplbodycfg =
             .jointAccelerationEstimationShift   = 5
         },
         .bcastpolicy            =
-        {
+        {   // we use pid_val in order to have the value of joint.status.ofpid.output regularly updated 
             .val2bcastList      =
             {
             /* 0 */ ICUBCANPROTO_PER_MC_MSG__POSITION,
             /* 1 */ ICUBCANPROTO_PER_MC_MSG__STATUS,
             /* 2 */ ICUBCANPROTO_PER_MC_MSG__PRINT,
-            /* 3 */ 0
+            /* 3 */ ICUBCANPROTO_PER_MC_MSG__PID_VAL
             }
         }
     }       
