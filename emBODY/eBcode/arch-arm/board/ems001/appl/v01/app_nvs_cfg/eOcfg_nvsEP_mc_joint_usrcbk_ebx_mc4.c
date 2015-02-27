@@ -701,12 +701,9 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* 
     }
 
 }
-
+//#warning TODO: the setpoint cannot be read, thus in here the reception of a eo_ropcode_ask is illegal. if the variable is proxied, and we receive an ask .... issue a diagnostics warning
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
- //   char str[96];
-    
-//    eOresult_t                              res;
     eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
     void                                    *val_ptr = NULL;
     eOmc_joint_status_t                     *jstatus = NULL;
@@ -795,11 +792,31 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             } break;
 
             case eomc_setpoint_current:
-            {
-                //removed until setpoint open loop will be introduced
-                //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT;                             
-                //val_ptr =  &(setPoint->to.current.value);
-                
+            { 
+                // marco.accame on 27 feb 2015.               
+                // when embObjMotionControl::setRefOutputRaw() sends a set<setpoint, (current, value)>,
+                // here is what it is done: we send it to mc4 with a openloop params command ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS.
+                // then the reading back is done with embObjMotionControl::getRefOutputRaw() which
+                // just reads its buffered value of joint.status.ofpid.positionreference which in this case 
+                // must contain the value of the openloop current as received and accepted by the mc4 
+                // board. the mc4 board could refuse to accept the value if for instance is not in openloop mode.
+                // moreover: the mc4 board does not normally broadcast this value, thus we must ask it
+                // in an explicit way with a further CAN message of type ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS
+                // at this point, in the tx phase the two CAN commands (set and then get) are sent and the
+                // reply of teh get is received at 1 ms from now in the next rx phase (hopefully).
+                // at this point the rx handler of the openloop param fills the value of joint.status.ofpid.positionreference
+                // which is broadcasted up to robotInterface about 1.8 ms after now.
+                // ... i can smell danger of a race condition if a high level user calls setRefOutputRaw() and then getRefOutputRaw()
+                // without any wait time in between.
+                // ... moreover: the getRefOutputRaw() returns the value buffered in EMS and asked to mc4 the last time a setRefOutputRaw()
+                // was called.
+                // anyway: for now it works fine and having asked around to people in the lab the thing is not worrying them
+                // a solution: getRefOutputRaw() does not read the joint.status but directly
+                // send a ask<eoprot_tag_mc_joint_status_ofpid_positionreference> WHICH IS A NEW TAG TO BE ADDED.
+                // then we use the proxy so that this request is sent to the mc4 which gives the value and then the value
+                // is sent up with a say<eoprot_tag_mc_joint_status_ofpid_positionreference, value> 
+                // in such a way the value is always correct   
+               
                 icubCanProto_setpoint_current_t setpoint_current;
                 setpoint_current.value = setPoint->to.current.value;
                 
