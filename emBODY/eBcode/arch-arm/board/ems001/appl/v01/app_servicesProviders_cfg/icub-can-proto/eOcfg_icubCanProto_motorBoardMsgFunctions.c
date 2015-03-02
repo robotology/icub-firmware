@@ -97,6 +97,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p,
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__print (EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode, eOmc_controlmode_t *eomc_controlmode);
 //static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode_old(icubCanProto_controlmode_t icubcanProto_controlmode, eOmc_jointId_t jId, uint8_t hw_error_flags, eOmc_controlmode_t *eomc_controlmode);
 static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode);
@@ -2727,7 +2728,21 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__overflow(EOicubCanProto* p,
 
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__print(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    return(eores_OK);
+    //Invalid CAN print frame
+    /*
+    if ((frame->data[0] != 0x06) && (frame->data[0] != 0x86))
+        return eores_NOK_generic;
+    */
+    eOresult_t res;
+    eOappTheDB_jointOrMotorCanLocation_t canLoc = {0};
+
+    canLoc.emscanport = canPort;
+    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+    canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;
+        
+    res = s_eo_icubCanProto_parser_per_mb_cmd__print (p, frame, canLoc);
+     
+    return(res);
 }
 
 
@@ -3084,6 +3099,18 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* 
     return(eores_OK);
 }
 
+static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__print (EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
+{    
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_canprint);
+    errdes.par16                = frame->size;
+    errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+    errdes.sourcedevice         = (eOcanport1 == canloc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+    errdes.sourceaddress        = canloc.addr;                
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);             
+    
+    return eores_OK;
+}
 
 // static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode_old(icubCanProto_controlmode_t icubcanProto_controlmode, eOmc_jointId_t jId,
 //                                                                                           uint8_t hw_error_flags, eOmc_controlmode_t *eomc_controlmode)
