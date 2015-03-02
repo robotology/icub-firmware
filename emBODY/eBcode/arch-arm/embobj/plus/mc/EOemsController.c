@@ -617,7 +617,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     }
     
     float pwm_joint[NAXLES];
-    
+    eObool_t torque_protection[NAXLES];
     eObool_t stiffness[NAXLES];
     
     eo_motors_check_wdog(ems->motors);
@@ -625,9 +625,44 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     //PWM computation (PID ecc)
     JOINTS(j)
     {
+        torque_protection[j] = eobool_false;
         pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
     }
  
+    //torque control limits protection mechanism
+    JOINTS(j)
+    {
+      if ((ems->axis_controller[j]->control_mode==eomc_controlmode_torque) ||
+          (ems->axis_controller[j]->interact_mode==eOmc_interactionmode_compliant &&
+          (ems->axis_controller[j]->control_mode==eomc_controlmode_position ||
+           ems->axis_controller[j]->control_mode==eomc_controlmode_velocity ||
+           ems->axis_controller[j]->control_mode==eomc_controlmode_mixed ||
+           ems->axis_controller[j]->control_mode==eomc_controlmode_direct)))
+      {
+        int32_t pos = ems->axis_controller[j]->position;
+        if (pos <  ems->axis_controller[j]->pos_min)
+        {
+            float pwm_lim = eo_pid_PWM_p( ems->axis_controller[j]->pidP, ems->axis_controller[j]->pos_min - pos);
+            if ((pwm_lim > 0) ^ (pwm_joint[j] > pwm_lim)) 
+            {
+               pwm_joint[j] = pwm_lim;
+               for (int8_t k; k<NAXLES; k++)
+                   torque_protection[k] = eobool_true; //put in protection all motors
+            }
+        }
+        else if (pos >  ems->axis_controller[j]->pos_max)
+        {
+            float pwm_lim = eo_pid_PWM_p( ems->axis_controller[j]->pidP,  ems->axis_controller[j]->pos_max - pos);
+            if ((pwm_lim > 0) ^ (pwm_joint[j] > pwm_lim))
+            {
+               pwm_joint[j] = pwm_lim;
+               for (int8_t k; k<NAXLES; k++)
+                   torque_protection[k] = eobool_true; //put in protection all motors
+            }
+        }
+      }
+    }
+
     //PWM decoupling
     float pwm_motor[NAXLES];
     eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
@@ -635,7 +670,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     //Friction compensation after joints decoupling
     MOTORS(m)
     {
-        pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m]);
+        if (!torque_protection[m])
+            pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m]);
     }
     
     MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);

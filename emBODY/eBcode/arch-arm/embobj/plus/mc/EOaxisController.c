@@ -537,18 +537,6 @@ extern float eo_axisController_FrictionCompensation(EOaxisController *o, float i
       int32_t vel = GET_AXIS_VELOCITY();
       int32_t pos = GET_AXIS_POSITION();
       pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, vel, o->torque_ref);
-      //torque control limits protection mechanism
-      if (pos < o->pos_min)
-      {
-          float pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_min - pos);
-          if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
-      }
-      else if (pos > o->pos_max)
-      {
-          float pwm_lim = eo_pid_PWM_p(o->pidP, o->pos_max - pos);
-          if ((pwm_lim > 0) ^ (pwm_out > pwm_lim)) pwm_out = pwm_lim;
-      }
-      //limit the PWM with the torque pid
       LIMIT(pwm_out,eo_pid_GetPwmMax(o->pidT));
     
     }
