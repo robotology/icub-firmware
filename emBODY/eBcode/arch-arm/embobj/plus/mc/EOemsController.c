@@ -162,7 +162,7 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
 {
     eo_motors_reset_wdog(ems->motors, motor);
     
-    ems->motor_current [motor] = current;
+    ems->motor_current [motor] = (2*current)/3; // Iq = sqrt(3)/2*Imeas, 32768 = 25000 mA ==> 0.66 scale factor
     ems->motor_velocity[motor] = velocity;
     ems->motor_position[motor] = position;
 }
