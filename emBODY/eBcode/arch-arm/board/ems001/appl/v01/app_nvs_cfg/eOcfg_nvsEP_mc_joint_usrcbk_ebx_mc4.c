@@ -731,7 +731,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     
     if(eo_ropcode_set == rd->ropcode)
     {
-        #warning marco.accame: i wrote if(eomc_motionmonitormode_forever == (eOmc_motionmonitormode_t)jconfig->motionmonitormode)
+        //#warning marco.accame: it would be better the following with cast to (eOmc_motionmonitormode_t)
         //if(eomc_motionmonitormode_forever == (eOmc_motionmonitormode_t)jconfig->motionmonitormode)
         if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)        
         {
@@ -852,40 +852,61 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         return;
     }
 
-#ifdef USE_PROTO_PROXY
-    if(eo_ropcode_ask == rd->ropcode)
-    {
-        //only for setpoint of type current and torque exist the get command
-        switch(setPoint->type)
-        {
-            case eomc_setpoint_torque:
-            {
-                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE;
-            } break;
-
-//            case eomc_setpoint_current:
-//            {
-//                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS;
-//                
-//            }break;
-
-            default:
-            {
-                return;
-            } break;
-        }
-#if 0        
-//        eOappTheDB_hid_ethProtoRequest_t req = 
+    // marco.accame on 03mar15: one should not send a ask<setpoint> to the ems. and robotInterface does not do it.
+    // but also the code in here is incorrect because: the proxy stores and id32 of type setpoint, the UPDT() function 
+    // send to the MC4 a can message of type ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE, the can parser when parses the reply
+    // in eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque() fill the setpoint-torque with rx value and then passed it
+    // to proxy with id32 of type eoprot_tag_mc_joint_config_impedance ... it cannot work.
+    // THUS: i remove it from here but also from eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque() .....
+//#ifdef USE_PROTO_PROXY
+//    if(eo_ropcode_ask == rd->ropcode)
+//    {
+//        //only for setpoint of type current and torque exist the get command
+//        switch(setPoint->type)
 //        {
-//            .id32 = rd->id32,
-//            .signature = rd->signature,
-//            .nvRam_ptr = nv->ram,
-//            .numOfExpectedResp = 1,
-//            .numOfREceivedResp = 0
-//        };  
-//        
-//        eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
-//        if(eores_OK != res)
+//            case eomc_setpoint_torque:
+//            {
+//                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE;
+//            } break;
+//
+//
+////            case eomc_setpoint_current:
+////            {
+////                msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS;
+////                
+////            }break;
+//
+//            default:
+//            {
+//                return;
+//            } break;
+//        }
+//#if 0        
+////        eOappTheDB_hid_ethProtoRequest_t req = 
+////        {
+////            .id32 = rd->id32,
+////            .signature = rd->signature,
+////            .nvRam_ptr = nv->ram,
+////            .numOfExpectedResp = 1,
+////            .numOfREceivedResp = 0
+////        };  
+////        
+////        eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
+////        if(eores_OK != res)
+////        {
+////            eOerrmanDescriptor_t errdes = {0};
+////            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+////            errdes.sourceaddress    = 0;
+////            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+////            errdes.par16            = 0; 
+////            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+////            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+////            return;
+////        }
+//#else        
+//        EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+//        eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
+//        if(NULL == param)
 //        {
 //            eOerrmanDescriptor_t errdes = {0};
 //            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -896,28 +917,14 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 //            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
 //            return;
 //        }
-#else        
-        EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-        eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
-        if(NULL == param)
-        {
-            eOerrmanDescriptor_t errdes = {0};
-            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress    = 0;
-            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
-            errdes.par16            = 0; 
-            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-            return;
-        }
-        param->p08_1 = 1;       // we expect one can frame
-        param->p08_2 = 0;       // and we havent received any yet
-#endif         
-        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
-        
-        return;
-    }
-#endif
+//        param->p08_1 = 1;       // we expect one can frame
+//        param->p08_2 = 0;       // and we havent received any yet
+//#endif         
+//        eo_appCanSP_SendCmd2Joint(appCanSP_ptr, (eOmc_jointId_t)jxx, msgCmd, NULL);
+//        
+//        return;
+//    }
+//#endif
 
 }
 

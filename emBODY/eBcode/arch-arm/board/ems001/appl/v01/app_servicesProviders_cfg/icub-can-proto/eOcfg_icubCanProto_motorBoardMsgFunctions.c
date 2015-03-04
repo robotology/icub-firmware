@@ -667,31 +667,75 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
     return(eores_OK);
 }
 
-
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                              res = eores_OK;
-#ifdef USE_PROTO_PROXY
-    eOmc_jointId_t                          jId;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
-    EOappTheDB                              *db = eo_appTheDB_GetHandle();
-    eOmc_setpoint_t                         setpoint = {0};
     
-    canLoc.emscanport = canPort;
-    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-    canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+    // marco.accame on 03mar15: the use of teh proxy in here is not correct. the proxy which triggered the
+    // ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE can message came from a ask<mc_joint_cmmnds_setpoint> which is not used by robotInterface
+    // and moreover cannot in here call the proxy with a id32 with tag eoprot_tag_mc_joint_config_impedance.
+    // BETTER REMOVE THE CODE.
     
-    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
-    if(eores_OK != res)
-    {
-        return(res);
-    }
-    
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
-    
-#if 0    
-//    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
-//    if(NULL == li)
+//#ifdef USE_PROTO_PROXY
+//    eOmc_jointId_t                          jId;
+//    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {0};
+//    EOappTheDB                              *db = eo_appTheDB_GetHandle();
+//    eOmc_setpoint_t                         setpoint = {0};
+//    
+//    canLoc.emscanport = canPort;
+//    canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+//    canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
+//    
+//    res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
+//    if(eores_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
+//    
+//#if 0    
+////    EOlistIter * li = eo_appTheDB_searchEthProtoRequest(db, id32);
+////    if(NULL == li)
+////    {
+////        eOerrmanDescriptor_t errdes = {0};
+////        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+////        errdes.sourceaddress    = 0;
+////        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+////        errdes.par16            = 0; 
+////        errdes.par64            = id32; 
+////        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
+////  
+////        return(eores_NOK_generic);
+////    }
+////    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
+////    
+////    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+////    //icubCanProto_torque_t icub_trq =  *((icubCanProto_torque_t*)(&frame->data[1]));
+////    
+////    icubCanProto_torque_t icub_trq = ((icubCanProto_torque_t)frame->data[1]) | (((icubCanProto_torque_t)frame->data[2])<<8);
+////    
+////    
+////    setpoint.type = eomc_setpoint_torque;
+////    setpoint.to.torque.value = eo_appMeasConv_torque_S2I(appMeasConv_ptr, jId, icub_trq);
+//
+//
+////    req->numOfREceivedResp++;
+////    res = eores_OK;
+////    
+////    if(req->numOfREceivedResp == req->numOfExpectedResp)
+////    {
+////        //send back response
+////        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+////        
+////        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, &setpoint);
+////        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+////    }
+//#else
+//
+//    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+//    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
+//    if(NULL == param)
 //    {
 //        eOerrmanDescriptor_t errdes = {0};
 //        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -699,71 +743,37 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanP
 //        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
 //        errdes.par16            = 0; 
 //        errdes.par64            = id32; 
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);        
-//  
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+//
 //        return(eores_NOK_generic);
-//    }
-//    eOappTheDB_hid_ethProtoRequest_t *req = (eOappTheDB_hid_ethProtoRequest_t*)li->data;
-//    
+//    } 
+//
+//
 //    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-//    //icubCanProto_torque_t icub_trq =  *((icubCanProto_torque_t*)(&frame->data[1]));
+//
 //    
 //    icubCanProto_torque_t icub_trq = ((icubCanProto_torque_t)frame->data[1]) | (((icubCanProto_torque_t)frame->data[2])<<8);
 //    
 //    
 //    setpoint.type = eomc_setpoint_torque;
 //    setpoint.to.torque.value = eo_appMeasConv_torque_S2I(appMeasConv_ptr, jId, icub_trq);
-
-
-//    req->numOfREceivedResp++;
+//     
+//    
+//    param->p08_2 ++;
 //    res = eores_OK;
 //    
-//    if(req->numOfREceivedResp == req->numOfExpectedResp)
+//    if(param->p08_1 == param->p08_2)
 //    {
-//        //send back response
-//        EOproxy *proxy_ptr = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-//        
-//        res = eo_proxy_ReplyROP_Load(proxy_ptr, id32, &setpoint);
-//        res = eo_appTheDB_removeEthProtoRequest(db, eoprot_entity_mc_joint, jId, li);
+//        // send back response
+//        res = eo_proxy_ReplyROP_Load(proxy, id32, &setpoint);
+//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
+//
+//
 //    }
-#else
-
-    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-    if(NULL == param)
-    {
-        eOerrmanDescriptor_t errdes = {0};
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
-        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-        errdes.par16            = 0; 
-        errdes.par64            = id32; 
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
-    } 
-
-    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-    
-    icubCanProto_torque_t icub_trq = ((icubCanProto_torque_t)frame->data[1]) | (((icubCanProto_torque_t)frame->data[2])<<8);
-    
-    
-    setpoint.type = eomc_setpoint_torque;
-    setpoint.to.torque.value = eo_appMeasConv_torque_S2I(appMeasConv_ptr, jId, icub_trq);
-     
-    
-    param->p08_2 ++;
-    res = eores_OK;
-    
-    if(param->p08_1 == param->p08_2)
-    {
-        // send back response
-        res = eo_proxy_ReplyROP_Load(proxy, id32, &setpoint);
-        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
-    }
-    
-#endif 
-    
-#endif // USE_PROTO_PROXY  
+//    
+//#endif 
+//    
+//#endif // USE_PROTO_PROXY  
     return(res);
 }
 
