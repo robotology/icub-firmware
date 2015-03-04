@@ -515,7 +515,7 @@ extern eOresult_t eo_appCanSP_read(EOappCanSP *p, eOcanport_t canport, uint8_t n
             errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&canframe);
             errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
             errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(canframe.id);                
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);             
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, s_eobj_ownname, &errdes);             
         }
     }
     
