@@ -67,7 +67,7 @@ eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
 eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
 eOdgn_can_statistics_t              eo_dgn_canstatistics;
-eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
+//eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ extern EOTheEMSdiagnostics_t* eo_theEMSdgn_Initialize(void)
     memset(&eo_dgn_emsapplcore, 0, sizeof(eOdgn_emsapplication_common_t));
     memset(&eo_dgn_emsappmc, 0, sizeof(eOdgn_emsapplication_emswithmc_t));
     memset(&eo_dgn_motorstflag, 0, sizeof(eOdgn_motorstatusflags_t));
-    memset(&eo_dgn_rxchecksepoints, 0, sizeof(eOdgn_rxCheckSetpoints_t));
+//    memset(&eo_dgn_rxchecksepoints, 0, sizeof(eOdgn_rxCheckSetpoints_t));
     memset(&eo_dgn_canstatistics, 0, sizeof(eOdgn_can_statistics_t));
     eo_dgn_canstatistics.config_mode.stat[0].info_rx.min = 255;
     eo_dgn_canstatistics.config_mode.stat[0].info_tx.min = 255;
@@ -347,18 +347,18 @@ extern eOresult_t eo_theEMSdgn_checkEthLinksStatus_quickly(EOTheEMSdiagnostics_t
 }
 
 
-extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p)
-{
-    uint8_t i;
-    for(i=0; i<4; i++)
-    {
-        eo_dgn_rxchecksepoints.position[i].deltaprognumber = INT32_MAX;
-        eo_dgn_rxchecksepoints.position[i].deltarxtime = UINT32_MAX;
-        eo_dgn_rxchecksepoints.impedence[i].deltaprognumber = INT32_MAX;
-        eo_dgn_rxchecksepoints.impedence[i].deltarxtime = UINT32_MAX;
-    } 
-    return(eores_OK);    
-}
+//extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p)
+//{
+//    uint8_t i;
+//    for(i=0; i<4; i++)
+//    {
+//        eo_dgn_rxchecksepoints.position[i].deltaprognumber = INT32_MAX;
+//        eo_dgn_rxchecksepoints.position[i].deltarxtime = UINT32_MAX;
+//        eo_dgn_rxchecksepoints.impedence[i].deltaprognumber = INT32_MAX;
+//        eo_dgn_rxchecksepoints.impedence[i].deltarxtime = UINT32_MAX;
+//    } 
+//    return(eores_OK);    
+//}
 
 
 extern void eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(eOcanport_t canport, uint8_t numofRXcanframe)

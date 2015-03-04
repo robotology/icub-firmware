@@ -72,7 +72,7 @@ extern eOdgn_emsperipheralstatus_t         eo_dgn_emsperiph;
 extern eOdgn_emsapplication_common_t       eo_dgn_emsapplcore;
 extern eOdgn_emsapplication_emswithmc_t    eo_dgn_emsappmc;
 extern eOdgn_motorstatusflags_t            eo_dgn_motorstflag;
-extern eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
+//extern eOdgn_rxCheckSetpoints_t            eo_dgn_rxchecksepoints;
 extern eOdgn_can_statistics_t              eo_dgn_canstatistics;
 
 
@@ -99,7 +99,7 @@ extern eOresult_t eo_theEMSdgn_UpdateErrorLog(EOTheEMSdiagnostics_t* p, char *st
 
 extern eOresult_t eo_theEMSdgn_checkEthLinksStatus_quickly(EOTheEMSdiagnostics_t* p, uint8_t *link1_isup, uint8_t *link2_isup);
 
-extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p);
+//extern eOresult_t eo_theEMSdgn_resetSetpoints(EOTheEMSdiagnostics_t* p);
 
 extern eOresult_t eo_theEMSdgn_UpdateCanQueuesStatistics(EOTheEMSdiagnostics_t* p, eOcanport_t canport, uint8_t numofRXcanframe, uint8_t numofXcanframe);
 
