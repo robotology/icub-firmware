@@ -63,25 +63,28 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "eOcfg_nvsEP_mngmnt_usr_hid.h"
+// remove this if you want to use function eoprot_fun_UPDT_mc_controller_config_jointcoupling() as defined inside this file
+#define EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
 #include "EOMtheEMSapplCfg_hid.h"
+
 // #define VERIFY_ROP_SETIMPEDANCE
 // #define VERIFY_ROP_SETPOSITIONRAW
 
 
-#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
-    #include "EOtheEMSapplDiagnostics.h"
-    #include "rxtools.h"
-    #define MAXJ 4
-    
-    #if   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-        #define VERIFY_ROP_SETPOINT_EB5
-    #endif
-#endif
+//#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
+//    #include "EOtheEMSapplDiagnostics.h"
+//    #include "rxtools.h"
+//    #define MAXJ 4
+//    
+//    #if   defined(EOMTHEEMSAPPLCFG_USE_EB5)
+//        #define VERIFY_ROP_SETPOINT_EB5
+//    #endif
+//#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -101,16 +104,16 @@
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(VERIFY_ROP_SETIMPEDANCE)
-    const uint32_t maxtimegap_impedance = 25; // 25 ms expressed in milli-sec
-    static rxtools_rec_status_t status_rop_impedance[MAXJ] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
-#endif
+//#if defined(VERIFY_ROP_SETIMPEDANCE)
+//    const uint32_t maxtimegap_impedance = 25; // 25 ms expressed in milli-sec
+//    static rxtools_rec_status_t status_rop_impedance[MAXJ] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+//#endif
     
     
-#if defined(VERIFY_ROP_SETPOSITIONRAW)
-    const uint32_t maxtimegap_setpositionraw = 25; // 25 ms expressed in milli-sec
-    static rxtools_rec_status_t status_rop_setpositionraw[MAXJ] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
-#endif
+//#if defined(VERIFY_ROP_SETPOSITIONRAW)
+//    const uint32_t maxtimegap_setpositionraw = 25; // 25 ms expressed in milli-sec
+//    static rxtools_rec_status_t status_rop_setpositionraw[MAXJ] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+//#endif
 
 
 
@@ -249,7 +252,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 
 extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmc_motor_params_t   *params_ptr = (eOmc_motor_params_t*)nv->ram;
+    eOmc_motor_params_t *params_ptr = (eOmc_motor_params_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     
     eo_emsController_SetMotorParams ((uint8_t)jxx, *params_ptr);
@@ -257,43 +260,44 @@ extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const e
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-   eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32); 
-#if defined(VERIFY_ROP_SETIMPEDANCE)   
-    
-    if(jxx < MAXJ)
-    {
-        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
-        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
-        txinrop.txprog = sign;
-        rxtools_results_t results = {0, 0, 0};     
-        //reset impedence set point info
-        eo_dgn_rxchecksepoints.impedence[jxx].deltaprognumber = INT32_MAX;
-        eo_dgn_rxchecksepoints.impedence[jxx].deltarxtime = UINT32_MAX;
-        
-        int32_t ret = rxtools_verify_reception(&status_rop_impedance[jxx], &txinrop, maxtimegap_impedance, &results);
-        
-        if(-1 == ret)
-        {   // error: eval retflags
-            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
-            {
-                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
-              
-                eo_dgn_rxchecksepoints.impedence[jxx].deltaprognumber = results.deltaprognumber;
-            }
-            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
-            {
-                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
-                eo_dgn_rxchecksepoints.impedence[jxx].deltarxtime = results.deltarxtime; 
-            }  
-            
-            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_rxcheckSetpoints, 1000);
-            eo_theEMSdgn_resetSetpoints(eo_theEMSdgn_GetHandle());
-        }
-    }
-    
-#endif  
+//   eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32); 
+//#if defined(VERIFY_ROP_SETIMPEDANCE)   
+//    
+//    if(jxx < MAXJ)
+//    {
+//        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
+//        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
+//        txinrop.txprog = sign;
+//        rxtools_results_t results = {0, 0, 0};     
+//        //reset impedence set point info
+//        eo_dgn_rxchecksepoints.impedence[jxx].deltaprognumber = INT32_MAX;
+//        eo_dgn_rxchecksepoints.impedence[jxx].deltarxtime = UINT32_MAX;
+//        
+//        int32_t ret = rxtools_verify_reception(&status_rop_impedance[jxx], &txinrop, maxtimegap_impedance, &results);
+//        
+//        if(-1 == ret)
+//        {   // error: eval retflags
+//            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
+//            {
+//                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
+//              
+//                eo_dgn_rxchecksepoints.impedence[jxx].deltaprognumber = results.deltaprognumber;
+//            }
+//            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
+//            {
+//                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
+//                eo_dgn_rxchecksepoints.impedence[jxx].deltarxtime = results.deltarxtime; 
+//            }  
+//            
+//            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_rxcheckSetpoints, 1000);
+//            eo_theEMSdgn_resetSetpoints(eo_theEMSdgn_GetHandle());
+//        }
+//    }
+//    
+//#endif  
 
 
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->ram;   
     eo_emsController_SetImpedance(jxx, cfg->stiffness, cfg->damping, cfg->offset);
 }
@@ -334,7 +338,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
         return; //error
     }
     
-    #warning marco.accame: better using cast to eOmc_motionmonitormode_t
+    //#warning marco.accame: better using cast to eOmc_motionmonitormode_t
     if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->ram))
     {
         jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
@@ -349,9 +353,9 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
 // //extern uint8_t callback_of_setpoint(int32_t data, uint8_t joint);
 // extern uint8_t callback_of_setpointV2(int32_t data, uint8_t joint);
 // extern uint8_t callback_of_setpoint_all_joints(verify_pair_t pair, uint8_t joint);
+
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-//    eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
     eOmc_joint_config_t                     *jconfig = NULL;
@@ -365,7 +369,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         return; //error
     }  
     
-    #warning -> marco.accame: cast to proper type
+    //#warning -> marco.accame: cast to proper type
     if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)
     {
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
@@ -374,7 +378,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             return; //error
         }
         
-        #warning --> marco.accame: cast to proper type
+        //#warning --> marco.accame: cast to proper type
         /* if monitorstatus values setpointreached means this is a new set point, 
         so i need to start to check is set point is reached because i'm in monitormode = forever */
         if(eomc_motionmonitorstatus_setpointisreached == jstatus->basic.motionmonitorstatus)
@@ -396,100 +400,100 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 //             //callback_of_setpoint(setPoint->to.position.value, jxx);
 //             //callback_of_setpointV2(setPoint->to.position.value, jxx);
 //             #endif
-            
-#if defined (VERIFY_ROP_SETPOINT_EB5)            
-    if(jxx < MAXJ)
-    {
-        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
-        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
-        txinrop.txprog = sign;
-        rxtools_results_t results = {0, 0, 0};        
-        
-        eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = INT32_MAX;
-        eo_dgn_rxchecksepoints.position[jxx].deltarxtime = UINT32_MAX;
-        
-        int32_t ret = rxtools_verify_reception(&status_rop_setpositionraw[jxx], &txinrop, maxtimegap_setpositionraw, &results);
-        
-        
-        if(-1 == ret)
-        {   // error: eval retflags
-            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
-            {
-                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
-              
-                eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = results.deltaprognumber;
-            }
-            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
-            {
-                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
-                eo_dgn_rxchecksepoints.position[jxx].deltarxtime = results.deltarxtime; 
-            }  
-            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_rxcheckSetpoints, 1000);
-            eo_theEMSdgn_resetSetpoints(eo_theEMSdgn_GetHandle());
-        }
-    }            
-            
-#endif            
+//            
+//#if defined (VERIFY_ROP_SETPOINT_EB5)            
+//    if(jxx < MAXJ)
+//    {
+//        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
+//        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
+//        txinrop.txprog = sign;
+//        rxtools_results_t results = {0, 0, 0};        
+//        
+//        eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = INT32_MAX;
+//        eo_dgn_rxchecksepoints.position[jxx].deltarxtime = UINT32_MAX;
+//        
+//        int32_t ret = rxtools_verify_reception(&status_rop_setpositionraw[jxx], &txinrop, maxtimegap_setpositionraw, &results);
+//        
+//        
+//        if(-1 == ret)
+//        {   // error: eval retflags
+//            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
+//            {
+//                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
+//              
+//                eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = results.deltaprognumber;
+//            }
+//            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
+//            {
+//                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
+//                eo_dgn_rxchecksepoints.position[jxx].deltarxtime = results.deltarxtime; 
+//            }  
+//            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_rxcheckSetpoints, 1000);
+//            eo_theEMSdgn_resetSetpoints(eo_theEMSdgn_GetHandle());
+//        }
+//    }            
+//            
+//#endif            
             
             
             
             eo_emsController_SetPosRef(jxx, setPoint->to.position.value, setPoint->to.position.withvelocity);
-        }break;
+        } break;
         
         case eomc_setpoint_positionraw:
         {
             
-#if (defined(VERIFY_ROP_SETPOSITIONRAW)  & (!defined(VERIFY_ROP_SETPOINT_EB5)))
-    
-    if(jxx < MAXJ)
-    {
-        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
-        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
-        txinrop.txprog = sign;
-        rxtools_results_t results = {0, 0, 0};        
-        int32_t ret = rxtools_verify_reception(&status_rop_setpositionraw[jxx], &txinrop, maxtimegap_setpositionraw, &results);
-        
-        eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = INT32_MAX;
-        eo_dgn_rxchecksepoints.position[jxx].deltarxtime = UINT32_MAX;
-
-        
-        if(-1 == ret)
-        {   // error: eval retflags
-            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
-            {
-                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
-              
-                eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = results.deltaprognumber;
-            }
-            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
-            {
-                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
-                eo_dgn_rxchecksepoints.position[jxx].deltarxtime = results.deltarxtime; 
-            }  
-            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_rxcheckSetpoints, 1000);
-            eo_theEMSdgn_resetSetpoints(eo_theEMSdgn_GetHandle());
-        }
-    }
-    
-#endif              
+//#if (defined(VERIFY_ROP_SETPOSITIONRAW)  & (!defined(VERIFY_ROP_SETPOINT_EB5)))
+//   
+//    if(jxx < MAXJ)
+//    {
+//        rxtools_tx_inrop_t txinrop = { 0xffffffff, 0xffffffff};
+//        txinrop.txtime = (EOK_uint64dummy == time) ? (0xffffffff) : (time / 1000);
+//        txinrop.txprog = sign;
+//        rxtools_results_t results = {0, 0, 0};        
+//        int32_t ret = rxtools_verify_reception(&status_rop_setpositionraw[jxx], &txinrop, maxtimegap_setpositionraw, &results);
+//        
+//        eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = INT32_MAX;
+//        eo_dgn_rxchecksepoints.position[jxx].deltarxtime = UINT32_MAX;
+//
+//        
+//        if(-1 == ret)
+//        {   // error: eval retflags
+//            if(rxtools_flag_error_prognum == (rxtools_flag_error_prognum & results.flags))
+//            {
+//                // to do: an error in rop sequence number. there is a gap of results.deltaprognumber
+//              
+//                eo_dgn_rxchecksepoints.position[jxx].deltaprognumber = results.deltaprognumber;
+//            }
+//            if(rxtools_flag_error_rxtime == (rxtools_flag_error_rxtime & results.flags))
+//            {
+//                // to do: an error in timing: there was more than maxtimegap and it was results.deltarxtime
+//                eo_dgn_rxchecksepoints.position[jxx].deltarxtime = results.deltarxtime; 
+//            }  
+//            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_rxcheckSetpoints, 1000);
+//            eo_theEMSdgn_resetSetpoints(eo_theEMSdgn_GetHandle());
+//        }
+//    }
+//    
+//#endif              
             
             eo_emsController_SetPosRaw(jxx, setPoint->to.position.value);
-        }break;
+        } break;
         
         case eomc_setpoint_velocity:
         {
             eo_emsController_SetVelRef(jxx, setPoint->to.velocity.value, setPoint->to.velocity.withacceleration);    
-        }break;
+        } break;
 
         case eomc_setpoint_torque:
         {
             eo_emsController_SetTrqRef(jxx, setPoint->to.torque.value);
-        }break;
+        } break;
 
         case eomc_setpoint_current:
         {
             eo_emsController_SetOutput(jxx, setPoint->to.current.value);
-        }break;
+        } break;
 
         default:
         {
@@ -643,7 +647,10 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->ram);
 }
 
-#if defined(EOMOTIONCONTROL_USE_VER_1_3)
+
+#if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
+    #warning --> EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
+#else
 extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;
