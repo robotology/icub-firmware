@@ -65,8 +65,8 @@ extern EOpid* eo_pid_New(void);
  **/
 
 //extern void eo_pid_SetPid(EOpid *o, float Kp, float Kd, float Ki, float Imax, flaot pwm_max, float pwm_offset, float Kbemf, float Kff);
-extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset);
-extern void eo_pid_SetPidTorq(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset, float Kff);
+extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset, float stiction_up, float stiction_down);
+extern void eo_pid_SetPidTorq(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset, float Kff, float stiction_up, float stiction_down);
 extern void eo_pid_SetPidBemf(EOpid *o, float Kbemf);
 extern void eo_pid_SetPidKtau(EOpid *o, float Ktau);
 

@@ -671,7 +671,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     MOTORS(m)
     {
         if (!torque_protection[m])
-            pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m]);
+            pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m],ems->motor_velocity[m]);
     }
     
     MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
@@ -1129,20 +1129,20 @@ extern void eo_emsController_SetTcFilterType(uint8_t joint, uint8_t filterType)
     }
 }
 
-extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float stiction_up, float stiction_down)
 {
     if (ems)
     {
-        eo_axisController_SetPosPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff);
+        eo_axisController_SetPosPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff, stiction_up, stiction_down);
         
         #ifdef USE_2FOC_FAST_ENCODER
             eo_axleVirtualEncoder_SetMotorSign(ems->axle_virt_encoder[joint], (Kp < 0.0f));
         #endif
     }
 }   
-extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff)
+extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down)
 {
-    if (ems) eo_axisController_SetTrqPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff, Kff);     
+    if (ems) eo_axisController_SetTrqPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff, Kff, stiction_up, stiction_down);     
 }   
 // PID configurations
 ///////////////////////

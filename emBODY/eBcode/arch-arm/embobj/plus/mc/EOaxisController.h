@@ -95,7 +95,7 @@ extern eObool_t eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
 extern eObool_t eo_axisController_SetOutput(EOaxisController *o, int16_t out);
 
 extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff);
-extern float eo_axisController_FrictionCompensation(EOaxisController *o, float input_pwm);
+extern float eo_axisController_FrictionCompensation(EOaxisController *o, float input_pwm, int32_t motor_velocity);
 
 extern void eo_axisController_Stop(EOaxisController *o);
 
@@ -127,8 +127,8 @@ extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 extern void eo_axisController_SetBemf(EOaxisController *o, float Kbemf);
 extern void eo_axisController_SetKtau(EOaxisController *o, float Ktau);
 extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filterType);
-extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff);
-extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff);
+extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float stiction_up, float stiction_down);
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down);
 
 extern void eo_axisController_StartCalibration(EOaxisController *o);
 extern void eo_axisController_SetCalibrated(EOaxisController *o);

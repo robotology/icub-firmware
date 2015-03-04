@@ -87,6 +87,9 @@ extern EOpid* eo_pid_New(void)
         o->Kbemf = 0.f;
         o->Ktau = 0.f;
         
+        o->stiction_up_val = 0.0f;
+        o->stiction_down_val = 0.0f;
+      
         o->xv0 = o->xv1 = 0.0f;
         o->yv0 = o->yv1 = 0.0f;
        
@@ -106,7 +109,7 @@ extern EOpid* eo_pid_New(void)
     return o;
 }
 
-extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset)
+extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset, float stiction_up, float stiction_down)
 {
     static const float N=10.f;
 
@@ -119,6 +122,9 @@ extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax
     o->In = 0.f;
     o->En = 0.f;
     
+    o->stiction_down_val = stiction_up;
+    o->stiction_up_val = stiction_down;
+  
     o->Kp = Kp;
     o->Kd = Kd;
     //o->Ki = Ki;
@@ -130,9 +136,9 @@ extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax
     o->B = (1.f - o->A)*Kd*EMS_FREQUENCY_FLOAT;
 }
 
-extern void eo_pid_SetPidTorq(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset, float Kff)
+extern void eo_pid_SetPidTorq(EOpid *o, float Kp, float Kd, float Ki, float Imax, float pwm_max, float pwm_offset, float Kff, float stiction_up, float stiction_down)
 {    
-    eo_pid_SetPidBase(o, Kp, Kd, Ki, Imax, pwm_max, pwm_offset);
+    eo_pid_SetPidBase(o, Kp, Kd, Ki, Imax, pwm_max, pwm_offset, stiction_up, stiction_down);
    
     o->Kff = Kff;
 }
@@ -321,10 +327,19 @@ extern float eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm)
 
 extern float eo_pid_PWM_friction(EOpid *o, float pwm_input, float vel, float Tr)
 {
+    float coulomb = 0;
+    
     //viscous friction
     pwm_input=pwm_input+ o->Kbemf*vel;
+    
     //coulomb friction
-    //...
+    /*if (vel>0)
+    {coulomb = o->stiction_up_val;}
+    else
+    {coulomb = o->stiction_down_val;} 
+    pwm_input=pwm_input+coulomb;
+    */
+  
     //motor torque constant
     pwm_input=pwm_input * o->Ktau;
 

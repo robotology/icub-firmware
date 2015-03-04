@@ -524,7 +524,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     return eobool_false;
 }
 
-extern float eo_axisController_FrictionCompensation(EOaxisController *o, float input_pwm )
+extern float eo_axisController_FrictionCompensation(EOaxisController *o, float input_pwm, int32_t motor_velocity )
 {
     float pwm_out = input_pwm;
     if ((o->control_mode==eomc_controlmode_torque) ||
@@ -534,9 +534,7 @@ extern float eo_axisController_FrictionCompensation(EOaxisController *o, float i
          o->control_mode==eomc_controlmode_mixed ||
          o->control_mode==eomc_controlmode_direct)))
     {
-      int32_t vel = GET_AXIS_VELOCITY();
-      int32_t pos = GET_AXIS_POSITION();
-      pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, vel, o->torque_ref);
+      pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, motor_velocity, o->torque_ref);
       LIMIT(pwm_out,eo_pid_GetPwmMax(o->pidT));
     
     }
@@ -771,15 +769,15 @@ extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filte
     }
 }
 
-extern void eo_axisController_SetPosPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff)
+extern void eo_axisController_SetPosPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float stiction_up, float stiction_down)
 {
     //if (!o) return;
     
     RST_BITS(o->state_mask, AC_NO_POS_PID);
 
-    eo_pid_SetPidBase(o->pidP, Kp, Kd, Ki, Imax, Ymax, Yoff);
+    eo_pid_SetPidBase(o->pidP, Kp, Kd, Ki, Imax, Ymax, Yoff, stiction_up, stiction_down);
 }
-extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff)
+extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down)
 {
     //if (!o) return;
     
@@ -787,7 +785,7 @@ extern void eo_axisController_SetTrqPid(EOaxisController *o, float Kp, float Kd,
 
     o->rot_sign = (Kp>=0.f)?1:-1;
     
-    eo_pid_SetPidTorq(o->pidT, Kp, Kd, Ki, Imax, Ymax, Yoff, Kff);
+    eo_pid_SetPidTorq(o->pidT, Kp, Kd, Ki, Imax, Ymax, Yoff, Kff, stiction_up, stiction_down);
 }
 
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_t* jointStatus)

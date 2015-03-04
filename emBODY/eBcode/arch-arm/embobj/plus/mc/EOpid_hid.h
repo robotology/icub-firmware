@@ -55,6 +55,9 @@ struct EOpid_hid
     
     float A,B;
     
+    float stiction_up_val;
+    float stiction_down_val;
+  
     float pwm_offset;
     float pwm_max;
     float pwm;
