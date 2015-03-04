@@ -47,8 +47,8 @@ static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, voi
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define VERIFY_ROP_SETIMPEDANCE
-#define VERIFY_ROP_SETPOSITIONRAW
+//#define VERIFY_ROP_SETIMPEDANCE
+//#define VERIFY_ROP_SETPOSITIONRAW
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -179,7 +179,7 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
     }
 
     
-/* personalize eodgn_nvidbdoor_motorstatus var*/
+    /* personalize eodgn_nvidbdoor_motorstatus var*/
 	res = opcprotman_personalize_var(   p, 
                                         eodgn_nvidbdoor_canQueueStatistics,
                                         (uint8_t*)&eo_dgn_canstatistics, 
@@ -191,20 +191,20 @@ extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
     }
     
     
-#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
-
-    /* personalize eodgn_nvidbdoor_rxcheckSetpoints var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_rxcheckSetpoints,
-                                        (uint8_t*)&eo_dgn_rxchecksepoints, 
-                                         NULL); //on ems i don't receive this data
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-    
-#endif   
+//#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
+//
+//    /* personalize eodgn_nvidbdoor_rxcheckSetpoints var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_rxcheckSetpoints,
+//                                        (uint8_t*)&eo_dgn_rxchecksepoints, 
+//                                         NULL); //on ems i don't receive this data
+//
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+//#endif   
     return(res);
 }
 

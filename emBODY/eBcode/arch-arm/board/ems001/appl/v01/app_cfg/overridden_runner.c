@@ -142,11 +142,11 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p);
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p);
 
-#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+//#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
-#else
-static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
-#endif
+//#else
+//static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
+//#endif
 EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 static void s_checkEthLinks(void);
 
@@ -399,53 +399,53 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
     
-#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+//#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
     return(s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(p, pwmList, size));
-#else	
-    return(s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(p, pwmList,size));
-#endif
+//#else	
+//    return(s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(p, pwmList,size));
+//#endif
 }
 
-#ifndef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
-static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
-{
-    eOresult_t 				err;
-	eOmeas_current_t            value;
-    eOresult_t 				    res = eores_OK;
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT
-    };	
+//#ifndef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+//static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
+//{
+//    eOresult_t 				err;
+//	eOmeas_current_t            value;
+//    eOresult_t 				    res = eores_OK;
+//    eOicubCanProto_msgCommand_t msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT
+//    };	
+//
+//#warning VALE --> solo per test
+//    pwmList[0] = 0x11AA;
+//    pwmList[1] = 0x12AA;
+//    pwmList[2] = 0x13AA;
+//    pwmList[3] = 0x14AA;
+//    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+//
+//    for (uint8_t jid = 0; jid <numofjoint; jid++)
+//    {
+//        value = pwmList[jid];
+//    
+//        /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
+//        they will be sent by transmitter */
+//
+//        err = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), jid, msgCmd, (void*)&value);
+//        
+//        if (err != eores_OK)
+//        {
+//            res = err;
+//        }
+//    }
+//    
+//    return(res);
+//   
+//}
+//#endif
 
-#warning VALE --> solo per test
-    pwmList[0] = 0x11AA;
-    pwmList[1] = 0x12AA;
-    pwmList[2] = 0x13AA;
-    pwmList[3] = 0x14AA;
-    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
-
-    for (uint8_t jid = 0; jid <numofjoint; jid++)
-    {
-        value = pwmList[jid];
-    
-        /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
-        they will be sent by transmitter */
-
-        err = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), jid, msgCmd, (void*)&value);
-        
-        if (err != eores_OK)
-        {
-            res = err;
-        }
-    }
-    
-    return(res);
-   
-}
-#endif
-
-#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+//#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
     eOresult_t 				                res = eores_OK;
@@ -477,7 +477,7 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
     
     return(res);    
 }
-#endif
+//#endif
 
 //extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
 
@@ -542,8 +542,8 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
         error_mask = 0xAA; // timeout
     }
 
-		// Restart the reading of the encoders
-		eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
+    // Restart the reading of the encoders
+    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
 		
     eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
         
@@ -732,7 +732,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
             return;
         }
 
-        #warning marco.accame: ecco qui il messaggio verso il can address 12 ...........................
+        //#warning marco.accame: ecco qui il messaggio verso il can address 12 ...........................
         //set destination of all messages 
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); // virtual ft sensor has address 12
         
