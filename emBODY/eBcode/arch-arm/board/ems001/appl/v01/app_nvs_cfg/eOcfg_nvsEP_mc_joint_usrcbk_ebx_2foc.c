@@ -169,7 +169,9 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidposition.ki*rescaler_pos, 
                                     cfg->pidposition.limitonintegral,
                                     cfg->pidposition.limitonoutput,
-                                    cfg->pidposition.offset);
+                                    cfg->pidposition.offset,
+                                    cfg->pidposition.stiction_up_val*rescaler_pos, 
+                                    cfg->pidposition.stiction_down_val*rescaler_pos);
 
     // 2) set torque pid    
     rescaler_trq = 1.0f/(float)(1<<cfg->pidtorque.scale);
@@ -179,7 +181,9 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.limitonintegral,
                                     cfg->pidtorque.limitonoutput, 
                                     cfg->pidtorque.offset,
-                                    cfg->pidtorque.kff*rescaler_trq);
+                                    cfg->pidtorque.kff*rescaler_trq,
+                                    cfg->pidtorque.stiction_up_val*rescaler_trq, 
+                                    cfg->pidtorque.stiction_down_val*rescaler_trq);
 
     eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
     
@@ -225,13 +229,15 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
     eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
-	
-    eo_emsController_SetPosPid(jxx, pid_ptr->kp*rescaler, 
-	                                pid_ptr->kd*rescaler, 
-	                                pid_ptr->ki*rescaler,
+
+    eo_emsController_SetPosPid(jxx, pid_ptr->kp*rescaler,   
+                                    pid_ptr->kd*rescaler, 
+                                    pid_ptr->ki*rescaler,
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 
-	                                pid_ptr->offset);
+                                    pid_ptr->offset,
+                                    pid_ptr->stiction_up_val*rescaler,
+                                    pid_ptr->stiction_down_val*rescaler);
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -241,13 +247,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
     
     eo_emsController_SetTrqPid(jxx, pid_ptr->kp*rescaler, 
-		                            pid_ptr->kd*rescaler, 
+                                    pid_ptr->kd*rescaler, 
                                     pid_ptr->ki*rescaler,
                                     pid_ptr->limitonintegral,
                                     pid_ptr->limitonoutput, 
                                     pid_ptr->offset,
-                                    pid_ptr->kff*rescaler
-                                    );
+                                    pid_ptr->kff*rescaler,
+                                    pid_ptr->stiction_up_val*rescaler,
+                                    pid_ptr->stiction_down_val*rescaler);
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const eOropdescriptor_t* rd) 
