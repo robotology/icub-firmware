@@ -20,25 +20,22 @@ extern "C" {
  
 //#define FORCE_ZERO_PWM_OUT
 //#define EXPERIMENTAL_MOTOR_TORQUE
-//#define USE_2FOC_FAST_ENCODER
 //#define EXPERIMENTAL_SPEED_CONTROL
-//#define USE_4BIT_INC_ENC_PRECISION
 //#define USE_ONLY_QE
     
-//#define V1_MECHANICS
-
 //#define SHOULDER_3rd_JOINT_COUPLING
-    
 //#define USE_JACOBIAN
-    
-#ifdef ICUB_DARMSTADT01
-    #define USE_2FOC_FAST_ENCODER
-    #ifdef USE_2FOC_FAST_ENCODER
-        //#define USE_4BIT_INC_ENC_PRECISION
-    #endif
-    #define V2_MECHANICS
-#else
+
+#ifdef ICUB_GENOVA04
     #define V1_MECHANICS
+    #define USE_2FOC_FAST_ENCODER
+#else
+    #define V2_MECHANICS
+    #define USE_2FOC_FAST_ENCODER
+#endif
+
+#ifdef USE_2FOC_FAST_ENCODER
+//#define USE_4BIT_INC_ENC_PRECISION
 #endif
 
 #define EMS_PERIOD           0.001f

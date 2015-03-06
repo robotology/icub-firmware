@@ -323,15 +323,19 @@ extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_
     
     o->axle_abs_pos = axle_abs_pos;
     
-    if (o->inverted)
+    //if (o->inverted)
+    if (o->slow_enc_inverted)
     {
-        o->velocity =  axle_virt_vel;    
-        o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
+        // R LEG OK enc - kp +
+        // L LEG NO enc + kp - !!!!
+        o->velocity =  -axle_virt_vel;    
+        o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
     }
     else
     {
-        o->velocity = -axle_virt_vel;
-        o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
+        // L LEG OK enc + kp - !!!!
+        o->velocity =  axle_virt_vel;
+        o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
     }
 
     o->axle_inc_pos -= inc*GEARBOX_REDUCTION;
