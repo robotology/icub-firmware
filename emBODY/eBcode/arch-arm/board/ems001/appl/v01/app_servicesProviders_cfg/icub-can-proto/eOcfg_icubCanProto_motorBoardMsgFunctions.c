@@ -1203,10 +1203,10 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePid(EOicubCanProto
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
 
     /* 3) set command's params */
-    *((uint16_t*)(&canFrame->data[1])) = torque_pid_ptr->kp;
-    *((uint16_t*)(&canFrame->data[3])) = torque_pid_ptr->ki;
-    *((uint16_t*)(&canFrame->data[5])) = torque_pid_ptr->kd;
-    canFrame->data[7] = torque_pid_ptr->scale;
+    *((uint16_t*)(&canFrame->data[1])) = (int16_t) torque_pid_ptr->kp;
+    *((uint16_t*)(&canFrame->data[3])) = (int16_t) torque_pid_ptr->ki;
+    *((uint16_t*)(&canFrame->data[5])) = (int16_t) torque_pid_ptr->kd;
+    canFrame->data[7] = (int8_t) torque_pid_ptr->scale;
     return(eores_OK);
 }
 
@@ -1283,9 +1283,9 @@ eOresult_t                                  res = eores_OK;
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
-    pid_ptr->kp = *((uint16_t*)&frame->data[1]);
-    pid_ptr->ki = *((uint16_t*)&frame->data[3]);
-    pid_ptr->kd = *((uint16_t*)&frame->data[5]);    
+    pid_ptr->kp = *((int16_t*)&frame->data[1]);
+    pid_ptr->ki = *((int16_t*)&frame->data[3]);
+    pid_ptr->kd = *((int16_t*)&frame->data[5]);    
     
     
     param->p08_2 ++;
@@ -1338,9 +1338,9 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setTorquePidLimits(EOicubCa
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
 
     /* 3) set command's params */
-    *((uint16_t*)(&canFrame->data[1])) = torque_pid_ptr->offset;
-    *((uint16_t*)(&canFrame->data[3])) = torque_pid_ptr->limitonoutput;
-    *((uint16_t*)(&canFrame->data[5])) = torque_pid_ptr->limitonintegral;
+    *((uint16_t*)(&canFrame->data[1])) = (int16_t) torque_pid_ptr->offset;
+    *((uint16_t*)(&canFrame->data[3])) = (int16_t) torque_pid_ptr->limitonoutput;
+    *((uint16_t*)(&canFrame->data[5])) = (int16_t) torque_pid_ptr->limitonintegral;
 
 
     return(eores_OK);
@@ -1418,9 +1418,9 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCa
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
-    pid_ptr->offset = *((uint16_t*)(&frame->data[1]));
-    pid_ptr->limitonoutput = *((uint16_t*)(&frame->data[3]));
-    pid_ptr->limitonintegral = *((uint16_t*)(&frame->data[5])); 
+    pid_ptr->offset = *((int16_t*)(&frame->data[1]));
+    pid_ptr->limitonoutput = *((int16_t*)(&frame->data[3]));
+    pid_ptr->limitonintegral = *((int16_t*)(&frame->data[5])); 
     
     
     param->p08_2 ++;
@@ -1470,10 +1470,10 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPid(EOicubCanProto* p
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
 
     /* 3) set command's params */
-    *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->kp;
-    *((uint16_t*)(&canFrame->data[3])) = pos_pid_ptr->ki;
-    *((uint16_t*)(&canFrame->data[5])) = pos_pid_ptr->kd;
-    canFrame->data[7] = pos_pid_ptr->scale;
+    *((uint16_t*)(&canFrame->data[1])) = (int16_t) pos_pid_ptr->kp;
+    *((uint16_t*)(&canFrame->data[3])) = (int16_t) pos_pid_ptr->ki;
+    *((uint16_t*)(&canFrame->data[5])) = (int16_t) pos_pid_ptr->kd;
+    canFrame->data[7] = (int8_t) pos_pid_ptr->scale;
 
     return(eores_OK);
 }
@@ -1554,9 +1554,9 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
-    pid_ptr->kp = (*((uint16_t*)&frame->data[1]));
-    pid_ptr->ki = (*((uint16_t*)&frame->data[3]));
-    pid_ptr->kd = *((uint16_t*)&frame->data[5]);
+    pid_ptr->kp = (*((int16_t*)&frame->data[1]));
+    pid_ptr->ki = (*((int16_t*)&frame->data[3]));
+    pid_ptr->kd = (*((int16_t*)&frame->data[5]));
     
     
     param->p08_2 ++;
@@ -1608,9 +1608,9 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setPosPidLimits(EOicubCanPr
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
 
     /* 3) set command's params */
-    *((uint16_t*)(&canFrame->data[1])) = pos_pid_ptr->offset;
-    *((uint16_t*)(&canFrame->data[3])) = pos_pid_ptr->limitonoutput;
-    *((uint16_t*)(&canFrame->data[5])) = pos_pid_ptr->limitonintegral;
+    *((uint16_t*)(&canFrame->data[1])) = (int16_t) pos_pid_ptr->offset;
+    *((uint16_t*)(&canFrame->data[3])) = (int16_t) pos_pid_ptr->limitonoutput;
+    *((uint16_t*)(&canFrame->data[5])) = (int16_t) pos_pid_ptr->limitonintegral;
     canFrame->data[7] = 0; //add this to clear values becaiuse len is 8 and not 7.
 
     return(eores_OK);
@@ -1687,8 +1687,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
-    pid_ptr->limitonoutput = *((uint16_t*)(&frame->data[3]));
-    pid_ptr->limitonintegral = *((uint16_t*)(&frame->data[5]));
+    pid_ptr->limitonoutput = *((int16_t*)(&frame->data[3]));
+    pid_ptr->limitonintegral = *((int16_t*)(&frame->data[5]));
     
     
     param->p08_2 ++;

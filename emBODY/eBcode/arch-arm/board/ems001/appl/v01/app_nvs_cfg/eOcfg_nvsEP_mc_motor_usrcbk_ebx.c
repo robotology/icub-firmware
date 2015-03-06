@@ -100,7 +100,7 @@ const eOmc_motor_t motor_default_dvalue =
             EO_INIT(.kff)                   0,
             EO_INIT(.stiction_up_val)       0,
             EO_INIT(.stiction_down_val)     0,
-            EO_INIT(.filler05)              {0xf1, 0xf2, 0xf3, 0xf4, 0xf5}
+            EO_INIT(.filler)                {0xf1, 0xf2, 0xf3}
 
         },
         EO_INIT(.maxvelocityofmotor)        0,

@@ -104,7 +104,7 @@ const eOmc_joint_t joint_default_value =
             EO_INIT(.kff)                   0,
             EO_INIT(.stiction_up_val)       0,
             EO_INIT(.stiction_down_val)     0,
-            EO_INIT(.filler05)              {0xf1, 0xf2, 0xf3, 0xf4, 0xf5}
+            EO_INIT(.filler)                {0xf1, 0xf2, 0xf3}
         },
         EO_INIT(.pidvelocity)
         {
@@ -118,7 +118,7 @@ const eOmc_joint_t joint_default_value =
             EO_INIT(.kff)                   0,
             EO_INIT(.stiction_up_val)       0,
             EO_INIT(.stiction_down_val)     0,
-            EO_INIT(.filler05)              {0xf1, 0xf2, 0xf3, 0xf4, 0xf5}
+            EO_INIT(.filler)                {0xf1, 0xf2, 0xf3}
         },
         EO_INIT(.pidtorque)
         {
@@ -132,7 +132,7 @@ const eOmc_joint_t joint_default_value =
             EO_INIT(.kff)                   0,
             EO_INIT(.stiction_up_val)       0,
             EO_INIT(.stiction_down_val)     0,
-            EO_INIT(.filler05)              {0xf1, 0xf2, 0xf3, 0xf4, 0xf5}
+            EO_INIT(.filler)                {0xf1, 0xf2, 0xf3}
         }, 
         EO_INIT(.limitsofjoint)
         {
