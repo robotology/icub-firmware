@@ -304,7 +304,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
             {
                 #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
-                snprintf(str, sizeof(str), "canboards ready: only 0x%x out of 0x%x.", canBoardsReady, canBoardsChecked);
+                snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
                 
                  
                 // the new currstate is set inside the on-entry of the state machine               
