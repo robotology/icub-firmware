@@ -110,7 +110,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingSensorB
 };        
 
 /* DECLARATION OF POLLING SENSOR BOARD PARSER LOOKUP TBL */
-extern const EOconstLookupTbl icubCanProto_pollingSensorBoardMsg_parser_LUTbl = 
+const EOconstLookupTbl icubCanProto_pollingSensorBoardMsg_parser_LUTbl = 
 {                                        
 
     EO_INIT(.capacity)          eo_icubCanProto_pollingSensorBoardMsg_inTbl_max,
@@ -153,27 +153,27 @@ const EOconstLookupTbl* const icubCanProto_pollingSensorBoardMsg_former_LUTbl__p
 /* DECLARATION OF PERIODIC SENSOR BOARD PARSER BODY TBL */
 static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSensorBoardMsg_parserFn_list[eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max] = 
 {
-    {   // 8 ICUBCANPROTO_PER_AS_CMD__UNCALIBFORCE_VECTOR_DEBUGMODE 			
+    {   // 8 ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     },
-    {   // 9 ICUBCANPROTO_PER_AS_CMD__UNCALIBTORQUE_VECTOR_DEBUGMODE 			
+    {   // 9 ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmode
     },    
-    {   // 10 ICUBCANPROTO_PER_AS_CMD__FORCE_VECTOR 			
+    {   // 10 ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__forceVector
     },
-    {   // 11 ICUBCANPROTO_PER_AS_CMD__TORQUE_VECTOR 			
+    {   // 11 ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__torqueVector
     },
-    {   // 12 ICUBCANPROTO_PER_AS_CMD__HES0TO6 			
+    {   // 12 ICUBCANPROTO_PER_AS_MSG__HES0TO6 			
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes0to6
     },
-    {   // 13 ICUBCANPROTO_PER_AS_CMD__HES7TO14
+    {   // 13 ICUBCANPROTO_PER_AS_MSG__HES7TO14
         EO_INIT(.parser)    eo_icubCanProto_parser_per_sb_cmd__hes7to14
     }
 };        
 
-extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_parser_LUTbl = 
+const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_parser_LUTbl = 
 {                                        
 
     EO_INIT(.capacity)          eo_icubCanProto_periodicSensorBoardMsg_inParserTbl_max,
@@ -182,7 +182,7 @@ extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_parser_LUTbl =
     EO_INIT(.itemsList)         &s_periodicSensorBoardMsg_parserFn_list[0]                          
 };
 
-extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_parser_LUTbl__ptr = &icubCanProto_periodicSensorBoardMsg_parser_LUTbl;
+const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_parser_LUTbl__ptr = &icubCanProto_periodicSensorBoardMsg_parser_LUTbl;
 
 
 
@@ -199,7 +199,7 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_periodicSensor
     }
 };        
 
-extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_former_LUTbl = 
+const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_former_LUTbl = 
 {                                        
 
     EO_INIT(.capacity)          eo_icubCanProto_periodicSensorBoardMsg_inFormerTbl_max,
@@ -208,7 +208,7 @@ extern const EOconstLookupTbl icubCanProto_periodicSensorBoardMsg_former_LUTbl =
     EO_INIT(.itemsList)         &s_periodicSensorBoardMsg_formerFn_list[0]                          
 };
 
-extern const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_former_LUTbl__ptr = &icubCanProto_periodicSensorBoardMsg_former_LUTbl;
+const EOconstLookupTbl* const icubCanProto_periodicSensorBoardMsg_former_LUTbl__ptr = &icubCanProto_periodicSensorBoardMsg_former_LUTbl;
 
 
 
@@ -245,7 +245,7 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingSkinMsg
 
 
 /* DECLARATION OF POLLING SKIN FORMER LOOKUP TBL */
-extern const EOconstLookupTbl icubCanProto_pollingSkinMsg_former_LUTbl = 
+const EOconstLookupTbl icubCanProto_pollingSkinMsg_former_LUTbl = 
 {
 
     EO_INIT(.capacity)          eo_icubCanProto_pollingSkinMsg_inTbl_max,
@@ -254,7 +254,7 @@ extern const EOconstLookupTbl icubCanProto_pollingSkinMsg_former_LUTbl =
     EO_INIT(.itemsList)         &s_pollingSkinMsg_formerFn_list[0]  
 };
 
-extern const EOconstLookupTbl* const icubCanProto_pollingSkinMsg_former_LUTbl__ptr = &icubCanProto_pollingSkinMsg_former_LUTbl;
+const EOconstLookupTbl* const icubCanProto_pollingSkinMsg_former_LUTbl__ptr = &icubCanProto_pollingSkinMsg_former_LUTbl;
 
 
 
@@ -277,7 +277,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_periodicSkinMs
     }
 };        
 
-extern const EOconstLookupTbl icubCanProto_periodicSkinMsg_parser_LUTbl = 
+const EOconstLookupTbl icubCanProto_periodicSkinMsg_parser_LUTbl = 
 {                                        
 
     EO_INIT(.capacity)          eo_icubCanProto_periodicSkinMsg_inTbl_max,
@@ -286,7 +286,7 @@ extern const EOconstLookupTbl icubCanProto_periodicSkinMsg_parser_LUTbl =
     EO_INIT(.itemsList)         &s_periodicSkinMsg_parserFn_list[0]                          
 };
 
-extern const EOconstLookupTbl* const icubCanProto_periodicSkinMsg_parser_LUTbl__ptr = &icubCanProto_periodicSkinMsg_parser_LUTbl;
+const EOconstLookupTbl* const icubCanProto_periodicSkinMsg_parser_LUTbl__ptr = &icubCanProto_periodicSkinMsg_parser_LUTbl;
 
 
 
@@ -323,7 +323,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(EOicub
         case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES:
         {
             res = eo_icubCanProto_parser_pol_sb_cmd__getFullScales(p, frame, canPort);
-        }break;
+        } break;
 
         default:
         {
@@ -351,26 +351,26 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingSensorBoard_former(EOicub
         case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE: //0x7
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setTxMode(p, val_ptr, dest, canFrame);
-        }break;
+        } break;
 
 
         case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE: //0x8
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setCanDatarate(p, val_ptr, dest, canFrame);
-        }break;
+        } break;
         
         
         case ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION: //0x10
         {
             res = eo_icubCanProto_former_pol_sb_cmd__setResolution(p, val_ptr, dest, canFrame);
-        }break;
+        } break;
 
 
 
         case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES: //0x18
         {
             res = eo_icubCanProto_former_pol_sb_cmd__getFullScales(p, val_ptr, dest, canFrame);
-        }break;
+        } break;
 
         
         default:
@@ -411,6 +411,7 @@ static eOresult_t s_eo_icubCanProto_pollingSensorBoardMsg_parser_excFn(void *arg
     return(s_eo_icubCanProto_exceptionMsgpollingSensorBoard_parser(exFn_arg->iproto_ptr,exFn_arg->u.p_arg.cmdId, 
                                                            exFn_arg->u.p_arg.frame, exFn_arg->u.p_arg.canPort));
 }
+
 static eOresult_t s_eo_icubCanProto_pollingSensorBoardMsg_former_excFn(void *arg)
 {
     eo_icubCanProto_hid_exceptionFn_argument_t *exFn_arg = (eo_icubCanProto_hid_exceptionFn_argument_t *)arg;
