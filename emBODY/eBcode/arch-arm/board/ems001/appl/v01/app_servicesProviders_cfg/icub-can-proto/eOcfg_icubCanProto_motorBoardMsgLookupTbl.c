@@ -707,18 +707,18 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE:  /* 0 */
         {
             res = eo_icubCanProto_parser_test(p, frame, canPort);
-        }break;
+        } break;
 
 
         case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:  /* 7 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getControlMode(p, frame, canPort);
-        }break;
+        } break;
     
         case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:  /* 8 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__motionDone(p, frame, canPort);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:  /* 12 */
         {
@@ -728,7 +728,7 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM:  /* 19 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getDebugParam(p, frame, canPort);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION:  /* 20 */
         {
@@ -738,12 +738,12 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_parser(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:  /* 45*/
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(p, frame, canPort);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID:  /* 51 */
         {
             res = eo_icubCanProto_parser_pol_mb_cmd__getBoardId(p, frame, canPort);
-        }break;
+        } break;
         
         default:
         {
@@ -771,53 +771,53 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN:  /* 1 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__controllerRun(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE:  /* 2 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__controllerIdle(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER:  /* 4 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD:  /* 5 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__enablePwmPad(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD:  /* 6 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__disablePwmPad(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
 
         case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:  /* 7 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getControlMode(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
     
         case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:  /* 8 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__motionDone(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE:  /* 9 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setControlMode(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:  /* 12 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getAdditionalInfo(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__SET_ADDITIONAL_INFO:  /* 13 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setAdditionalInfo(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT:  /* 14 */
         {
@@ -827,12 +827,12 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__SET_DEBUG_PARAM:  /* 18 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setDebugParam(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM:  /* 19 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getDebugParam(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION:  /* 20 */
         {
@@ -842,12 +842,12 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE	:  /* 27 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__positionMove(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE:  /* 28 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__velocityMove(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__SET_ENCODER_POSITION:  /* 29 */
         {
@@ -857,12 +857,12 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE:  /* 44*/
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:  /* 45*/
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getDesiredTorque(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY:  /* 46*/
         {
@@ -872,12 +872,12 @@ static eOresult_t s_eo_icubCanProto_exceptionMsgpollingMotorBoard_former(EOicubC
         case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID:  /* 51 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__getBoardId(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         case ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION:  /* 62 */
         {
             res = eo_icubCanProto_former_pol_mb_cmd__setCmdPos(p, nv_ptr, dest, canFrame);
-        }break;
+        } break;
 
         default:
         {
