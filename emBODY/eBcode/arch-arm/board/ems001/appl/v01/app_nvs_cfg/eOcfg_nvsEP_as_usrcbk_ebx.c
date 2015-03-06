@@ -480,7 +480,6 @@ static void s_signalGetFullScales(eOas_strainId_t strainId, eObool_t signaloncef
     else
     {
         //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 4);
-        //#warning FORSE PROVOCA CRASH
     }
 
 }
