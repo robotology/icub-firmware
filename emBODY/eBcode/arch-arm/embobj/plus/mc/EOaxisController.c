@@ -795,13 +795,13 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
     jointStatus->interactionmodestatus =  o->interact_mode;
     
     jointStatus->basic.controlmodestatus   = o->control_mode;
-    jointStatus->basic.position            = GET_AXIS_POSITION();           
-    jointStatus->basic.velocity            = GET_AXIS_VELOCITY();        
+    jointStatus->basic.jnt_position        = GET_AXIS_POSITION();           
+    jointStatus->basic.jnt_velocity        = GET_AXIS_VELOCITY();        
     
     #warning acceleration to be implemented
-    jointStatus->basic.acceleration        = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
+    jointStatus->basic.jnt_acceleration    = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     
-    jointStatus->basic.torque              = o->torque_meas;
+    jointStatus->basic.jnt_torque          = o->torque_meas;
 }
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)

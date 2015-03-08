@@ -1091,10 +1091,10 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* 
     }
     else
     {
-        jointStatus->basic.position            = 0;  // the position of the joint           
-        jointStatus->basic.velocity            = 0;  // the velocity of the joint          
-        jointStatus->basic.acceleration        = 0;  // the acceleration of the joint       
-        jointStatus->basic.torque              = 0;  // the torque of the joint when locally measured
+        jointStatus->basic.jnt_position        = 0;  // the position of the joint           
+        jointStatus->basic.jnt_velocity        = 0;  // the velocity of the joint          
+        jointStatus->basic.jnt_acceleration    = 0;  // the acceleration of the joint       
+        jointStatus->basic.jnt_torque          = 0;  // the torque of the joint when locally measured
         jointStatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  // use eOmc_motionmonitorstatus_t. it is eomc_motionmonitorstatus_notmonitored unless the monitor is activated in jconfig.motionmonitormode  
         jointStatus->basic.controlmodestatus   = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
     }
@@ -1191,9 +1191,9 @@ extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state)
 
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status)
 {
-    motor_status->basic.position = ems->motor_position[mId];
-    motor_status->basic.velocity = ems->motor_velocity[mId];
-    motor_status->basic.current  = ems->motor_current [mId];
+    motor_status->basic.mot_position = ems->motor_position[mId];
+    motor_status->basic.mot_velocity = ems->motor_velocity[mId];
+    motor_status->basic.mot_current  = ems->motor_current [mId];
 }
 
 extern void eo_emsMotorController_GoIdle(void)
