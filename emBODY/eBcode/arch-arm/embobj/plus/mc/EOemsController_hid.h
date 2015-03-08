@@ -69,6 +69,7 @@ struct EOemsController_hid
     EOaxleVirtualEncoder   *axle_virt_encoder[NAXLES];
     
     int16_t motor_current [NAXLES];
+    int32_t motor_acceleration[NAXLES];
     int32_t motor_velocity[NAXLES];
     int32_t motor_position[NAXLES];
     int32_t gearbox_ratio [NAXLES];

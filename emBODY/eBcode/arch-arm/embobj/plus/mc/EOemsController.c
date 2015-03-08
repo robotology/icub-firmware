@@ -120,6 +120,7 @@ extern EOemsController* eo_emsController_Init()
             #endif
             ems->motor_current [j] = 0;
             ems->motor_velocity[j] = 0;
+            ems->motor_acceleration[j] = 0;
             ems->motor_position[j] = 0;
             ems->gearbox_ratio[j]  = 1;
         }
@@ -1200,6 +1201,7 @@ extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* mo
 {
     motor_status->basic.mot_position = ems->motor_position[mId];
     motor_status->basic.mot_velocity = ems->motor_velocity[mId];
+    motor_status->basic.mot_acceleration = ems->motor_acceleration[mId];
     motor_status->basic.mot_current  = ems->motor_current [mId];
 }
 
