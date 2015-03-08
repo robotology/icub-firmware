@@ -120,6 +120,7 @@ extern void eo_emsController_SetPosMin(uint8_t joint, int32_t pos_min);
 extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max);
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
+extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio);
 extern void eo_emsMotorController_GoIdle(void);
 
 /** @}            

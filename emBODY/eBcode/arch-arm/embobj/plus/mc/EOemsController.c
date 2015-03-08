@@ -121,6 +121,7 @@ extern EOemsController* eo_emsController_Init()
             ems->motor_current [j] = 0;
             ems->motor_velocity[j] = 0;
             ems->motor_position[j] = 0;
+            ems->gearbox_ratio[j]  = 1;
         }
         
         ems->motors = eo_motors_New(NAXLES);
@@ -533,6 +534,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_vel[0] = /*FOC_2_EMS_SPEED*/ems->motor_velocity[0];
         axle_virt_vel[1] = /*FOC_2_EMS_SPEED*/(ems->motor_velocity[0]+(40*ems->motor_velocity[1])/65);
         axle_virt_vel[2] = /*FOC_2_EMS_SPEED*/((40*(ems->motor_velocity[2]-ems->motor_velocity[1]))/65);
+        //axle_virt_vel[2] = /*FOC_2_EMS_SPEED*/((40*(ems->motor_velocity[1]-ems->motor_velocity[2]))/65);  //CHECKME
         axle_virt_vel[3] = /*FOC_2_EMS_SPEED*/ems->motor_velocity[3];
     
         axle_virt_pos[0] = ems->motor_position[0];
@@ -1182,6 +1184,11 @@ extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max)
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 {
     if (ems) eo_axisController_SetVelMax(ems->axis_controller[joint], vel_max);
+}
+
+extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio)
+{
+    if (ems) ems->gearbox_ratio[joint]=gearboxratio;
 }
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state)

@@ -71,6 +71,7 @@ struct EOemsController_hid
     int16_t motor_current [NAXLES];
     int32_t motor_velocity[NAXLES];
     int32_t motor_position[NAXLES];
+    int32_t gearbox_ratio [NAXLES];
     
     //float torque_meas[NJOINTS];
 }; 
