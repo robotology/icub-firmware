@@ -327,16 +327,22 @@ extern float eo_pid_PWM_pi_0_5Hz_1stLPF(EOpid *o, float Tr, float Tm)
 
 extern float eo_pid_PWM_friction(EOpid *o, float pwm_input, float vel, float Tr)
 {
-    float coulomb = 0;
-    
     //viscous friction
     pwm_input=pwm_input+ o->Kbemf*vel;
     
     //coulomb friction
-    /*if (vel>0)
-    {coulomb = o->stiction_up_val;}
+    /*float coulomb = 0;
+    if (vel>910) coulomb = 1; //910 corresponds to 5deg/s (65535/360*5)
+    else if (vel<-910) coulomb = -1;
     else
-    {coulomb = o->stiction_down_val;} 
+    {
+      coulomb = vel*vel*vel/753571000; //753571000 = 910^3
+    }
+    
+    if (vel>0)
+    {coulomb = coulomb * o->stiction_up_val;}
+    else
+    {coulomb = coulomb * o->stiction_down_val;} 
     pwm_input=pwm_input+coulomb;
     */
   
