@@ -120,6 +120,7 @@ extern EOemsController* eo_emsController_Init()
             #endif
             ems->motor_current [j] = 0;
             ems->motor_velocity[j] = 0;
+            ems->motor_velocity_gbx[j] = 0;
             ems->motor_acceleration[j] = 0;
             ems->motor_position[j] = 0;
             ems->gearbox_ratio[j]  = 1;
@@ -162,12 +163,11 @@ extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position)
 {
-    static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
-    
     eo_motors_reset_wdog(ems->motors, motor);
     
     ems->motor_current [motor] = (2*current)/3; // Iq = sqrt(3)/2*Imeas, 32768 = 25000 mA ==> 0.66 scale factor
-    ems->motor_velocity[motor] = FOC_2_EMS_SPEED*velocity;
+    ems->motor_velocity[motor] = 1000*velocity;
+    ems->motor_velocity_gbx[motor] = ems->motor_velocity[motor]/ems->gearbox_ratio[motor];
     ems->motor_position[motor] = position;
 }
 
@@ -517,7 +517,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             MOTORS(m)
             {
                 axle_virt_pos[j] += ems->motors->J[j][m]*ems->motor_position[m];
-                axle_virt_vel[j] += ems->motors->J[j][m]*ems->motor_velocity[m];
+                axle_virt_vel[j] += ems->motors->J[j][m]*ems->motor_velocity_gbx[m];
             }
                 
             axle_virt_pos[j] >>= 14;
@@ -532,11 +532,11 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         //             | 0  -40/65   40/65  0 |
         //             | 0     0       0    1 |
     
-        axle_virt_vel[0] = /*FOC_2_EMS_SPEED*/ems->motor_velocity[0];
-        axle_virt_vel[1] = /*FOC_2_EMS_SPEED*/(ems->motor_velocity[0]+(40*ems->motor_velocity[1])/65);
-        axle_virt_vel[2] = /*FOC_2_EMS_SPEED*/((40*(ems->motor_velocity[2]-ems->motor_velocity[1]))/65);
-        //axle_virt_vel[2] = /*FOC_2_EMS_SPEED*/((40*(ems->motor_velocity[1]-ems->motor_velocity[2]))/65);  //CHECKME
-        axle_virt_vel[3] = /*FOC_2_EMS_SPEED*/ems->motor_velocity[3];
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = (ems->motor_velocity_gbx[0]+(40*ems->motor_velocity_gbx[1])/65);
+        axle_virt_vel[2] = ((40*(ems->motor_velocity_gbx[2]-ems->motor_velocity_gbx[1]))/65);
+        //axle_virt_vel[2] = ((40*(ems->motor_velocity_gbx[1]-ems->motor_velocity[2]_gbx))/65);  //CHECKME
+        axle_virt_vel[3] = ems->motor_velocity_gbx[3];
     
         axle_virt_pos[0] = ems->motor_position[0];
         axle_virt_pos[1] = ems->motor_position[0]+(40*ems->motor_position[1])/65;
@@ -549,20 +549,20 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         // J = dq/dm = |  -1     1     0   |
         //             | 44/80 44/80 44/80 | 
 
-        axle_virt_vel[0] = /*FOC_2_EMS_SPEED*/(     ems->motor_velocity[0] + ems->motor_velocity[1]);
-        axle_virt_vel[1] = /*FOC_2_EMS_SPEED*/(    -ems->motor_velocity[0] + ems->motor_velocity[1]);
-        axle_virt_vel[2] = /*FOC_2_EMS_SPEED*/((44*(ems->motor_velocity[0] + ems->motor_velocity[1] + ems->motor_velocity[2]))/80);
+        axle_virt_vel[0] = (     ems->motor_velocity_gbx[0] + ems->motor_velocity[1]_gbx);
+        axle_virt_vel[1] = (    -ems->motor_velocity_gbx[0] + ems->motor_velocity[1]_gbx);
+        axle_virt_vel[2] = ((44*(ems->motor_velocity_gbx[0] + ems->motor_velocity[1]_gbx + ems->motor_velocity[2]_gbx))/80);
         
         axle_virt_pos[0] =      ems->motor_position[0] + ems->motor_position[1];
         axle_virt_pos[1] =     -ems->motor_position[0] + ems->motor_position[1];
-        axle_virt_pos[2] = (44*(ems->motor_velocity[0] + ems->motor_velocity[1] + ems->motor_velocity[2]))/80;
+        axle_virt_pos[2] = (44*(ems->motor_position[0] + ems->motor_position[1] + ems->motor_position[2]))/80;
         
     #elif defined(UPPERLEG_BOARD)
     
-        axle_virt_vel[0] = /*FOC_2_EMS_SPEED*/(50*ems->motor_velocity[0])/75;
-        axle_virt_vel[1] = /*FOC_2_EMS_SPEED*/    ems->motor_velocity[1]    ;
-        axle_virt_vel[2] = /*FOC_2_EMS_SPEED*/    ems->motor_velocity[2]    ;
-        axle_virt_vel[3] = /*FOC_2_EMS_SPEED*/    ems->motor_velocity[3]    ;
+        axle_virt_vel[0] = (50*ems->motor_velocity_gbx[0])/75;
+        axle_virt_vel[1] =     ems->motor_velocity_gbx[1]    ;
+        axle_virt_vel[2] =     ems->motor_velocity_gbx[2]    ;
+        axle_virt_vel[3] =     ems->motor_velocity_gbx[3]    ;
         
         axle_virt_pos[0] = (50*ems->motor_position[0])/75;
         axle_virt_pos[1] =     ems->motor_position[1]    ;
@@ -571,8 +571,8 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         
     #elif defined(ANKLE_BOARD)
         
-        axle_virt_vel[0] = /*FOC_2_EMS_SPEED*/ems->motor_velocity[0];
-        axle_virt_vel[1] = /*FOC_2_EMS_SPEED*/ems->motor_velocity[1];
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = ems->motor_velocity_gbx[1];
         
         axle_virt_pos[0] = ems->motor_position[0];
         axle_virt_pos[1] = ems->motor_position[1];
@@ -586,7 +586,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     JOINTS(j)
     {
         #ifdef USE_2FOC_FAST_ENCODER
-            eo_axleVirtualEncoder_Acquire(ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
+            eo_axleVirtualEncoder_Acquire(ems->gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
             eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else

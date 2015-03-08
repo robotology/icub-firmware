@@ -315,10 +315,9 @@ extern void eo_axleVirtualEncoder_SetMotorSign(EOaxleVirtualEncoder* o, eObool_t
 }
 
 
-extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel)
+extern void eo_axleVirtualEncoder_Acquire(int32_t gearbox_reduction, EOaxleVirtualEncoder* o, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel)
 {    
-    static const int32_t N_BITS_PRECISION_BOUND = GEARBOX_REDUCTION * ENCODER_QUANTIZATION;
-                        
+    int32_t N_BITS_PRECISION_BOUND = gearbox_reduction * ENCODER_QUANTIZATION;
     int32_t inc = axle_abs_pos - o->axle_abs_pos;
     
     o->axle_abs_pos = axle_abs_pos;
@@ -338,15 +337,15 @@ extern void eo_axleVirtualEncoder_Acquire(EOaxleVirtualEncoder* o, int32_t axle_
         o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
     }
 
-    o->axle_inc_pos -= inc*GEARBOX_REDUCTION;
+    o->axle_inc_pos -= inc*gearbox_reduction;
                         
     LIMIT(o->axle_inc_pos, N_BITS_PRECISION_BOUND);
     
     #ifdef USE_4BIT_INC_ENC_PRECISION
     #ifdef USE_ONLY_QE
-    o->position = axle_virt_pos/GEARBOX_REDUCTION;
+    o->position = axle_virt_pos/gearbox_reduction;
     #else
-    o->position = axle_abs_pos + o->axle_inc_pos/GEARBOX_REDUCTION;
+    o->position = axle_abs_pos + o->axle_inc_pos/gearbox_reduction;
     #endif
     #else
     o->position = axle_abs_pos;

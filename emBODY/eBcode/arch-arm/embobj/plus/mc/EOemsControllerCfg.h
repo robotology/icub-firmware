@@ -45,7 +45,6 @@ extern "C" {
 #define TICKS_PER_REVOLUTION      65536
 #define TICKS_PER_HALF_REVOLUTION 32768
 #define ENCODER_QUANTIZATION      16
-#define GEARBOX_REDUCTION         100
     
 #define VELOCITY_CMD_TIMEOUT      100 // cycles
 #define TORQUE_CMD_TIMEOUT        100 // cycles
