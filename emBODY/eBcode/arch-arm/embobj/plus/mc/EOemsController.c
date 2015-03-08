@@ -549,9 +549,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         // J = dq/dm = |  -1     1     0   |
         //             | 44/80 44/80 44/80 | 
 
-        axle_virt_vel[0] = (     ems->motor_velocity_gbx[0] + ems->motor_velocity[1]_gbx);
-        axle_virt_vel[1] = (    -ems->motor_velocity_gbx[0] + ems->motor_velocity[1]_gbx);
-        axle_virt_vel[2] = ((44*(ems->motor_velocity_gbx[0] + ems->motor_velocity[1]_gbx + ems->motor_velocity[2]_gbx))/80);
+        axle_virt_vel[0] = (     ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]);
+        axle_virt_vel[1] = (    -ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]);
+        axle_virt_vel[2] = ((44*(ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1] + ems->motor_velocity_gbx[2]))/80);
         
         axle_virt_pos[0] =      ems->motor_position[0] + ems->motor_position[1];
         axle_virt_pos[1] =     -ems->motor_position[0] + ems->motor_position[1];
