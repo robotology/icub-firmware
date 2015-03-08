@@ -2487,11 +2487,11 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
     // note of marco.accame: the following code is ok as long as the 2foc has been configured to send up in its periodic message 
     // current, velocity, and position. if so, frame->data contains: [current:2bytes, velocity:2bytes, position:4bytes]. 
     // the following code extract these values. 
-    mstatus->basic.current  = ((int16_t*)frame->data)[0];
-    mstatus->basic.velocity = ((int16_t*)frame->data)[1];
-    mstatus->basic.position = ((int32_t*)frame->data)[1];
+    mstatus->basic.mot_current  = ((int16_t*)frame->data)[0];
+    mstatus->basic.mot_velocity = ((int16_t*)frame->data)[1];
+    mstatus->basic.mot_position = ((int32_t*)frame->data)[1];
      
-    eo_emsController_AcquireMotorEncoder(mId, mstatus->basic.current, mstatus->basic.velocity, mstatus->basic.position);
+    eo_emsController_AcquireMotorEncoder(mId, mstatus->basic.mot_current, mstatus->basic.mot_velocity, mstatus->basic.mot_position);
 
     return(eores_OK);
 }
@@ -2948,7 +2948,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
         pos_icubCanProtValue = *((icubCanProto_position_t*)&(frame->data[4])); 
     }
 
-    jstatus->basic.position = eo_appMeasConv_jntPosition_E2I(appMeasConv_ptr, jId, pos_icubCanProtValue); 
+    jstatus->basic.jnt_position = eo_appMeasConv_jntPosition_E2I(appMeasConv_ptr, jId, pos_icubCanProtValue); 
     
     
 //    jstatus_ptr->basic.position++;
@@ -2959,7 +2959,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
-    eOmc_jointId_t   		                jId;
+    eOmc_jointId_t                          jId;
     eOmc_joint_status_t                     *jstatus = NULL;
     
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
@@ -3007,11 +3007,11 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p
     
     if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
     {
-        mstatus->basic.current = *((uint16_t*)&(frame->data[0]));
+        mstatus->basic.mot_current = *((uint16_t*)&(frame->data[0]));
     }
     else
     {
-        mstatus->basic.current = *((uint16_t*)&(frame->data[2]));
+        mstatus->basic.mot_current = *((uint16_t*)&(frame->data[2]));
     }
     return(eores_OK);
 }
@@ -3055,10 +3055,10 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
     
     //convert measure for icub world and set values in jstatus (nv mem)
     vel_icubCanProtValue = (vel_icubCanProtValue*1000) >> eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jId);
-	jstatus->basic.velocity = eo_appMeasConv_jntVelocity_E2I(appMeasConv_ptr, jId, vel_icubCanProtValue);
+    jstatus->basic.jnt_velocity = eo_appMeasConv_jntVelocity_E2I(appMeasConv_ptr, jId, vel_icubCanProtValue);
     
     acc_icubCanProtValue = (acc_icubCanProtValue * 1000000) >> (eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jId) + eo_appMeasConv_hid_GetAccEstimShift(appMeasConv_ptr, jId));
-    jstatus->basic.acceleration = eo_appMeasConv_jntAcceleration_E2I(appMeasConv_ptr, jId, acc_icubCanProtValue);
+    jstatus->basic.jnt_acceleration = eo_appMeasConv_jntAcceleration_E2I(appMeasConv_ptr, jId, acc_icubCanProtValue);
     
     return(eores_OK);
 }
