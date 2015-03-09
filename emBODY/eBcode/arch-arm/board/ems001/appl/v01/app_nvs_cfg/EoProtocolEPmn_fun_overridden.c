@@ -277,14 +277,14 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_appl_state_t *newstate_ptr = (eOmn_appl_state_t *)nv->ram;
+    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
 
     eOresult_t res = eores_NOK_generic;
     
-    switch(*newstate_ptr)
+    switch(*go2state)
     {
         case applstate_config:
         {
