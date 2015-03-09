@@ -56,18 +56,18 @@ typedef struct
     eOappTheDB_mapping2canboard_t 		mapping2canboard;
     eOappTheDB_jointShiftValues_t       *shiftvalues_ptr;   
     eOicubCanProto_bcastpolicy_t        *bcastpolicy_ptr;
-#ifdef USE_PROTO_PROXY
-    EOlist                              *ethProtoReq_list;  // list of eOappTheDB_hid_ethProtoRequest_t items
-#endif
+//#ifdef USE_PROTO_PROXY
+//    EOlist                              *ethProtoReq_list;  // list of eOappTheDB_hid_ethProtoRequest_t items
+//#endif
 } eOappTheDB_hid_jointInfo_t;
 
 
 typedef struct
 {
     eOappTheDB_mapping2canboard_t 		mapping2canboard;
-#ifdef USE_PROTO_PROXY
-    EOlist                              *ethProtoReq_list;  // list of eOappTheDB_hid_ethProtoRequest_t items
-#endif
+//#ifdef USE_PROTO_PROXY
+//    EOlist                              *ethProtoReq_list;  // list of eOappTheDB_hid_ethProtoRequest_t items
+//#endif
 } eOappTheDB_hid_motorInfo_t;
 
 
@@ -108,8 +108,8 @@ typedef struct
 
 typedef struct
 {
-		eOsizecntnr_t 	    capacity;
-		eObrd_boardId_t		*tbl; // gli indici partono da zero, anche se l'indirizzo zero sara' sempre usato dalla ems
+    eOsizecntnr_t 	    capacity;
+    eObrd_boardId_t		*tbl; // gli indici partono da zero, anche se l'indirizzo zero sara' sempre usato dalla ems
 } eOappTheDB_hid_canaddressLookuptbl;
 
 struct EOappTheDB_hid

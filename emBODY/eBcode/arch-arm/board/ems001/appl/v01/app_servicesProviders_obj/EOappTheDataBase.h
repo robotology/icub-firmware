@@ -50,10 +50,10 @@ extern "C" {
 #include "EoSkin.h"
 #include "EOicubCanProto_specifications.h"
 
-#ifdef USE_PROTO_PROXY
-#include "EoProtocol.h"
-#include "EOlist.h"
-#endif
+//#ifdef USE_PROTO_PROXY
+//#include "EoProtocol.h"
+//#include "EOlist.h"
+//#endif
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -101,7 +101,8 @@ typedef struct
     uint16_t addr : 4;               /**< use icubCanProto_canBoardAddress_t */ 
     uint16_t ffu3 : 3;               /**< for future use */
     uint16_t type : 8;               /**< use eObrd_cantype_t */
-} eOappTheDB_canboardinfo_t;        EO_VERIFYsizeof(eOappTheDB_canboardinfo_t, 2);
+    eOicubCanProto_protocolVersion_t canprotversion;
+} eOappTheDB_canboardinfo_t;        EO_VERIFYsizeof(eOappTheDB_canboardinfo_t, 4);
 
 
 //typedef struct
@@ -189,7 +190,7 @@ extern uint16_t eo_appTheDB_GetNumberOfConnectedMotors(EOappTheDB *p);
 
 extern uint16_t eo_appTheDB_GetNumberOfCanboards(EOappTheDB *p);
 
-extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_board_canlocation_t *loc,  eObrd_cantype_t *expectedtype, eObrd_typeandversions_t *detectedtypever);
+extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_board_canlocation_t *loc,  eObrd_typeandversions_t *expectedtypever, eObrd_typeandversions_t *detectedtypever);
 
 extern eObool_t	eo_appTheDB_isSkinConnected(EOappTheDB *p);
 

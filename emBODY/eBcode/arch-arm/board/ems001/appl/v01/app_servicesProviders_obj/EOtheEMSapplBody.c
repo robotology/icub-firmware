@@ -512,9 +512,7 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
         eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
         uint8_t                         boardEndAddr;
         eOicubCanProto_msgDestination_t msgdest;
-        
-        uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-        
+              
         eOicubCanProto_msgCommand_t msgCmd = 
         {
             EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
@@ -522,7 +520,7 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
         };
         
         
-        for(j=0; j<numofskin; j++) //for each skid
+        for(j=0; j<numofskin; j++) 
         {
             res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
             if(eores_OK != res)
@@ -639,7 +637,9 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
     uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
     uint8_t i = 0;
     eOappTheDB_board_canlocation_t loc = {0};
-    eObrd_cantype_t exptype = eobrd_cantype_unknown;
+    //eObrd_cantype_t exptype = eobrd_cantype_unknown;
+    eObrd_typeandversions_t expected = {0};
+    expected.boardtype = eobrd_cantype_unknown;
     eObrd_typeandversions_t detected = {0};
     
     eOerrmanDescriptor_t des = {0};
@@ -647,12 +647,12 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
     
     for(i=0; i<numcanboards; i++)
     {
-        if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &exptype, &detected))
+        if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &expected, &detected))
         {
             // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
             des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
             des.sourceaddress   = loc.addr;
-            des.par16           = (exptype << 8) | ((detected.boardtype) & 0xff); 
+            des.par16           = (expected.boardtype << 8) | ((detected.boardtype) & 0xff); 
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
         }                    
     }
@@ -1044,7 +1044,7 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
         
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canboardinfo->addr);
                         
-        res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, (eOcanport_t)canboardinfo->port, msgdest, msgCmd, (void*)&p->config.icubcanprotoimplementedversion);
+        res = eo_appCanSP_SendCmd(p->bodyobjs.appCanSP, (eOcanport_t)canboardinfo->port, msgdest, msgCmd, (void*)&canboardinfo->canprotversion);
         if(eores_OK != res)
         {
             return(res);

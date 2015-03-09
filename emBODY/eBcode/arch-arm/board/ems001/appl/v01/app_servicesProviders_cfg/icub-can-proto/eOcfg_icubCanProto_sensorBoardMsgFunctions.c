@@ -93,14 +93,16 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
+
+static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint64_t par64);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -114,6 +116,7 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 // --------------------------------------------------------------------------------------------------------------------
 
 //********************** P A R S E R       POLLING     F U N C T I O N S  ******************************************************
+
 extern eOresult_t eo_icubCanProto_parser_pol_sb_unexpected_cmd(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     return(eores_OK);
@@ -187,18 +190,18 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__setResolution(EOicubCanProt
         case eoas_maisresolution_08:
         {
             canFrame->data[1] = 2;
-        }break;
+        } break;
         
         case eoas_maisresolution_16:
         {
             canFrame->data[1] = 0;
-        }break;
+        } break;
 
 #ifdef _MAIS_TEST_
         case eoas_maisresolution_debug:
         {
             canFrame->data[1] = 1;
-        }break;
+        } break;
 #endif
         default:
         {
@@ -238,14 +241,16 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1);
+        return(eores_OK);
     }
 
     /* 2) get signaloncefullscale, contained in strain config nv. */
     config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == config)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(2);
+        return(eores_OK);
     } 
 //     if(!config->signaloncefullscale)
 //     {
@@ -258,7 +263,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(3);
+        return(eores_OK);
     }      
     
     
@@ -278,7 +284,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
         //des.sourceaddress = 0;
         //des.sourcedevice = eo_errman_sourcedevice_localboard;
         //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);
-        return(eores_NOK_generic);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(4);
+        return(eores_OK);
     }
     else
     {
@@ -304,6 +311,11 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     {
         // prepare occasional rop to send
         res = s_loadFullscalelikeoccasionalrop(sId);
+        if(eores_OK != res)
+        {
+            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(5);
+            return(eores_OK);
+        }
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
         
         // if application is in cfg state, then we send a request to configurator to send ropframe out
@@ -338,6 +350,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sb_cmd__getFullScales(EOicubCanProt
 
 
 //********************** P A R S E R       PERIODIC     F U N C T I O N S  ******************************************************
+
 extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
     eOresult_t                                  res;
@@ -354,7 +367,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(6);
+        return(eores_OK);
     }
 
     /* 2) get strain transmission mode, contained in strain config nv.
@@ -362,13 +376,15 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
     config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == config)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(7);
+        return(eores_OK);
     } 
     /* 3) get pointer to nv var where save incoming force values */
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(8);
+        return(eores_OK);
     } 
     
     
@@ -388,10 +404,16 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
             //memcpy(&(status->uncalibratedvalues.data[0]), &(frame->data[0]), 6);
         } break;
         
+        case eoas_strainmode_acquirebutdonttx:
+        {
+            // i dont do anything in here. but i dont return nok. because it may be that we must empty a rx buffer of canframes rx just before
+            // that we have silenced the strain.
+        } break;
+        
         default:
         {
             //i must never be here!
-            return(eores_NOK_generic);
+            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(9);
         }
     };
     
@@ -414,7 +436,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(10);
+        return(eores_OK);
     }
 
     /* 2) get strain transmission mode, contained in straion config nv.
@@ -422,14 +445,16 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == config)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(11);
+        return(eores_OK);
     }     
     
     /* 3) get pointer to nv var where save incoming force values */
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(12);
+        return(eores_OK);
     }      
     
     /* 4) set incoming force values */
@@ -449,10 +474,16 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
             //memcpy(&(status->uncalibratedvalues.data[6]), &frame->data[0], 6);
         } break;
         
+        case eoas_strainmode_acquirebutdonttx:
+        {
+            // i dont do anything in here. but i dont return nok. because it may be that we must empty a rx buffer of canframes rx just before
+            // that we have silenced the strain.
+        } break;
+        
         default:
         {
             //i must never be here!
-            return(eores_NOK_generic);
+            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(13);
         }
     };
     
@@ -476,16 +507,19 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(14);
+        return(eores_OK);
     }
 
     /* 1) get pointer to nv var where save incoming force values */
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(15);
+        return(eores_OK);
     } 
 
+    // use the eoarray
     memcpy(&(status->uncalibratedvalues.data[0]), &frame->data[0], 6);
 
     return(eores_OK);
@@ -506,16 +540,19 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(16);
+        return(eores_OK);
     }
 
     /* 1) get pointer to nv var where save incoming force values */
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(17);
+        return(eores_OK);
     } 
 
+    // use the eoarray
     memcpy(&(status->uncalibratedvalues.data[6]), &frame->data[0], 6);
 
     return(eores_OK);
@@ -534,13 +571,15 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
     res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(18);
+        return(eores_OK);
     }
 
     status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(19);
+        return(eores_OK);
     }     
 
     // copy the canframe data values inside the array
@@ -571,13 +610,15 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
     res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(20);
+        return(eores_OK);
     }
     
     status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(21);
+        return(eores_OK);
     } 
     
     // copy the canframe data values inside the array
@@ -597,6 +638,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
 
 
 //********************** F O R M E R       PERIODIC     F U N C T I O N S  ******************************************************
+
 extern eOresult_t eo_icubCanProto_former_per_sb_cmd__forceVector(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
 
@@ -639,7 +681,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     res = eo_appTheDB_GetSkinId_BySkinCanLocation(db, canloc, &skId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(22);
+        return(eores_OK);
     }
     
     //#warning -> marco.accame: we have only two skins (at most), thus we could pre-compute the skin0 and skin1 pointers onece for all.
@@ -648,7 +691,8 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     
     if(NULL == skinstatus)
     {
-        return(res);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(23);
+        return(eores_OK);
     }
 
 
@@ -656,9 +700,23 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     candata.info = info;    
     memcpy(candata.data, frame->data, sizeof(candata.data));
     
+    
     res = eo_array_PushBack((EOarray*)(&skinstatus->arrayofcandata), &candata);
+    if(eores_OK != res)
+    {   // marco.accame: it may happen that one receives so many skin can frames that cannot be put inside the skinstatus->arrayofcandata. 
+        //               i have seen it sometimes at ctrl-c of robot-interface. probably because there are many messages for the 12 joints
+        //               before the skin is silenced. if that happens at ctrl-c: dont worry. otherwise it may be that we are losing skin can frames 
+        eOerrmanDescriptor_t des = {0};
+        des.code            = eoerror_code_get(eoerror_category_Skin, eoerror_value_SK_arrayofcandataoverflow);
+        des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        des.sourceaddress   = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+        des.sourcedevice    = (eOcanport1 == canPort) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des); 
+        //s_eo_icubCanProto_sb_send_runtime_error_diagnostics(24);
+    }
 
-    return(res);
+    return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
@@ -672,13 +730,13 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup(EOicubCanProto* p
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
 
     canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;  
-    canFrame->data[1]=0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
-    canFrame->data[2]=0x01;  //==> invia ogni 40 milli
-    canFrame->data[3]=0x03;
-    canFrame->data[4]=0;
-    canFrame->data[5]=0x20;
-    canFrame->data[6]=0;
-    canFrame->data[7]=0x35;
+    canFrame->data[1] = 0x01;  //==> risoluzione 8 bit   e 12 isure indipendenti
+    canFrame->data[2] = 0x01;  //==> invia ogni 40 milli
+    canFrame->data[3] = 0x03;
+    canFrame->data[4] = 0;
+    canFrame->data[5] = 0x20;
+    canFrame->data[6] = 0;
+    canFrame->data[7] = 0x35;
 
     return(eores_OK);
 }
@@ -693,13 +751,13 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__tactSetup2(EOicubCanProto* 
     canFrame->size = 7;
 
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
-    canFrame->data[0]=ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2; 
-    canFrame->data[1]=0x00;  
-    canFrame->data[2]=0x22;
-    canFrame->data[3]=0xf0;
-    canFrame->data[4]=0x00;
-    canFrame->data[5]=0xFF;
-    canFrame->data[6]=0xff;
+    canFrame->data[0] = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2; 
+    canFrame->data[1] = 0x00;  
+    canFrame->data[2] = 0x22;
+    canFrame->data[3] = 0xf0;
+    canFrame->data[4] = 0x00;
+    canFrame->data[5] = 0xFF;
+    canFrame->data[6] = 0xff;
 
     return(eores_OK);
 }
@@ -750,6 +808,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setTriangCfg(EOicubCanProto
 
     return(eores_OK);
 }
+
 //unused
 //extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to3(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 //{
@@ -770,6 +829,7 @@ extern eOresult_t eo_icubCanProto_former_pol_sk_cmd__setTriangCfg(EOicubCanProto
 //{
 //    return(eores_OK);
 //}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -788,6 +848,7 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
     
     if(NULL == bodycfg)
     {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "eo_emsapplBody_GetConfig() fails tag_12cerf", NULL, &eo_errman_DescrRuntimeErrorLocal);
         return(eores_NOK_generic);
     }
 
@@ -823,8 +884,19 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
     }
     
     return(res);
-};
+}
 
+
+static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint64_t par64)
+{
+    eOerrmanDescriptor_t des = {0};
+    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
+    des.par16 = 0x1111;
+    des.par64 = 0x1100000000000000 + par64;
+    des.sourceaddress = 0;
+    des.sourcedevice = eo_errman_sourcedevice_localboard;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

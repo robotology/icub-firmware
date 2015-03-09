@@ -273,11 +273,11 @@ extern eOresult_t eo_appTheDB_GetTypeOfCanboard(EOappTheDB *p, eObrd_boardId_t b
 
 
 // it is the information received from a board in position bid with that (port, addr)
-extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_board_canlocation_t *loc,  eObrd_cantype_t *expectedtype, eObrd_typeandversions_t *detectedtypever)
+extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t bid, eOappTheDB_board_canlocation_t *loc,  eObrd_typeandversions_t *expectedtypever, eObrd_typeandversions_t *detectedtypever)
 {
     eOappTheDB_hid_canBoardInfo_t   *ptr;
     
-    if((NULL == p) || (NULL == loc) || (NULL == expectedtype) || (NULL == detectedtypever))
+    if((NULL == p) || (NULL == loc) || (NULL == expectedtypever) || (NULL == detectedtypever))
     {
         return(eores_NOK_nullpointer);
     }
@@ -292,7 +292,10 @@ extern eOresult_t eo_appTheDB_GetCanDetectedInfo(EOappTheDB *p, eObrd_boardId_t 
     loc->emscanport = ptr->basicboardinfo.port;
     loc->addr       = ptr->basicboardinfo.addr;
     loc->unused     = 0;
-    *expectedtype   = ptr->basicboardinfo.type;
+    memset(expectedtypever, 0, sizeof(eObrd_typeandversions_t)); // at first i set everything to zero. then i init only what i have
+    expectedtypever->boardtype = ptr->basicboardinfo.type;
+    expectedtypever->protocolversion.major = ptr->basicboardinfo.canprotversion.major;
+    expectedtypever->protocolversion.minor = ptr->basicboardinfo.canprotversion.minor;
     memcpy(detectedtypever, &(ptr->typeandversion), sizeof(eObrd_typeandversions_t));
     
     return(eores_OK);
@@ -1089,6 +1092,8 @@ static eOresult_t s_appTheDB_canboardslist_init(EOappTheDB *p)
         item.basicboardinfo.addr    = p2canboardinfo->addr;
         item.basicboardinfo.port    = p2canboardinfo->port;
         item.basicboardinfo.type    = p2canboardinfo->type;
+        item.basicboardinfo.canprotversion.major = p2canboardinfo->canprotversion.major;
+        item.basicboardinfo.canprotversion.minor = p2canboardinfo->canprotversion.minor;
         
         item.typeandversion.boardtype               = eobrd_cantype_unknown;
         item.typeandversion.protocolversion.major   = 0;    // this value and the others must be told by the board

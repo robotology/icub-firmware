@@ -77,26 +77,30 @@
 static const eOappTheDB_canboardinfo_t s_cfg_appDB_boards[] = 
 {
     { // 0 == FOC_ADDRCAN_1_BID 
-        .port   = eOcanport1,
-        .addr   = 1,
-        .type   = eobrd_cantype_1foc,
+        .port           = eOcanport1,
+        .addr           = 1,
+        .type           = eobrd_cantype_1foc,
+        .canprotversion = {.major = 1, .minor = 2}        
     },
     { // 1 == FOC_ADDRCAN_2_BID 
     // marco.accame: this board is not used by the joints. however in the application it is present inside the list of boards.
     //               its address is used to ask the fw-version ... we could change the type to eobrd_none so that no fw-version can message is sent.  
-        .port   = eOcanport1,       
-        .addr   = 2,        // if you ever change this address ............ change also function s_eo_icubCanProto_isUnused2FOCinTorso()
-        .type   = eobrd_cantype_1foc,
+        .port           = eOcanport1,       
+        .addr           = 2,        // if you ever change this address ............ change also function s_eo_icubCanProto_isUnused2FOCinTorso()
+        .type           = eobrd_cantype_1foc,
+        .canprotversion = {.major = 1, .minor = 2} 
     }, 
     { // 2  == FOC_ADDRCAN_3_BID
-        .port   = eOcanport1,
-        .addr   = 3,
-        .type   = eobrd_cantype_1foc,
+        .port           = eOcanport1,
+        .addr           = 3,
+        .type           = eobrd_cantype_1foc,
+        .canprotversion = {.major = 1, .minor = 2} 
     },      
     { // 3  == FOC_ADDRCAN_4_BID
-        .port   = eOcanport1,
-        .addr   = 4,
-        .type   = eobrd_cantype_1foc,
+        .port           = eOcanport1,
+        .addr           = 4,
+        .type           = eobrd_cantype_1foc,
+        .canprotversion = {.major = 1, .minor = 2} 
     }
 };    
     

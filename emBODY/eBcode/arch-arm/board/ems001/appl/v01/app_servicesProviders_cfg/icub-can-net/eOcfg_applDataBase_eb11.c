@@ -178,7 +178,7 @@ static const eOappTheDB_cfg_skinInfo_t  s_cfg_appDB_skin [] =
         EO_INIT(.numofboards)                             6
     }
 };
-#warning --> in eb11-can2 there are 6 skin boards .. is it really so?
+//#warning --> in eb11-can2 there are 6 skin boards .. is it really so?
 
 const EOconstvector  s_eo_cfg_appDB_constvec_skin = 
 {

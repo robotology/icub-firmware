@@ -92,6 +92,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc);
@@ -103,7 +104,8 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
 static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode);
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode(icubCanProto_interactionmode_t icubcanProto_intermode,
                                                                                       eOmc_interactionmode_t *eomc_intermode);
-
+static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint64_t par64);
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -118,130 +120,23 @@ static const char s_eobj_ownname[] = "icubCanProto";
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern eOresult_t eo_icubCanProto_parser_pol_mb_unexpected_cmd(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-    // #include "hal_trace.h"
-    // char str [70];
-    
-    // snprintf(str, sizeof(str), "parser_pol_mb_unexpected_cmd: id=0x%x, cmd=%d", frame->id, frame->data[0]);
-    // hal_trace_puts(str);
+    // the caller of this function will manage the NOK and will issue a unrecognised can frame message
     return(eores_NOK_unsupported);
 }
 
 
 extern eOresult_t eo_icubCanProto_parser_test(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
 {
-
-//     eOresult_t res;
-//     static eOmc_joint_status_t j;
-//     eo_emsCanNetTopo_jointOrMotorCanLocation_t canLoc;
-//     eOmc_jointId_t jId;
-//     eOmc_motorId_t mId;
-//     void *memRef1, *memRef2, *pidVel_NVptr;
-//     eOmc_PID_t pidVel, pidPos1, pidPos2;
-//     eOmc_joint_config_t /*jc1,*/ jc2;
-//     eOmc_motor_config_t  mc;
-//      
-//     eo_icubCanProto_canBoardAddress_t boardAddr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
-// //DEBUG_PIN4_OFF;
-
-// //      res = eo_emsCanNetTopo_GetMotorBoardNV_Status_ByCanLocation(p->emsCanNetTopo_ptr, canPort, boardAddr,
-// //                                                       eo_emsCanNetTopo_jm_index_first, &nvt_ptr);
-//     canLoc.emscanport = canPort;
-//     canLoc.canaddr = boardAddr;
-//     canLoc.jm_idInBoard = 0;
-//     res = eo_emsCanNetTopo_GetJointId_ByJointCanLocation(p->emsCanNetTopo_ptr, &canLoc, &jId);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-// //    res = eo_appTheNVmapRef_GetJointNVMemoryRef_test(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig, &memRef1);
-// //    if(eores_OK != res)
-// //    {
-// //        return(res);
-// //    }
-
-
-//     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig, &memRef2);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-//     if(memRef1 == memRef2)
-//     {
-//         j.basic.velocity = 1;
-//     }
-//     else
-//     {
-//         j.basic.velocity = 2;
-//     }
-//     j=j;
-// //    memcpy(&jc1, memRef1, sizeof(eOmc_joint_config_t));  memref1 uset for test
-
-//     memcpy(&jc2, memRef2, sizeof(eOmc_joint_config_t));
-// //DEBUG_PIN3_OFF;
-
-// //pidPos
-//     res = eo_appTheNVmapRef_GetJointNVMemoryRef_test(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidposition, &memRef1);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }    
-
-
-//     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidposition, &memRef2);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-//     memcpy(&pidPos1, memRef1, sizeof(eOmc_PID_t)); 
-//     memcpy(&pidPos2, memRef2, sizeof(eOmc_PID_t)); 
-
-
-
-//     //pidvel
-//     res = eo_appTheNVmapRef_GetJointNVMemoryRef(eo_appTheNVmapRef_GetHandle(), jId, jointNVindex_jconfig__pidvelocity, &pidVel_NVptr);
-//     memcpy(&pidVel,pidVel_NVptr, sizeof(eOmc_PID_t)); 
-
-//     pidVel.kd = 0x1010;
-
-
-
-
-// /*************************************************************************************/
-// /*              motor                      */
-
-//     res = eo_emsCanNetTopo_GetMotorId_ByMotorCanLocation(p->emsCanNetTopo_ptr, &canLoc, &mId);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-
-//     res = eo_appTheNVmapRef_GetMotorNVMemoryRef(eo_appTheNVmapRef_GetHandle(), mId, motorNVindex_mconfig, &memRef1);
-//     if(eores_OK != res)
-//     {
-//         return(res);
-//     }
-//     memcpy(&mc, memRef1, sizeof(eOmc_motor_config_t));
-
-// //DEBUG_PIN3_OFF;
-// //    nvJoint_ptr->jm_idInBoard.position = frame->data[1];
-// //    nvJoint_ptr->jm_idInBoard.velocity = frame->data[2]; 
     return(eores_OK);
 }
 
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_unexpected_cmd(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    // #include "hal_trace.h"
-    // char str [70];
-    
-    // snprintf(str, sizeof(str), "former_pol_mb_unexpected_cmd: ");
-    // hal_trace_puts(str);
-    
+    // the caller will manage the NOK by issuing the proper diagnostics message
     return(eores_NOK_unsupported);
 }
 
@@ -320,21 +215,21 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type0.pwmlimit;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type0.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
-        }break;
+        } break;
 
         case icubCanProto_calibration_type1_abs_sens_analog:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type1.position;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type1.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
-        }break;
+        } break;
 
         case icubCanProto_calibration_type2_hard_stops_diff:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type2.pwmlimit;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type2.velocity;
             memset(&canFrame->data[6], 0, 2); //pad with 0          
-        }break;
+        } break;
 
 
         case icubCanProto_calibration_type3_abs_sens_digital:
@@ -342,14 +237,19 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type3.position;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type3.velocity;
             *((uint16_t*)(&canFrame->data[6])) = calib_ptr->params.type3.offset;        
-        }break;
+        } break;
 
         case icubCanProto_calibration_type4_abs_and_incremental:
         {
             *((uint16_t*)(&canFrame->data[2])) = calib_ptr->params.type4.position;
             *((uint16_t*)(&canFrame->data[4])) = calib_ptr->params.type4.velocity;
             *((uint16_t*)(&canFrame->data[6])) = calib_ptr->params.type4.maxencoder;        
-        }break;
+        } break;
+        
+        default:
+        {
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1);
+        } break;
 
     }
     return(eores_OK);
@@ -393,13 +293,15 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(2);
+        return(eores_OK);
     }
 
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        return(res); //error
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(3);
+        return(eores_OK);
     }
 
 
@@ -461,13 +363,15 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__motionDone(EOicubCanProto* 
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(4);
+        return(eores_OK);
     }
 
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        return(res); //error
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(5);
+        return(eores_OK);
     }
     
     eOmc_motionmonitorstatus_t motionmonitorstatus = (eOmc_motionmonitorstatus_t) jstatus->basic.motionmonitorstatus;
@@ -668,9 +572,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setDesiredTorque(EOicubCanP
 }
 
 extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort)
-{
-    eOresult_t                              res = eores_OK;
-    
+{   
     // marco.accame on 03mar15: the use of teh proxy in here is not correct. the proxy which triggered the
     // ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE can message came from a ask<mc_joint_cmmnds_setpoint> which is not used by robotInterface
     // and moreover cannot in here call the proxy with a id32 with tag eoprot_tag_mc_joint_config_impedance.
@@ -774,7 +676,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getDesiredTorque(EOicubCanP
 //#endif 
 //    
 //#endif // USE_PROTO_PROXY  
-    return(res);
+    return(eores_OK);
 }
 
 
@@ -847,11 +749,12 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMinPosition(EOicubCanPro
     canLoc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
     canLoc.indexinsidecanboard = eo_icubCanProto_hid_getjmIndexInBOardFromFrame(frame);;   
     
-    
+ 
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
+        return(eores_OK);
     }
     
     
@@ -915,7 +818,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMinPosition(EOicubCanPro
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmeas_position_limits_t *limits_ptr = (eOmeas_position_limits_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
@@ -948,7 +851,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMinPosition(EOicubCanPro
 #endif
     
 #endif //USE_PROTO_PROXY
-    return(res);
+    return(eores_OK);
 
 
 }
@@ -993,7 +896,8 @@ eOresult_t                                  res = eores_OK;
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(7);
+        return(eores_OK);
     }
     
     
@@ -1056,7 +960,7 @@ eOresult_t                                  res = eores_OK;
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmeas_position_limits_t *limits_ptr = (eOmeas_position_limits_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
@@ -1090,7 +994,7 @@ eOresult_t                                  res = eores_OK;
 #endif
     
 #endif // USE_PROTO_PROXY
-    return(res);
+    return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getMaxPosition(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
@@ -1227,7 +1131,8 @@ eOresult_t                                  res = eores_OK;
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(7);
+        return(eores_OK);
     }
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jId, eoprot_tag_mc_joint_config_pidtorque);
@@ -1279,13 +1184,13 @@ eOresult_t                                  res = eores_OK;
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
     pid_ptr->kp = *((int16_t*)&frame->data[1]);
     pid_ptr->ki = *((int16_t*)&frame->data[3]);
-    pid_ptr->kd = *((int16_t*)&frame->data[5]);    
+    pid_ptr->kd = *((int16_t*)&frame->data[5]); 
     
     
     param->p08_2 ++;
@@ -1305,7 +1210,7 @@ eOresult_t                                  res = eores_OK;
     
 #endif // USE_PROTO_PROXY
     
-    return(res);
+    return(eores_OK);
 
 }
 
@@ -1362,7 +1267,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCa
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(8);
+        return(eores_OK);
     }
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_pidtorque);
@@ -1414,7 +1320,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCa
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -1439,7 +1345,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCa
 #endif
     
 #endif // USE_PROTO_PROXY
-    return(res);
+    return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getTorquePidLimits(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
@@ -1496,7 +1402,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(9);
+        return(eores_OK);
     }
     
     
@@ -1550,7 +1457,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -1575,7 +1482,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p
 #endif
     
 #endif // USE_PROTO_PROXY
-    return(res);
+    return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getPosPid(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
@@ -1631,7 +1538,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(9);
+        return(eores_OK);
     }
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_pidposition);
@@ -1683,7 +1591,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmc_PID_t* pid_ptr = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -1707,7 +1615,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
 #endif    
     
 #endif // USE_PROTO_PROXY   
-    return(res);
+    return(eores_OK);
 }
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getPosPidLimits(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
@@ -1771,7 +1679,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCa
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(10);
+        return(eores_OK);
     }
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
@@ -1827,7 +1736,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCa
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     eOmc_impedance_t *impedance_ptr = (eOmc_impedance_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -1857,7 +1766,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCa
 #endif  
     
 #endif // USE_PROTO_PROXY    
-    return(res);
+    return(eores_OK);
     
 }
 
@@ -1903,7 +1812,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCa
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(12);
+        return(eores_OK);
     }
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint,  jId, eoprot_tag_mc_joint_config_impedance);
@@ -1956,7 +1866,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCa
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_NOK_generic);
+        return(eores_OK);
     } 
 
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
@@ -1982,7 +1892,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCa
 #endif      
     
 #endif // USE_PROTO_PROXY    
-    return(res);
+    return(eores_OK);
     
 }
 
@@ -2006,7 +1916,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     eOresult_t                              res;
     eOappTheDB_board_canlocation_t          canLoc = {0};
     eObrd_boardId_t                         bid;
-    char                                    str[64];
+    char                                    str[56] = {0};
     uint32_t                                canBoardsReady = 0;
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     eObrd_typeandversions_t                 typeversion = {0};
@@ -2018,7 +1928,8 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     res = eo_appTheDB_GetCanBoardId_ByCanLocation(db, canLoc, &bid); 
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(13);
+        return(eores_OK);
     }
     
     typeversion.boardtype                   = frame->data[1];
@@ -2036,6 +1947,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
 //        uint16_t buildNum = *((uint16_t*)&frame->data[2]);
 //        snprintf(str, sizeof(str), "getfwVer id%d: type=0x%x fw_ver=0x%x build=%d prot=%d.%d check=%d", frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6],frame->data[7]); 
 //        //snprintf(str, sizeof(str), "protFWver mismatch: CAN%d ID=%d BRD=0x%x FW=0x%x BLD=%d PROTVER=%d.%d", canPort+1, frame->id, frame->data[1], buildNum, frame->data[4], frame->data[5], frame->data[6]);   
+        snprintf(str, sizeof(str), "wrong fwver: %d %d", typeversion.firmwareversion.major, typeversion.firmwareversion.minor); 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &eo_errman_DescrUnspecified);
     }
     else
@@ -2324,14 +2236,16 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(14);
+        return(eores_OK);
     }
     
     
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(15);
+        return(eores_OK);
     }
        
     jstatus->ofpid.positionreference = *((int16_t*)&frame->data[1]);
@@ -2474,13 +2388,15 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
     res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(16);
+        return(eores_OK);
     }
 
     mstatus = eo_protocolwrapper_GetMotorStatus(eo_protocolwrapper_GetHandle(), mId);
     if(NULL == mstatus)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(17);
+        return(eores_OK);
     }     
     
 
@@ -2511,7 +2427,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, canLoc);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(15);
+        return(eores_OK);
     }
 
 
@@ -2519,8 +2436,13 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
     
     res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, canLoc);
-
-    return(res);
+    if(eores_OK != res)
+    {
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(16);
+        return(eores_OK);
+    }
+    
+    return(eores_OK);
 }
 
 
@@ -2538,15 +2460,21 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, canLoc);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        return(eores_OK);
     }
 
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
     
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, canLoc);
+    if(eores_OK != res)
+    {
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
+        return(eores_OK);
+    }
     
-    return(res);
+    return(eores_OK);
 }
 
 
@@ -2581,7 +2509,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
+        return(eores_OK);
     }
    
     if(applrunMode__2foc == runmode)
@@ -2590,7 +2519,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
         if(eores_OK != res)
         {
-            return(res);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(20);
+            return(eores_OK);
         }
         eo_emsController_ReadMotorstatus(mId, frame->data);
         //l'aggiornamento delle nv del giunto sara' fatto nel DO.
@@ -2605,27 +2535,24 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
         if(eores_OK != res)
         {
-            return(res);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(21);
+            return(eores_OK);
         }
         
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == jstatus)
         {
-            return(eores_NOK_generic); // error
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(22);
+            return(eores_OK);
         }
 
     
         // set control mode status
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
         if(eores_OK != res)
-        {      
-            des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-            des.par16 = (frame->data[1] << 8) | eomc_controlmode;
-            des.sourceaddress = jId;
-            des.sourcedevice = eo_errman_sourcedevice_localboard;
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);           
-
-            return(res);
+        {
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
+            return(eores_OK);
         }
  
 
@@ -2652,21 +2579,24 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
         if(eores_OK != res)
         {
-            return(res);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(23);
+            return(eores_OK);
         }
         
         //get mId
         res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
         if(eores_OK != res)
         {
-            return(res);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+            return(eores_OK);
         }
 
 
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == jstatus)
         {
-            return(eores_NOK_generic); //error
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(25);
+            return(eores_OK);
         }
 
     
@@ -2674,12 +2604,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[3], &eomc_controlmode);
         if(eores_OK != res)
         {
-            des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-            des.par16 = (frame->data[1] << 8) | eomc_controlmode;
-            des.sourceaddress = jId;
-            des.sourcedevice = eo_errman_sourcedevice_localboard;
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);            
-            return(res);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(125);
+            return(eores_OK);
         }
         
         if(eomc_controlmode_hwFault == eomc_controlmode)
@@ -2717,7 +2643,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(23);
+        return(eores_OK);
     }
 
 
@@ -2725,8 +2652,12 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
     res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
-    
-    return(res);
+    if(eores_OK != res)
+    {
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+        return(eores_OK);
+    }    
+    return(eores_OK);
 }
 
 
@@ -2751,8 +2682,13 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__print(EOicubCanProto* p, eO
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_first;
         
     res = s_eo_icubCanProto_parser_per_mb_cmd__print (p, frame, canLoc);
-     
-    return(res);
+    if(eores_OK != res)
+    {
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        return(eores_OK);
+    } 
+    
+    return(eores_OK);
 }
 
 
@@ -2770,15 +2706,21 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, canLoc);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+        return(eores_OK);
     }
 
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
     res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, canLoc);
-
-    return(res);
+    if(eores_OK != res)
+    {
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        return(eores_OK);
+    }
+    
+    return(eores_OK);
 }
 
 
@@ -2796,15 +2738,20 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidError(p, frame, canLoc);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+        return(eores_OK);
     }
     
     // set position about the second joint in board
     canLoc.indexinsidecanboard = eo_icubCanProto_jm_index_second;
 
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidError( p, frame, canLoc);
-
-    return(res);
+    if(eores_OK != res)
+    {
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        return(eores_OK);
+    }
+    return(eores_OK);
 
 }
 
@@ -2843,20 +2790,23 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(26);
+        return(eores_OK);
     }
         
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(27);
+        return(eores_OK);
     }
     
     //note i can use dynamic cast because both param have size equal to u8
     res = s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode((icubCanProto_interactionmode_t)(frame->data[0] & 0x0f), (eOmc_interactionmode_t *)&jstatus->interactionmodestatus);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(28);
+        return(eores_OK);
     }
 
 
@@ -2867,22 +2817,25 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(29);
+        return(eores_OK);
     }
         
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        return(eores_NOK_generic); //error
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(30);
+        return(eores_OK);
     }
     
     res = s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode((icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >>4), (eOmc_interactionmode_t *)&jstatus->interactionmodestatus);
     if(eores_OK != res)
     {
-        return(res);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(30);
+        return(eores_OK);
     }
 
-    return(res);
+    return(eores_OK);
 }
 
 
@@ -2915,6 +2868,7 @@ extern eOresult_t eo_icubCanProto_former_per_mb_cmd__emsto2foc_desiredcurrent(EO
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
@@ -2951,7 +2905,6 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
     jstatus->basic.jnt_position = eo_appMeasConv_jntPosition_E2I(appMeasConv_ptr, jId, pos_icubCanProtValue); 
     
     
-//    jstatus_ptr->basic.position++;
     return(eores_OK);
 }
 
@@ -2959,7 +2912,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
     eOresult_t                              res;
-    eOmc_jointId_t                          jId;
+    eOmc_jointId_t   		                jId;
     eOmc_joint_status_t                     *jstatus = NULL;
     
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
@@ -3055,7 +3008,7 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* 
     
     //convert measure for icub world and set values in jstatus (nv mem)
     vel_icubCanProtValue = (vel_icubCanProtValue*1000) >> eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jId);
-    jstatus->basic.jnt_velocity = eo_appMeasConv_jntVelocity_E2I(appMeasConv_ptr, jId, vel_icubCanProtValue);
+	jstatus->basic.jnt_velocity = eo_appMeasConv_jntVelocity_E2I(appMeasConv_ptr, jId, vel_icubCanProtValue);
     
     acc_icubCanProtValue = (acc_icubCanProtValue * 1000000) >> (eo_appMeasConv_hid_GetVelEstimShift(appMeasConv_ptr, jId) + eo_appMeasConv_hid_GetAccEstimShift(appMeasConv_ptr, jId));
     jstatus->basic.jnt_acceleration = eo_appMeasConv_jntAcceleration_E2I(appMeasConv_ptr, jId, acc_icubCanProtValue);
@@ -3404,6 +3357,19 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
     
     return(eores_OK);
     
+}
+
+
+
+static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint64_t par64)
+{
+    eOerrmanDescriptor_t des = {0};
+    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
+    des.par16 = 0x2222;
+    des.par64 = 0x2200000000000000 + par64;
+    des.sourceaddress = 0;
+    des.sourcedevice = eo_errman_sourcedevice_localboard;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
