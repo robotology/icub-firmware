@@ -503,15 +503,15 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
     }
     
     uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+    EOappCanSP *appCanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    eOresult_t res = eores_NOK_generic;
             
     if(numofskin > 0)
     {
-        eOresult_t                      res;
         uint8_t                         i, j;
-        EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
         eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
-        uint8_t                         boardEndAddr;
-        eOicubCanProto_msgDestination_t msgdest;
+        uint8_t                         boardEndAddr = 0;;
+        eOicubCanProto_msgDestination_t msgdest = {0};
               
         eOicubCanProto_msgCommand_t msgCmd = 
         {
@@ -522,9 +522,25 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
         
         for(j=0; j<numofskin; j++) 
         {
+            // i stop the skin only if it was started before
+            eOsk_skin_t *skin = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)j);
+            if(NULL == skin)
+            {   // i dont have a skin on j
+                return(eores_NOK_generic);
+            }
+            
+            if(eosk_sigmode_dontsignal == skin->config.sigmode)
+            {   
+                // if the skin was not initted by robot-interface, then i dont deinit it. the reason is twofold:
+                // 1. if the skin boards dont transmit, there is no need to silence them,
+                // 2. in case the .ini file of robotinterface has disable the skin because the skin is not mounted, i dont want to tx on a disconnected can bus.
+                return(eores_OK);
+            }
+            
+            
             res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
             if(eores_OK != res)
-            {
+            {  
                 return(eores_NOK_generic);
             }
                 
@@ -536,19 +552,23 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
             {
                 msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
                 
-                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
+                res = eo_appCanSP_SendCmd(appCanSP, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
                 if(eores_OK != res)
                 {
                     return(eores_NOK_generic);
                 }
             }
+            
+            // i set the skin as not transmitting
+            skin->config.sigmode = eosk_sigmode_dontsignal;
         }    
     }
     
     return(eores_OK);
 }
 
-// maro.accame: at the date of 20feb2015 it highly temporary.
+
+// marco.accame: at the date of 20feb2015 it highly temporary.
 
 static eObool_t maisfound = eobool_false;
 
