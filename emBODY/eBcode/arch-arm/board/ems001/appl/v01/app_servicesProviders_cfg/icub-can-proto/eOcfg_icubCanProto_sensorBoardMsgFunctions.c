@@ -672,7 +672,6 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
 {
     eOresult_t                      res = eores_NOK_generic;
     eOsk_skinId_t                   skId = 0;
-    eOsk_status_t                   *skinstatus = NULL;
     EOappTheDB                      *db = eo_appTheDB_GetHandle();
     eOappTheDB_SkinCanLocation_t    canloc = {0};
     eOsk_candata_t                  candata = {0};
@@ -687,25 +686,32 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     
     //#warning -> marco.accame: we have only two skins (at most), thus we could pre-compute the skin0 and skin1 pointers onece for all.
     //            maybe as static values.   
-    skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), skId);
     
-    if(NULL == skinstatus)
-    {
+    
+    eOsk_skin_t *skin = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)skId);
+    if(NULL == skin)
+    {   // i dont have a skin on skId
         s_eo_icubCanProto_sb_send_runtime_error_diagnostics(23);
         return(eores_OK);
     }
-
-
+            
+    // if skin->config.sigmode is dontsignal then we dont use the payload of the can frame. 
+    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffrede in the rx-fifo    
+    if(eosk_sigmode_dontsignal == skin->config.sigmode)
+    {
+        return(eores_OK);
+    }        
+    
+    // otherwise we put the canframe content inside teh arrayofcandata
+    
     uint16_t info = EOSK_CANDATA_INFO(frame->size, frame->id);
     candata.info = info;    
     memcpy(candata.data, frame->data, sizeof(candata.data));
     
     
-    res = eo_array_PushBack((EOarray*)(&skinstatus->arrayofcandata), &candata);
+    res = eo_array_PushBack((EOarray*)(&skin->status.arrayofcandata), &candata);
     if(eores_OK != res)
-    {   // marco.accame: it may happen that one receives so many skin can frames that cannot be put inside the skinstatus->arrayofcandata. 
-        //               i have seen it sometimes at ctrl-c of robot-interface. probably because there are many messages for the 12 joints
-        //               before the skin is silenced. if that happens at ctrl-c: dont worry. otherwise it may be that we are losing skin can frames 
+    {   
         eOerrmanDescriptor_t des = {0};
         des.code            = eoerror_code_get(eoerror_category_Skin, eoerror_value_SK_arrayofcandataoverflow);
         des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
