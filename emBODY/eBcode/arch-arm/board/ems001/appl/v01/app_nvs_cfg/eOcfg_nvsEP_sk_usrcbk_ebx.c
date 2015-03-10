@@ -97,12 +97,15 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+// marco.accame: we start with a silent skin and with an empty status_arrayofcandata.
+// then we put skin in sigmode eosk_sigmode_signal only if robotInterface orders it to the board.
+
 
 extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
 {
     eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)nv->ram;
     
-    *sigmode = eosk_sigmode_signal;
+    *sigmode = eosk_sigmode_dontsignal; 
 }
 
 
