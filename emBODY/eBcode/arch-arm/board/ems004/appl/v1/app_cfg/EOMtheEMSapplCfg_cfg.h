@@ -84,7 +84,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          66
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          67
 //  </h>version
 
 //  <h> build date
@@ -95,9 +95,9 @@ extern "C" {
 //  <o> day             <1-31> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          10
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         19
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         21
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          27
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          11
 //  </h>build date
 
 // </h>Info 
@@ -633,9 +633,9 @@ extern "C" {
 //  <i> default: 50
 #define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_PRIORITYof   50
 
-//  <o> task stack size <256-6144:128>
+//  <o> task stack size <256-8192:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   6144
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   7168
 
 //  </h>Configurator object configuration
 
