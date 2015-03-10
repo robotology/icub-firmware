@@ -207,7 +207,12 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 //        return(eores_OK);
 //    }
     
-    
+    if ((frame->size == 0) || (frame->size > 8))
+    {
+        //return not ok, so that the message will be displayed as invalid
+        return eores_NOK_generic;
+    }
+        
     skincanloc.emscanport = canPortRX;
     //NOTE: when skin messages will belong to a particular class message,(not to analog sensor message class)
     //remove following if-else and leave only eo_icubCanProto_hid_getMsgClassFromFrameId function
