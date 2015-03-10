@@ -78,7 +78,7 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanPr
 
 static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
-static eObool_t s_eo_icubCanProto_isUnused2FOCinTorso(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
+//static eObool_t s_eo_icubCanProto_isUnused2FOCinTorso(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
 static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX);
 
@@ -207,10 +207,33 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
 //        return(eores_OK);
 //    }
     
-    if ((frame->size == 0) || (frame->size > 8))
+    if(frame->size > 8)
     {
         //return not ok, so that the message will be displayed as invalid
         return eores_NOK_generic;
+    }
+    else if(frame->size == 0)
+    {
+        // marco.accame: it may be an ack sent by strain or mais to ems ifollowing a polling message. in such a case it is ok
+        if((eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id) == icubCanProto_msgCmdClass_pollingAnalogSensor) && (0 == (frame->id & 0x00f)))
+        {   // if in here it is a polling analog message sent to address 0, the EMS: ID = 0x2P0, where P is teh address of the mais or strain
+            
+            eOappTheDB_board_canlocation_t canloc = {0};
+            canloc.emscanport = canPortRX;
+            canloc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+            eOas_strainId_t sid = 0;
+            eOas_maisId_t mid = 0;
+            if(eores_OK == eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canloc, &sid))
+            {   // yes it is a strain
+                return(eores_OK);
+            }
+            else if(eores_OK == eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canloc, &mid))
+            {   // yes it is a mais
+                return(eores_OK);   
+            }
+        }
+        // in all other cases zero-length is not valid
+        return(eores_NOK_generic);        
     }
         
     skincanloc.emscanport = canPortRX;
@@ -299,26 +322,26 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanPr
     }
 }
 
-static eObool_t s_eo_icubCanProto_isUnused2FOCinTorso(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
-{
-    eOprotBRD_t localboard = eoprot_board_local_get();
-    const eOprotBRD_t eb5board = 4;
-    
-    if(localboard != eb5board)
-    {
-        return(eobool_false);
-    }
-    
-    if( (eOcanport1 == canPortRX) &&  (2 == eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id)) )
-    {
-        return(eobool_true);
-    }
-    else
-    {
-        return(eobool_false);
-    }    
-   
-}
+//static eObool_t s_eo_icubCanProto_isUnused2FOCinTorso(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
+//{
+//    eOprotBRD_t localboard = eoprot_board_local_get();
+//    const eOprotBRD_t eb5board = 4;
+//    
+//    if(localboard != eb5board)
+//    {
+//        return(eobool_false);
+//    }
+//    
+//    if( (eOcanport1 == canPortRX) &&  (2 == eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id)) )
+//    {
+//        return(eobool_true);
+//    }
+//    else
+//    {
+//        return(eobool_false);
+//    }    
+//   
+//}
 
  
 static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
