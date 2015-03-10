@@ -217,7 +217,12 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
         // marco.accame: it may be an ack sent by strain or mais to ems ifollowing a polling message. in such a case it is ok
         if((eo_icubCanProto_hid_getMsgClassFromFrameId(frame->id) == icubCanProto_msgCmdClass_pollingAnalogSensor) && (0 == (frame->id & 0x00f)))
         {   // if in here it is a polling analog message sent to address 0, the EMS: ID = 0x2P0, where P is teh address of the mais or strain
-            
+            // marco.accame: the following code is ok, but ... it uses too much operations and i suspect that it requires a large stack 
+            // i prefer not to use it for now. for now it is ok by me to say that if it is of length zero and ponning analog and towards 0 it is ok.
+#if 1
+            return(eores_OK);    
+#else
+
             eOappTheDB_board_canlocation_t canloc = {0};
             canloc.emscanport = canPortRX;
             canloc.addr = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
@@ -231,6 +236,7 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
             {   // yes it is a mais
                 return(eores_OK);   
             }
+#endif            
         }
         // in all other cases zero-length is not valid
         return(eores_NOK_generic);        
