@@ -83,40 +83,40 @@ static eOresult_t s_eo_icubCanProto_msgClasses_excFn(void *arg);
 /* DECLARATION OF MSG CLASS BODY TBL */                           
 static const eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t s_msgClasses_tblsReference_list[eo_icubCanProto_msgClasses_inTbl_max] = 
 {
-    {   // 0  ==> ICUBCANPROTO_CLASS_POLLING_MOTORBOARD
+    {   // 0  ==> ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL
         EO_INIT(.parserTbl)                           &icubCanProto_pollingMotorBoardMsg_parser_LUTbl,
         EO_INIT(.formerTbl)                           &icubCanProto_pollingMotorBoardMsg_former_LUTbl,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofPollingClass
     },
 
-    {   // 1
+    {   // 1 -> ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL
         EO_INIT(.parserTbl)                           &icubCanProto_periodicMotorBoardMsg_parser_LUTbl,
         EO_INIT(.formerTbl)                           &icubCanProto_periodicMotorBoardMsg_former_LUTbl,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass
     },
 
 
-    {   // 2
+    {   // 2 -> ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR
         EO_INIT(.parserTbl)                           &icubCanProto_pollingSensorBoardMsg_parser_LUTbl,
         EO_INIT(.formerTbl)                           &icubCanProto_pollingSensorBoardMsg_former_LUTbl,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofPollingClass
     },
 
 
-    {   // 3
+    {   // 3 -> ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR
         EO_INIT(.parserTbl)                           &icubCanProto_periodicSensorBoardMsg_parser_LUTbl,
         EO_INIT(.formerTbl)                           &icubCanProto_periodicSensorBoardMsg_former_LUTbl,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofPeriodicClass 
     },
     //in order to use the same mecchanism of other messages i used class message id = 4,
     //currently not used, to parse/former skin's messages.
-    {   // 4
+    {   // 4 -> ICUBCANPROTO_CLASS_PERIODIC_SKIN
         EO_INIT(.parserTbl)                           &icubCanProto_periodicSkinMsg_parser_LUTbl,
         EO_INIT(.formerTbl)                           &icubCanProto_pollingSkinMsg_former_LUTbl, 
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  s_eo_icubCanProto_getCmdId_fromFrame_ofSkinClass  
     }
 /*   uncomment when loader msg will be use
-    {   // 5
+    {   // 7 -> 
         EO_INIT(.parserTbl)                           NULL,
         EO_INIT(.formerTbl)                           NULL,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  NULL 
@@ -128,7 +128,7 @@ static const eo_icubCanProto_hid_LUTbl_item_classMsgTblReference_t s_msgClasses_
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  NULL 
     },
 
-    {   // 7   Loader!!!
+    {   // 7 -> ICUBCANPROTO_CLASS_BOOTLOADER
         EO_INIT(.parserTbl)                           NULL,
         EO_INIT(.formerTbl)                           NULL,
         EO_INIT(.eo_icubCanProto_getCmdId_fromFrame)  NULL 
