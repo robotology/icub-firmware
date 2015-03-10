@@ -105,7 +105,11 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode(icubCanProto_interactionmode_t icubcanProto_intermode,
                                                                                       eOmc_interactionmode_t *eomc_intermode);
 static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint64_t par64);
-    
+   
+static eObool_t s_eo_icubCanProto_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t canPortRX);
+
+static void s_eo_icubCanProto_mb_send_up_canframe(eOcanframe_t *frame, eOcanport_t canport);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -2388,6 +2392,12 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
     res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
+        if(eobool_true == s_eo_icubCanProto_is_from_unused2foc_in_eb5(frame, canPort))
+        {   // the board eb5 has an additional 1foc board which sends a can frame of this kind but it does not serve any motor
+            // or joint. hence, its can address is not recognised by eo_appTheDB_GetMotorId_ByMotorCanLocation().
+            // for this board we must not issue the error but we must do nothing
+            return(eores_OK);            
+        }
         s_eo_icubCanProto_mb_send_runtime_error_diagnostics(16);
         return(eores_OK);
     }
@@ -2509,6 +2519,10 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
     res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
     if(eores_OK != res)
     {
+        if(eobool_true == s_eo_icubCanProto_is_from_unused2foc_in_eb5(frame, canPort))
+        {   // see lines 2394-2396
+            return(eores_OK);            
+        }
         s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
         return(eores_OK);
     }
@@ -2643,7 +2657,8 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(23);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(31);
+        s_eo_icubCanProto_mb_send_up_canframe(frame, canPort);
         return(eores_OK);
     }
 
@@ -3371,6 +3386,40 @@ static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint64_t par64)
     des.sourcedevice = eo_errman_sourcedevice_localboard;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);    
 }
+
+static eObool_t s_eo_icubCanProto_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t canPortRX)
+{
+    eOprotBRD_t localboard = eoprot_board_local_get();
+    const eOprotBRD_t eb5board = 4;
+    
+    if(localboard != eb5board)
+    {
+        return(eobool_false);
+    }
+    
+    if( (eOcanport1 == canPortRX) &&  (2 == eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id)) )
+    {
+        return(eobool_true);
+    }
+    else
+    {
+        return(eobool_false);
+    }    
+    
+}
+
+static void s_eo_icubCanProto_mb_send_up_canframe(eOcanframe_t *frame, eOcanport_t canport)
+{
+    eOerrmanDescriptor_t des = {0};
+    des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+    des.par64 = eo_common_canframe_data2u64(frame);
+    des.sourcedevice = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+    des.sourceaddress = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
