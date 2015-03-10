@@ -329,12 +329,17 @@ static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *
 
 //Sinse mais is only on board with MC4 before check runmode
     eOmn_appl_runMode_t apprunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-    if((applrunMode__2foc == apprunmode) || (applrunMode__default == apprunmode))
+    if((applrunMode__2foc == apprunmode) || (applrunMode__default == apprunmode) || (applrunMode__skinOnly == apprunmode))
     {
-        return (eobool_false);
+        return(eobool_false);
     }
     
-    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), 0, &canloc);
+    eOresult_t res = eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), 0, &canloc);
+    
+    if(eores_OK != res)
+    {
+        return(eobool_false);
+    }
     
     if( (canloc.emscanport == canPortRX) &&  //if port rx frame is equal of mais can location
         ((frame->id & 0x700) >> 8 == 0x0 ) &&  //if message class is motor polling
