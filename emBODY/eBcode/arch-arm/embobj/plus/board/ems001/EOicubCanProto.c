@@ -153,28 +153,32 @@ extern eOresult_t eo_icubCanProto_FormCanFrame(EOicubCanProto* p,
 }
 
 
+//
+// marco.accame on 11 mar 2015: the function is not used. better removing it for a while
+//
+//extern eOresult_t eo_icubCanProto_ParseSkinCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
+//{
+//    const EOconstLookupTbl                             *tbl;
+//    eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
+// 
+//    if((NULL == p) || (NULL == frame))
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//
+//    tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, icubCanProto_msgCmdClass_skinBoard);
+//
+//    if(NULL == tbl)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//
+//    itemList = (eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t*)tbl->itemsList;
+//    return(itemList[0].parser(p, frame, canPortRX));
+//
+//}
+//
 
-extern eOresult_t eo_icubCanProto_ParseSkinCanFrame(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
-{
-    const EOconstLookupTbl                             *tbl;
-    eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  *itemList;
- 
-    if((NULL == p) || (NULL == frame))
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    tbl = s_eo_icubCanProto_LUTbl_GetParserTbl(p, icubCanProto_msgCmdClass_skinBoard);
-
-    if(NULL == tbl)
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    itemList = (eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t*)tbl->itemsList;
-    return(itemList[0].parser(p, frame, canPortRX));
-
-}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
