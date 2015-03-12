@@ -203,6 +203,12 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         // e poi mando la configurazione alle board can
         eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
         eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
+        // poi abilito MAIS e BCastPolicy nel caso di MC4
+        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
+        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
+        {   
+            eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+        }
     }
     else
     {  
