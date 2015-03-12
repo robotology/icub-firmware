@@ -32,6 +32,9 @@
 #include "EOconstLookupTbl.h"
 #include "EOappTheDataBase.h"
 #include "EOtheEMSapplBody.h"
+
+#include "EOtheErrorManager.h"
+#include "EoError.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -378,6 +381,14 @@ static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *
         ((frame->id & 0x700) >> 8 == 0x0 ) &&  //if message class is motor polling
         (((frame->id &0x0f0) >> 4) == canloc.addr)) //if sender adress is of mais board
     {
+        eOerrmanDescriptor_t des = {0};
+        des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+        des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64 = eo_common_canframe_data2u64(frame);
+        des.sourcedevice = (eOcanport1 == canPortRX) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        des.sourceaddress = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
+
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
         return(eobool_true);
     }
     else
