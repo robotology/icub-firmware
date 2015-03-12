@@ -339,7 +339,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
         res = s_eo_emsapplBody_SendTxMode2Strain(p);
         return(res);
     }
-    else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only != p->appRunMode))
+    else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {   
         //#warning marco.accame: remove mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
         res = s_eo_emsapplBody_MaisTXenable(p);
