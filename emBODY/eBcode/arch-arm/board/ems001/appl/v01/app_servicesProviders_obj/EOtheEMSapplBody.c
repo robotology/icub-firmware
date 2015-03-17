@@ -351,7 +351,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 
         numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
         
-        for(i=0; (i<numofjoint) && (eores_OK == res); i++)
+        for(i=0; i<numofjoint; i++)
         {
             //get bcast policy from db
             res = eo_appTheDB_GetJointBcastpolicyPtr(eo_appTheDB_GetHandle(), (eOmc_jointId_t)i, &bcastpolicy_ptr);
