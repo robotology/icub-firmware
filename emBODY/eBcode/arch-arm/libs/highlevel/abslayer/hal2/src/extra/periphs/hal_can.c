@@ -231,7 +231,7 @@ extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     cancomcfg.callback_on_tx                = cfg->callback_on_tx;
     cancomcfg.arg_cb_tx                     = cfg->arg_cb_tx;
     cancomcfg.priorityerr                   = hl_irqpriority01;
-    cancomcfg.callback_on_err               = cfg->callback_on_tx;
+    cancomcfg.callback_on_err               = cfg->callback_on_err;
     cancomcfg.arg_cb_err                    = cfg->arg_cb_err;
     
 
