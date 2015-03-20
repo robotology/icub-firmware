@@ -1202,10 +1202,11 @@ static void s_eo_appCanSP_callbackOnErr_portx(void *arg, eOcanport_t port)
 {
     EOappCanSP *p = (EOappCanSP *)arg;
     
+    //update status
     hal_can_status_t status = {0};
-    
     hal_can_getstatus((hal_can_port_t)port, &status);
-
+    memcpy(&(p->periphstatus[port].st), &status, sizeof(hal_can_status_t));
+    
     if(1 == p->periphstatus[port].st.u.s.sw_status.rxqueueisfull)
     {
         // send msg about rx-fifo-overflow
@@ -1220,6 +1221,30 @@ static void s_eo_appCanSP_callbackOnErr_portx(void *arg, eOcanport_t port)
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);           
     }    
 
+    if ((1 == p->periphstatus[port].st.u.s.hw_status.busoff)        ||
+        (1 == p->periphstatus[port].st.u.s.hw_status.warning)       ||
+        (1 == p->periphstatus[port].st.u.s.hw_status.passive)       ||
+        (1 == p->periphstatus[port].st.u.s.hw_status.rxqueueisfull) ||
+        (1 == p->periphstatus[port].st.u.s.hw_status.txqueueisfull)
+       )
+    {
+        // send msg about generic hw error
+        eOerrmanDescriptor_t errdes = {0};  
+        errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);       
+        errdes.par16                = 0x0000;
+        errdes.par64                =   ((uint64_t)p->periphstatus[port].st.u.s.hw_status.rxqueueisfull)        |
+                                        ((uint64_t)p->periphstatus[port].st.u.s.hw_status.txqueueisfull << 8)   |
+                                        ((uint64_t)p->periphstatus[port].st.u.s.hw_status.busoff        << 16)  |
+                                        ((uint64_t)p->periphstatus[port].st.u.s.hw_status.passive       << 24)  |
+                                        ((uint64_t)p->periphstatus[port].st.u.s.hw_status.warning       << 32)  |
+                                        ((uint64_t)p->periphstatus[port].st.u.s.hw_status.TEC           << 40)  |
+                                        ((uint64_t)p->periphstatus[port].st.u.s.hw_status.REC           << 48);
+        
+        errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = 0;          
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);           
+        
+    }
     // marco.accame: diagnostics about internals of can passes through here.
     #warning --> marco.accame: now can diagnostics is enabled only for rxfifo oveflow and txfifo overflow
 #if 0    
