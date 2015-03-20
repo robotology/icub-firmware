@@ -341,12 +341,6 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     }
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {   
-        //#warning marco.accame: remove mais-tx-enable from eo_emsapplBody_EnableTxAllJointOnCan().
-        res = s_eo_emsapplBody_MaisTXenable(p);
-        if(eores_OK != res)
-        {
-            return(res);
-        }
         
 
         numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
