@@ -1970,7 +1970,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
         eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
         if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
         {   
-            eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+			eo_emsapplBody_MAISstart(eo_emsapplBody_GetHandle());
         }
     }
     
