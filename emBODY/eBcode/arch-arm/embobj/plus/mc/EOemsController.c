@@ -124,6 +124,7 @@ extern EOemsController* eo_emsController_Init()
             ems->motor_acceleration[j] = 0;
             ems->motor_position[j] = 0;
             ems->gearbox_ratio[j]  = 1;
+            ems->rotorencoder[j]  = 1;
         }
         
         ems->motors = eo_motors_New(NAXLES);
@@ -1276,6 +1277,11 @@ extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio)
 {
     if (ems) ems->gearbox_ratio[joint]=gearboxratio;
+}
+
+extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder)
+{
+    if (ems) ems->rotorencoder[joint]=rotorencoder;
 }
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state)

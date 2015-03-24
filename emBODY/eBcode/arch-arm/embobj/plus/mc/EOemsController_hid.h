@@ -74,6 +74,7 @@ struct EOemsController_hid
     int32_t motor_velocity_gbx[NAXLES];
     int32_t motor_position[NAXLES];
     int32_t gearbox_ratio [NAXLES];
+    int32_t rotorencoder [NAXLES];
     
     //float torque_meas[NJOINTS];
 }; 
