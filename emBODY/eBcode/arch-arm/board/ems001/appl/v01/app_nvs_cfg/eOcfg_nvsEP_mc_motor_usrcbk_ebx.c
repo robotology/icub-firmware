@@ -104,6 +104,7 @@ const eOmc_motor_t motor_default_dvalue =
 
         },
         EO_INIT(.gearboxratio)              0,
+        EO_INIT(.rotorencoder)              0,
         EO_INIT(.maxvelocityofmotor)        0,
         EO_INIT(.maxcurrentofmotor)         0,
         EO_INIT(.filler02)                  {0}

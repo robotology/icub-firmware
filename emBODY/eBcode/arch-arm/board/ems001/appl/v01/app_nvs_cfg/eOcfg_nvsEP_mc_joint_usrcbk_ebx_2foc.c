@@ -661,6 +661,13 @@ extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const e
     eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
 }
 
+extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    int32_t      *gbx_ptr = (int32_t*)nv->ram;
+    eo_emsController_SetRotorEncoder(jxx, *gbx_ptr);
+}
+
 #if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
     #warning --> EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
 #else
