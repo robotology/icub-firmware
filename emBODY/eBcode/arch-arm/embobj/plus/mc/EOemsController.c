@@ -170,6 +170,14 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     ems->motor_velocity[motor] = 1000*velocity;
     ems->motor_velocity_gbx[motor] = ems->motor_velocity[motor]/ems->gearbox_ratio[motor];
     ems->motor_position[motor] = position;
+    
+    //change the sign of motor position and motor velocity according to the sign of rotorencoder
+    if (ems->rotorencoder<0)
+    {
+       ems->motor_velocity[motor]     = - ems->motor_velocity[motor];
+       ems->motor_velocity_gbx[motor] = - ems->motor_velocity_gbx[motor];
+       ems->motor_position[motor]     = - ems->motor_position[motor];
+    }
 }
 
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
