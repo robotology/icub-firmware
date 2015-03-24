@@ -550,10 +550,13 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 #ifdef  HAL_USE_TIMER
     
     #include "hal_timer_hid.h"
-    #warning --> trovare alcuni timer hw per ...
-    extern const hal_timer_boardconfig_t hal_timer__theboardconfig =
+    #warning --> supporting all timers apart the first 5 and timer 8 (reserved for some objects...)
+		extern const hal_timer_boardconfig_t hal_timer__theboardconfig =
     {
-        .supportedmask  = (1 << hal_timer6) | (1 << hal_timer7)  //(1 << hal_timer8) //(1 << hal_timer1) | (1 << hal_timer2) | (1 << hal_timer3) | (1 << hal_timer4) | (1 << hal_timer5) |
+        .supportedmask  = (0 << hal_timer1)  | (0 << hal_timer2)  | (0 << hal_timer3)  | (0 << hal_timer4)  | 
+                          (0 << hal_timer5)  | (1 << hal_timer6)  | (1 << hal_timer7)  | (0 << hal_timer8)  | 
+                          (1 << hal_timer9)  | (1 << hal_timer10) | (1 << hal_timer11) | (1 << hal_timer12) |
+                          (1 << hal_timer13) | (1 << hal_timer14)
     }; 
     
 #endif//HAL_USE_TIMER
@@ -886,7 +889,7 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
     
     extern const hal_led_boardconfig_t hal_led__theboardconfig =
     {
-        .supportedmask      = (1 << hal_led0) | (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) , // = 0x3F: only first 6 leds ...
+        .supportedmask      = (1 << hal_led0) | (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) , // only first 4 leds
         .boardcommon        =
         {
             .value_on       = hal_gpio_valLOW,
@@ -959,7 +962,7 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
     
 #ifdef HAL_USE_MUX
 
-		#warning 2 mux (virtuali) supportati
+	#warning 2 mux (virtuali) supportati
 		
     #include "hal_mux_hid.h"
     
