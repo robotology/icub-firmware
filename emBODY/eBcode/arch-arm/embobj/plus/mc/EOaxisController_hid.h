@@ -88,14 +88,16 @@ struct EOaxisController_hid
     int32_t err;
     
     // measures (read only)
-    int32_t torque_meas;
+    int32_t torque_meas_jnt;
+    int32_t torque_meas_mot;
     uint8_t torque_wdog;
 
     int32_t velocity_timer;
     int32_t torque_timer;
 
     // torque control
-    int32_t torque_ref;
+    int32_t torque_ref_jnt;
+    int32_t torque_ref_mot;
     int32_t torque_out;
     int32_t torque_off;
     uint8_t tcFilterType;

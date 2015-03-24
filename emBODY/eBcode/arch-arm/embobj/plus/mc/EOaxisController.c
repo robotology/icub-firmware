@@ -19,6 +19,7 @@
 #include "EOemsControllerCfg.h"
 //#include "hal_led.h"
 #include "EoError.h"
+#include "EoemsController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -92,10 +93,12 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         ///////////////////////////
         o->pos_min = o->pos_max = TICKS_PER_HALF_REVOLUTION;
         
-        o->torque_ref = 0;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->torque_out = 0;
         o->torque_off = 0;
-        o->torque_meas = 0;
+        o->torque_meas_jnt = 0;
+        o->torque_meas_mot = 0;
         o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
 
         o->stiffness = 0;
@@ -301,9 +304,10 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq)
 {
     if (o)
     {
-        if (o->torque_meas != trq)
+        if (o->torque_meas_jnt != trq)
         {
-            o->torque_meas = trq;
+            //beware: if torque measuremenet is saturated torque_meas_jnt==trq and a timeout/sturation is triggered.
+            o->torque_meas_jnt = trq;
             o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
         }
     }
@@ -397,19 +401,20 @@ extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq)
     
     if (NOT_READY())
     {
-        o->torque_ref = 0;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         return eobool_false;
     }
     
     if (o->control_mode != eomc_controlmode_torque)
     {
-        o->torque_ref = 0;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         return eobool_false;
     }
     
     o->torque_timer = TORQUE_CMD_TIMEOUT;
-    
-    o->torque_ref = trq;
+    o->torque_ref_jnt = trq;
     
     return eobool_true;
 }
@@ -470,6 +475,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     case eomc_controlmode_cmd_idle:
         axisMotionReset(o);
         o->control_mode = eomc_controlmode_idle;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         return eobool_true;
     
     case eomc_controlmode_direct:
@@ -477,6 +484,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->err = 0;
         return eobool_true;
     
@@ -485,6 +494,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->err = 0;
         return eobool_true;
     
@@ -493,6 +504,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->err = 0;
         return eobool_true;
     
@@ -501,6 +514,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->err = 0;
         return eobool_true;
 
@@ -508,8 +523,10 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         eo_pid_Reset(o->pidT);
         o->torque_timer = 0;
         o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
-        o->torque_ref = 0;
-        o->torque_meas = 0;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
+        o->torque_meas_jnt = 0;
+        o->torque_meas_mot = 0;
         o->err = 0;
         o->control_mode = eomc_controlmode_torque;
         return eobool_true;
@@ -517,6 +534,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     case eomc_controlmode_cmd_openloop:
         o->control_mode = eomc_controlmode_openloop;
         o->openloop_out = 0;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->err = 0;
         return eobool_true;
     }
@@ -534,13 +553,14 @@ extern float eo_axisController_FrictionCompensation(EOaxisController *o, float i
          o->control_mode==eomc_controlmode_mixed ||
          o->control_mode==eomc_controlmode_direct)))
     {
-      pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, motor_velocity, o->torque_ref);
+      pwm_out=eo_pid_PWM_friction(o->pidT, input_pwm, motor_velocity, o->torque_ref_mot); //here torque_ref_mot has already been computed
+      //MR: This is here only temporary: it has to be replaced with limit of the motor, not the limit of the pid
       LIMIT(pwm_out,eo_pid_GetPwmMax(o->pidT));
     
     }
     else
     {
-      //limit the PWM with the position pid
+      //MR: This is here only temporary: it has to be replaced with limit of the motor, not the limit of the pid
       LIMIT(pwm_out,eo_pid_GetPwmMax(o->pidP));
     }
     return pwm_out;
@@ -645,27 +665,29 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 {
                     SET_BITS(o->state_mask,AC_TORQUE_SENS_FAULT); 
                     o->control_mode = eomc_controlmode_hwFault;
-                    o->torque_ref = o->torque_meas = 0;
+                    o->torque_ref_jnt = o->torque_ref_mot = o->torque_meas_jnt = o->torque_meas_mot = 0;
                     return 0;
                 }
         
-                o->torque_ref = o->torque_off + (o->stiffness*err)/1000 + o->damping*(err - o->err);
-
+                o->torque_ref_jnt = o->torque_off + (o->stiffness*err)/1000 + o->damping*(err - o->err);
                 o->err = err;
+                
+                eo_emsController_GetDecoupledMeasuredTorque (o->axisID,&o->torque_meas_mot);
+                eo_emsController_GetDecoupledReferenceTorque(o->axisID,&o->torque_ref_mot);
                 
                 float pwm_out = 0;
                 if      (o->tcFilterType==3) 
-                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                    pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
                 else if (o->tcFilterType==1) 
-                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                    pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
                 else if (o->tcFilterType==2) 
-                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                    pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
                 else if (o->tcFilterType==0)
-                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
                 else
                     {
                         //invalid tcFilterType, do not use it
-                        pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                        pwm_out = 0;
                     }
                 
                 return pwm_out;
@@ -685,7 +707,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             {
                 SET_BITS(o->state_mask,AC_TORQUE_SENS_FAULT);
                 o->control_mode = eomc_controlmode_hwFault;
-                o->torque_ref = o->torque_meas = 0;
+                o->torque_ref_mot = o->torque_ref_jnt = o->torque_meas_jnt = o->torque_meas_mot = 0;
                 return 0;
             }
             
@@ -695,24 +717,27 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             }
             else
             {
-                o->torque_ref = 0;
-                
+                //MR: temporary disabled
+                //o->torque_ref_mot = o->torque_ref_jnt= 0;
                 //return 0;
             }
+           
+            eo_emsController_GetDecoupledMeasuredTorque (o->axisID,&o->torque_meas_mot);
+            eo_emsController_GetDecoupledReferenceTorque(o->axisID,&o->torque_ref_mot);
             
             float pwm_out = 0;
             if      (o->tcFilterType==3) 
-                pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                pwm_out = eo_pid_PWM_pi_3_0Hz_1stLPF(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
             else if (o->tcFilterType==1) 
-                pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                pwm_out = eo_pid_PWM_pi_1_1Hz_1stLPF(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
             else if (o->tcFilterType==2) 
-                pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref, o->torque_meas);
+                pwm_out = eo_pid_PWM_pi_0_8Hz_1stLPF(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
             else if (o->tcFilterType==0)
-                pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref_mot, o->torque_meas_mot);
             else
                 {
                     //invalid tcFilterType, do not use it
-                    pwm_out = eo_pid_PWM_pi(o->pidT, o->torque_ref, o->torque_meas);
+                    pwm_out = 0;
                 }
             
             return pwm_out;
@@ -801,7 +826,7 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
     #warning acceleration to be implemented
     jointStatus->basic.jnt_acceleration    = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     
-    jointStatus->basic.jnt_torque          = o->torque_meas;
+    jointStatus->basic.jnt_torque          = o->torque_meas_jnt;
 }
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
@@ -829,7 +854,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     if (o->control_mode == eomc_controlmode_torque)
     {
         pidStatus->positionreference = 0;
-        pidStatus->torquereference = o->torque_ref;
+        pidStatus->torquereference = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
         eo_pid_GetStatusInt32(o->pidT, &(pidStatus->output), &(pidStatus->error));
         
@@ -839,7 +864,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     if (o->interact_mode == eOmc_interactionmode_compliant)
     {
         pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
-        pidStatus->torquereference = o->torque_ref;
+        pidStatus->torquereference = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
         eo_pid_GetStatusInt32(o->pidT, &(pidStatus->output), &(pidStatus->error));
         
@@ -872,7 +897,8 @@ static void axisMotionReset(EOaxisController *o)
         eo_pid_Reset(o->pidT);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->torque_timer = 0;
-        o->torque_ref = 0;
+        o->torque_ref_jnt = 0;
+        o->torque_ref_mot = 0;
         o->err = 0;
 }
 

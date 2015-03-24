@@ -74,7 +74,7 @@ extern void eo_motors_check_wdog(EOmotors *o);
 extern void eo_motors_set_Jacobian(EOmotors *o, int32_t **Ji32);
 extern eObool_t eo_motors_are_coupled(EOmotors *o, uint8_t ma, uint8_t mb);
     
-extern void eo_motors_PWM(EOmotors *o, float *pwm_joint, float *pwm_motor, eObool_t* stiff);
+extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_motor, eObool_t* stiff);
 extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 
 extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t* state);

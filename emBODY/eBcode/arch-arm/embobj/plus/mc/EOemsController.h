@@ -86,8 +86,10 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 // asynchronous
 
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode);
+extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_controlmode_command_t mode);
 extern eOmc_controlmode_t eo_emsController_GetControlMode(uint8_t joint);
 
+extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eOmc_interactionmode_t mode);
 extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode);
 //extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint);
 
@@ -121,6 +123,8 @@ extern void eo_emsController_SetPosMax(uint8_t joint, int32_t pos_max);
 extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max);
 extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
 extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio);
+extern void eo_emsController_GetDecoupledMeasuredTorque (uint8_t joint, int32_t * Trq);
+extern void eo_emsController_GetDecoupledReferenceTorque (uint8_t joint, int32_t * Trq);
 extern void eo_emsMotorController_GoIdle(void);
 
 /** @}            

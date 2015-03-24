@@ -534,13 +534,12 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
         axle_virt_vel[0] = ems->motor_velocity_gbx[0];
         axle_virt_vel[1] = (ems->motor_velocity_gbx[0]+(40*ems->motor_velocity_gbx[1])/65);
-        axle_virt_vel[2] = ((40*(ems->motor_velocity_gbx[2]-ems->motor_velocity_gbx[1]))/65);
-        //axle_virt_vel[2] = ((40*(ems->motor_velocity_gbx[1]-ems->motor_velocity[2]_gbx))/65);  //CHECKME
+        axle_virt_vel[2] = ((40*(-ems->motor_velocity_gbx[1]+ems->motor_velocity_gbx[2]))/65);
         axle_virt_vel[3] = ems->motor_velocity_gbx[3];
     
         axle_virt_pos[0] = ems->motor_position[0];
         axle_virt_pos[1] = ems->motor_position[0]+(40*ems->motor_position[1])/65;
-        axle_virt_pos[2] = (40*(ems->motor_position[2]-ems->motor_position[1]))/65;
+        axle_virt_pos[2] = (40*(-ems->motor_position[1]+ems->motor_position[2]))/65;
         axle_virt_pos[3] = ems->motor_position[3];
     
     #elif defined(WAIST_BOARD)
@@ -670,7 +669,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
 
     //PWM decoupling
     float pwm_motor[NAXLES];
-    eo_motors_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
+    eo_motors_decouple_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
     
     //Friction compensation after joints decoupling
     MOTORS(m)
@@ -720,6 +719,93 @@ extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_a
 extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
 {
     if (ems) eo_axisController_SetTrqRef(ems->axis_controller[joint], trq);
+}
+
+extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_t * torque_motor)
+{
+    if (!ems) return; 
+    #if   defined(SHOULDER_BOARD)
+          if (joint_id==0) {*torque_motor= ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt; return;}
+          if (joint_id==1) {*torque_motor=(ems->axis_controller[1]->torque_meas_jnt - ems->axis_controller[2]->torque_meas_jnt)* 0.625; return;}
+          if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt * 0.625; return;}
+          if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_meas_jnt; return;}
+    #elif defined(WAIST_BOARD)
+          if (joint_id==0) {*torque_motor=(ems->axis_controller[0]->torque_meas_jnt - ems->axis_controller[1]->torque_meas_jnt)*0.5 + ems->axis_controller[2]->torque_meas_jnt*0.275; return;}
+          if (joint_id==1) {*torque_motor=(ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt)*0.5 + ems->axis_controller[2]->torque_meas_jnt*0.275; return;}
+          if (joint_id==2) {*torque_motor= ems->axis_controller[2]->torque_meas_jnt*0.55; return;}
+    #elif defined(UPPERLEG_BOARD)
+          if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
+          if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
+          if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt; return;}
+          if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_meas_jnt; return;}
+    #elif defined(ANKLE_BOARD)
+          if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
+          if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
+    #else
+          *torque_motor=ems->axis_controller[joint_id]->torque_meas_jnt;
+    #endif  
+}
+
+extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32_t * torque_motor)
+{
+    if (!ems) return; 
+    #if   defined(SHOULDER_BOARD)
+          if (joint_id==0) {*torque_motor= ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt; return;}
+          if (joint_id==1) {*torque_motor=(ems->axis_controller[1]->torque_meas_jnt - ems->axis_controller[2]->torque_meas_jnt)* 0.625; return;}
+          if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt * 0.625; return;}
+          if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_ref_jnt; return;}
+    #elif defined(WAIST_BOARD)
+          if (joint_id==0) {*torque_motor=(ems->axis_controller[0]->torque_ref_jnt - ems->axis_controller[1]->torque_ref_jnt)*0.5 + ems->axis_controller[2]->torque_ref_jnt*0.275; return;}
+          if (joint_id==1) {*torque_motor=(ems->axis_controller[0]->torque_ref_jnt + ems->axis_controller[1]->torque_ref_jnt)*0.5 + ems->axis_controller[2]->torque_ref_jnt*0.275; return;}
+          if (joint_id==2) {*torque_motor= ems->axis_controller[2]->torque_ref_jnt*0.55; return;}
+    #elif defined(UPPERLEG_BOARD)
+          if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
+          if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
+          if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_ref_jnt; return;}
+          if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_ref_jnt; return;}
+    #elif defined(ANKLE_BOARD)
+          if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
+          if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
+    #else
+          *torque_motor=ems->axis_controller[joint_id]->torque_ref_jnt;
+    #endif  
+}
+
+extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_controlmode_command_t mode)
+{
+  #if   defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+      if (joint <3) 
+      {
+        eo_emsController_SetControlMode(0, mode);
+        eo_emsController_SetControlMode(1, mode);
+        eo_emsController_SetControlMode(2, mode);
+      }
+      else
+      {
+        eo_emsController_SetControlMode(joint, mode);
+      }
+  #else
+        eo_emsController_SetControlMode(joint, mode);
+  #endif  
+}
+
+extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eOmc_interactionmode_t mode)
+{
+  #if   defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+      if (joint <3) 
+      {
+        eo_emsController_SetInteractionMode(0, mode);
+        eo_emsController_SetInteractionMode(1, mode);
+        eo_emsController_SetInteractionMode(2, mode);
+      }
+      else
+      {
+        eo_emsController_SetInteractionMode(joint, mode);
+      }
+  #else
+        eo_emsController_SetInteractionMode(joint, mode);
+  #endif
+  return eobool_true;
 }
 
 extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_command_t mode)
@@ -1458,6 +1544,26 @@ extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature
     #endif
 #endif
 
+    /*
+    //@@@@MR: use this block for nice print debugging
+    static int count =0;
+    if (count == 1000)
+    {
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes.par16                = 0;
+    errdes.par64                = 0;
+    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress        = 0;  
+    //char *str = NULL;
+    char str[eomn_info_status_extra_sizeof] = {0};
+    snprintf(str, sizeof(str), "I%f T%f F%f R%f", pwm_input, o->Ktau, o->Kff, Tr);             
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+    count =0;
+    }
+    count++;
+    */
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
