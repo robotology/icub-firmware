@@ -634,7 +634,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     */
     
     // 2) set control mode to ems controller
-    eo_emsController_SetControlMode(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr));       
+    eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode_ptr));       
 }
 
 
@@ -643,7 +643,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
     eOmc_interactionmode_t* interaction = (eOmc_interactionmode_t*)rd->data;
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     
-    eo_emsController_SetInteractionMode(jxx, *interaction);
+    eo_emsController_SetInteractionModeGroupJoints(jxx, *interaction);
 }
 
 
