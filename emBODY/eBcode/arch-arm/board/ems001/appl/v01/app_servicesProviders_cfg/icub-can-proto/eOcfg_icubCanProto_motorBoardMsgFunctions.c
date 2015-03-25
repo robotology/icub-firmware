@@ -104,7 +104,7 @@ static eOresult_t s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcContro
 static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanframe_t *frame, eOmn_appl_runMode_t runmode);
 static eOresult_t s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode(icubCanProto_interactionmode_t icubcanProto_intermode,
                                                                                       eOmc_interactionmode_t *eomc_intermode);
-static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint64_t par64);
+static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint8_t parser, uint64_t par64, eOcanframe_t *frame, eOcanport_t port);
    
 static eObool_t s_eo_icubCanProto_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t canPortRX);
 
@@ -252,7 +252,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__calibrateEncoder(EOicubCanP
         
         default:
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(0, 1, NULL, 0);
         } break;
 
     }
@@ -297,14 +297,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getControlMode(EOicubCanPro
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(2);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 2, frame, canPort);
         return(eores_OK);
     }
 
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(3);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 3, frame, canPort);
         return(eores_OK);
     }
 
@@ -367,14 +367,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__motionDone(EOicubCanProto* 
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(4);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 4, frame, canPort);
         return(eores_OK);
     }
 
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(5);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 5, frame, canPort);
         return(eores_OK);
     }
     
@@ -757,7 +757,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getMinPosition(EOicubCanPro
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 6, frame, canPort);
         return(eores_OK);
     }
     
@@ -900,7 +900,7 @@ eOresult_t                                  res = eores_OK;
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(7);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 7, frame, canPort);
         return(eores_OK);
     }
     
@@ -1135,7 +1135,7 @@ eOresult_t                                  res = eores_OK;
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(7);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 8, frame, canPort);
         return(eores_OK);
     }
     
@@ -1271,7 +1271,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getTorquePidLimits(EOicubCa
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(8);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 9, frame, canPort);
         return(eores_OK);
     }
     
@@ -1406,7 +1406,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPid(EOicubCanProto* p
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(9);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 10, frame, canPort);
         return(eores_OK);
     }
     
@@ -1542,7 +1542,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getPosPidLimits(EOicubCanPr
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(9);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 11, frame, canPort);
         return(eores_OK);
     }
     
@@ -1683,7 +1683,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceParams(EOicubCa
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(10);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 12, frame, canPort);
         return(eores_OK);
     }
     
@@ -1816,7 +1816,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getImpedanceOffset(EOicubCa
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(12);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 13, frame, canPort);
         return(eores_OK);
     }
     
@@ -1932,7 +1932,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getFirmwareVersion(EOicubCa
     res = eo_appTheDB_GetCanBoardId_ByCanLocation(db, canLoc, &bid); 
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(13);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 14, frame, canPort);
         return(eores_OK);
     }
     
@@ -2246,7 +2246,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
     res = eo_appTheDB_GetJointId_ByJointCanLocation(db, canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(14);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 15, frame, canPort);
         return(eores_OK);
     }
     
@@ -2254,7 +2254,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams(EOicubCan
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(15);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 16, frame, canPort);
         return(eores_OK);
     }
        
@@ -2404,14 +2404,14 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOc
             // for this board we must not issue the error but we must do nothing
             return(eores_OK);            
         }
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(16);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 17, frame, canPort);
         return(eores_OK);
     }
 
     mstatus = eo_protocolwrapper_GetMotorStatus(eo_protocolwrapper_GetHandle(), mId);
     if(NULL == mstatus)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(17);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 18, frame, canPort);
         return(eores_OK);
     }     
     
@@ -2443,7 +2443,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(15);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 19, frame, canPort);
         return(eores_OK);
     }
 
@@ -2454,7 +2454,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__position(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(16);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 20, frame, canPort);
         return(eores_OK);
     }
     
@@ -2476,7 +2476,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 21, frame, canPort);
         return(eores_OK);
     }
 
@@ -2486,7 +2486,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, e
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidVal(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 22, frame, canPort);
         return(eores_OK);
     }
     
@@ -2529,7 +2529,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         {   // see lines 2394-2396
             return(eores_OK);            
         }
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 23, frame, canPort);
         return(eores_OK);
     }
    
@@ -2539,7 +2539,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(20);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 24, frame, canPort);
             return(eores_OK);
         }
         eo_emsController_ReadMotorstatus(mId, frame->data);
@@ -2555,14 +2555,14 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(21);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 25, frame, canPort);
             return(eores_OK);
         }
         
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == jstatus)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(22);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 26, frame, canPort);
             return(eores_OK);
         }
 
@@ -2571,7 +2571,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(19);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 27, frame, canPort);
             return(eores_OK);
         }
  
@@ -2599,7 +2599,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(23);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 28, frame, canPort);
             return(eores_OK);
         }
         
@@ -2607,7 +2607,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = eo_appTheDB_GetMotorId_ByMotorCanLocation(eo_appTheDB_GetHandle(), canLoc, &mId);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 29, frame, canPort);
             return(eores_OK);
         }
 
@@ -2615,7 +2615,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == jstatus)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(25);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 30, frame, canPort);
             return(eores_OK);
         }
 
@@ -2624,7 +2624,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__status(EOicubCanProto* p, e
         res = s_eo_icubCanProto_translate_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[3], &eomc_controlmode);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(125);
+            s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 31, frame, canPort);
             return(eores_OK);
         }
         
@@ -2663,7 +2663,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(31);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 32, frame, canPort);
         s_eo_icubCanProto_mb_send_up_canframe(frame, canPort);
         return(eores_OK);
     }
@@ -2675,7 +2675,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, 
     res = s_eo_icubCanProto_parser_per_mb_cmd__current(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 33, frame, canPort);
         return(eores_OK);
     }    
     return(eores_OK);
@@ -2705,7 +2705,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__print(EOicubCanProto* p, eO
     res = s_eo_icubCanProto_parser_per_mb_cmd__print (p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 34, frame, canPort);
         return(eores_OK);
     } 
     
@@ -2727,7 +2727,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 35, frame, canPort);
         return(eores_OK);
     }
 
@@ -2737,7 +2737,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__velocity(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__velocity( p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 36, frame, canPort);
         return(eores_OK);
     }
     
@@ -2759,7 +2759,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidError(p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(24);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 37, frame, canPort);
         return(eores_OK);
     }
     
@@ -2769,7 +2769,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__pidError(EOicubCanProto* p,
     res = s_eo_icubCanProto_parser_per_mb_cmd__pidError( p, frame, canLoc);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(18);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 38, frame, canPort);
         return(eores_OK);
     }
     return(eores_OK);
@@ -2811,14 +2811,14 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(26);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 39, frame, canPort);
         return(eores_OK);
     }
         
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(27);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 40, frame, canPort);
         return(eores_OK);
     }
     
@@ -2826,7 +2826,7 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     res = s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode((icubCanProto_interactionmode_t)(frame->data[0] & 0x0f), (eOmc_interactionmode_t *)&jstatus->interactionmodestatus);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(28);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 41, frame, canPort);
         return(eores_OK);
     }
 
@@ -2838,21 +2838,21 @@ extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__additionalStatus(EOicubCanP
     res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canLoc, &jId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(29);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 42, frame, canPort);
         return(eores_OK);
     }
         
     jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
     if(NULL == jstatus)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(30);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 43, frame, canPort);
         return(eores_OK);
     }
     
     res = s_eo_icubCanProto_translate_icubCanProtoInteractionMode2eOmcInteractionMode((icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >>4), (eOmc_interactionmode_t *)&jstatus->interactionmodestatus);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(30);
+        s_eo_icubCanProto_mb_send_runtime_error_diagnostics(1, 44, frame, canPort);
         return(eores_OK);
     }
 
@@ -3382,15 +3382,28 @@ static eOresult_t s_eo_appTheDB_UpdateMototStatusPtr(eOmc_motorId_t mId, eOcanfr
 
 
 
-static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint64_t par64)
+static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint8_t parser, uint64_t par64, eOcanframe_t *frame, eOcanport_t port)
 {
-    eOerrmanDescriptor_t des = {0};
-    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
-    des.par16 = 0x2222;
-    des.par64 = 0x2200000000000000 + par64;
-    des.sourceaddress = 0;
-    des.sourcedevice = eo_errman_sourcedevice_localboard;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);    
+    eOerrmanDescriptor_t des = {0};  
+    
+    if(1 == parser)
+    {
+        des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxfromwrongboard);
+        des.par16                = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64                = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        des.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        des.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);  
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des); 
+    }
+    else
+    {
+        des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
+        des.par16 = 0x1111;
+        des.par64 = 0x2200000000000000 + par64;
+        des.sourceaddress = 0;
+        des.sourcedevice = eo_errman_sourcedevice_localboard;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);        
+    }       
 }
 
 static eObool_t s_eo_icubCanProto_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t canPortRX)

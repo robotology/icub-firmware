@@ -96,7 +96,7 @@
 
 static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 
-static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint64_t par64);
+static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint8_t parser, uint64_t par64, eOcanframe_t *frame, eOcanport_t port);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -241,7 +241,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
 
@@ -249,7 +249,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == config)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(2);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 2, frame, canPort);
         return(eores_OK);
     } 
 //     if(!config->signaloncefullscale)
@@ -263,7 +263,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(3);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }      
     
@@ -284,7 +284,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
         //des.sourceaddress = 0;
         //des.sourcedevice = eo_errman_sourcedevice_localboard;
         //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(4);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
     else
@@ -313,7 +313,7 @@ extern eOresult_t eo_icubCanProto_parser_pol_sb_cmd__getFullScales(EOicubCanProt
         res = s_loadFullscalelikeoccasionalrop(sId);
         if(eores_OK != res)
         {
-            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(5);
+            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
             return(eores_OK);
         }
         eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &appl_st);
@@ -367,7 +367,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(6);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
 
@@ -376,14 +376,14 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
     config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == config)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(7);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     } 
     /* 3) get pointer to nv var where save incoming force values */
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(8);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     } 
     
@@ -413,7 +413,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__forceVector(EOicubCanProto*
         default:
         {
             //i must never be here!
-            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(9);
+            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         }
     };
     
@@ -436,7 +436,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(10);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
 
@@ -445,7 +445,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     config = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == config)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(11);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }     
     
@@ -453,7 +453,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(12);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }      
     
@@ -483,7 +483,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__torqueVector(EOicubCanProto
         default:
         {
             //i must never be here!
-            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(13);
+            s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         }
     };
     
@@ -507,7 +507,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(14);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
 
@@ -515,7 +515,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibForceVectorDebugmode
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(15);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     } 
 
@@ -540,7 +540,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
     res = eo_appTheDB_GetSnsrStrainId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(16);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
 
@@ -548,7 +548,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__uncalibTorqueVectorDebugmod
     status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(17);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     } 
 
@@ -571,14 +571,14 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes0to6(EOicubCanProto* p, 
     res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(18);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
 
     status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(19);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }     
 
@@ -610,14 +610,14 @@ extern eOresult_t eo_icubCanProto_parser_per_sb_cmd__hes7to14(EOicubCanProto* p,
     res = eo_appTheDB_GetSnsrMaisId_BySensorCanLocation(eo_appTheDB_GetHandle(), canLoc, &sId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(20);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
     
     status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), sId);
     if(NULL == status)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(21);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     } 
     
@@ -680,7 +680,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     res = eo_appTheDB_GetSkinId_BySkinCanLocation(db, canloc, &skId);
     if(eores_OK != res)
     {
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(22);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
     
@@ -691,7 +691,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
     eOsk_skin_t *skin = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)skId);
     if(NULL == skin)
     {   // i dont have a skin on skId
-        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(23);
+        s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
             
@@ -719,7 +719,7 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
         des.sourceaddress   = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
         des.sourcedevice    = (eOcanport1 == canPort) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des); 
-        //s_eo_icubCanProto_sb_send_runtime_error_diagnostics(24);
+        //s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
     }
 
     return(eores_OK);
@@ -893,15 +893,39 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
 }
 
 
-static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint64_t par64)
+//static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint64_t par64)
+//{
+//    eOerrmanDescriptor_t des = {0};
+//    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
+//    des.par16 = 0x1111;
+//    des.par64 = 0x1100000000000000 + par64;
+//    des.sourceaddress = 0;
+//    des.sourcedevice = eo_errman_sourcedevice_localboard;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);    
+//}
+
+static void s_eo_icubCanProto_sb_send_runtime_error_diagnostics(uint8_t parser, uint64_t par64, eOcanframe_t *frame, eOcanport_t port)
 {
-    eOerrmanDescriptor_t des = {0};
-    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
-    des.par16 = 0x1111;
-    des.par64 = 0x1100000000000000 + par64;
-    des.sourceaddress = 0;
-    des.sourcedevice = eo_errman_sourcedevice_localboard;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);    
+    eOerrmanDescriptor_t des = {0};  
+    
+    if(1 == parser)
+    {
+        des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxfromwrongboard);
+        des.par16                = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64                = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        des.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        des.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);  
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des); 
+    }
+    else
+    {
+        des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runtimeerror);
+        des.par16 = 0x1111;
+        des.par64 = 0x1100000000000000 + par64;
+        des.sourceaddress = 0;
+        des.sourcedevice = eo_errman_sourcedevice_localboard;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);        
+    }       
 }
 
 // --------------------------------------------------------------------------------------------------------------------
