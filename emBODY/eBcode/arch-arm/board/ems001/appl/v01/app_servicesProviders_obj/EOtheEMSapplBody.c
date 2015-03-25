@@ -314,8 +314,11 @@ extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p)
         return(eores_NOK_nullpointer);
     }    
     
-    return(s_eo_emsapplBody_MaisTXenable(p));
     
+    //return(s_eo_emsapplBody_MaisTXenable(p));
+
+    // the following sets tx and datarate according to config of mais.
+    return(s_eo_emsapplBody_MaisStart(p));    
 }
 
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
@@ -931,8 +934,8 @@ static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
             },
             // port2
             {
-                .fn = NULL, //eo_emsapplBody_hid_canSP_cbkonrx,
-                .argoffn = NULL, //eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())
+                .fn = eo_emsapplBody_hid_canSP_cbkonrx,
+                .argoffn = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())
             },
         }
     };
