@@ -84,14 +84,36 @@ typedef struct
     uint8_t unused : 3;
 } eOcanmap_boardlocation_t;
 
+// used only as internal representation for eOcanmap_canboard_t which has only four bits available for the index. 
+typedef enum 
+{
+    entindex00 =  0, entindex01 =  1, entindex02 =  2, entindex03 =  3, entindex04 =  4, 
+    entindex05 =  5, entindex06 =  6, entindex07 =  7, entindex08 =  8, entindex09 =  9, 
+    entindex10 = 10, entindex11 = 11, entindex12 = 12, entindex13 = 13, entindex14 = 14, 
+    entindexNONE = 255    
+} eOcanmap_entityindex_t;
+
+//typedef struct
+//{
+//    eObrd_typeandversions_t     board;              /**< information about the can board */
+//    eOcanmap_boardlocation_t    location;           /**< its can location */
+//    uint8_t                     indexentity0: 4;    /**< the eoprot index of the entity0 it hosts. use eOcanmap_entityindex_t. used for joints, motors, strains, maises, skins */
+//    uint8_t                     indexentity1: 4;    /**< the eoprot index of the entity1 it hosts. use eOcanmap_entityindex_t. used only for joints and motors in board eobrd_cantype_mc4 */
+//} eOcanmap_canboard_t;          EO_VERIFYsizeof(eOcanmap_canboard_t, 8);       
+
 typedef struct
 {
-    eObrd_typeandversions_t     board;              /**< information about the can board */
+    eOenum08_t                  type;               /**< use eObrd_cantype_t */
     eOcanmap_boardlocation_t    location;           /**< its can location */
-    uint8_t                     indexentity0: 4;    /**< the eoprot index of the entity0 it hosts. used for joints, motors, strains, maises, skins */
-    uint8_t                     indexentity1: 4;    /**< the eoprot index of the entity1 it hosts. used only for joints and motors in board eobrd_cantype_mc4 */
-} eOcanmap_canboard_t;          EO_VERIFYsizeof(eOcanmap_canboard_t, 8);       
+    eObrd_version_t             requiredprotocol;   /**< so far, the only requirement is that the protocol version is ... */
+    uint8_t                     indexofentity[2];   /**< at most two entities per board. use eOcanmap_insideindex_t for addressing array and use eOcanmap_entityindex_t as its value. */
+} eOcanmap_board_t;             EO_VERIFYsizeof(eOcanmap_board_t, 6); 
 
+typedef struct
+{
+    eOcanmap_board_t            board;
+    eObrd_typeandversions_t     detected;
+} eOcanmap_canboard_t;          EO_VERIFYsizeof(eOcanmap_canboard_t, 12); 
 
 
 /**	@typedef    typedef struct eOcanmap_cfg_t 
@@ -127,18 +149,29 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg);
 extern EOtheCANmapping * eo_canmap_GetHandle(void);
 
 
-/** @fn         extern eOprotIndex_t eo_canmap_Parse(EOtheCANmapping *p, eOcanframe_t *frame, eOcanport_t port) 
-    @brief      It gives back an index 
-    @param      p               The singleton
-    @param      frame           The input can frame.
-    @param      port            The can port
-    @return     eores_OK if the parsing is successful, eores_NOK_nullpointer in case of NULL parameters, eores_NOK_generic if the frame is not recognised.  
- **/
-extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eOcanmap_entitylocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity);
+// get a board given its can location, fro read only purposes
+extern const eOcanmap_canboard_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanmap_entitylocation_t loc);
+
+
+// change the fw version etc on a board. we read it from can and then we set it with this function
+extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_entitylocation_t loc, eObrd_typeandversions_t *detected);
+
+
+// i get the index of the entity on the board on a given location without verifying type of board
+extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eOcanmap_entitylocation_t loc);
+
+
+// i get the index of the entity on teh board on a given location, but i also verify that the wanted ep-entity is coherent with the found board type
+// it does the same job as eo_canmap_GetEntityIndexSimple(0 but with some more checks and computation.
+extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOcanmap_entitylocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity);
 
 
 
-extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *board);
+// the id32 contains ep, entity, idex and tag = eoprot_tag_none
+// it gets the location of a specified entity
+extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t id32, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype);
+
+extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *board);
 
 
 

@@ -45,15 +45,22 @@ extern "C" {
     
 #include "iCubCanProtocol.h"  
 
+#include "EOtheCANmapping.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#define EOCANPROT_FRAME2CLASS(frame)            ( ((frame)->id & 0x700) >> 8 )
 
-#define EOCANPROT_FRAME2SOURCEADDRESS(frame)    ( (frame->id & 0x0F0) >> 4 )
+#define EOCANPROT_FRAME2SOURCEADDRESS(frame)    ( ((frame)->id & 0x0F0) >> 4 )
 
-#define EOCANPROT_MC_FRAME2INTERNALINDEX(frame) ( (frame->data[0] & 0x80) >> 7)
+#define EOCANPROT_FRAME2INTERNALINDEX(frame)    ( ((frame)->data[0] & 0x80) >> 7)
 
-#define EOCANPROT_MC_POL_CREATE_ID(orig, dest)  ( (ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL << 8) | ((orig&0xf) << 4) | (dest&0xf) )  
+#define EOCANPROT_FRAME2IDPOLLING(frame)        ( ((frame)->data[0] & 0x7F) )
+
+#define EOCANPROT_FRAME2IDPERIODIC(frame)       ( ((frame)->id & 0x00F) )
+
+#define EOCANPROT_MC_POL_CREATE_ID(orig, dest)  ( (ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL << 8) | (((orig)&0xf) << 4) | ((dest)&0xf) )  
  
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -84,7 +91,7 @@ typedef struct
     uint8_t     msgclass;               // they are: ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL, etc. they may be redefined as enum (see icubCanProto_msgCommand_class_t) at max they can be in 4 bits.
     uint8_t     msgidentifier;          // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
     uint8_t     destinationaddress;     // it is the can address. at max 4 bits
-    uint8_t     internalindex;          // it is either 0 or 1 or none. it is used if the message is for a joint/motor inside the can board. otherwise it is not used.
+    uint8_t     internalindex;          // use eOcanmap_insideindex_t: 0, 1, none. it is used if the message is for a joint/motor inside the can board. otherwise it is not used.
     void*       value;                  // keeps a pointer to the value to be put inside the can frame.
 } eOcanprot_descriptor_t;
 

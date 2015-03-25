@@ -63,8 +63,9 @@ extern "C" {
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern eOresult_t eocanprotSKperiodic_parser_00(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotSKperiodic_parser_TactileSensorOutput8bit(eOcanframe_t *frame, eOcanport_t port);
 extern eOresult_t eocanprotSKperiodic_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
 
 
 

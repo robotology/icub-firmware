@@ -61,7 +61,7 @@ extern "C" {
 // example, what do we have in can1 bus at address 3? we look at eo_canmapping_boards[0][3]. if no can board is present 
 // then we have NULL, otherwise we have a pointer to the board.  
 
-extern const eOcanmap_canboard_t * const * const eo_canmapping_boards[];
+extern eOcanmap_canboard_t * const * const eo_canmapping_boards[];
 
 
 // -- entities: joint

@@ -94,6 +94,22 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__exceptions(eOcanframe_t *frame, eOcanport_t port)
+{
+  
+    return(eores_OK);    
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__exceptions(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    
+     return(eores_OK);
+}
+
+
+
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port)
 {
     // not expected. print a diagnostics error
@@ -124,9 +140,9 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanfr
     eOcanmap_entitylocation_t loc = {0};
     loc.port            = port;
     loc.addr            = EOCANPROT_FRAME2SOURCEADDRESS(frame);
-    loc.insideindex     = EOCANPROT_MC_FRAME2INTERNALINDEX(frame);
+    loc.insideindex     = EOCANPROT_FRAME2INTERNALINDEX(frame);
     
-    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(EOK_uint08dummy == index)
     {
         //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
