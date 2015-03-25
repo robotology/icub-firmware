@@ -172,7 +172,7 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     ems->motor_position[motor] = position;
     
     //change the sign of motor position and motor velocity according to the sign of rotorencoder
-    if (ems->rotorencoder<0)
+    if (ems->rotorencoder[motor]<0)
     {
        ems->motor_velocity[motor]     = - ems->motor_velocity[motor];
        ems->motor_velocity_gbx[motor] = - ems->motor_velocity_gbx[motor];
