@@ -112,23 +112,17 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
     eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
     
 
-    // se non ho la skin, allora entro dentro
-    if(!(eo_emsapplBody_HasDevice(eo_emsapplBody_GetHandle(), eo_emsapplbody_deviceid_skin)))
-    {
-        numofRXcanframe = 0;
-        res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
-        if(eores_OK != res)
-        { // se c'e un errore sui parametri passati ovvero mai., 
-            return;
-        }
+    // before version 1.70, this part was skipped if the skin was connected on CAN bus 2
+    numofRXcanframe = 0;
+    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
+    if(eores_OK != res)
+    { // se c'e un errore sui parametri passati ovvero mai., 
+        return;
+    }
 #ifdef _GET_CANQUEUE_STATISTICS_
         eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
 #endif
-        // se non ho la skin leggo sul can2 tutti i canframe presenti e per ognuno chiamo le funzioni di callback 
-        // sono i messaggi provenienti dai sensori strain
-        eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);
-    }
-        
+    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);   
 }
 
 
