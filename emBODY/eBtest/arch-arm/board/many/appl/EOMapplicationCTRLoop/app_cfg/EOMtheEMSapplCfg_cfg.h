@@ -82,22 +82,22 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          22
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          14
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          33
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2013
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2015
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        3
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          19
 //  <o> hour            <0-23> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         18
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          10
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          15
 //  </h>build date
 
 // </h>Info 
@@ -234,7 +234,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   1
+#define ADDR_USEIPAL   0
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
@@ -406,7 +406,7 @@ extern "C" {
 
 //  <o> max number of input datagrams <1-8>
 //  <i> default: 2
-#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  2
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  1
 
 //  <o> max size of input datagrams <16-64>
 //  <i> default: 16
@@ -418,7 +418,7 @@ extern "C" {
 
 //  <o> max size of output datagrams <16-256>
 //  <i> default: 32
-#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  160
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  150
 
 //  </h>datagrams in socket
 
@@ -615,7 +615,7 @@ extern "C" {
 //  <o> maximum time a reply can be contained (in ms)       <0-100000>
 //  <i> default: 10. 
 //  <i> it is the max time a reply can be stored in the container before the say<> is considered lost
-#define EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC     10000
+#define EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC     1000
 
 //  </h> reply container
 
@@ -633,9 +633,9 @@ extern "C" {
 //  <i> default: 50
 #define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_PRIORITYof   50
 
-//  <o> task stack size <256-2048:64>
+//  <o> task stack size <256-8192:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   1536
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   7168
 
 //  </h>Configurator object configuration
 
@@ -646,9 +646,9 @@ extern "C" {
 //  <i> default: 40
 #define EOMTHEEMSAPPLCFG_ERROBJ_TASK_PRIORITYof   40
 
-//  <o> task stack size <256-2048:64>
+//  <o> task stack size <256-2048:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   1536
+#define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   2048
 
 //  </h>Error object configuration
 
@@ -674,55 +674,133 @@ extern "C" {
 
 //  <h> stack sizes 
 
-//  <o> RX task stack size <256-1024:64>
+//  <o> RX task stack size <256-2048:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   2048
 
-//  <o> DO task stack size <256-1024:64>
+//  <o> DO task stack size <256-2048:128>
 //  <i> default: 1024
 #define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof   1024
 
-//  <o> TX task stack size <256-1024:64>
+//  <o> TX task stack size <256-2048:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   2048
 
 //  </h>stack sizes
 
-//  <h> timings
+//  <e0> enable custom timings
+//	<i> If checked, the timings defined below will be used. If not, the default (adaptive) values will be used in the control loop
+
+#define EOMTHEEMSAPPLCFG_RUNOBJ_CUSTOMIZED 0
+
+#if (EOMTHEEMSAPPLCFG_RUNOBJ_CUSTOMIZED == 1)
+	//  <o> period [usec] <100-10000:100>
+	//  <i> default: 1000
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD         1000
+
+	//  <o> RX start after [usec] <0-10000:10>
+	//  <i> default: 0
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER       0
+
+	//  <o> RX safe execution [usec] <0-10000:10>
+	//  <i> default: 300
+	//  <i> B2/B4: 	 350
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME    300
+
+	//  <o> DO start after [usec] <0-10000:10>
+	//  <i> default: 400
+	//  <i> B2/B4: 	 450
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER       400
+
+	//  <o> DO safe execution [usec] <0-10000:10>
+	//  <i> default: 200
+	//  <i> B2/B4: 	 50
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME    200
+
+	//  <o> TX start after [usec] <0-10000:10>
+	//  <i> default: 700
+	//  <i> B2/B4: 	 550
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER       700
+
+	//  <o> TX safe execution [usec] <0-10000:10>
+	//  <i> default: 250
+	//  <i> B2/B4: 	 350
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME    250
+#else
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD      1000
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER    0
+	
+	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     350
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   	    450
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     50
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		550
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     350
+	#else
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     300
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   		400
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     200
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		700
+		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     250
+	#endif
+#endif
+
+//  </e> enable custom timings
+
+//  <h> hardware timers
+//  <i> specify the hal timers used for triggering the phases of the runner plus the safetime alerts
+//  <i> all the timers must be different.
 
 
-//  <o> period [usec] <100-10000:100>
-//  <i> default: 1000
-#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD   1000
+//  <o> hal_timer for start rx
+//                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
+//                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
+//  <i> default: hal_timer9
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX   2
 
-//  <o> RX start after [usec] <0-10000:10>
-//  <i> default: 0
-#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER   0
+//  <o> hal_timer for start do
+//                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
+//                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
+//  <i> default: hal_timer10
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO   3
 
-//  <o> RX safe execution [usec] <0-10000:10>
-//  <i> default: 300
-#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME   300
+//  <o> hal_timer for start tx
+//                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
+//                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
+//  <i> default: hal_timer11
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTTX   4
 
-//  <o> DO start after [usec] <0-10000:10>
-//  <i> default: 400
-#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   400
+//  <o> hal_timer for alert rx
+//                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
+//                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
+//                           <255=> hal_timerNONE
+//  <i> default: hal_timer12
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTRX   255
 
-//  <o> DO safe execution [usec] <0-10000:10>
-//  <i> default: 200
-#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME   200
+//  <o> hal_timer for alert do
+//                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
+//                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
+//                           <255=> hal_timerNONE
+//  <i> default: hal_timer13
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTDO   255
 
-//  <o> TX start after [usec] <0-10000:10>
-//  <i> default: 700
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   700
-
-//  <o> TX safe execution [usec] <0-10000:10>
-//  <i> default: 250
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME   250
-
+//  <o> hal_timer for alert tx
+//                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
+//                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
+//                           <255=> hal_timerNONE
+//  <i> default: hal_timer14
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTTX   255
 
 
-//  </h>timings
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTRX   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX))
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTDO   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO))
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_STARTTX   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTTX))
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_ALERTRX   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTRX))
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_ALERTDO   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTDO))
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_ID_ALERTTX   ((hal_timer_t)(EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_ALERTTX))
 
+
+//  </h> hardware timers
 
 
 //  <h> behaviour
@@ -841,124 +919,87 @@ extern "C" {
 // -------------------------------------------------------------------------------------------------------------------
 
 // in here we put only the macros required for the reference application
+#if defined(ICUB_GENOVA04)
+    #define NAME_PREFIX     aEMS
+    //#define NAME_POSTFIX    v1mec
+    #define NAME_POSTFIX    gen04
+#else
+    #define NAME_PREFIX     aEMS
+    #define NAME_POSTFIX    v2mec
+#endif    
+
+#define PPCAT_NX(A, B, C)   A ## B ## C
+#define PPCAT(A, B, C)      PPCAT_NX(A, B, C)
+
+#define STRINGIZE_NX(A)     #A
+#define STRINGIZE(A)        STRINGIZE_NX(A)
 
 #if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB1
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB1"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     01
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b01.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg
-#else
-        #include    "eOcfg_EPs_eb1.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb1_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb1_hashfunction_ep2index
-#endif        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg     
 #elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB2
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB2"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     02
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b02.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb2.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb2_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb2_hashfunction_ep2index     
-#endif        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg       
 #elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB3
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB3"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     03
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b03.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb3.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb3_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb3_hashfunction_ep2index    
-#endif        
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg       
 #elif   (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB4
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB4"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     04
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b04.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b04_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb4.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb4_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb4_hashfunction_ep2index  
-#endif
 #elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB5
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB5"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     05
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b05.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b05_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb5.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb5_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb5_hashfunction_ep2index  
-#endif
 #elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB6
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB6"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     06
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b06.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b06_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb6.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb6_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb6_hashfunction_ep2index  
-#endif
 #elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB7
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB7"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     07
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b07.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b07_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb7.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb7_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb7_hashfunction_ep2index  
-#endif
 #elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB8
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB8"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     08
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b08.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b08_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb8.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb8_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb8_hashfunction_ep2index  
-#endif
 #elif   (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB9
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB9"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     09
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b09.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b09_nvsetDEVcfg
-#else        
-        #include    "eOcfg_EPs_eb9.h"
-        #define     EOMTHEEMSAPPLCFG_vectorof_endpoint_cfg  &eo_cfg_EPs_vectorof_eb9_object
-        #define     EOMTHEEMSAPPLCFG_hashfunction_ep2index  eo_cfg_nvsEP_eb9_hashfunction_ep2index  
-#endif
 #elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB10
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB10"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     10
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b10.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b10_nvsetDEVcfg
-#else        
-       #error undefined netvars for board 10 in eth proto version  1
-#endif
 #elif   (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB11
-        #define     EOMTHEEMSAPPLCFG_NAME                   "EOMemsApplEB11"
-#if defined(EO_USE_EPROT_V2)
+        #define     NUM     11
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b11.h"
         #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b11_nvsetDEVcfg
-#else        
-       #error undefined netvars for board 11 in eth proto version  1
-#endif
 #endif
 
 
