@@ -58,7 +58,8 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
+hal_result_t hal_motor_enable(hal_motor_t id);
+hal_result_t hal_motor_disable(hal_motor_t id);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -76,7 +77,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
+#define EN1 	GPIO_Pin_12
+#define EN2 	GPIO_Pin_13
+#define EN3 	GPIO_Pin_14
+#define EN4 	GPIO_Pin_15
  
 
 
@@ -259,17 +263,17 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOE , ENABLE);
 
 	GPIO_StructInit(&GPIO_InitStructure);  
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15; 	
+	GPIO_InitStructure.GPIO_Pin = EN1 | EN2 | EN3 | EN4; 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(GPIOE, &GPIO_InitStructure);
 
-	GPIO_SetBits(GPIOE, GPIO_Pin_12);
-	GPIO_SetBits(GPIOE, GPIO_Pin_13);
-	GPIO_SetBits(GPIOE, GPIO_Pin_14);
-	GPIO_SetBits(GPIOE, GPIO_Pin_15);
+	GPIO_SetBits(GPIOE, EN1);
+	GPIO_SetBits(GPIOE, EN2);
+	GPIO_SetBits(GPIOE, EN3);
+	GPIO_SetBits(GPIOE, EN4);
 
 	//SETTING DRVFLT1..4 as output L6206
 
@@ -295,7 +299,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	/* GPIOA Configuration: Channel 1, 2, 3 and 4 as alternate function push-pull */
   	
 	GPIO_StructInit(&GPIO_InitStructure);  
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -303,6 +307,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   GPIO_Init(GPIOA, &GPIO_InitStructure);
  
 	/*Timer1 alternate function full remapping*/  
+		GPIO_PinAFConfig(GPIOA,GPIO_PinSource6,GPIO_AF_TIM1); //TIM1_BKIN  
 	GPIO_PinAFConfig(GPIOA,GPIO_PinSource8,GPIO_AF_TIM1);  //MOT1_PHA
 	GPIO_PinAFConfig(GPIOA,GPIO_PinSource9,GPIO_AF_TIM1);  //MOT1_PHB
 	GPIO_PinAFConfig(GPIOA,GPIO_PinSource10,GPIO_AF_TIM1); //MOT2_PHA
@@ -351,14 +356,14 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	TIM1_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
 	TIM1_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM1_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-//	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
-	TIM1_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_Low;
+	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Disable;
+	TIM1_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_High;
 	TIM1_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
 	TIM_BDTRConfig(TIM1, &TIM1_BDTRInitStructure);
 		
 	TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-	TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
+  TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
 	
 	
 	//initialization of TIM1 for controlling the first 2 motors
@@ -372,7 +377,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   	
 	GPIO_StructInit(&GPIO_InitStructure);  
 	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_2;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -380,6 +385,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   GPIO_Init(GPIOI, &GPIO_InitStructure);
  
 	/*Timer1 alternate function full remapping*/  
+	GPIO_PinAFConfig(GPIOI,GPIO_PinSource4,GPIO_AF_TIM8); //TIM8_BKIN
 	GPIO_PinAFConfig(GPIOI,GPIO_PinSource5,GPIO_AF_TIM8);  //MOT3_PHA
 	GPIO_PinAFConfig(GPIOI,GPIO_PinSource6,GPIO_AF_TIM8);  //MOT3_PHB
 	GPIO_PinAFConfig(GPIOI,GPIO_PinSource7,GPIO_AF_TIM8); //MOT4_PHA
@@ -425,11 +431,11 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	
 	// Automatic Output enable, Break, dead time and lock configuration
 	TIM8_BDTRInitStructure.TIM_OSSRState = TIM_OSSRState_Enable;
-	TIM8_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
+	TIM8_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Disable;
 	TIM8_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM8_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM8_BDTRInitStructure.TIM_Break = TIM_Break_Disable;
-	TIM8_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_Low;
+	TIM8_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
+	TIM8_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_High;
 	TIM8_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
 	TIM_BDTRConfig(TIM8, &TIM8_BDTRInitStructure);
@@ -475,11 +481,18 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
   NVIC_Init(&NVIC_InitStructure);
     
   /* Enable the TIM1 BRK Interrupt */
-  //NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
-  //NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  //NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  //NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  //NVIC_Init(&NVIC_InitStructure); 
+  NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure); 
+	
+	  /* Enable the TIM8 BRK Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = TIM8_BRK_TIM12_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure); 
 	}
     return(hal_res_OK);
 }
@@ -626,6 +639,125 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 }
 
 
+
+
+/*******************************************************************************
+* Function Name  : TIM1_BRK_IRQHandler
+* Description    : This function handles TIM1 Break interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM1_BRK_TIM9_IRQHandler(void)
+{
+  // write somewhere disable due to external fault 
+  hal_motor_disable(motor1);
+  hal_motor_disable(motor2); 
+	hal_motor_disable(motor3);
+  hal_motor_disable(motor4);
+  TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+;
+}
+
+/*******************************************************************************
+* Function Name  : TIM8_BRK_IRQHandler
+* Description    : This function handles TIM8 Break interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM8_BRK_TIM12_IRQHandler(void)
+{
+  // write somewhere disable due to external fault 
+	 
+	hal_motor_disable(motor1);
+  hal_motor_disable(motor2);
+  hal_motor_disable(motor3);
+  hal_motor_disable(motor4);
+  TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
+}
+
+/*******************************************************************************
+* Function Name  : hal_motor_enable
+* Description    : This function disable the motors 
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+hal_result_t hal_motor_enable(hal_motor_t id)
+{
+	switch (id)
+	{
+		case 0:
+		case 1:
+		{
+		    TIM_CtrlPWMOutputs(TIM1,ENABLE);
+			GPIO_SetBits(GPIOE, EN1);
+			GPIO_SetBits(GPIOE, EN2);
+		}
+		break;
+	    case 2:
+		case 3:
+		{
+		    TIM_CtrlPWMOutputs(TIM8,ENABLE);
+			GPIO_SetBits(GPIOE, EN3);
+			GPIO_SetBits(GPIOE, EN4);
+		}
+		break;
+		default:
+		{
+			TIM_CtrlPWMOutputs(TIM1,ENABLE);
+		    TIM_CtrlPWMOutputs(TIM8,ENABLE);
+			GPIO_SetBits(GPIOE, EN1);
+			GPIO_SetBits(GPIOE, EN2);
+			GPIO_SetBits(GPIOE, EN3);
+			GPIO_SetBits(GPIOE, EN4);
+		}
+		break;
+	}
+	return hal_res_OK;
+}
+
+/*******************************************************************************
+* Function Name  : hal_motor_disable
+* Description    : This function disable the motors 
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+hal_result_t hal_motor_disable(hal_motor_t id)
+{
+	switch (id)
+	{
+		case 0:
+		case 1:
+		{
+		    TIM_CtrlPWMOutputs(TIM1,DISABLE);
+//			GPIO_ResetBits(GPIOE, EN1);
+//			GPIO_ResetBits(GPIOE, EN2);
+		}
+		break;
+	    case 2:
+		case 3:
+		{
+		    TIM_CtrlPWMOutputs(TIM8,DISABLE);
+//			GPIO_ResetBits(GPIOE, EN3);
+//			GPIO_ResetBits(GPIOE, EN4);
+		}
+		break;
+		default:
+		{
+			TIM_CtrlPWMOutputs(TIM1,DISABLE);
+		    TIM_CtrlPWMOutputs(TIM8,DISABLE);
+//			GPIO_ResetBits(GPIOE, EN1);
+//			GPIO_ResetBits(GPIOE, EN2);
+//			GPIO_ResetBits(GPIOE, EN3);
+//			GPIO_ResetBits(GPIOE, EN4);
+		}
+		break;
+	}
+	return hal_res_OK;
+}
 #endif//HAL_USE_DEVICE_MOTORCL
 
 // --------------------------------------------------------------------------------------------------------------------
