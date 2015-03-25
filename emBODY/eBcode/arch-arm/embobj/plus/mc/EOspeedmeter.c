@@ -292,9 +292,6 @@ extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
 
     if (o)
     {   
-        o->slow_enc_inverted = eobool_false;
-        o->motor_inverted = eobool_false;        
-        o->inverted = eobool_false;
         o->axle_virt_pos = 0;
         o->axle_abs_pos = 0;
         o->axle_inc_pos = 0;
@@ -303,19 +300,6 @@ extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
     return o;
 }
 
-extern void eo_axleVirtualEncoder_SetSlowEncSign(EOaxleVirtualEncoder* o, eObool_t slow_enc_inverted)
-{
-    o->slow_enc_inverted = slow_enc_inverted;
-    o->inverted = (o->slow_enc_inverted) ^ (o->motor_inverted);
-}
-
-extern void eo_axleVirtualEncoder_SetMotorSign(EOaxleVirtualEncoder* o, eObool_t motor_inverted)
-{
-    o->motor_inverted = motor_inverted;
-    o->inverted = (o->slow_enc_inverted) ^ (o->motor_inverted);
-}
-
-
 extern void eo_axleVirtualEncoder_Acquire(int32_t gearbox_reduction, EOaxleVirtualEncoder* o, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel)
 {    
     int32_t N_BITS_PRECISION_BOUND = gearbox_reduction * ENCODER_QUANTIZATION;
@@ -323,21 +307,9 @@ extern void eo_axleVirtualEncoder_Acquire(int32_t gearbox_reduction, EOaxleVirtu
     
     o->axle_abs_pos = axle_abs_pos;
     
-    //if (o->inverted)
-    if (o->slow_enc_inverted)
-    {
-        // R LEG OK enc - kp +
-        // L LEG NO enc + kp - !!!!
-        o->velocity =  +axle_virt_vel;    
-        o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
-    }
-    else
-    {
-        // L LEG OK enc + kp - !!!!
-        o->velocity = -axle_virt_vel;
-        o->axle_inc_pos -= axle_virt_pos - o->axle_virt_pos;
-    }
-
+    o->velocity = + axle_virt_vel;    
+    o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
+  
     o->axle_inc_pos -= inc*gearbox_reduction;
                         
     LIMIT(o->axle_inc_pos, N_BITS_PRECISION_BOUND);

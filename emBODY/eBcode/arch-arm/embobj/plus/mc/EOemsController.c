@@ -141,10 +141,6 @@ extern void eo_emsController_set_Jacobian(int32_t **Ji32)
 extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
 {
     eo_absCalibratedEncoder_SetSign(ems->abs_calib_encoder[joint], sign);
-    
-    #ifdef USE_2FOC_FAST_ENCODER
-        eo_axleVirtualEncoder_SetSlowEncSign(ems->axle_virt_encoder[joint], (sign<0));
-    #endif
 }
 
 //             | 1     0       0   |
@@ -1234,12 +1230,9 @@ extern void eo_emsController_SetPosPid(uint8_t joint, float Kp, float Kd, float 
     if (ems)
     {
         eo_axisController_SetPosPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff, stiction_up, stiction_down);
-        
-        #ifdef USE_2FOC_FAST_ENCODER
-            eo_axleVirtualEncoder_SetMotorSign(ems->axle_virt_encoder[joint], (Kp < 0.0f));
-        #endif
     }
-}   
+}
+
 extern void eo_emsController_SetTrqPid(uint8_t joint, float Kp, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down)
 {
     if (ems) eo_axisController_SetTrqPid(ems->axis_controller[joint], Kp, Kd, Ki, Imax, Ymax, Yoff, Kff, stiction_up, stiction_down);     
