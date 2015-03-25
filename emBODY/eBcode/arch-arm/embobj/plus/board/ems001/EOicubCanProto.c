@@ -368,16 +368,17 @@ static const EOconstLookupTbl*  s_eo_icubCanProto_LUTbl_GetFormerTbl(EOicubCanPr
 static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPortRX)
 {
     eOappTheDB_board_canlocation_t canloc = { .emscanport = eOcanport1, .addr = 0}; // default value 
-//This msg is send by Mais board every time it has received an unknown msg.
-//on dspic30 there is a bug hw in filter can, so some motor msg are reveived by Mais and read as unknown message
+    // valentina.gaggero: This msg is send by Mais board every time it has received an unknown msg.
+    // on dspic30 there is a bug hw in filter can, so some motor msg are reveived by Mais and read as unknown message
 
-//Sinse mais is only on board with MC4 before check runmode
+    // valentina.gagegro: Sinse mais is only on board with MC4 before check runmode
     eOmn_appl_runMode_t apprunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
     if((applrunMode__2foc == apprunmode) || (applrunMode__default == apprunmode) || (applrunMode__skinOnly == apprunmode))
     {
         return(eobool_false);
     }
     
+    // retrieve can location of mais board
     eOresult_t res = eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), 0, &canloc);
     
     if(eores_OK != res)
@@ -385,18 +386,22 @@ static eObool_t s_eo_icubCanProto_isMaisBUGmsg(EOicubCanProto* p, eOcanframe_t *
         return(eobool_false);
     }
     
-    if( (canloc.emscanport == canPortRX) &&  //if port rx frame is equal of mais can location
-        ((frame->id & 0x700) >> 8 == 0x0 ) &&  //if message class is motor polling
-        (((frame->id &0x0f0) >> 4) == canloc.addr)) //if sender adress is of mais board
+    uint8_t frameisfrommais = (canloc.emscanport == canPortRX) && (((frame->id & 0x0f0) >> 4) == canloc.addr);
+    uint8_t rxclass = (frame->id & 0x700) >> 8;
+    uint8_t classismotorpolling  = (rxclass == ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL) ? 1 : 0;
+    uint8_t classismotorperiodic = (rxclass == ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL) ? 1 : 0;
+    if( frameisfrommais &&                              // if the frame is from mais
+        (classismotorpolling || classismotorperiodic)   // the class is either motor polling or motor broadcast
+      )    
     {
         eOerrmanDescriptor_t des = {0};
-        des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+        des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxmaisbug);
         des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
         des.par64 = eo_common_canframe_data2u64(frame);
         des.sourcedevice = (eOcanport1 == canPortRX) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
         des.sourceaddress = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);
 
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);
         return(eobool_true);
     }
     else
