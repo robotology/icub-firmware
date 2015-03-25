@@ -206,6 +206,14 @@ static eOresult_t s_eo_icubCanProto_ParseCanFrame(EOicubCanProto* p, eOcanframe_
     
     if(eobool_true == s_eo_icubCanProto_isMaisBUGmsg(p, frame, canPortRX))
     {
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxmaisbug);
+        errdes.par16                = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)&frame);
+        errdes.sourcedevice         = (eOcanport1 == canPortRX) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = eo_icubCanProto_hid_getSourceBoardAddrFromFrameId(frame->id);                
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes); 
+        
         return(eores_OK);
     }
     
