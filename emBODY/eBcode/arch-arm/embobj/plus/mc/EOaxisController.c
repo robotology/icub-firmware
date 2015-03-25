@@ -304,12 +304,8 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq)
 {
     if (o)
     {
-        if (o->torque_meas_jnt != trq)
-        {
-            //beware: if torque measuremenet is saturated torque_meas_jnt==trq and a timeout/sturation is triggered.
-            o->torque_meas_jnt = trq;
-            o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
-        }
+       o->torque_meas_jnt = trq;
+       o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
     }
 }
 
