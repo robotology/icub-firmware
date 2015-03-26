@@ -540,14 +540,19 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
             {  
                 return(eores_NOK_generic);
             }
-                
+            
+            // i set the skin as not transmitting as soon as possible. because in such a way, can messages being received
+            // are not pushed back in skin->status.arrayofcandata and its does not overflow.
+            skin->config.sigmode = eosk_sigmode_dontsignal;
+              
+            // then i stop transmission of each skin can board
+            
             boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
-        
-            icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-                
-            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) //for each skid 
-            {
+                             
+            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) 
+            {   // for each skin board 
                 msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+                icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
                 
                 res = eo_appCanSP_SendCmd(appCanSP, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
                 if(eores_OK != res)
@@ -555,9 +560,6 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
                     return(eores_NOK_generic);
                 }
             }
-            
-            // i set the skin as not transmitting
-            skin->config.sigmode = eosk_sigmode_dontsignal;
         }    
     }
     
