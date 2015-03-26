@@ -549,18 +549,24 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
     #elif defined(WAIST_BOARD)
     
-        //             |   1     1     0   |
-        // J = dq/dm = |  -1     1     0   |
-        //             | 44/80 44/80 44/80 | 
+        //beware: this matrix is valid inside the firmare only
+        //             |   0.5   0.5    0   |
+        // J = dq/dm = |  -0.5   0.5    0   |
+        //             | 22/80 22/80  22/40 |
+        
+        //at the user level, torso joints are swapped (0 1 2 -> 2 0 1) and the matrix is:
+        //             | 22/40 22/80 22/80  |
+        // J = dq/dm = |     0   0.5   0.5  |
+        //             |     0  -0.5   0.5  |
+        
+        axle_virt_vel[0] = (    ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]) * 0.5;
+        axle_virt_vel[1] = (   -ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]) * 0.5;
+        axle_virt_vel[2] =      ems->motor_velocity_gbx[0]*0.022/0.08 + ems->motor_velocity_gbx[1]*0.022/0.08 + ems->motor_velocity_gbx[2]*0.022/0.04;
+        
+        axle_virt_pos[0] = (    ems->motor_position[0] + ems->motor_position[1]) * 0.5;
+        axle_virt_pos[1] = (   -ems->motor_position[0] + ems->motor_position[1]) * 0.5;
+        axle_virt_pos[2] =      ems->motor_position[0]*0.022/0.08 + ems->motor_position[1]*0.022/0.08 + ems->motor_position[2]*0.022/0.04;
 
-        axle_virt_vel[0] = (     ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]);
-        axle_virt_vel[1] = (    -ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]);
-        axle_virt_vel[2] = ((44*(ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1] + ems->motor_velocity_gbx[2]))/80);
-        
-        axle_virt_pos[0] =      ems->motor_position[0] + ems->motor_position[1];
-        axle_virt_pos[1] =     -ems->motor_position[0] + ems->motor_position[1];
-        axle_virt_pos[2] = (44*(ems->motor_position[0] + ems->motor_position[1] + ems->motor_position[2]))/80;
-        
     #elif defined(UPPERLEG_BOARD)
     
         axle_virt_vel[0] = (50*ems->motor_velocity_gbx[0])/75;
