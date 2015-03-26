@@ -435,17 +435,20 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {
     eOresult_t res = eores_NOK_generic;
     
-    // set run mode on demand in order to send messages to can straihth away as soon as they are generated one by one.
+    // set run mode on demand in order to send messages to can straight away as soon as they are generated one by one.
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+  
+    
+    // stop skin. the check whether to stop skin or not is done internally.
+    eo_emsapplBody_StopSkin(eo_emsapplBody_GetHandle());
 
+    // stop motion control
  	res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
 	{
 		//handle the error
 	}
     
-    // the check whether to stop skin or not is done internally.
-    eo_emsapplBody_StopSkin(eo_emsapplBody_GetHandle());
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
