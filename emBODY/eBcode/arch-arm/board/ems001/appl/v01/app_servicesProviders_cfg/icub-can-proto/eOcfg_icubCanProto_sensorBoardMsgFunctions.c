@@ -694,13 +694,27 @@ extern eOresult_t eo_icubCanProto_parser_per_sk_cmd__allSkinMsg(EOicubCanProto* 
         s_eo_icubCanProto_sb_send_runtime_error_diagnostics(1, 1, frame, canPort);
         return(eores_OK);
     }
-            
-    // if skin->config.sigmode is dontsignal then we dont use the payload of the can frame. 
-    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffrede in the rx-fifo    
+    
+    
+    // marco.accame:        
+    // if skin->config.sigmode is eosk_sigmode_dontsignal then we dont need using the payload of the can frame. 
+    // however, also if skin->config.sigmode is eosk_sigmode_signal but we are not in RUN mode we should not put 
+    // frames inside the arrayofcandata. this latter for example is tha case if we are still in the cfg->run transition 
+    // and thus not  yet inside the control-loop which empties the arrayofcandata, or also if  the udp packet with go2run 
+    // rop<> gets lost.
+    
+    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffered in the rx-fifo    
     if(eosk_sigmode_dontsignal == skin->config.sigmode)
     {
         return(eores_OK);
-    }        
+    } 
+
+    eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STcfg;
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
+    if(eo_sm_emsappl_STrun != applstate)
+    {
+        return(eores_OK);
+    }
     
     // otherwise we put the canframe content inside teh arrayofcandata
     
