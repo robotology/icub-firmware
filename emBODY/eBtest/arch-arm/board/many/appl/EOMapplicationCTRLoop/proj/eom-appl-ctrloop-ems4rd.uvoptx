@@ -75,7 +75,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>255</CpuCode>
+      <CpuCode>18</CpuCode>
       <Books>
         <Book>
           <Number>0</Number>
@@ -143,7 +143,6 @@
         <tRtrace>0</tRtrace>
         <sRSysVw>1</sRSysVw>
         <tRSysVw>1</tRSysVw>
-        <tPdscDbg>1</tPdscDbg>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>7</nTsel>
@@ -248,6 +247,7 @@
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
           <ItemText>str</ItemText>
+          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
@@ -255,6 +255,7 @@
           <WinNumber>2</WinNumber>
           <SubType>0</SubType>
           <ItemText>loc_device_def</ItemText>
+          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow2>
       <MemoryWindow3>
@@ -262,6 +263,7 @@
           <WinNumber>3</WinNumber>
           <SubType>0</SubType>
           <ItemText>xxx</ItemText>
+          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow3>
       <Tracepoint>
@@ -353,7 +355,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>255</CpuCode>
+      <CpuCode>18</CpuCode>
       <Books>
         <Book>
           <Number>0</Number>
@@ -421,7 +423,6 @@
         <tRtrace>0</tRtrace>
         <sRSysVw>1</sRSysVw>
         <tRSysVw>1</tRSysVw>
-        <tPdscDbg>1</tPdscDbg>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>7</nTsel>
@@ -509,6 +510,7 @@
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
           <ItemText>0x20007f70</ItemText>
+          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
@@ -516,6 +518,7 @@
           <WinNumber>2</WinNumber>
           <SubType>0</SubType>
           <ItemText>loc_device_def</ItemText>
+          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow2>
       <MemoryWindow3>
@@ -523,6 +526,7 @@
           <WinNumber>3</WinNumber>
           <SubType>0</SubType>
           <ItemText>xxx</ItemText>
+          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow3>
       <Tracepoint>
@@ -1558,7 +1562,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v1\opcprot\OPCprotocolManager.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot\OPCprotocolManager.c</PathWithFileName>
       <FilenameWithoutPath>OPCprotocolManager.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1817,7 +1821,7 @@
 
   <Group>
     <GroupName>eo-comm-v2-protocol-boards</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1829,7 +1833,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b01.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b01.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b01.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1842,7 +1846,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b02.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b02.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b02.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1855,7 +1859,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b03.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b03.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b03.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1868,7 +1872,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b04.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b04.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b04.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1881,7 +1885,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b05.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b05.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b05.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1894,7 +1898,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b06.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b06.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b06.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1907,7 +1911,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b07.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b07.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b07.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1920,7 +1924,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b08.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b08.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b08.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1933,7 +1937,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b09.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b09.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b09.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1946,8 +1950,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_robot_ge04.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_robot_ge04.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b10.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b10.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1959,34 +1963,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b10.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b10.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>100</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b11.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b11.c</PathWithFileName>
       <FilenameWithoutPath>eOprot_b11.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>15</GroupNumber>
-      <FileNumber>101</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_robot_ge04_callbacks.template.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_robot_ge04_callbacks.template.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1994,13 +1972,13 @@
 
   <Group>
     <GroupName>eo-comm-v2-protocol</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>102</FileNumber>
+      <FileNumber>100</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2013,7 +1991,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>103</FileNumber>
+      <FileNumber>101</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2026,7 +2004,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>104</FileNumber>
+      <FileNumber>102</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2039,7 +2017,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>105</FileNumber>
+      <FileNumber>103</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2052,7 +2030,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>106</FileNumber>
+      <FileNumber>104</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2065,7 +2043,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>107</FileNumber>
+      <FileNumber>105</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2078,7 +2056,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>108</FileNumber>
+      <FileNumber>106</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2091,7 +2069,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>109</FileNumber>
+      <FileNumber>107</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2104,7 +2082,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>110</FileNumber>
+      <FileNumber>108</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2117,7 +2095,7 @@
     </File>
     <File>
       <GroupNumber>16</GroupNumber>
-      <FileNumber>111</FileNumber>
+      <FileNumber>109</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2125,6 +2103,32 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src\EoProtocolSK_rom.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolSK_rom.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>110</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoError.c</PathWithFileName>
+      <FilenameWithoutPath>EoError.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>111</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport\EOtheInfoDispatcher.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheInfoDispatcher.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2251,7 +2255,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\services\embodyrobot\emBODYrobot.c</PathWithFileName>
       <FilenameWithoutPath>emBODYrobot.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
