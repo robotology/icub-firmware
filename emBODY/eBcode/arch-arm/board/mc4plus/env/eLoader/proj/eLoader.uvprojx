@@ -365,7 +365,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -411,7 +411,7 @@
             <File>
               <FileName>loader_updt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eLoader\app\loader_updt.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eLoader\loader_updt.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -476,7 +476,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -904,7 +904,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -950,7 +950,7 @@
             <File>
               <FileName>loader_updt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eLoader\app\loader_updt.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eLoader\loader_updt.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1015,7 +1015,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>

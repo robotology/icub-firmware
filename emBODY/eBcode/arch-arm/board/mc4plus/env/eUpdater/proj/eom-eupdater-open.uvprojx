@@ -365,7 +365,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -411,32 +411,32 @@
             <File>
               <FileName>eom-eupdater-main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eom-eupdater-main.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eom-eupdater-main.c</FilePath>
             </File>
             <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eupdater_parser.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eupdater_parser.c</FilePath>
             </File>
             <File>
               <FileName>eOcfg_sm_cangtw.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eOcfg_sm_cangtw.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eOcfg_sm_cangtw.c</FilePath>
             </File>
             <File>
               <FileName>eupdater_cangtw.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eupdater_cangtw.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eupdater_cangtw.c</FilePath>
             </File>
             <File>
               <FileName>eupdater-info.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eupdater-info.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eupdater-info.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\updater-core.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\updater-core.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -755,7 +755,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1183,7 +1183,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1229,32 +1229,32 @@
             <File>
               <FileName>eom-eupdater-main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eom-eupdater-main.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eom-eupdater-main.c</FilePath>
             </File>
             <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eupdater_parser.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eupdater_parser.c</FilePath>
             </File>
             <File>
               <FileName>eOcfg_sm_cangtw.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eOcfg_sm_cangtw.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eOcfg_sm_cangtw.c</FilePath>
             </File>
             <File>
               <FileName>eupdater_cangtw.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eupdater_cangtw.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eupdater_cangtw.c</FilePath>
             </File>
             <File>
               <FileName>eupdater-info.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\eupdater-info.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\eupdater-info.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems001\env\eUpdater\app\updater-core.c</FilePath>
+              <FilePath>..\..\..\..\common\env\eUpdater\updater-core.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1573,7 +1573,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
