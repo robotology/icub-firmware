@@ -108,7 +108,7 @@
 //     <o> Cache table size <4-100>
 //     <i> Number of cached hardware/IP addresses
 //     <i> Default: 10
-#define IPAL_ARP_CACHESIZE    8
+#define IPAL_ARP_CACHESIZE    32
 
 //     <o> Cache Timeout [sec] <5-255><#*1000000>
 //     <i> A timeout for a cached hardware/IP addresses
@@ -124,14 +124,14 @@
 //     <o> Retry Timeout [sec] <1-10><#*1000000>
 //     <i> A timeout to resend the ARP Request
 //     <i> Default: 1
-#define IPAL_ARP_RETRYTIMEOUT     1000000
+#define IPAL_ARP_RETRYTIMEOUT     0
 
 //     <q> Autonotify enabled
 //     <i> When this option is enabled, the embedded host
 //     <i> will send a gratuitous ARP notification at startup,
 //     <i> or when the device IP address has changed.
 //     <i> Default: Enabled
-#define IPAL_ARP_AUTONOTIFY     1
+#define IPAL_ARP_AUTONOTIFY     0
 
 
 //  </h>Address Resolution Protocol

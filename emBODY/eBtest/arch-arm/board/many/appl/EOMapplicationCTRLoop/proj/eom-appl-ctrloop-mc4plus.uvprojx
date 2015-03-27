@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -145,6 +145,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -363,7 +364,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
-              <Define>EOPROT_USE_MN_VERSION_2_0 dontEOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME _FORCE_NETWORK_FROM_IPAL_CFG EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2 HAL_IS_VERSION_2</Define>
+              <Define>TOGGLE_RUN_CFG_WITH3RXPACKETS EOPROT_USE_MN_VERSION_2_0 dontEOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME _FORCE_NETWORK_FROM_IPAL_CFG EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2 HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\eBcode\embobj\core\core;..\..\..\..\..\..\..\eBcode\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\embobj\plus\embenv;..\..\..\..\..\..\..\eBcode\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\eBcode\embobj\plus\ctrloop;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\eBcode\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\robotconfig\v1\eprotocol;..\embenv_cfg\ems004like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\eBcode\robotconfig\api;..\..\..\..\..\..\..\eBcode\robotconfig;..\..\..\..\..\..\..\..\canProtocolLib</IncludePath>
             </VariousControls>
@@ -806,6 +807,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>app-services</GroupName>
+          <Files>
+            <File>
+              <FileName>EOappEncodersReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems001\appl\v01\app_servicesProviders_obj\EOappEncodersReader.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>opc-protocol</GroupName>
           <Files>
             <File>
@@ -1226,7 +1237,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1357,6 +1368,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -2014,6 +2026,16 @@
               <FileName>overridden_backdoortransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app_cfg\overridden_backdoortransceiver.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>app-services</GroupName>
+          <Files>
+            <File>
+              <FileName>EOappEncodersReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems001\appl\v01\app_servicesProviders_obj\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>

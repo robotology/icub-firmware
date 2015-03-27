@@ -29,13 +29,16 @@
 
 #include "stdio.h"
 #include "string.h"
-#include "stdio.h"
 #include "osal.h"
 #include "osal_arch_arm.h"
 #include "hal_trace.h"
 #include "stdlib.h"
 
+#include "hal_led.h"
+#include "hal_sys.h"
 
+#include "EOtheErrorManager.h"
+#include "EoError.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -49,34 +52,18 @@
 
 extern void* osal_ext_calloc(uint32_t s, uint32_t n)
 {
-//    char str[64];
-  
     void* ret = calloc(s, n);
-        
-//    snprintf(str, sizeof(str), "mycalloc %d bytes: [%x, %x]", n*s, (uint32_t)ret, (uint32_t)ret+n*s);
-//    hal_trace_puts(str);
-    
     return(ret);
 }
 
 extern void* osal_ext_realloc(void* m, uint32_t s)
 {
-//    char str[64];
-  
     void* ret = realloc(m, s);
-//        
-//    snprintf(str, sizeof(str), "mycalloc %d bytes: [%x, %x]", s, (uint32_t)ret, (uint32_t)ret+s);
-//    hal_trace_puts(str);
-    
     return(ret);
 }
 
 extern void osal_ext_free(void* m)
 {
-//    char str[64];
-//    snprintf(str, sizeof(str), "myfree %x", (uint32_t)m);
-//    hal_trace_puts(str);
-
     free(m);
 }
 
@@ -124,12 +111,57 @@ const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
 {
     uint8_t tskid = 0;
-    char str[128];
-    
+    char str[64];    
     osal_task_id_get(task, &tskid);
-    snprintf(str, sizeof(str), "error %d from taskid %d: %s\n\r", errorcode, tskid, errormsg);
-    hal_trace_puts(str);
-    for(;;);
+    snprintf(str, sizeof(str), "osalerror %d taskid %d: %s", errorcode, tskid, errormsg);
+    
+    if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
+    {
+        // ok ... use the error manager, either in its simple form or in its networked form
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_osalerror);
+        errdes.par16            = errorcode;
+        errdes.par64            = 0;
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;    
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "OSAL", &errdes);                
+    }
+    else
+    {
+        if(NULL != errormsg)
+        {
+            hal_trace_puts(errormsg);
+        }
+        
+
+        // in case of fatal error we blink all leds but led1
+        hal_led_init(hal_led0, NULL);
+        hal_led_init(hal_led1, NULL);
+        hal_led_init(hal_led2, NULL);
+        hal_led_init(hal_led3, NULL);
+        hal_led_init(hal_led4, NULL);
+        hal_led_init(hal_led5, NULL);
+    
+        hal_led_off(hal_led0);
+        hal_led_off(hal_led1);
+        hal_led_off(hal_led2);
+        hal_led_off(hal_led3);
+        hal_led_off(hal_led4);
+        hal_led_off(hal_led5);   
+
+        for(;;)
+        {
+            hal_sys_delay(100);
+            
+            hal_led_toggle(hal_led0);
+            //hal_led_toggle(hal_led1);
+            hal_led_toggle(hal_led2);
+            hal_led_toggle(hal_led3);
+            hal_led_toggle(hal_led4);
+            hal_led_toggle(hal_led5);  
+        }
+    }    
+   
 }
 
 static void s_osal_cfg_on_idle(void)

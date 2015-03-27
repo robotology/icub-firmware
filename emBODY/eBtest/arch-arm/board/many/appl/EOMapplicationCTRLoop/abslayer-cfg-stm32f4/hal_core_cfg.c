@@ -28,8 +28,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stdlib.h"
-#include "stdio.h"
 #include "hal_core.h"
+
+#include "EOtheErrorManager.h"
+#include "EoError.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -89,20 +91,58 @@ const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
 
 #include "hal_trace.h"
 #include "hal_led.h"
+
 static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
-    errorcode = errorcode;
-    if(NULL != errormsg)
+    if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
     {
-        hal_trace_puts(errormsg);
+        // ok ... use the error manager, either in its simple form or in its networked form
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_halerror);
+        errdes.par16            = errorcode;
+        errdes.par64            = 0;
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;    
+        eo_errman_Error(eo_errman_GetHandle(), (hal_fatalerror_warning == errorcode) ? eo_errortype_warning : eo_errortype_fatal, errormsg, "HAL", &errdes);                
     }
-
-    hal_led_init(hal_led2, NULL);
-
-    for(;;)
+    else
     {
-        hal_sys_delay(250*1000);
-        hal_led_toggle(hal_led2);
+        if(NULL != errormsg)
+        {
+            hal_trace_puts(errormsg);
+        }
+        
+        if(hal_fatalerror_warning == errorcode)
+        {
+            return;
+        }
+
+        // in case of fatal error we blink all leds but led0
+        hal_led_init(hal_led0, NULL);
+        hal_led_init(hal_led1, NULL);
+        hal_led_init(hal_led2, NULL);
+        hal_led_init(hal_led3, NULL);
+        hal_led_init(hal_led4, NULL);
+        hal_led_init(hal_led5, NULL);
+    
+        hal_led_off(hal_led0);
+        hal_led_off(hal_led1);
+        hal_led_off(hal_led2);
+        hal_led_off(hal_led3);
+        hal_led_off(hal_led4);
+        hal_led_off(hal_led5);   
+
+        for(;;)
+        {
+            hal_sys_delay(100);
+            
+            //hal_led_toggle(hal_led0);
+            hal_led_toggle(hal_led1);
+            hal_led_toggle(hal_led2);
+            hal_led_toggle(hal_led3);
+            hal_led_toggle(hal_led4);
+            hal_led_toggle(hal_led5);  
+        }
     }
 }
 

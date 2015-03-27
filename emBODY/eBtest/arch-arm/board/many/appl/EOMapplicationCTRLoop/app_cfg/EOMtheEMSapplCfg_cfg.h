@@ -234,7 +234,7 @@ extern "C" {
 
 //  <o> addresses       <0=> from eeprom 
 //                      <1=> from ipal_cfg.h                               
-#define ADDR_USEIPAL   0
+#define ADDR_USEIPAL   1
 
 #if (1 == ADDR_USEIPAL)
     #define EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT        0
@@ -756,19 +756,19 @@ extern "C" {
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //  <i> default: hal_timer9
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX   2
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX   5
 
 //  <o> hal_timer for start do
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //  <i> default: hal_timer10
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO   3
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO   6
 
 //  <o> hal_timer for start tx
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //  <i> default: hal_timer11
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTTX   4
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTTX   8
 
 //  <o> hal_timer for alert rx
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 

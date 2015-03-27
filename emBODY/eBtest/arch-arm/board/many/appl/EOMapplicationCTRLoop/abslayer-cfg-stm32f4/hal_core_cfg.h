@@ -66,7 +66,7 @@
 //   <o> heap size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much heap you want.
 #ifndef HAL_SYS_CFG_HEAPSIZE
- #define HAL_SYS_CFG_HEAPSIZE      0x0000C000
+ #define HAL_SYS_CFG_HEAPSIZE      0x00012000
 #endif
 
 // </h>SYS module
@@ -87,6 +87,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+#define HALCAN1capacityofrxfifoofframes     20 //120
+#define HALCAN1capacityoftxfifoofframes     60 //160
+#define HALCAN1capacityoftxfifohighprio     0
+
+
+#define HALCAN2capacityofrxfifoofframes     32 //132
+#define HALCAN2capacityoftxfifoofframes     16 //116
+#define HALCAN2capacityoftxfifohighprio     0
 
 #endif  // include-guard
 

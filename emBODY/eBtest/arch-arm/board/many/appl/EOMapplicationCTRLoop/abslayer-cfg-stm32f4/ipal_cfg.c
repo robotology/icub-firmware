@@ -27,9 +27,13 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdio.h"
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+
 
 #include "ipal.h"
+
+
 #include "hal.h"
 #include "osal.h"
 
@@ -40,11 +44,9 @@
 
 #include "ipal_cfg.h"
 
+static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);
+
 static void onethframerx(void);
-
-
-static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg);;
-
 
 
 uint64_t macnn = IPAL_mac48addr(0x1e, 0x30, 0x6c, 0xa2, 0x45, 0x5e);  
@@ -117,16 +119,15 @@ const ipal_cfg_t ipal_cfg =
 
     .extfn                  = 
     { 
-        .usr_on_fatal_error         = s_ipal_cfg_on_fatal_error,
+        .usr_on_fatal_error         =  s_ipal_cfg_on_fatal_error,
 
-//         .osal_mutex_new             = NULL, 
-//         .osal_mutex_take            = NULL, 
-//         .osal_mutex_release         = NULL, 
-//         .osal_param_tout_forever    = 0, 
-        .osal_mutex_new             = (void *(*)(void))osal_mutex_new,
-        .osal_mutex_take            = (ipal_result_t (*)(void*, uint32_t))osal_mutex_take,
-        .osal_mutex_release         = (ipal_result_t (*)(void*))osal_mutex_release,
-        .osal_param_tout_forever    = OSAL_reltimeINFINITE,
+        .osal_mutex_new             = NULL, 
+        .osal_mutex_take            = NULL, 
+        .osal_mutex_release         = NULL, 
+        .osal_param_tout_forever    = 0, 
+        .osal_system_scheduling_suspend = NULL, //osal_system_scheduling_suspend,
+        .osal_system_scheduling_restart = NULL, //osal_system_scheduling_restart,
+
 
         .hal_eth_init               = (ipal_result_t (*)(void*)) hal_eth_init,
         .hal_eth_enable             = (ipal_result_t (*)(void))  hal_eth_enable,
@@ -158,21 +159,6 @@ const ipal_cfg_t ipal_cfg =
 const ipal_cfg_t *ipal_cfgMINE = &ipal_cfg;
 
 
-static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
-{
-    static volatile uint8_t a = 0;
-    char str[80];
-//    static ipal_fatalerror_t er = ipal_error_generic;
-   
-    snprintf(str, sizeof(str), "fatal error #%d: %s\n", errorcode, errormsg);
-    hal_trace_puts(str);
-    for(;;)
-    {
-//        er = er;
-        a++;
-        a = a;
-    }
-}
 
 static void onethframerx(void)
 {
@@ -182,6 +168,58 @@ static void onethframerx(void)
 }
 
 
+static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
+{
+
+    char str[256];
+    
+    if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
+    {
+        // ok ... use the error manager, either in its simple form or in its networked form
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_halerror);
+        errdes.par16            = errorcode;
+        errdes.par64            = 0;
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        
+        snprintf(str, sizeof(str), "ipal_fatalerror_t %d: %s", errorcode, errormsg);
+
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, str, "IPAL", &errdes);
+    }
+    else
+    {    
+        char str[256];
+        snprintf(str, sizeof(str), "ipal_fatalerror_t %d: %s", errorcode, errormsg);
+        
+        // in case of fatal error we blink all leds but led2
+        hal_led_init(hal_led0, NULL);
+        hal_led_init(hal_led1, NULL);
+        hal_led_init(hal_led2, NULL);
+        hal_led_init(hal_led3, NULL);
+        hal_led_init(hal_led4, NULL);
+        hal_led_init(hal_led5, NULL);
+    
+        hal_led_off(hal_led0);
+        hal_led_off(hal_led1);
+        hal_led_off(hal_led2);
+        hal_led_off(hal_led3);
+        hal_led_off(hal_led4);
+        hal_led_off(hal_led5);   
+
+        for(;;)
+        {
+            hal_sys_delay(100);
+            
+            hal_led_toggle(hal_led0);
+            hal_led_toggle(hal_led1);
+            //hal_led_toggle(hal_led2);
+            hal_led_toggle(hal_led3);
+            hal_led_toggle(hal_led4);
+            hal_led_toggle(hal_led5);  
+        }
+    }
+}
 
 
 
