@@ -39,7 +39,7 @@
 #include "EOtheMemoryPool.h"
 
 #include "OPCprotocolManager_Cfg.h" 
-//#include "EOtheEMSapplDiagnostics.h"
+#include "EOtheEMSapplDiagnostics.h"
 
 #include "osal.h"
 
@@ -91,11 +91,12 @@ static void s_eo_appEncReader_configureConnectedEncoders(EOappEncReader *p, hal_
 static eOboolvalues_t s_eo_appEncReader_IsValidValue(uint32_t *valueraw, eOappEncReader_errortype_t *error);
 static void s_eo_appEncReader_mapStreams2HalNumbering(EOappEncReader *p);
 
-//static void s_eo_appEncReader_check(EOappEncReader *p);
+static void s_eo_appEncReader_check(EOappEncReader *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
 #define HALv2_encoder1      hal_encoder1
 #define HALv2_encoder2      hal_encoder2
 #define HALv2_encoder3      hal_encoder3
@@ -162,7 +163,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
         return(eores_NOK_nullpointer);
     }
 
-    //s_eo_appEncReader_check(p);
+    s_eo_appEncReader_check(p);
 
     if(ENCODER_NULL != p->configuredEnc_SPI1.readSeq.first)
     { 
@@ -313,19 +314,6 @@ __inline extern eOboolvalues_t eo_appEncReader_isReadySPI3(EOappEncReader *p)
     return(eobool_false);
 }
 
-extern eOresult_t eo_appEncReader_QuadEnc_init (EOappEncReader *p, uint8_t enc_number)
-{
-    hal_quad_enc_single_init(enc_number);
-    return(eores_OK);
-}
-
-extern eOresult_t eo_appEncReader_QuadEnc_GetValue (EOappEncReader *p, uint8_t enc_number, uint32_t *value)
-{
-    *value = hal_quad_enc_getCounter(enc_number);
-    return(eores_OK);
-}
-
-/*
 extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p)
 {
     if(NULL == p)
@@ -335,7 +323,6 @@ extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EO
 
     return(&p->dgninfo);
 }
-*/
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -542,7 +529,6 @@ static void s_eo_appEncReader_mapStreams2HalNumbering(EOappEncReader *p)
 		}
 }
 
-/*
 static void s_eo_appEncReader_check(EOappEncReader *p)
 {
    uint32_t index, errtype;
@@ -583,7 +569,7 @@ static void s_eo_appEncReader_check(EOappEncReader *p)
     memset(&p->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));
     p->dgninfo.count = 0;
 }
-*/
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
