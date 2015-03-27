@@ -2560,7 +2560,7 @@
 
   <Group>
     <GroupName>eo-protocol-cfg-callbacks</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2572,8 +2572,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\eoprot-callbacks\EoProtocolEPmn_fun_overridden.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolEPmn_fun_overridden.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\EoProtocolMN_fun_ems4rd.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolMN_fun_ems4rd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2585,8 +2585,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\eoprot-callbacks\eOcfg_nvsEP_as_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_usrcbk_ebx.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolAS_fun_ems4rd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2598,8 +2598,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\eoprot-callbacks\eOcfg_nvsEP_sk_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_sk_usrcbk_ebx.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolSK_fun_ems4rd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2611,8 +2611,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\eoprot-callbacks\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_ebx.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolMC_fun_ems4rd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

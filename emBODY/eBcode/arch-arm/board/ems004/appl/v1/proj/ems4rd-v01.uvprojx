@@ -1224,24 +1224,24 @@
           <GroupName>eo-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
+              <FileName>EoProtocolMN_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolEPmn_fun_overridden.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
+              <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
+              <FileName>EoProtocolSK_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
+              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2478,24 +2478,24 @@
           <GroupName>eo-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolEPmn_fun_overridden.c</FileName>
+              <FileName>EoProtocolMN_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolEPmn_fun_overridden.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_as_usrcbk_ebx.c</FileName>
+              <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\eOcfg_nvsEP_as_usrcbk_ebx.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_sk_usrcbk_ebx.c</FileName>
+              <FileName>EoProtocolSK_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\eOcfg_nvsEP_sk_usrcbk_ebx.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_nvsEP_mc_usrcbk_ebx.c</FileName>
+              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\eOcfg_nvsEP_mc_usrcbk_ebx.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
             </File>
           </Files>
         </Group>
