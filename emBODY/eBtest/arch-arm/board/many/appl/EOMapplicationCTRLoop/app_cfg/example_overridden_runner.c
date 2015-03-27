@@ -105,7 +105,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     if(3 == totalreceived)
     {
         totalreceived = 0;
-        eom_emsrunner_StopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
+        eom_emsrunner_GracefulStopAndGoTo(eom_emsrunner_GetHandle(), eo_sm_emsappl_EVgo2cfg);
     } 
     
     static uint32_t totalcalled = 0;
