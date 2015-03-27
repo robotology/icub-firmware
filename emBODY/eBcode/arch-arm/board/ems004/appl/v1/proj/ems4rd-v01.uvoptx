@@ -449,7 +449,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_cfg\overridden_appl.c</Filename>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -465,7 +465,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_cfg\overridden_appl.c</Filename>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -481,7 +481,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</Filename>
+          <Filename>C:\Users\acemor\acemorising\003\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoemsappl\eom_emsappl_main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -497,7 +497,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</Filename>
+          <Filename>C:\Users\acemor\acemorising\003\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoemsappl\eom_emsappl_main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -513,7 +513,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</Filename>
+          <Filename>C:\Users\acemor\acemorising\003\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoemsappl\eom_emsappl_main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -529,7 +529,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</Filename>
+          <Filename>..\src\eoappservices\EOtheEMSapplBody.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -545,7 +545,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</Filename>
+          <Filename>..\src\eoappservices\EOtheEMSapplBody.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -561,7 +561,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</Filename>
+          <Filename>C:\Users\acemor\acemorising\003\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoemsappl\eom_emsappl_main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -577,7 +577,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</Filename>
+          <Filename>C:\Users\acemor\acemorising\003\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoemsappl\eom_emsappl_main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -593,7 +593,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</Filename>
+          <Filename>C:\Users\acemor\acemorising\003\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoemsappl\eom_emsappl_main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -609,7 +609,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</Filename>
+          <Filename>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -625,7 +625,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</Filename>
+          <Filename>..\src\eoappservices\EOtheEMSapplBody.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -701,8 +701,8 @@
   </Target>
 
   <Group>
-    <GroupName>app_main</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>main</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -714,7 +714,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_main\eom_emsappl_main.c</PathWithFileName>
+      <PathWithFileName>..\main\eom_emsappl_main.c</PathWithFileName>
       <FilenameWithoutPath>eom_emsappl_main.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -766,19 +766,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>5</FileNumber>
-      <FileType>2</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\hal_startup_mpu_name_stm32f407ig.s</PathWithFileName>
-      <FilenameWithoutPath>hal_startup_mpu_name_stm32f407ig.s</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
   </Group>
 
   <Group>
@@ -789,14 +776,27 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
+      <FileNumber>5</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\cfg\abslayer\hal_core_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>hal_core_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
       <FileNumber>6</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\osal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\abslayer\ipal_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>ipal_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -808,8 +808,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\ipal_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>ipal_cfg.h</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\abslayer\osal_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -821,7 +821,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\hal_core_cfg.c</PathWithFileName>
+      <PathWithFileName>..\cfg\abslayer\hal_core_cfg.c</PathWithFileName>
       <FilenameWithoutPath>hal_core_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -829,13 +829,13 @@
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>9</FileNumber>
-      <FileType>5</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\hal_core_cfg.h</PathWithFileName>
-      <FilenameWithoutPath>hal_core_cfg.h</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\abslayer\ipal_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -847,21 +847,21 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\ipal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\abslayer\osal_cfg.c</PathWithFileName>
+      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>11</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\abslayer-cfg-stm32f4\osal_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>osal_cfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\abslayer\hal_startup_mpu_name_stm32f407ig.s</PathWithFileName>
+      <FilenameWithoutPath>hal_startup_mpu_name_stm32f407ig.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1436,7 +1436,7 @@
   </Group>
 
   <Group>
-    <GroupName>eo-ctrloop</GroupName>
+    <GroupName>eo-emsappl</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1600,7 +1600,7 @@
   </Group>
 
   <Group>
-    <GroupName>eo-ctrloop-cfg</GroupName>
+    <GroupName>eo-emsappl-cfg</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1613,7 +1613,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\app_cfg\EOMtheEMSapplCfg_cfg.h</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\EOMtheEMSapplCfg_cfg.h</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSapplCfg_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1626,7 +1626,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_runner.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\overridden_runner.c</PathWithFileName>
       <FilenameWithoutPath>overridden_runner.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1639,7 +1639,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_appl.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\overridden_appl.c</PathWithFileName>
       <FilenameWithoutPath>overridden_appl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1652,7 +1652,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_sm.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\overridden_sm.c</PathWithFileName>
       <FilenameWithoutPath>overridden_sm.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1665,7 +1665,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_configurator.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\overridden_configurator.c</PathWithFileName>
       <FilenameWithoutPath>overridden_configurator.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1678,7 +1678,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_backdoortransceiver.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\overridden_backdoortransceiver.c</PathWithFileName>
       <FilenameWithoutPath>overridden_backdoortransceiver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1691,7 +1691,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\overridden_error.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoemsappl\overridden_error.c</PathWithFileName>
       <FilenameWithoutPath>overridden_error.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1741,7 +1741,7 @@
   </Group>
 
   <Group>
-    <GroupName>appl-services-provider</GroupName>
+    <GroupName>appl-services</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1754,7 +1754,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheEMSapplBody.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOtheEMSapplBody.c</PathWithFileName>
       <FilenameWithoutPath>EOtheEMSapplBody.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1767,7 +1767,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappCanServicesProvider.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOappCanServicesProvider.c</PathWithFileName>
       <FilenameWithoutPath>EOappCanServicesProvider.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1780,7 +1780,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappEncodersReader.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOappEncodersReader.c</PathWithFileName>
       <FilenameWithoutPath>EOappEncodersReader.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1793,7 +1793,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappMeasuresConverter.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOappMeasuresConverter.c</PathWithFileName>
       <FilenameWithoutPath>EOappMeasuresConverter.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1806,7 +1806,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOappTheDataBase.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOappTheDataBase.c</PathWithFileName>
       <FilenameWithoutPath>EOappTheDataBase.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1819,7 +1819,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_obj\EOtheProtocolWrapper.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOtheProtocolWrapper.c</PathWithFileName>
       <FilenameWithoutPath>EOtheProtocolWrapper.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1827,7 +1827,7 @@
   </Group>
 
   <Group>
-    <GroupName>appl-services-provider-cfg</GroupName>
+    <GroupName>appl-services-cfg</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1840,7 +1840,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_messagesLookupTbl.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_messagesLookupTbl.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_messagesLookupTbl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1853,7 +1853,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1866,7 +1866,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1879,7 +1879,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgFunctions.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgFunctions.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1892,7 +1892,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1905,7 +1905,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\measures-converter\measuresConvFuncOveridden.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\measures-converter\measuresConvFuncOveridden.c</PathWithFileName>
       <FilenameWithoutPath>measuresConvFuncOveridden.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1918,7 +1918,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_servicesProviders_cfg\icub-can-net\eOcfg_appTheDataBase_ebx.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoappservices\icub-can-net\eOcfg_appTheDataBase_ebx.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_appTheDataBase_ebx.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2033,7 +2033,7 @@
   </Group>
 
   <Group>
-    <GroupName>ethLowLevelParserDebug</GroupName>
+    <GroupName>diagnostics</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -2046,68 +2046,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\ethlowlevelparser\usrCbk_ethLowLevParser.c</PathWithFileName>
-      <FilenameWithoutPath>usrCbk_ethLowLevParser.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>94</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils\eODeb_eoProtoParser.c</PathWithFileName>
-      <FilenameWithoutPath>eODeb_eoProtoParser.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>18</GroupNumber>
-      <FileNumber>95</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils\eOtheEthLowLevelParser.c</PathWithFileName>
-      <FilenameWithoutPath>eOtheEthLowLevelParser.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>diagnostics</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>19</GroupNumber>
-      <FileNumber>96</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001\EOtheEMSapplDiagnostics.c</PathWithFileName>
       <FilenameWithoutPath>EOtheEMSapplDiagnostics.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>19</GroupNumber>
-      <FileNumber>97</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_cfg\userdef_onerror.c</PathWithFileName>
-      <FilenameWithoutPath>userdef_onerror.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2120,8 +2060,8 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>98</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>94</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2133,8 +2073,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>99</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>95</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2146,8 +2086,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>100</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>96</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2159,8 +2099,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>101</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>97</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2172,8 +2112,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>102</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>98</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2185,8 +2125,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>103</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>99</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2198,8 +2138,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>104</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>100</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2211,8 +2151,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>105</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>101</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2224,8 +2164,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>106</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>102</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2237,8 +2177,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>107</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>103</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2250,8 +2190,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>108</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>104</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2263,8 +2203,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>109</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>105</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2276,8 +2216,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>110</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>106</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2289,8 +2229,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>111</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>107</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2302,8 +2242,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>20</GroupNumber>
-      <FileNumber>112</FileNumber>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>108</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2317,14 +2257,14 @@
   </Group>
 
   <Group>
-    <GroupName>eo-comm-protocol</GroupName>
+    <GroupName>eo-protocol</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>113</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>109</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2336,8 +2276,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>114</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>110</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2349,8 +2289,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>115</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>111</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2362,8 +2302,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>116</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>112</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2375,8 +2315,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>117</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>113</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2388,8 +2328,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>118</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>114</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2401,8 +2341,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>119</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>115</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2414,8 +2354,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>120</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>116</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2427,8 +2367,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>121</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>117</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2440,8 +2380,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>122</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>118</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2453,8 +2393,8 @@
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>21</GroupNumber>
-      <FileNumber>123</FileNumber>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>119</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2468,102 +2408,162 @@
   </Group>
 
   <Group>
-    <GroupName>eo-comm-protocol-cfg-boards</GroupName>
+    <GroupName>eo-protocol-cfg-boards</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>120</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b01.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b01.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>121</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b02.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b02.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>122</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b03.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b03.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>123</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b04.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b04.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>124</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b01.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b01.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b05.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b05.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>125</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b02.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b02.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b06.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b06.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>126</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b03.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b03.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b07.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b07.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>127</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b04.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b04.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b08.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b08.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>128</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b05.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b05.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b09.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b09.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>129</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b06.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b06.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b10.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b10.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>22</GroupNumber>
+      <GroupNumber>21</GroupNumber>
       <FileNumber>130</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b07.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b07.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-boards\eOprot_b11.c</PathWithFileName>
+      <FilenameWithoutPath>eOprot_b11.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>eo-protocol-cfg-callbacks</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>22</GroupNumber>
       <FileNumber>131</FileNumber>
@@ -2572,8 +2572,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b08.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b08.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\EoProtocolEPmn_fun_overridden.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolEPmn_fun_overridden.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2585,8 +2585,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b09.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b09.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\eOcfg_nvsEP_as_usrcbk_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_as_usrcbk_ebx.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2598,8 +2598,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b10.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b10.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\eoprot-callbacks\eOcfg_nvsEP_sk_usrcbk_ebx.c</PathWithFileName>
+      <FilenameWithoutPath>eOcfg_nvsEP_sk_usrcbk_ebx.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2611,81 +2611,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b11.c</PathWithFileName>
-      <FilenameWithoutPath>eOprot_b11.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eo-comm-protocol-cfg-callbacks</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>135</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_nvs_cfg\EoProtocolEPmn_fun_overridden.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolEPmn_fun_overridden.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>136</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_as_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_as_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>137</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_sk_usrcbk_ebx.c</PathWithFileName>
-      <FilenameWithoutPath>eOcfg_nvsEP_sk_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>138</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_nvs_cfg\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
+      <PathWithFileName>..\cfg\eoprot-callbacks\eOcfg_nvsEP_mc_usrcbk_ebx.c</PathWithFileName>
       <FilenameWithoutPath>eOcfg_nvsEP_mc_usrcbk_ebx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>23</GroupNumber>
-      <FileNumber>139</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems001\appl\v01\app_nvs_cfg\rxtools.c</PathWithFileName>
-      <FilenameWithoutPath>rxtools.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2698,8 +2625,8 @@
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
-      <GroupNumber>24</GroupNumber>
-      <FileNumber>140</FileNumber>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>135</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
