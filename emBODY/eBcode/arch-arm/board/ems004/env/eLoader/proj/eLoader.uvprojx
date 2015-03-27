@@ -364,7 +364,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardMCBSTM32F400 -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -475,7 +475,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -902,7 +902,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1013,7 +1013,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1440,7 +1440,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\robotconfig</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\cfg;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1551,7 +1551,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
