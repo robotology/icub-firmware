@@ -39,6 +39,7 @@
 #include "eOcommon.h"
 
 #include "hal_encoder.h"
+#include "hal_quad_enc.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -120,7 +121,10 @@ extern uint32_t eo_appEncReader_deltaSPI3(EOappEncReader *p);
 
 extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_encoder_errors_flags *flags);
 
-extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p);
+extern eOresult_t eo_appEncReader_QuadEnc_init (EOappEncReader *p, uint8_t enc_number);
+extern eOresult_t eo_appEncReader_QuadEnc_GetValue (EOappEncReader *p, uint8_t enc_number, uint32_t *value);
+
+//extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p);
 
 /** @}            
     end of group eo_app_encodersReader
