@@ -82,32 +82,32 @@
 
 
 #undef  EXECUTE_TEST_FLASH
-#define EXECUTE_TEST_FLASH
+//#define EXECUTE_TEST_FLASH
 
 
 
 #undef  EXECUTE_TEST_SYS_DELAY
-#define EXECUTE_TEST_SYS_DELAY
+//#define EXECUTE_TEST_SYS_DELAY
 
 #undef EXECUTE_TEST_I2C
-#define EXECUTE_TEST_I2C
+//#define EXECUTE_TEST_I2C
 
 #undef  EXECUTE_TEST_EEPROM
-#define EXECUTE_TEST_EEPROM
+//#define EXECUTE_TEST_EEPROM
 
 
 #undef  EXECUTE_TEST_TIMER
-#define EXECUTE_TEST_TIMER
+//#define EXECUTE_TEST_TIMER
 
 #undef  EXECUTE_TEST_WATCHDOG
 //#define EXECUTE_TEST_WATCHDOG
 
 #undef EXECUTE_TEST_UNIQUEID
-#define EXECUTE_TEST_UNIQUEID
+//#define EXECUTE_TEST_UNIQUEID
 
 
 #undef EXECUTE_TEST_ENCODER
-//#define EXECUTE_TEST_ENCODER
+#define EXECUTE_TEST_ENCODER
 
 
 #undef EXECUTE_TEST_CAN
@@ -132,7 +132,7 @@
 //#define EXECUTE_TEST_SWITCH
 
 #undef EXECUTE_TEST_ETH
-#define EXECUTE_TEST_ETH
+//#define EXECUTE_TEST_ETH
 
 
 #ifdef EXECUTE_TEST_ETH
@@ -175,6 +175,7 @@ void userdef1(void);
 void userdef2(void);
 void userdef3(void);
 void userdef4(void);
+void encoders_complete_read(void);
 static void brd_eventviewer_init(void);
 #endif//USE_EVENTVIEWER
 
@@ -193,7 +194,6 @@ static void test_has_failed(const char* msg);
 static void test_message(const char* msg);
 
 static void info_about_core_plus_led(void);
-
 
 #if     defined(EXECUTE_TEST_FLASH)    
 static void test_flash(void);
@@ -234,30 +234,32 @@ static void test_periph_can(void);
 static void test_periph_eth(void);
 #endif//defined(EXECUTE_TEST_ETH)   
 
-
 #if     defined(EXECUTE_TEST_SWITCH)    
 static void test_device_switch(void);
 #endif//defined(EXECUTE_TEST_SWITCH)   
 
 #if     defined(EXECUTE_TEST_ENCODER)    
 static void test_encoder(void);
+static void test_encoder_deinit(void);
 #endif//defined(EXECUTE_TEST_ENCODER)  
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+//Set the tick period to 1 ms
 static const hal_reltime_t systickperiod = hal_RELTIME_1millisec;
 static volatile uint32_t msTicks = 0;
 
-
+//Rate led1: 500 ms
 static volatile uint32_t led1_blink_rate_ms = 500;
 
 static volatile uint8_t s_tick_slower = 0; //s_tick_slower
 static const uint32_t s_tick_slower_rate_ms = 100;
 
+static volatile uint32_t enc_pos;
 
-
+// Initialization of GPIO User Button Map (only if needed)
 #if     defined(HAL_USE_GPIO)
 
 static const hal_gpio_map_t user_button_map = 
@@ -300,7 +302,6 @@ static const hal_gpio_cfg_t user_button_config =
 };
 
 
-
 static const hal_gpio_val_t user_notpushed_value = 
 #if     defined(HAL_BOARD_MCBSTM32F400)    
     hal_gpio_valHIGH;
@@ -321,18 +322,23 @@ static const hal_gpio_val_t user_notpushed_value =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+// Main program execution
 int main(void) 
 {
-    extern const hal_cfg_t*     hal_coreCFGptr;
-    hal_result_t res = hal_res_OK;
+	  //Pointer to hal_cfg_t
+    extern const hal_cfg_t* hal_coreCFGptr;
+	hal_result_t res = hal_res_OK; 
     
-   
+		//Init, with configuration pointer
     hal_core_init(hal_coreCFGptr);
     
+		//Start
     hal_core_start();
     
-     
-    leds_init();    
+    //Leds initialization 
+    leds_init();
+
+		//Buttons initialization
     button_init();
 
 #if !defined(DONT_USE_TRACE)    
@@ -350,73 +356,76 @@ int main(void)
 #endif
     
     // 1 millisec.
+		// Set an handler: every millisecond onsystick is called
     res = hal_sys_systick_sethandler(onsystick, systickperiod, hal_int_priority00);
     res =  res;   
     
     // now, if the led0 blinks at 1Hz, then  we have tested the hal-core plus gpio plus leds. ... ok, not exaustively
-       
+    
+		// Print more info about the board status/features		
     info_about_core_plus_led();
     
-
     // now after the systick i execute some more tests.
     
-
     test_message("");
     test_message(" ------------------------------------------ ");
     test_message(" ----------- BEGINNING OF TESTS ----------- ");
     test_message(" ------------------------------------------ ");
     test_message("");
     
-#if     defined(EXECUTE_TEST_FLASH)    
+#if     defined(EXECUTE_TEST_FLASH)
+		//Test flash memory
     test_flash();
-#endif//defined(EXECUTE_TEST_FLASH)    
-
-#if     defined(EXECUTE_TEST_SYS_DELAY)    
+#endif//defined(EXECUTE_TEST_FLASH)
+#if     defined(EXECUTE_TEST_SYS_DELAY)
+		//Test some delays time and check graphically if it works
     test_sys_delay();
 #endif//defined(EXECUTE_TEST_SYS_DELAY)      
  
-#if     defined(EXECUTE_TEST_I2C)    
+#if     defined(EXECUTE_TEST_I2C)
+    //Test i2c bus
     test_periph_i2c();
 #endif//defined(EXECUTE_TEST_I2C)  
 
-#if     defined(EXECUTE_TEST_EEPROM)    
+#if     defined(EXECUTE_TEST_EEPROM)
+		// Test device eeprom memory
     test_device_eeprom();
 #endif//defined(EXECUTE_TEST_EEPROM)  
 
     
-#if     defined(EXECUTE_TEST_TIMER)    
+#if     defined(EXECUTE_TEST_TIMER)
+		// Test timer (hardware)?
     test_periph_timer();
 #endif//defined(EXECUTE_TEST_TIMER)    
 
-#if     defined(EXECUTE_TEST_WATCHDOG)    
+#if     defined(EXECUTE_TEST_WATCHDOG)  
+		// Test the watchdog (recovery)
     test_periph_watchdog();
 #endif//defined(EXECUTE_TEST_WATCHDOG)   
 
-#if     defined(EXECUTE_TEST_UNIQUEID)    
+#if     defined(EXECUTE_TEST_UNIQUEID)
+		// Check and test the unique id of the board
     test_periph_uniqueid();
 #endif//defined(EXECUTE_TEST_UNIQUEID)  
 
-
-#if     defined(EXECUTE_TEST_ENCODER)    
-    test_encoder(); // forever loop
+#if     defined(EXECUTE_TEST_ENCODER) 
+	// Loop to test and read the encoder (forever loop)
+    test_encoder();
+    //test_encoder_deinit();
 #endif//defined(EXECUTE_TEST_ENCODER)  
 
-// keep it last, as it contains a forever loop
-
-#if     defined(EXECUTE_TEST_CAN)    
+#if     defined(EXECUTE_TEST_CAN)
+		// Test can bus transmission (various modes, forever loop)
     test_periph_can();
 #endif//defined(EXECUTE_TEST_CAN)
-     
 
-// it also contains a forever loop. you cannot ping it. just use the two ports
-
-#if     defined(EXECUTE_TEST_SWITCH)    
+#if     defined(EXECUTE_TEST_SWITCH)
+    //Switch test (forever loop)
     test_device_switch();
 #endif//defined(EXECUTE_TEST_SWITCH)   
 
-// keep it last, as it contains a forever loop
-
-#if     defined(EXECUTE_TEST_ETH)    
+#if     defined(EXECUTE_TEST_ETH)
+		// Ethernet test (various modes,  forever loop)
     test_periph_eth();
 #endif//defined(EXECUTE_TEST_ETH)
      
@@ -426,32 +435,29 @@ int main(void)
     test_message(" ----------- ALL TESTS ARE OVER ----------- ");
     test_message(" ------------------------------------------ ");
     
-    for(;;);
-    
+    //for(;;);
 }
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
     
-
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // -------------------------------------------------------------------------------------------------------------------- 
 
 #ifdef  USE_EVENTVIEWER
 
-// keep tem extern to make them visible in eventviewer
+// keep them extern to make them visible in eventviewer
 void idle(void){}
 void userdef1(void){}
 void userdef2(void){}
 void userdef3(void){}
 void userdef4(void){}
-    
+		
+void encoders_complete_read(void){}
+
+// EventViewer Initialization
 static void brd_eventviewer_init(void)
 {
     
@@ -464,29 +470,34 @@ static void brd_eventviewer_init(void)
     eventviewer_load(ev_ID_first_usrdef+2, userdef2);
     eventviewer_load(ev_ID_first_usrdef+3, userdef3);
     eventviewer_load(ev_ID_first_usrdef+4, userdef4);
-    
+		
+		eventviewer_load(ev_ID_first_usrdef+5, encoders_complete_read);
+
     // the eventviewer shall stay most of time in idle
     // apart from some specific actions: systick, userdef1 and userdef2
     eventviewer_switch_to(ev_ID_idle);
     
-
 }
 
 #endif//USE_EVENTVIEWER
 
-
 static void leds_init(void)
 {
+	//function executed only if the board uses LED 
 #if     defined(HAL_USE_LED)
     
     hal_result_t res;
     
+		// Initialize the led itself using hal_led_init
     res = hal_led_init(hal_led0, NULL);
+		// Why res=res?
     res =  res;    
 
+		//Switch on and switch off 
     leds_led0_toggle();
     leds_led0_toggle();
     
+	  //Repeat for all the others led
     res = hal_led_init(hal_led1, NULL);
     res =  res;
     
@@ -609,6 +620,7 @@ extern void onsystick(void)
 
 static void button_init(void)
 {
+	//function executed only if the board uses Buttons
 #if     defined(HAL_USE_GPIO)
  
     hal_gpio_init(user_button_map.gpio, &user_button_config);
@@ -617,6 +629,7 @@ static void button_init(void)
 #endif//defined(HAL_USE_GPIO)    
 }
 
+// Return 0 if the button is not pushed, 1 otherwise
 static uint8_t button_ispushed(void)
 {
 #if     defined(HAL_USE_GPIO)
@@ -728,7 +741,8 @@ static void info_about_core_plus_led(void)
     hal_trace_puts(" TRACE:             enabled and used (otherwise you would not read this print)");         
         
 #ifdef HAL_USE_LED
-    hal_trace_puts(" LED:        enabled and used");  
+    hal_trace_puts(" LED:        enabled and used");
+    hal_trace_puts(extra);		
 #endif
         
     hal_trace_puts(" PLUS OTHERS");
@@ -744,7 +758,6 @@ static void info_about_core_plus_led(void)
 #if     defined(EXECUTE_TEST_FLASH)    
 static void test_flash(void)
 {
-    
     test_is_beginning("flash: erasing a bank, writing, reading it back");
 
     static uint32_t address = 0;
@@ -810,6 +823,7 @@ static void test_sys_delay(void)
     
     hal_sys_irq_disable();
     
+	 // Begin all the test with different delay times
 #ifdef  USE_EVENTVIEWER
      prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
 #endif  
@@ -892,8 +906,7 @@ static void test_sys_delay(void)
 //                 leds_led2_toggle();
 //                 hal_sys_delay(500*1000);
 //     }        
-    test_was_successful("sys-delay: ONLY IF the measures with eventviewer is OK");
-
+    test_was_successful("sys-delay: ONLY IF the measures with eventviewer is OK, check it graphically!");
 }    
     
 #endif//defined(EXECUTE_TEST_SYS_DELAY)  
@@ -1100,6 +1113,7 @@ static const hal_watchdog_cfg_t wdtconfig =
     .onwindowexpiry_arg     = NULL   
 };
 
+// ?
 static void test_periph_watchdog(void)
 {
 
@@ -1308,7 +1322,7 @@ static void test_periph_can(void)
     
 //#if defined(EXECUTE_TEST_CAN_TX1)||defined(EXECUTE_TEST_CAN_TX1_RX2)    
     
-    test_is_beginning("can");   
+	  test_is_beginning("can test:");   
     char msg[128] =  {0};
     hal_can_frame_t canframetx =
     {
@@ -1662,10 +1676,7 @@ static void test_periph_ethtransceiver_links(void)
         hal_trace_puts(msg); 
     }
 
-    
-    
 }
-
 
 static void test_periph_eth(void)
 {    
@@ -1739,8 +1750,6 @@ static void test_periph_eth(void)
             hal_trace_puts("eth: toggled led4");
         }
         
-            
-    
     } 
     
 #endif//defined(EXECUTE_TEST_ETH_PING)||defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)    
@@ -1748,61 +1757,328 @@ static void test_periph_eth(void)
 }
 #endif//defined(EXECUTE_TEST_ETH)
 
-
-
 #if     defined(EXECUTE_TEST_ENCODER)    
 
 #include "hal_encoder.h"
 
-static hal_encoder_position_t positioncbk = 0;
+// Callback variables
+static volatile hal_bool_t ready12 = hal_false;
+static volatile hal_bool_t ready34 = hal_false;
+static const hal_bool_t sdata_check = hal_false;
+static const uint8_t reg_to_read = 0x77;
 
-static void test_encoder_cbk(void* arg);
+// Callback functions
+static void test_encoder_cbk1(void* arg);
+static void test_encoder_cbk2(void* arg);
+static void test_encoder_cbk3(void* arg);
+static void test_encoder_cbk4(void* arg);
+static void test_encoder_cbk5(void* arg);
 
-static const hal_encoder_t hal_encoder = hal_encoder1;
-static void test_encoder(void)
+
+static const hal_encoder_t hal_encoder_3 = hal_encoder2;
+static const hal_encoder_t hal_encoder_4 = hal_encoder5;
+
+//One Encoder mapped on P6 (spi2) and the other one on P7 (spi3)
+static const hal_encoder_t hal_encoder_1 = hal_encoder1;
+static const hal_encoder_t hal_encoder_2 = hal_encoder4;
+
+
+evEntityId_t prev_act;
+
+static void test_encoder_deinit(void)
 {
-    
-    static hal_encoder_cfg_t encodercfg =
+	hal_result_t res = hal_res_NOK_generic;
+	hal_encoder_position_t position = 0;
+	hal_encoder_errors_flags flags;
+	flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+    char str[256] = {0};
+	uint8_t i = 0;
+	
+	//delay needed
+	hal_sys_delay(25*hal_RELTIME_1millisec);
+	
+	static const hal_encoder_cfg_t encodercfg1 =
     {
         .priority           = hal_int_priority03,
-        .callback_on_rx     = test_encoder_cbk,
-        .arg                = NULL
+		.callback_on_rx     = NULL,
+        .arg                = NULL,
+		.type								= hal_encoder_t1,
+		.reg_address				= NULL,
+        .sdata_precheck			= hal_false
+    };
+	
+	static const hal_encoder_cfg_t encodercfg2 =
+    {
+        .priority           = hal_int_priority03,
+		.callback_on_rx     = NULL,
+        .arg                = NULL,
+		.type				= hal_encoder_t2,
+		.reg_address		= reg_to_read,
+		.sdata_precheck		= sdata_check
+    };
+	
+    //Init
+	res = hal_encoder_init(hal_encoder_1, &encodercfg1);
+	res = hal_encoder_init(hal_encoder_2, &encodercfg2);
+
+	//Read for 20 seconds
+	for(i = 0; i<20; i++)
+	{
+        // Start the read procedure
+        hal_encoder_read_start(hal_encoder_1);
+        hal_encoder_read_start(hal_encoder_2);
+        // Wait 1 sec
+        hal_sys_delay(hal_RELTIME_1second);
+        //Read the data and print them
+        hal_encoder_get_value(hal_encoder_1, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder P6 reading: %d\tStatus Register read: 0x%x "
+                                    "TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position, reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+        position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+		
+        hal_encoder_get_value(hal_encoder_2, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder P7 reading: %d\tStatus Register read: 0x%x "
+                                    "TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position, reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+        position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+	}
+
+	//Now de-init
+	snprintf(str, sizeof(str),	"Deinitializing the encoder and waiting before reinit");
+    hal_trace_puts(str);
+	
+    hal_encoder_deinit(hal_encoder_1);
+	hal_encoder_deinit(hal_encoder_2);
+	
+	//Some safe delay
+	hal_sys_delay(hal_RELTIME_1second);
+	
+	//Reinit and read again for 20 seconds
+	hal_encoder_init(hal_encoder_1, &encodercfg1);
+	hal_encoder_init(hal_encoder_2, &encodercfg2);
+	 
+	for(i = 0; i<20; i++)
+	{
+		// Start the read procedure
+		hal_encoder_read_start(hal_encoder_1);
+		hal_encoder_read_start(hal_encoder_2);
+		// Wait 1 sec
+		hal_sys_delay(hal_RELTIME_1second);
+		//Read the data and print them
+		hal_encoder_get_value(hal_encoder_1, &position, &flags);
+		snprintf(str, sizeof(str),	"Encoder P6 reading: %d\tStatus Register read: 0x%x "
+									"TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position, reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+		position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+		
+		hal_encoder_get_value(hal_encoder_2, &position, &flags);
+		snprintf(str, sizeof(str),	"Encoder P7 reading: %d\tStatus Register read: 0x%x "
+									"TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position, reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+		position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+	}
+	
+ }	 
+	  
+static void test_encoder(void)
+{
+	//Wait some time, for:
+	// - voltage stabilization of the ICMU chip (~2,7 ms)
+ 	// - power up time of the chip itself (EEPROM data valid) (typical = 20ms)
+	// For the sake of security, wait at least for 23/25 ms
+	hal_sys_delay(25*hal_RELTIME_1millisec);
+	
+	//Encoder struct config init: priority, callback function, arg
+	//4 encoders of type 2 (AMO)
+	//only the callback changes in the config struct
+    static const hal_encoder_cfg_t encodercfg1 =
+    {
+        .priority           = hal_int_priority03,
+		.callback_on_rx     = test_encoder_cbk1,
+        .arg                = NULL,
+		.type				= hal_encoder_t2,
+		.reg_address		= reg_to_read,
+		.sdata_precheck		= sdata_check
     };
     
-    hal_encoder_position_t position = 0;
-
+	static const hal_encoder_cfg_t encodercfg2 =
+    {
+        .priority           = hal_int_priority03,
+		.callback_on_rx     = test_encoder_cbk2,
+        .arg                = NULL,
+		.type				= hal_encoder_t2,
+		.reg_address		= reg_to_read,
+		.sdata_precheck		= sdata_check
+    };
     
-    char str[128] = {0};
-
+	static const hal_encoder_cfg_t encodercfg3 =
+    {
+        .priority           = hal_int_priority03,
+		.callback_on_rx     = test_encoder_cbk3,
+        .arg                = NULL,
+		.type				= hal_encoder_t2,
+		.reg_address		= reg_to_read,
+		.sdata_precheck		= sdata_check
+    };
     
+	static const hal_encoder_cfg_t encodercfg4 =
+    {
+        .priority           = hal_int_priority03,
+		.callback_on_rx     = test_encoder_cbk4,
+        .arg                = NULL,
+		.type				= hal_encoder_t2,
+		.reg_address		= reg_to_read,
+		.sdata_precheck		= sdata_check
+    };
+		
+	// Encoder 5 of type 1
+	static const hal_encoder_cfg_t encodercfg5 =
+    {
+        .priority           = hal_int_priority03,
+		.callback_on_rx     = test_encoder_cbk5,
+        .arg                = NULL,
+		.type				= hal_encoder_t1,
+		.reg_address		= NULL,
+		.sdata_precheck		= hal_false
+    };
+		
+	//Initialize array [256]  to 0 (trace string to be printed for debug)
+    char str[256] = {0};
+
     hal_result_t res = hal_res_NOK_generic;
-    res = hal_encoder_init(hal_encoder, &encodercfg);
-    res = res;
-    uint32_t tt = 0;
-    
+		
+	// Initialize the encoders with the config struct
+	// Actual config: 1 AEA encoder on P6 and 1 AMO encoder on P7 
+	// Be careful: you cannot initialize two different encoder models on the same SPI 
+    //res = hal_encoder_init(hal_encoder_1, &encodercfg1);
+	//res = res;
+		
+	//res = hal_encoder_init(hal_encoder_2, &encodercfg2);
+	//res = res;
+		
+	//res = hal_encoder_init(hal_encoder_3, &encodercfg3);
+	//res = res;
+		
+	res = hal_encoder_init(hal_encoder_1, &encodercfg1);
+	res = res;
+		
+	res = hal_encoder_init(hal_encoder_3, &encodercfg4);
+	res = res;
+		
+	hal_encoder_position_t position = 0;
+	hal_bool_t val = hal_false;
+	uint16_t regs = 0x00;
+	uint8_t rstatus = 0x00;
+	uint8_t rdata = 0x00;
+	uint8_t rec_bytes[4];
+	hal_encoder_errors_flags flags;
+				
+	//Start reading (encoder 1 and encoder 3 can start to read in parallel (different SPI))
+	prev_act = eventviewer_switch_to(ev_ID_first_usrdef+5);
+	hal_encoder_read_start (hal_encoder_1);
+    ready34 = hal_true; // using only one SPI
+	//hal_encoder_read_start(hal_encoder_3);
+	
+	//Forever loop
     for(;;)
     {
-        hal_sys_delay(1*hal_RELTIME_1second);
-        res = hal_encoder_read_start(hal_encoder);
-        res = res;
-        hal_sys_delay(1*hal_RELTIME_1second);
-        res = hal_encoder_get_value(hal_encoder, &position);
-        position = position;
-        tt = (position >> 2) & 0xfff0;
-        snprintf(str, sizeof(str), "encoder reading: %d, orig = 0x%x", tt, position);
+        // Reading the 4 encoders (using callbacks). Before reading I wait that both pairs are ready
+        while ((ready12 != hal_true) || (ready34 != hal_true));
+        eventviewer_switch_to(prev_act);
+        
+        //Encoder 1
+        //hal_encoder_get_value_t2 (hal_encoder_1, &position, &val, &regs);
+        //rstatus = (regs >> 8) & 0xFF;
+        //rdata = regs & 0xFF;
+        //snprintf(str, sizeof(str),	"Encoder 1 reading: %d, Validity: %d, "
+        //														"Register 0x%x Status: 0x%x, Register 0x%x Data: 0x%x", position, val, reg_to_read, rstatus, reg_to_read, rdata);
+        hal_encoder_get_value(hal_encoder_1, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder 1 reading: %d\tStatus Register read: 0x%x "
+                                    "TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d\n", position, reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
         hal_trace_puts(str);
-       
+        enc_pos = position;
+        /*position = 0,*/ flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+
+        /*
+        //Encoder 2
+        hal_encoder_get_value_t2 (hal_encoder_2, &position, &val, &regs);
+        hal_encoder_get_value(hal_encoder_2, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder 2 reading: %d\tStatus Register read: 0x%x "
+        														"TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position,reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+        position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+         
+        //Encoder 3
+        //hal_encoder_get_value_t2 (hal_encoder_3, &position, &val, &regs);
+        hal_encoder_get_value(hal_encoder_3, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder 3 reading: %d\tStatus Register read: 0x%x "
+                                                                "TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position,reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str); 
+        position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+
+        //Encoder 4
+        hal_encoder_get_value_t2 (hal_encoder_4, &position, &val, &regs);
+        hal_encoder_get_value(hal_encoder_4, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder 4 reading: %d\tStatus Register read: 0x%x "
+        												"TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position, reg_to_read, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+        position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+         
+        //Encoder 5
+        hal_encoder_get_value(hal_encoder_5, &position, &flags);
+        snprintf(str, sizeof(str),	"Encoder 5 reading: %d\t\t"
+        													"TX Error flag: %d, Data error flag: %d, Data not ready flag: %d, Chip error flag: %d", position, flags.tx_error, flags.data_error, flags.data_notready, flags.chip_error); 
+        hal_trace_puts(str);
+        position = 0, flags.tx_error = 0, flags.data_error = 0, flags.data_notready = 0, flags.chip_error = 0;
+         
+        hal_trace_puts("\n");
+        */
+        ready12 = hal_false;
+        //ready34 = hal_false;
+         
+        //500 ms delay
+        hal_sys_delay(100*hal_RELTIME_1millisec);
+        prev_act = eventviewer_switch_to(ev_ID_first_usrdef+5);
+        hal_encoder_read_start (hal_encoder_1);
+        //hal_encoder_read_start(hal_encoder_3);
     }
-       
+} 
+
+/*  Callback functions invoked when new encoder data is available, but only if specified in the config struct
+    for the encoder */
+
+static void test_encoder_cbk1(void* arg)
+{
+	// Start encoder 2
+	//hal_encoder_read_start(hal_encoder_2);
+	ready12 = hal_true;
 }
 
-static void test_encoder_cbk(void* arg)
+static void test_encoder_cbk2(void* arg)
 {
-    hal_result_t rr = hal_res_NOK_generic;
-    //rr = hal_encoder_get_value(hal_encoder, &positioncbk);  
-    rr = rr;    
-    positioncbk = positioncbk;    
+	// Set flag
+	ready12 = hal_true;
 }
+
+static void test_encoder_cbk3(void* arg)
+{
+    // Start encoder 4
+    //hal_encoder_read_start(hal_encoder_4);
+    ready34 = hal_true;
+}
+
+static void test_encoder_cbk4(void* arg)
+{
+    // Set flag
+	ready34 = hal_true;
+}
+
+static void test_encoder_cbk5(void* arg)
+{
+	// Set flag
+	ready12 = hal_true;
+}
+
 
 #endif//defined(EXECUTE_TEST_ENCODER)  
 

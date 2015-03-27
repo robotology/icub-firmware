@@ -24,11 +24,11 @@
 #include "string.h"  
 #include "stdlib.h"
 #include "stdio.h"
+#include "time.h"
 
 #include "hal.h"  
 #include "hal_core.h"  
-#include "pid.h"
-#include "as5048.h"
+
 #if     !defined(HAL_USE_LIB)
 #include "hal_brdcfg_modules.h"
 #else
@@ -78,28 +78,28 @@
 
 
 #undef  EXECUTE_TEST_FLASH
-#define EXECUTE_TEST_FLASH
+//#define EXECUTE_TEST_FLASH
 
 
 
 #undef  EXECUTE_TEST_SYS_DELAY
-#define EXECUTE_TEST_SYS_DELAY
+//#define EXECUTE_TEST_SYS_DELAY
 
 #undef EXECUTE_TEST_I2C
-#define EXECUTE_TEST_I2C
+//#define EXECUTE_TEST_I2C
 
 #undef  EXECUTE_TEST_EEPROM
-#define EXECUTE_TEST_EEPROM
+//#define EXECUTE_TEST_EEPROM
 
 
 #undef  EXECUTE_TEST_TIMER
-#define EXECUTE_TEST_TIMER
+//#define EXECUTE_TEST_TIMER
 
 #undef  EXECUTE_TEST_WATCHDOG
 //#define EXECUTE_TEST_WATCHDOG
 
 #undef EXECUTE_TEST_UNIQUEID
-#define EXECUTE_TEST_UNIQUEID
+//#define EXECUTE_TEST_UNIQUEID
 
 
 #undef EXECUTE_TEST_ENCODER
@@ -111,7 +111,7 @@
 
 
 #undef EXECUTE_TEST_ENCODER_SPI
-//#define EXECUTE_TEST_ENCODER_SPI
+#define EXECUTE_TEST_ENCODER_SPI
 
 
 #define haLcAn1    hal_can1
@@ -129,23 +129,21 @@
 //#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif//EXECUTE_TEST_CAN
 
-#define EXECUTE_TEST_SWITCH
 #undef EXECUTE_TEST_SWITCH
+//#define EXECUTE_TEST_SWITCH
 
 
-#define EXECUTE_TEST_ETH
-//#undef EXECUTE_TEST_ETH
+#undef EXECUTE_TEST_ETH
+//#define EXECUTE_TEST_ETH
 
-
-#define EXECUTE_TEST_ADC
 #undef EXECUTE_TEST_ADC
+#define EXECUTE_TEST_ADC
 
-
-#define EXECUTE_TEST_DEVICE_MOTORCTL
 #undef EXECUTE_TEST_DEVICE_MOTORCTL
+//#define EXECUTE_TEST_DEVICE_MOTORCTL
 
 #ifdef EXECUTE_TEST_ETH
-#define EXECUTE_TEST_ETH_PING
+//#define EXECUTE_TEST_ETH_PING
 #define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 //#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
@@ -221,6 +219,7 @@ static void test_device_eeprom(void);
 
 #if     defined(EXECUTE_TEST_TIMER)    
 static void test_periph_timer(void);
+static void test_periph_timer2(void);
 #endif//defined(EXECUTE_TEST_TIMER)    
 
 
@@ -245,6 +244,7 @@ static int16_t current[4]={0,0,0,0};
 
 #if     defined(EXECUTE_TEST_ENCODER_SPI)    
 static void test_encoder_spi(void);
+static void test_quad_enc(void);
 #endif//defined(EXECUTE_TEST_ENCODER_SPI) 
 
 
@@ -391,70 +391,83 @@ int main(void)
     
 #if     defined(EXECUTE_TEST_FLASH)    
     test_flash();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_FLASH)    
 
 #if     defined(EXECUTE_TEST_SYS_DELAY)    
     test_sys_delay();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_SYS_DELAY)      
  
 #if     defined(EXECUTE_TEST_I2C)    
     test_periph_i2c();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_I2C)  
 
 #if     defined(EXECUTE_TEST_EEPROM)    
     test_device_eeprom();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_EEPROM)  
 
 #if     defined(EXECUTE_TEST_SWITCH)    
     test_device_switch();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_SWITCH)   
 
 
 #if     defined(EXECUTE_TEST_TIMER)    
-    test_periph_timer();
+    //test_periph_timer();
+	test_periph_timer2();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_TIMER)   
 
 // keep it last, as it contains a forever loop
 
 #if     defined(EXECUTE_TEST_ETH)    
     test_periph_eth();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_ETH)
     
 
 
 #if     defined(EXECUTE_TEST_WATCHDOG)    
     test_periph_watchdog();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_WATCHDOG)   
 
 #if     defined(EXECUTE_TEST_UNIQUEID)    
     test_periph_uniqueid();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_UNIQUEID)  
 
 
 #if     defined(EXECUTE_TEST_ENCODER)    
     test_encoder(); // forever loop
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_ENCODER)  
 
 // keep it last, as it contains a forever loop
 
 #if     defined(EXECUTE_TEST_CAN)    
     test_periph_can();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_CAN)
 
 #if     defined(EXECUTE_TEST_ADC)    
     test_periph_adc();
-    
+    hal_sys_delay(2*hal_RELTIME_1second);
 		
 #if     defined(EXECUTE_TEST_ENCODER_SPI)
-	test_encoder_spi();
+	//test_encoder_spi();
+    test_quad_enc();
+    hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)
  
 #endif//defined(EXECUTE_TEST_ADC) 
 
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
-      test_device_motorctl_2();
-			
-//    	test_device_motorctl_1();
+    test_device_motorctl_2();
+    //test_device_motorctl_1();
 #endif//defined(EXECUTE_TEST_DEVICE_MOTORCL) 
 
 // it also contains a forever loop. you cannot ping it. just use the two ports
@@ -543,7 +556,7 @@ static void leds_init(void)
     res = hal_led_init(hal_led3, NULL);
     res =  res;
 		
-		leds_led3_toggle();
+	leds_led3_toggle();
     leds_led3_toggle();
     
     res = hal_led_init(hal_led4, NULL);
@@ -644,8 +657,8 @@ extern void onsystick(void)
     if(led1_blink_rate_ms == count)
     {
         count = 0;
-        leds_led0_toggle();
-				leds_led1_toggle();
+        //leds_led0_toggle();
+				//leds_led1_toggle();
     }
     
     if(0 == (msTicks % s_tick_slower_rate_ms))
@@ -968,11 +981,16 @@ static void test_periph_i2c(void)
 #endif//defined(EXECUTE_TEST_I2C)  
 
 
-#if     defined(EXECUTE_TEST_ENCODER_SPI)    
+#if     defined(EXECUTE_TEST_ENCODER_SPI)
+#include "hal_as5048.h"
+#include "hal_quad_enc.h"
+
 static void test_encoder_spi(void)
 {
+	//can objects
   hal_can_frame_t canframe;
 	hal_can_t CAN_PERIPH=hal_can1;
+	
   hal_result_t res;
 	uint8_t message_received=0;
 	uint8_t remaining=0;
@@ -980,18 +998,24 @@ static void test_encoder_spi(void)
   int32_t enc[4]={0,0,0,0};
   test_is_beginning("encoder as5048_as5055 : "); 
 
+	//init the spis for reading encoders
 	as5048_init(0);
 	as5048_init(1);
+	
+	//init timers...?
 	hal_quad_enc_Init();
 
+		//characterize the canframe
     canframe.id = 0x1AA;
     canframe.id_type = hal_can_frameID_std;
     canframe.frame_type = hal_can_frame_data;
     canframe.data[0] = 0xAA;
     canframe.size = 8;
-   	 
+  
+	//loop until i receive a message on can
 	while(message_received==0)
 	{
+		// read the encoders and fill the canframe with the data
 	  angle[0]=0; 
 	  angle[0]=1; 
    	angle[0]=as5048_read(0)[0];
@@ -1010,14 +1034,19 @@ static void test_encoder_spi(void)
 
 //		  canframe.data[5] = (aRxBuffer[0] & 0x8000)>>8;	   //parity
 //		  canframe.data[6] = (aRxBuffer[0] & 0x4000)>>8;	   //error flag
+		
+		// Send to can
     hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);	
 	  hal_sys_delay(100*hal_RELTIME_1microsec);  
 	  
+		//Get the incremental counter for 4 encoders
 		  enc[0]=hal_quad_enc_getCounter(0);
 			enc[1]=hal_quad_enc_getCounter(1); 
 			enc[2]=hal_quad_enc_getCounter(2);
 			enc[3]=hal_quad_enc_getCounter(3); 
 			canframe.id=0x300;
+			
+			//Fill another canframe and send it
 			canframe.data[0]=((uint16_t)enc[0] & 0xFF);
 			canframe.data[1]=((uint16_t)enc[0] & 0xFF00)>>8;
 			canframe.data[2]=((uint16_t)enc[1] & 0xFF);
@@ -1029,15 +1058,55 @@ static void test_encoder_spi(void)
 			hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now); 
 			 
 			hal_sys_delay(250*hal_RELTIME_1microsec);
-		
+		// Get the first item inside can rx queue
 		res=hal_can_get(CAN_PERIPH, &canframe, &remaining);
 		
+		//Send messages to can
 		send_adcTocan(canframe,CAN_PERIPH);
 		
 	  if (res==hal_res_OK ) message_received=1;		  
 	} 
   test_was_successful("encoder as5048-as5055"); 
 	    
+}
+
+static void test_quad_enc(void)
+{
+    test_is_beginning("quad_enc:");
+    
+    //hal_quad_enc_Init();
+    hal_quad_enc_single_init(0);
+    hal_quad_enc_single_init(1);
+    hal_quad_enc_single_init(2);
+    hal_quad_enc_single_init(3);
+    
+    //fake init, it should return doing nothing
+    hal_quad_enc_single_init(10);
+    
+    char str_quad_enc[64];
+    for(;;)
+    {
+        uint32_t cnt =  0;
+        static uint16_t step = 0;
+        step++;
+        //Test to reset 
+        if (step == 100)
+        {
+            hal_quad_enc_reset_counter(0);
+            hal_quad_enc_reset_counter(1);
+            hal_quad_enc_reset_counter(2);
+            hal_quad_enc_reset_counter(3);
+        }
+        for(uint8_t i = 0; i<4; i++)
+        {
+            hal_sys_delay(10*hal_RELTIME_1millisec);
+            cnt = hal_quad_enc_getCounter(i);
+            snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d", i+1, cnt);
+            test_message(str_quad_enc);
+        }
+        test_message("\n");
+        hal_sys_delay(500*hal_RELTIME_1millisec);
+    }
 }
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)  
 
@@ -1116,6 +1185,10 @@ static void test_device_eeprom(void)
 
 static volatile uint8_t test_timer_count = 0;
 
+static volatile uint16_t test_timer_count1 = 0;
+static volatile uint16_t test_timer_count2 = 0;
+static volatile uint16_t test_timer_count3 = 0;
+
 static void test_timer_callback(void* p)
 {
 #ifdef  USE_EVENTVIEWER
@@ -1136,7 +1209,47 @@ static void test_timer_callback(void* p)
 #endif
 }
 
+static void test_timer_callback_blink1(void* p)
+{
+	  test_timer_count1++;
+	
+#if  defined(HAL_USE_LED)
+		// 10Hz
+		if(0 == (test_timer_count1%1000))
+			hal_led_toggle(hal_led0);
+#endif//defined(HAL_USE_LED)
+    
+}
+static void test_timer_callback_blink2(void* p)
+{
+	  test_timer_count2++;
+	
+#if  defined(HAL_USE_LED)
+	// 5Hz
+    if(test_timer_count2 == 2000)
+    {
+        hal_led_toggle(hal_led1);
+        test_timer_count2 = 0;
+    }     
+#endif//defined(HAL_USE_LED)
+    
+}
+static void test_timer_callback_blink3(void* p)
+{
+	  test_timer_count3++;
+	
+#if  defined(HAL_USE_LED)
+		// 2Hz
+		if(0 == (test_timer_count3%5000))
+       hal_led_toggle(hal_led2);
+#endif//defined(HAL_USE_LED)
+}
+
 static const hal_timer_t haltimer_ontest = hal_timer6;
+
+static const hal_timer_t haltimer_blink1 = hal_timer9;
+static const hal_timer_t haltimer_blink2 = hal_timer10;
+static const hal_timer_t haltimer_blink3 = hal_timer11;
 
 static const hal_timer_cfg_t test_timer_config =
 {
@@ -1148,6 +1261,16 @@ static const hal_timer_cfg_t test_timer_config =
     .arg                = NULL    
 };
 
+
+static hal_timer_cfg_t test_timer_config_blink =
+{
+    .prescaler          = hal_timer_prescalerAUTO,
+    .countdown          = 100,
+    .priority           = hal_int_priority15,
+    .mode               = hal_timer_mode_periodic,
+    .callback_on_exp    = test_timer_callback_blink1,
+    .arg                = NULL  
+};
 static void test_periph_timer(void)
 {
 #if     defined(HAL_USE_TIMER)
@@ -1187,6 +1310,35 @@ static void test_periph_timer(void)
 
 #endif//defined(HAL_USE_TIMER)
 }
+
+static void test_periph_timer2(void)
+{
+#if     defined(HAL_USE_TIMER)
+    
+	test_is_beginning("timer: check conflict test");
+
+	hal_result_t res = hal_res_OK;
+    //res += hal_timer_init(haltimer_blink1, &test_timer_config_blink, NULL);
+    
+    test_timer_config_blink.callback_on_exp = test_timer_callback_blink2;
+	res += hal_timer_init(haltimer_blink2, &test_timer_config_blink, NULL);
+    
+    //test_timer_config_blink.callback_on_exp = test_timer_callback_blink3;
+	//res += hal_timer_init(haltimer_blink3, &test_timer_config_blink, NULL);
+
+    //res += hal_timer_start(haltimer_blink1);
+	res += hal_timer_start(haltimer_blink2);
+	//res += hal_timer_start(haltimer_blink3);
+
+    if(hal_res_OK != res)
+    {
+        test_has_failed("timer: hal_timer_init() or hal_timer_start() failed");
+    }
+    
+    test_was_successful("timer: only if the led are blinking with different frequencies: 10HZ, 5HZ, 2HZ");
+#endif//defined(HAL_USE_TIMER)
+}
+
 
 #endif//defined(EXECUTE_TEST_TIMER)
 
@@ -1293,9 +1445,7 @@ static void test_periph_uniqueid(void)
     
 }
 #endif//defined(EXECUTE_TEST_UNIQUEID)   
-
-
-#if     defined(EXECUTE_TEST_CAN)    
+#if     defined(EXECUTE_TEST_CAN) 
 
 static const hal_can_cfg_t canconfigbase =
 {
@@ -1321,11 +1471,6 @@ typedef struct
     uint16_t    filler;
     uint32_t    sequencenumber;  
 } can_message_format_t;
-
-#endif
-
-
-#if     defined(EXECUTE_TEST_CAN) 
 
 #if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
 static hal_result_t can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
@@ -1419,37 +1564,38 @@ static void test_periph_can(void)
     hal_can_init(haLcAn1, &canxconfig);
     hal_can_enable(haLcAn1);   
     
-    // 2. run 10 times 
-	  static uint32_t count = 0;
-		static hal_result_t r;
-			test_message("Try to send a message");
-			if(1 == s_tick_slower)
-			{
-					s_tick_slower = 0;
+    // 2. send a message with a randomly defined first byte
+
+    hal_result_t r;
+	static uint32_t count = 0xAA;
+    char str[50];
+    snprintf(str, sizeof(str), "Try to send a test message with data[0] = %d", count);
+    hal_trace_puts(str);
+    while(1 != s_tick_slower){};
+	s_tick_slower = 0;
 #if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
-					r=can_transmit_regular(&canframetx, count);
-					if (r==hal_res_OK)
-					{
-						test_message("Message OK sent");
-					}
-					else
-					{
-						test_message("Message NOK not sent");	
-					}
+	r=can_transmit_regular(&canframetx, count);
+	if (r==hal_res_OK)
+	{
+		//	test_message("Message OK sent");
+	}
+	else
+	{
+	test_message("Message NOK not sent");	
+	}
 #elif   defined(EXECUTE_TEST_CAN_TX1_BURST)
-					can_transmit_burst(&canframetx, BURSTLEN, count); 
+	can_transmit_burst(&canframetx, BURSTLEN, count); 
 #elif   defined(EXECUTE_TEST_CAN_TX1_MIXED)
-					can_transmit_mixed(&canframetx, BURSTLEN, count); 
-#endif        
-			}
+	can_transmit_mixed(&canframetx, BURSTLEN, count); 
+#endif
 	//		test_message("Waiting a message ");	
 	//		while(0 == can1_received)
 			{
 					//can1_received = 0;
 					
 			}
-      test_message("Message received to can1"); 
-		test_was_successful("can"); 
+    test_message("Message received to can1"); 
+	test_was_successful("can"); 
       
 #endif//defined(EXECUTE_TEST_CAN_TX1)      
 }
@@ -1475,10 +1621,13 @@ static void test_device_switch(void)
 }
 
 #endif//defined(EXECUTE_TEST_SWITCH)  
-
-
-#if     defined(HAL_USE_DEVICE_MOTORCTL)
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)
+
+#include "hal_dc_motorctl.h"
+#include "hal_adc.h"
+#include "hal_quad_enc.h"
+#include "pid.h"
+
 static void test_device_motorctl_1(void)
 {
 
@@ -1737,12 +1886,11 @@ static void test_device_motorctl_2(void)
 
 
 }
-
-
-#endif//defined(HAL_USE_DEVICE_MOTORCTL)
 #endif//EXECUTE_TEST_DEVICE_MOTORCTL
 
 #if     defined(EXECUTE_TEST_ADC)
+
+#include "hal_adc.h"
 
 static uint16_t ADC_result[12];
 
@@ -1845,11 +1993,12 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 
 static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 {	
-	
+	/*
 	current[0]=ADC_result[0]=hal_get_current(0);
 	current[1]=ADC_result[1]=hal_get_current(1);
 	current[2]=ADC_result[2]=hal_get_current(2);
 	current[3]=ADC_result[3]=hal_get_current(3);
+	*/
 	canframe.id = 0x1AD; 
 	canframe.size= 8;
 	canframe.data[1] = ADC_result[0] & 0xFF;
@@ -2172,7 +2321,7 @@ static void test_periph_eth(void)
         {
             s_reply_udp_msg = 0;
             test_periph_eth_udp_reply();
-            test_periph_ethtransceiver_links();
+            //test_periph_ethtransceiver_links();
         }
 #endif//defined(EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY)            
         
@@ -2186,7 +2335,7 @@ static void test_periph_eth(void)
         {        
             hal_led_toggle(hal_led4);
             s_blink_ipal_led4 = 0;
-            hal_trace_puts("eth: toggled led4");
+            //hal_trace_puts("eth: toggled led4");
         }
         
             
@@ -2206,55 +2355,84 @@ static void test_periph_eth(void)
 #include "hal_encoder.h"
 
 static hal_encoder_position_t positioncbk = 0;
+static hal_bool_t ready1 = hal_false, ready2 = hal_false;
 
-static void test_encoder_cbk(void* arg);
+static void test_encoder_cbk1(void* arg);
+static void test_encoder_cbk2(void* arg);
 
-static const hal_encoder_t hal_encoder = hal_encoder1;
+static const hal_encoder_t hal_encoder_1 = hal_encoder1;
+static const hal_encoder_t hal_encoder_2 = hal_encoder2;
+
 static void test_encoder(void)
 {
-    
-    static hal_encoder_cfg_t encodercfg =
+	
+	hal_sys_delay(50*hal_RELTIME_1millisec);
+	
+    static hal_encoder_cfg_t encodercfg1 =
     {
         .priority           = hal_int_priority03,
-        .callback_on_rx     = test_encoder_cbk,
-        .arg                = NULL
+        .callback_on_rx     = test_encoder_cbk1,
+        .arg                = NULL,
+				.type								= hal_encoder_t1,
+				.reg_address				= 0,
+				.sdata_precheck			= hal_false
     };
-    
-    hal_encoder_position_t position = 0;
-
-    
+		    
+		static hal_encoder_cfg_t encodercfg2 =
+    {
+        .priority           = hal_int_priority03,
+        .callback_on_rx     = test_encoder_cbk2,
+        .arg                = NULL,
+				.type								= hal_encoder_t2,
+				.reg_address				= 0x77,
+				.sdata_precheck			= hal_false
+    };
+		
     char str[128] = {0};
 
-    
     hal_result_t res = hal_res_NOK_generic;
-    res = hal_encoder_init(hal_encoder, &encodercfg);
+    res = hal_encoder_init(hal_encoder_1, &encodercfg1);
     res = res;
-    uint32_t tt = 0;
-    
+		res = hal_encoder_init(hal_encoder_2, &encodercfg2);
+    res = res;
+		hal_encoder_position_t position = 0;
+		hal_encoder_errors_flags fl;
+		fl.tx_error = 0, fl.data_error = 0, fl.data_notready = 0, fl.chip_error = 0;
+    hal_encoder_read_start(hal_encoder_1);
+		hal_encoder_read_start(hal_encoder_2);
     for(;;)
     {
-        hal_sys_delay(1*hal_RELTIME_1second);
-        res = hal_encoder_read_start(hal_encoder);
-        res = res;
-        hal_sys_delay(1*hal_RELTIME_1second);
-        res = hal_encoder_get_value(hal_encoder, &position);
-        position = position;
-        tt = (position >> 2) & 0xfff0;
-        snprintf(str, sizeof(str), "encoder reading: %d, orig = 0x%x", tt, position);
+				while((ready1 == hal_false) || (ready2 == hal_false));
+        res = hal_encoder_get_value(hal_encoder_1, &position, &fl);
+				position = (position >> 2) & 0xfff0;
+				snprintf(str, sizeof(str), "Encoder SPI3 reading: %d, flags: %d, %d, %d, %d",position, fl.tx_error, fl.data_error, fl.data_notready, fl.chip_error);
         hal_trace_puts(str);
-       
+				position = 0;
+				fl.tx_error = 0, fl.data_error = 0, fl.data_notready = 0, fl.chip_error = 0;
+			
+			  res = hal_encoder_get_value(hal_encoder_2, &position, &fl);
+				snprintf(str, sizeof(str), "Encoder SPI2 reading: %d, flags: %d, %d, %d, %d",position, fl.tx_error, fl.data_error, fl.data_notready, fl.chip_error);
+        hal_trace_puts(str);
+				position = 0;
+				fl.tx_error = 0, fl.data_error = 0, fl.data_notready = 0, fl.chip_error = 0;
+			
+			  hal_sys_delay(1*hal_RELTIME_1second);
+				ready1 = hal_false, ready2 = hal_false;
+				res = hal_encoder_read_start(hal_encoder_1);
+			  res = hal_encoder_read_start(hal_encoder_2);
     }
        
 }
 
-static void test_encoder_cbk(void* arg)
+static void test_encoder_cbk1(void* arg)
 {
-    hal_result_t rr = hal_res_NOK_generic;
-    //rr = hal_encoder_get_value(hal_encoder, &positioncbk);  
-    rr = rr;    
-    positioncbk = positioncbk;    
+   ready1 = hal_true;
 }
 
+static void test_encoder_cbk2(void* arg)
+{
+   ready2 = hal_true;
+}
 
 
 #endif//defined(EXECUTE_TEST_ENCODER)  
