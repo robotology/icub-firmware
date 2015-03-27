@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_sk_usrcbk_ebx.c
+/* @file       EoProtocolAS_fun_ems4rd.c
     @brief      This file keeps the user-defined functions used in every ems board ebx for endpoint as
     @author     valentina.gaggero@iit.it
     @date       06/11/2012

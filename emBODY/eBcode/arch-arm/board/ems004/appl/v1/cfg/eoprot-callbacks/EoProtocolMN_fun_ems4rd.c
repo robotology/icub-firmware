@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       EoProtocolEPmn_fun_overridden.c
+/* @file       EoProtocolMN_fun_ems4rd.c
     @brief      This file keeps c...
     @author     marco.accame@iit.it
     @date       06/06/2013

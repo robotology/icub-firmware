@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_nvsEP_mc_usrcbk_ebx.c
+/* @file       eOcfg_nvsEP_mc_joint_usrcbk_ebx_2foc.c
     @brief      This file keeps the user-defined functions used in every ems board ebx for endpoint mc
     @author     valentina.gaggero@iit.it
     @date       05/04/2012
