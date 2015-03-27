@@ -365,7 +365,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>TOGGLE_RUN_CFG_WITH3RXPACKETS EOPROT_USE_MN_VERSION_2_0 dontEOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME _FORCE_NETWORK_FROM_IPAL_CFG EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO EO_USE_EPROT_V2 HAL_IS_VERSION_2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol;..\embenv_cfg\ems004like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards;..\embenv_cfg\ems004like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\eBcode\arch-arm\\libs\highlevel\services\embodyrobot\api;..\..\..\..\..\..\..\eBcode\arch-arm\\libs\highlevel\services\embodyrobot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\src\eoappservices;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -811,7 +811,7 @@
             <File>
               <FileName>EOappEncodersReader.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems001\appl\v01\app_servicesProviders_obj\EOappEncodersReader.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\src\eoappservices\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -976,110 +976,57 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b02.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b03.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b03.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b04.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b04.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b05.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b05.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b06.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b07.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b08.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b08.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_robot_ge04.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_robot_ge04.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>2</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b09.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b10.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b10.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b10.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b11.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b11.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_robot_ge04_callbacks.template.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_robot_ge04_callbacks.template.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b11.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1104,7 +1051,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1587,7 +1534,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>DONT_TEST_ARP EOPROT_USE_MN_VERSION_2_0 dontEOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME DONT_FORCE_NETWORK_FROM_IPAL_CFG HAL_IS_VERSION_2 dontTOGGLE_RUN_CFG_WITH3RXPACKETS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol;..\embenv_cfg\ems004like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app_main;..\app_cfg;..\abslayer-cfg-stm32f4;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards;..\embenv_cfg\ems004like;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\eBcode\arch-arm\\libs\highlevel\services\embodyrobot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2033,7 +1980,7 @@
             <File>
               <FileName>EOappEncodersReader.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems001\appl\v01\app_servicesProviders_obj\EOappEncodersReader.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\src\eoappservices\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2198,153 +2145,57 @@
             <File>
               <FileName>eOprot_b01.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b01.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b01.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b02.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b02.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b02.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b03.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b03.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b03.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b04.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b04.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b04.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b05.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b05.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b05.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b06.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b06.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b06.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b07.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b07.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b07.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b08.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b08.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b08.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b09.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b09.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_robot_ge04.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_robot_ge04.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>2</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b09.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b10.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b10.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b10.c</FilePath>
             </File>
             <File>
               <FileName>eOprot_b11.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_b11.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_robot_ge04_callbacks.template.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\eprotocol\eOprot_robot_ge04_callbacks.template.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>2</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\board\ems004\appl\v1\cfg\eoprot-boards\eOprot_b11.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2369,7 +2220,7 @@
             <File>
               <FileName>emBODYrobot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\emBODYrobot.c</FilePath>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
             </File>
           </Files>
         </Group>
