@@ -54,21 +54,14 @@
 // empty-section
   
 
-// - declaration of public user-defined types ------------------------------------------------------------------------- 
+// - declaration of extern public functions ---------------------------------------------------------------------------
 extern hal_result_t hal_adc_dma_init(void);
 extern hal_result_t hal_adc_inj_init(void);
 extern void hal_adc_currentCalibration(void);
 extern void hal_adc_currentConfig(void);
 extern uint16_t hal_get_current(uint16_t channel);
-void ADC_IRQHandler(void);
-
-
-/** @typedef    typedef enum hal_adc_t 
-    @brief      hal_adc_t contains the possible AD channels  
- **/
-
-
 extern uint16_t hal_get_adc(uint16_t ADC_type, uint16_t channel );
+//void ADC_IRQHandler(void);
 /** @}            
     end of group doxy_group_hal_adc  
  **/

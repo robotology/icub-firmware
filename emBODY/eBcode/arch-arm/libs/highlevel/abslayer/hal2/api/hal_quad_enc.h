@@ -26,6 +26,16 @@
 #ifndef _HAL_QUAD_ENC_H_
 #define _HAL_QUAD_ENC_H_
 
-void hal_quad_enc_Init(void);
-int32_t hal_quad_enc_getCounter(int16_t encoder_number);
+// - external dependencies --------------------------------------------------------------------------------------------
+
+#include "hal_common.h"
+
+// - declaration of extern public functions ---------------------------------------------------------------------------
+extern void hal_quad_enc_Init(void);
+
+extern void hal_quad_enc_single_init(uint8_t encoder_number);
+
+extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number);
+
+extern void hal_quad_enc_reset_counter(uint8_t encoder_number);
 #endif
