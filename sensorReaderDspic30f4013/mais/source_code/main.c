@@ -77,6 +77,13 @@
 //
 //  There is a strange behaviour of the can filters reported in ERRATA of the dspic30f4013     
 //
+//  marco.accame on 31 march 2014:
+//  - now the timer2 just sets a flag and the frames are transmitted inside the main loop and not in the isr anymore. 
+//    in this way we avoid potential concurrency in tx over can
+//  - the handling of unexpected can frames of wrong class (due to the can filter bug) is done differently. we don't tx 
+//    a can error frame anymore but we instead increment an error counter which can be later retrieved with a polling message request.
+//  - the unexpected can frames of the expected classes (ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR and ICUBCANPROTO_CLASS_BOOTLOADER)
+//    are managed by incrementing an error counter which can be later retrieved with a polling message request.
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -114,7 +121,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define USE_HAL_CAN_PUT
 
 
 //// CONFIGURATION BITS INITIALIZATION 
@@ -140,9 +148,11 @@ extern version_srcCode_info_t *mais_srcCode_info_ptr; // info of binary compiled
 
 
 //leds
-uint8_t  toggledY=0;
+uint8_t  toggledY = 0;
+uint8_t toggleR = 0;
 
-uint8_t  start_read_analogChan = 0;
+volatile uint8_t start_read_analogChan = 0;   // marco.accame: keep it volatile as it is shared between main loop and an ISR
+
 uint8_t  can_trasmission_enable = 0;
 
 mais_analog_ch_data_t AN_channel_info;
@@ -154,9 +164,16 @@ uint8_t canProtocol_compatibility_ack = 0; //actually it is use to send compatib
                                            //in case it values 0 mais application runs in safe mode.
 
 
+
+volatile uint8_t periodic_data_tx_triggered = 0;     // marco.accame: keep it volatile as it is shared between main loop and an ISR
+
+uint32_t    errorcounter_canframe_unrecognised_class = 0;
+uint32_t    errorcounter_canframe_unrecognised_command = 0;
+ 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
 static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *datalen);
 static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *datalen);
 static void s_parse_can_msg(void);
@@ -165,6 +182,7 @@ static void s_test(void);
 static void s_timer1_callback(void);
 static void s_timer2_callback(void);
 
+static void s_eval_transmission_of_periodic_data(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -196,10 +214,10 @@ int main(void)
 	//enable watchdog
 	hal_watchdog_enable();
 
-	mais_config_init(&mais_cfg); //init main configuration with default values
+	mais_config_init(&mais_cfg); // init main configuration with default values
 
 	res = mais_config_readFromEE(&mais_cfg); // EEPROM Data Recovery
-    //if eeprom has been resetted, write defalut CAN address in eeprom.
+    // if eeprom has been resetted, write default CAN address in eeprom.
     if(0 == res)
     {
         mais_config_saveInEE(&mais_cfg);   
@@ -288,14 +306,15 @@ int main(void)
 		
 		while(start_read_analogChan) 
 		{
-			start_read_analogChan = 0; //reset of the T1 timer flag
+			start_read_analogChan = 0; // reset of the T1 timer flag
 			
 			s_parse_can_msg(); 
 			
 			s_idle();
+            
 			if (toggledY>=((3-mais_cfg.hesdata_resolution)<<6))
 			{
-				toggledY=0;
+				toggledY = 0;
 			}
 			
 			// reading of the 15 HES signals	    
@@ -332,8 +351,12 @@ int main(void)
 					Chn=0;
 					flag=0;
 				}  
-			}// end for reading 15 channels
-		}// end while
+			} // end for reading 15 channels
+            
+            // marco.accame: evaluate the transmission of the acquired values           
+            s_eval_transmission_of_periodic_data();
+            
+		} // end while
 	}
 }
 
@@ -345,7 +368,7 @@ int main(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 //
-// This function clear the wachtdog
+// This function clear the watchdog
 // put hear things that can be done during idle time
 //void s_idle(void)
 //{
@@ -380,11 +403,11 @@ void s_idle(void)
 //can msg parser 
 static void s_parse_can_msg(void)
 {
-	hal_canmsg_t *msg;
-	hal_canmsg_t CAN_Msg;
-	uint8_t Txdata[9]; 
-	int8_t datalen;
-	uint16_t SID;
+	hal_canmsg_t *msg = NULL;
+	hal_canmsg_t CAN_Msg = {0};
+	uint8_t Txdata[9] = {0}; 
+	int8_t datalen = -1;    // marco.accame: if datalen is still negative after the canframe has been parsed we dont transmit.
+	uint16_t SID = 0;
 
 
 	if (hal_can_buff_rx_isEmpty(hal_can_portCAN1))
@@ -398,42 +421,42 @@ static void s_parse_can_msg(void)
 	msg=&CAN_Msg;
 
 	switch (msg->CAN_Per_Msg_Class)
-	{
-		case (ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR):
+    {
+        case (ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR):
 		{
-  			s_parse_can_pollingMsg(msg, Txdata, &datalen);
-			break;		
-		}
+  			s_parse_can_pollingMsg(msg, Txdata, &datalen);	
+		} break;
 		
 		case (ICUBCANPROTO_CLASS_BOOTLOADER):
 		{
 			s_parse_can_loaderMsg(msg, Txdata, &datalen);
-			break;
-		}
+		} break;
 		
 		default:
 		{
 			// UNKNOWN COMMAND FOR THIS CLASS
+            // marco.accame: for now we just increment a counter which will later be made available upon request (a new ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR is required).
+            errorcounter_canframe_unrecognised_class++;
+            datalen = -1;
 			
 			//ATTENTION: removed send error message because it creates problem in case board mais mounts chip
 			//with hw bug in can filter (it doesn't work)
 			//hal_error_canMsg_set(Txdata, &datalen, msg->CAN_Per_Msg_PayLoad[0]);
-			break;
-		}
+        } break;
 		
-	  }
-	
-	  // Load message ID , Data into transmit buffer and set transmit request bit
-	  // swap source and destination
-	  SID = (msg->CAN_Per_Msg_Class << 8 ) | ( mais_cfg.ee_data.CAN_BoardAddress << 4 ) | ( msg->CAN_Poll_Msg_Source );
-	
-	  // Send ack messages with datalen > 0
-	  // Skip ack messages with datalen < 0
-	  // Send ack messages with datalen = 0 and CAN_ACK_EVERY_MESSAGE = 1
-	  if ( (datalen > 0) || (datalen == 0 && mais_cfg.can_ack_every_msg == 1) )
-	  { 
-	    hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID,hal_can_frameType_data,datalen,Txdata); 
-	  }
+    }
+      
+
+    // Send ack messages with datalen > 0
+    // Skip ack messages with datalen < 0
+    // Send ack messages with datalen = 0 and CAN_ACK_EVERY_MESSAGE = 1
+    if ( (datalen > 0) || (datalen == 0 && mais_cfg.can_ack_every_msg == 1) )
+    { 
+        // Load message ID , Data into transmit buffer and set transmit request bit
+        // swap source and destination
+        SID = (msg->CAN_Per_Msg_Class << 8 ) | ( mais_cfg.ee_data.CAN_BoardAddress << 4 ) | ( msg->CAN_Poll_Msg_Source );
+        hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID,hal_can_frameType_data,datalen,Txdata); 
+    }
 }
 
 
@@ -631,6 +654,12 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			//ATTENTION: removed send error message because it creates problem in case board mais mounts chip
 			//with hw bug in can filter (it doesn't work)
 			//hal_error_canMsg_set(Txdata, datalen, msg->CAN_Per_Msg_PayLoad[0]);
+            
+            // marco.accame: so far we dont send back anything. but we shall do it.
+            
+            *datalen=-1;
+            errorcounter_canframe_unrecognised_command++;
+            
 			break;
 		}
 		
@@ -741,6 +770,11 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 			//ATTENTION: removed send error message because it creates problem in case board mais mounts chip
 			//with hw bug in can filter (it doesn't work)
 			//hal_error_canMsg_set(Txdata, datalen, msg->CAN_Per_Msg_PayLoad[0]);
+            
+            // marco.accame: so far we dont send back anything. but we shall do it.           
+            *datalen=-1;
+            errorcounter_canframe_unrecognised_command++;
+            
 			break;
 		}
 		
@@ -788,7 +822,14 @@ static void s_timer1_callback(void)
 
 
 static void s_timer2_callback(void)
-{    
+{ 
+#if 1
+    if(1 == can_trasmission_enable)
+    {
+        periodic_data_tx_triggered = 1;
+    }
+    
+#else   
 	uint16_t SID;
 	uint8_t HESData1[8], HESData2[8], HESData3[8],HESData4[8];
 	
@@ -859,8 +900,124 @@ static void s_timer2_callback(void)
 		default:
 		break;
  	
+    }
+  toggledY++;  
+#endif  
 }
-  toggledY++;   
+
+static void s_eval_transmission_of_periodic_data(void)
+{   // marco.accame on 31mar15: this function is now called inside the main loop. the control upon transmission is done inside
+
+    if(0 == can_trasmission_enable)
+    {
+        return;
+    }
+
+    if(0 == periodic_data_tx_triggered)
+    {
+        return;
+    }
+    
+    periodic_data_tx_triggered = 0;
+    
+    // ok, now we retrieve data and transmit the two can frames.
+    
+	uint16_t SID = 0;
+	uint8_t HESData1[8] = {0};
+    uint8_t HESData2[8] = {0};
+    uint8_t HESData3[8] = {0};
+    uint8_t HESData4[8] = {0};
+	
+
+	switch (mais_cfg.hesdata_resolution)
+	{
+		case hesdata_8bit:
+		{
+			HESData1[0] = AN_channel_info.values[0] >>4;  
+			HESData1[1] = AN_channel_info.values[1] >>4;  
+			HESData1[2] = AN_channel_info.values[2] >>4;  
+			HESData1[3] = AN_channel_info.values[3] >>4;  
+			HESData1[4] = AN_channel_info.values[4] >>4;  
+			HESData1[5] = AN_channel_info.values[5] >>4;  
+			HESData1[6] = AN_channel_info.values[6] >>4;  
+			
+			
+			HESData2[0] = AN_channel_info.values[7] >>4;  
+			HESData2[1] = AN_channel_info.values[8 ] >>4;  
+			HESData2[2] = AN_channel_info.values[9 ] >>4;  
+			HESData2[3] = AN_channel_info.values[10] >>4;  
+			HESData2[4] = AN_channel_info.values[11] >>4;  
+			HESData2[5] = AN_channel_info.values[12] >>4;  
+			HESData2[6] = AN_channel_info.values[13] >>4;  
+			HESData2[7] = AN_channel_info.values[14] >>4;
+		
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES0TO6) ;
+            #if !defined(USE_HAL_CAN_PUT)
+			hal_can_put_immediately(hal_can_portCAN1,SID, HESData1, 7, 0 );
+            #else
+            hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID, hal_can_frameType_data, 7, HESData1); 
+            #endif
+			
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES7TO14) ;
+			
+            #if !defined(USE_HAL_CAN_PUT)
+			hal_can_put_immediately(hal_can_portCAN1, SID, HESData2, 8, 1 );
+            #else
+            hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID, hal_can_frameType_data, 8, HESData2); 
+            #endif
+		} break;
+ 	
+		case hesdata_16bit:
+		{
+			memcpy(HESData1,&AN_channel_info.values[0],8);
+			memcpy(HESData2,&AN_channel_info.values[4],8);
+			
+			memcpy(HESData3,&AN_channel_info.values[8],8);
+			memcpy(HESData4,&AN_channel_info.values[12],6);
+			
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES0TO3) ;
+            #if !defined(USE_HAL_CAN_PUT)
+			hal_can_put_immediately(hal_can_portCAN1, SID, HESData1, 8, 0 );	
+            #else            
+            hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID, hal_can_frameType_data, 8, HESData1);            
+			#endif
+            
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES4TO7) ;
+            #if !defined(USE_HAL_CAN_PUT)
+			hal_can_put_immediately(hal_can_portCAN1, SID, HESData2, 8, 1 );
+            #else
+            hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID, hal_can_frameType_data, 8, HESData2);
+            #endif
+			
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES8TO11) ;
+			#if !defined(USE_HAL_CAN_PUT)
+            hal_can_put_immediately(hal_can_portCAN1, SID, HESData3, 8, 2 );
+            #else            
+            hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID, hal_can_frameType_data, 8, HESData3);
+            #endif
+			
+			SID = (CAN_MSG_CLASS_PERIODIC) | ((mais_cfg.ee_data.CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__HES12TO14) ;
+            #if !defined(USE_HAL_CAN_PUT)
+			while( !(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0)) );
+			hal_can_put_immediately(hal_can_portCAN1, SID, HESData4, 8, 0 );
+            #else
+            hal_can_put(hal_can_portCAN1, mais_cfg.ee_data.CAN_BoardAddress, SID, hal_can_frameType_data, 8, HESData4);
+            #endif
+		
+		} break;
+
+		case hesdata_12bit:  // send square waves and triangular waves
+		{
+			s_test();
+		} break;
+        
+		default:
+        {
+        } break;
+ 	
+    }
+    
+    toggledY++;          
 }
 
 // --------------------------------------------------------------------------------------------------------------------

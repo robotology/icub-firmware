@@ -63,12 +63,12 @@ const version_srcCode_info_t mais_srcCode_info =
 	//fw_ExeFile
 	{
 	0x03, //version
-	0x00, //release
+	0x01, //release
 	0x02  //build
 	},
 	//canProtocol
 	{
-		0x1, //mejor
+		0x1, //major
 		0x0	 //minor
 	}
 };
@@ -129,7 +129,7 @@ uint8_t mais_config_readFromEE(mais_config_data_t *mais_cfg)
     HAL_EE_GET_ADDR(mais_ee_cfg_addr, mais_EE_cfg);
 
     hal_eeprom_read((uint8_t*)&(aux), mais_ee_cfg_addr, sizeof(mais_eeprom_data_t));
-	if (0 == aux.CAN_BoardAddress)//if eeprom was been erased, the application can use dafault values.
+	if (0 == aux.CAN_BoardAddress) // if eeprom has been erased, the application can use default values.
 	{
 		return(0);
 	}
@@ -157,6 +157,7 @@ void mais_config_address_set(mais_config_data_t *mais_cfg)
     hal_eeprom_write((uint8_t*)(&(mais_cfg->ee_data)), mais_ee_cfg_addr, 1);
 
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
