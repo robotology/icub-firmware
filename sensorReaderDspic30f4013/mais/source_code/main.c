@@ -300,7 +300,8 @@ int main(void)
 	// enable interrupt Timer1	
 	hal_timer_interrupt_ena(hal_timerT1);
 
-	ledR_ON; //Set led red on
+	ledR_OFF; //Set led red off
+	ledY_ON;
 	for(;;)
 	{ 
 		
@@ -907,7 +908,7 @@ static void s_timer2_callback(void)
 
 static void s_eval_transmission_of_periodic_data(void)
 {   // marco.accame on 31mar15: this function is now called inside the main loop. the control upon transmission is done inside
-
+	static uint32_t count=0;  
     if(0 == can_trasmission_enable)
     {
         return;
@@ -919,7 +920,12 @@ static void s_eval_transmission_of_periodic_data(void)
     }
     
     periodic_data_tx_triggered = 0;
-    
+	count++;
+	if (count==100)
+	{
+		ledR=~ledR;
+		count=0;
+ 	}   
     // ok, now we retrieve data and transmit the two can frames.
     
 	uint16_t SID = 0;
