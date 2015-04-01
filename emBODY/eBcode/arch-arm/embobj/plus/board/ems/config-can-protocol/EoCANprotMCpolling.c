@@ -82,7 +82,9 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port);
 
+static eOresult_t s_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -97,15 +99,86 @@
 
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__exceptions(eOcanframe_t *frame, eOcanport_t port)
-{
-  
-    return(eores_OK);    
+{   // manage in here msgtype lower than ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
+    
+    eOresult_t res = eores_OK;
+    
+    uint8_t type = EOCANPROT_FRAME_POLLING_GET_TYPE(frame);
+    
+    switch(type)
+    {
+        case ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;
+        
+        case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;
+
+        case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:
+        {
+            res = s_parser_POL_MC_CMD__MOTION_DONE(frame, port);          
+        } break;
+
+        case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;
+        
+        case ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;        
+
+        case ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break; 
+        
+        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break; 
+
+        case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;  
+
+        default:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;                 
+    }
+    
+     
+    return(res);    
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__exceptions(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
+{   // manage in here msgtype lower than ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
+    eOresult_t res = eores_OK;
     
-     return(eores_OK);
+    uint8_t type = EOCANPROT_FRAME_POLLING_GET_TYPE(frame);
+    
+    switch(type)
+    {
+        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN:
+        {   
+            res = s_former_POL_MC_CMD__CONTROLLER_RUN(descriptor, frame);
+        } break;
+        
+ 
+        default:
+        {   // not managed
+            res = eores_NOK_generic;
+        } break;                 
+    }
+    
+     
+    return(res);  
 }
 
 
@@ -228,8 +301,54 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION(eOcanpr
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
+{
+    eOresult_t res = eores_OK; 
+    
+    // retrieve the joint related to the message
+    eOcanmap_entitylocation_t loc = {0};
+    loc.port = port;
+    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    eOprotIndex_t jointindex = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    
+    if(EOK_uint08dummy == jointindex)
+    {
+        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        return(eores_OK);
+    }
+    
+    eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jointindex);
+    
+    if(NULL == joint)
+    {
+        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        return(eores_OK);        
+    }
+    
+    eOmc_motionmonitorstatus_t motionmonitorstatus = (eOmc_motionmonitorstatus_t) joint->status.basic.motionmonitorstatus;
+    
+    if(eomc_motionmonitorstatus_notmonitored == motionmonitorstatus)
+    {
+        // pc104 isn't interested in motion monitoring
+        return(eores_OK);
+    }
+    
+    joint->status.basic.motionmonitorstatus = (eOmc_motionmonitorstatus_t)frame->data[1];    
+    
+    return(eores_OK);
+}
 
-
+static eOresult_t s_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingMotorControl, 0, descriptor->destinationaddress);
+    frame->id_type      = 0; // standard id
+    frame->frame_type   = 0; // data frame
+    frame->size         = 1;
+    frame->data[0]      = EOCANPROT_CREATE_POLLING_MC_DATA0(descriptor->internalindex, ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN);
+    return(eores_OK);        
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

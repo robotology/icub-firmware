@@ -26,6 +26,9 @@
 
 #include "EOtheCANprotocolCfg.h" 
 
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -583,7 +586,12 @@ extern eOresult_t eo_canprot_Parse(EOtheCANprotocol *p, eOcanframe_t *frame, eOc
         return(eores_NOK_nullpointer);
     }
     
-    // 1. verify the length is ok.
+    if(eobool_true == s_eo_canprot_isit_exception(frame, port, &res))
+    {   // in here we manage for instance the mais error.
+        return(res);
+    }    
+    
+    // verify the length is ok.
     if(frame->size > 8)
     {
         return(eores_NOK_generic);
@@ -592,12 +600,7 @@ extern eOresult_t eo_canprot_Parse(EOtheCANprotocol *p, eOcanframe_t *frame, eOc
     {
         return(s_eo_canprot_parse0length(frame, port));
     }
-    
-    if(eobool_true == s_eo_canprot_isit_exception(frame, port, &res))
-    {   // in here we manage for instance the mais error.
-        return(res);
-    }
-    
+       
     
     if(eores_OK != s_eo_canprot_get_indices(frame, NULL, &index0, &index1))
     {
@@ -668,12 +671,18 @@ static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t por
     // we avoid doing the extra check that the sender address is from a mais/strain to save computations
     if((eocanprot_msgclass_pollingAnalogSensor == EOCANPROT_FRAME_GET_CLASS(frame)) && (0 == EOCANPROT_FRAME_POLLING_GET_DESTINATION(frame)))
     {
-        return(eores_OK);
+        eOcanmap_entitylocation_t loc = {0};
+        loc.port = port;
+        loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
+        loc.insideindex = eocanmap_insideindex_none;
+        const eOcanmap_canboard_t *board = eo_canmap_GetBoard(eo_canmap_GetHandle(), loc);
+        if((eobrd_cantype_strain == board->board.type) || (eobrd_cantype_mais == board->board.type))
+        {
+            return(eores_OK);
+        }
     }
-    else
-    {
-        return(eores_NOK_generic);
-    }
+
+    return(eores_NOK_generic);
 }
 
 //static eOresult_t s_eo_canprot_search4exceptions(eOcanframe_t *frame, eOcanport_t port)
@@ -689,7 +698,49 @@ static eObool_t s_eo_canprot_isit_exception(eOcanframe_t *frame, eOcanport_t por
 {
     // in here is put ok only if we find an exception
     
-     #warning -> marco.accame: in eo_canprot_Parse() u must consider also the case of mais error. 
+    // mais bug
+    // get location of mais 
+    static eObool_t mais_is_present = eobool_false;
+    static eObool_t mais_is_searched = eobool_false;    
+    static eOcanmap_entitylocation_t loc = {0};
+    if(eobool_false == mais_is_searched)
+    {   // search mais only at first execution of the function
+        mais_is_searched = eobool_true;
+        eOprotID32_t id32  = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, 0, eoprot_tag_none);
+        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &loc, NULL, NULL))
+        {   // have found a mais
+            mais_is_present = eobool_true;
+        }
+    }
+    
+    if(eobool_false == mais_is_present)
+    {
+        return(eobool_false);
+    } 
+
+    if((loc.port == port) && (EOCANPROT_FRAME_GET_SOURCE(frame) == loc.addr))
+    {   // ok, it is from mais
+        // it is a mais bug only if class is either motor polling or motor periodic
+        uint8_t rxclass = EOCANPROT_FRAME_GET_CLASS(frame);
+        uint8_t classismotorpolling  = (rxclass == ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL) ? 1 : 0;
+        uint8_t classismotorperiodic = (rxclass == ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL) ? 1 : 0;
+
+        if(classismotorpolling || classismotorperiodic) 
+        {
+            eOerrmanDescriptor_t des = {0};
+            des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_rxmaisbug);
+            des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+            des.par64 = eo_common_canframe_data2u64(frame);
+            des.sourcedevice = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+            des.sourceaddress = EOCANPROT_FRAME_GET_SOURCE(frame);
+
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);
+            
+            *res = eores_OK; 
+            return(eobool_true);
+        }                
+    }
+    
          
     // if we find an exception, then we return true and we put the relevant result in *res 
     return(eobool_false);
@@ -715,7 +766,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
         msgclass = des->msgclass;
     }
     else
-    {
+    {   // only one between them is non NULL, not both
         return(eores_NOK_generic);
     }
     
@@ -831,7 +882,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             *index1 = msgtype;    
             // marco.accame: at most they are 16 ... we don't remap. if any hole we manage with NULL function pointers. 
             res = eores_OK;   
-            if(*index1 >= s_eo_canprot_functions_pollingAnalogSensor_maxnumber)
+            if(*index1 >= s_eo_canprot_functions_periodicAnalogSensor_maxnumber)
             {   // extra check
                 res = eores_NOK_generic;
             }             
