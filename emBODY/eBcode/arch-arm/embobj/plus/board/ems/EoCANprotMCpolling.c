@@ -119,11 +119,12 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION(eOcanfr
 #warning --> marco.accame; attenzioen che internalindex sia solo 0/1 e non altro valore ... 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    frame->id           = EOCANPROT_MC_POL_CREATE_ID(0, descriptor->destinationaddress);
+    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingMotorControl, 0, descriptor->destinationaddress);
     frame->id_type      = 0; 
     frame->frame_type   = 0; 
     frame->size         = 5;
-    frame->data[0]      = ((descriptor->internalindex & 0x1)  << 7) | ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
+    //frame->data[0]      = ((descriptor->internalindex & 0x1)  << 7) | ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
+    frame->data[0]      = EOCANPROT_CREATE_POLLING_MC_DATA0(descriptor->internalindex, ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION);
     
     *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->value);
     
@@ -139,8 +140,8 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanfr
 
     eOcanmap_entitylocation_t loc = {0};
     loc.port            = port;
-    loc.addr            = EOCANPROT_FRAME2SOURCEADDRESS(frame);
-    loc.insideindex     = EOCANPROT_FRAME2INTERNALINDEX(frame);
+    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
     
     index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(EOK_uint08dummy == index)

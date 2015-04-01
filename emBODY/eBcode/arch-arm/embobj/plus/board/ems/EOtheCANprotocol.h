@@ -50,19 +50,41 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-#define EOCANPROT_FRAME2CLASS(frame)            ( ((frame)->id & 0x700) >> 8 )
+// we mange teh following: 
+// - class: it is eOcanprot_msgclass_t
+// - source: it is the can address which sent the frame [0, 14]
+// - destination: it is the can address where to send the frame [0, 14]
+// - type: it is either the MSG or the CMD whcih describes the message (ICUBCANPROTO_PER_MC_MSG__POSITION, ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE, etc.).
+// - idcan: it is the ID of the CAN frame
+// - internal index: it is either 0 or 1 and is used in mc to specify a joint/motor
 
-#define EOCANPROT_FRAME2SOURCEADDRESS(frame)    ( ((frame)->id & 0x0F0) >> 4 )
+// retrieves the class of a frame
+#define EOCANPROT_FRAME_GET_CLASS(frame)                        ( ((frame)->id & 0x700) >> 8 )
 
-#define EOCANPROT_FRAME2INTERNALINDEX(frame)    ( ((frame)->data[0] & 0x80) >> 7)
+// retrieves the source address of a frame
+#define EOCANPROT_FRAME_GET_SOURCE(frame)                       ( ((frame)->id & 0x0F0) >> 4 )
 
-#define EOCANPROT_FRAME2IDPOLLING(frame)        ( ((frame)->data[0] & 0x7F) )
+// retrieves the destination address of a frame (for polling messages only)
+#define EOCANPROT_FRAME_POLLING_GET_DESTINATION(frame)          ( ((frame)->id & 0x00F) )
 
-#define EOCANPROT_FRAME2IDPERIODIC(frame)       ( ((frame)->id & 0x00F) )
+// retrievs the internal index (0 or 1) of a frame (for polling motion control frames only)
+#define EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame)     ( ((frame)->data[0] & 0x80) >> 7)
 
-#define EOCANPROT_MC_POL_CREATE_ID(orig, dest)  ( (ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL << 8) | (((orig)&0xf) << 4) | ((dest)&0xf) )  
- 
- 
+// retrieves the message type of a frame (for the case of polling messages)
+#define EOCANPROT_FRAME_POLLING_GET_TYPE(frame)                 ( ((frame)->data[0] & 0x7F) )
+
+// retrieves the message type of a frame (for the case of periodic messages)
+#define EOCANPROT_FRAME_PERIODIC_GET_TYPE(frame)                ( ((frame)->id & 0x00F) )
+
+//#define EOCANPROT_MC_POL_CREATE_ID(orig, dest)  ( (ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL << 8) | (((orig)&0xf) << 4) | ((dest)&0xf) )  
+
+// creates the CAN ID given the class, origin and destination addresses
+#define EOCANPROT_CREATE_CANID(clss, orig, dest)                ( (((clss)&0xF) << 8) | (((orig)&0xF) << 4) | ((dest)&0xF) )  
+
+// creates the DATA[0] byte for MC polling messages given the internalindex and the message type
+#define EOCANPROT_CREATE_POLLING_MC_DATA0(intindex, type)       ( (((intindex)&0x1) << 7) | ((type)&0x7F) )
+
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 /** @typedef    typedef struct EOtheCANprotocol_hid EOtheCANprotocol
@@ -88,9 +110,9 @@ enum { eocanprot_msgclass_numberofthem = 5 };
  **/ 
 typedef struct
 {
-    uint8_t     msgclass;               // they are: ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL, etc. they may be redefined as enum (see icubCanProto_msgCommand_class_t) at max they can be in 4 bits.
-    uint8_t     msgidentifier;          // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
-    uint8_t     destinationaddress;     // it is the can address. at max 4 bits
+    uint8_t     msgclass;               // use eOcanprot_msgclass_t
+    uint8_t     msgtype;                // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
+    uint8_t     destinationaddress;     // it is the destination can address. at max 4 bits
     uint8_t     internalindex;          // use eOcanmap_insideindex_t: 0, 1, none. it is used if the message is for a joint/motor inside the can board. otherwise it is not used.
     void*       value;                  // keeps a pointer to the value to be put inside the can frame.
 } eOcanprot_descriptor_t;

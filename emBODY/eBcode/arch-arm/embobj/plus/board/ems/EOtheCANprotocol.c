@@ -663,9 +663,17 @@ extern eOresult_t eo_canprot_Form(EOtheCANprotocol *p, eOcanprot_descriptor_t *d
 
 static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t port)
 {
-    // in here is put ok or nok depending on what is inside
-    
-    return(eores_OK);
+    // the only zero-length can frames are those coming as ack sent by strain or mais for a polling message.
+    // we just check that the message is class eocanprot_msgclass_pollingAnalogSensor and is for address 0 (the EMS).
+    // we avoid doing the extra check that the sender address is from a mais/strain to save computations
+    if((eocanprot_msgclass_pollingAnalogSensor == EOCANPROT_FRAME_GET_CLASS(frame)) && (0 == EOCANPROT_FRAME_POLLING_GET_DESTINATION(frame)))
+    {
+        return(eores_OK);
+    }
+    else
+    {
+        return(eores_NOK_generic);
+    }
 }
 
 //static eOresult_t s_eo_canprot_search4exceptions(eOcanframe_t *frame, eOcanport_t port)
@@ -692,14 +700,14 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
     eOresult_t res = eores_NOK_generic;
     
     uint8_t msgclass = 0;
-    uint8_t msgidentifier = 0;
+    uint8_t msgtype = 0;
     eObool_t parsemode = eobool_true;
     
     // i retrieve the msgclass and the id from the frame in case of parsing, and from the descriptor in case of forming
     if(NULL != frame)
     {
         parsemode = eobool_true;
-        msgclass = EOCANPROT_FRAME2CLASS(frame);
+        msgclass = EOCANPROT_FRAME_GET_CLASS(frame);
     }
     else if(NULL != des)
     {
@@ -726,23 +734,23 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             *index0 = msgclass; 
             if(eobool_true == parsemode)
             {
-                msgidentifier = EOCANPROT_FRAME2IDPOLLING(frame);  
+                msgtype = EOCANPROT_FRAME_POLLING_GET_TYPE(frame);  
             }
             else
             {
-                msgidentifier = des->msgidentifier;
+                msgtype = des->msgtype;
             }
             // marco.accame: the used IDs starts from ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION = 64. 
             //               the exceptions are: ICUBCANPROTO_POL_MC_CMD__MOTION_DONE (8), and ... nothing else. i manage exceptions at position 0. the others from 64 start at position 1 
             
-            if(msgidentifier < ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION)
+            if(msgtype < ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION)
             {
                 *index1 = 0;        // the exceptions are mapped as last.
                 res = eores_OK;
             }
-            else if(msgidentifier < (ICUBCANPROTO_POL_MC_CMD_MAXNUM))
+            else if(msgtype < (ICUBCANPROTO_POL_MC_CMD_MAXNUM))
             {
-                *index1 = msgidentifier - (ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION - 1); // so that id 64 is mapped at position 1, 65 at position 2 etc.
+                *index1 = msgtype - (ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION - 1); // so that id 64 is mapped at position 1, 65 at position 2 etc.
                 res = eores_OK;
             }
             
@@ -757,15 +765,15 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             *index0 = msgclass; 
             if(eobool_true == parsemode)
             {
-                msgidentifier = EOCANPROT_FRAME2IDPOLLING(frame); 
+                msgtype = EOCANPROT_FRAME_POLLING_GET_TYPE(frame); 
             }
             else
             {
-                msgidentifier = des->msgidentifier;
+                msgtype = des->msgtype;
             }                
             // marco.accame: the used IDs are only 4 out of a maximum of 50 something. so, ... just get the used ids and remaps them into 0, 1, 2, 3
             //               actually there are also those of the skin polling commands. they are 5. i write a big switch-case
-            switch(msgidentifier)
+            switch(msgtype)
             {
                 case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE:           { *index1 = 0; res = eores_OK; } break;
                 case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE:      { *index1 = 1; res = eores_OK; } break;
@@ -791,14 +799,14 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             *index0 = msgclass;
             if(eobool_true == parsemode)
             {
-                msgidentifier = EOCANPROT_FRAME2IDPERIODIC(frame); 
+                msgtype = EOCANPROT_FRAME_PERIODIC_GET_TYPE(frame); 
             }
             else
             {
-                msgidentifier = des->msgidentifier;
+                msgtype = des->msgtype;
             }  
             
-            *index1 = msgidentifier; 
+            *index1 = msgtype; 
             // marco.accame: at most they are 16 ... we don't remap. if any hole we manage with NULL function pointers. 
             res = eores_OK; 
             
@@ -813,14 +821,14 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             *index0 = msgclass;
             if(eobool_true == parsemode)
             {
-                msgidentifier = EOCANPROT_FRAME2IDPERIODIC(frame); 
+                msgtype = EOCANPROT_FRAME_PERIODIC_GET_TYPE(frame); 
             }
             else
             {
-                msgidentifier = des->msgidentifier;
+                msgtype = des->msgtype;
             }              
             
-            *index1 = msgidentifier;    
+            *index1 = msgtype;    
             // marco.accame: at most they are 16 ... we don't remap. if any hole we manage with NULL function pointers. 
             res = eores_OK;   
             if(*index1 >= s_eo_canprot_functions_pollingAnalogSensor_maxnumber)

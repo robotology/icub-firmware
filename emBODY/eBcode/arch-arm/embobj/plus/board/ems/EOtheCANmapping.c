@@ -67,7 +67,7 @@ const eOcanmap_cfg_t eo_canmap_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ const eOcanmap_cfg_t eo_canmap_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-////static const char s_eobj_ownname[] = "EOtheCANmapping";
+//static const char s_eobj_ownname[] = "EOtheCANmapping";
 
 
  
@@ -321,15 +321,11 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
     eOprotEndpoint_t ep = eoprot_ID2endpoint(id32);
     eOprotEntity_t entity = eoprot_ID2entity(id32);
     eOprotIndex_t index = eoprot_ID2index(id32);
-    return(eo_canmap_GetEntityLocation2(p, ep, entity, index, loc, numoflocs, boardtype));
-}
     
-extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype)
-{
     eOresult_t res = eores_NOK_generic;
     const eOcanmap_canboard_t *theboard = NULL;
         
-    if((NULL == loc) || (NULL == numoflocs))
+    if(NULL == loc)
     {   
         return(res);
     }  
@@ -362,7 +358,10 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
             {   // ok, we have a board. now see if it is a 2foc or 4dc
                 if((eobrd_cantype_1foc == theboard->board.type) || (eobrd_cantype_mc4 == theboard->board.type))
                 {   // ok, correct board type: we retrieve the info
-                    *numoflocs = 1;
+                    if(NULL != numoflocs)
+                    {
+                        *numoflocs = 1;
+                    }
                     loc->port = theboard->board.location.port;
                     loc->addr = theboard->board.location.addr; 
                     if(index == theboard->board.indexofentity[0])
@@ -398,7 +397,10 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
                     {
                         if(eobrd_cantype_strain == theboard->board.type)
                         {   // ok, correct board. we retrieve the info
-                            *numoflocs = 1;
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
                             loc->port = theboard->board.location.port;
                             loc->addr = theboard->board.location.addr;             
                             if(index == theboard->board.indexofentity[0])
@@ -426,7 +428,10 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
                     {
                         if(eobrd_cantype_mais == theboard->board.type)
                         {   // ok, correct board. we retrieve the info
-                            *numoflocs = 1;
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
                             loc->port = theboard->board.location.port;
                             loc->addr = theboard->board.location.addr;             
                             if(index == theboard->board.indexofentity[0])
@@ -462,7 +467,10 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
                         {   // must verify it is non NULL ... and that it is a skin board
                             if(eobrd_cantype_skin == theboard->board.type)
                             {   // ok, correct board. we retrieve the info
-                                *numoflocs = eo_canmapcfg_skins_boardsinside[index];
+                                if(NULL != numoflocs)
+                                {
+                                    *numoflocs = eo_canmapcfg_skins_boardsinside[index];
+                                }
                                 loc->port = theboard->board.location.port;
                                 loc->addr = theboard->board.location.addr; 
                                 loc->insideindex = eocanmap_insideindex_none; // if it is a skin we dont care about insideindex
@@ -489,6 +497,184 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
     // returns ok or nok depeding on what the function has found
     return(res);
 }
+    
+//extern eOresult_t s_eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype)
+//{
+//    eOresult_t res = eores_NOK_generic;
+//    const eOcanmap_canboard_t *theboard = NULL;
+//        
+//    if(NULL == loc)
+//    {   
+//        return(res);
+//    }  
+//    
+//        
+//    // now we retrieve the pointer to board specified inside the tables.
+//    // in here we can also verify if the board type is coherent with the asked endpoint-entity
+//    // and we can also retrieve address.
+//    switch(ep)
+//    {
+//        case eoprot_endpoint_motioncontrol:
+//        {
+//            if(eoprot_entity_mc_joint == entity)
+//            {
+//                if(index < eo_canmapcfg_joints_numberof)
+//                {
+//                    theboard = eo_canmapcfg_joints[index];
+//                }                
+//            }
+//            else if(eoprot_entity_mc_motor == entity)
+//            {
+//                if(index < eo_canmapcfg_motors_numberof)
+//                {
+//                    theboard = eo_canmapcfg_motors[index];
+//                }                
+//            }
+
+//            // verification for motion control is equal for joint or motor
+//            if(NULL != theboard)
+//            {   // ok, we have a board. now see if it is a 2foc or 4dc
+//                if((eobrd_cantype_1foc == theboard->board.type) || (eobrd_cantype_mc4 == theboard->board.type))
+//                {   // ok, correct board type: we retrieve the info
+//                    if(NULL != numoflocs)
+//                    {
+//                        *numoflocs = 1;
+//                    }
+//                    loc->port = theboard->board.location.port;
+//                    loc->addr = theboard->board.location.addr; 
+//                    if(index == theboard->board.indexofentity[0])
+//                    {
+//                        loc->insideindex = eocanmap_insideindex_first; // for 1foc we could use eocanmap_insideindex_none, but it is ok even in this way
+//                        res = eores_OK;
+//                    }
+//                    else if(index == theboard->board.indexofentity[1])
+//                    {
+//                        loc->insideindex = eocanmap_insideindex_second;
+//                        res = eores_OK;
+//                    } 
+//                    //else
+//                    //{   // the board is correct but none of the inside indices matches the target index. cannot give ok result                        
+//                    //}
+//                    if(NULL != boardtype)
+//                    {
+//                        *boardtype = (eObrd_cantype_t)theboard->board.type;
+//                    }
+//                }               
+//            }
+//        } break;
+//        
+
+//        case eoprot_endpoint_analogsensors:
+//        {
+//            if(eoprot_entity_as_strain == entity)
+//            {
+//                if(index < eo_canmapcfg_strains_numberof)
+//                {
+//                    theboard = eo_canmapcfg_strains[index];
+//                    if(NULL != theboard)
+//                    {
+//                        if(eobrd_cantype_strain == theboard->board.type)
+//                        {   // ok, correct board. we retrieve the info
+//                            if(NULL != numoflocs)
+//                            {
+//                                *numoflocs = 1;
+//                            }
+//                            loc->port = theboard->board.location.port;
+//                            loc->addr = theboard->board.location.addr;             
+//                            if(index == theboard->board.indexofentity[0])
+//                            {
+//                                loc->insideindex = eocanmap_insideindex_none; // if it is a strain we dont care about the insideindex
+//                                res = eores_OK;
+//                            }
+//                            //else
+//                            //{   // the board is correct but the insideindex0 does not match the target index. cannot give ok result                        
+//                            //} 
+//                            if(NULL != boardtype)
+//                            {
+//                                *boardtype = (eObrd_cantype_t)theboard->board.type;
+//                            }
+//                        }
+//                    }
+//                }                
+//            }
+//            else if(eoprot_entity_as_mais == entity)
+//            {
+//                if(index < eo_canmapcfg_maises_numberof)
+//                {
+//                    theboard = eo_canmapcfg_maises[index];
+//                    if(NULL != theboard)
+//                    {
+//                        if(eobrd_cantype_mais == theboard->board.type)
+//                        {   // ok, correct board. we retrieve the info
+//                            if(NULL != numoflocs)
+//                            {
+//                                *numoflocs = 1;
+//                            }
+//                            loc->port = theboard->board.location.port;
+//                            loc->addr = theboard->board.location.addr;             
+//                            if(index == theboard->board.indexofentity[0])
+//                            {
+//                                loc->insideindex = eocanmap_insideindex_none; // if it is a mais we dont care about the inside index
+//                                res = eores_OK;
+//                            }
+//                            //else
+//                            //{   // the board is correct but the insideindex0 does not match the target index. cannot give ok result                        
+//                            //}  
+//                            if(NULL != boardtype)
+//                            {
+//                                *boardtype = (eObrd_cantype_t)theboard->board.type;
+//                            }                            
+//                        }
+//                    }                    
+//                }                
+//            }            
+//        } break;  
+//        
+//        case eoprot_endpoint_skin:
+//        {
+//            if(eoprot_entity_sk_skin == entity)
+//            {
+//                if(index < eo_canmapcfg_skins_numberof)
+//                {
+//                    const eOcanmap_canboard_t * const * theboards = eo_canmapcfg_skins_boards[index];
+//                    //theboard = eo_canmapcfg_skins[index];
+//                    if(NULL != theboards)
+//                    {   // ok, we have a valid array of boards. let us see the first one ...
+//                        theboard = theboards[0];
+//                        if(NULL != theboard)
+//                        {   // must verify it is non NULL ... and that it is a skin board
+//                            if(eobrd_cantype_skin == theboard->board.type)
+//                            {   // ok, correct board. we retrieve the info
+//                                if(NULL != numoflocs)
+//                                {
+//                                    *numoflocs = eo_canmapcfg_skins_boardsinside[index];
+//                                }
+//                                loc->port = theboard->board.location.port;
+//                                loc->addr = theboard->board.location.addr; 
+//                                loc->insideindex = eocanmap_insideindex_none; // if it is a skin we dont care about insideindex
+//                                res = eores_OK;
+//                                if(NULL != boardtype)
+//                                {
+//                                    *boardtype = (eObrd_cantype_t)theboard->board.type;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }                
+//            }
+//           
+//        } break;  
+//        
+//        default:
+//        {
+//        } break;
+//        
+//    }
+//       
+//    
+//    // returns ok or nok depeding on what the function has found
+//    return(res);
+//}
 
 
 

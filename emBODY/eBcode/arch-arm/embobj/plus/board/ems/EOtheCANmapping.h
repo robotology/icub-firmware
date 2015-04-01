@@ -149,7 +149,7 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg);
 extern EOtheCANmapping * eo_canmap_GetHandle(void);
 
 
-// get a board given its can location, fro read only purposes
+// get a board given its can location, for read only purposes
 extern const eOcanmap_canboard_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanmap_entitylocation_t loc);
 
 
@@ -171,7 +171,6 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
 // it gets the location of a specified entity
 extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t id32, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype);
 
-extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoint_t ep, eOprotEntity_t entity, eOprotIndex_t index, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *board);
 
 
 
