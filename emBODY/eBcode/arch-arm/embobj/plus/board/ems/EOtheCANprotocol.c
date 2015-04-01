@@ -24,13 +24,8 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 
-#include "EoCANprotMCpolling.h" 
-#include "EoCANprotMCperiodic.h" 
+#include "EOtheCANprotocolCfg.h" 
 
-#include "EoCANprotASpolling.h" 
-#include "EoCANprotASperiodic.h" 
-
-#include "EoCANprotSKperiodic.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

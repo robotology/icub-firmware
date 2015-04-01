@@ -18,24 +18,22 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCANPROTOCOLMCPOLLING_H_
-#define _EOCANPROTOCOLMCPOLLING_H_
+#ifndef _EOTHECANPROTOCOLCFG_H_
+#define _EOTHECANPROTOCOLCFG_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/** @file       EoCANprotocolMCpolling.h
-    @brief      This header file contains declaration of the functions used to parse / form can frames related to 
-                motion control polling messages
+/** @file       EOtheCANprotocolCfg.h
+    @brief      This header file contains declaration of the functions used to parse / form can frames
     @author     marco.accame@iit.it
 	@date       12 mar 2015
 **/
 
-/** @defgroup eo_EoCANprotocolMCpolling CAN protocol for MC polling messages
-    This file contains function declarations for parsing / forming can frames related to motion control
-    polling message
+/** @defgroup doxygroup_EOtheCANprotocolCfg CAN protocol parsing/forming functions
+    This file contains function declarations for parsing / forming can frames
     
     @{        
  **/
@@ -63,25 +61,62 @@ extern "C" {
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+// - analog sensors: polling
+
+extern eOresult_t eocanprotASpolling_parser_00(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASpolling_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+extern eOresult_t eocanprotASpolling_parser_01(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASpolling_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+extern eOresult_t eocanprotASpolling_parser_02(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+
+// - analog sensors: periodic
+
+extern eOresult_t eocanprotASperiodic_parser_00(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASperiodic_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+extern eOresult_t eocanprotASperiodic_parser_01(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASperiodic_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+
+// - motion control: polling
+
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__exceptions(eOcanframe_t *frame, eOcanport_t port);
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__exceptions(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port);
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
-
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port);
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
-
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION(eOcanframe_t *frame, eOcanport_t port);
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 
+// - motion control: periodic
+
+extern eOresult_t eocanprotMCperiodic_parser_00(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotMCperiodic_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+extern eOresult_t eocanprotMCperiodic_parser_01(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotMCperiodic_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
+
+// - skin: polling
+// nothing
+
+// - skin: periodic
+
+extern eOresult_t eocanprotSKperiodic_parser_TactileSensorOutput8bit(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotSKperiodic_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 
 /** @}            
-    end of group eo_EoCANprotocolMCpolling  
+    end of group doxygroup_EOtheCANprotocolCfg  
  **/
 
 #ifdef __cplusplus

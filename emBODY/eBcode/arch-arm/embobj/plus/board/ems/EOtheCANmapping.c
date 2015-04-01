@@ -24,7 +24,7 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 
-#include "EoCANmapBoards.h"
+#include "EOtheCANmappingCfg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -118,7 +118,7 @@ extern EOtheCANmapping* eo_canmap_GetHandle(void)
 
 extern const eOcanmap_canboard_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanmap_entitylocation_t loc)
 {
-    eOcanmap_canboard_t *board = NULL;
+//    eOcanmap_canboard_t *board = NULL;
     
 // useless if port is only one bit    
 //    if(loc.port > 1)
@@ -131,14 +131,14 @@ extern const eOcanmap_canboard_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanm
         return(NULL);
     }
     
-    return((const eOcanmap_canboard_t*)eo_canmapping_boards[loc.port][loc.addr]);
+    return((const eOcanmap_canboard_t*)eo_canmapcfg_boards[loc.port][loc.addr]);
 }
 
 
 extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_entitylocation_t loc, eObrd_typeandversions_t *detected)
 {
     
-    eOresult_t res = eores_NOK_generic;
+//      eOresult_t res = eores_NOK_generic;
     
 // useless if port is only one bit    
 //    if(loc.port > 1)
@@ -156,7 +156,7 @@ extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_entity
         return(eores_NOK_nullpointer);
     }
     
-    eOcanmap_canboard_t * board = eo_canmapping_boards[loc.port][loc.addr];  
+    eOcanmap_canboard_t * board = eo_canmapcfg_boards[loc.port][loc.addr];  
     
     if(NULL == board)
     {
@@ -185,7 +185,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eOcanmap_entit
         return(EOK_uint08dummy);
     }
     
-    const eOcanmap_canboard_t * theboard = eo_canmapping_boards[loc.port][loc.addr];
+    const eOcanmap_canboard_t * theboard = eo_canmapcfg_boards[loc.port][loc.addr];
     
     if(NULL == theboard)
     {   // it means that we dont have such a board at the specified location
@@ -234,7 +234,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
         return(EOK_uint08dummy);
     }
     
-    const eOcanmap_canboard_t * theboard = eo_canmapping_boards[loc.port][loc.addr];
+    const eOcanmap_canboard_t * theboard = eo_canmapcfg_boards[loc.port][loc.addr];
     
     if(NULL == theboard)
     {   // it means that we dont have such a board at the specified location
@@ -344,16 +344,16 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
         {
             if(eoprot_entity_mc_joint == entity)
             {
-                if(index < eo_canmapping_joints_numberof)
+                if(index < eo_canmapcfg_joints_numberof)
                 {
-                    theboard = eo_canmapping_joints[index];
+                    theboard = eo_canmapcfg_joints[index];
                 }                
             }
             else if(eoprot_entity_mc_motor == entity)
             {
-                if(index < eo_canmapping_motors_numberof)
+                if(index < eo_canmapcfg_motors_numberof)
                 {
-                    theboard = eo_canmapping_motors[index];
+                    theboard = eo_canmapcfg_motors[index];
                 }                
             }
 
@@ -391,9 +391,9 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
         {
             if(eoprot_entity_as_strain == entity)
             {
-                if(index < eo_canmapping_strains_numberof)
+                if(index < eo_canmapcfg_strains_numberof)
                 {
-                    theboard = eo_canmapping_strains[index];
+                    theboard = eo_canmapcfg_strains[index];
                     if(NULL != theboard)
                     {
                         if(eobrd_cantype_strain == theboard->board.type)
@@ -419,9 +419,9 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
             }
             else if(eoprot_entity_as_mais == entity)
             {
-                if(index < eo_canmapping_maises_numberof)
+                if(index < eo_canmapcfg_maises_numberof)
                 {
-                    theboard = eo_canmapping_maises[index];
+                    theboard = eo_canmapcfg_maises[index];
                     if(NULL != theboard)
                     {
                         if(eobrd_cantype_mais == theboard->board.type)
@@ -451,10 +451,10 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
         {
             if(eoprot_entity_sk_skin == entity)
             {
-                if(index < eo_canmapping_skins_numberof)
+                if(index < eo_canmapcfg_skins_numberof)
                 {
-                    const eOcanmap_canboard_t * const * theboards = eo_canmapping_skins_boards[index];
-                    //theboard = eo_canmapping_skins[index];
+                    const eOcanmap_canboard_t * const * theboards = eo_canmapcfg_skins_boards[index];
+                    //theboard = eo_canmapcfg_skins[index];
                     if(NULL != theboards)
                     {   // ok, we have a valid array of boards. let us see the first one ...
                         theboard = theboards[0];
@@ -462,7 +462,7 @@ extern eOresult_t eo_canmap_GetEntityLocation2(EOtheCANmapping *p, eOprotEndpoin
                         {   // must verify it is non NULL ... and that it is a skin board
                             if(eobrd_cantype_skin == theboard->board.type)
                             {   // ok, correct board. we retrieve the info
-                                *numoflocs = eo_canmapping_skins_boardsinside[index];
+                                *numoflocs = eo_canmapcfg_skins_boardsinside[index];
                                 loc->port = theboard->board.location.port;
                                 loc->addr = theboard->board.location.addr; 
                                 loc->insideindex = eocanmap_insideindex_none; // if it is a skin we dont care about insideindex
