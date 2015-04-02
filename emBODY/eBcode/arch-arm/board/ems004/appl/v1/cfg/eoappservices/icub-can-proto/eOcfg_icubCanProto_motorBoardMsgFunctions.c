@@ -2932,6 +2932,8 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__position(EOicubCanProto* 
 
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
 {
+#if 1 
+    
     eOresult_t                              res;
     eOmc_jointId_t   		                jId;
     eOmc_joint_status_t                     *jstatus = NULL;
@@ -2958,7 +2960,42 @@ static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__pidVal(EOicubCanProto* p,
     }
 
     return(eores_OK);
+    
+#else
+    
+    // marco.accame on 02apr15: this is the ways it should be after we have changed the type of jstatus->ofpid.output
+    // ... and if we consider the content of the can frame as a signed int int16_t
+    eOresult_t                              res;
+    eOmc_jointId_t   		                jId;
+    eOmc_joint_status_t                     *jstatus = NULL;
+    
+    res = eo_appTheDB_GetJointId_ByJointCanLocation(eo_appTheDB_GetHandle(), canloc, &jId);
+    if(eores_OK != res)
+    {
+        return(res);
+    }
 
+    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
+    if(NULL == jstatus)
+    {
+        return(eores_NOK_generic); //error
+    }
+   
+    int16_t value = 0;
+    if(eo_icubCanProto_jm_index_first == canloc.indexinsidecanboard)
+	{
+        value = *((int16_t*)&(frame->data[0]));
+    }
+    else
+    {
+        value = *((int16_t*)&(frame->data[2]));
+    }
+    
+    jstatus->ofpid.output = value;
+
+    return(eores_OK);    
+    
+#endif
 }
 
 static eOresult_t s_eo_icubCanProto_parser_per_mb_cmd__current(EOicubCanProto* p, eOcanframe_t *frame, eOappTheDB_jointOrMotorCanLocation_t canloc)
