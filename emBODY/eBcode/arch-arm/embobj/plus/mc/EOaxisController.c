@@ -311,14 +311,19 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq)
 
 extern eObool_t eo_axisController_SetInteractionMode(EOaxisController *o, eOmc_interactionmode_t mode)
 {
-    o->interact_mode = mode;
- 
-    if (mode == eOmc_interactionmode_stiff)
+    if (o)
     {
-        axisMotionReset(o);
+       if (o->interact_mode == mode) return eobool_true;
+      
+       o->interact_mode = mode;
+       if (mode == eOmc_interactionmode_stiff)
+       {
+          axisMotionReset(o);
+       }
+       return eobool_true;
     }
-    
-    return eobool_true;
+
+    return eobool_true; //eobool_false?
 }
 
 /*
@@ -476,6 +481,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_true;
     
     case eomc_controlmode_direct:
+        if (o->control_mode == eomc_controlmode_direct) return eobool_true;
         o->control_mode = eomc_controlmode_direct;
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
@@ -486,6 +492,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_true;
     
     case eomc_controlmode_cmd_position:
+        if (o->control_mode == eomc_controlmode_position) return eobool_true;
         o->control_mode = eomc_controlmode_position;
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
@@ -496,6 +503,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_true;
     
     case eomc_controlmode_cmd_velocity:
+        if (o->control_mode == eomc_controlmode_cmd_velocity) return eobool_true;
         o->control_mode = eomc_controlmode_velocity;
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
@@ -506,6 +514,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_true;
     
     case eomc_controlmode_cmd_mixed:
+        if (o->control_mode == eomc_controlmode_cmd_mixed) return eobool_true;
         o->control_mode = eomc_controlmode_mixed;
         eo_pid_Reset(o->pidP);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
@@ -516,6 +525,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_true;
 
     case eomc_controlmode_cmd_torque:
+        if (o->control_mode == eomc_controlmode_cmd_torque) return eobool_true;
         eo_pid_Reset(o->pidT);
         o->torque_timer = 0;
         o->torque_wdog = TORQUE_SENSOR_TIMEOUT;
@@ -528,6 +538,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         return eobool_true;
     
     case eomc_controlmode_cmd_openloop:
+        if (o->control_mode == eomc_controlmode_cmd_openloop) return eobool_true;
         o->control_mode = eomc_controlmode_openloop;
         o->openloop_out = 0;
         o->torque_ref_jnt = 0;
