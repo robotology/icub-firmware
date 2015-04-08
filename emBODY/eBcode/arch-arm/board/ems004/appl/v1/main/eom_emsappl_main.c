@@ -40,12 +40,14 @@
 #include "EOMtheEMSapplCfg.h"
 #include "EOMtheEMSappl.h"
 
-#include "OPCprotocolManager_Cfg.h" 
-#include "EOtheEMSapplDiagnostics.h"
+//#include "OPCprotocolManager_Cfg.h" 
+//#include "EOtheEMSapplDiagnostics.h"
 #include "emBODYrobot.h"
 
 #include "EOtheLEDpulser.h"
 
+#include "EoError.h"
+#include "EOtheErrorManager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -115,20 +117,29 @@ int main(void)
 
 }
 
-//#ifdef _TEST_SEQNUM_
-//extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
-//{
-//    char str[80];
-//    snprintf(str, sizeof(str)-1, "SEQ_NUM: rec=%llu expeted=%llu ", rec_seqnum, expected_seqnum);
-//    hal_trace_puts(str);
-//  
-//}
-//#endif
+
 
 extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
-{
-    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());    
-    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon  , 0);
+{   // the only reason of using the following two variables as static is: to reduce the use of stack.
+    static int64_t delta = 0;
+    static eOerrmanDescriptor_t errdes = 
+    {
+        .code           = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error),
+        .sourcedevice   = eo_errman_sourcedevice_localboard,
+        .sourceaddress  = 0,
+        .par16          = 0,
+        .par64          = 0
+    };
+   
+    delta = rec_seqnum - expected_seqnum;
+    if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
+    else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
+    
+    errdes.par16            = (int16_t)delta; 
+    errdes.par64            = expected_seqnum; 
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+//    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());    
+//    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon  , 0);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
