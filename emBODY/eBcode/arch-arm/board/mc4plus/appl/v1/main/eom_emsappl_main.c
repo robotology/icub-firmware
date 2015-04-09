@@ -86,7 +86,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_eom_emsappl_main_init(void);
-
+static void s_eom_emsappl_main_init_testing(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,6 +102,7 @@ static void s_eom_emsappl_main_init(void);
 
 int main(void)
 {
+
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_Initialise();
 
     eom_sys_Initialise( &emscfg->wsyscfg.msyscfg, 
@@ -110,9 +111,8 @@ int main(void)
                         &emscfg->wsyscfg.tmrmancfg, 
                         &emscfg->wsyscfg.cbkmancfg 
                       );  
-    
-    eom_sys_Start(eom_sys_GetHandle(), s_eom_emsappl_main_init);
-
+  
+    eom_sys_Start(eom_sys_GetHandle(), s_eom_emsappl_main_init_testing);
 }
 
 //#ifdef _TEST_SEQNUM_
@@ -178,6 +178,103 @@ static void s_eom_emsappl_main_init(void)
     }
 }
 
+/** @fn         static void s_eom_emsappl_main_init_testing(void)
+    @brief      Redefine this function for testing purpose 
+    @details    bla bla bla.
+ **/
+
+static void s_eom_emsappl_main_init_testing(void)
+{      
+      
+    eOappEncReader_cfg_t cfg = { 0 }; // marco.accame on 12jan2015: the warning will be removed when a final version of the config is released.
+    
+    //memcpy(&cfg.streams, &p->config.encoderstreams, sizeof(cfg.streams));
+    //cfg.connectedEncodersMask = p->config.connectedEncodersMask;
+    cfg.SPI_callbackOnLastRead = NULL;
+    cfg.SPI_callback_arg = NULL;
+    
+    //Test Initialization
+    //joints
+    cfg.joints_number = 3;
+    eOappEncReader_joint_t j1,j2,j3,jnone;
+    j1.joint_pos = eo_appEncReader_joint_position0;
+    j1.primary_encoder = eo_appEncReader_enc_type_AMO;
+    j1.SPI_encoder = hal_encoder1;
+    j1.extra_encoder = eo_appEncReader_enc_type_NONE;
+    j1.SPI_stream_associated = eo_appEncReader_stream0;
+    j1.SPI_stream_position = 0;
+    
+    j2.joint_pos = eo_appEncReader_joint_position2;
+    j2.primary_encoder = eo_appEncReader_enc_type_AEA;
+    j2.SPI_encoder = hal_encoder2;
+    j2.extra_encoder = eo_appEncReader_enc_type_NONE;
+    j2.SPI_stream_associated = eo_appEncReader_stream1;
+    j2.SPI_stream_position = 0;
+    
+    j3.joint_pos = eo_appEncReader_joint_position3;
+    j3.primary_encoder = eo_appEncReader_enc_type_INC;
+    j3.extra_encoder= eo_appEncReader_enc_type_NONE;
+    jnone.primary_encoder = eo_appEncReader_enc_type_NONE;
+    jnone.extra_encoder = eo_appEncReader_enc_type_NONE;
+    cfg.joints[0] = j1;
+    cfg.joints[1] = j2;
+    cfg.joints[2] = j3;
+    cfg.joints[3] = jnone;
+    cfg.joints[4] = jnone;
+    cfg.joints[5] = jnone;
+    
+    //SPI streams
+    eOappEncReader_stream_t st1, st2;
+    st1.numberof = 1;
+    st1.type = hal_encoder_t2;
+    st1.encoders[0] = hal_encoder1;
+    st1.encoders[1] = hal_encoderNONE;
+    st1.encoders[2] = hal_encoderNONE;
+    st1.encoders[3] = hal_encoderNONE;
+    st1.encoders[4] = hal_encoderNONE;
+    st1.encoders[5] = hal_encoderNONE;
+    
+    st2.numberof = 1;
+    st2.type = hal_encoder_t1;
+    st2.encoders[0] = hal_encoder2;
+    st2.encoders[1] = hal_encoderNONE;
+    st2.encoders[2] = hal_encoderNONE;
+    st2.encoders[3] = hal_encoderNONE;
+    st2.encoders[4] = hal_encoderNONE;
+    st2.encoders[5] = hal_encoderNONE;
+    
+    cfg.SPI_streams[0] = st1;
+    cfg.SPI_streams[1] = st2;
+    
+   EOappEncReader* enc_ptr = eo_appEncReader_New(&cfg);
+   
+   eo_appEncReader_StartRead(enc_ptr);
+   uint32_t pos1, pos2,pos3,dummy;
+   char str[96];
+   hal_encoder_errors_flags fl;
+   for(;;)
+   {
+       //wait until both SPI are ready
+       while (!eo_appEncReader_isReady(enc_ptr)) {};
+       eo_appEncReader_GetJointValue(enc_ptr,0, &pos1, &dummy,&fl);
+       snprintf (str, sizeof(str), "ENCODER POS1: %d", pos1);
+       hal_trace_puts(str);
+           
+       eo_appEncReader_GetJointValue(enc_ptr,2, &pos2, &dummy,&fl);
+       snprintf (str, sizeof(str), "ENCODER POS2: %d", pos2);
+       hal_trace_puts(str);
+           
+       eo_appEncReader_GetJointValue(enc_ptr,3, &pos3, &dummy,&fl);
+       snprintf (str, sizeof(str), "ENCODER POS4: %d", pos3);
+       hal_trace_puts(str);
+    
+       //restart the encoders and wait
+       eo_appEncReader_StartRead(enc_ptr);
+       hal_trace_puts("\n");    
+       hal_sys_delay(hal_RELTIME_1second);
+   }
+  
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
