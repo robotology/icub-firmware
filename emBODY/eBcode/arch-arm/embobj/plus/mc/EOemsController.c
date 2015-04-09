@@ -761,9 +761,9 @@ extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32
 {
     if (!ems) return; 
     #if   defined(SHOULDER_BOARD)
-          if (joint_id==0) {*torque_motor= ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt; return;}
-          if (joint_id==1) {*torque_motor=(ems->axis_controller[1]->torque_meas_jnt - ems->axis_controller[2]->torque_meas_jnt)* 0.625; return;}
-          if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt * 0.625; return;}
+          if (joint_id==0) {*torque_motor= ems->axis_controller[0]->torque_ref_jnt + ems->axis_controller[1]->torque_ref_jnt; return;}
+          if (joint_id==1) {*torque_motor=(ems->axis_controller[1]->torque_ref_jnt - ems->axis_controller[2]->torque_ref_jnt)* 0.625; return;}
+          if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_ref_jnt * 0.625; return;}
           if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_ref_jnt; return;}
     #elif defined(WAIST_BOARD)
           if (joint_id==0) {*torque_motor=(ems->axis_controller[0]->torque_ref_jnt - ems->axis_controller[1]->torque_ref_jnt)*0.5 + ems->axis_controller[2]->torque_ref_jnt*0.275; return;}
