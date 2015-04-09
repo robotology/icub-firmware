@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero
- * email:   valentina.gaggero@iit.it
+ * Author:  Valentina Gaggero, Davide Pollarolo
+ * email:   valentina.gaggero@iit.it, davide.pollarolo@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -25,7 +25,7 @@
 // - doxy -------------------------------------------------------------------------------------------------------------
 /* @file       EOappEncodersReader.h
     @brief     This file provides hidden interface to encodersReader obj.
-    @author    valentina.gaggero@iit.it
+    @author    valentina.gaggero@iit.it, davide.pollarolo@iit.it
     @date       02/17/2012
 **/
 
@@ -40,7 +40,7 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-// the application must read 6 encoders: 3 connected with sP1 1 and others 3 connected with SPI3.
+// the application must read 6 encoders: 3 connected with SP1 1 and others 3 connected with SPI3.
 //
 enum { encodersNum = 6 };
 enum { encodersNumPerSPI = 3 };
@@ -55,7 +55,7 @@ enum { encodersNumPerSPI = 3 };
 
 typedef struct
 {
-    uint8_t list[encodersNumPerSPI];    /**< for the encoder i-th: in list[i] the encoder i-th finds the number of encoder it must start when it has finish its onw read. */
+    uint8_t list[encodersNumPerSPI+1];    /**< for the encoder i-th: in list[i] the encoder i-th finds the number of encoder it must start when it has finish its onw read. */
     uint8_t first;                      /**< indicates the first encoder to read */
 } EOappEncReader_configEncSPIXReadSequence_hid_t;
 
@@ -78,14 +78,10 @@ typedef struct
 
 struct EOappEncReader_hid
 {
-    eOappEncReader_cfg_t    cfg;
-    //uint16_t                halConfigEncMask;
-	  hal_encoder_type	halConfigEncMask[encodersNum];
-//    struct configEncSPIX    configuredEnc_SPI1;     /**< contains the sequence of reading of encoders connected to SPI1*/ 
-//    struct configEncSPIX    configuredEnc_SPI3;     /**< contains the sequence of reading of encoders connected to SPI3 */ 
-    EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI1;
-    EOappEncReader_confEncDataPerSPI_hid_t configuredEnc_SPI3;
-    eOappEncReader_diagnosticsinfo_t dgninfo;
+    eOappEncReader_cfg_t                    cfg;                            /* Init configuration */ 
+    EOappEncReader_confEncDataPerSPI_hid_t  configuredEnc_SPI1;             /* Encoders configured on SPI1 */
+    EOappEncReader_confEncDataPerSPI_hid_t  configuredEnc_SPI3;             /* Encoders configured on SPI3 */
+    eOappEncReader_diagnosticsinfo_t        dgninfo;                        /* Diagnostics info, deprecated */
     uint64_t    times[2][4];
 }; 
 
