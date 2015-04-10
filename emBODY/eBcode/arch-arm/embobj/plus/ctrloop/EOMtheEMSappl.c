@@ -178,7 +178,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     
     // tell something
     snprintf(str, sizeof(str), 
-        "EMS APPL %s: ver %d.%d of %d/%d/%d %d:%d", 
+             "EMS APPL %s: ver %d.%d of %d/%d/%d %d:%d", 
              s_emsappl_singleton.cfg.emsappinfo->info.name,
              s_emsappl_singleton.cfg.emsappinfo->info.entity.version.major,
              s_emsappl_singleton.cfg.emsappinfo->info.entity.version.minor,
