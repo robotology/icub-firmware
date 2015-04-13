@@ -287,12 +287,12 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT,
         .sizes                  =
         {
-            .capacityoftxpacket             = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, //1024,
-            .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, //256,
-            .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, //768,
-            .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, //128,
-            .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, //128,
-            .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS //32           
+            .capacityoftxpacket             = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, 
+            .capacityofrop                  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, 
+            .capacityofropframeregulars     = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, 
+            .capacityofropframeoccasionals  = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, 
+            .capacityofropframereplies      = EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, 
+            .maxnumberofregularrops         = EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS         
         },
         .transprotection        = eo_trans_protection_none, //eo_trans_protection_enabled, //eo_trans_protection_none,
         .nvsetprotection        = eo_nvset_protection_none,//eo_nvset_protection_one_per_endpoint //eo_nvset_protection_none // eo_nvset_protection_one_per_netvar eo_nvset_protection_one_per_endpoint
@@ -343,7 +343,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .maxnumofRXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_RX_MAXPACKETS,                // add a control that is is lower equal to inpdatagramnumber.
         .maxnumofTXpackets          = EOMTHEEMSAPPLCFG_RUNOBJ_TX_MAXPACKETS,                // so far it can be only 0 or 1 
         .modeatstartup              = (eOemsrunner_mode_t) EOMTHEEMSAPPLCFG_RUNOBJ_MODE_AT_STARTUP,
-        .TXdecimationfactor         = 1        
+        .defaultTXdecimationfactor  = EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR        
     },
     .applbodycfg    =  &theapplbodyconfig
 };
