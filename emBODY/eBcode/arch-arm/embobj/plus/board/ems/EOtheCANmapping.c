@@ -678,6 +678,43 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
 
 
 
+extern eOresult_t eo_canmap_GetCompactAddressList(EOtheCANmapping *p, eOcanport_t port, eOcanmap_compact_address_list_t *addresslist, uint8_t *numofboards)
+{
+
+    if(NULL == addresslist)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eOcanmap_canboard_t * const * theboards = eo_canmapcfg_boards[port];
+    
+    uint8_t i = 0;
+    uint8_t num = 0;
+    uint64_t list = 0;
+    
+    for(i=0; i<15; i++)
+    {
+        eOcanmap_canboard_t * board = theboards[i];
+        if(NULL == board)
+        {
+            continue;
+        }
+        uint64_t tmp = (board->board.location.addr) << (4*num);
+        num++;
+        list = list | tmp;      
+    }
+        
+    // ok, now i copy into the param
+    memcpy(addresslist, &list, 8);
+    
+    if(NULL != numofboards)
+    {
+        *numofboards = num;
+    }
+    
+    return(eores_OK);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

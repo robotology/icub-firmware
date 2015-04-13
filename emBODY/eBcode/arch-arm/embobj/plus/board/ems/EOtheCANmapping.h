@@ -124,7 +124,28 @@ typedef struct
     uint32_t            nothingsofar;
 } eOcanmap_cfg_t;
 
-
+/**	@typedef    typedef struct eOcanmap_compact_address_list_t 
+ 	@brief      Contains a compact address list of up to 16 can boards, each using 4 bits. 
+ **/
+typedef struct
+{   // or rather, the other way round in arm ... thus maybe better saying that the adresses are organised in nibbles
+    uint64_t    b00 : 4;
+    uint64_t    b01 : 4;
+    uint64_t    b02 : 4;
+    uint64_t    b03 : 4;
+    uint64_t    b04 : 4;
+    uint64_t    b05 : 4;
+    uint64_t    b06 : 4;
+    uint64_t    b07 : 4;
+    uint64_t    b08 : 4;
+    uint64_t    b09 : 4;
+    uint64_t    b10 : 4;
+    uint64_t    b11 : 4;
+    uint64_t    b12 : 4;
+    uint64_t    b13 : 4;
+    uint64_t    b14 : 4;
+    uint64_t    b15 : 4;
+} eOcanmap_compact_address_list_t;  EO_VERIFYsizeof(eOcanmap_compact_address_list_t, 8); 
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -171,6 +192,8 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
 // it gets the location of a specified entity
 extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t id32, eOcanmap_entitylocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype);
 
+
+extern eOresult_t eo_canmap_GetCompactAddressList(EOtheCANmapping *p, eOcanport_t port, eOcanmap_compact_address_list_t *addresslist, uint8_t *numofboards);
 
 
 
