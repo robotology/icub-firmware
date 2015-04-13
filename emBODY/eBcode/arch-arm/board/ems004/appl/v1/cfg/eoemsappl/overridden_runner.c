@@ -127,6 +127,8 @@ extern uint64_t eom_emsrunner_txprevduration;
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static EOarray* s_getSkinDataArray(eOcanport_t port);
+
 //RX
 // marco.accame: commented it out on nov 26 2014 because it is not used and the compiler complains
 //static void s_eom_emsrunner_hid_read_can_messages(eOcanport_t port, eObool_t all, uint8_t max);
@@ -182,8 +184,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
         eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
     }
     
+    /*    
     eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-		/*
     if(applrunMode__2foc == runmode)
     {
          eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
@@ -200,51 +202,49 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 
 }
 
+
+
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
-    eOresult_t                      res;
-    EOappTheDB                      *db_ptr = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_SkinCanLocation_t    skincanloc = {0};
-    eOsk_skinId_t                   skId;
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
     EOappCanSP                      *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eOsk_status_t                   *skinstatus = NULL;
- 
     
     for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
     {
-        skincanloc.emscanport = (eOcanport_t)port;
-        res = eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), skincanloc, &skId);
-        if(eores_OK == res)
-        {
-            // reset the skin status
-            skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), skId);
-            if(skinstatus == NULL)
-            {
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "cannot get a skin", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
+        // marco.accame: the following strategy is ok if the bus containing skin does not contain any other board type
+        // the bus has only skin? then i read at most a number of canframes equal to capacity of skin-data buffer
+        // else i read all the content of the rx can buffer.
+        
+        // step 1: decide the max number of can frames to read
+        
+        EOarray *arrayofcandata = s_getSkinDataArray((eOcanport_t)port);
+        if(NULL != arrayofcandata)
+        {   // ok, we have a skin            
+            if(eobool_false == eom_emsrunner_CycleIsTransmitting(eom_emsrunner_GetHandle()))
+            {   // if we dont transmit in this cycle then i dont read any frame from this bus
+                numofRXcanframe = 0;                
             }
-            
-            
-            eo_array_Reset((EOarray*)(&skinstatus->arrayofcandata));
-            
-            
-            // if skin is connected i should read at maximum as many messages as the capacity of the array
-            // the can callback shall copy the canframe into the array
-            numofRXcanframe = eo_array_Capacity((EOarray*)(&skinstatus->arrayofcandata)); 
+            else
+            {   // we read at most the capacity of the skin patch. but we also need to reset the array so that new can frames can be pushed back inside
+                numofRXcanframe = eo_array_Capacity(arrayofcandata);
+                eo_array_Reset(arrayofcandata);                
+            }  
         }
         else
-        {
-            res = eo_appCanSP_GetNumOfRecCanframe(cansp, (eOcanport_t)port, &numofRXcanframe);
-            eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "err in GetNumOfRecCanframe", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
+        {   // in this bus we dont have skin, thus ... i read everything in the rx can buffer
+            eo_appCanSP_GetNumOfRecCanframe(cansp, (eOcanport_t)port, &numofRXcanframe);
         }
+        
     
-        #ifdef _GET_CANQUEUE_STATISTICS_
-        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
-        #endif
+//        // step x: update diagnostics (marco.accame: maybe we remove it later on)
+//        #ifdef _GET_CANQUEUE_STATISTICS_
+//        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
+//        #endif
+        
+        // step 2: read the can frames. this function also parses them and triggers associated action ...
         eo_appCanSP_read(cansp, (eOcanport_t)port, numofRXcanframe, NULL); 
     }
-
 }
 
 
@@ -254,7 +254,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
+    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
 
     /* TAG_ALE */
 //     if(applrunMode__skinAndMc4 == runmode)
@@ -299,15 +299,17 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    uint8_t numoftxframe_p1, numoftxframe_p2;
+    uint8_t numofframes2betransmitted_can1 = 0;
+    uint8_t numofframes2betransmitted_can2 = 0;
     
-    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numoftxframe_p1);
-    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numoftxframe_p2);
+    // i enable transmission on both can buses. functions are not blocking as the transmission is done by the ISRs
+    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframes2betransmitted_can1);
+    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numofframes2betransmitted_can2);
     
-#ifdef _GET_CANQUEUE_STATISTICS_
-    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport1, numoftxframe_p1);
-    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport2, numoftxframe_p2);
-#endif
+//#ifdef _GET_CANQUEUE_STATISTICS_
+//    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport1, numoftxframe_p1);
+//    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport2, numoftxframe_p2);
+//#endif
 }
 
 
@@ -315,7 +317,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    eOresult_t res[2];
+    eOresult_t res[2] = {eores_NOK_generic, eores_NOK_generic};
  
     // before wait can, check link status!!
     count_ethlink_status ++;
@@ -336,6 +338,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     
     res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
+    
     if((eores_NOK_timeout ==  res[0]) || (eores_NOK_timeout ==  res[1]))
     {
         eo_dgn_emsapplcore.core.runst.cantxfailuretimeoutsemaphore++;
@@ -356,12 +359,6 @@ extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
         
-// marco.accame: removed because it does nothing        
-//    eOemsrunner_diagnosticsinfo_t *dgn_ptr = eom_emsrunner_GetDiagnosticsInfoHandle(p);
-//    if(NULL == dgn_ptr)
-//    {
-//        return;
-//    }
     
     eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
     // marco.accame: for now i remove the action of this object and i call only the errormanager. for later we can have both the error handlers
@@ -379,12 +376,6 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
     
-// marco.accame: removed because it does nothing     
-//    eOemstransceiver_diagnosticsinfo_t* dgn_ptr = eom_emstransceiver_GetDiagnosticsInfoHandle(p);    
-//    if(NULL == dgn_ptr)
-//    {
-//        return;
-//    }
     // marco.accame: for now i remove the action of this object and i call only the errormanager. for later we can have both the error handlers
     eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
     //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);    
@@ -393,6 +384,34 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+static EOarray* s_getSkinDataArray(eOcanport_t port)
+{   // tells if the can port has a skin entity in it 
+    static EOarray* arraysofcandata[2] = {NULL, NULL};
+    static eObool_t evaluated[2] = {eobool_false, eobool_false};
+
+    if(eobool_false == evaluated[port])
+    {
+        evaluated[port] = eobool_true;
+        
+       // ok, now i prepare the value of retvalues[port] but i do it only once
+        eOappTheDB_SkinCanLocation_t skincanloc = {0};
+        skincanloc.emscanport = (eOcanport_t)port;
+        eOsk_skinId_t skid =  255;
+
+        if(eores_OK == eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), skincanloc, &skid)) 
+        {
+            // ok, i can attempt to retrieve the pointer
+            eOsk_status_t * skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), skid);
+            if(NULL != skinstatus)
+            {
+                arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
+            }
+        }        
+    }
+        
+    return(arraysofcandata[port]);    
+}
 
 
 
@@ -486,7 +505,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     eOresult_t          							res;
     EOtheEMSapplBody    							*emsappbody_ptr = eo_emsapplBody_GetHandle();
     uint32_t            							encvalue[4]; // = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
-		hal_encoder_errors_flags					encflags[4];
+    hal_encoder_errors_flags					    encflags[4];
     int16_t             							pwm[4];
     EOappEncReader      							*app_enc_reader = eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr);
     uint8_t             							error_mask = 0;

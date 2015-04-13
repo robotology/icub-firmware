@@ -58,7 +58,7 @@ extern "C" {
 //  <o> ID of the EMS board     <0=> Use external file <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9   <10=>EB10   <11=>EB11
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     0
 
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 0
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
@@ -84,18 +84,18 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          70
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          71
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2015
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        3
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          31
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          12
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
 //  <o> minute          <0-59> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          13
 //  </h>build date
@@ -697,6 +697,10 @@ extern "C" {
 	//  <o> period [usec] <100-10000:100>
 	//  <i> default: 1000
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD         1000
+    
+	//  <o> tx decimation factor [integer] <1-10:1>
+	//  <i> default: 1
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR         1      
 
 	//  <o> RX start after [usec] <0-10000:10>
 	//  <i> default: 0
@@ -728,6 +732,8 @@ extern "C" {
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME    250
 #else
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD      1000
+    #define EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR         1
+    
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER    0
 	
 	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))

@@ -84,7 +84,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          71
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          72
 //  </h>version
 
 //  <h> build date
@@ -93,11 +93,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          3
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          12
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          00
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          13
 //  </h>build date
 
 // </h>Info 
@@ -697,6 +697,11 @@ extern "C" {
 	//  <o> period [usec] <100-10000:100>
 	//  <i> default: 1000
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD         1000
+    
+    
+	//  <o> tx decimation factor [integer] <1-10:1>
+	//  <i> default: 1
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR         1    
 
 	//  <o> RX start after [usec] <0-10000:10>
 	//  <i> default: 0
@@ -728,6 +733,8 @@ extern "C" {
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME    250
 #else
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD      1000
+    #define EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR         1
+    
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER    0
 	
 	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))
