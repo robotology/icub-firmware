@@ -112,7 +112,7 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
     EO_INIT(.maxnumofRXpackets)         3,
     EO_INIT(.maxnumofTXpackets)         1,
     EO_INIT(.modeatstartup)             eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
-    EO_INIT(.TXdecimationfactor)        1
+    EO_INIT(.defaultTXdecimationfactor) 1
 };
 
 
@@ -184,7 +184,9 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.numofpacketsinsidesocket) 0,
     EO_INIT(.waitudptxisdone)       NULL,
     EO_INIT(.osaltaskipnetexec)     NULL,
-    EO_INIT(.iterationnumber)       0
+    EO_INIT(.iterationnumber)       0,
+    EO_INIT(.usedTXdecimationfactor) 0,
+    EO_INIT(.itisaTXcycle)          eobool_true
 };
 
 
@@ -263,6 +265,10 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.waitudptxisdone), "eom_emsrunner_Initialise(): waitudptxisdone is NULL", s_eobj_ownname, NULL);
     
     
+    s_theemsrunner.iterationnumber = 0;    
+    s_theemsrunner.usedTXdecimationfactor = cfg->defaultTXdecimationfactor;
+    s_theemsrunner.itisaTXcycle = eobool_true;
+    
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runRX], 
                                                                   cfg->taskstacksize[eo_emsrunner_taskid_runRX], 
@@ -325,6 +331,28 @@ extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t 
     return(s_theemsrunner.task[id]);
 }
 
+extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor)
+{  
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }   
+
+    p->usedTXdecimationfactor = txdecimationfactor;
+
+    return(eores_OK);    
+}
+
+extern eObool_t eom_emsrunner_CycleIsTransmitting(EOMtheEMSrunner *p)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    } 
+
+    return(p->itisaTXcycle);
+    
+}
 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
 {
@@ -664,14 +692,18 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
     {
         processtransmission = eobool_false;
     } 
-
-    if(p->cfg.TXdecimationfactor != 1)
+    else
     {
-        if(0 != (s_theemsrunner.iterationnumber % p->cfg.TXdecimationfactor))
-        {
-            processtransmission = eobool_false;
-        }
+        processtransmission = s_theemsrunner.itisaTXcycle;
     }
+
+//    if(s_theemsrunner.usedTXdecimationfactor > 1)   // if 0 we cannot divide, if 1 there is no need, if 2 or more we divide 
+//    {
+//        if(0 != (s_theemsrunner.iterationnumber % s_theemsrunner.usedTXdecimationfactor))
+//        {
+//            processtransmission = eobool_false;
+//        }
+//    }
     
         
     // the transmission section
@@ -860,11 +892,21 @@ static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 
 static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
-    // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.
+    // do things .... only when both eo_emsrunner_evt_enable and a eo_emsrunner_evt_execute are received.   
+    eom_emsrunner_rxstart = osal_system_abstime_get();
     
     s_theemsrunner.iterationnumber ++;
     
-    eom_emsrunner_rxstart = osal_system_abstime_get();
+
+    s_theemsrunner.itisaTXcycle = eobool_true; // just to be sure ...
+    
+    if(s_theemsrunner.usedTXdecimationfactor > 1)   // if 0 we cannot divide, if 1 there is no need, if 2 or more we divide 
+    {
+        if(0 != (s_theemsrunner.iterationnumber % s_theemsrunner.usedTXdecimationfactor))
+        {
+            s_theemsrunner.itisaTXcycle = eobool_false;
+        }
+    }
     
     
     // perform the rx activity    

@@ -79,6 +79,8 @@ struct EOMtheEMSrunner_hid
     osal_semaphore_t*   waitudptxisdone;
     osal_task_t*        osaltaskipnetexec;
     uint64_t            iterationnumber;
+    uint8_t             usedTXdecimationfactor;
+    eObool_t            itisaTXcycle;
 };
 
 

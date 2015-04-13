@@ -107,7 +107,7 @@ typedef struct
     uint16_t            maxnumofRXpackets;      /**< It allows to receive and parse up to a given number of packets */ 
     uint16_t            maxnumofTXpackets;      /**< so far it can be only 0 or 1 */
     eOemsrunner_mode_t  modeatstartup;
-    uint16_t            TXdecimationfactor;
+    uint8_t             defaultTXdecimationfactor;
 } eOemsrunner_cfg_t;
 
 typedef struct
@@ -150,6 +150,11 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *emsru
     @return     The handle to the EOMtheEMSrunner
  **/
 extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
+
+
+extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor);
+
+extern eObool_t eom_emsrunner_CycleIsTransmitting(EOMtheEMSrunner *p);
 
 // start 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
