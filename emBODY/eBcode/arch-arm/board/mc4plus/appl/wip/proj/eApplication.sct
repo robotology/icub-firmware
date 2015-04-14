@@ -1,0 +1,38 @@
+#! armcc -E
+; the above must be on teh first line of teh scatter file ...
+
+; Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+; Author:  Marco Accame
+; email:   marco.accame@iit.it
+; website: www.robotcub.org
+; Permission is granted to copy, distribute, and/or modify this program
+; under the terms of the GNU General Public License, version 2 or any
+; later version published by the Free Software Foundation.
+;
+; A copy of the license can be found at
+; http://www.robotcub.org/icub/license/gpl.txt
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+; Public License for more details
+
+; due to a bug in linker (in some older versions), you may need to put the whole path ... thus change it by hand
+;#include "D:\#inhere\sdl\embedded\arm\embody\body\embenv\envcom\eEmemorymap.h"
+#include "..\..\..\..\ems004\env\cfg\eEmemorymap.h"
+
+
+LR_IROM1 EENV_MEMMAP_EAPPLICATION_ROMADDR EENV_MEMMAP_EAPPLICATION_ROMSIZE  {    ; load region size_region
+  ER_IROM1 EENV_MEMMAP_EAPPLICATION_ROMADDR EENV_MEMMAP_EAPPLICATION_ROMSIZE  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  RW_IRAM1 EENV_MEMMAP_EAPPLICATION_RAMADDR EENV_MEMMAP_EAPPLICATION_RAMSIZE  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+} 
+
+
+
+
