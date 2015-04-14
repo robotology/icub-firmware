@@ -130,16 +130,29 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
         .par16          = 0,
         .par64          = 0
     };
-   
-    delta = rec_seqnum - expected_seqnum;
-    if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
-    else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
     
-    errdes.par16            = (int16_t)delta; 
-    errdes.par64            = expected_seqnum; 
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());    
-//    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon  , 0);
+    if(1 == rec_seqnum)
+    {
+        // it is the first packet received from a remote transmitter freshly initted (i.e., robotInterface has just re-started bu this board was alive well before)
+        // thus, we dont issue an error but an info: 
+        errdes.code  = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_restarted);
+        errdes.par64 = expected_seqnum;
+        errdes.par16 = 1;       
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);   
+        
+        // ok, now we must set back the error code as it is normal.
+        errdes.code = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error);
+    }  
+    else
+    {    
+        delta = rec_seqnum - expected_seqnum;
+        if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
+        else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
+        
+        errdes.par16            = (int16_t)delta; 
+        errdes.par64            = expected_seqnum; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
