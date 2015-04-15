@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -17,23 +17,23 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOPROT_B11_H_
-#define _EOPROT_B11_H_
+#ifndef _EOPROT_B12_H_
+#define _EOPROT_B12_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/** @file       eOprot_b11.h          
-	@brief      This header file contains protocol personalisation for board eb11 (right leg, skin) and its interface
+/** @file       eOprot_b12.h          
+	@brief      This header file contains protocol personalisation for board eb12 (head, mc4plus) and its interface
                 towards EOnvset.
 	@author     marco.accame@iit.it
-	@date       04/12/2014
+	@date       06/06/2013
 **/
 
-/** @defgroup doxy_eOprot_b11 Configuration of protocol for board eeb11 (right leg, skin) 
-    It contains protocol personalisation for board eb11 (right leg, skin)  and its interface towards EOnvset 
+/** @defgroup doxy_eOprot_b12 Configuration of protocol for board eb12 (head, mc4plus)
+    It contains protocol personalisation for board eb12 (head, icub v3) and its interface towards EOnvset 
     
     @{		
  **/
@@ -46,8 +46,9 @@ extern "C" {
 #include "EOnvSet.h"
 
 #include "EoProtocol.h"
+//#include "EoProtocolAS.h"
+#include "EoProtocolMC.h"
 #include "EoProtocolMN.h"
-#include "EoProtocolSK.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -55,86 +56,100 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-enum { eoprot_b11_boardnumber = 10 }; 
+enum { eoprot_b12_boardnumber = 0 }; 
 
 
-enum { eoprot_b11_endpoints_numberof = 2 };
+enum { eoprot_b12_endpoints_numberof = 2 };
 
 
 // - management
 
-enum { eoprot_b11_mn_comms_numberof = 1, eoprot_b11_mn_appls_numberof = 1, eoprot_b11_mn_infos_numberof = 1 };
+enum { eoprot_b12_mn_comms_numberof = 1, eoprot_b12_mn_appls_numberof = 1, eoprot_b12_mn_infos_numberof = 1 };
 
 
-/** @typedef    typedef struct eOprot_b11_management_t;
-    @brief      It is the container of entities comm and app in the management endpoint of board b11.
+/** @typedef    typedef struct eOprot_b12_management_t;
+    @brief      It is the container of entities comm and app in the management endpoint of board b12.
  **/
 typedef struct                  // 124+24+40 = 168              
 {
     eOmn_comm_t                 communication; 
     eOmn_appl_t                 application;
     eOmn_info_t                 info;
-} eOprot_b11_management_t;      //EO_VERIFYsizeof(eOprot_b11_management_t, 168); 
+} eOprot_b12_management_t;      //EO_VERIFYsizeof(eOprot_b12_management_t, 168); 
 
 
+// - motion control
 
-// - motion control: none
+enum { eoprot_b12_mc_joints_numberof = 4, eoprot_b12_mc_motors_numberof = 4, eoprot_b12_mc_controllers_numberof = 1 };
 
-// - analog sensors: none
-
-
-// - skin
-
-enum { eoprot_b11_sk_skins_numberof = 2 };
-            
-
-/** @typedef    typedef struct eOprot_b11_skin_t;
-    @brief      It is the container of skins in the skin endpoint of board eb2.
+ 
+/** @typedef    typedef struct eOprot_b12_motioncontrol_t;
+    @brief      It is the container of joints, motors, controllers in the motion control endpoint of board eb1.
  **/
-typedef struct                  // 176+0 = 176              
+typedef struct                  // 176*4+48*4+16 = 912              
 {
-    eOsk_skin_t                 skin[eoprot_b11_sk_skins_numberof]; 
-} eOprot_b11_skin_t;            //EO_VERIFYsizeof(eOprot_b11_skin_t, 176); 
+    eOmc_joint_t                joints[eoprot_b12_mc_joints_numberof]; 
+    eOmc_motor_t                motors[eoprot_b12_mc_motors_numberof];
+    eOmc_controller_t           thecontroller;
+} eOprot_b12_motioncontrol_t;   //EO_VERIFYsizeof(eOprot_b12_motioncontrol_t, 912);      
 
+
+#if 0
+
+// - analog sensors
+
+enum { eoprot_b12_as_strains_numberof = 0, eoprot_b12_as_maises_numberof = 0, eoprot_b12_as_extorque_numberof = 0 };
+         
+
+/** @typedef    typedef struct eOprot_b12_analogsensors_t;
+    @brief      It is the container of strain, mais in the analog sensors endpoint of board eb1.
+ **/
+typedef struct                  // 56+4*8+0 = 88              
+{
+    eOas_strain_t               strain; 
+    eOas_extorque_t             extorquE[eoprot_b12_as_extorque_numberof];
+} eOprot_b12_analogsensors_t;   //EO_VERIFYsizeof(eOprot_b12_analogsensors_t, 88); 
+
+#endif
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 // the configuration for the EOnvset object for protocol management
-extern const eOnvset_DEVcfg_t eoprot_b11_nvsetDEVcfg;
+extern const eOnvset_DEVcfg_t eoprot_b12_nvsetDEVcfg;
 
-extern const uint8_t eoprot_b11_mn_entities_numberofeach[]; // = { eoprot_b11_mn_comms_numberof, eoprot_b11_mn_appls_numberof };
-extern const uint8_t eoprot_b11_sk_entities_numberofeach[]; // = { eoprot_b11_sk_skins_numberof };
+extern const uint8_t eoprot_b12_mn_entities_numberofeach[]; // = { eoprot_b12_mn_comms_numberof, eoprot_b12_mn_appls_numberof };
+extern const uint8_t eoprot_b12_mc_entities_numberofeach[]; // = { eoprot_b12_mc_joints_numberof, eoprot_b12_mc_motors_numberof, eoprot_b12_mc_controllers_numberof };
+//extern const uint8_t eoprot_b12_as_entities_numberofeach[]; // = { eoprot_b12_as_strains_numberof, eoprot_b12_as_maises_numberof, eoprot_b12_as_extorque_numberof };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn         extern eOresult_t eoprot_b11_Initialise(void* p, eObool_t islocal)
+/** @fn         extern eOresult_t eoprot_b12_Initialise(void* p, eObool_t islocal)
     @brief      Initialises the endpoints of this board by loading the number of 
                 entities for each of them in the related endpoint file. As a result of that, 
                 the functions which require a brd argument will return the correct value if called 
-                with brd = eoprot_b11_boardnumber.
+                with brd = eoprot_b12_boardnumber.
                 This function is called by the EOnvset because the eOnvset_DEVcfg_t contains a 
                 pointer to it.  However, it is made public so that it can be called independently 
                 from the use of EOnvset.
     @return     eores_OK if successful or eores_NOK_generic upon failure.
  **/
-extern eOresult_t eoprot_b11_Initialise(void* p, eObool_t islocal);
+extern eOresult_t eoprot_b12_Initialise(void *p, eObool_t islocal);
 
 
-/** @fn         extern eObool_t eoprot_b11_isvariableproxied(eOnvID32_t id)
+/** @fn         extern eObool_t eoprot_b12_isvariableproxied(eOnvID32_t id)
     @brief      Tells if a variable is proxied.
                 This function is called by the EOnvset because the eOnvset_DEVcfg_t contains a 
                 pointer to it.  However, it is made public so that it can be called independently 
                 from the use of EOnvset.
     @return     eobool_true if the variable described by ID is proxied, eobool_false if it is fully local.
  **/
-extern eObool_t eoprot_b11_isvariableproxied(eOnvID32_t id);
-
+extern eObool_t eoprot_b12_isvariableproxied(eOnvID32_t id);
 
 
 
 /** @}            
-    end of group doxy_eOprot_b11  
+    end of group doxy_eOprot_b12  
  **/
 
 #ifdef __cplusplus

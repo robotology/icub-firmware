@@ -28,10 +28,8 @@
 #include "EOMtask.h"
 
 #include "EOMtheEMSappl.h"
-#include "EOtheEMSApplBody.h"
 #include "EOMtheEMSapplCfg.h"
 
-#include "EOtheEMSapplDiagnostics.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
@@ -53,9 +51,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
-#define configurator_timeout_send_diagnostics   1000
-#define MAX_WAITFOR2FOC                         300
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -93,6 +88,7 @@
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfigurator* p)
 {
+#if 0
     eOresult_t  res;
     uint8_t     numofRXcanframe = 0;
 
@@ -106,9 +102,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
         return;
     }
     
-#ifdef _GET_CANQUEUE_STATISTICS_
-    eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
-#endif
+
     eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
     
 
@@ -119,10 +113,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
     { // se c'e un errore sui parametri passati ovvero mai., 
         return;
     }
-#ifdef _GET_CANQUEUE_STATISTICS_
-        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
-#endif
-    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);   
+
+    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);  
+#endif    
 }
 
 
@@ -131,6 +124,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
 {
+#if 0
     uint32_t readyCanBoardsMask = 0;    // keeps the boards that are ready. if bit pos i-th is 1, then the board in list i-th is OK   
     uint32_t checkedmask = 0;           // keeps the boards that are checked
     static uint32_t count_times = 0;
@@ -209,17 +203,14 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         // i check again if the can boards are ready. however, i dont check the boards already ready
         eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), readyCanBoardsMask);
     }
+#endif
     
 }
 
 // marco.accame on Nov 26 2014: this function is triggered if function eom_emssocket_Transmit() fails
 // to transmit a udp packet.
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
-{
-    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-    // marco.accame: for now i remove the action of this object and i call the errormanager. for later we can have both the error handlers
-    // eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , configurator_timeout_send_diagnostics);    
-    
+{    
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_configurator_udptxfailure);
     errdes.par16            = 0;

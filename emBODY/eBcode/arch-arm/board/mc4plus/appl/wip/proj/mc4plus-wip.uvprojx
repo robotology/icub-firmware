@@ -724,16 +724,6 @@
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
-              <FileName>EOMtheEMSbackdoor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
@@ -767,6 +757,21 @@
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot\OPCprotocolManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -811,109 +816,25 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>opc-protocol</GroupName>
+          <GroupName>services</GroupName>
           <Files>
             <File>
-              <FileName>OPCprotocolManager.c</FileName>
+              <FileName>EOmcService.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot\OPCprotocolManager.c</FilePath>
+              <FilePath>..\src\eoappservices\EOmcService.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>opc-protocol-cfg</GroupName>
-          <Files>
-            <File>
-              <FileName>OPCprotocolManager_Cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor\OPCprotocolManager_Cfg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>appl-services</GroupName>
-          <Files>
-            <File>
-              <FileName>EOtheEMSapplBody.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheEMSapplBody.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappCanServicesProvider.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappCanServicesProvider.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappMeasuresConverter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappMeasuresConverter.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappTheDataBase.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappTheDataBase.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheProtocolWrapper.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheProtocolWrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappEncodersReader.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>appl-services-cfg</GroupName>
-          <Files>
-            <File>
-              <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_messagesLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>measuresConvFuncOveridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\measures-converter\measuresConvFuncOveridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_appTheDataBase_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-net\eOcfg_appTheDataBase_ebx.c</FilePath>
-            </File>
-          </Files>
+          <GroupName>services-cfg</GroupName>
         </Group>
         <Group>
           <GroupName>eo-ems-can</GroupName>
-          <Files>
-            <File>
-              <FileName>EOicubCanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001\EOicubCanProto.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>eo-motor-controller</GroupName>
@@ -924,7 +845,7 @@
               <RVCTZI>0</RVCTZI>
               <RVCTOtherData>0</RVCTOtherData>
               <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>2</IncludeInBuild>
+              <IncludeInBuild>0</IncludeInBuild>
               <AlwaysBuild>2</AlwaysBuild>
               <GenerateAssemblyFile>2</GenerateAssemblyFile>
               <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -1007,16 +928,6 @@
               <FileName>EOtrajectory.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOtrajectory.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>diagnostics</GroupName>
-          <Files>
-            <File>
-              <FileName>EOtheEMSapplDiagnostics.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1164,59 +1075,9 @@
           <GroupName>eo-protocol-cfg-boards</GroupName>
           <Files>
             <File>
-              <FileName>eOprot_b01.c</FileName>
+              <FileName>eOprot_b12.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b01.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b02.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b02.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b03.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b03.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b04.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b04.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b05.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b05.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b06.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b06.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b07.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b07.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b08.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b08.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b09.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b09.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b10.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b10.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b11.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b11.c</FilePath>
+              <FilePath>..\cfg\eoprot-boards\eOprot_b12.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1224,24 +1085,9 @@
           <GroupName>eo-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolMN_fun_ems4rd.c</FileName>
+              <FileName>EoProtocolMN_fun_redefined.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_ems4rd.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolSK_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_redefined.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2038,16 +1884,6 @@
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
-              <FileName>EOMtheEMSbackdoor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
@@ -2081,6 +1917,21 @@
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+            </File>
+            <File>
+              <FileName>OPCprotocolManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot\OPCprotocolManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2125,109 +1976,25 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>opc-protocol</GroupName>
+          <GroupName>services</GroupName>
           <Files>
             <File>
-              <FileName>OPCprotocolManager.c</FileName>
+              <FileName>EOmcService.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot\OPCprotocolManager.c</FilePath>
+              <FilePath>..\src\eoappservices\EOmcService.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>opc-protocol-cfg</GroupName>
-          <Files>
-            <File>
-              <FileName>OPCprotocolManager_Cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor\OPCprotocolManager_Cfg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>appl-services</GroupName>
-          <Files>
-            <File>
-              <FileName>EOtheEMSapplBody.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheEMSapplBody.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappCanServicesProvider.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappCanServicesProvider.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappMeasuresConverter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappMeasuresConverter.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappTheDataBase.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappTheDataBase.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheProtocolWrapper.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheProtocolWrapper.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappEncodersReader.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>appl-services-cfg</GroupName>
-          <Files>
-            <File>
-              <FileName>eOcfg_icubCanProto_messagesLookupTbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_messagesLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_motorBoardMsgFunctions.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgFunctions.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_motorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgFunctions.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-proto\eOcfg_icubCanProto_sensorBoardMsgLookupTbl.c</FilePath>
-            </File>
-            <File>
-              <FileName>measuresConvFuncOveridden.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\measures-converter\measuresConvFuncOveridden.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOcfg_appTheDataBase_ebx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoappservices\icub-can-net\eOcfg_appTheDataBase_ebx.c</FilePath>
-            </File>
-          </Files>
+          <GroupName>services-cfg</GroupName>
         </Group>
         <Group>
           <GroupName>eo-ems-can</GroupName>
-          <Files>
-            <File>
-              <FileName>EOicubCanProto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001\EOicubCanProto.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>eo-motor-controller</GroupName>
@@ -2321,16 +2088,6 @@
               <FileName>EOtrajectory.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOtrajectory.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>diagnostics</GroupName>
-          <Files>
-            <File>
-              <FileName>EOtheEMSapplDiagnostics.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001\EOtheEMSapplDiagnostics.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2478,59 +2235,9 @@
           <GroupName>eo-protocol-cfg-boards</GroupName>
           <Files>
             <File>
-              <FileName>eOprot_b01.c</FileName>
+              <FileName>eOprot_b12.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b01.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b02.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b02.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b03.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b03.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b04.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b04.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b05.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b05.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b06.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b06.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b07.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b07.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b08.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b08.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b09.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b09.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b10.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b10.c</FilePath>
-            </File>
-            <File>
-              <FileName>eOprot_b11.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-boards\eOprot_b11.c</FilePath>
+              <FilePath>..\cfg\eoprot-boards\eOprot_b12.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2538,24 +2245,9 @@
           <GroupName>eo-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolMN_fun_ems4rd.c</FileName>
+              <FileName>EoProtocolMN_fun_redefined.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_ems4rd.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolSK_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_redefined.c</FilePath>
             </File>
           </Files>
         </Group>

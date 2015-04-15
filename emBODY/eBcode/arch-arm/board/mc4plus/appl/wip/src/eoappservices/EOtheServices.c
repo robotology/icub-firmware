@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero
- * email:   valentina.gaggero@iit.it
+ * Copyright (C) 2015 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -16,58 +16,31 @@
  * Public License for more details
 */
 
-/* @file       eOcfg_emsCanNetworkTopology.c
-    @brief      This file keeps ems can network configuration for ebx
-    @author     valentina.gaggero@iit.it
-    @date       07/16/2012
-**/
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#include "stdlib.h"
 #include "string.h"
-#include "EoCommon.h"
 
+#include "eOcommon.h"
+#include "EOtheErrorManager.h"
 
-#include "EOMtheEMSapplCfg_cfg.h" // to see EOMTHEEMSAPPLCFG_*
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
-#include "eOcfg_appTheDataBase.h"
 
+#include "EOtheServices.h"
 
-
-#if  defined(EOMTHEEMSAPPLCFG_USE_EB1)
-      #include    "eOcfg_applDataBase_eb1.c"
- #elif   defined(EOMTHEEMSAPPLCFG_USE_EB2)
-      #include    "eOcfg_applDataBase_eb2.c"  
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB3)
-      #include    "eOcfg_applDataBase_eb3.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB4)
-      #include    "eOcfg_applDataBase_eb4.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-      #include    "eOcfg_applDataBase_eb5.c" 
-#elif  defined(EOMTHEEMSAPPLCFG_USE_EB6)
-      #include    "eOcfg_applDataBase_eb6.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7)
-      #include    "eOcfg_applDataBase_eb7.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB8)
-      #include    "eOcfg_applDataBase_eb8.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB9)
-        #include    "eOcfg_applDataBase_eb9.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10)
-        #include    "eOcfg_applDataBase_eb10.c"
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB11)
-        #include    "eOcfg_applDataBase_eb11.c"
-#else
-    #error --> you must define an EBx
-#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#include "EOtheServices_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,10 +50,9 @@
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - definition (and initialisation) of extern variables, but better using _get(), _set() 
+// - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -97,13 +69,56 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static EOtheServices s_eo_theserv = 
+{
+    .initted                 = eobool_false
+};
+
+//static const char s_eobj_ownname[] = "EOtheServices";
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
+extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg)
+{
+    s_eo_theserv.initted = eobool_true;    
+    return(&s_eo_theserv);
+}
+
+
+extern EOtheServices* eo_serv_GetHandle(void)
+{
+    if(eobool_false == s_eo_theserv.initted)
+    {
+        return(NULL);
+    }
+    return(&s_eo_theserv);
+}
+
+
+extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOserv_MCcfg_t *mccfg)
+{
+//    eOresult_t res = eores_OK;
+    
+    if((NULL == p) || (NULL ==mccfg))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eOmcserv_cfg_t cfg;
+    cfg.jointnum = mccfg->jointnum;
+    cfg.motornum = mccfg->motornum;
+    cfg.type     = (eOmcserv_type_t) mccfg->type;
+    eo_mcserv_Initialise(&cfg);
+    
+    return(eores_OK);
+}
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -111,15 +126,16 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
+
 
 

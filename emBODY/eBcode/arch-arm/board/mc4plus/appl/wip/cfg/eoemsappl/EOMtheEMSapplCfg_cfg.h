@@ -55,10 +55,9 @@ extern "C" {
 // <i> It holds ...
 
 
-//  <o> ID of the EMS board     <0=> Use external file <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
-//                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9   <10=>EB10   <11=>EB11
+//  <o> ID of the EMS board     <0=> Use external file <12=> EB12    <13=> EB13
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     1
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     12
 
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 0
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
@@ -84,7 +83,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          2
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          0
 //  </h>version
 
 //  <h> build date
@@ -93,11 +92,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          9
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          14
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         17
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          00
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          11
 //  </h>build date
 
 // </h>Info 
@@ -393,9 +392,17 @@ extern "C" {
 //  </h>listener task
 
 
-// </h>Backdoor configuration
+// </h>Discovery Listener
 
-//  <h> Backdoor configuration (for EOMtheEMSbackdoor)
+
+
+// <e> Backdoor configuration
+// <i> Enable backdoor (thus EOMtheEMSbackdoor, EOMtheEMSbackdoortransceiver, OPCprotocolManager)
+// <i> Default: disabled
+#ifndef EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED
+ #define EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED       0
+#endif
+
 
 //  <o> IP listening port <4444=> 4444
 //  <i> default: 4444
@@ -404,21 +411,21 @@ extern "C" {
 
 //  <h> datagrams in socket
 
-//  <o> max number of input datagrams <1-8>
+//  <o> max number of input datagrams <0-8>
 //  <i> default: 2
-#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  1
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER                  0
 
-//  <o> max size of input datagrams <16-64>
+//  <o> max size of input datagrams <0-64>
 //  <i> default: 16
-#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMSIZEOF                  32
+#define EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMSIZEOF                  0
 
-//  <o> max number of output datagrams <1-8>
+//  <o> max number of output datagrams <0-8>
 //  <i> default: 2 
-#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  4
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMNUMBER                  0
 
-//  <o> max size of output datagrams <16-256>
+//  <o> max size of output datagrams <0-256>
 //  <i> default: 32
-#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  150
+#define EOMTHEEMSAPPLCFG_BACKDOOR_OUTDGRAMSIZEOF                  0
 
 //  </h>datagrams in socket
 
@@ -456,9 +463,9 @@ extern "C" {
 
 //  <h> backdoor task
 
-//  <o> task priority <2-251>
-//  <i> default: 41
-#define EOMTHEEMSAPPLCFG_BACKDOOR_TASK_PRIORITYof   251
+//  <o> task priority <0-251>
+//  <i> default: 41. If 0, then the backdoor is not enabled
+#define EOMTHEEMSAPPLCFG_BACKDOOR_TASK_PRIORITYof   0
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
@@ -467,7 +474,7 @@ extern "C" {
 //  </h>backdoor task
 
 
-// </h>Backdoor configuration
+// </e>Backdoor configuration
 
 //  <h> Socket configuration (for EOMtheEMSsocket)
 
@@ -697,6 +704,11 @@ extern "C" {
 	//  <o> period [usec] <100-10000:100>
 	//  <i> default: 1000
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD         1000
+    
+    
+	//  <o> tx decimation factor [integer] <1-10:1>
+	//  <i> default: 1
+	#define EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR         1    
 
 	//  <o> RX start after [usec] <0-10000:10>
 	//  <i> default: 0
@@ -728,6 +740,8 @@ extern "C" {
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME    250
 #else
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_PERIOD      1000
+    #define EOMTHEEMSAPPLCFG_RUNOBJ_TXDECIMATIONFACTOR         1
+    
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER    0
 	
 	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))
@@ -934,72 +948,18 @@ extern "C" {
 #define STRINGIZE_NX(A)     #A
 #define STRINGIZE(A)        STRINGIZE_NX(A)
 
-#if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB1
-        #define     NUM     01
+#if     (12 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+        #define     EOMTHEEMSAPPLCFG_USE_EB12
+        #define     NUM     12
         #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b01.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b01_nvsetDEVcfg     
-#elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB2
-        #define     NUM     02
+        #include    "eOprot_b12.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b12_nvsetDEVcfg     
+#elif   (13 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+        #define     EOMTHEEMSAPPLCFG_USE_EB13
+        #define     NUM     13
         #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b02.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b02_nvsetDEVcfg       
-#elif   (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB3
-        #define     NUM     03
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b03.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b03_nvsetDEVcfg       
-#elif   (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB4
-        #define     NUM     04
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b04.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b04_nvsetDEVcfg
-#elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB5
-        #define     NUM     05
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b05.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b05_nvsetDEVcfg
-#elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB6
-        #define     NUM     06
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b06.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b06_nvsetDEVcfg
-#elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB7
-        #define     NUM     07
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b07.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b07_nvsetDEVcfg
-#elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB8
-        #define     NUM     08
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b08.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b08_nvsetDEVcfg
-#elif   (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB9
-        #define     NUM     09
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b09.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b09_nvsetDEVcfg
-#elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB10
-        #define     NUM     10
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b10.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b10_nvsetDEVcfg
-#elif   (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-        #define     EOMTHEEMSAPPLCFG_USE_EB11
-        #define     NUM     11
-        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b11.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b11_nvsetDEVcfg
+        #include    "eOprot_b13.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b13_nvsetDEVcfg       
 #endif
 
 

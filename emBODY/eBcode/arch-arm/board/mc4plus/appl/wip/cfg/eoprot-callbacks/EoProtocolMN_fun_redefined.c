@@ -40,10 +40,9 @@
 
 // - for ems 
 #include "EOMtheEMSappl.h"
-#include "EOtheEMSapplBody.h"
-#include "EOtheEMSapplDiagnostics.h"
-#include "EOtheErrorManager.h"
+//#include "EOtheEMSapplBody.h"
 
+#include "EOtheErrorManager.h"
 #include "EoError.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -301,7 +300,10 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             uint32_t canBoardsReady = 0;
             uint32_t canBoardsChecked = 0;
             char str[60];
-            if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
+            //if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
+            
+            #warning -----------> add verification of entering the ctrl loop
+            if(1)
             {
                 #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
                 snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
@@ -702,8 +704,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    #warning --------------> send error up
                 }
             }        
         } break;
@@ -728,8 +729,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    #warning --------------> send error up
                 }
             }         
         } break;        
