@@ -393,9 +393,16 @@ extern "C" {
 //  </h>listener task
 
 
-// </h>Backdoor configuration
+// </h>Discovery Listener
 
-//  <h> Backdoor configuration (for EOMtheEMSbackdoor)
+
+
+// <e> Backdoor configuration
+// <i> Enable backdoor (thus EOMtheEMSbackdoor, EOMtheEMSbackdoortransceiver, OPCprotocolManager)
+// <i> Default: disabled
+#ifndef EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED
+ #define EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED       1
+#endif
 
 //  <o> IP listening port <4444=> 4444
 //  <i> default: 4444
@@ -467,7 +474,7 @@ extern "C" {
 //  </h>backdoor task
 
 
-// </h>Backdoor configuration
+// </e>Backdoor configuration
 
 //  <h> Socket configuration (for EOMtheEMSsocket)
 
