@@ -260,6 +260,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .backdoorcfg    =
     {
+        .enabled                = EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED,
         .taskpriority           = EOMTHEEMSAPPLCFG_BACKDOOR_TASK_PRIORITYof,
         .taskstacksize          = EOMTHEEMSAPPLCFG_BACKDOOR_TASK_STACKSIZEof,
         .inpdatagramnumber      = EOMTHEEMSAPPLCFG_BACKDOOR_INPDGRAMNUMBER,

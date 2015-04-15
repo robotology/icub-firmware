@@ -116,11 +116,19 @@ extern EOMtheEMSbackdoortransceiver * eom_emsbackdoortransceiver_Initialise(cons
     }
     
     memcpy(&s_emsbackdoortransceiver_singleton.cfg, cfg, sizeof(eOemsbackdoortransceiver_cfg_t));
+
+    // marco.accame: if we dont have a configuration (i.e., opcprotman_getconfiguration() returns NULL),
+    //               then we cannot go use the backdoortransceiver
+    const opcprotman_cfg_t *opccfg = opcprotman_getconfiguration();
+    if(NULL == opccfg)
+    {
+        return(NULL);
+    }
     
     s_emsbackdoortransceiver_singleton.replypkt = eo_packet_New(s_emsbackdoortransceiver_singleton.cfg.replypktcapacity);
     s_emsbackdoortransceiver_singleton.transmit = eobool_false;
     
-    s_emsbackdoortransceiver_singleton.opcprotman = opcprotman_New(OPCprotocolManager_Cfg_getconfig());
+    s_emsbackdoortransceiver_singleton.opcprotman = opcprotman_New(opccfg);
     
     return(&s_emsbackdoortransceiver_singleton);
 }
@@ -203,10 +211,10 @@ extern eOresult_t eom_emsbackdoortransceiver_FormSignal(EOMtheEMSbackdoortransce
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-__weak extern opcprotman_cfg_t* eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
-{
-    return(NULL);
-}
+//__weak extern opcprotman_cfg_t* eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
+//{
+//    return(NULL);
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------

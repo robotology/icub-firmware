@@ -66,6 +66,7 @@
 
 const eOemsbackdoor_cfg_t eom_emsbackdoor_DefaultCfg = 
 {
+    EO_INIT(.enabled)                   1, 
     EO_INIT(.taskpriority)              42, 
     EO_INIT(.taskstacksize)             512,
     EO_INIT(.inpdatagramnumber)         2, 
@@ -146,6 +147,11 @@ extern EOMtheEMSbackdoor * eom_emsbackdoor_Initialise(const eOemsbackdoor_cfg_t 
     
     memcpy(&s_emsbackdoor_singleton.cfg, cfg, sizeof(eOemsbackdoor_cfg_t));
     
+    if(0 == cfg->enabled)
+    {
+        // we dont use the backdoor. we return NULL
+        return(NULL);
+    }
     
     if(NULL == eom_ipnet_GetHandle())
     {

@@ -65,7 +65,8 @@ typedef struct EOMtheEMSbackdoor_hid EOMtheEMSbackdoor;
  **/
 typedef struct
 {
-    uint8_t                     taskpriority;
+    uint8_t                     enabled;
+    uint8_t                     taskpriority;               
     uint16_t                    taskstacksize;   
     eOsizecntnr_t               inpdatagramnumber;
     eOsizecntnr_t               outdatagramnumber;
@@ -83,7 +84,7 @@ typedef struct
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const eOemsbackdoor_cfg_t eom_emsbackdoor_DefaultCfg; // = {.taskpriority = 51, .taskstacksize = 512};
+extern const eOemsbackdoor_cfg_t eom_emsbackdoor_DefaultCfg; // = {.enabled = 1, .taskpriority = 51, .taskstacksize = 512};
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
