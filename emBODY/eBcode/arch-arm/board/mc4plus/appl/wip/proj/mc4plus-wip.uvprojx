@@ -845,7 +845,7 @@
               <RVCTZI>0</RVCTZI>
               <RVCTOtherData>0</RVCTOtherData>
               <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
+              <IncludeInBuild>2</IncludeInBuild>
               <AlwaysBuild>2</AlwaysBuild>
               <GenerateAssemblyFile>2</GenerateAssemblyFile>
               <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -1079,6 +1079,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\eoprot-boards\eOprot_b12.c</FilePath>
             </File>
+            <File>
+              <FileName>eOprot_b13.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-boards\eOprot_b13.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1088,6 +1093,11 @@
               <FileName>EoProtocolMN_fun_redefined.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_redefined.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_fun_redefined.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_redefined.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2239,6 +2249,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\eoprot-boards\eOprot_b12.c</FilePath>
             </File>
+            <File>
+              <FileName>eOprot_b13.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-boards\eOprot_b13.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2248,6 +2263,11 @@
               <FileName>EoProtocolMN_fun_redefined.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_redefined.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_fun_redefined.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_redefined.c</FilePath>
             </File>
           </Files>
         </Group>

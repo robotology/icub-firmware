@@ -58,22 +58,67 @@ typedef enum
 } eOmcserv_type_t;
 
 typedef struct
-{
-    uint32_t            tbd;
-} eOmcserv_jomo_mapping_t;
+{   // mapped as eOcanmap_entitylocation_t
+    uint8_t     port    : 1;        // 0 is can1, 1 is can2. not used if onboard is 1.
+    uint8_t     addr    : 4;        // if onboard is 1, then it is the index used by hal, otherwise the can address
+    uint8_t     insideindex : 2;    // in case of can it is the inside index (0 or 1) of where the motor/joint is. otherwise it is 2
+    uint8_t     onboard : 1;        // if 1 is onboard pwm otherwise is on can
+} eOmcserv_pwm_mapping_t;
+
+
+typedef struct
+{  
+    uint8_t     dummy0   : 1;        // 0 is can1, 1 is can2. not used if onboard is 1.
+    uint8_t     index    : 4;        // if onboard is 1, then it is the index used by hal, otherwise the can address
+    uint8_t     dummy1   : 2;    // in case of can it is the inside index (0 or 1) of where the motor/joint is. otherwise it is 2
+    uint8_t     type     : 1;        // if 1 is onboard  otherwise is on can
+} eOmcserv_act_local_mapping_t;
+
+
+typedef struct
+{   // mapped as eOcanmap_entitylocation_t
+    uint8_t     port    : 1;        // 0 is can1, 1 is can2. not used if onboard is 1.
+    uint8_t     addr    : 4;        // if onboard is 1, then it is the index used by hal, otherwise the can address
+    uint8_t     insideindex : 2;    // in case of can it is the inside index (0 or 1) of where the motor/joint is. otherwise it is 2
+    uint8_t     type    : 1;        // if 1 is onboard  otherwise is on can
+} eOmcserv_act_oncan_mapping_t;
+
+typedef struct
+{   // mapped as eOcanmap_entitylocation_t
+    uint8_t     dummy   : 7;       
+    uint8_t     type    : 1;         // if 1 is onboard  otherwise is on can
+} eOmcserv_act_any_mapping_t;
+
+typedef union
+{   // mapped as eOcanmap_entitylocation_t
+    eOmcserv_act_any_mapping_t      any;
+    eOmcserv_act_local_mapping_t    local;
+    eOmcserv_act_oncan_mapping_t    oncan;    
+} eOmcserv_act_mapping_t;           EO_VERIFYsizeof(eOmcserv_act_mapping_t, 1); 
 
 typedef struct
 {
-    uint32_t            tbd;
+    uint8_t     etype : 4;      // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc.
+    uint8_t     index : 4;      // 0, 1, 2, 3, 4, etc where the number is referred to the hal enum specified by the type.   
+    // example: aea encoder on port p6 or the ems is etype=0, index=0
 } eOmcserv_enc_mapping_t;
 
 typedef struct
 {
-    eOmcserv_type_t     type;
-    uint8_t             jointnum;
-    uint8_t             motornum;
-    uint32_t            whateverisneeded2define_jomolocation_encoders;     // in here put a ... list of ...
-} eOmcserv_cfg_t;
+    eOmcserv_act_mapping_t      actuator;
+    eOmcserv_enc_mapping_t      encoder;    
+} eOmcserv_jomo_cfg_t;          EO_VERIFYsizeof(eOmcserv_jomo_cfg_t, 2);
+
+enum { eomcserv_jomo_maxnumberof = 12 };
+
+typedef struct
+{
+    eOmcserv_type_t         type;
+    uint8_t                 jointnum;
+    uint8_t                 motornum;
+    uint8_t                 ffu;
+    eOmcserv_jomo_cfg_t     jomos[eomcserv_jomo_maxnumberof];
+} eOmcserv_cfg_t;           EO_VERIFYsizeof(eOmcserv_cfg_t, 28);
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------

@@ -57,7 +57,7 @@ extern "C" {
 
 //  <o> ID of the EMS board     <0=> Use external file <12=> EB12    <13=> EB13
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     12
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     13
 
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 0
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD

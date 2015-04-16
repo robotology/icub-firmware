@@ -38,12 +38,12 @@
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
 
-// - for ems 
 #include "EOMtheEMSappl.h"
-//#include "EOtheEMSapplBody.h"
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
+
+#include "EOmcService.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -302,8 +302,8 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             char str[60];
             //if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
             
-            #warning -----------> add verification of entering the ctrl loop
-            if(1)
+            #warning -----------> add verification of entering the ctrl loop not only for mc but also for other
+            if(eobool_false == eo_mcserv_AreResourcesReady(eo_mcserv_GetHandle(), NULL))
             {
                 #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
                 snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
@@ -314,53 +314,21 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
                 // it MUST NOT be fatal error because we want to give the ems time to find the boards ready
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
                 return;
-//                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
             }
             else
             {
-                // marco.accame: if i send diagnostics messages just before going to running mode ... the application crashes. TO BE UNDERSTOOD WHY !
-                //eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
-//                // maybe in here we can put an info diagnostics message    
-//                // send message about the ready boards
-//                uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
-//                uint8_t i = 0;
-//                eOappTheDB_board_canlocation_t loc = {0};
-//                eObrd_cantype_t exptype = eobrd_cantype_unknown;
-//                eObrd_typeandversions_t detected = {0};
-//                
-//                eOerrmanDescriptor_t des = {0};
-//                des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
-//                
-//                for(i=0; i<numcanboards; i++)
-//                {
-//                    if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &exptype, &detected))
-//                    {
-//                        // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
-//                        des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//                        des.sourceaddress   = loc.addr;
-//                        des.param           = (exptype << 8) | (detected.boardtype); 
-//                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
-//                    }                    
-//                }
+                // marco.accame: it would be nice sending info diagnostics messages about the found resources 
             }
             
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-            // the new currstate is set inside the on-entry of the state machine
-            //if(eores_OK == res)
-            //{   
-            //    status->currstate = applstate_running;
-            //}
+            // the new currstate is set inside the relevant on-entry of the state machine
         } break;
         
         case applstate_error:
         {
-            //I don't expect to receive go to error cmd
+            // i don't expect to receive a go2error command
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
-            // the new currstate is set inside the on-entry of the state machine
-            //if(eores_OK == res)
-            //{   
-            //    status->currstate = applstate_error;
-            //}
+            // the new currstate is set inside the relevant on-entry of the state machine
         } break;
         
         default:
