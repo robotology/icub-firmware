@@ -12,15 +12,21 @@
 
 #include "stdlib.h"
 #include "EoCommon.h"
-#include "osal_system.h"
-
 #include "EOtheMemoryPool.h"
 
 #include <string.h>
 
+// keep it before any evaluation of macros ...
+#include "EOemsControllerCfg.h"
 
-#include "EOicubCanProto_specifications.h"
-#include "EOtheEMSapplBody.h"
+
+#if !defined(DONT_USE_2FOC) 
+ // we need to communicate over can 
+ #include "EOicubCanProto_specifications.h"
+ #include "EOtheEMSapplBody.h"
+#endif
+
+
 
 //////////////////////////////////
 #include "EOtheBOARDtransceiver.h"
@@ -32,11 +38,6 @@
 #include "EOtheErrorManager.h"
 
 
-extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime);
-//////////////////////////////////
-
-//#include "EOMtheEMSbackdoor.h"
-//#include "OPCprotocolManager_Cfg.h"
 
 #if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
 #error mechanics is undefined
@@ -103,7 +104,7 @@ static EOemsController *ems = NULL;
 
 extern EOemsController* eo_emsController_Init() 
 {    
-#ifndef NO_2FOC_BOARD
+#ifndef NO_LOCAL_CONTROL
     ems = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
 #endif
     
@@ -1332,6 +1333,7 @@ extern void eo_emsMotorController_GoIdle(void)
 
 void config_2FOC(uint8_t motor)
 {
+#if !defined(DONT_USE_2FOC)   
     eOmc_PID_t pid;
     eOmc_i2tParams_t i2t;
     icubCanProto_current_t max_current;
@@ -1365,10 +1367,12 @@ void config_2FOC(uint8_t motor)
     max_current = 5000; // 5A
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &max_current);
+#endif    
 }
 
 void set_2FOC_idle(uint8_t motor)
 {
+#if !defined(DONT_USE_2FOC)
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()); 
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
     eOicubCanProto_msgDestination_t msgdest;
@@ -1388,10 +1392,12 @@ void set_2FOC_idle(uint8_t motor)
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc); //+
     
     eo_motor_set_motor_status(ems->motors, motor, 0);
+#endif    
 }
 
 void set_2FOC_running(uint8_t motor)
 {
+#if !defined(DONT_USE_2FOC)    
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
@@ -1417,97 +1423,9 @@ void set_2FOC_running(uint8_t motor)
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
+#endif    
 }
 
-/*
-extern eOresult_t send_diagnostics_to_server(const char *str, uint32_t signature, uint8_t plustime)
-{
-#if 1
-    
-    #warning--> marco.accame: changed to use eo_errman_Error(). however, remove this function
-    
-    eOerrmanDescriptor_t descriptor = {0};
-    descriptor.code                 = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_first);
-    descriptor.par16                = 0;
-    descriptor.sourcedevice         = eomn_info_source_board;
-    descriptor.sourceaddress        = 0;    
-  
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, str, s_eobj_ownname, &descriptor); 
-    
-    return(eores_OK);
-    
-#else
-    
-    #warning--> marco.accame: TODO: change to use eo_errman_Error()
-    
-    static uint8_t initted = 0;
-    static eOropdescriptor_t rd;
-    static EOnv* nv = NULL;
-    static EOtransceiver *t = NULL;  
-    static EOnvSet * nvset = NULL;  
-    eOmn_info_status_t infostatus = {0};
-    
-    eOresult_t res = eores_NOK_generic;
-
-
-    uint16_t maxlen = sizeof(infostatus.extra)-1;
-
-    
-    if((NULL == str) || (strlen(str) > maxlen))
-    {
-        return(eores_NOK_generic);
-    }
-    
-    if(0 == initted)
-    {
-        t = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
-        nvset = eo_boardtransceiver_GetNVset(eo_boardtransceiver_GetHandle());
-        memcpy(&rd, &eok_ropdesc_basic, sizeof(eOropdescriptor_t));
-        rd.ropcode  = eo_ropcode_sig;
-        rd.id32     = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status);
-        rd.data     = NULL; 
-        
-        nv = eo_nv_New();
-        eo_nvset_NV_Get(nvset, eok_ipv4addr_localhost, rd.id32, nv);    
-        
-     
-        initted = 1;
-    }
-    
-    // fill signature
-    rd.control.plussign     = (eo_nv_ID32dummy == signature) ? (0) : 1;
-    rd.signature            = signature;
-    rd.control.plustime     = plustime;
-    
-    // must put str into the 8 bytes of eOmn_appl_status_t
-    
-    uint16_t size = 0;
-    eo_nv_Get(nv, eo_nv_strg_volatile, &infostatus, &size);
-  
-    infostatus.basic.timestamp              = osal_system_abstime_get();    
-    infostatus.basic.properties.code        = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_first);
-    infostatus.basic.properties.param       = 0;
-    infostatus.basic.properties.flags       = 0;
-    EOMN_INFO_PROPERTIES_FLAGS_set_type(infostatus.basic.properties.flags, eomn_info_type_info);
-    EOMN_INFO_PROPERTIES_FLAGS_set_source(infostatus.basic.properties.flags, eomn_info_source_board);
-    EOMN_INFO_PROPERTIES_FLAGS_set_address(infostatus.basic.properties.flags, 0);
-    EOMN_INFO_PROPERTIES_FLAGS_set_extraformat(infostatus.basic.properties.flags, eomn_info_extraformat_verbal);
-    EOMN_INFO_PROPERTIES_FLAGS_set_futureuse(infostatus.basic.properties.flags, 0);
-    
-    
-    memcpy(&infostatus.extra[0], str, strlen(str));
-
-   
-    eo_nv_Set(nv, &infostatus, eobool_true, eo_nv_upd_dontdo);
-       
-    
-    res  = eo_transceiver_OccasionalROP_Load(t, &rd);
-  
-    return(res);
-#endif
-
-}
-*/
 
 #ifdef EXPERIMENTAL_MOTOR_TORQUE
     #if defined(SHOULDER_BOARD)

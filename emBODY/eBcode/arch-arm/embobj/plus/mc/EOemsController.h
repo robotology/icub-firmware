@@ -93,6 +93,7 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
 extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode);
 //extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint);
 
+extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder);
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state);
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status);
 

@@ -14,7 +14,7 @@ extern "C" {
         
  // - external dependencies --------------------------------------------------------------------------------------------
  
- #include "EOMtheEMSapplCfg_cfg.h"
+#include "EOMtheEMSapplCfg_cfg.h"
  
  // - public #define  --------------------------------------------------------------------------------------------------
  
@@ -75,8 +75,11 @@ extern "C" {
     #define UPPERLEG_BOARD // RIGHT
     #define NAXLES 4
 #elif (2==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (10==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NO_2FOC_BOARD
+    #define NO_LOCAL_CONTROL
     #define NAXLES 1
+#elif (12==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    #define NAXLES 2
+    #define DONT_USE_2FOC
 #else
     #error invalid board
 #endif
