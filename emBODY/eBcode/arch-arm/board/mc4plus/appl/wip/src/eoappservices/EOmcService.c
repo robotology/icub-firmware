@@ -27,6 +27,8 @@
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
 
+#include "EOtheMemoryPool.h"
+
 #include "EOemsController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,12 +87,12 @@ static EOmcService s_eo_mcserv =
         .jomosnumber        = 0
     },
     .resourcesareready      = eobool_false,
-    .thejoints              = {NULL},
-    .themotors              = {NULL},
+    .thejoints              = NULL,
+    .themotors              = NULL,
     .thelocalcontroller     = NULL,
     .thelocalencoderreader  = NULL,
-    .valuesencoder          = {0},
-    .valuespwm              = {0}
+    .valuesencoder          = NULL,
+    .valuespwm              = NULL
 };
 
 //static const char s_eobj_ownname[] = "EOmcService";
@@ -364,6 +366,10 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // eth-protocol: TBD when needed
     
     
+    // initialise pointers to joints and motors
+    p->thejoints = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(eOmc_joint_t*), p->config.jomosnumber);
+    p->themotors = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(eOmc_motor_t*), p->config.jomosnumber);
+    
     // retrieve pointers to joints and motors   
     for(jm=0; jm<p->config.jomosnumber; jm++)
     {
@@ -381,9 +387,16 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         p->thelocalcontroller = NULL;
     }
     
+    // allocate some values
+
    
+    // encoder reader
     if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
     {
+        // some arrays used by encoder reader
+        p->valuesencoder = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint32_t), p->config.jomosnumber);
+        p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
+        
         // encoder-reader (so far we only have encoders supported by the encoder reader object).
         #warning TBD: init the encoder-reader
         for(jm=0; jm<p->config.jomosnumber; jm++)
@@ -398,6 +411,8 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     else
     {
         p->thelocalencoderreader = NULL;
+        p->valuesencoder = NULL;
+        p->valuespwm = NULL;
     }
     
     // actuator

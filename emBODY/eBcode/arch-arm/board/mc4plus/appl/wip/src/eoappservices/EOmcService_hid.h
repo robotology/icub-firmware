@@ -44,12 +44,12 @@ struct EOmcService_hid
     eObool_t            initted;
     eOmcserv_cfg_t      config;
     eObool_t            resourcesareready;
-    eOmc_joint_t*       thejoints[eomcserv_jomo_maxnumberof];
-    eOmc_motor_t*       themotors[eomcserv_jomo_maxnumberof];
+    eOmc_joint_t**      thejoints;
+    eOmc_motor_t**      themotors;
     EOemsController*    thelocalcontroller;
     void*               thelocalencoderreader;
-    uint32_t            valuesencoder[eomcserv_jomo_maxnumberof];
-    int16_t             valuespwm[eomcserv_jomo_maxnumberof];
+    uint32_t*           valuesencoder;
+    int16_t*            valuespwm;
 }; 
 
 
