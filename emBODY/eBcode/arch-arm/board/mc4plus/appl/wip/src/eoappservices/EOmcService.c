@@ -27,6 +27,7 @@
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
 
+#include "EOemsController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -64,7 +65,11 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p);
+
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p);
+
+static eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,11 +81,16 @@ static EOmcService s_eo_mcserv =
     .initted                = eobool_false,
     .config                 = 
     {
-        .type           = eomcserv_type_undefined,
-        .jointnum       = 0,
-        .motornum       = 0
+        .type               = eomcserv_type_undefined,
+        .jomosnumber        = 0
     },
-    .resourcesareready      = eobool_false
+    .resourcesareready      = eobool_false,
+    .thejoints              = {NULL},
+    .themotors              = {NULL},
+    .thelocalcontroller     = NULL,
+    .thelocalencoderreader  = NULL,
+    .valuesencoder          = {0},
+    .valuespwm              = {0}
 };
 
 //static const char s_eobj_ownname[] = "EOmcService";
@@ -105,6 +115,8 @@ extern EOmcService* eo_mcserv_Initialise(eOmcserv_cfg_t *cfg)
     }    
     
     memcpy(&s_eo_mcserv.config, cfg, sizeof(eOmcserv_cfg_t));
+    
+    s_eo_mcserv_init_jomo(&s_eo_mcserv);
        
     s_eo_mcserv.initted = eobool_true;  
        
@@ -128,17 +140,17 @@ extern uint8_t eo_mcserv_NumberOfJoints(EOmcService *p)
         return(0);
     } 
 
-    return(p->config.jointnum);
+    return(p->config.jomosnumber);
 }
 
 extern eOmc_joint_t* eo_mcserv_GetJoint(EOmcService *p, uint8_t index)
 {
-    if((NULL == p) || (index >= p->config.jointnum))
+    if((NULL == p) || (index >= p->config.jomosnumber))
     {
         return(NULL);
     } 
     
-    return(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index));    
+    return(p->thejoints[index]);  
 }
 
 
@@ -149,17 +161,17 @@ extern uint8_t eo_mcserv_NumberOfMotors(EOmcService *p)
         return(0);
     } 
 
-    return(p->config.motornum);
+    return(p->config.jomosnumber);
 }
 
 extern eOmc_motor_t* eo_mcserv_GetMotor(EOmcService *p, uint8_t index)
 {
-    if((NULL == p) || (index >= p->config.motornum))
+    if((NULL == p) || (index >= p->config.jomosnumber))
     {
         return(NULL);
     } 
     
-    return(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, index));    
+    return(p->themotors[index]);   
 }
 
 extern eOresult_t eo_mcserv_CheckResources(EOmcService *p)
@@ -231,7 +243,7 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
     {
         case eomcserv_type_mc4plus:
         {
-            #warning TBD: start the first reading of encoders
+            #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
             res = eores_OK;        
         } break;
         case eomcserv_type_mc4can:
@@ -242,6 +254,7 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
         case eomcserv_type_2foc:
         {
             // must start the first reading of encoders and ... enable teh joints and ........ 
+            #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
             res = eores_OK;     
         } break;    
         default:
@@ -267,7 +280,7 @@ extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
         case eomcserv_type_mc4plus:
         {
             #warning TBD: read all the encoders, compute pwm, send pwm to hal peripheral, update joint-motor status
-            res = eores_OK;        
+            res = s_eo_mcserv_do_mc4plus(p);      
         } break;
         case eomcserv_type_mc4can:
         {
@@ -290,6 +303,8 @@ extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
 
 
 }
+
+
 
 extern eOresult_t eo_mcserv_Stop(EOmcService *p)
 {
@@ -335,6 +350,73 @@ extern eOresult_t eo_mcserv_Stop(EOmcService *p)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
+static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
+{
+    eOresult_t res = eores_OK;
+    uint8_t jm = 0;
+    
+    // in here we must init whatever is needed for the management of joint-motor.
+    // in the future: eth-protocol, can-mapping maybe, 
+    // surely now: encoder-reader object, actuator on hal-pwm if present, etc.
+    
+    // eth-protocol: TBD when needed
+    
+    
+    // retrieve pointers to joints and motors   
+    for(jm=0; jm<p->config.jomosnumber; jm++)
+    {
+        p->thejoints[jm] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jm); 
+        p->themotors[jm] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, jm);
+    }
+    
+    // ems controller. it is used only in some control types
+    if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
+    {
+        p->thelocalcontroller = eo_emsController_Init();        
+    }
+    else
+    {
+        p->thelocalcontroller = NULL;
+    }
+    
+   
+    if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
+    {
+        // encoder-reader (so far we only have encoders supported by the encoder reader object).
+        #warning TBD: init the encoder-reader
+        for(jm=0; jm<p->config.jomosnumber; jm++)
+        {
+            // in here we prepare the config array
+            // p->config.jomos[jm].encoder.etype ... 0 is aea
+            // p->config.jomos[jm].encoder.index ... is index strating from 0
+        }
+        // in here we init the encoder reader
+        p->thelocalencoderreader = (void*)0x3;
+    }
+    else
+    {
+        p->thelocalencoderreader = NULL;
+    }
+    
+    // actuator
+    for(jm=0; jm<p->config.jomosnumber; jm++)
+    {
+        if(1 == p->config.jomos[jm].actuator.any.type)
+        {   // on board
+            #warning TBD: init the hal pwm
+            uint8_t pwm = p->config.jomos[jm].actuator.local.index;
+            pwm = pwm;
+        }
+    }
+    
+    
+    return(res);
+}
+
+
+
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
 {
     eOresult_t res = eores_OK;
@@ -351,7 +433,89 @@ static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
     return(res);
 }
 
+void myhal_pwm(uint8_t i, int16_t v)
+{
+    
+}
 
+void myhal_pwm_init(uint8_t i)
+{
+    
+}
+
+extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
+{
+    eOresult_t res = eores_OK;
+    uint8_t jm = 0;
+    
+    uint8_t errormask = 0x00;
+    
+    #warning TBD: add what is missing for do phase
+      
+    // 1. wait some time until encoders are ready. if not ready by a timeout, then issue a diagnostics message and ... quit or continue?
+    // tbd
+    
+    // 2. read encoders and put result into p->valuesencoder[] and fill an errormask
+    errormask = 0x00;
+    // tbd
+    
+    // 3. restart a new reading of the encoders 
+    // tbd
+    
+    // 4. apply the readings to localcontroller
+    eo_emsController_AcquireAbsEncoders((int32_t*)p->valuesencoder, errormask);
+    
+    // 5. compute the pwm using pid
+    eo_emsController_PWM(p->valuespwm);
+    
+    // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
+    for(jm=0; jm<p->config.jomosnumber; jm++)
+    {
+        myhal_pwm(p->config.jomos[jm].actuator.local.index, p->valuespwm[jm]);
+    }
+
+    // 7. propagate the status of joint motors locally computed in localcontroller to the joints / motors in ram
+    {   // so far in here. but later on move it in a function.... also 2foc mode does that 
+        uint8_t transmit_decoupled_pwms = 1;
+        for(jm=0; jm<p->config.jomosnumber; jm++)
+        {
+            // joint ...
+            eOmc_joint_status_t *jstatus = &(p->thejoints[jm]->status);
+            
+            eo_emsController_GetJointStatus(jm, jstatus);
+            eo_emsController_GetActivePidStatus(jm, &(jstatus->ofpid)); 
+            if(transmit_decoupled_pwms) 
+            {   //this functions is used to get the motor PWM after the decoupling matrix
+                eo_emsController_GetPWMOutput(jm, &(jstatus->ofpid.output));
+            }
+            if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
+            {
+                #warning TBD: see how we manage the motion done for the case of mc4plus
+                /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+                - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+                message because the setpoint is alredy reached. this means that:
+                    - if monitormode is forever, no new set point has been configured 
+                    - if monitormode is _untilreached, the joint reached the setpoint already.
+                - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+                message because pc104 is not interested in getting motion done.
+                */
+                if(eo_emsController_GetMotionDone(jm))
+                {
+                    jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
+                }
+            }
+            
+            // motor ...
+            eOmc_motor_status_t *mstatus = &(p->themotors[jm]->status);
+            
+            eo_emsController_GetMotorStatus(jm, mstatus);
+  
+        }
+        
+    } // propagate status
+    
+    return(res);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

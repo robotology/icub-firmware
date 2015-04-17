@@ -190,10 +190,21 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     #warning -> marco.accame: put in here the main builder of the application EOapplication    
     
     eo_serv_Initialise(NULL);
-    eOserv_MCcfg_t mcconfig = {0};
-    mcconfig.jointnum   = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    mcconfig.motornum   = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
-    mcconfig.type       = eomcserv_type_mc4plus;
+    eOmcserv_cfg_t mcconfig = {0};
+    mcconfig.jomosnumber  = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    mcconfig.type         = eomcserv_type_mc4plus;
+    // we do it for board 13 in its simplified form: tow joints
+    // jomo 0
+    mcconfig.jomos[0].actuator.any.type = 1;        // on board
+    mcconfig.jomos[0].actuator.local.index = 0;  
+    mcconfig.jomos[0].encoder.etype = 0;            // aea 
+    mcconfig.jomos[0].encoder.index = 0;            // encoder1 which is mapped in spi2 (sck I1, miso C2, mosi I3)    
+    // jomo 1
+    mcconfig.jomos[1].actuator.any.type = 1;        // on board
+    mcconfig.jomos[1].actuator.local.index = 1;   
+    mcconfig.jomos[1].encoder.etype = 0;            // aea 
+    mcconfig.jomos[1].encoder.index = 1;            // encoder2 which is mapped in spi3 (sck C10, miso C11, mosi C12)     
+    
     eo_serv_ConfigMC(eo_serv_GetHandle(), &mcconfig);  
 
     eo_mcserv_CheckResources(eo_mcserv_GetHandle());    
@@ -206,6 +217,7 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
     
     #warning -> TBD: if CAN is available, add eo_canserv_SetMode(onevent), eo_canserv_Empty_TXqueues()
+        
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
@@ -221,7 +233,7 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     
     eo_mcserv_Start(eo_mcserv_GetHandle());
     
-    #warning -> TBD: add an enable of motion control loop, such as eo_mcserv_Start() [it enables the tx of all joints on can, ... or else for mc4plus] it also starts enconders, 
+    #warning -> TBD: add an enable of motion control loop, such as eo_mcserv_Start() [it enables the tx of all joints on can, ... or else for mc4plus it also starts enconders, 
     #warning -> TBD: if CAN is available, add eo_canserv_SetMode(ondemand), eo_canserv_Empty_TXqueues()
     // also start strain
 }

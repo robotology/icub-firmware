@@ -100,20 +100,16 @@ extern EOtheServices* eo_serv_GetHandle(void)
 }
 
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOserv_MCcfg_t *mccfg)
+extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcserv_cfg_t *mccfg)
 {
 //    eOresult_t res = eores_OK;
     
-    if((NULL == p) || (NULL ==mccfg))
+    if((NULL == p) || (NULL == mccfg))
     {
         return(eores_NOK_nullpointer);
     }
     
-    eOmcserv_cfg_t cfg;
-    cfg.jointnum = mccfg->jointnum;
-    cfg.motornum = mccfg->motornum;
-    cfg.type     = (eOmcserv_type_t) mccfg->type;
-    eo_mcserv_Initialise(&cfg);
+    eo_mcserv_Initialise(mccfg);
     
     return(eores_OK);
 }

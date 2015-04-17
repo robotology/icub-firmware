@@ -26,7 +26,9 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-// empty-section
+
+#include "eOcommon.h"
+#include "EOemsController.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -35,12 +37,19 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
+#warning TBD: add the encoderreader object pointer in here.
+// evaluate to save memory by changing the arrays in pointers
 struct EOmcService_hid
 {
-    eObool_t        initted;
-    eOmcserv_cfg_t  config;
-    eObool_t        resourcesareready;
+    eObool_t            initted;
+    eOmcserv_cfg_t      config;
+    eObool_t            resourcesareready;
+    eOmc_joint_t*       thejoints[eomcserv_jomo_maxnumberof];
+    eOmc_motor_t*       themotors[eomcserv_jomo_maxnumberof];
+    EOemsController*    thelocalcontroller;
+    void*               thelocalencoderreader;
+    uint32_t            valuesencoder[eomcserv_jomo_maxnumberof];
+    int16_t             valuespwm[eomcserv_jomo_maxnumberof];
 }; 
 
 

@@ -68,10 +68,10 @@ typedef struct
 
 typedef struct
 {  
-    uint8_t     dummy0   : 1;        // 0 is can1, 1 is can2. not used if onboard is 1.
-    uint8_t     index    : 4;        // if onboard is 1, then it is the index used by hal, otherwise the can address
-    uint8_t     dummy1   : 2;    // in case of can it is the inside index (0 or 1) of where the motor/joint is. otherwise it is 2
-    uint8_t     type     : 1;        // if 1 is onboard  otherwise is on can
+    uint8_t     dummy0   : 1;       
+    uint8_t     index    : 4;       // it is the index used by hal,
+    uint8_t     dummy1   : 2;       
+    uint8_t     type     : 1;       // if 1 is local otherwise is on can
 } eOmcserv_act_local_mapping_t;
 
 
@@ -105,8 +105,8 @@ typedef struct
 
 typedef struct
 {
-    eOmcserv_act_mapping_t      actuator;
-    eOmcserv_enc_mapping_t      encoder;    
+    eOmcserv_enc_mapping_t      encoder;   
+    eOmcserv_act_mapping_t      actuator; 
 } eOmcserv_jomo_cfg_t;          EO_VERIFYsizeof(eOmcserv_jomo_cfg_t, 2);
 
 enum { eomcserv_jomo_maxnumberof = 12 };
@@ -114,11 +114,10 @@ enum { eomcserv_jomo_maxnumberof = 12 };
 typedef struct
 {
     eOmcserv_type_t         type;
-    uint8_t                 jointnum;
-    uint8_t                 motornum;
-    uint8_t                 ffu;
+    uint8_t                 jomosnumber; // so far we have number of motors = number of joints 
+    uint16_t                ffu;
     eOmcserv_jomo_cfg_t     jomos[eomcserv_jomo_maxnumberof];
-} eOmcserv_cfg_t;           EO_VERIFYsizeof(eOmcserv_cfg_t, 28);
+} eOmcserv_cfg_t;           //EO_VERIFYsizeof(eOmcserv_cfg_t, 28);
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
@@ -150,9 +149,11 @@ extern eOresult_t eo_mcserv_CheckResources(EOmcService *p);
 // use it when robotinterface attempt to start the run mode.
 extern eObool_t eo_mcserv_AreResourcesReady(EOmcService *p, uint32_t *readyresourcesdescriptor);
 
+
 // call it in on-entry of run mode
 extern eOresult_t eo_mcserv_Start(EOmcService *p);
-
+// call it in on-exit or run mode
+extern eOresult_t eo_mcserv_Stop(EOmcService *p);
 
 // call it inside the protocol callbacks ... to be refined along the way.
 extern eOresult_t eo_mcserv_Set(EOmcService *p, uint8_t jomo, uint32_t whatisrequired);
@@ -165,8 +166,6 @@ extern eOresult_t eo_mcserv_Set(EOmcService *p, uint8_t jomo, uint32_t whatisreq
 extern eOresult_t eo_mcserv_Actuate(EOmcService *p);
 
 
-// call it in on-exit or run mode
-extern eOresult_t eo_mcserv_Stop(EOmcService *p);
 
 
 /** @}            

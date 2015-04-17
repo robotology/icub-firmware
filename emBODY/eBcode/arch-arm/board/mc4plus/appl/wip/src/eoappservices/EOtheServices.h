@@ -58,13 +58,7 @@ typedef struct
     uint8_t     whatever;
 } eOserv_cfg_t;
 
-typedef struct
-{
-    uint8_t     jointnum;
-    uint8_t     motornum;
-    uint8_t     type;
-} eOserv_MCcfg_t;
-   
+
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -75,7 +69,7 @@ extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg);
 
 extern EOtheServices* eo_serv_GetHandle(void);
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOserv_MCcfg_t *mccfg);
+extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcserv_cfg_t *mccfg);
 
 
 
