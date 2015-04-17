@@ -80,6 +80,9 @@ extern "C" {
 #elif (12==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
     #define NAXLES 2
     #define DONT_USE_2FOC
+#elif (13==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    #define NAXLES 2
+    #define DONT_USE_2FOC  
 #else
     #error invalid board
 #endif
