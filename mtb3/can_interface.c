@@ -615,6 +615,8 @@ int CAN1_handleRx (unsigned int board_id)
                     TIMER_VALUE= (uint16_t)p;
 					PR1=TIMER_VALUE;
 					
+					TRIANGLE_MASK=0x0000; // Disable all the triangles
+
                     NOLOAD = CANRxBuffer[canRxBufferIndex-1].CAN_data[3]; 
                     
                     if(can_transmission_enabled)
