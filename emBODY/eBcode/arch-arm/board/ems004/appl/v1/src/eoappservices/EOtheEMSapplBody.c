@@ -976,7 +976,7 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 {
     //uint16_t i, numofjoint = 0;
     
-    p->bodyobjs.emsController = eo_emsController_Init();
+    p->bodyobjs.emsController = eo_emsController_Init(NAXLES);
 
 //NOTE: removed check because eo_emsController_Init returns NULL if any 2foc board is connected to ems. (i.e, eb2, eb4, eb10, eb11)
 //     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
