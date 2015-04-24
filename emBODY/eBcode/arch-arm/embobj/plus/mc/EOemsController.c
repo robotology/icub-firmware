@@ -1336,10 +1336,9 @@ extern void eo_emsMotorController_GoIdle(void)
 
 void config_2FOC(uint8_t motor)
 {
-#if !defined(DONT_USE_2FOC)   
-    eOmc_PID_t pid;
-    eOmc_i2tParams_t i2t;
-    icubCanProto_current_t max_current;
+#if !defined(DONT_USE_2FOC)
+    //eOmc_i2tParams_t i2t;
+    //icubCanProto_current_t max_current;
     
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_jointOrMotorCanLocation_t canLoc;
@@ -1355,21 +1354,31 @@ void config_2FOC(uint8_t motor)
     
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
      
-    pid.kp = 0x00C0;
-    pid.ki = 0x0080;
-    pid.kd = 0x3500; // it is integral anti windup
+    int8_t KpKiKdKs[7];
+    ((int16_t*)KpKiKdKs)[0] =  8; //Kp
+    ((int16_t*)KpKiKdKs)[1] =  2; //Ki
+    ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
+               KpKiKdKs [6] = 10; // shift
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &pid);
-    
-    i2t.time  = 668;
-    i2t.tresh = 12000;
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &i2t);
-    
-    max_current = 5000; // 5A
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, KpKiKdKs);
+
+    uint32_t max_current = 5000; // 5A
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &max_current);
+
+    #define HAS_QE      0x0001
+    #define HAS_HALL    0x0002
+    #define HAS_TSENS   0x0004
+
+    uint8_t motor_config[5];
+    motor_config[0] = HAS_QE|HAS_HALL;
+    *(int16_t*)(motor_config+1)=14400;
+    motor_config[3] = 1; // swapAB QE
+    motor_config[4] = 4; // num motor poles
+
+    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, motor_config);
 #endif    
 }
 
@@ -1422,7 +1431,6 @@ void set_2FOC_running(uint8_t motor)
     controlmode_2foc = icubCanProto_controlmode_openloop;
     //controlmode_2foc = icubCanProto_controlmode_current;
     #endif
-    
     
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
