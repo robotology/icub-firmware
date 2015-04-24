@@ -76,6 +76,8 @@
 
 //static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd);
 
+static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
+
 static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command);
 
 static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command);
@@ -274,6 +276,17 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 
 
 
+extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint8_t *txratedivider = (uint8_t*)rd->data;
+   
+    if(0 == *txratedivider)
+    {
+        *txratedivider = 1;
+    }
+    
+    s_eoprot_ep_mn_fun_apply_config_txratedivider(*txratedivider);   
+}
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
@@ -733,10 +746,14 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
 
 }
 
-
-
-
-
+static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
+{
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    status->txdecimationfactor = txratedivider;   
+    
+    eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
