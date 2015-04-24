@@ -62,7 +62,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define SCAN(s)     for (uint8_t s=0; s<NAXLES; ++s)
+#define SCAN(s)     for (uint8_t s=0; s<ems->naxles; ++s)
 #define JOINTS(j)   SCAN(j)
 #define MOTORS(m)   SCAN(m)
 #define ENCODERS(e) SCAN(e)
@@ -102,14 +102,17 @@ static EOemsController *ems = NULL;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOemsController* eo_emsController_Init() 
+extern EOemsController* eo_emsController_Init(uint8_t nax) 
 {    
 #ifndef NO_LOCAL_CONTROL
     ems = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
 #endif
     
     if (ems)
-    {        
+    {
+        if (nax>MAX_NAXLES) nax = MAX_NAXLES;
+        
+        ems->naxles = nax;
         ems->n_calibrated = 0;
         
         JOINTS(j)
@@ -128,7 +131,7 @@ extern EOemsController* eo_emsController_Init()
             ems->rotorencoder[j]  = 1;
         }
         
-        ems->motors = eo_motors_New(NAXLES);
+        ems->motors = eo_motors_New(ems->naxles);
     }
     
     return ems;
@@ -183,9 +186,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     //static const int16_t FOC_2_EMS_SPEED = 1000/GEARBOX_REDUCTION;
 #endif
     
-    int32_t axle_abs_pos[NAXLES];
+    int32_t axle_abs_pos[MAX_NAXLES];
     #ifndef USE_2FOC_FAST_ENCODER
-    int32_t axle_abs_vel[NAXLES];
+    int32_t axle_abs_vel[MAX_NAXLES];
     #endif
     
     ENCODERS(e)
@@ -216,8 +219,8 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
     #if defined(USE_JACOBIAN)
     
-    uint8_t  ef[NAXLES];
-    uint16_t mf[NAXLES];
+    uint8_t  ef[MAX_NAXLES];
+    uint16_t mf[MAX_NAXLES];
     
     JOINTS(j)
     {
@@ -510,8 +513,8 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
 #ifdef USE_2FOC_FAST_ENCODER
     
-    int32_t axle_virt_vel[NAXLES];
-    int32_t axle_virt_pos[NAXLES];
+    int32_t axle_virt_vel[MAX_NAXLES];
+    int32_t axle_virt_pos[MAX_NAXLES];
     
     #if defined(USE_JACOBIAN)
     
@@ -606,7 +609,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         #endif
     }
     
-    if (ems->n_calibrated != NAXLES)
+    if (ems->n_calibrated != ems->naxles)
     {
         eo_emsController_CheckCalibrations();
     }
@@ -626,15 +629,15 @@ extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measu
 
 extern void eo_emsController_PWM(int16_t* pwm_motor_16)
 {
-    if ((!ems))// || (ems->state_mask != EMS_OK) /*|| (ems->n_calibrated != NAXLES)*/)
+    if ((!ems))// || (ems->state_mask != EMS_OK) /*|| (ems->n_calibrated != ems->naxles)*/)
     {
         MOTORS(m) pwm_motor_16[m] = 0;
         return;
     }
     
-    float pwm_joint[NAXLES];
-    eObool_t torque_protection[NAXLES];
-    eObool_t stiffness[NAXLES];
+    float pwm_joint[MAX_NAXLES];
+    eObool_t torque_protection[MAX_NAXLES];
+    eObool_t stiffness[MAX_NAXLES];
     
     eo_motors_check_wdog(ems->motors);
     
@@ -662,7 +665,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
             if ((pwm_lim > 0) ^ (pwm_joint[j] > pwm_lim)) 
             {
                pwm_joint[j] = pwm_lim;
-               for (int8_t k; k<NAXLES; k++)
+               for (int8_t k; k<ems->naxles; k++)
                    torque_protection[k] = eobool_true; //put in protection all motors
             }
         }
@@ -672,7 +675,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
             if ((pwm_lim > 0) ^ (pwm_joint[j] > pwm_lim))
             {
                pwm_joint[j] = pwm_lim;
-               for (int8_t k; k<NAXLES; k++)
+               for (int8_t k; k<ems->naxles; k++)
                    torque_protection[k] = eobool_true; //put in protection all motors
             }
         }
@@ -680,7 +683,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     }
 
     //PWM decoupling
-    float pwm_motor[NAXLES];
+    float pwm_motor[MAX_NAXLES];
     eo_motors_decouple_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
     
     //Friction compensation after joints decoupling
@@ -1076,7 +1079,7 @@ extern void eo_emsController_CheckCalibrations(void)
     
     #if defined(USE_JACOBIAN)
     
-    eObool_t joint_ok[NAXLES];
+    eObool_t joint_ok[MAX_NAXLES];
     
     JOINTS(j)
     {

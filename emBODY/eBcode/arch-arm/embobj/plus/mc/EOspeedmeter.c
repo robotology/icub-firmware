@@ -226,21 +226,24 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         {
             int32_t delta = normalize_angle(position - o->position_sure);
             
-            if (delta || o->delta)
+            //if (delta || o->delta)
+            if (delta)
             {
                 o->position_sure = position;
                 
-                int32_t inc = (o->delta + delta) >> 1;
+                //int32_t inc = (o->delta + delta) >> 1;
                 
                 o->delta = delta;
                 
-                if (inc)
-                {
-                    o->distance += inc;
-                }
+                o->distance += delta;
+                //if (inc)
+                //{
+                //    o->distance += inc;
+                //}
                 
                 #ifndef USE_2FOC_FAST_ENCODER
-                o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*inc) >> 3;
+                //o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*inc) >> 3;
+                o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*delta) >> 3;
                 #endif
             }
             #ifndef USE_2FOC_FAST_ENCODER
@@ -250,7 +253,6 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
             }
             #endif
         }
-        
         else
         {
             //message "spike encoder error"

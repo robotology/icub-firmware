@@ -38,7 +38,7 @@
 
 #define CABLE_WARNING_x_100  2000
 
-#define MOTORS(m) for (uint8_t m=0; m<NAXLES; ++m)
+#define MOTORS(m) for (uint8_t m=0; m<o->nMotors; ++m)
 #define JOINTS(j) MOTORS(j) 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -71,6 +71,7 @@ static char invert_matrix(float** M, float** I, char n);
 extern EOmotors* eo_motors_New(uint8_t nMotors) 
 {
     if (!nMotors) return NULL;
+    if (nMotors > MAX_NAXLES) nMotors = MAX_NAXLES;
     
     EOmotors *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
 

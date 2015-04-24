@@ -62,19 +62,20 @@ struct EOemsController_hid
     
     //uint16_t motor_state_mask[4];
     
+    uint8_t           naxles;
     EOmotors         *motors;
-    EOaxisController *axis_controller[NAXLES];
+    EOaxisController *axis_controller[MAX_NAXLES];
     
-    EOabsCalibratedEncoder *abs_calib_encoder[NAXLES];
-    EOaxleVirtualEncoder   *axle_virt_encoder[NAXLES];
+    EOabsCalibratedEncoder *abs_calib_encoder[MAX_NAXLES];
+    EOaxleVirtualEncoder   *axle_virt_encoder[MAX_NAXLES];
     
-    int16_t motor_current [NAXLES];
-    int32_t motor_acceleration[NAXLES];
-    int32_t motor_velocity[NAXLES];
-    int32_t motor_velocity_gbx[NAXLES];
-    int32_t motor_position[NAXLES];
-    int32_t gearbox_ratio [NAXLES];
-    int32_t rotorencoder [NAXLES];
+    int16_t motor_current[MAX_NAXLES];
+    int32_t motor_acceleration[MAX_NAXLES];
+    int32_t motor_velocity[MAX_NAXLES];
+    int32_t motor_velocity_gbx[MAX_NAXLES];
+    int32_t motor_position[MAX_NAXLES];
+    int32_t gearbox_ratio[MAX_NAXLES];
+    int32_t rotorencoder[MAX_NAXLES];
     
     //float torque_meas[NJOINTS];
 }; 

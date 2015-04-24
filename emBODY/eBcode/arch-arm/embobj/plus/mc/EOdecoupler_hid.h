@@ -39,12 +39,12 @@ struct EOmotors_hid
 {
     uint8_t nMotors;
     
-    uint16_t motor_state_watchdog[NAXLES];
+    uint16_t motor_state_watchdog[MAX_NAXLES];
     
     eObool_t Jok;
-    uint16_t motor_fault_mask2[NAXLES];
-    int32_t J[NAXLES][NAXLES];
-    int32_t Ji[NAXLES][NAXLES];
+    uint16_t motor_fault_mask2[MAX_NAXLES];
+    int32_t J[MAX_NAXLES][MAX_NAXLES];
+    int32_t Ji[MAX_NAXLES][MAX_NAXLES];
 }; 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------

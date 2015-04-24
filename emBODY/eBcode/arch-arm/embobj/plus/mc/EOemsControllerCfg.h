@@ -53,6 +53,8 @@ extern "C" {
 
 #define NOMINAL_CURRENT     10000
 
+#define MAX_NAXLES 4
+
 #if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 
     #define ANKLE_BOARD // LEFT
     #define NAXLES 2
