@@ -40,9 +40,7 @@
 #include "EOMtheEMSapplCfg.h"
 #include "EOMtheEMSappl.h"
 
-//#include "OPCprotocolManager_Cfg.h" 
-//#include "EOtheEMSapplDiagnostics.h"
-#include "emBODYrobot.h"
+
 
 #include "EOtheLEDpulser.h"
 
