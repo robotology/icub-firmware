@@ -3444,9 +3444,9 @@ static void s_eo_icubCanProto_mb_send_runtime_error_diagnostics(uint8_t parser, 
 }
 
 static eObool_t s_eo_icubCanProto_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t canPortRX)
-{
-    eOprotBRD_t localboard = eoprot_board_local_get();
+{    
     const eOprotBRD_t eb5board = 4;
+    eOprotBRD_t localboard = eoprot_board_local_get();
     
     if(localboard != eb5board)
     {
