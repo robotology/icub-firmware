@@ -282,8 +282,8 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
         .usemutex                   = eobool_true
     },  
     .transcfg       =
-    {   // the same ipv4 addr and port as in applcfg ...
-        .nvsetdevcfg            = EOMTHEEMSAPPLCFG_nvsetdevcfg,     
+    {   // the same ipv4 addr and port as in applcfg ...   
+        .nvsetbrdcfg            = &eonvset_BRDcfgBasic,  
         .hostipv4addr           = EO_COMMON_IPV4ADDR(EOMTHEEMSAPPLCFG_HOSTIPADDR1, EOMTHEEMSAPPLCFG_HOSTIPADDR2, EOMTHEEMSAPPLCFG_HOSTIPADDR3, EOMTHEEMSAPPLCFG_HOSTIPADDR4),
         .hostipv4port           = EOMTHEEMSAPPLCFG_TRANSCEIVER_HOSTIPPORT,
         .sizes                  =

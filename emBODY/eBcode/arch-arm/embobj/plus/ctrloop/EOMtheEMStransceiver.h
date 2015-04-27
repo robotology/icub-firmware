@@ -65,7 +65,7 @@ typedef struct EOMtheEMStransceiver_hid EOMtheEMStransceiver;
  **/
 typedef struct
 {
-    const eOnvset_DEVcfg_t*         nvsetdevcfg;   
+    const eOnvset_BRDcfg_t*         nvsetbrdcfg;   
     eOipv4addr_t                    hostipv4addr;
     eOipv4port_t                    hostipv4port; 
     eOtransceiver_sizes_t           sizes; 

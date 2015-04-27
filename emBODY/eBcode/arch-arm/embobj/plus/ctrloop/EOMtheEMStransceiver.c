@@ -70,7 +70,7 @@
 
 const eOemstransceiver_cfg_t eom_emstransceiver_DefaultCfg = 
 {
-    EO_INIT(.nvsetdevcfg)               NULL,  
+    EO_INIT(.nvsetbrdcfg)               NULL,  
     EO_INIT(.hostipv4addr)              EO_COMMON_IPV4ADDR(10, 0, 1, 200), 
     EO_INIT(.hostipv4port)              12345,
     EO_INIT(.sizes)
@@ -153,7 +153,7 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     eOboardtransceiver_cfg_t brdtransceiver_cfg;
     
 
-    brdtransceiver_cfg.nvsetdevcfg              = cfg->nvsetdevcfg;
+    brdtransceiver_cfg.nvsetbrdcfg              = cfg->nvsetbrdcfg;
 
     brdtransceiver_cfg.remotehostipv4addr       = cfg->hostipv4addr;
     brdtransceiver_cfg.remotehostipv4port       = cfg->hostipv4port; // it is the remote port where to send packets to
