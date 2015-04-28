@@ -35,6 +35,10 @@
 
 #include "EOemsController.h"
 #include "EOappEncodersReader.h"
+#include "EOMtheEMStransceiver.h"
+
+#include "EoProtocol.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -70,6 +74,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p);
 
@@ -123,6 +129,8 @@ extern EOmcService* eo_mcserv_Initialise(eOmcserv_cfg_t *cfg)
     }    
     
     memcpy(&s_eo_mcserv.config, cfg, sizeof(eOmcserv_cfg_t));
+    
+    s_eo_mcserv_protocol_load_mc_endpoint(&s_eo_mcserv);
     
     s_eo_mcserv_init_jomo(&s_eo_mcserv);
        
@@ -361,6 +369,32 @@ extern eOresult_t eo_mcserv_Stop(EOmcService *p)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p)
+{
+    eOresult_t res = eores_OK;
+
+    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+
+    // load mc endpoint specific to this board using a proper number of joint motors
+    eOprot_EPcfg_t epcfgmc = {0};
+    epcfgmc.endpoint    = eoprot_endpoint_motioncontrol;
+    epcfgmc.numberofentities[0] = p->config.jomosnumber;
+    epcfgmc.numberofentities[1] = p->config.jomosnumber;
+    epcfgmc.numberofentities[2] = 1; // one controller
+
+
+    if(eobool_true == eoprot_EPcfg_isvalid(&epcfgmc))
+    {
+        eo_nvset_LoadEP(nvset, &epcfgmc, eobool_true);
+    }                        
+        
+    // now we must define the .... proxy rules
+    // e.g., if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
+    // in teh future we can set this proxy mode on teh basis of the board number received
+    //eOprotBRD_t localboard = eoprot_board_local_get();
+
+    return(res);
+}
 
 
 static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
@@ -389,7 +423,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // ems controller. it is used only in some control types
     if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
     {
-        p->thelocalcontroller = eo_emsController_Init(NAXLES);        
+        p->thelocalcontroller = eo_emsController_Init(p->config.jomosnumber);        
     }
     else
     {

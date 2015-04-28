@@ -39,6 +39,10 @@
 #include "EOtheServices.h"
 
 
+#include "EOnvSet.h"
+#include "EoProtocolMC.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,10 +58,28 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//joints configuration
-#if defined (EOMTHEEMSAPPLCFG_USE_EB15)
 
+// - now we specialise the eth protocol for each board
+
+#if     (15 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)     
+
+    #define NJOMO 1
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {NJOMO, NJOMO, 1, 0, 0, 0, 0}     
+        }    
+    };
+    
+#else
+    #error -> must specify a board number   
 #endif
+
+
+
+static const uint8_t s_boardnum = EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD - 1;
+static const uint8_t s_theEPcfgsOthers_NumberOf = sizeof(s_theEPcfgsOthers) / sizeof(eOprot_EPcfg_t);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -306,6 +328,43 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     // pulse led3 forever at 20 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);
 
+    {    
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+    }
+    
+    
+//    {   
+//        // marco.accame on 24 apr 2015: here is how to customise the eth protocol from a generic to a specific board
+//        // so far, we can keep it in here. but further on we shall customise one endpoint at a time in runtime.
+//        
+//        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+//        uint8_t i = 0;
+//        // 1. set the board number. the value of the generic board is 99. 
+//        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+//        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+//        
+//        // 2. load all the endpoints specific to this board. the generic board loads only management
+//        for(i=0; i<s_theEPcfgsOthers_NumberOf; i++)
+//        {
+//            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) &s_theEPcfgsOthers[i];
+//            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+//            {
+//                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+//            }                        
+//        }
+//        
+//        // now we must define the .... proxy rules
+//        // e.g., if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
+//        // in teh future we can set this proxy mode on teh basis of the board number received
+//        //eOprotBRD_t localboard = eoprot_board_local_get();
+
+//    }      
+    
+    
+
     // start the application body   
     //const eOemsapplbody_cfg_t *applbodycfg = &theemsapplbodycfg;   
     //const eOemsapplbody_cfg_t * applbodycfg   = (const eOemsapplbody_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
@@ -317,7 +376,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     //configuration & init for motion control service
     eOmcserv_cfg_t mcconfig = {0};
-    mcconfig.jomosnumber  = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//    mcconfig.jomosnumber  = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    mcconfig.jomosnumber  = NJOMO;
     mcconfig.type         = eomcserv_type_mc4plus;
   
     //memcpy(&mcconfig.encoder_reader_cfg, &servicescfg->enc_reader_cfg, sizeof(eOappEncReader_cfg_t)); 
