@@ -55,9 +55,9 @@ extern "C" {
 // <i> It holds ...
 
 
-//  <o> ID of the EMS board     <0=> Use external file <12=> EB12    <13=> EB13
+//  <o> ID of the EMS board     <0=> Use external file <12=> EB12    <13=> EB13  <15=> EB15
 
-#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     13
+#define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     15
 
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 0
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
@@ -83,7 +83,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          0
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          1
 //  </h>version
 
 //  <h> build date
@@ -770,19 +770,19 @@ extern "C" {
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //  <i> default: hal_timer9
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX   2
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX   5
 
 //  <o> hal_timer for start do
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //  <i> default: hal_timer10
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO   3
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO   6
 
 //  <o> hal_timer for start tx
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
 //  <i> default: hal_timer11
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTTX   4
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTTX   8
 
 //  <o> hal_timer for alert rx
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
@@ -959,7 +959,13 @@ extern "C" {
         #define     NUM     13
         #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
         #include    "eOprot_b13.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b13_nvsetDEVcfg       
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b13_nvsetDEVcfg
+#elif   (15 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+        #define     EOMTHEEMSAPPLCFG_USE_EB15
+        #define     NUM     15
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
+        #include    "eOprot_b15.h"
+        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b15_nvsetDEVcfg               
 #endif
 
 
