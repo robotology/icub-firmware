@@ -222,6 +222,8 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
             case eomn_opc_config_REGROPs_assign:
             case eomn_opc_config_REGROPs_append:
             case eomn_opc_config_REGROPs_remove:
+            case eomn_opc_config_PROT_boardnumber:
+            case eomn_opc_config_PROT_endpoint:
             {
                 s_eoprot_ep_mn_fun_configcommand(command);                  
             } break;
@@ -638,7 +640,8 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
     eOropdescriptor_t ropdesc;
     EOtransceiver* theems00transceiver; 
     
-    eOmn_cmd_config_t* cmdconfig = (eOmn_cmd_config_t*)&command->cmd;
+    //eOmn_cmd_config_t* cmdconfig = (eOmn_cmd_config_t*)&command->cmd; /////// not correct.
+    eOmn_cmd_config_t* cmdconfig = &command->cmd.config;
     EOarray *array = (EOarray*)cmdconfig->array;
     
     uint16_t targetcapacity = (sizeof(cmdconfig->array) - sizeof(eOarray_head_t))  / sizeof(eOropSIGcfg_t);
@@ -736,7 +739,26 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
             }         
         } break;          
 
+        case eomn_opc_config_PROT_boardnumber:
+        {   // simply set the byte in array[0] as the new localboard number
+            //eOprotBRD_t brdnum = command->cmd.config.array[0];
+            eoprot_config_board_local(command->cmd.config.array[0]);                
+        } break;
         
+        case eomn_opc_config_PROT_endpoint:
+        {   // simply use the bytes in array[0->7] as a eOprot_EPcfg_t. but only if the EP is valid and not loaded yet.
+            eOprot_EPcfg_t *epcfg = (eOprot_EPcfg_t*) &command->cmd.config.array[0];
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                if(eobool_false == eoprot_endpoint_configured_is(eoprot_board_localboard, epcfg->endpoint))
+                {
+                    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle());
+                    eo_nvset_LoadEP(nvset, epcfg, eobool_true);                        
+                }                  
+            }        
+        } break;
+
+            
         default:
         {
             
