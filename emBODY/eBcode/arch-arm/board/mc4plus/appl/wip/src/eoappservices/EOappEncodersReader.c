@@ -490,7 +490,13 @@ extern uint32_t eo_appEncReader_deltaSPI_stream1(EOappEncReader *p)
 
 __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
 {
-    if((p->configuredEnc_SPI_stream0.readSeq.first != ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first != ENCODER_NULL))
+    // no SPI encoders
+    if((p->configuredEnc_SPI_stream0.readSeq.first == ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first == ENCODER_NULL))
+    {
+        return eobool_true;
+    }
+    // both streams has SPI encoders
+    else if((p->configuredEnc_SPI_stream0.readSeq.first != ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first != ENCODER_NULL))
     {
         if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st) && (eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st))
 		{
@@ -498,10 +504,12 @@ __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
 		}
 		return(eobool_false);
 	}
+    // SPI encoders only on stream1
     else if (p->configuredEnc_SPI_stream0.readSeq.first == ENCODER_NULL)
     {
 		return eo_appEncReader_isReadySPI_stream1(p);
 	}
+    // SPI encoders only on stream0
 	else if (p->configuredEnc_SPI_stream1.readSeq.first == ENCODER_NULL)
 	{
 		return eo_appEncReader_isReadySPI_stream0(p);
