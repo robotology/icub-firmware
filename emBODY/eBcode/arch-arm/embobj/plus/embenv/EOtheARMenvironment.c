@@ -32,12 +32,8 @@
 
 #include "hal.h"
 
-#if		defined(HAL_IS_VERSION_2) || defined(HAL_USE_VERSION_2)
+
 #include "hal_uniqueid.h"
-#else
-#include "hal_arch_arm.h"
-#define hal_uniqueid_id64bit_get hal_arch_arm_uniqueid64_get
-#endif
 
 #include "eEsharedServices.h" 
 
