@@ -24,13 +24,17 @@
 #include "stdlib.h"
 #include "string.h"
 
+#include "hal_dc_motorctl.h"
+#include "hal_sys.h"
+
+
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
 
 #include "EOtheMemoryPool.h"
 
 #include "EOemsController.h"
-
+#include "EOappEncodersReader.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -49,8 +53,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
+#define LOCAL_ENCODER(enc_type)     ((enc_type == 0) || (enc_type == 1) || (enc_type == 2) || (enc_type == 3)) // AEA, AMO, INC, ADH 
+#define SPI_ENCODER(enc_type)       ((enc_type == 0) || (enc_type == 1)) // AEA, AMO 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -72,6 +76,8 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p);
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p);
+
+static void myhal_pwm_set(uint8_t i, int16_t v);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -245,8 +251,10 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
     {
         case eomcserv_type_mc4plus:
         {
+            // must start the first reading of encoders and ... enable teh joints and ........
             #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
-            res = eores_OK;        
+            eo_appEncReader_StartRead(p->thelocalencoderreader);
+            res = eores_OK;            
         } break;
         case eomcserv_type_mc4can:
         {
@@ -257,6 +265,7 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
         {
             // must start the first reading of encoders and ... enable teh joints and ........ 
             #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
+            eo_appEncReader_StartRead(p->thelocalencoderreader);    
             res = eores_OK;     
         } break;    
         default:
@@ -380,33 +389,77 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // ems controller. it is used only in some control types
     if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
     {
-        p->thelocalcontroller = eo_emsController_Init();        
+        p->thelocalcontroller = eo_emsController_Init(NAXLES);        
     }
     else
     {
         p->thelocalcontroller = NULL;
     }
     
-    // allocate some values
-
    
     // encoder reader
     if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
     {
-        // some arrays used by encoder reader
+        // reserve some memory used by encoder reader to store values        
         p->valuesencoder = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint32_t), p->config.jomosnumber);
-        p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
         
         // encoder-reader (so far we only have encoders supported by the encoder reader object).
         #warning TBD: init the encoder-reader
+        // here occurs the problem of the remapping between the EOappEncodersReader numbering (local joints: 0...5)
+        // and the EomcService numbering (all the joints: 0...11)
+        /*
         for(jm=0; jm<p->config.jomosnumber; jm++)
         {
             // in here we prepare the config array
             // p->config.jomos[jm].encoder.etype ... 0 is aea
             // p->config.jomos[jm].encoder.index ... is index strating from 0
         }
+        */
+        
+        //test to fill the configuration using the jomos data
+        //init enc config
+        eOappEncReader_cfg_t encoder_reader_cfg;
+        memset(&encoder_reader_cfg, 0xFF, sizeof(eOappEncReader_cfg_t)); //0xFF is the invalid value
+        encoder_reader_cfg.SPI_callbackOnLastRead = NULL, encoder_reader_cfg.SPI_callback_arg = NULL;
+        encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof = 0, encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof = 0;
+        
+        eOmcserv_jomo_cfg_t current_jomo = {0};
+        uint8_t enc_joint_index = 0, etype = 0;
+        for(jm=0; jm<p->config.jomosnumber; jm++)
+        {
+            current_jomo = p->config.jomos[jm];
+            etype        = p->config.jomos[jm].encoder.etype;
+            // local encoder
+            if (LOCAL_ENCODER(etype))
+            {
+                //set type and position
+                encoder_reader_cfg.joints[jm].primary_encoder      = (eo_appEncReader_enc_type_t) current_jomo.encoder.etype;
+                encoder_reader_cfg.joints[jm].primary_enc_position = (eo_appEncReader_encoder_position_t) current_jomo.encoder.index;
+                //store the encoder joint value --> use it when you get the value
+                p->config.jomos[jm].encoder.enc_joint = enc_joint_index;
+                enc_joint_index++;
+                
+                //only for SPI encoders
+                if (SPI_ENCODER(etype))
+                {
+                    if (current_jomo.encoder.index % 2 == 0)
+                    {
+                       encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof++; // even
+                          if (encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof == 1) //if not set yet
+                              encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].type = (hal_encoder_type) etype;
+                    }                      
+                    else
+                    {
+                       encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof++; // odd
+                          if (encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof == 1) //if not set yet
+                              encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].type = (hal_encoder_type) etype; 
+                    }
+                }
+            }
+        }
+        
         // in here we init the encoder reader
-        p->thelocalencoderreader = (void*)0x3;
+        p->thelocalencoderreader = (void*)eo_appEncReader_New(&encoder_reader_cfg);
     }
     else
     {
@@ -416,6 +469,9 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     }
     
     // actuator
+    // reserve some memory for pwm values
+    p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
+    
     for(jm=0; jm<p->config.jomosnumber; jm++)
     {
         if(1 == p->config.jomos[jm].actuator.any.type)
@@ -425,7 +481,8 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
             pwm = pwm;
         }
     }
-    
+    //currently the motors are initialized all together and without config
+    hal_motor_and_adc_init(0, NULL);
     
     return(res);
 }
@@ -448,9 +505,14 @@ static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
     return(res);
 }
 
-void myhal_pwm(uint8_t i, int16_t v)
+void myhal_pwm_set(uint8_t i, int16_t v)
 {
+    //out of bound
+    if (i > 3)
+        return;
     
+    #warning hal set the pwm taking as the argument a int32_t...should we change this parameter or the pwmvalues type?
+    hal_motor_pwmset(i, v);
 }
 
 void myhal_pwm_init(uint8_t i)
@@ -464,18 +526,70 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     uint8_t jm = 0;
     
     uint8_t errormask = 0x00;
+    uint32_t dummy_extra = 0x00;
+    hal_encoder_errors_flags fl = {0};
+    EOappEncReader *app_enc_reader = p->thelocalencoderreader;
     
     #warning TBD: add what is missing for do phase
       
     // 1. wait some time until encoders are ready. if not ready by a timeout, then issue a diagnostics message and ... quit or continue?
-    // tbd
+    /*
+    while(!eo_appEncReader_isReady(app_enc_reader))
+    {
+        //do nothing
+    }
+    //determine if the timeout is expired
+    */
+    
+    
+    uint8_t spi_stream0 = 0, spi_stream1 = 0;
+    for(uint8_t i=0; i<30; ++i)
+    {
+        if (eo_appEncReader_isReady(app_enc_reader))
+        {
+            break;
+        }
+        // it means that the SPI encoders are not ready yet...
+        else
+        {
+            if (!eo_appEncReader_isReadySPI_stream0(app_enc_reader)) ++spi_stream0;
+            if (!eo_appEncReader_isReadySPI_stream1(app_enc_reader)) ++spi_stream1;
+            hal_sys_delay(5);
+        }
+    }
     
     // 2. read encoders and put result into p->valuesencoder[] and fill an errormask
-    errormask = 0x00;
-    // tbd
+    if (eo_appEncReader_isReady(app_enc_reader))
+    {
+        for(jm=0; jm<p->config.jomosnumber; jm++)
+        {
+            //for some type of encoder I need to get the values from EOappEncodersReader, for the others we get the value in other ways
+            if(     (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_AEA)
+                ||  (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_AMO)
+                ||  (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_INC))
+            {
+                res = eo_appEncReader_GetJointValue (app_enc_reader,
+                                                    (eo_appEncReader_joint_position_t)p->config.jomos[jm].encoder.enc_joint,
+                                                    &p->valuesencoder[jm],
+                                                    &dummy_extra,
+                                                    &fl);
+                //fill the errormask
+                if (res != eores_OK)
+                    errormask |= 1<<(jm<<1);
+            }
+            else
+            {
+            // handle the encoders not supported yet (remote)   
+            }
+        }
+    }   
+    else
+    {
+        errormask = 0xAA; // timeout
+    }
     
     // 3. restart a new reading of the encoders 
-    // tbd
+    eo_appEncReader_StartRead(app_enc_reader);
     
     // 4. apply the readings to localcontroller
     eo_emsController_AcquireAbsEncoders((int32_t*)p->valuesencoder, errormask);
@@ -486,7 +600,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
     for(jm=0; jm<p->config.jomosnumber; jm++)
     {
-        myhal_pwm(p->config.jomos[jm].actuator.local.index, p->valuespwm[jm]);
+        myhal_pwm_set(p->config.jomos[jm].actuator.local.index, p->valuespwm[jm]);
     }
 
     // 7. propagate the status of joint motors locally computed in localcontroller to the joints / motors in ram

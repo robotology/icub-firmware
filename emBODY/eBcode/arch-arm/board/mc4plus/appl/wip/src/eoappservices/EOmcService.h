@@ -98,16 +98,28 @@ typedef union
 
 typedef struct
 {
-    uint8_t     etype : 4;      // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc.
-    uint8_t     index : 4;      // 0, 1, 2, 3, 4, etc where the number is referred to the hal enum specified by the type.   
+    uint8_t     etype       : 4;      // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc. 
+    uint8_t     index       : 4;      // 0, 1, 2, 3, 4, etc where the number is referred to the hal enum specified by the type.
+    uint8_t     enc_joint   : 3;      // 0...6 joint index referred to the joints list inside the eoappencodersreader
+    uint8_t     dummy       : 5;
     // example: aea encoder on port p6 or the ems is etype=0, index=0
 } eOmcserv_enc_mapping_t;
+//we'll need also an external mapping (encoder on CAN, e.g MAIS) but we'll resolve it later on
 
+/*
+typedef struct
+{
+    uint8_t     etype           : 4;    // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc. 
+    uint8_t     local_index     : 4;    // 0, 1, 2, 3, 4, etc where the number is referred to the EOappEncodersReader numbering
+    uint8_t     external_index  : 4;    // 0, 1, 2, 3, 4, etc where the number is referred to the CAN index from which the values is collected.
+    uint8_t     dummy           : 4;         
+} eOmcserv_enc_mapping_t;
+*/
 typedef struct
 {
     eOmcserv_enc_mapping_t      encoder;   
     eOmcserv_act_mapping_t      actuator; 
-} eOmcserv_jomo_cfg_t;          EO_VERIFYsizeof(eOmcserv_jomo_cfg_t, 2);
+} eOmcserv_jomo_cfg_t;          EO_VERIFYsizeof(eOmcserv_jomo_cfg_t, 3);
 
 enum { eomcserv_jomo_maxnumberof = 12 };
 
