@@ -205,6 +205,14 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     }
 #endif
     
+    //after 10 seconds, go 2 run
+    /*
+    static uint32_t count_times = 0;
+    count_times++;
+    
+    if (count_times == 40)
+        eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_go2runner);
+    */
 }
 
 // marco.accame on Nov 26 2014: this function is triggered if function eom_emssocket_Transmit() fails
