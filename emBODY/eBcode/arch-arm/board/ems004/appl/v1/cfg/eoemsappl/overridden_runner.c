@@ -676,7 +676,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     }
     
     if (jstatus->basic.controlmodestatus == eomc_controlmode_position
-     || jstatus->basic.controlmodestatus == eomc_controlmode_velocity_pos
+     || jstatus->basic.controlmodestatus == eomc_controlmode_mixed
      || jstatus->basic.controlmodestatus == eomc_controlmode_calib)
     {
        if(jstatus->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
