@@ -46,6 +46,8 @@
 
 #include "EoError.h"
 
+#include "eEsharedServices.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -420,6 +422,21 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             //    status->currstate = applstate_error;
             //}
         } break;
+
+        case applstate_resetmicro:
+        {
+            // i just reset the micro ... straight away
+            osal_system_scheduling_suspend();
+            ee_sharserv_sys_restart();
+        } break;
+        
+        case applstate_restartapp:
+        {
+            osal_system_scheduling_suspend();
+            ee_sharserv_ipc_gotoproc_set(ee_procApplication);
+            ee_sharserv_sys_restart();           
+        } break;
+        
         
         default:
         {
