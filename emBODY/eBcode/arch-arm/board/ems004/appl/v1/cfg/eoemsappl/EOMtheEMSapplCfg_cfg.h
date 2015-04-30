@@ -969,8 +969,6 @@ extern "C" {
         #define     EOMTHEEMSAPPLCFG_USE_EB7
         #define     NUM     07
         #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-        #include    "eOprot_b07.h"
-        #define     EOMTHEEMSAPPLCFG_nvsetdevcfg            &eoprot_b07_nvsetBRDcfg
 #elif   (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB8
         #define     NUM     08
