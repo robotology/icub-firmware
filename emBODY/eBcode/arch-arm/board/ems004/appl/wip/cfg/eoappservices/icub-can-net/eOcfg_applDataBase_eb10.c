@@ -77,11 +77,13 @@
 
 const EOconstvector  s_eo_cfg_appDB_constvec_boards = 
 {
-    EO_INIT(.size)              0, //sizeof(s_cfg_appDB_boards)/sizeof(eOappTheDB_canboardinfo_t), 
-    EO_INIT(.item_size)         0, //sizeof(eOappTheDB_canboardinfo_t),
-    EO_INIT(.item_array_data)   NULL//s_cfg_appDB_boards
+    .capacity       = 0,
+    .size           = 0, 
+    .item_size      = 0,
+    .dummy          = 0,  
+    .stored_items   = NULL,
+    .functions      = NULL 
 };
-
 extern const EOconstvector* const eo_cfg_appDB_thecanboards = &s_eo_cfg_appDB_constvec_boards;
 
 
@@ -103,11 +105,13 @@ extern const EOconstvector* const eo_cfg_appDB_thecanboards = &s_eo_cfg_appDB_co
 
 const EOconstvector  s_eo_cfg_appDB_constvec_joints = 
 {
-    EO_INIT(.size)              0,//sizeof(s_cfg_appDB_joints)/sizeof(eOappTheDB_mapping2canboard_t),
-    EO_INIT(.item_size)         0,//sizeof(eOappTheDB_mapping2canboard_t),
-    EO_INIT(.item_array_data)   NULL// s_cfg_appDB_joints
+    .capacity       = 0,
+    .size           = 0, 
+    .item_size      = 0,
+    .dummy          = 0,  
+    .stored_items   = NULL,
+    .functions      = NULL
 };
-
 extern const EOconstvector* const eo_cfg_appDB_thejoints_mapping2canboards = &s_eo_cfg_appDB_constvec_joints;
 
 
@@ -133,12 +137,13 @@ extern const EOconstvector* const eo_cfg_appDB_themotors_mapping2canboards = &s_
 
 const EOconstvector  s_eo_cfg_appDB_constvec_snsrMais = 
 {
-    EO_INIT(.size)              0,//sizeof(s_cfg_appDB_snsrMais)/sizeof(eOappTheDB_mapping2canboard_t), 
-    EO_INIT(.item_size)         0,//sizeof(eOappTheDB_mapping2canboard_t),
-    EO_INIT(.item_array_data)   NULL//s_cfg_appDB_snsrMais
+    .capacity       = 0,
+    .size           = 0, 
+    .item_size      = 0,
+    .dummy          = 0,  
+    .stored_items   = NULL,
+    .functions      = NULL
 };
-
-
 extern const EOconstvector* const eo_cfg_appDB_themaises_mapping2canboards = &s_eo_cfg_appDB_constvec_snsrMais;
 
 
@@ -147,12 +152,13 @@ extern const EOconstvector* const eo_cfg_appDB_themaises_mapping2canboards = &s_
 
 const EOconstvector  s_eo_cfg_appDB_constvec_snsrStrain = 
 {   // empty
-    EO_INIT(.size)              0, //sizeof(s_cfg_appDB_snrStrain)/sizeof(eOappTheDB_mapping2canboard_t), 
-    EO_INIT(.item_size)         0, //sizeof(eOappTheDB_mapping2canboard_t),
-    EO_INIT(.item_array_data)   NULL //s_cfg_appDB_snsrStrain
+    .capacity       = 0,
+    .size           = 0, 
+    .item_size      = 0,
+    .dummy          = 0,  
+    .stored_items   = NULL,
+    .functions      = NULL
 };
-
-
 extern const EOconstvector* const eo_cfg_appDB_thestrains_mapping2canboards = &s_eo_cfg_appDB_constvec_snsrStrain;
 
 
@@ -182,11 +188,12 @@ static const eOappTheDB_cfg_skinInfo_t  s_cfg_appDB_skin [] =
 
 const EOconstvector  s_eo_cfg_appDB_constvec_skin = 
 {
-     EO_INIT(.size)              sizeof(s_cfg_appDB_skin)/sizeof(eOappTheDB_cfg_skinInfo_t), 
-     EO_INIT(.item_size)         sizeof(eOappTheDB_cfg_skinInfo_t),
-     EO_INIT(.item_array_data)   s_cfg_appDB_skin
+    .capacity       = sizeof(s_cfg_appDB_skin)/sizeof(eOappTheDB_cfg_skinInfo_t),
+    .size           = sizeof(s_cfg_appDB_skin)/sizeof(eOappTheDB_cfg_skinInfo_t), 
+    .item_size      = sizeof(eOappTheDB_cfg_skinInfo_t),
+    .dummy          = 0,  
+    .stored_items   = (void*) s_cfg_appDB_skin,
+    .functions      = NULL      
 };
-
-
 extern const EOconstvector* const eo_cfg_appDB_theskins_info = &s_eo_cfg_appDB_constvec_skin;
 

@@ -292,7 +292,7 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port,
     
     hal_sys_irqn_enable(irqn);
     
-    if(numofoutframe != 0)
+    if(0 != numofoutframe)
     {
         hal_can_transmit((hal_can_port_t)port);
     }
@@ -315,7 +315,7 @@ extern eOresult_t eo_appCanSP_starttransmit_XXX(EOappCanSP *p, eOcanport_t port,
 
 extern eOresult_t eo_appCanSP_wait_XXX(EOappCanSP *p, eOcanport_t port)
 {
-    osal_result_t           osal_res = osal_res_OK ;
+    osal_result_t osal_res = osal_res_OK ;
 
     if(NULL == p)
     {

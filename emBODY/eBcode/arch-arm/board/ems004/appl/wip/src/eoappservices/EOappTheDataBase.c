@@ -44,6 +44,8 @@
 
 #include "EOconstvector.h" 
 
+#include "EoProtocol.h"
+
 
 
 #ifdef USE_PROTO_PROXY
