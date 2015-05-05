@@ -29,6 +29,9 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+#include "EOtheCANmapping.h"
+#include "EoProtocol.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

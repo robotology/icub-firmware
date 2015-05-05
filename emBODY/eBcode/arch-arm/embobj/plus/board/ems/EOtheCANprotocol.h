@@ -43,7 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"    
 #include "iCubCanProtocol.h"  
-#include "EOtheCANmapping.h"
+//#include "EOtheCANmapping.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
