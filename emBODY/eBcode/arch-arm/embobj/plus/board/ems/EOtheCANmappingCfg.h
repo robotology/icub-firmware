@@ -61,73 +61,73 @@ extern "C" {
 // example, what do we have in can1 bus at address 3? we look at eo_canmapcfg_boards[0][3]. if no can board is present 
 // then we have NULL, otherwise we have a pointer to the board.  
 
-extern eOcanmap_canboard_t * const * const eo_canmapcfg_boards[];
+//extern eOcanmap_board_extended_t * const * const eo_canmapcfg_boards[];
 
 
 // -- entities: joint
 
 // this variable contains the number of joints (which is also the size of array eo_canmapcfg_joints, and which MUST be
 // equal to eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-extern const uint8_t eo_canmapcfg_joints_numberof;
+//extern const uint8_t eo_canmapcfg_joints_numberof;
 
 // this variable contains the pointers of the boards which serve a given joint in number [0, eo_canmapcfg_joints_numberof-1]
 // for example, eo_canmapcfg_joints[0] gives back the pointer to the board which host the joint 0.
 // in case eo_canmapcfg_joints_numberof is 4, then we cannot use eo_canmapcfg_joints[4] and beyond. 
-extern const eOcanmap_canboard_t * const eo_canmapcfg_joints[];
+//extern const eOcanmap_board_extended_t * const eo_canmapcfg_joints[];
 
 // -- entities: motor
 
 // this variable contains the number of motors (which is also the size of array eo_canmapcfg_motors, and which MUST be
 // equal to eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
-extern const uint8_t eo_canmapcfg_motors_numberof;
+//extern const uint8_t eo_canmapcfg_motors_numberof;
 
 // this variable contains the pointers of the boards which serve a given motor in number [0, eo_canmapcfg_motors_numberof-1]
 // for example, eo_canmapcfg_motors[0] gives back the pointer to the board which host the motor 0.
 // in case eo_canmapcfg_motors_numberof is 4, then we cannot use eo_canmapcfg_motors[4] and beyond. 
-extern const eOcanmap_canboard_t * const eo_canmapcfg_motors[];
+//extern const eOcanmap_board_extended_t * const eo_canmapcfg_motors[];
 
 
 // -- entities: strain
 
 // this variable contains the number of strains (which is also the size of array eo_canmapcfg_strains, and which MUST be
 // equal to eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
-extern const uint8_t eo_canmapcfg_strains_numberof;
+//extern const uint8_t eo_canmapcfg_strains_numberof;
 
 // this variable contains the pointers of the boards which serve a given strain in number [0, eo_canmapcfg_strains_numberof-1]
 // for example, eo_canmapcfg_strains[0] gives back the pointer to the board which host the strain 0.
 // in case eo_canmapcfg_strains_numberof is 1/0, then we cannot use eo_canmapcfg_strains[1/0] and beyond. 
-extern const eOcanmap_canboard_t * const eo_canmapcfg_strains[];
+//extern const eOcanmap_board_extended_t * const eo_canmapcfg_strains[];
 
 
 // -- entities: mais
 
 // this variable contains the number of maises (which is also the size of array eo_canmapcfg_maises, and which MUST be
 // equal to eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
-extern const uint8_t eo_canmapcfg_maises_numberof;
+//extern const uint8_t eo_canmapcfg_maises_numberof;
 
 // this variable contains the pointers of the boards which serve a given mais in number [0, eo_canmapcfg_maises_numberof-1]
 // for example, eo_canmapcfg_maises[0] gives back the pointer to the board which host the mais 0.
 // in case eo_canmapcfg_maises_numberof is 1/0, then we cannot use eo_canmapcfg_maises[1/0] and beyond. 
-extern const eOcanmap_canboard_t * const eo_canmapcfg_maises[];
+//extern const eOcanmap_board_extended_t * const eo_canmapcfg_maises[];
 
 
 
 // -- entities: skin -- the skin is different from other entities because a skin entity is served by more than one skin board
 
 
-// this variable contains the number of skins as an entity (which is also the size of array xxxxxxxx?, and which MUST be
-// equal to eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-extern const uint8_t eo_canmapcfg_skins_numberof;
+//// this variable contains the number of skins as an entity (which is also the size of array xxxxxxxx?, and which MUST be
+//// equal to eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+//extern const uint8_t eo_canmapcfg_skins_numberof;
 
 
-// this array tells for each skin in value [0, eo_canmapcfg_skins_numberof-1] how many boards are used to implement it
-extern const uint8_t eo_canmapcfg_skins_boardsinside[];
+//// this array tells for each skin in value [0, eo_canmapcfg_skins_numberof-1] how many boards are used to implement it
+//extern const uint8_t eo_canmapcfg_skins_boardsinside[];
 
-// this variable contains the pointer of each board inside the skin number [0, eo_canmapcfg_skins_numberof-1].
-// to get the pointer of the board we must use two indices, as in the following example:
-// eo_canmapcfg_skins_boards[0][3] contains the pointer to the fourth board of the first skin.  
-// that is a valid pointer only if eo_canmapcfg_skins_numberof > 0, and eo_canmapcfg_skins_boardsinside[0] > 3.
-extern const eOcanmap_canboard_t * const * const eo_canmapcfg_skins_boards[];
+//// this variable contains the pointer of each board inside the skin number [0, eo_canmapcfg_skins_numberof-1].
+//// to get the pointer of the board we must use two indices, as in the following example:
+//// eo_canmapcfg_skins_boards[0][3] contains the pointer to the fourth board of the first skin.  
+//// that is a valid pointer only if eo_canmapcfg_skins_numberof > 0, and eo_canmapcfg_skins_boardsinside[0] > 3.
+//extern const eOcanmap_board_extended_t * const * const eo_canmapcfg_skins_boards[];
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

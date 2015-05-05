@@ -25,6 +25,8 @@
 #include "EoCommon.h"
 #include "EOtheCANmapping.h"
 
+#include "EOconstvector_hid.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -48,155 +50,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// - the can boards: 4 1foc, 1 strain
-
-static eOcanmap_canboard_t s_board_c1a01_1foc = 
-{  
-    .board =
-    {
-        .type               = eobrd_cantype_1foc,
-        .location =
-        {
-            .port   = eOcanport1,
-            .addr   = 1         
-        },
-        .requiredprotocol   = {.major = 1, .minor = 2},
-        .indexofentity = 
-        {
-            entindex00,     // jomo #0
-            entindexNONE    // none            
-        }
-    },
-    .detected   = {0} 
-};
-
-
-static const eOcanmap_canboard_t s_board_c1a02_1foc = 
-{   
-    .board =
-    {
-        .type               = eobrd_cantype_1foc,
-        .location =
-        {
-            .port   = eOcanport1,
-            .addr   = 2         
-        },
-        .requiredprotocol   = {.major = 1, .minor = 2},
-        .indexofentity = 
-        {
-            entindex01,     // jomo #1
-            entindexNONE    // none            
-        }
-    },
-    .detected   = {0} 
-};
-
-
-static const eOcanmap_canboard_t s_board_c1a03_1foc = 
-{ 
-    .board =
-    {
-        .type               = eobrd_cantype_1foc,
-        .location =
-        {
-            .port   = eOcanport1,
-            .addr   = 3         
-        },
-        .requiredprotocol   = {.major = 1, .minor = 2},
-        .indexofentity = 
-        {
-            entindex02,     // jomo #2
-            entindexNONE    // none            
-        }
-    },
-    .detected   = {0}  
-};
-
-static const eOcanmap_canboard_t s_board_c1a04_1foc = 
-{
-    .board =
-    {
-        .type               = eobrd_cantype_1foc,
-        .location =
-        {
-            .port   = eOcanport1,
-            .addr   = 4         
-        },
-        .requiredprotocol   = {.major = 1, .minor = 2},
-        .indexofentity = 
-        {
-            entindex03,     // jomo #3
-            entindexNONE    // none            
-        }
-    },
-    .detected   = {0}     
-};
-
-
-static const eOcanmap_canboard_t s_board_c2a13_strain = 
-{
-    .board =
-    {
-        .type               = eobrd_cantype_1foc,
-        .location =
-        {
-            .port   = eOcanport2,
-            .addr   = 13         
-        },
-        .requiredprotocol   = {.major = 0, .minor = 0},
-        .indexofentity = 
-        {
-            entindex00,     // strain #0
-            entindexNONE    // none            
-        }
-    },
-    .detected   = {0}   
-};
-
-
-
-// - the can mapping
-
-static const eOcanmap_canboard_t * const s_boards_can1[] =
-{   // they must be 15
-    NULL,   // the ems has address 0
-    &s_board_c1a01_1foc,
-    &s_board_c1a02_1foc,
-    &s_board_c1a03_1foc,
-    &s_board_c1a04_1foc,
-    NULL,
-    NULL,
-    NULL,
-    NULL, 
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
-};  EO_VERIFYsizeof(s_boards_can1, 15*sizeof(eOcanmap_canboard_t *)); 
-
-static const eOcanmap_canboard_t * const s_boards_can2[] =
-{   // they must be 15
-    NULL,   // the ems has address 0
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL, 
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    &s_board_c2a13_strain,
-    NULL
-};  EO_VERIFYsizeof(s_boards_can2, 15*sizeof(eOcanmap_canboard_t *));
-
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -214,72 +67,6 @@ static const eOcanmap_canboard_t * const s_boards_can2[] =
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-// this variable contains the pointers of the canboards which are in the two can buses in each of the [0, 14] address
-// if no can board is present at a given address, then we have NULL.  
-eOcanmap_canboard_t * const * const eo_canmapcfg_boards[] =
-{   
-    (eOcanmap_canboard_t * const *)&s_boards_can1,   
-    (eOcanmap_canboard_t * const *)&s_boards_can2
-};  EO_VERIFYsizeof(eo_canmapcfg_boards, 2*sizeof(eOcanmap_canboard_t * const *));   
-
-
-// - joints
-
-// this variable contains the number of joints.
-const uint8_t eo_canmapcfg_joints_numberof = 4;
-
-// this variable contains the pointers of the boards which serve a given joint in number [0, eo_canmapcfg_joints_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_joints[] =
-{
-    &s_board_c1a01_1foc,    // j0
-    &s_board_c1a02_1foc,    // j1
-    &s_board_c1a03_1foc,    // j2
-    &s_board_c1a04_1foc     // j3
-};
-
-
-
-// - motors
-
-// this variable contains the number of motors.
-const uint8_t eo_canmapcfg_motors_numberof = 4;
-
-// this variable contains the pointers of the boards which serve a given motor in number [0, eo_canmapcfg_motors_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_motors[] =
-{
-    &s_board_c1a01_1foc,    // m0
-    &s_board_c1a02_1foc,    // m1
-    &s_board_c1a03_1foc,    // m2
-    &s_board_c1a04_1foc     // m3
-};
-
-
-
-// - strains
-
-// this variable contains the number of strains.
-const uint8_t eo_canmapcfg_strains_numberof = 1;
-
-// this variable contains the pointers of the boards which serve a given strain in number [0, eo_canmapcfg_strains_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_strains[] =
-{
-    &s_board_c2a13_strain
-};
-
-
-// - maises
-
-// this variable contains the number of maises
-const uint8_t eo_canmapcfg_maises_numberof = 0;
-
-// this variable contains the pointers of the boards which serve a given mais in number [0, eo_canmapcfg_maises_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_maises[] =
-{
-    NULL
-};
-
-
-
 
 // - skins
 
@@ -293,15 +80,178 @@ const uint8_t eo_canmapcfg_skins_boardsinside[] =
 };
 
 // this variable contains for each skin in value [0, eo_canmapcfg_skins_numberof-1] the array of the skin boards 
-const eOcanmap_canboard_t * const *const eo_canmapcfg_skins_boards[] =
+const eOcanmap_board_extended_t * const *const eo_canmapcfg_skins_boards[] =
 {
     NULL
 };
 
 
+static const eOcanmap_board_properties_t s_boardprops[] = 
+{
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
+        {
+            .port   = eOcanport1,
+            .addr   = 1         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 2}
+    },  
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
+        {
+            .port   = eOcanport1,
+            .addr   = 2         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 2}
+    },
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
+        {
+            .port   = eOcanport1,
+            .addr   = 3         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 2}
+    },
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
+        {
+            .port   = eOcanport1,
+            .addr   = 4         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 2}
+    },
+    {
+        .type               = eobrd_cantype_strain,
+        .location =
+        {
+            .port   = eOcanport2,
+            .addr   = 13         
+        },
+        .requiredprotocol   = {.major = 0, .minor = 0}
+    }    
+};
 
-  
+EOconstvector s_eo_vectorof_boardprops_eb1 = 
+{
+    .capacity       = sizeof(s_boardprops)/sizeof(eOcanmap_board_properties_t),
+    .size           = sizeof(s_boardprops)/sizeof(eOcanmap_board_properties_t),
+    .item_size      = sizeof(eOcanmap_board_properties_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_boardprops,
+    .functions      = NULL   
+};
+
+EOconstvector* eo_vectorof_boardprops_eb1 = &s_eo_vectorof_boardprops_eb1;
+
+
+
+static const eOcanmap_entitydescriptor_t s_des_jomo[] = 
+{
+    {   // jomo 0
+        .location   =
+        {   
+            .port           = eOcanport1,
+            .addr           = 1,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex00
+    },        
+    {   // jomo 1
+        .location   =
+        {
+            .port           = eOcanport1,
+            .addr           = 2,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex01,        
+    },    
+    {   // jomo 2
+        .location   =
+        {
+            .port           = eOcanport1,
+            .addr           = 3,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex02
+    },
+    {   // jomo 3
+        .location   =
+        {
+            .port           = eOcanport1,
+            .addr           = 4,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex03
+    }     
+};
+
+EOconstvector s_eo_vectorof_des_jomo_eb1 = 
+{
+    .capacity       = sizeof(s_des_jomo)/sizeof(eOcanmap_entitydescriptor_t),
+    .size           = sizeof(s_des_jomo)/sizeof(eOcanmap_entitydescriptor_t),
+    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_des_jomo,
+    .functions      = NULL   
+};
+
+EOconstvector* eo_vectorof_descriptor_jomo_eb1 = &s_eo_vectorof_des_jomo_eb1;
+
+static const eOcanmap_entitydescriptor_t s_des_strain[] = 
+{
+    {   // strain 0
+        .location   =
+        {
+            .port           = eOcanport2,
+            .addr           = 13,
+            .insideindex    = eocanmap_insideindex_none
+        },
+        .index      = entindex00
+    }  
+};
+
+EOconstvector s_eo_vectorof_des_strain_eb1 = 
+{
+    .capacity       = sizeof(s_des_strain)/sizeof(eOcanmap_entitydescriptor_t),
+    .size           = sizeof(s_des_strain)/sizeof(eOcanmap_entitydescriptor_t),
+    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_des_strain,
+    .functions      = NULL   
+};
+
+EOconstvector* eo_vectorof_descriptor_strain_eb1 = &s_eo_vectorof_des_strain_eb1;
+
+
+EOconstvector s_eo_vectorof_des_mais_eb1 = 
+{
+    .capacity       = 0,
+    .size           = 0,
+    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+    .dummy          = 0,
+    .stored_items   = NULL,
+    .functions      = NULL   
+};
+
+
+EOconstvector* eo_vectorof_descriptor_mais_eb1 = &s_eo_vectorof_des_mais_eb1;
  
+
+EOconstvector s_eo_vectorof_des_skin_eb1 = 
+{
+    .capacity       = 0,
+    .size           = 0,
+    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+    .dummy          = 0,
+    .stored_items   = NULL,
+    .functions      = NULL   
+};
+
+EOconstvector* eo_vectorof_descriptor_skin_eb1 = &s_eo_vectorof_des_skin_eb1;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions

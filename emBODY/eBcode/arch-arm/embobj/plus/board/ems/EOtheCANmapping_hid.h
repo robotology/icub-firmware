@@ -50,8 +50,13 @@ extern "C" {
  **/  
 struct EOtheCANmapping_hid 
 {
-	eOcanmap_cfg_t      config;
-    uint32_t            tobedefined;
+	eOcanmap_cfg_t                  config;
+    eOcanmap_board_extended_t***    canmapping;         // [can][adr] -> pointer to 
+    eOcanmap_board_extended_t****   entitylocation;     // [ep][ent][index]-> pointer to
+    eOcanmap_board_extended_t***    skinlocation;       // [index]-> array[] of up to 8 pointers to 
+    uint8_t                         numofskinboardsindex[eocanmap_skins_maxnumberof];
+    eOcanmap_arrayof_locations_t    arrayofboardlocations;
+    uint32_t                        tobedefined;
 };
 
 

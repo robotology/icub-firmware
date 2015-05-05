@@ -1164,12 +1164,12 @@ static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t por
     // we avoid doing the extra check that the sender address is from a mais/strain to save computations
     if((eocanprot_msgclass_pollingAnalogSensor == EOCANPROT_FRAME_GET_CLASS(frame)) && (0 == EOCANPROT_FRAME_POLLING_GET_DESTINATION(frame)))
     {
-        eOcanmap_entitylocation_t loc = {0};
-        loc.port = port;
-        loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-        loc.insideindex = eocanmap_insideindex_none;
-        const eOcanmap_canboard_t *board = eo_canmap_GetBoard(eo_canmap_GetHandle(), loc);
-        if((eobrd_cantype_strain == board->board.type) || (eobrd_cantype_mais == board->board.type))
+        eOcanmap_location_t bloc = {0};
+        bloc.port = port;
+        bloc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
+        //loc.insideindex = eocanmap_insideindex_none;
+        const eOcanmap_board_extended_t *board = eo_canmap_GetBoard(eo_canmap_GetHandle(), bloc);
+        if((eobrd_cantype_strain == board->board.props.type) || (eobrd_cantype_mais == board->board.props.type))
         {
             return(eores_OK);
         }
@@ -1195,7 +1195,7 @@ static eObool_t s_eo_canprot_isit_exception(eOcanframe_t *frame, eOcanport_t por
     // get location of mais 
     static eObool_t mais_is_present = eobool_false;
     static eObool_t mais_is_searched = eobool_false;    
-    static eOcanmap_entitylocation_t loc = {0};
+    static eOcanmap_location_t loc = {0};
     if(eobool_false == mais_is_searched)
     {   // search mais only at first execution of the function
         mais_is_searched = eobool_true;

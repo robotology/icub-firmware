@@ -274,7 +274,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanfr
     
     eOprotIndex_t index = EOK_uint08dummy;  
 
-    eOcanmap_entitylocation_t loc = {0};
+    eOcanmap_location_t loc = {0};
     loc.port            = port;
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
@@ -683,7 +683,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
     eOresult_t res = eores_OK; 
     
     // retrieve the joint related to the frame
-    eOcanmap_entitylocation_t loc = {0};
+    eOcanmap_location_t loc = {0};
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);

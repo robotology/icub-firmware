@@ -54,7 +54,7 @@
 
 // - the can mapping
 
-static const eOcanmap_canboard_t * const s_boards_can1[] =
+static const eOcanmap_board_extended_t * const s_boards_can1[] =
 {   // they must be 15
     NULL,   // the ems has address 0
     NULL,
@@ -71,9 +71,9 @@ static const eOcanmap_canboard_t * const s_boards_can1[] =
     NULL,
     NULL,
     NULL
-};  EO_VERIFYsizeof(s_boards_can1, 15*sizeof(eOcanmap_canboard_t *)); 
+};  EO_VERIFYsizeof(s_boards_can1, 15*sizeof(eOcanmap_board_extended_t *)); 
 
-static const eOcanmap_canboard_t * const s_boards_can2[] =
+static const eOcanmap_board_extended_t * const s_boards_can2[] =
 {   // they must be 15
     NULL,   // the ems has address 0
     NULL,
@@ -90,7 +90,7 @@ static const eOcanmap_canboard_t * const s_boards_can2[] =
     NULL,
     NULL,
     NULL
-};  EO_VERIFYsizeof(s_boards_can2, 15*sizeof(eOcanmap_canboard_t *));
+};  EO_VERIFYsizeof(s_boards_can2, 15*sizeof(eOcanmap_board_extended_t *));
 
 
 
@@ -113,11 +113,11 @@ static const eOcanmap_canboard_t * const s_boards_can2[] =
 
 // this variable contains the pointers of the canboards which are in the two can buses in each of the [0, 14] address
 // if no can board is present at a given address, then we have NULL.  
-eOcanmap_canboard_t * const * const eo_canmapcfg_boards[] =
+eOcanmap_board_extended_t * const * const eo_canmapcfg_boards[] =
 {   
-    (eOcanmap_canboard_t * const *)&s_boards_can1,   
-    (eOcanmap_canboard_t * const *)&s_boards_can2
-};  EO_VERIFYsizeof(eo_canmapcfg_boards, 2*sizeof(eOcanmap_canboard_t * const *));  
+    (eOcanmap_board_extended_t * const *)&s_boards_can1,   
+    (eOcanmap_board_extended_t * const *)&s_boards_can2
+};  EO_VERIFYsizeof(eo_canmapcfg_boards, 2*sizeof(eOcanmap_board_extended_t * const *));  
 
 
 // - joints
@@ -126,7 +126,7 @@ eOcanmap_canboard_t * const * const eo_canmapcfg_boards[] =
 const uint8_t eo_canmapcfg_joints_numberof = 0;
 
 // this variable contains the pointers of the boards which serve a given joint in number [0, eo_canmapcfg_joints_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_joints[] =
+const eOcanmap_board_extended_t * const eo_canmapcfg_joints[] =
 {
     NULL
 };
@@ -139,7 +139,7 @@ const eOcanmap_canboard_t * const eo_canmapcfg_joints[] =
 const uint8_t eo_canmapcfg_motors_numberof = 0;
 
 // this variable contains the pointers of the boards which serve a given motor in number [0, eo_canmapcfg_motors_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_motors[] =
+const eOcanmap_board_extended_t * const eo_canmapcfg_motors[] =
 {
     NULL
 };    
@@ -152,7 +152,7 @@ const eOcanmap_canboard_t * const eo_canmapcfg_motors[] =
 const uint8_t eo_canmapcfg_strains_numberof = 0;
 
 // this variable contains the pointers of the boards which serve a given strain in number [0, eo_canmapcfg_strains_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_strains[] =
+const eOcanmap_board_extended_t * const eo_canmapcfg_strains[] =
 {
     NULL
 };
@@ -165,7 +165,7 @@ const eOcanmap_canboard_t * const eo_canmapcfg_strains[] =
 const uint8_t eo_canmapcfg_maises_numberof = 0;
 
 // this variable contains the pointers of the boards which serve a given mais in number [0, eo_canmapcfg_maises_numberof-1]
-const eOcanmap_canboard_t * const eo_canmapcfg_maises[] =
+const eOcanmap_board_extended_t * const eo_canmapcfg_maises[] =
 {
     NULL
 };
@@ -185,7 +185,7 @@ const uint8_t eo_canmapcfg_skins_boardsinside[] =
 };
 
 // this variable contains for each skin in value [0, eo_canmapcfg_skins_numberof-1] the array of the skin boards  
-const eOcanmap_canboard_t * const * const eo_canmapcfg_skins_boards[] =
+const eOcanmap_board_extended_t * const * const eo_canmapcfg_skins_boards[] =
 {
     NULL
 };

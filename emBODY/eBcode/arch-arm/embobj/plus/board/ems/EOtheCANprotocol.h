@@ -41,10 +41,8 @@ extern "C" {
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoCommon.h"
-    
+#include "EoCommon.h"    
 #include "iCubCanProtocol.h"  
-
 #include "EOtheCANmapping.h"
 
 
