@@ -290,7 +290,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_INC:
             {
-                *primary_value = hal_quad_enc_getCounter(this_joint.primary_enc_position);
+                val_raw = hal_quad_enc_getCounter(this_joint.primary_enc_position);
+                *primary_value = val_raw & 0xFFFF;
                 res1 = eores_OK;
                 break;
             }
