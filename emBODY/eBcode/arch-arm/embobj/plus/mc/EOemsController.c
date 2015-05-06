@@ -1367,18 +1367,18 @@ void config_2FOC(uint8_t motor)
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &max_current);
 
-    #define HAS_QE      0x0001
-    #define HAS_HALL    0x0002
-    #define HAS_TSENS   0x0004
+//    #define HAS_QE      0x0001
+//    #define HAS_HALL    0x0002
+//    #define HAS_TSENS   0x0004
 
-    uint8_t motor_config[5];
-    motor_config[0] = HAS_QE|HAS_HALL;
-    *(int16_t*)(motor_config+1)=14400;
-    motor_config[3] = 1; // swapAB QE
-    motor_config[4] = 4; // num motor poles
+//    uint8_t motor_config[5];
+//    motor_config[0] = HAS_QE|HAS_HALL;
+//    *(int16_t*)(motor_config+1)=14400;
+//    motor_config[3] = 1; // swapAB QE
+//    motor_config[4] = 4; // num motor poles
 
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, motor_config);
+//    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+//    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, motor_config);
 #endif    
 }
 
