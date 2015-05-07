@@ -43,6 +43,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+#include "EOtheServices.h"
 #include "EOmcService.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -750,11 +751,90 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
             eOprot_EPcfg_t *epcfg = (eOprot_EPcfg_t*) &command->cmd.config.array[0];
             if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
             {
-                if(eobool_false == eoprot_endpoint_configured_is(eoprot_board_localboard, epcfg->endpoint))
+                if(eoprot_endpoint_motioncontrol == epcfg->endpoint)
                 {
-                    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle());
-                    eo_nvset_LoadEP(nvset, epcfg, eobool_true);                        
-                }                  
+                    //configuration & init for motion control service
+                    eOmcconfig_cfg_t mcconfig = {0};
+                    mcconfig.jomosnumber  = epcfg->numberofentities[eoprot_entity_mc_joint];
+                    
+                    //API test 1 - retrieve config from string
+                    /*
+                    {
+                    const char str[] = {"MC4Plus_experimental_jig"};
+ 
+                    eOmcconfig_value_t val = eOmcconfig_string2value(str,eOmcconfig_type_mc4plus);
+                    
+                    if (val != eOmcconfig_value_dummy)
+                    {
+                        eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val);
+                        
+                        mcconfig.type = eOmcconfig_code2type(cfg_code);
+                        
+                        const eOmcconfig_jomo_cfg_t* jm_ref = eOmcconfig_code2config(cfg_code);
+                        
+                        if (jm_ref != NULL)
+                        {
+                            //instead of memcpy it's better to cycle on the jomosnumber
+                            //with memcpy we could have problem with the last joints not set (garbage memory)
+                            memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
+                        
+                        }
+                        {
+                            // handle the error
+                            // probably sending up an error saying "Not existing configuration" is a good practice
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    }
+                    */
+                    //API test 2 - retrieve config from code
+                    
+                    //let's imagine that we have received also a code number with MC config
+                    // 1) we want to use the experimental setup, so let's create the code
+                    eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, eOmcconfig_value_MC4PLUS_experimental);
+                    
+                    // 2) extract the config type to set in the config structure
+                    mcconfig.type = eOmcconfig_code2type(cfg_code);
+                    
+                    // 3) Now extract with the code the right joints/motor config
+                    const eOmcconfig_jomo_cfg_t* jm_ref = eOmcconfig_code2config(cfg_code);
+                    
+                    if (jm_ref != NULL)
+                    {
+                         //set the active code for a common entry point to the mc config from the entire application
+                         EoMCConfigurations* mccfg = eOmcconfig_Init();
+                         eOmcconfig_Set_Active_Code(mccfg, cfg_code);
+                         //instead of memcpy it's better to cycle on the jomosnumber
+                         //with memcpy we could have problem with the last joints not set (garbage memory)
+                         memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
+                        
+                    }
+                    {
+                         // handle the error
+                         // probably sending up an error saying "Not existing configuration" is a good practice
+                    }
+                   
+                    //old working version
+                    /*
+                    mcconfig.type         = eomcserv_type_mc4plus; 
+                    // example for board 15 (MC4 Plus JIG) --> one joint controlled by one AEA encoder
+                    #warning think about how to store this information inside the project (const structure?...)
+                    mcconfig.jomos[0].actuator.local.type   = 1;        // on board
+                    mcconfig.jomos[0].actuator.local.index  = 2;        // motor 2
+                    mcconfig.jomos[0].encoder.etype         = 0;        // aea
+                    mcconfig.jomos[0].encoder.index         = 0;        // position index for low level mapping (hal)
+                    //mcconfig.jomos[0].encoder.etype         = 2;        // incremental
+                    //mcconfig.jomos[0].encoder.index         = 2;        // position index for low level mapping (hal)
+                    */
+                    
+                    //inside the MC initializer we also define the encoder reader configuration, using jomos info
+                    eo_serv_ConfigMC(eo_serv_GetHandle(), &mcconfig);  
+
+                    eo_mcserv_CheckResources(eo_mcserv_GetHandle());
+                }
             }        
         } break;
 

@@ -328,14 +328,16 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     // pulse led3 forever at 20 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);
 
+    //now is done in a callback of an eth message from pc104
+    /*
     {    
         EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
         // 1. set the board number. the value of the generic board is 99. 
         //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
         eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
     }
-    
-    
+    */
+/*    
 //    {   
 //        // marco.accame on 24 apr 2015: here is how to customise the eth protocol from a generic to a specific board
 //        // so far, we can keep it in here. but further on we shall customise one endpoint at a time in runtime.
@@ -362,29 +364,24 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 //        //eOprotBRD_t localboard = eoprot_board_local_get();
 
 //    }      
+*/    
     
-    
-
-    // start the application body   
-    //const eOemsapplbody_cfg_t *applbodycfg = &theemsapplbodycfg;   
-    //const eOemsapplbody_cfg_t * applbodycfg   = (const eOemsapplbody_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
-    //eo_emsapplBody_Initialise(applbodycfg);   
+  
     #warning -> marco.accame: put in here the main builder of the application EOapplication    
-    const eOserv_cfg_t * servicescfg   = (const eOserv_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
-    //so far is doing nothing, so we can pass NULL
-    eo_serv_Initialise(NULL);
+    eOserv_cfg_t * servicescfg   = (eOserv_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
+
+    eo_serv_Initialise(servicescfg);
     
+    //now is done in a callback of an eth message from pc104 
+    /*
     //configuration & init for motion control service
     eOmcserv_cfg_t mcconfig = {0};
-//    mcconfig.jomosnumber  = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     mcconfig.jomosnumber  = NJOMO;
-    mcconfig.type         = eomcserv_type_mc4plus;
-  
-    //memcpy(&mcconfig.encoder_reader_cfg, &servicescfg->enc_reader_cfg, sizeof(eOappEncReader_cfg_t)); 
+    mcconfig.type         = eomcserv_type_mc4plus; 
     
     // done inside the inizializer of the motion control service...or not?
     // need to clarify
-    /*
+    
     // we do it for board 13 in its simplified form: two joints
     // jomo 0
     mcconfig.jomos[0].actuator.any.type = 1;        // on board
@@ -396,7 +393,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     mcconfig.jomos[1].actuator.local.index = 1;   
     mcconfig.jomos[1].encoder.etype = 0;            // aea 
     mcconfig.jomos[1].encoder.index = 1;            // joint index inside the EoappEncoderReader joints array    
-    */
+    
     
     // example for board 15 (MC4 Plus JIG) --> one joint controlled by one AEA encoder
     mcconfig.jomos[0].actuator.local.type   = 1;        // on board
@@ -410,18 +407,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_serv_ConfigMC(eo_serv_GetHandle(), &mcconfig);  
 
     eo_mcserv_CheckResources(eo_mcserv_GetHandle());
-
-    //for test we could also send a tick event to the configurator...after 10 seconds it must go to RUN
-    //Test -- begin
-    /*
-    EOaction_strg astg = {0};
-    EOaction *action = (EOaction*)&astg;
-    EOtimer *tick_timer;
-    tick_timer = eo_timer_New();
-    eo_action_SetEvent(action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-    eo_timer_Start(tick_timer, eok_abstimeNOW, 250*eok_reltime1ms, eo_tmrmode_FOREVER, action);
     */
-    //Test -- end
 }
 
 
