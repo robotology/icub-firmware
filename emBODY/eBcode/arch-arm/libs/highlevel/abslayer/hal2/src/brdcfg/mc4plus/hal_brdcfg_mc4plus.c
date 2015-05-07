@@ -291,6 +291,17 @@ static void s_hal_brdcfg_mc4plus_vaux_5v0_off(void);
 
 // --  extra: mpu peripherals
 
+#ifdef HAL_USE_ADC
+    #include "hal_adc_hid.h"
+    extern const hal_adc_boardconfig_t hal_adc__theboardconfig =
+    {
+        .supportedmask =  (1 << hal_adc1) | (1 << hal_adc2) | (1 << hal_adc3),
+        .data_regs_addresses = { ADC1_DR_ADDRESS,
+                                 ADC2_DR_ADDRESS, 
+                                 ADC3_DR_ADDRESS
+                               }
+    };
+#endif
 #ifdef  HAL_USE_CAN
 
     
