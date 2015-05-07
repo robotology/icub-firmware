@@ -31,11 +31,38 @@
 #include "hal_common.h"
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+/** @fn         extern void hal_quad_enc_Init(void)
+    @brief      This function initialize all the quadrature encoders for the MC4 plus boards.
+                It uses the ports from P2 to P5 (included) and HW TIMERS 2 to 5.
+   @return      none
+  */
 extern void hal_quad_enc_Init(void);
 
+/** @fn         extern void hal_quad_single_init(void)
+    @brief      This function initialize the quadrature choosen as a parameter.
+    Every encoder is associated to a port and an hw timer. In particular:
+    - 0 : P2, TIM2
+    - 1 : P3, TIM3
+    - 2 : P4, TIM4
+    - 3 : P5. TIM5
+   @param       encoder_number  encoder to initialize
+   @retval      none
+  */
 extern void hal_quad_enc_single_init(uint8_t encoder_number);
 
+/** @fn         uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
+    @brief      This function returns the angular position of the encoder,
+                reading the counter of the associated timer
+   @param       encoder_number  encoder to be read
+   @retval      uint32_t        position read
+  */
 extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number);
 
+/** @fn         hal_quad_enc_reset_counter(uint8_t encoder_number)
+    @brief      This function reset the value of the timer associated to the encoder,
+                setting it to 0.
+   @param       encoder_number  encoder to be reset
+   @retval      none
+  */
 extern void hal_quad_enc_reset_counter(uint8_t encoder_number);
 #endif

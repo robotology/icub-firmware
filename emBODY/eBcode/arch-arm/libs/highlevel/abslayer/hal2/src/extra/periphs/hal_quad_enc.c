@@ -62,15 +62,6 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-/*******************************************************************************
-* Function Name  : quadrature_ie_Init
-* Description    : General Purpose Timer x set-up for encoder speed/position 
-*                  sensors
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-
 extern void hal_quad_enc_Init(void)
 {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
@@ -335,15 +326,6 @@ extern void hal_quad_enc_Init(void)
 }	
 
 }
-
-/*******************************************************************************
-* Function Name  : hal_quad_enc_getCounter
-* Description    : Returns the incremental counter  
-* Input          : None
-* Output         : None
-* Return         : incremental counter
-
-*******************************************************************************/
 extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
 {
   uint32_t temp;
