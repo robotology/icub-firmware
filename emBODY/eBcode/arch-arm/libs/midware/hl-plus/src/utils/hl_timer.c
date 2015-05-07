@@ -849,7 +849,17 @@ void TIM9_IRQHandler(void)
     {
         TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
         s_hl_timer_callback(hl_timer9);
-    }   
+    }
+    if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
+    {
+        /*
+        hal_motor_disable(motor1);
+        hal_motor_disable(motor2); 
+        hal_motor_disable(motor3);
+        hal_motor_disable(motor4);
+        */
+        TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+    }
 }
 #else
     #warning HL says: user, you must define your own TIM1_BRK_TIM9_IRQHandler()
@@ -876,6 +886,17 @@ void TIM12_IRQHandler(void)
         TIM_ClearITPendingBit(TIM12, TIM_IT_Update);
         s_hl_timer_callback(hl_timer12);
     }
+    
+    if(SET == TIM_GetFlagStatus(TIM8, TIM_FLAG_Break))
+    {
+        /*
+        hal_motor_disable(motor1);
+        hal_motor_disable(motor2);
+        hal_motor_disable(motor3);
+        hal_motor_disable(motor4);
+        */
+        TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
+    }      
 }
 #else
     #warning HL says: user, you must define your own TIM8_BRK_TIM12_IRQHandler()
