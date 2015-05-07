@@ -138,10 +138,11 @@ typedef enum
     hal_gpio_dirINP  = 0,       /**< Input direction                */
     hal_gpio_dirOUT  = 1,       /**< Output direction               */
     hal_gpio_dirALT  = 2,       /**< Alternate mode configuration   */
+    hal_gpio_dirAN   = 3,       /**< Analog mode configuration   */
     hal_gpio_dirNONE = 255,     /**< use when no direction can be specified. it does not count in hal_gpio_speeds_number */
 } hal_gpio_dir_t;
 
-enum { hal_gpio_dirs_number = 3 };
+enum { hal_gpio_dirs_number = 4 };
  
  
 /** @typedef    typedef enum hal_gpio_val_t 

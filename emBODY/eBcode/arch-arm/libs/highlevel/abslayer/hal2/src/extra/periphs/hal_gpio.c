@@ -320,6 +320,14 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         .gpio_otype = GPIO_OType_PP, 
         .gpio_pupd  = GPIO_PuPd_NOPULL    
     };
+    const hl_gpio_initmode_fx_t gpiomodeAN =
+    {
+        .gpio_pins  = 0,
+        .gpio_mode  = GPIO_Mode_AN,
+        .gpio_speed = GPIO_Speed_2MHz,  
+        .gpio_otype = GPIO_OType_PP, 
+        .gpio_pupd  = GPIO_PuPd_NOPULL    
+    };
 #else //defined(HAL_USE_MPU_TYPE_*)
     #error ERR --> choose a HAL_USE_MPU_TYPE_*
 #endif
@@ -349,7 +357,18 @@ static hal_result_t s_hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin, ha
         }        
         s_hal_gpio_output_clear(port, pin);
     }
-
+    
+    else if(hal_gpio_dirAN == dir)
+    {
+        memcpy(&gpioinit.mode, &gpiomodeAN, sizeof(gpiomodeAN));
+        gpioinit.mode.gpio_pins     = pin;
+        
+        if(hl_res_OK != hl_gpio_init(&gpioinit))
+        {
+            return(hal_res_NOK_generic);
+        }        
+        s_hal_gpio_output_clear(port, pin);
+    }
  
     s_hal_gpio_initted_set(port, pin);
     
