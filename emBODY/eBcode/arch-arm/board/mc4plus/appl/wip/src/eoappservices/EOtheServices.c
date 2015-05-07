@@ -100,7 +100,7 @@ extern EOtheServices* eo_serv_GetHandle(void)
 }
 
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcserv_cfg_t *mccfg)
+extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg)
 {
 //    eOresult_t res = eores_OK;
     
