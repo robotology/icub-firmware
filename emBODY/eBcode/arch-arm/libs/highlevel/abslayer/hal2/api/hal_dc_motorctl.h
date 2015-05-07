@@ -67,10 +67,10 @@
 
 /****	 Pattern type is edge aligned  ****/
 
-	#define PWM_PRSC ((uint8_t)0)
+#define PWM_PRSC ((uint8_t)0)
 
-        /* Resolution: 1Hz */                            
-	#define PWM_PERIOD ((uint16_t) (CKTIM / (uint32_t)(1 * PWM_FREQ *(PWM_PRSC+1)))) 
+/* Resolution: 1Hz */                            
+#define PWM_PERIOD ((uint16_t) (CKTIM / (uint32_t)(1 * PWM_FREQ *(PWM_PRSC+1)))) 
 
 #define PWM_MINDUTY 20
 /****	ADC IRQ-HANDLER frequency, related to PWM  ****/
@@ -78,8 +78,8 @@
                       //             (REP_RATE + 1)/(2*PWM_PERIOD) seconds.     
 					     
 ////////////////////////////// MOTOR DEADTIME Value /////////////////////////////////
-	#define MOTOR_DEADTIME  (uint16_t)((unsigned long long)CKTIM/2 \
-          *(unsigned long long)DEADTIME_NS/1000000000uL)  
+#define MOTOR_DEADTIME  (uint16_t)((unsigned long long)CKTIM/2 \
+                        *(unsigned long long)DEADTIME_NS/1000000000uL)  
 						
 /** @typedef    typedef enum hal_motor_t 
     @brief      hal_pwm_status_t contains the states of the pwm peripheral.
@@ -163,7 +163,7 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg);
 				 
     @details    On ARM-STM32 architecture, the registers of the timers are 16 bits, and holds bot the counter and the prescaler.
                 As a result, the precision and maximum range is chosen as follows: (prec, max) = (1000 us, 6400ms), 
-                (100 us, 640ms), (10 us, 64ms), (1 us, 8ms). 
+                (100us us, 640ms), (10 us, 64ms), (1 us, 8ms). 
     @param      motor           The motor to initialise. 
     @param      cfg             The configuration. It cannot be NULL.
 
@@ -230,6 +230,9 @@ extern hal_result_t hal_pwm_interrupt_disable(hal_motor_t id);
 
 
 extern int16_t hal_motor_pwmget(hal_motor_t id);
+
+extern hal_result_t hal_motor_enable(hal_motor_t id);
+extern hal_result_t hal_motor_disable(hal_motor_t id);
 /** @}            
     end of group doxy_group_hal_pwm  
  **/
