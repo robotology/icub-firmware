@@ -42,7 +42,7 @@
 struct EOmcService_hid
 {
     eObool_t            initted;
-    eOmcserv_cfg_t      config;
+    eOmcconfig_cfg_t    config;
     eObool_t            resourcesareready;
     eOmc_joint_t**      thejoints;
     eOmc_motor_t**      themotors;

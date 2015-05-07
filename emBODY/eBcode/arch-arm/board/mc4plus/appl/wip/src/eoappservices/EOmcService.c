@@ -95,7 +95,7 @@ static EOmcService s_eo_mcserv =
     .initted                = eobool_false,
     .config                 = 
     {
-        .type               = eomcserv_type_undefined,
+        .type               = eOmcconfig_type_undefined,
         .jomosnumber        = 0
     },
     .resourcesareready      = eobool_false,
@@ -115,7 +115,7 @@ static EOmcService s_eo_mcserv =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOmcService* eo_mcserv_Initialise(eOmcserv_cfg_t *cfg)
+extern EOmcService* eo_mcserv_Initialise(eOmcconfig_cfg_t *cfg)
 {
     if(NULL == cfg)
     {
@@ -123,14 +123,23 @@ extern EOmcService* eo_mcserv_Initialise(eOmcserv_cfg_t *cfg)
     }
     
     // remove later on
-    if(eomcserv_type_mc4plus != cfg->type)
+    if(eOmcconfig_type_mc4plus != cfg->type)
     {
         return(NULL);
-    }    
+    }  
+
+    if(eobool_true == s_eo_mcserv.initted)
+    {
+        return(&s_eo_mcserv);
+    }        
     
-    memcpy(&s_eo_mcserv.config, cfg, sizeof(eOmcserv_cfg_t));
+    memcpy(&s_eo_mcserv.config, cfg, sizeof(eOmcconfig_cfg_t));
     
-    s_eo_mcserv_protocol_load_mc_endpoint(&s_eo_mcserv);
+    
+    if(eobool_false == eoprot_endpoint_configured_is(eoprot_board_localboard, eoprot_endpoint_motioncontrol))
+    {    
+        s_eo_mcserv_protocol_load_mc_endpoint(&s_eo_mcserv);
+    }
     
     s_eo_mcserv_init_jomo(&s_eo_mcserv);
        
@@ -146,7 +155,7 @@ extern EOmcService* eo_mcserv_GetHandle(void)
     {
         return(NULL);
     }
-    return(&s_eo_mcserv);
+    return(&s_eo_mcserv); 
 }
 
 extern uint8_t eo_mcserv_NumberOfJoints(EOmcService *p)
@@ -190,6 +199,16 @@ extern eOmc_motor_t* eo_mcserv_GetMotor(EOmcService *p, uint8_t index)
     return(p->themotors[index]);   
 }
 
+extern eOmcconfig_cfg_t* eo_mcserv_GetMotionControlConfig (EOmcService *p)
+{
+    if((NULL == p) || p->initted != eobool_true)
+    {
+        return(NULL);
+    }
+    
+    return(&p->config);    
+}
+
 extern eOresult_t eo_mcserv_CheckResources(EOmcService *p)
 {
     eOresult_t res = eores_NOK_generic;
@@ -199,20 +218,25 @@ extern eOresult_t eo_mcserv_CheckResources(EOmcService *p)
         return(eores_NOK_nullpointer);
     }
     
+    if(eobool_true == p->resourcesareready)
+    {
+        return eores_OK;
+    }
+    
     switch(p->config.type)
     {
-        case eomcserv_type_mc4plus:
+        case eOmcconfig_type_mc4plus:
         {
             // nothing to verify, .... so far. we thus set everything to ready, so taht eo_mcserv_AreResourcesReady() can returns true.
             p->resourcesareready = eobool_true;
             res = eores_OK;        
         } break;
-        case eomcserv_type_mc4can:
+        case eOmcconfig_type_mc4can:
         {
             // must start the discovery procedure for mc4 boards and mais on can bus.
             res = s_eo_mcserv_can_discovery_start(p);     
         } break;   
-        case eomcserv_type_2foc:
+        case eOmcconfig_type_2foc:
         {
             // must start the discovery procedure for mc4 boards and mais on can bus.
             res = s_eo_mcserv_can_discovery_start(p);     
@@ -257,19 +281,19 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
     
     switch(p->config.type)
     {
-        case eomcserv_type_mc4plus:
+        case eOmcconfig_type_mc4plus:
         {
             // must start the first reading of encoders and ... enable teh joints and ........
             #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
             eo_appEncReader_StartRead(p->thelocalencoderreader);
             res = eores_OK;            
         } break;
-        case eomcserv_type_mc4can:
+        case eOmcconfig_type_mc4can:
         {
             // must send the broadcast policy to mc4 ... what else
             res = eores_OK;     
         } break;   
-        case eomcserv_type_2foc:
+        case eOmcconfig_type_2foc:
         {
             // must start the first reading of encoders and ... enable teh joints and ........ 
             #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
@@ -296,19 +320,19 @@ extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
     
     switch(p->config.type)
     {
-        case eomcserv_type_mc4plus:
+        case eOmcconfig_type_mc4plus:
         {
             #warning TBD: read all the encoders, compute pwm, send pwm to hal peripheral, update joint-motor status
             res = s_eo_mcserv_do_mc4plus(p);      
         } break;
-        case eomcserv_type_mc4can:
+        case eOmcconfig_type_mc4can:
         {
             // must perform motion done and send virtual strain values
             // for motiondone, you could implement some functions: motiondone_init() called at entry on run, motiondone_tick() called in here.
             // the same for virtualstrain.
             res = eores_OK;     
         } break;   
-        case eomcserv_type_2foc:
+        case eOmcconfig_type_2foc:
         {
             // must start the first reading of encoders and ... enable teh joints and ........ 
             res = eores_OK;     
@@ -336,17 +360,17 @@ extern eOresult_t eo_mcserv_Stop(EOmcService *p)
     
     switch(p->config.type)
     {
-        case eomcserv_type_mc4plus:
+        case eOmcconfig_type_mc4plus:
         {
             #warning TBD: maybe stop pwm , disable teh joints and ??? see what 2foc does 
             res = eores_OK;        
         } break;
-        case eomcserv_type_mc4can:
+        case eOmcconfig_type_mc4can:
         {
             // must send the broadcast policy to mc4 ... what else
             res = eores_OK;     
         } break;   
-        case eomcserv_type_2foc:
+        case eOmcconfig_type_2foc:
         {
             // must disable the joints and ........ 
             res = eores_OK;     
@@ -421,7 +445,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     }
     
     // ems controller. it is used only in some control types
-    if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
+    if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
     {
         p->thelocalcontroller = eo_emsController_Init(p->config.jomosnumber);        
     }
@@ -432,7 +456,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     
    
     // encoder reader
-    if((eomcserv_type_2foc == p->config.type) || (eomcserv_type_mc4plus == p->config.type))
+    if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
     {
         // reserve some memory used by encoder reader to store values        
         p->valuesencoder = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint32_t), p->config.jomosnumber);
@@ -457,7 +481,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         encoder_reader_cfg.SPI_callbackOnLastRead = NULL, encoder_reader_cfg.SPI_callback_arg = NULL;
         encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof = 0, encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof = 0;
         
-        eOmcserv_jomo_cfg_t current_jomo = {0};
+        eOmcconfig_jomo_cfg_t current_jomo = {0};
         uint8_t enc_joint_index = 0, etype = 0;
         for(jm=0; jm<p->config.jomosnumber; jm++)
         {
@@ -508,7 +532,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     
     for(jm=0; jm<p->config.jomosnumber; jm++)
     {
-        if(1 == p->config.jomos[jm].actuator.any.type)
+        if(1 == p->config.jomos[jm].actuator.local.type)
         {   // on board
             #warning TBD: init the hal pwm
             uint8_t pwm = p->config.jomos[jm].actuator.local.index;

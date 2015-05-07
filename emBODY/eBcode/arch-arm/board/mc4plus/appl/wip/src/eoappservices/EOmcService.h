@@ -42,6 +42,8 @@
 #include "EoAnalogSensors.h"
 #include "EoSkin.h"
 
+#include "EoMCConfigurations.h"
+
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
@@ -49,95 +51,13 @@
 
 typedef struct EOmcService_hid EOmcService;
 
-typedef enum
-{
-    eomcserv_type_undefined     = 0,
-    eomcserv_type_2foc          = 1,
-    eomcserv_type_mc4can        = 2,
-    eomcserv_type_mc4plus       = 3        
-} eOmcserv_type_t;
-
-typedef struct
-{   // mapped as eOcanmap_entitylocation_t
-    uint8_t     port    : 1;        // 0 is can1, 1 is can2. not used if onboard is 1.
-    uint8_t     addr    : 4;        // if onboard is 1, then it is the index used by hal, otherwise the can address
-    uint8_t     insideindex : 2;    // in case of can it is the inside index (0 or 1) of where the motor/joint is. otherwise it is 2
-    uint8_t     onboard : 1;        // if 1 is onboard pwm otherwise is on can
-} eOmcserv_pwm_mapping_t;
-
-
-typedef struct
-{  
-    uint8_t     dummy0   : 1;       
-    uint8_t     index    : 4;       // it is the index used by hal,
-    uint8_t     dummy1   : 2;       
-    uint8_t     type     : 1;       // if 1 is local otherwise is on can
-} eOmcserv_act_local_mapping_t;
-
-
-typedef struct
-{   // mapped as eOcanmap_entitylocation_t
-    uint8_t     port    : 1;        // 0 is can1, 1 is can2. not used if onboard is 1.
-    uint8_t     addr    : 4;        // if onboard is 1, then it is the index used by hal, otherwise the can address
-    uint8_t     insideindex : 2;    // in case of can it is the inside index (0 or 1) of where the motor/joint is. otherwise it is 2
-    uint8_t     type    : 1;        // if 1 is onboard  otherwise is on can
-} eOmcserv_act_oncan_mapping_t;
-
-typedef struct
-{   // mapped as eOcanmap_entitylocation_t
-    uint8_t     dummy   : 7;       
-    uint8_t     type    : 1;         // if 1 is onboard  otherwise is on can
-} eOmcserv_act_any_mapping_t;
-
-typedef union
-{   // mapped as eOcanmap_entitylocation_t
-    eOmcserv_act_any_mapping_t      any;
-    eOmcserv_act_local_mapping_t    local;
-    eOmcserv_act_oncan_mapping_t    oncan;    
-} eOmcserv_act_mapping_t;           EO_VERIFYsizeof(eOmcserv_act_mapping_t, 1); 
-
-typedef struct
-{
-    uint8_t     etype       : 4;      // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc. 
-    uint8_t     index       : 4;      // 0, 1, 2, 3, 4, etc where the number is referred to the hal enum specified by the type.
-    uint8_t     enc_joint   : 3;      // 0...6 joint index referred to the joints list inside the eoappencodersreader
-    uint8_t     dummy       : 5;
-    // example: aea encoder on port p6 or the ems is etype=0, index=0
-} eOmcserv_enc_mapping_t;
-//we'll need also an external mapping (encoder on CAN, e.g MAIS) but we'll resolve it later on
-
-/*
-typedef struct
-{
-    uint8_t     etype           : 4;    // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc. 
-    uint8_t     local_index     : 4;    // 0, 1, 2, 3, 4, etc where the number is referred to the EOappEncodersReader numbering
-    uint8_t     external_index  : 4;    // 0, 1, 2, 3, 4, etc where the number is referred to the CAN index from which the values is collected.
-    uint8_t     dummy           : 4;         
-} eOmcserv_enc_mapping_t;
-*/
-typedef struct
-{
-    eOmcserv_enc_mapping_t      encoder;   
-    eOmcserv_act_mapping_t      actuator; 
-} eOmcserv_jomo_cfg_t;          EO_VERIFYsizeof(eOmcserv_jomo_cfg_t, 3);
-
-enum { eomcserv_jomo_maxnumberof = 12 };
-
-typedef struct
-{
-    eOmcserv_type_t         type;
-    uint8_t                 jomosnumber; // so far we have number of motors = number of joints 
-    uint16_t                ffu;
-    eOmcserv_jomo_cfg_t     jomos[eomcserv_jomo_maxnumberof];
-} eOmcserv_cfg_t;           //EO_VERIFYsizeof(eOmcserv_cfg_t, 28);
-
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOmcService* eo_mcserv_Initialise(eOmcserv_cfg_t *cfg);
+extern EOmcService* eo_mcserv_Initialise(eOmcconfig_cfg_t *cfg);
 
 extern EOmcService* eo_mcserv_GetHandle(void);
 
@@ -150,6 +70,8 @@ extern eOmc_joint_t* eo_mcserv_GetJoint(EOmcService *p, uint8_t index);
 extern uint8_t eo_mcserv_NumberOfMotors(EOmcService *p);
 
 extern eOmc_motor_t* eo_mcserv_GetMotor(EOmcService *p, uint8_t index);
+
+extern eOmcconfig_cfg_t* eo_mcserv_GetMotionControlConfig (EOmcService *p);
 
 
 
