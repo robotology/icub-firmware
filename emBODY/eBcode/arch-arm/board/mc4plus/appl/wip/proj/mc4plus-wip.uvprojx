@@ -366,7 +366,7 @@
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\src\eoappservices\mc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -908,37 +908,37 @@
             <File>
               <FileName>EOaxisController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOaxisController.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOaxisController.c</FilePath>
             </File>
             <File>
               <FileName>EOdecoupler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOdecoupler.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOdecoupler.c</FilePath>
             </File>
             <File>
               <FileName>EOemsController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOemsController.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOpid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOpid.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOspeedmeter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOspeedmeter.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtrajectory.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOtrajectory.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOemsController.c</FilePath>
             </File>
             <File>
               <FileName>EOemsControllerCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOemsControllerCfg.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOemsControllerCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOpid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\mc\EOpid.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOspeedmeter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\mc\EOspeedmeter.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtrajectory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\mc\EOtrajectory.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2079,37 +2079,37 @@
             <File>
               <FileName>EOaxisController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOaxisController.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOaxisController.c</FilePath>
             </File>
             <File>
               <FileName>EOdecoupler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOdecoupler.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOdecoupler.c</FilePath>
             </File>
             <File>
               <FileName>EOemsController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOemsController.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOpid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOpid.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOspeedmeter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOspeedmeter.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtrajectory.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOtrajectory.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOemsController.c</FilePath>
             </File>
             <File>
               <FileName>EOemsControllerCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOemsControllerCfg.c</FilePath>
+              <FilePath>..\src\eoappservices\mc\EOemsControllerCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOpid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\mc\EOpid.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOspeedmeter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\mc\EOspeedmeter.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtrajectory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\mc\EOtrajectory.c</FilePath>
             </File>
           </Files>
         </Group>

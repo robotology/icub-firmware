@@ -1589,7 +1589,7 @@
 
   <Group>
     <GroupName>eo-motor-controller</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1601,7 +1601,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOaxisController.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\mc\EOaxisController.c</PathWithFileName>
       <FilenameWithoutPath>EOaxisController.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1614,7 +1614,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOdecoupler.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\mc\EOdecoupler.c</PathWithFileName>
       <FilenameWithoutPath>EOdecoupler.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1627,7 +1627,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOemsController.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\mc\EOemsController.c</PathWithFileName>
       <FilenameWithoutPath>EOemsController.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1640,8 +1640,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOpid.c</PathWithFileName>
-      <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\mc\EOemsControllerCfg.c</PathWithFileName>
+      <FilenameWithoutPath>EOemsControllerCfg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1653,8 +1653,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOspeedmeter.c</PathWithFileName>
-      <FilenameWithoutPath>EOspeedmeter.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\mc\EOpid.c</PathWithFileName>
+      <FilenameWithoutPath>EOpid.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1666,8 +1666,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOtrajectory.c</PathWithFileName>
-      <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\mc\EOspeedmeter.c</PathWithFileName>
+      <FilenameWithoutPath>EOspeedmeter.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1679,8 +1679,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\mc\EOemsControllerCfg.c</PathWithFileName>
-      <FilenameWithoutPath>EOemsControllerCfg.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\mc\EOtrajectory.c</PathWithFileName>
+      <FilenameWithoutPath>EOtrajectory.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
