@@ -51,13 +51,8 @@ extern int32_t joint2ticksperrevolution (uint8_t joint_n)
 {
     if (joint_n >= MAX_NAXLES)
         return 0;
-    
-    EoMCConfigurations* mccfg_ptr = eOmcconfig_GetHandle();
-    
-    if (mccfg_ptr == NULL)
-        return 0;
-    
-    eOmcconfig_code_t code = Get_Active_Code(mccfg_ptr);
+        
+    eOmcconfig_code_t code = eOmcconfig_Get_Active_Code();
     if (code == eOmcconfig_code_dummy)
         return 0;
     
@@ -78,12 +73,7 @@ extern eo_appEncReader_enc_type_t joint2encodertype (uint8_t joint_n)
     if (joint_n >= MAX_NAXLES)
         return eo_appEncReader_enc_type_NONE;
     
-    EoMCConfigurations* mccfg_ptr = eOmcconfig_GetHandle();
-    
-    if (mccfg_ptr == NULL)
-        return 0;
-    
-    eOmcconfig_code_t code = Get_Active_Code(mccfg_ptr);
+    eOmcconfig_code_t code = eOmcconfig_Get_Active_Code();
     if (code == eOmcconfig_code_dummy)
         return 0;
     

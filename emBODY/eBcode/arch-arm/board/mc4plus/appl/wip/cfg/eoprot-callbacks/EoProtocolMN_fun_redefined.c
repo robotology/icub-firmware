@@ -805,8 +805,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                     if (jm_ref != NULL)
                     {
                          //set the active code for a common entry point to the mc config from the entire application
-                         EoMCConfigurations* mccfg = eOmcconfig_Init();
-                         eOmcconfig_Set_Active_Code(mccfg, cfg_code);
+                         eOmcconfig_Set_Active_Code(cfg_code);
                          //instead of memcpy it's better to cycle on the jomosnumber
                          //with memcpy we could have problem with the last joints not set (garbage memory)
                          memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
