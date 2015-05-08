@@ -37,7 +37,6 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-#warning TBD: add the encoderreader object pointer in here.
 // evaluate to save memory by changing the arrays in pointers
 struct EOmcService_hid
 {
@@ -47,7 +46,7 @@ struct EOmcService_hid
     eOmc_joint_t**      thejoints;
     eOmc_motor_t**      themotors;
     EOemsController*    thelocalcontroller;
-    void*               thelocalencoderreader;
+    EOappEncReader*     thelocalencoderreader;
     uint32_t*           valuesencoder;
     int16_t*            valuespwm;
 }; 

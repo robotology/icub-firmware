@@ -103,7 +103,11 @@ extern "C" {
 #else
     #error invalid board
 #endif
- 
+
+#ifdef DONT_USE_2FOC
+    #undef USE_2FOC_FAST_ENCODER
+#endif
+
 // utilities
     
 #define SET_BITS(mask,bits) mask |=  (bits)

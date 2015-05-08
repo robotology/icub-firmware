@@ -540,7 +540,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         }
     }
     //currently the motors are initialized all together and without config
-    hal_motor_and_adc_init(0, NULL);
+    hal_motor_and_adc_init(motor1, NULL);
     
     return(res);
 }
