@@ -71,7 +71,7 @@
 #define FOC_ADDRCAN_1_BID       0
 #define FOC_ADDRCAN_2_BID       1
 
-#if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )
+#if     defined(ICUB_DARMSTADT01)
     #define STRAIN_ADDRCAN_1_BID   2
 #endif
 
@@ -90,7 +90,7 @@ static const eOappTheDB_canboardinfo_t s_cfg_appDB_boards[] =
         .type           = eobrd_cantype_1foc,
         .canprotversion = {.major = 1, .minor = 2}
     }
-#if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )       
+#if     defined(ICUB_DARMSTADT01)   
     ,{// 2 == STRAIN_ADDRCAN_1_BID
         .port           = eOcanport2,
         .addr           = 1,
@@ -171,7 +171,7 @@ extern const EOconstvector* const eo_cfg_appDB_themaises_mapping2canboards = &s_
 
 // - in here we have the mapping of the strain sensors into a given can board
 
-#if     ( defined(ICUB_DARMSTADT01) || (emBODYrobot_ROBOT_NAME == iCubDarmstadt01) )
+#if     defined(ICUB_DARMSTADT01)
 static const eOappTheDB_mapping2canboard_t  s_cfg_appDB_snsrStrain[] =
 {
     {// 0
