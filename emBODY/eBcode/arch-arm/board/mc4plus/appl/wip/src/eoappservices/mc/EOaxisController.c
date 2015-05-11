@@ -619,7 +619,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     
                     eo_axisController_SetCalibrated (o);
                     o->control_mode = eomc_controlmode_position;
-                    
+                    // acemor: define how to go back                    
                     //Set position reference and return
                     eo_axisController_SetPosRef(o, 0, (pos-0)/2); //how to know the right return position and velocity?
                     return 0;
