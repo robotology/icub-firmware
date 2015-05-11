@@ -77,20 +77,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          72
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          73
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2015
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          11
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          13
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          25
 //  </h>build date
 
 // </h>Info 
@@ -635,7 +635,7 @@ extern "C" {
 
 //  <o> task stack size <256-8192:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   7168
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   8192
 
 //  </h>Configurator object configuration
 
@@ -646,7 +646,7 @@ extern "C" {
 //  <i> default: 40
 #define EOMTHEEMSAPPLCFG_ERROBJ_TASK_PRIORITYof   40
 
-//  <o> task stack size <256-2048:128>
+//  <o> task stack size <256-4096:128>
 //  <i> default: 512
 #define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   2048
 
@@ -674,17 +674,17 @@ extern "C" {
 
 //  <h> stack sizes 
 
-//  <o> RX task stack size <256-2048:128>
+//  <o> RX task stack size <256-4096:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   2048
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   3072
 
-//  <o> DO task stack size <256-2048:128>
+//  <o> DO task stack size <256-4096:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof   1024
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof   2048
 
-//  <o> TX task stack size <256-2048:128>
+//  <o> TX task stack size <256-4096:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   2048
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   3072
 
 //  </h>stack sizes
 
