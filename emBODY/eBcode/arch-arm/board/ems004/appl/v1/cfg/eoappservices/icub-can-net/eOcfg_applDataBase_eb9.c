@@ -80,13 +80,13 @@ static const eOappTheDB_canboardinfo_t s_cfg_appDB_boards[] =
 {
     { // 0 == FOC_ADDRCAN_1_BID 
         .port           = eOcanport1,
-        .addr           = 2,
+        .addr           = 1,
         .type           = eobrd_cantype_1foc,
         .canprotversion = {.major = 1, .minor = 2}
     },
     { // 1 == FOC_ADDRCAN_2_BID 
         .port           = eOcanport1,
-        .addr           = 1,
+        .addr           = 2,
         .type           = eobrd_cantype_1foc,
         .canprotversion = {.major = 1, .minor = 2}
     }
