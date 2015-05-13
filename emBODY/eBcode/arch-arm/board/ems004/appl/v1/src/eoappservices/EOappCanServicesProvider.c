@@ -529,16 +529,16 @@ extern eOresult_t eo_appCanSP_GetNumOfRecCanframe(EOappCanSP *p, eOcanport_t can
 }
 
 
-extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofTXcanframe)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
+//extern eOresult_t eo_appCanSP_GetNumOfTxCanframe(EOappCanSP *p, eOcanport_t canport, uint8_t *numofTXcanframe)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
 
-    // here not check if numofRXcanframe is null because hal function already do it.   
-    return((eOresult_t)hal_can_out_get((hal_can_port_t)canport, numofTXcanframe));
-}
+//    // here not check if numofRXcanframe is null because hal function already do it.   
+//    return((eOresult_t)hal_can_out_get((hal_can_port_t)canport, numofTXcanframe));
+//}
 
 
 extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t runmode)
@@ -573,153 +573,155 @@ extern eOresult_t eo_appCanSP_SetRunMode(EOappCanSP *p, eo_appCanSP_runMode_t ru
     return(eores_OK);
 }
 
-extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t canport, eOboolvalues_t waitflag)
-{
-    uint8_t                 numofoutframe = 0;
-    eOresult_t              res = eores_OK;
-    hal_result_t            halres;
+//extern eOresult_t eo_appCanSP_StartTransmitCanFrames(EOappCanSP *p, eOcanport_t canport, eOboolvalues_t waitflag)
+//{
+//    uint8_t                 numofoutframe = 0;
+//    eOresult_t              res = eores_OK;
+//    hal_result_t            halres;
 
 
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
 
-    hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;  
-     
+//    hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;  
+//     
 
-    // disa tx
-    hal_sys_irqn_disable(irqn);
-    
-    // get num of can frame in out queue
-    hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
+//    // disa tx
+//    hal_sys_irqn_disable(irqn);
+//    
+//    // get num of can frame in out queue
+//    hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
 
-    if((waitflag) && (numofoutframe > 0))     // prepare data for wait sending can frame
-    {
-        p->waittxdata[canport].waitenable = eobool_true;
-    }
-    p->waittxdata[canport].numoftxframe2send = numofoutframe;
+//    if((waitflag) && (numofoutframe > 0))     // prepare data for wait sending can frame
+//    {
+//        p->waittxdata[canport].waitenable = eobool_true;
+//    }
+//    p->waittxdata[canport].numoftxframe2send = numofoutframe;
 
-    // ena tx
-    hal_sys_irqn_enable(irqn);
+//    // ena tx
+//    hal_sys_irqn_enable(irqn);
 
-    
-    if(0 != numofoutframe)
-    {
-        halres = hal_can_transmit((hal_can_port_t)canport);
-        res = (hal_res_OK == halres) ? (eores_OK):(eores_NOK_generic);
-    }
-    
-    return(res);
-}
-
-
-extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport)
-{
-    osal_result_t osal_res;
-    
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(p->waittxdata[canport].waitenable == eobool_false)
-    {
-        return(eores_NOK_nodata);
-    }
-    
-    
-    //#warning marco.accame: put a timeout of 5 ms (before it was infinite)
-    osal_result_t osalres = osal_semaphore_decrement(p->run_data.semafori[canport], 5*osal_reltime1ms);
-    
-    if(osal_res_OK != osalres)
-    {
-        // manage error
-        eOerrmanDescriptor_t errdes = {0};        
-        uint8_t sizeoftxfifo = 0;
-        hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);       
-        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-        errdes.par16                = 0x0002;
-        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
-        errdes.par64                = 0; // dont knw what to send up
-        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-        errdes.sourceaddress        = 0;                         
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
-    }    
-    
-    
-    // if i'm here i wake up
-    hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;
-   
-    //disa tx
-    hal_sys_irqn_disable(irqn);
-    
-    p->waittxdata[canport].waitenable = eobool_false;
-    p->waittxdata[canport].numoftxframe2send = 0;
-    
-    //ena tx
-    hal_sys_irqn_enable(irqn);
-    
-    return((eOresult_t)osal_res);
-
-}
-
-extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t canport)
-{
-    uint8_t numofoutframe = 0;
-    uint8_t after = 0;
-
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
+//    
+//    if(0 != numofoutframe)
+//    {
+//        halres = hal_can_transmit((hal_can_port_t)canport);
+//        res = (hal_res_OK == halres) ? (eores_OK):(eores_NOK_generic);
+//    }
+//    
+//    return(res);
+//}
 
 
-    hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;
+//extern eOresult_t eo_appCanSP_WaitTransmitCanFrames(EOappCanSP *p, eOcanport_t canport)
+//{
+//    osal_result_t osal_res;
+//    
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
 
-    // disa tx
-    hal_sys_irqn_disable(irqn);
-    
-    p->waittxdata[canport].waitenable = eobool_true;
-    
-    // get num of can frame in out queue
-    hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
-    p->waittxdata[canport].numoftxframe2send = numofoutframe;
-    // ena tx
-    hal_sys_irqn_enable(irqn);
-    
-    hal_can_transmit((hal_can_port_t)canport);
-    
-    //#warning marco.accame: put a timeout of 5 ms (before it was infinite)
-    osal_result_t osalres = osal_semaphore_decrement(p->waittxdata[canport].semaphore, 5*osal_reltime1ms);
-    
-    if(osal_res_OK != osalres)
-    {
-        // manage error        
-        eOerrmanDescriptor_t errdes = {0};
-        uint8_t sizeoftxfifo = 0;
-        hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
-        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
-        errdes.par16                = 0x0003;
-        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
-        errdes.par64                = 0; // dont knw what to send up
-        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-        errdes.sourceaddress        = 0;                  
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
-    }
-    
-    // if i'm here i just wake up
-    hal_sys_irqn_disable(irqn);
-    p->waittxdata[canport].waitenable = eobool_false;    
-    hal_can_out_get((hal_can_port_t)canport, &after);
-  
-    
-    hal_sys_irqn_enable(irqn);
+//    if(p->waittxdata[canport].waitenable == eobool_false)
+//    {
+//        return(eores_NOK_nodata);
+//    }
+//    
+//    
+//    //#warning marco.accame: put a timeout of 5 ms (before it was infinite)
+//    osal_result_t osalres = osal_semaphore_decrement(p->run_data.semafori[canport], 5*osal_reltime1ms);
+//    
+//    if(osal_res_OK != osalres)
+//    {
+//        // manage error
+//        eOerrmanDescriptor_t errdes = {0};        
+//        uint8_t sizeoftxfifo = 0;
+//        hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);       
+//        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
+//        errdes.par16                = 0x0002;
+//        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+//        errdes.par64                = 0; // dont knw what to send up
+//        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//        errdes.sourceaddress        = 0;                         
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
+//    }    
+//    
+//    
+//    // if i'm here i wake up
+//    hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;
+//   
+//    //disa tx
+//    hal_sys_irqn_disable(irqn);
+//    
+//    p->waittxdata[canport].waitenable = eobool_false;
+//    p->waittxdata[canport].numoftxframe2send = 0;
+//    
+//    //ena tx
+//    hal_sys_irqn_enable(irqn);
+//    
+//    return((eOresult_t)osal_res);
 
-    return(eores_OK);
-    
-}
+//}
 
+//extern eOresult_t eo_appCanSP_StartTransmitAndWait(EOappCanSP *p, eOcanport_t canport)
+//{
+//    uint8_t numofoutframe = 0;
+//    uint8_t after = 0;
+
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+
+
+//    hal_irqn_t irqn = (eOcanport1 == canport)? EOAPPCANSP_CAN1_TX_IRQN : EOAPPCANSP_CAN2_TX_IRQN;
+
+//    // disa tx
+//    hal_sys_irqn_disable(irqn);
+//    
+//    p->waittxdata[canport].waitenable = eobool_true;
+//    
+//    // get num of can frame in out queue
+//    hal_can_out_get((hal_can_port_t)canport, &numofoutframe);
+//    p->waittxdata[canport].numoftxframe2send = numofoutframe;
+//    // ena tx
+//    hal_sys_irqn_enable(irqn);
+//    
+//    hal_can_transmit((hal_can_port_t)canport);
+//    
+//    //#warning marco.accame: put a timeout of 5 ms (before it was infinite)
+//    osal_result_t osalres = osal_semaphore_decrement(p->waittxdata[canport].semaphore, 5*osal_reltime1ms);
+//    
+//    if(osal_res_OK != osalres)
+//    {
+//        // manage error        
+//        eOerrmanDescriptor_t errdes = {0};
+//        uint8_t sizeoftxfifo = 0;
+//        hal_can_out_get((hal_can_port_t)canport, &sizeoftxfifo);
+//        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
+//        errdes.par16                = 0x0003;
+//        errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
+//        errdes.par64                = 0; // dont knw what to send up
+//        errdes.sourcedevice         = (eOcanport1 == canport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//        errdes.sourceaddress        = 0;                  
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);    
+//    }
+//    
+//    // if i'm here i just wake up
+//    hal_sys_irqn_disable(irqn);
+//    p->waittxdata[canport].waitenable = eobool_false;    
+//    hal_can_out_get((hal_can_port_t)canport, &after);
+//  
+//    
+//    hal_sys_irqn_enable(irqn);
+
+//    return(eores_OK);
+//    
+//}
+
+
+// marco.accame: in here we block until all the frames are sent. it is used a semaphore different from the one used in control loop .... boh.
 extern eOresult_t eo_appCanSP_EmptyCanOutputQueue(EOappCanSP *p, eOcanport_t canport)
 {
     uint8_t numberofoutcanframe = 0;
