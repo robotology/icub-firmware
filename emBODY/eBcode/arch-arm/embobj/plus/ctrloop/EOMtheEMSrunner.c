@@ -30,6 +30,9 @@
 
 
 #include "EOMtheEMStransceiver.h"
+
+#include "EOtransceiver.h"
+#include "EOtransmitter.h"
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
 
@@ -185,7 +188,7 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.waitudptxisdone)       NULL,
     EO_INIT(.osaltaskipnetexec)     NULL,
     EO_INIT(.iterationnumber)       0,
-    EO_INIT(.usedTXdecimationfactor) 0,
+    EO_INIT(.usedTXdecimationfactor) 1,
     EO_INIT(.itisaTXcycle)          eobool_true
 };
 
@@ -267,6 +270,10 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     
     s_theemsrunner.iterationnumber = 0;    
     s_theemsrunner.usedTXdecimationfactor = cfg->defaultTXdecimationfactor;
+    if(0 == s_theemsrunner.usedTXdecimationfactor)
+    {
+        s_theemsrunner.usedTXdecimationfactor = 1;
+    }
     s_theemsrunner.itisaTXcycle = eobool_true;
     
     s_theemsrunner.task[eo_emsrunner_taskid_runRX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
@@ -338,6 +345,10 @@ extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8
         return(eores_NOK_nullpointer);
     }   
 
+    if(0 == txdecimationfactor)
+    {
+        txdecimationfactor = 1;
+    }
     p->usedTXdecimationfactor = txdecimationfactor;
 
     return(eores_OK);    
@@ -377,6 +388,11 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     p->mode = p->cfg.modeatstartup;    
     osal_semaphore_set(s_theemsrunner.waitudptxisdone, 0);
     
+    
+    // set the ems-transceiver to have a given tx-rate.
+    EOtransmitter * transmitter = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));    
+    // replies are not decimated. only regulars and occasionals are decimated. in this way we have prompt responses to ask<> rops
+    eo_transmitter_TXdecimation_Set(transmitter, 1, s_theemsrunner.usedTXdecimationfactor, s_theemsrunner.usedTXdecimationfactor);
 
     s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(&s_theemsrunner);
   
@@ -390,7 +406,10 @@ extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p)
         return(eores_NOK_nullpointer);
     }  
 
-
+    // set the ems-transceiver to have the standard tx-rate.
+    EOtransmitter * transmitter = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));    
+    eo_transmitter_TXdecimation_Set(transmitter, 1, 1, 1);
+        
     s_eom_emsrunner_6HALTIMERS_stop();    
 
     return(eores_OK);    
@@ -710,7 +729,6 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
     if(eobool_true == processtransmission)
     {
         eOresult_t resformer;
-        eOresult_t restx;
         
         // 1. process one packet        
         processedpkts++;   
@@ -718,21 +736,23 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
         // 1.1 call the former to retrieve a tx packet (even if it is an empty ropframe)        
         resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
         
-        // 1.2  send a packet back. but only if the former gave us a good one.
+        // 1.2  send a packet back. but only if the former gave us a good one and if we have at least 1 rop inside
         if(eores_OK == resformer)
         {
-            //restx = 
-            restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
-            if(eores_OK == restx)
+            if(numberoftxrops > 0)
             {
-                p->numoftxrops += numberoftxrops;
-                p->numoftxpackets++;
-                p->numofpacketsinsidesocket++;
-            }
-            else
-            {
-                s_eom_emsrunner_update_diagnosticsinfo_txfailure();
-                eom_emsrunner_hid_userdef_onfailedtransmission(p);
+                eOresult_t restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+                if(eores_OK == restx)
+                {
+                    p->numoftxrops += numberoftxrops;
+                    p->numoftxpackets++;
+                    p->numofpacketsinsidesocket++;
+                }
+                else
+                {
+                    s_eom_emsrunner_update_diagnosticsinfo_txfailure();
+                    eom_emsrunner_hid_userdef_onfailedtransmission(p);
+                }
             }
         }
         else
@@ -899,7 +919,9 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
 
     s_theemsrunner.itisaTXcycle = eobool_true; // just to be sure ...
-    
+
+// now the usedTXdecimationfactor is used inside the EOtransmitter and every cycle is a potential tx one
+#if 0      
     if(s_theemsrunner.usedTXdecimationfactor > 1)   // if 0 we cannot divide, if 1 there is no need, if 2 or more we divide 
     {
         if(0 != (s_theemsrunner.iterationnumber % s_theemsrunner.usedTXdecimationfactor))
@@ -907,7 +929,7 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
             s_theemsrunner.itisaTXcycle = eobool_false;
         }
     }
-    
+#endif    
     
     // perform the rx activity    
     if(eobool_true == eom_runner_hid_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runRX))

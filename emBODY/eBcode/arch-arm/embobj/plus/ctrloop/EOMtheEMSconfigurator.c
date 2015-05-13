@@ -292,16 +292,14 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
         res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
         
-        // 2.  send a packet back. but only if the former gave us a good one 
+        // 2.  send a packet back. but only if the former gave us a good one and there are rops inside
         if(eores_OK == res)
         {
-            // we transmit even if there are no rops inside, so that the host can monitor teh presence of the board
-            // and because ... eom_emstransceiver_Form() increment teh sequence number. if we drop packet, then there
-            // is a hole in the sequence number.
-            //if(numberoftxrops > 0)
-            //{ 
+            // we must transmit only if there are rops inside. the sequence number is incremented only if there are any rops.
+            if(numberoftxrops > 0)
+            { 
                 res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
-            //}
+            }
         }
         else
         {
