@@ -77,7 +77,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          74
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          75
 //  </h>version
 
 //  <h> build date
@@ -86,11 +86,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          13
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         17
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          31
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          48
 //  </h>build date
 
 // </h>Info 
@@ -613,7 +613,7 @@ extern "C" {
 #define EOMTHEEMSAPPLCFG_PROXY_MAXNUMOFREPLYROPS 16
 
 //  <o> maximum time a reply can be contained (in ms)       <0-100000>
-//  <i> default: 10. 
+//  <i> default: 20. 
 //  <i> it is the max time a reply can be stored in the container before the say<> is considered lost
 #define EOMTHEEMSAPPLCFG_PROXY_REPLYTIMEOUTMILLISEC     1000
 
