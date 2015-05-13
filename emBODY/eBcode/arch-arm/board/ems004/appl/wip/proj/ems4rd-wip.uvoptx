@@ -2715,7 +2715,7 @@
       <GroupNumber>23</GroupNumber>
       <FileNumber>125</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -2737,6 +2737,19 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>127</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems\EOtheCANservice.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheCANservice.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -2747,7 +2760,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>127</FileNumber>
+      <FileNumber>128</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2760,7 +2773,7 @@
     </File>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>128</FileNumber>
+      <FileNumber>129</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2781,7 +2794,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>25</GroupNumber>
-      <FileNumber>129</FileNumber>
+      <FileNumber>130</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2794,7 +2807,7 @@
     </File>
     <File>
       <GroupNumber>25</GroupNumber>
-      <FileNumber>130</FileNumber>
+      <FileNumber>131</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2807,7 +2820,7 @@
     </File>
     <File>
       <GroupNumber>25</GroupNumber>
-      <FileNumber>131</FileNumber>
+      <FileNumber>132</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2820,7 +2833,7 @@
     </File>
     <File>
       <GroupNumber>25</GroupNumber>
-      <FileNumber>132</FileNumber>
+      <FileNumber>133</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -2833,7 +2846,7 @@
     </File>
     <File>
       <GroupNumber>25</GroupNumber>
-      <FileNumber>133</FileNumber>
+      <FileNumber>134</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>

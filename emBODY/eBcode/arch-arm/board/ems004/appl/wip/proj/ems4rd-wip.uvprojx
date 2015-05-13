@@ -1208,6 +1208,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems\EOtheCANprotocol.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheCANservice.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems\EOtheCANservice.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2461,6 +2466,11 @@
               <FileName>EOtheCANprotocol.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems\EOtheCANprotocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheCANservice.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems\EOtheCANservice.c</FilePath>
             </File>
           </Files>
         </Group>
