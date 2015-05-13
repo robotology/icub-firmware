@@ -172,7 +172,7 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
    
     //#warning --> marco.accame: so far the dispatcher uses capacity = 16. maybe we can increase the number.
     eOinfodispatcher_cfg_t config = {0};
-    config.capacity     = 16; // 16 or or eo_sizecntnr_dynamic ....
+    config.capacity     = 24; // 16 or or eo_sizecntnr_dynamic ....
     config.transmitter  = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));
     eo_infodispatcher_Initialise(&config);    
     
