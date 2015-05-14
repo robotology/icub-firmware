@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -145,7 +145,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -366,7 +365,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -646,27 +645,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -676,22 +675,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -701,12 +700,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -833,7 +832,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -964,7 +963,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1185,7 +1183,7 @@
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\cfg;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\services\embodyrobot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1465,27 +1463,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1495,22 +1493,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1520,12 +1518,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
