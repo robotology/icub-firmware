@@ -548,7 +548,7 @@ static void s_hl_chip_micrel_ks8893_maxpacket_set(uint8_t pktsizemode)
         default:                                                        
         {
             return;
-        } break;
+        }//break;
     }    
        
 
@@ -597,7 +597,7 @@ static void s_hl_chip_micrel_ks8893_xcorrection_set(hl_ethtrans_xcorr_t targetxc
         default:                                                        
         {
             return;
-        } break;
+        }//break;
     }    
        
 
