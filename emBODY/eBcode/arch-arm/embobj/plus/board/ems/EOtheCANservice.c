@@ -219,7 +219,7 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
     
     osal_result_t osal_res = osal_res_OK ;   
     
-    if(p->locktilltxall[port].numoftxframes > 0)
+    if(p->locktilltxall[port].totaltxframes > 0)
     {
         if(osal_res_OK != (osal_res = osal_semaphore_decrement(p->locktilltxall[port].locksemaphore, 3*osal_reltime1ms)))
         {            
@@ -234,6 +234,7 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
             errdes.sourceaddress        = 0;                                   
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    
         }
+        p->locktilltxall[port].totaltxframes = 0;
     }
     return((eOresult_t)osal_res);
 }
