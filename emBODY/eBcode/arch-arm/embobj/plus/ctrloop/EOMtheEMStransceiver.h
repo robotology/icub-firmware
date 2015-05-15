@@ -136,7 +136,7 @@ extern eOresult_t eom_emstransceiver_Parse(EOMtheEMStransceiver* p, EOpacket* rx
 
 extern eOresult_t eom_emstransceiver_NumberofOutROPs(EOMtheEMStransceiver *p, uint16_t *numberofreplies, uint16_t *numberofoccasionals, uint16_t *numberofregulars);
 
-extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops);
+extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops, eOtransmitter_ropsnumber_t *ropsnum);
 
 //this function copy internal data to dgn_ptr
 extern eOresult_t eom_emstransceiver_GetDiagnosticsInfo(EOMtheEMStransceiver* p, eOemstransceiver_diagnosticsinfo_t *dgn_ptr);

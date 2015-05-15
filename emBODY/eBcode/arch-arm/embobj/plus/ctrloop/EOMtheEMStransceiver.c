@@ -282,7 +282,7 @@ extern eOresult_t eom_emstransceiver_NumberofOutROPs(EOMtheEMStransceiver *p, ui
 
 
 
-extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops)
+extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** txpkt, uint16_t *numberofrops, eOtransmitter_ropsnumber_t *ropsnum)
 {
     eOresult_t res;
     uint16_t numofrops = 0;
@@ -297,7 +297,7 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     // call the info-dispatcher so that it may insert sig<info> rops in occasional ropframe.
     eo_infodispatcher_Send(eo_infodispatcher_GetHandle(), eoinfodispatcher_sendnumber_all, NULL);
        
-    res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops);
+    res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops, ropsnum);
     if(eores_OK != res)
     {
         return(res);

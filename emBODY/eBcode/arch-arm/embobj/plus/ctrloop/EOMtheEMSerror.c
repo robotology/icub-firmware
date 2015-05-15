@@ -248,7 +248,7 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
     if(eobool_true == eo_common_event_check(evt, emserror_evt_ropframeTx))
     {
         // 1. call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        res = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops, NULL);
         
         // 2.  send a packet back. but only if the former gave us a good one and there are rops inside
         if(eores_OK == res)
