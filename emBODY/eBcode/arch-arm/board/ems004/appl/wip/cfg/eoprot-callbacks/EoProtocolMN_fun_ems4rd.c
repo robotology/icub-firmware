@@ -46,6 +46,8 @@
 
 #include "EoError.h"
 
+#include "eEsharedServices.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,6 +76,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
 
 //static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd);
 
@@ -221,6 +225,8 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
             case eomn_opc_config_REGROPs_assign:
             case eomn_opc_config_REGROPs_append:
             case eomn_opc_config_REGROPs_remove:
+            case eomn_opc_config_PROT_boardnumber:
+            case eomn_opc_config_PROT_endpoint:
             {
                 s_eoprot_ep_mn_fun_configcommand(command);                  
             } break;
@@ -238,6 +244,21 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
+extern void eoprot_fun_INIT_mn_appl_config(const EOnv* nv)
+{
+    eOmn_appl_config_t config = {0};
+    
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    config.cycletime        = emscfg->runobjcfg.period;
+    config.txratedivider    = emscfg->runobjcfg.defaultTXdecimationfactor;
+          
+    // set it
+    eo_nv_Set(nv, &config, eobool_true, eo_nv_upd_dontdo);        
+}
+
+
+
 extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 {
     // i init the application status to ...     
@@ -246,20 +267,21 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
     
     // build date
-    status.buildate.year    = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
-    status.buildate.month   = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
-    status.buildate.day     = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
-    status.buildate.hour    = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
-    status.buildate.min     = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
+    status.buildate.year        = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
+    status.buildate.month       = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
+    status.buildate.day         = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
+    status.buildate.hour        = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
+    status.buildate.min         = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
     
     // version
-    status.version.major    = emscfg->applcfg.emsappinfo->info.entity.version.major;
-    status.version.minor    = emscfg->applcfg.emsappinfo->info.entity.version.minor;
+    status.version.major        = emscfg->applcfg.emsappinfo->info.entity.version.major;
+    status.version.minor        = emscfg->applcfg.emsappinfo->info.entity.version.minor;
 		
 	// control loop timings 
-    status.cloop_timings[0] = emscfg->runobjcfg.execDOafter;
-	status.cloop_timings[1] = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
-	status.cloop_timings[2] = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
+    status.cloop_timings[0]     = emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[1]     = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[2]     = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
+    status.txdecimationfactor   = emscfg->runobjcfg.defaultTXdecimationfactor;
     
     uint16_t min = EO_MIN(sizeof(status.name), sizeof(emscfg->applcfg.emsappinfo->info.name));
     memcpy(status.name, emscfg->applcfg.emsappinfo->info.name, min);
@@ -273,6 +295,36 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
 }
 
+extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmn_appl_config_t *cfg = (eOmn_appl_config_t*)rd->data;
+    
+    if(1000 != cfg->cycletime)
+    {
+        cfg->cycletime = 1000;
+        #warning marco.accame: send up a warning about unsuppported feature
+    }
+    
+    if(0 == cfg->txratedivider)
+    {
+        cfg->txratedivider = 1;
+    }
+    
+    s_eoprot_ep_mn_fun_apply_config_txratedivider(cfg->txratedivider);   
+}
+
+
+extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    uint8_t *txratedivider = (uint8_t*)rd->data;
+   
+    if(0 == *txratedivider)
+    {
+        *txratedivider = 1;
+    }
+    
+    s_eoprot_ep_mn_fun_apply_config_txratedivider(*txratedivider);   
+}
 
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
@@ -289,6 +341,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         case applstate_config:
         {
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+            res = res;
             // the new currstate is set inside the on-entry of the state machine
             //if(eores_OK == res)
             //{   
@@ -300,19 +353,28 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         {
             uint32_t canBoardsReady = 0;
             uint32_t canBoardsChecked = 0;
-            char str[60];
             if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
             {
-                #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
-                snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
+                //#warning marco.accame: put a dedicated diagnostics message with list of missing can boards
+                //snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
                 
                  
                 // the new currstate is set inside the on-entry of the state machine               
                 //status->currstate = applstate_error;
                 // it MUST NOT be fatal error because we want to give the ems time to find the boards ready
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
+                
+                eOerrmanDescriptor_t errdes = {0};
+                errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_missing);
+                errdes.par16                = 0;
+                errdes.par64                = (uint64_t)canBoardsReady | (((uint64_t)canBoardsChecked) << 32);            
+                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress        = 0;       
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);   
+                {
+                    #warning -> marco.accame: send the 4 messages with the searched and found on can1 and can2                   
+                }
+                
                 return;
-//                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
             }
             else
             {
@@ -360,6 +422,21 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             //    status->currstate = applstate_error;
             //}
         } break;
+
+        case applstate_resetmicro:
+        {
+            // i just reset the micro ... straight away
+            osal_system_scheduling_suspend();
+            ee_sharserv_sys_restart();
+        } break;
+        
+        case applstate_restartapp:
+        {
+            osal_system_scheduling_suspend();
+            ee_sharserv_ipc_gotoproc_set(ee_procApplication);
+            ee_sharserv_sys_restart();           
+        } break;
+        
         
         default:
         {
@@ -655,7 +732,8 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
     eOropdescriptor_t ropdesc;
     EOtransceiver* theems00transceiver; 
     
-    eOmn_cmd_config_t* cmdconfig = (eOmn_cmd_config_t*)&command->cmd;
+    //eOmn_cmd_config_t* cmdconfig = (eOmn_cmd_config_t*)&command->cmd; /////// not correct.
+    eOmn_cmd_config_t* cmdconfig = &command->cmd.config;
     EOarray *array = (EOarray*)cmdconfig->array;
     
     uint16_t targetcapacity = (sizeof(cmdconfig->array) - sizeof(eOarray_head_t))  / sizeof(eOropSIGcfg_t);
@@ -755,7 +833,26 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
             }         
         } break;          
 
+        case eomn_opc_config_PROT_boardnumber:
+        {   // simply set the byte in array[0] as the new localboard number
+            //eOprotBRD_t brdnum = command->cmd.config.array[0];
+            eoprot_config_board_local(command->cmd.config.array[0]);                
+        } break;
         
+        case eomn_opc_config_PROT_endpoint:
+        {   // simply use the bytes in array[0->7] as a eOprot_EPcfg_t. but only if the EP is valid and not loaded yet.
+            eOprot_EPcfg_t *epcfg = (eOprot_EPcfg_t*) &command->cmd.config.array[0];
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                if(eobool_false == eoprot_endpoint_configured_is(eoprot_board_localboard, epcfg->endpoint))
+                {
+                    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle());
+                    eo_nvset_LoadEP(nvset, epcfg, eobool_true);                        
+                }                  
+            }        
+        } break;
+
+            
         default:
         {
             
@@ -766,7 +863,14 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
 }
 
 
-
+static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
+{
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    status->txdecimationfactor = txratedivider;   
+    
+    eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

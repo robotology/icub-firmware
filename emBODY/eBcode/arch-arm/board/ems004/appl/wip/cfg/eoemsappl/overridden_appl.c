@@ -37,6 +37,8 @@
 
 #include "EOMtheEMSapplCfg_cfg.h"
 
+#include "EOnvSet.h"
+#include "EoProtocolMC.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -200,6 +202,107 @@
     #error --> you must define an EBx
 #endif
 
+
+
+// - now we specialise the eth protocol for each board
+
+#if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)       
+    
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {4, 4, 1, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {1, 0, 1, 0, 0, 0, 0}        
+        }      
+    };
+ 
+#elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {12, 12, 1, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {0, 1, 0, 0, 0, 0, 0}        
+        },
+        {           
+            .endpoint           = eoprot_endpoint_skin,
+            .numberofentities  = {1, 0, 0, 0, 0, 0, 0}     
+        }          
+    };
+ 
+#elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {3, 3, 1, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {0, 0, 1, 0, 0, 0, 0}        
+        }      
+    };
+
+#elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {4, 4, 1, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {1, 0, 1, 0, 0, 0, 0}        
+        }      
+    };
+
+#elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+
+    #if defined(ICUB_DARMSTADT01)
+        #define EB7EB9_NUMBEROFSTRAINS     1
+    #else
+        #define EB7EB9_NUMBEROFSTRAINS     0
+    #endif
+    
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {2, 2, 1, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {EB7EB9_NUMBEROFSTRAINS, 0, 1, 0, 0, 0, 0}        
+        }      
+    };
+
+#elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+
+    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_skin,
+            .numberofentities  = {2, 0, 0, 0, 0, 0, 0}     
+        }     
+    };
+    
+#endif
+
+
+
+static const uint8_t s_boardnum = EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD - 1;
+static const uint8_t s_theEPcfgsOthers_NumberOf = sizeof(s_theEPcfgsOthers) / sizeof(eOprot_EPcfg_t);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -359,8 +462,41 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
 }
 
 
+extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
+{    
+    eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
+    
+    eOprotEntity_t ent = eoprot_ID2entity(id);
+    if(eoprot_entity_mc_joint != ent)
+    {
+        return(eobool_false);
+    }
+    
+    eOprotTag_t tag = eoprot_ID2tag(id);
+    
+    switch(tag)
+    {
+        //VALE get velocity pid not implemented!!!
+        case eoprot_tag_mc_joint_config_pidposition:
+        // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
+        case eoprot_tag_mc_joint_config_pidtorque:
+        case eoprot_tag_mc_joint_config_limitsofjoint:
+        case eoprot_tag_mc_joint_config_impedance:
+        case eoprot_tag_mc_joint_cmmnds_setpoint:           // marco.accame on 03mar15: the setpoint should not be asked, thus why in here? i may just remove the handler so that no reply is obtained if wrongly used
+        {
+            return(eobool_true);
+        }
+        
+        default:
+        {
+            return(eobool_false);
+        };
+     };
+}
+
+
 // marco.accame: this function is called inside eom_emsappl_Initialise() just before to run the state machine
-// which enters in the CFG state. it is the place where to launch new services.
+// which enters in the CFG state. it is the place where to launch new services
 
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {  
@@ -370,6 +506,38 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     // pulse led3 forever at 20 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);
 
+
+    {   
+        // marco.accame on 24 apr 2015: here is how to customise the eth protocol from a generic to a specific board
+        // so far, we can keep it in here. but further on we shall customise one endpoint at a time in runtime.
+        
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        uint8_t i = 0;
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+        
+        // 2. load all the endpoints specific to this board. the generic board loads only management
+        for(i=0; i<s_theEPcfgsOthers_NumberOf; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) &s_theEPcfgsOthers[i];
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+            }                        
+        }
+        
+        // now we must define the .... proxy rules
+        // if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
+        // in teh future we can set this proxy mode on teh basis of the board number received
+        eOprotBRD_t localboard = eoprot_board_local_get();
+        if((1 == localboard) || (3 == localboard))
+        {
+            eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_b02_b04_mc_isproxied);
+        }
+    }    
+    
+    
     
     // initialise diagnostics
     eo_theEMSdgn_Initialize();
