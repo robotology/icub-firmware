@@ -101,21 +101,21 @@
 
 const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
-    EO_INIT(.taskpriority)              {250,   251,    252},  
-    EO_INIT(.taskstacksize)             {2048,  1024,   2048},
-    EO_INIT(.haltimerstart)             {hal_timer2, hal_timer3, hal_timer4},    
-    EO_INIT(.haltimeralert)             {hal_timer5, hal_timer6, hal_timer7},  
-    EO_INIT(.period)                    1000,  
-    EO_INIT(.execRXafter)               0, 
-    EO_INIT(.safeRXexecutiontime)       300,
-    EO_INIT(.execDOafter)               400, 
-    EO_INIT(.safeDOexecutiontime)       250,
-    EO_INIT(.execTXafter)               700,
-    EO_INIT(.safeTXexecutiontime)       250,    
-    EO_INIT(.maxnumofRXpackets)         3,
-    EO_INIT(.maxnumofTXpackets)         1,
-    EO_INIT(.modeatstartup)             eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
-    EO_INIT(.defaultTXdecimationfactor) 1
+    .taskpriority               = {250,   251,    252},  
+    .taskstacksize              = {2048,  1024,   2048},
+    .haltimerstart              = {hal_timer2, hal_timer3, hal_timer4},    
+    .haltimeralert              = {hal_timer5, hal_timer6, hal_timer7},  
+    .period                     = 1000,  
+    .execRXafter                = 0, 
+    .safeRXexecutiontime        = 300,
+    .execDOafter                = 400, 
+    .safeDOexecutiontime        = 250,
+    .execTXafter                = 700,
+    .safeTXexecutiontime        = 250,    
+    .maxnumofRXpackets          = 3,
+    .maxnumofTXpackets          = 1,
+    .modeatstartup              = eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
+    .defaultTXdecimationfactor  = 1
 };
 
 
@@ -170,26 +170,27 @@ static const char s_eobj_ownname[] = "EOMtheEMSrunner";
  
 static EOMtheEMSrunner s_theemsrunner = 
 {
-    EO_INIT(.cfg)                   {0},
-    EO_INIT(.task)                  {NULL, NULL, NULL},
-    EO_INIT(.event)                 eo_sm_emsappl_EVdummy,
-    EO_INIT(.osaltimer)             NULL,
-    EO_INIT(.cycleisrunning)        eobool_false,
-    EO_INIT(.safeDurationExpired)   {eobool_false, eobool_false, eobool_false},
-    EO_INIT(.overflownToNextTask)   {eobool_false, eobool_false, eobool_false},
-    EO_INIT(.haltimer_start)        {hal_timer2, hal_timer3, hal_timer4},
-    EO_INIT(.haltimer_alert)        {hal_timer5, hal_timer6, hal_timer7},
-    EO_INIT(.numofrxpackets)        0,  
-    EO_INIT(.numofrxrops)           0,
-    EO_INIT(.numoftxpackets)        0,
-    EO_INIT(.numoftxrops)           0,
-    EO_INIT(.mode)                  eo_emsrunner_mode_softrealtime,
-    EO_INIT(.numofpacketsinsidesocket) 0,
-    EO_INIT(.waitudptxisdone)       NULL,
-    EO_INIT(.osaltaskipnetexec)     NULL,
-    EO_INIT(.iterationnumber)       0,
-    EO_INIT(.usedTXdecimationfactor) 1,
-    EO_INIT(.itisaTXcycle)          eobool_true
+    .cfg                    = {0},
+    .task                   = {NULL, NULL, NULL},
+    .event                  = eo_sm_emsappl_EVdummy,
+    .osaltimer              = NULL,
+    .cycleisrunning         = eobool_false,
+    .safeDurationExpired    = {eobool_false, eobool_false, eobool_false},
+    .overflownToNextTask    = {eobool_false, eobool_false, eobool_false},
+    .haltimer_start         = {hal_timer2, hal_timer3, hal_timer4},
+    .haltimer_alert         = {hal_timer5, hal_timer6, hal_timer7},
+    .numofrxpackets         = 0,  
+    .numofrxrops            = 0,
+    .numoftxpackets         = 0,
+    .numoftxrops            = 0,
+    .mode                   = eo_emsrunner_mode_softrealtime,
+    .numofpacketsinsidesocket = 0,
+    .waitudptxisdone        = NULL,
+    .osaltaskipnetexec      = NULL,
+    .iterationnumber        = 0,
+    .usedTXdecimationfactor = 1,
+    .itisaTXcycle           = eobool_true,
+    .txropsnumberincycle    = {0, 0, 0}
 };
 
 
@@ -354,15 +355,16 @@ extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8
     return(eores_OK);    
 }
 
-extern eObool_t eom_emsrunner_CycleIsTransmitting(EOMtheEMSrunner *p)
+extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p)
 {
     if(NULL == p)
     {
         return(eobool_false);
     } 
-
-    return(p->itisaTXcycle);
     
+    eObool_t ret = (0 == p->txropsnumberincycle.numberofregulars) ? (eobool_false) : (eobool_true);
+
+    return(ret);   
 }
 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
@@ -734,7 +736,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
         processedpkts++;   
         
         // 1.1 call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops);
+        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops, &s_theemsrunner.txropsnumberincycle);
         
         // 1.2  send a packet back. but only if the former gave us a good one and if we have at least 1 rop inside
         if(eores_OK == resformer)

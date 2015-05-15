@@ -154,7 +154,7 @@ extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 
 extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor);
 
-extern eObool_t eom_emsrunner_CycleIsTransmitting(EOMtheEMSrunner *p);
+extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p);
 
 // start 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
