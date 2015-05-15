@@ -213,23 +213,29 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
     {
         // marco.accame: the following strategy is ok if the bus containing skin does not contain any other board type
-        // the bus has only skin? then i read at most a number of canframes equal to capacity of skin-data buffer
+        // the bus has only skin? then i read at most a number of canframes equal to what the skin-data buffer can host
         // else i read all the content of the rx can buffer.
         
         // step 1: decide the max number of can frames to read
         
         EOarray *arrayofcandata = s_getSkinDataArray((eOcanport_t)port);
         if(NULL != arrayofcandata)
-        {   // ok, we have a skin            
-            if(eobool_false == eom_emsrunner_CycleIsTransmitting(eom_emsrunner_GetHandle()))
-            {   // if we dont transmit in this cycle then i dont read any frame from this bus
-                numofRXcanframe = 0;                
-            }
-            else
-            {   // we read at most the capacity of the skin patch. but we also need to reset the array so that new can frames can be pushed back inside
-                numofRXcanframe = eo_array_Capacity(arrayofcandata);
-                eo_array_Reset(arrayofcandata);                
-            }  
+        {   // ok, we have a skin   
+
+            // i read from bus at most the number of can frame that the array can host. 
+            // that does not depend on the fact that in this cycle we transmit the regulars.
+            // the array is emptied only after the regulars are transmitted, so that non can frame is lost.
+            // this opertion is done in function eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()
+            numofRXcanframe = eo_array_Available(arrayofcandata);
+//            if(eobool_false == eom_emsrunner_CycleIsTransmitting(eom_emsrunner_GetHandle()))
+//            {   // if we dont transmit in this cycle then i dont read any frame from this bus
+//                numofRXcanframe = 0;                
+//            }
+//            else
+//            {   // we read at most the capacity of the skin patch. but we also need to reset the array so that new can frames can be pushed back inside
+//                numofRXcanframe = eo_array_Capacity(arrayofcandata);
+//                eo_array_Reset(arrayofcandata);                
+//            }  
         }
         else
         {   // in this bus we dont have skin, thus ... i read everything in the rx can buffer
@@ -334,8 +340,23 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
         }
         count_ethlink_status = 0;
     }
+        
+    // if we have skin and we have just transmitted the regulars, then we must reset the status->array containing the
+    // can frames, so that at the rx cycle we can put some more canframes inside.
+    uint8_t port = 0;
+    EOarray *arrayofcandata = NULL;
+    for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
+    {
+        if(NULL != (arrayofcandata = s_getSkinDataArray((eOcanport_t)port)))
+        {   // ok, we have a skin   
+            if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
+            {   // ok, we can reset the array
+                eo_array_Reset(arrayofcandata);
+            }            
+        }
+    }
     
-    
+    // now we wait for the can tx to finish    
     res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
     
