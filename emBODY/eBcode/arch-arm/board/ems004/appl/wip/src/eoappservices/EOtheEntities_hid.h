@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHEPROTOCOLWRAPPER_HID_H_
-#define _EOTHEPROTOCOLWRAPPER_HID_H_
+#ifndef _EOTHEENTITIES_HID_H_
+#define _EOTHEENTITIES_HID_H_
 
 
 
@@ -30,7 +30,7 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheProtocolWrapper.h"
+#include "EOtheEntities.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
@@ -44,7 +44,7 @@ enum
     eoprotwrap_max_maises   = 1
 };
 
-struct EOtheProtocolWrapper_hid
+struct EOtheEntities_hid
 {
     eObool_t        initted;
     eOmc_joint_t*   joints[eoprotwrap_max_joints];

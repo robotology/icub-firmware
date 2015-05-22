@@ -46,7 +46,7 @@
 //#include "EOicubCanProto_specifications.h"
 #include "EOappMeasuresConverter.h"
 
-#include "EOtheProtocolWrapper.h"
+#include "EOtheEntities.h"
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
@@ -207,7 +207,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
     
     // 8) set monitormode status
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -340,7 +340,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
     eOmc_joint_status_t     *jstatus = NULL;
     eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -371,7 +371,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
 
     //set monitor status = notreachedyet if monitormode is forever
-    jconfig = eo_protocolwrapper_GetJointConfig(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jconfig = eo_entities_GetJointConfig(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jconfig)
     {
         return; //error
@@ -380,7 +380,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     //#warning -> marco.accame: cast to proper type
     if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)
     {
-        jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+        jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
         if(NULL == jstatus)
         {
             return; //error

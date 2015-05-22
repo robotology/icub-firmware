@@ -18,12 +18,12 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHEPROTOCOLWRAPPER_H_
-#define _EOTHEPROTOCOLWRAPPER_H_
+#ifndef _EOTHEENTITIES_H_
+#define _EOTHEENTITIES_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheProtocolWrapper.h
+/** @file       EOtheEntities.h
     @brief      This file gives direct access to the RAM used in protocol. That can be done directly by calling
                 function eoprot_entity_ramof_get() but i also write this object because originally this service was
                 inside another object.                
@@ -31,7 +31,7 @@
     @date       01/09/2015
 **/
 
-/** @defgroup eo_EOtheProtocolWrapper Object EOtheProtocolWrapper
+/** @defgroup eo_EOtheEntities Object EOtheEntities
     ...... 
     @{        
  **/
@@ -49,7 +49,7 @@
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheProtocolWrapper_hid EOtheProtocolWrapper;
+typedef struct EOtheEntities_hid EOtheEntities;
 
 
    
@@ -58,38 +58,34 @@ typedef struct EOtheProtocolWrapper_hid EOtheProtocolWrapper;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheProtocolWrapper* eo_protocolwrapper_Initialise(void);
+extern EOtheEntities* eo_entities_Initialise(void);
 
-extern EOtheProtocolWrapper* eo_protocolwrapper_GetHandle(void);
-
-
-// null if does not exists. the real pointer (use it with care!) if everything is ok
-
-extern eOmc_joint_t * eo_protocolwrapper_GetJoint(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOmc_joint_config_t * eo_protocolwrapper_GetJointConfig(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOmc_joint_status_t * eo_protocolwrapper_GetJointStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
-
-extern eOmc_motor_t * eo_protocolwrapper_GetMotor(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOmc_motor_status_t * eo_protocolwrapper_GetMotorStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
-
-extern eOas_mais_t * eo_protocolwrapper_GetMais(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOas_mais_config_t * eo_protocolwrapper_GetMaisConfig(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
-
-extern eOas_strain_t * eo_protocolwrapper_GetStrain(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
-
-extern eOsk_skin_t * eo_protocolwrapper_GetSkin(EOtheProtocolWrapper *p, eOprotIndex_t id);
-extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern EOtheEntities* eo_entities_GetHandle(void);
 
 
+extern eOmc_joint_t * eo_entities_GetJoint(EOtheEntities *p, eOprotIndex_t id);
+extern eOmc_joint_config_t * eo_entities_GetJointConfig(EOtheEntities *p, eOprotIndex_t id);
+extern eOmc_joint_status_t * eo_entities_GetJointStatus(EOtheEntities *p, eOprotIndex_t id);
+
+extern eOmc_motor_t * eo_entities_GetMotor(EOtheEntities *p, eOprotIndex_t id);
+extern eOmc_motor_status_t * eo_entities_GetMotorStatus(EOtheEntities *p, eOprotIndex_t id);
+
+extern eOas_mais_t * eo_entities_GetMais(EOtheEntities *p, eOprotIndex_t id);
+extern eOas_mais_config_t * eo_entities_GetMaisConfig(EOtheEntities *p, eOprotIndex_t id);
+extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIndex_t id);
+
+extern eOas_strain_t * eo_entities_GetStrain(EOtheEntities *p, eOprotIndex_t id);
+extern eOas_strain_config_t * eo_entities_GetStrainConfig(EOtheEntities *p, eOprotIndex_t id);
+extern eOas_strain_status_t * eo_entities_GetStrainStatus(EOtheEntities *p, eOprotIndex_t id);
+
+extern eOsk_skin_t * eo_entities_GetSkin(EOtheEntities *p, eOprotIndex_t id);
+extern eOsk_status_t * eo_entities_GetSkinStatus(EOtheEntities *p, eOprotIndex_t id);
 
 
 
 
 /** @}            
-    end of group eo_EOtheProtocolWrapper
+    end of group eo_EOtheEntities
  **/
 
 #endif  // include-guard

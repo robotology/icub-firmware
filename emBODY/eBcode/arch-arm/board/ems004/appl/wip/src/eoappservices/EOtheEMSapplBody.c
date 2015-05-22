@@ -56,7 +56,7 @@
 
 #include "EOaction.h"
 
-#include "EOtheProtocolWrapper.h"
+#include "EOtheEntities.h"
 
 #include "EoError.h"
 
@@ -213,7 +213,7 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     
     s_eo_emsapplBody_computeRunMode(p); // the run mode depends on connected can board (mc4, 2foc, only skin, etc)
         
-    eo_protocolwrapper_Initialise();
+    eo_entities_Initialise();
         
     s_eo_emsapplBody_mc4data_init(p);    
     s_eo_emsapplBody_canServicesProvider_init(p);
@@ -1472,7 +1472,7 @@ static eOresult_t s_eo_emsapplBody_computeRunMode(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
 {
     const uint8_t number = 0; 
-    eOas_mais_config_t *cfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), number);
+    eOas_mais_config_t *cfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), number);
 
     if(NULL == cfg)
     {   // we dont have mais
@@ -1505,7 +1505,7 @@ static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
 //    // we start the mais with the values inside the mais.config data structure.
 //    eOresult_t res = eores_NOK_generic;
 //    const eOas_maisId_t maisId = 0; 
-//    eOas_mais_config_t *maiscfg = eo_protocolwrapper_GetMaisConfig(eo_protocolwrapper_GetHandle(), maisId);
+//    eOas_mais_config_t *maiscfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), maisId);
 //    
 //    if(NULL == maiscfg)
 //    {   // we dont have mais
@@ -1569,7 +1569,7 @@ static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 {
     const uint8_t number = 0; 
-    eOas_strain_config_t *cfg = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), number);
+    eOas_strain_config_t *cfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), number);
 
     if(NULL == cfg)
     {   // we dont have strain
@@ -1598,7 +1598,7 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 //    };
 
 //    
-//    straincfg = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), sId);
+//    straincfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), sId);
 //    if(NULL == straincfg)
 //    {
 //         //if no strain is connected to ems ==> nothing to do ==> ok
@@ -1616,7 +1616,7 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
 static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
 {
     const uint8_t number = 0; 
-    eOas_strain_config_t *cfg = eo_protocolwrapper_GetStrainConfig(eo_protocolwrapper_GetHandle(), number);
+    eOas_strain_config_t *cfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), number);
 
     if(NULL == cfg)
     {   // we dont have strain

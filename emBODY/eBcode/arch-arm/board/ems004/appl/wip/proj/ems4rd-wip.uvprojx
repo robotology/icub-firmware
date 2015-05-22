@@ -839,9 +839,9 @@
               <FilePath>..\src\eoappservices\EOappMeasuresConverter.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheProtocolWrapper.c</FileName>
+              <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheProtocolWrapper.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2083,9 +2083,9 @@
               <FilePath>..\src\eoappservices\EOappMeasuresConverter.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheProtocolWrapper.c</FileName>
+              <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheProtocolWrapper.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
             </File>
           </Files>
         </Group>

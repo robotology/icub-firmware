@@ -46,7 +46,7 @@
 #include "EoProtocol.h"
 
 
-#include "EOtheProtocolWrapper.h"
+#include "EOtheEntities.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
@@ -163,7 +163,7 @@ extern void eoprot_fun_UPDT_as_mais_config(const EOnv* nv, const eOropdescriptor
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
     
     
-    eOas_mais_status_t *status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), number);
+    eOas_mais_status_t *status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), number);
     if(NULL == status)
     {
         return; //error
@@ -212,7 +212,7 @@ extern void eoprot_fun_UPDT_as_mais_config(const EOnv* nv, const eOropdescriptor
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->resolution));
     
 
-    status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), maisId);
+    status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisId);
     if(NULL == status)
     {
         return; //error
@@ -324,7 +324,7 @@ extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOro
     
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
     
-    eOas_mais_status_t *status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), number);
+    eOas_mais_status_t *status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), number);
     if(NULL == status)
     {
         return; //error
@@ -347,7 +347,7 @@ extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOro
     
     eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisresolution);
     
-    status = eo_protocolwrapper_GetMaisStatus(eo_protocolwrapper_GetHandle(), maisId);
+    status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisId);
     if(NULL == status)
     {
         return; //error
@@ -605,7 +605,7 @@ static void s_signalGetFullScales(uint32_t id32, eObool_t signaloncefullscale)
     {
         //clear array in strainstatus
         //uint8_t number = eoprot_ID2index(id32);        
-        eOas_strain_status_t* status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), eoprot_ID2index(id32));
+        eOas_strain_status_t* status = eo_entities_GetStrainStatus(eo_entities_GetHandle(), eoprot_ID2index(id32));
         if(NULL != status)
         {
             // impose that fullscale is an empty array of itemsize 2 and capacity 6. 
@@ -646,7 +646,7 @@ static void s_signalGetFullScales(uint32_t id32, eObool_t signaloncefullscale)
         //clear array in strainstatus
         
         
-        status = eo_protocolwrapper_GetStrainStatus(eo_protocolwrapper_GetHandle(), strainId);
+        status = eo_entities_GetStrainStatus(eo_entities_GetHandle(), strainId);
         if(NULL != status)
         {
             // impose that fullscale is an empty array of itemsize 2 and capacity 6. 

@@ -39,7 +39,7 @@
 #include "EoAnalogSensors.h"
 #include "EoManagement.h"
 
-#include "EOtheProtocolWrapper.h"
+#include "EOtheEntities.h"
 
 #include "EOemsController_hid.h" 
 #include "OPCprotocolManager_Cfg.h" 
@@ -438,7 +438,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
         {   // found a skin-0
             if(port == loc.port)
             {   // and it is on the same can port
-                eOsk_status_t * skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), 0);
+                eOsk_status_t * skinstatus = eo_entities_GetSkinStatus(eo_entities_GetHandle(), 0);
                 if(NULL != skinstatus)
                 {
                     arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
@@ -450,7 +450,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
         {   // found a skin-1
             if(port == loc.port)
             {   // and it is on the same can port
-                eOsk_status_t * skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), 1);
+                eOsk_status_t * skinstatus = eo_entities_GetSkinStatus(eo_entities_GetHandle(), 1);
                 if(NULL != skinstatus)
                 {
                     arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
@@ -694,7 +694,7 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     for(jId = 0; jId<numofjomos; jId++)
     {
         #warning --> in the future use eo_mcserv_GetJoint()->status
-        jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
+        jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jId);
         if(NULL == jstatus)
         {
             return; //error
@@ -736,7 +736,7 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     for(jId = 0; jId<numofjomos; jId++)
     {
         #warning --> in the future use eo_mcserv_GetMotor()->status
-        mstatus = eo_protocolwrapper_GetMotorStatus(eo_protocolwrapper_GetHandle(), jId);
+        mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), jId);
         if(NULL == mstatus)
         {
             return; //error
@@ -777,7 +777,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     
     numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db_ptr);
 
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), motionDoneJoin2Use);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), motionDoneJoin2Use);
     if(NULL == jstatus)
     {
         return; //error
