@@ -365,7 +365,7 @@
               <MiscControls>-DUSE_EMS4RD</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY USE_CANCOMM_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\cfg\eoprot-boards;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\plus\board\ems;..\..\..\..\..\embobj\plus\board\ems\config-can-mapping;..\..\..\..\..\embobj\plus\board\ems\config-can-protocol</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\cfg\eoprot-boards;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-mapping;..\..\..\..\..\embobj\plus\can\config-can-protocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1121,22 +1121,22 @@
             <File>
               <FileName>EOtheCANmapping.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EOtheCANmapping.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANmapping.c</FilePath>
             </File>
             <File>
               <FileName>EOtheCANprotocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EOtheCANprotocol.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANprotocol.c</FilePath>
             </File>
             <File>
               <FileName>EOtheCANservice.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EOtheCANservice.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</FilePath>
             </File>
             <File>
               <FileName>EoCANnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EoCANnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EoCANnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1146,12 +1146,12 @@
             <File>
               <FileName>EoCANmapBoardsEB1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-mapping\EoCANmapBoardsEB1.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB1.c</FilePath>
             </File>
             <File>
               <FileName>EoCANmapBoardsEB2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-mapping\EoCANmapBoardsEB2.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1161,27 +1161,27 @@
             <File>
               <FileName>EoCANprotASperiodic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotASperiodic.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotASpolling.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASpolling.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotMCperiodic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotMCperiodic.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotMCperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotMCpolling.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotMCpolling.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotMCpolling.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotSKperiodic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2305,22 +2305,22 @@
             <File>
               <FileName>EOtheCANmapping.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EOtheCANmapping.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANmapping.c</FilePath>
             </File>
             <File>
               <FileName>EOtheCANprotocol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EOtheCANprotocol.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANprotocol.c</FilePath>
             </File>
             <File>
               <FileName>EOtheCANservice.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EOtheCANservice.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</FilePath>
             </File>
             <File>
               <FileName>EoCANnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\EoCANnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EoCANnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2330,12 +2330,12 @@
             <File>
               <FileName>EoCANmapBoardsEB1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-mapping\EoCANmapBoardsEB1.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB1.c</FilePath>
             </File>
             <File>
               <FileName>EoCANmapBoardsEB2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-mapping\EoCANmapBoardsEB2.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2345,27 +2345,27 @@
             <File>
               <FileName>EoCANprotASperiodic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotASperiodic.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotASpolling.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASpolling.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotMCperiodic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotMCperiodic.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotMCperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotMCpolling.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotMCpolling.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotMCpolling.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotSKperiodic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
             </File>
           </Files>
         </Group>

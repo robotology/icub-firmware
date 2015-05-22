@@ -694,7 +694,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\board\ems\EOtheCANmapping.c</Filename>
+          <Filename>..\..\..\..\..\embobj\plus\can\EOtheCANmapping.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -2431,7 +2431,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\EOtheCANmapping.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\EOtheCANmapping.c</PathWithFileName>
       <FilenameWithoutPath>EOtheCANmapping.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2444,7 +2444,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\EOtheCANprotocol.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\EOtheCANprotocol.c</PathWithFileName>
       <FilenameWithoutPath>EOtheCANprotocol.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2457,7 +2457,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\EOtheCANservice.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</PathWithFileName>
       <FilenameWithoutPath>EOtheCANservice.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2470,7 +2470,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\EoCANnet.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\EoCANnet.c</PathWithFileName>
       <FilenameWithoutPath>EoCANnet.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2491,7 +2491,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-mapping\EoCANmapBoardsEB1.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB1.c</PathWithFileName>
       <FilenameWithoutPath>EoCANmapBoardsEB1.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2504,7 +2504,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-mapping\EoCANmapBoardsEB2.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB2.c</PathWithFileName>
       <FilenameWithoutPath>EoCANmapBoardsEB2.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2525,7 +2525,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotASperiodic.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</PathWithFileName>
       <FilenameWithoutPath>EoCANprotASperiodic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2538,7 +2538,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotASpolling.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASpolling.c</PathWithFileName>
       <FilenameWithoutPath>EoCANprotASpolling.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2551,7 +2551,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotMCperiodic.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotMCperiodic.c</PathWithFileName>
       <FilenameWithoutPath>EoCANprotMCperiodic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2564,7 +2564,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotMCpolling.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotMCpolling.c</PathWithFileName>
       <FilenameWithoutPath>EoCANprotMCpolling.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2577,7 +2577,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\board\ems\config-can-protocol\EoCANprotSKperiodic.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</PathWithFileName>
       <FilenameWithoutPath>EoCANprotSKperiodic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
