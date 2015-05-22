@@ -229,6 +229,8 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
 extern const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanmap_location_t loc);
 
 
+extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eOcanmap_location_t bloc);
+
 
 /** @fn         eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t loc, eObrd_typeandversions_t *detected)
     @brief      change the fw version etc on a board. we read it from can and then we set it with this function       

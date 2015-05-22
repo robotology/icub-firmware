@@ -360,6 +360,17 @@ extern const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, 
 }
 
 
+extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eOcanmap_location_t bloc)
+{   
+    const eOcanmap_board_extended_t *brd = eo_canmap_GetBoard(p, bloc);
+    if(NULL == brd)
+    {
+        return(eobrd_cantype_unknown);
+    }
+    return(brd->board.props.type);
+}
+
+
 extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t bloc, eObrd_typeandversions_t *detected)
 {
     

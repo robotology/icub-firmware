@@ -64,7 +64,7 @@
 
 const eOcanserv_cfg_t eo_canserv_DefaultCfg = 
 {    
-    .mode             = eocanserv_mode_ondemand,
+    .mode               = eocanserv_mode_ondemand,
     .rxqueuesize        = {64, 64},
     .txqueuesize        = {64, 64},
     .onrxcallback       = {NULL, NULL},
@@ -88,6 +88,8 @@ static void s_eo_canserv_onrx_can(void *arg);
 static void s_eo_canserv_ontx_can(void *arg);
 static void s_eo_canserv_onerror_can(void *arg);
 static eOresult_t s_eo_canserv_send_frame_simplemode(EOtheCANservice *p, eOcanport_t port, eOcanframe_t *frame);
+
+static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanport_t port, eOcanprot_descriptor_t *command);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -206,7 +208,7 @@ extern eOresult_t eo_canserv_TXstart(EOtheCANservice *p, eOcanport_t port, uint8
 
 
 extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t port, uint32_t timeout)
-{
+{ //3*osal_reltime1ms
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -221,7 +223,7 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
     
     if(p->locktilltxall[port].totaltxframes > 0)
     {
-        if(osal_res_OK != (osal_res = osal_semaphore_decrement(p->locktilltxall[port].locksemaphore, 3*osal_reltime1ms)))
+        if(osal_res_OK != (osal_res = osal_semaphore_decrement(p->locktilltxall[port].locksemaphore, timeout)))
         {            
             uint8_t sizeoftxfifo = 0;
             hal_can_out_get((hal_can_port_t)port, &sizeoftxfifo);
@@ -297,6 +299,16 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t port, uint8_t
     return(eores_OK);
 }
 
+extern eOresult_t eo_canserv_SendCommand(EOtheCANservice *p, eOcanport_t port, eOcanprot_descriptor_t *command)
+{
+    if((NULL == p) || (NULL == command))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    return(s_eo_canserv_SendCommand(p, port, command));
+}
+
 #warning ---> it is ok for all but for skin .......
 extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOprotID32_t id32, eOcanprot_descriptor_t *command)
 {
@@ -308,7 +320,8 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOprotID32_
     }
 
     // now i find the location of the entity
-    eOcanmap_location_t location = {0};   
+    eOcanmap_location_t location = {0};  
+    
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL))
     {   // error ...
         #warning --> put diagnostics
@@ -317,25 +330,89 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOprotID32_
     
     // here is the addressing
     eOcanport_t port = (eOcanport_t)location.port; 
-    command->destinationaddress = location.addr;
+    command->address = location.addr;
     command->internalindex = location.insideindex;
     
-    // here is the frame
-    eOcanframe_t frame = {0};
+    return(s_eo_canserv_SendCommand(p, port, command));
     
-    if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
+//    // here is the frame
+//    eOcanframe_t frame = {0};
+//    
+//    if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
+//    {   // error ...
+//        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
+//        errdes.par16                = (command->msgclass << 8) | (command->msgtype);
+//        errdes.par64                = 0;
+//        errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//        errdes.sourceaddress        = command->address;           
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);               
+//        return(eores_NOK_generic);
+//    }
+//    
+//    // ok now i can sent the frame over can. what i do depends on the mode.
+//    return(s_eo_canserv_send_frame_simplemode(p, port, &frame));
+}
+
+#warning -> TBD: we may merge eo_canserv_SendCommandToAllBoardsInEntity() into eo_canserv_SendCommandToEntity() ....
+extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOprotID32_t id32, eOcanprot_descriptor_t *command)
+{
+    eOerrmanDescriptor_t errdes = {0};
+
+    if((NULL == p) || (NULL == command))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    // now i find the location of the entity
+    eOcanmap_location_t location = {0};  
+    uint8_t numoflocs = 0;
+    if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, &numoflocs, NULL))
     {   // error ...
-        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
-        errdes.par16                = (command->msgclass << 8) | (command->msgtype);
-        errdes.par64                = 0;
-        errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-        errdes.sourceaddress        = command->destinationaddress;           
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);               
+        #warning --> put diagnostics
         return(eores_NOK_generic);
     }
     
-    // ok now i can sent the frame over can. what i do depends on the mode.
-    return(s_eo_canserv_send_frame_simplemode(p, port, &frame));
+    // here is the starting address.
+    eOcanport_t port = (eOcanport_t)location.port; 
+    command->address = location.addr;
+    command->internalindex = location.insideindex;
+    
+    uint8_t i=0;
+    eOresult_t res = eores_OK;
+    for(i=0; i<numoflocs; i++)
+    {    
+//        // here is the frame
+//        eOcanframe_t frame = {0};
+//        
+//        if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
+//        {   // error ...
+//            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
+//            errdes.par16                = (command->msgclass << 8) | (command->msgtype);
+//            errdes.par64                = 0;
+//            errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//            errdes.sourceaddress        = command->address;           
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);               
+//            return(eores_NOK_generic);
+//        }
+//        
+//        // ok now i can sent the frame over can. what i do depends on the mode.
+//        eOresult_t r = s_eo_canserv_send_frame_simplemode(p, port, &frame);
+//        if(eores_OK != r)
+//        {
+//            res = r;
+//        }
+        
+        eOresult_t r = s_eo_canserv_SendCommand(p, port, command);
+        if(eores_OK != r)
+        {
+            res = r;
+        }
+
+        // ok, now i increment the address.
+        command->address++;
+    }
+    
+    return(res);
 }
 
 
@@ -507,6 +584,28 @@ static eOresult_t s_eo_canserv_send_frame_simplemode(EOtheCANservice *p, eOcanpo
     }
     
     return(res);
+}
+
+
+static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanport_t port, eOcanprot_descriptor_t *command)
+{   
+    eOerrmanDescriptor_t errdes = {0};
+    // here is the frame
+    eOcanframe_t frame = {0};
+    
+    if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
+    {   // error ...
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
+        errdes.par16                = (command->msgclass << 8) | (command->msgtype);
+        errdes.par64                = 0;
+        errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        errdes.sourceaddress        = command->address;           
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);               
+        return(eores_NOK_generic);
+    }
+    
+    // ok now i can sent the frame over can. what i do depends on the mode.
+    return(s_eo_canserv_send_frame_simplemode(p, port, &frame));   
 }
 
 // --------------------------------------------------------------------------------------------------------------------

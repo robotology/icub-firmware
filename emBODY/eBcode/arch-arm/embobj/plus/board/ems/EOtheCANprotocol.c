@@ -102,7 +102,6 @@ static EOtheCANprotocol s_eo_canprot_singleton =
 
 
 
-#if 1
 
 const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
 {
@@ -131,12 +130,12 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .parser     = NULL
     }, 
     {   // 006      ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD,
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__DISABLE_PWM_PAD,
         .parser     = NULL
     },  
     {   // 007      ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE,
-        .parser     = NULL //eocanprotMCpolling_parser_POL_MC_CMD__GET_CONTROL_MODE
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_CONTROL_MODE
     }, 
     {   // 008      ICUBCANPROTO_POL_MC_CMD__MOTION_DONE
         .former     = eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE,
@@ -178,39 +177,39 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 018
+    {   // 018      ICUBCANPROTO_POL_MC_CMD__SET_DEBUG_PARAM
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 019
+    {   // 019      ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 020
+    {   // 020      ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 021
+    {   // 021      ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_POSITION
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 22
+    {   // 22       ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_POSITION
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 023
+    {   // 023      ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_VELOCITY
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 024
+    {   // 024      ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_VELOCITY
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 025
+    {   // 025      ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_ACCELER
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 026
+    {   // 026      ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_ACCELER
         .former     = NULL,
         .parser     = NULL
     },  
@@ -222,63 +221,63 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = eocanprotMCpolling_former_POL_MC_CMD__VELOCITY_MOVE,
         .parser     = NULL
     },  
-    {   // 029
+    {   // 029      ICUBCANPROTO_POL_MC_CMD__SET_ENCODER_POSITION
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 30
+    {   // 30       ICUBCANPROTO_POL_MC_CMD__SET_P_GAIN
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 031
+    {   // 031      ICUBCANPROTO_POL_MC_CMD__GET_P_GAIN
         .former     = NULL,
         .parser     = NULL
     },    
-    {   // 032
+    {   // 032      ICUBCANPROTO_POL_MC_CMD__SET_D_GAIN
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 033
+    {   // 033      ICUBCANPROTO_POL_MC_CMD__GET_D_GAIN     
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 034
+    {   // 034      ICUBCANPROTO_POL_MC_CMD__SET_I_GAIN
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 035
+    {   // 035      ICUBCANPROTO_POL_MC_CMD__GET_I_GAIN
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 036
+    {   // 036      ICUBCANPROTO_POL_MC_CMD__SET_ILIM_GAIN
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 037
+    {   // 037      ICUBCANPROTO_POL_MC_CMD__GET_ILIM_GAIN
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 038
+    {   // 038      ICUBCANPROTO_POL_MC_CMD__SET_OFFSET
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 039
+    {   // 039      ICUBCANPROTO_POL_MC_CMD__GET_OFFSET
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 040
+    {   // 040      ICUBCANPROTO_POL_MC_CMD__SET_SCALE
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 041
+    {   // 041      ICUBCANPROTO_POL_MC_CMD__GET_SCALE
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 042
+    {   // 042      ICUBCANPROTO_POL_MC_CMD__SET_TLIM
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 043
+    {   // 043      ICUBCANPROTO_POL_MC_CMD__GET_TLIM
         .former     = NULL,
         .parser     = NULL
     }, 
@@ -286,8 +285,8 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_TORQUE,
         .parser     = NULL
     },  
-    {   // 045
-        .former     = NULL,
+    {   // 045      ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_DESIRED_TORQUE,
         .parser     = NULL
     }, 
     {   // 046      ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY
@@ -306,15 +305,15 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 050
+    {   // 050      ICUBCANPROTO_POL_MC_CMD__SET_BOARD_ID
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 051
+    {   // 051      ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 052
+    {   // 052      ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_SOURCE
         .former     = NULL,
         .parser     = NULL
     },  
@@ -326,11 +325,11 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 055
+    {   // 055      ICUBCANPROTO_POL_MC_CMD__GET_PID_ERROR
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 056
+    {   // 056      ICUBCANPROTO_POL_MC_CMD__GET_CALIBRATION_STATUS
         .former     = NULL,
         .parser     = NULL
     },  
@@ -346,11 +345,11 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 060
+    {   // 060      ICUBCANPROTO_POL_MC_CMD__GET_ERROR_STATUS
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 061
+    {   // 061      ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_VELOCITY
         .former     = NULL,
         .parser     = NULL
     }, 
@@ -358,28 +357,25 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_COMMAND_POSITION,
         .parser     = NULL
     },  
-    {   // 063
+    {   // 063      ICUBCANPROTO_POL_MC_CMD__GET_PID_OUTPUT
         .former     = NULL,
         .parser     = NULL
-    },
-
-    
-    
+    },       
     {   // 064      ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = NULL //eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
+        .parser     = NULL 
     },
     {   // 065      ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = NULL //eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
     },
     {   // 066      ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = NULL //eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
+        .parser     = NULL //unsupported
     },
     {   // 067      ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MAX_POSITION,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MAX_POSITION
     },
     {   // 068      ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY,
@@ -427,7 +423,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     },  
     {   // 079      ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_PID,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_PID
     },
     {   // 080      ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_PIDLIMITS,
@@ -435,7 +431,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     }, 
     {   // 081      ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_PIDLIMITS,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_PIDLIMITS
     }, 
     {   // 082      ICUBCANPROTO_POL_MC_CMD__SET_POS_PID 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_POS_PID,
@@ -443,7 +439,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     }, 
     {   // 083      ICUBCANPROTO_POL_MC_CMD__GET_POS_PID
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_POS_PID,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_PID
     },        
     {   // 084      ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_POS_PIDLIMITS,
@@ -451,7 +447,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     },
     {   // 085      ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_POS_PIDLIMITS,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_PIDLIMITS
     },
     {   // 086      ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_VEL_TIMEOUT,
@@ -463,7 +459,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     },
     {   // 088      ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_IMPEDANCE_PARAMS,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_PARAMS
     },  
     {   // 089      ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_IMPEDANCE_OFFSET,
@@ -471,360 +467,127 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     },
     {   // 090      ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_IMPEDANCE_OFFSET,
-        .parser     = NULL
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_OFFSET
     }, 
-    {   // 091 
+    {   // 091      ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION 
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION,
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION
+    }, 
+    {   // 092      ICUBCANPROTO_POL_MC_CMD__SET_OPTICAL_ENC_RATIO 
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 092 
-        .former     = NULL,
-        .parser     = NULL
-    }, 
-    {   // 093 
+    {   // 093      ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS
         .former     = NULL,
         .parser     = NULL
     },        
-    {   // 094  
+    {   // 094      ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS        
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 095
+    {   // 095      ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 096 
+    {   // 096      ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 097 
+    {   // 097      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAMS 
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 098 
+    {   // 098      ICUBCANPROTO_POL_MC_CMD__GET_MOTOR_PARAMS
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 099 
+    {   // 099      ICUBCANPROTO_POL_MC_CMD__SET_MODEL_PARAMS 
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 100 
+    {   // 100      ICUBCANPROTO_POL_MC_CMD__GET_MODEL_PARAMS
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 101 
+    {   // 101      ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID 
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID,
+        .parser     = NULL
+    }, 
+    {   // 102      ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PID
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 102 
-        .former     = NULL,
-        .parser     = NULL
-    }, 
-    {   // 103 
-        .former     = NULL,
+    {   // 103      ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS 
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS,
         .parser     = NULL
     },        
-    {   // 104  
+    {   // 104      ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_PIDLIMITS  
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 105
+    {   // 105      ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID,
+        .parser     = NULL
+    },
+    {   // 106      ICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PID 
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 106 
-        .former     = NULL,
+    {   // 107      ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS 
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID,
         .parser     = NULL
     },
-    {   // 107 
-        .former     = NULL,
-        .parser     = NULL
-    },
-    {   // 108 
+    {   // 108      ICUBCANPROTO_POL_MC_CMD__GET_VELOCITY_PIDLIMITS
         .former     = NULL,
         .parser     = NULL
     },  
-    {   // 109 
-        .former     = NULL,
+    {   // 109      ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_CURRENT,
         .parser     = NULL
     },
-    {   // 110 
+    {   // 110      ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_CURRENT
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 111 
+    {   // 111      ICUBCANPROTO_POL_MC_CMD__SET_PERIODIC_MSG_CONTENTS
         .former     = NULL,
         .parser     = NULL
     }, 
-    {   // 112 
-        .former     = NULL,
+    {   // 112      ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS       
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_I2T_PARAMS,
         .parser     = NULL
     }, 
-    {   // 113 
+    {   // 113      ICUBCANPROTO_POL_MC_CMD__GET_I2T_PARAMS
         .former     = NULL,
         .parser     = NULL
     },        
-    {   // 114  
+    {   // 114      ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS 
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_OPENLOOP_PARAMS,
+        .parser     = NULL
+    },
+    {   // 115      ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_OPENLOOP_PARAMS,
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS
+    },
+    {   // 116      ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE 
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE,
+        .parser     = NULL
+    },
+    {   // 117      ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE 
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 115
+    {   // 118      ICUBCANPROTO_POL_MC_CMD__SET_TCFILTER_TYPE
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 116 
-        .former     = NULL,
-        .parser     = NULL
-    },
-    {   // 117 
-        .former     = NULL,
-        .parser     = NULL
-    },
-    {   // 118 
-        .former     = NULL,
-        .parser     = NULL
-    },
-    {   // 119 
+    {   // 119      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG 
         .former     = NULL,
         .parser     = NULL
     }   
 };  EO_VERIFYsizeof(s_eo_canprot_functions_pollingMotorControl, (ICUBCANPROTO_POL_MC_CMD_MAXNUM)*sizeof(eOcanprot_functions_t));
 
 
-#else
-const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
-{
-    {   // keep it first
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__exceptions,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__exceptions
-    },  
-    
-    {   // 064  
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
-    },
-    {   // 065
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
-    },
-    {   // 066 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 067 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 068 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },  
-    {   // 069 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 070 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 071 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 072 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 073 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },        
-    {   // 074  
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
-    },
-    {   // 075
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
-    },
-    {   // 076 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 077 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 078 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },  
-    {   // 079 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 080 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 081 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 082 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 083 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },        
-    {   // 084  
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
-    },
-    {   // 085
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
-    },
-    {   // 086 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 087 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 088 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },  
-    {   // 089 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 090 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 091 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 092 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 093 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },        
-    {   // 094  
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
-    },
-    {   // 095
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
-    },
-    {   // 096 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 097 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 098 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },  
-    {   // 099 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 100 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 101 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 102 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 103 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },        
-    {   // 104  
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
-    },
-    {   // 105
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
-    },
-    {   // 106 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 107 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 108 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },  
-    {   // 109 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 110 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 111 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 112 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }, 
-    {   // 113 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },        
-    {   // 114  
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION
-    },
-    {   // 115
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION
-    },
-    {   // 116 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 117 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    },
-    {   // 118 
-        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION,
-        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION
-    }
-
-   
-};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingMotorControl, ((ICUBCANPROTO_POL_MC_CMD_MAXNUM) - (ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION) + 1)*sizeof(eOcanprot_functions_t));
-
-#endif
 
 
 static const uint8_t s_eo_canprot_functions_pollingMotorControl_maxnumber = sizeof(s_eo_canprot_functions_pollingMotorControl) / sizeof(eOcanprot_functions_t);
@@ -833,115 +596,448 @@ static const uint8_t s_eo_canprot_functions_pollingMotorControl_maxnumber = size
 
 const eOcanprot_functions_t s_eo_canprot_functions_periodicMotorControl[] =
 {
-    {   // 000
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 000      ICUBCANPROTO_PER_MC_MSG__2FOC
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__2FOC
     },
-    {   // 001
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 001      ICUBCANPROTO_PER_MC_MSG__POSITION
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__POSITION
     }, 
-    {   // 002
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 002      ICUBCANPROTO_PER_MC_MSG__PID_VAL
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL
     },
-    {   // 003
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 003      ICUBCANPROTO_PER_MC_MSG__STATUS
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__STATUS
     },
-    {   // 004
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 004      ICUBCANPROTO_PER_MC_MSG__CURRENT
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT
     },
-    {   // 005
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 005      ICUBCANPROTO_PER_MC_MSG__OVERFLOW
+        .former     = NULL,
+        .parser     = NULL
     },
-    {   // 006
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 006      ICUBCANPROTO_PER_MC_MSG__PRINT
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__PRINT
     },
-    {   // 007
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 007      ICUBCANPROTO_PER_MC_MSG__VELOCITY
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY
     },
-    {   // 008
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 008      ICUBCANPROTO_PER_MC_MSG__PID_ERROR
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR
     },
-    {   // 009
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 009      ICUBCANPROTO_PER_MC_MSG__DEBUG
+        .former     = NULL,
+        .parser     = NULL
     },
-    {   // 010
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 010      ICUBCANPROTO_PER_MC_MSG__MOTOR_POSITION
+        .former     = NULL,
+        .parser     = NULL
     },
-    {   // 011
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 011      ICUBCANPROTO_PER_MC_MSG__MOTOR_SPEED
+        .former     = NULL,
+        .parser     = NULL
     }, 
-    {   // 012
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+    {   // 012      ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS
+        .former     = NULL,
+        .parser     = eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS
     },
     {   // 013
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+        .former     = NULL,
+        .parser     = NULL
     },
     {   // 014
-        .former     = eocanprotMCperiodic_former_00,
-        .parser     = eocanprotMCperiodic_parser_00
+        .former     = NULL,
+        .parser     = NULL
     },
-    {   // 015
-        .former     = eocanprotMCperiodic_former_01,
-        .parser     = eocanprotMCperiodic_parser_01
+    {   // 015      ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
+        .former     = eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT,
+        .parser     = NULL
     }    
-};  EO_VERIFYsizeof(s_eo_canprot_functions_periodicMotorControl, ((16))*sizeof(eOcanprot_functions_t));
+};  EO_VERIFYsizeof(s_eo_canprot_functions_periodicMotorControl, ((eocanprot_classperiodic_msgtypes_maxnumberof))*sizeof(eOcanprot_functions_t));
 
 static const uint8_t s_eo_canprot_functions_periodicMotorControl_maxnumber = sizeof(s_eo_canprot_functions_periodicMotorControl) / sizeof(eOcanprot_functions_t);
 
 
-
 const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
 {
-    {   // 000 - > ICUBCANPROTO_POL_AS_CMD__SET_TXMODE = 0x07
-        .former     = eocanprotASpolling_former_00,
-        .parser     = eocanprotASpolling_parser_00
-    },
-    {   // 001 -> ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE = 0x08
-        .former     = eocanprotASpolling_former_01,
-        .parser     = eocanprotASpolling_parser_01
-    },
-    {   // 002 -> ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION = 0x10
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02
-    },
-    {   // 003 -> ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES = 0x18
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02        
-    },
-    {   // 004 -> ICUBCANPROTO_POL_SK_CMD__TACT_SETUP = 0x4c
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02        
+    {   // 000      ICUBCANPROTO_POL_AS_CMD__NONE
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 001      ICUBCANPROTO_POL_AS_CMD__SET_IIR
+        .former     = NULL,
+        .parser     = NULL
     }, 
-    {   // 005 -> ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG = 0x4d
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02        
+    {   // 002      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 003      ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_RC
+        .former     = NULL,
+        .parser     = NULL
     }, 
-    {   // 006 -> ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2 = 0x4e
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02        
+    {   // 004      ICUBCANPROTO_POL_AS_CMD__SET_CH_DAC
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 005      ICUBCANPROTO_POL_AS_CMD__SELECT_ACTIVE_CH
+        .former     = NULL,
+        .parser     = NULL
     }, 
-    {   // 007 -> ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP = 0x4f
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02        
-    },   
-    {   // 008 -> ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG = 0x50
-        .former     = eocanprotASpolling_former_02,
-        .parser     = eocanprotASpolling_parser_02        
-    }     
-};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingAnalogSensor, ((9))*sizeof(eOcanprot_functions_t));
+    {   // 006      ICUBCANPROTO_POL_AS_CMD__CALIBRATE_OFFSET
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 007      ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+        .former     = eocanprotASpolling_former_POL_AS_CMD__SET_TXMODE,
+        .parser     = NULL
+    }, 
+    {   // 008      ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
+        .former     = eocanprotASpolling_former_POL_AS_CMD__SET_CANDATARATE,
+        .parser     = NULL
+    },  
+    {   // 009      ICUBCANPROTO_POL_AS_CMD__SAVE2EE
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 010      ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 011      ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 012      ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 013      ICUBCANPROTO_POL_AS_CMD__FILTER_EN
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 014      ICUBCANPROTO_POL_AS_CMD__MUX_EN
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 015      ICUBCANPROTO_POL_AS_CMD__MUX_NUM
+        .former     = NULL,
+        .parser     = NULL
+    },     
+    {   // 016      ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION
+        .former     = eocanprotASpolling_former_POL_AS_CMD__SET_RESOLUTION,
+        .parser     = NULL
+    },  
+    {   // 017      ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_G
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 018      ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 019      ICUBCANPROTO_POL_AS_CMD__SET_CALIB_TARE
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 020      ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 021      ICUBCANPROTO_POL_AS_CMD__SET_CURR_TARE
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 22       ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 023      ICUBCANPROTO_POL_AS_CMD__SET_FULL_SCALES
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 024      ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
+        .former     = eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES,
+        .parser     = eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES
+    },  
+    {   // 025      ICUBCANPROTO_POL_AS_CMD__SET_SERIAL_NO
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 026      ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 027      ICUBCANPROTO_POL_AS_CMD__GET_EEPROM_STATUS
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 028      ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 029      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 30       
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 031      
+        .former     = NULL,
+        .parser     = NULL
+    },    
+    {   // 032      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 033           
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 034      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 035      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 036      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 037      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 038      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 039      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 040      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 041      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 042      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 043      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 044      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 045      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 046      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 047
+        .former     = NULL,
+        .parser     = NULL
+    },     
+    {   // 048
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 049
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 050      ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 051      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 052      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 053
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 054
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 055      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 056      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 057
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 058
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 059
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 060      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 061      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 062      
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 063      
+        .former     = NULL,
+        .parser     = NULL
+    },       
+    {   // 064       
+        .former     = NULL,
+        .parser     = NULL 
+    },
+    {   // 065      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 066       
+        .former     = NULL,
+        .parser     = NULL 
+    },
+    {   // 067       
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 068       
+        .former     = NULL,
+        .parser     = NULL
+    },  
+    {   // 069      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 070      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 071      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 072       
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 073      
+        .former     = NULL,
+        .parser     = NULL
+    },        
+    {   // 074       
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 075      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 076      ICUBCANPROTO_POL_SK_CMD__TACT_SETUP      
+        .former     = eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP,
+        .parser     = NULL
+    },
+    {   // 077      ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG
+        .former     = eocanprotASpolling_former_POL_SK_CMD__SET_BRD_CFG,
+        .parser     = NULL
+    },
+    {   // 078      ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2 
+        .former     = eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP2,
+        .parser     = NULL
+    },  
+    {   // 079      ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 080      ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG 
+        .former     = eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG,
+        .parser     = NULL
+    }, 
+    {   // 081      
+        .former     = NULL,
+        .parser     = NULL
+    }
+};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingAnalogSensor, (82)*sizeof(eOcanprot_functions_t));
+
+
+
+//const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
+//{
+//    {   // 000 - > ICUBCANPROTO_POL_AS_CMD__SET_TXMODE = 0x07
+//        .former     = eocanprotASpolling_former_00,
+//        .parser     = eocanprotASpolling_parser_00
+//    },
+//    {   // 001 -> ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE = 0x08
+//        .former     = eocanprotASpolling_former_01,
+//        .parser     = eocanprotASpolling_parser_01
+//    },
+//    {   // 002 -> ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION = 0x10
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02
+//    },
+//    {   // 003 -> ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES = 0x18
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02        
+//    },
+//    {   // 004 -> ICUBCANPROTO_POL_SK_CMD__TACT_SETUP = 0x4c
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02        
+//    }, 
+//    {   // 005 -> ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG = 0x4d
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02        
+//    }, 
+//    {   // 006 -> ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2 = 0x4e
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02        
+//    }, 
+//    {   // 007 -> ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP = 0x4f
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02        
+//    },   
+//    {   // 008 -> ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG = 0x50
+//        .former     = eocanprotASpolling_former_02,
+//        .parser     = eocanprotASpolling_parser_02        
+//    }     
+//};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingAnalogSensor, ((9))*sizeof(eOcanprot_functions_t));
 
 static const uint8_t s_eo_canprot_functions_pollingAnalogSensor_maxnumber = sizeof(s_eo_canprot_functions_pollingAnalogSensor) / sizeof(eOcanprot_functions_t);
 
@@ -980,29 +1076,29 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicAnalogSensor[] =
         .former     = NULL,
         .parser     = NULL
     },
-    {   // 008
-        .former     = eocanprotASperiodic_former_00,
-        .parser     = eocanprotASperiodic_parser_00
+    {   // 008      ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE
+        .former     = NULL,
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE
     },
-    {   // 009
-        .former     = eocanprotASperiodic_former_00,
-        .parser     = eocanprotASperiodic_parser_00
+    {   // 009      ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE
+        .former     = NULL,
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE
     },
-    {   // 010
-        .former     = eocanprotASperiodic_former_00,
-        .parser     = eocanprotASperiodic_parser_00
+    {   // 010      ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR
+        .former     = eocanprotASperiodic_former_PER_AS_MSG__FORCE_VECTOR,
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__FORCE_VECTOR
     },
-    {   // 011
-        .former     = eocanprotASperiodic_former_00,
-        .parser     = eocanprotASperiodic_parser_00
+    {   // 011      ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR
+        .former     = eocanprotASperiodic_former_PER_AS_MSG__TORQUE_VECTOR,
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__TORQUE_VECTOR
     }, 
-    {   // 012
-        .former     = eocanprotASperiodic_former_00,
-        .parser     = eocanprotASperiodic_parser_00
+    {   // 012      ICUBCANPROTO_PER_AS_MSG__HES0TO6
+        .former     = NULL,
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__HES0TO6
     },
-    {   // 013
-        .former     = eocanprotASperiodic_former_00,
-        .parser     = eocanprotASperiodic_parser_00
+    {   // 013      ICUBCANPROTO_PER_AS_MSG__HES7TO14
+        .former     = NULL,
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14
     },
     {   // 014
         .former     = NULL,
@@ -1013,7 +1109,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicAnalogSensor[] =
         .parser     = NULL
     }   
     
-};   EO_VERIFYsizeof(s_eo_canprot_functions_periodicAnalogSensor, ((16))*sizeof(eOcanprot_functions_t));
+};   EO_VERIFYsizeof(s_eo_canprot_functions_periodicAnalogSensor, ((eocanprot_classperiodic_msgtypes_maxnumberof))*sizeof(eOcanprot_functions_t));
 
 static const uint8_t s_eo_canprot_functions_periodicAnalogSensor_maxnumber = sizeof(s_eo_canprot_functions_periodicAnalogSensor) / sizeof(eOcanprot_functions_t);
 
@@ -1023,7 +1119,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicSkin[] =
 {
     {
         .former     = NULL,
-        .parser     = eocanprotSKperiodic_parser_TactileSensorOutput8bit
+        .parser     = eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG
     }
 };   EO_VERIFYsizeof(s_eo_canprot_functions_periodicSkin, ((1))*sizeof(eOcanprot_functions_t));
 
@@ -1038,7 +1134,7 @@ const eOcanprot_functions_t * const eo_canprot_lut_functions[] =
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_pollingAnalogSensor,
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicAnalogSensor,
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicSkin
-};  EO_VERIFYsizeof(eo_canprot_lut_functions, eocanprot_msgclass_numberofthem*sizeof(const eOcanprot_functions_t *));  
+};  EO_VERIFYsizeof(eo_canprot_lut_functions, (eocanprot_msgclass_maxvalue+1)*sizeof(const eOcanprot_functions_t *));  
 
 
 
@@ -1266,7 +1362,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
         return(eores_NOK_generic);
     }
     
-    if(msgclass >= eocanprot_msgclass_numberofthem)
+    if(msgclass > eocanprot_msgclass_maxvalue)
     {
         return(eores_NOK_generic);
     }
@@ -1288,32 +1384,17 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
                 msgtype = des->msgtype;
             }
 
-#if 1
             // marco.accame: the msgtype is used as an index to a big sparse table. this solution gives quicker access.
             *index1 = msgtype;
             res = eores_OK;
-#else  
-            // marco.accame: the used IDs starts from ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION = 64. 
-            //               the exceptions are: less then 20. i manage exceptions at position 0. the others from 64 start at position 1 
-          
-            if(msgtype < ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION)
-            {
-                *index1 = 0;        // the exceptions are mapped as last.
-                res = eores_OK;
-            }
-            else if(msgtype < (ICUBCANPROTO_POL_MC_CMD_MAXNUM))
-            {
-                *index1 = msgtype - (ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION - 1); // so that id 64 is mapped at position 1, 65 at position 2 etc.
-                res = eores_OK;
-            }
-#endif                        
+                       
             if(*index1 >= s_eo_canprot_functions_pollingMotorControl_maxnumber)
             {   // extra check
                 res = eores_NOK_generic;
             } 
         } break;
         
-        case eocanprot_msgclass_pollingAnalogSensor:
+        case eocanprot_msgclass_pollingAnalogSensor: // or eocanprot_msgclass_pollingSkin, both equal to 2
         {
             *index0 = msgclass; 
             if(eobool_true == parsemode)
@@ -1323,28 +1404,39 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             else
             {
                 msgtype = des->msgtype;
-            }                
-            // marco.accame: the used IDs are only 4 out of a maximum of 50 something. so, ... just get the used ids and remaps them into 0, 1, 2, 3
-            //               actually there are also those of the skin polling commands. they are 5. i write a big switch-case
-            switch(msgtype)
-            {
-                case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE:           { *index1 = 0; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE:      { *index1 = 1; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION:       { *index1 = 2; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES:      { *index1 = 3; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_SK_CMD__TACT_SETUP:           { *index1 = 4; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG:          { *index1 = 5; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2:          { *index1 = 6; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP:       { *index1 = 7; res = eores_OK; } break;
-                case ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG:       { *index1 = 8; res = eores_OK; } break;
-                default: { res = eores_NOK_generic; } break;            
-            }
-            
-            // marco.accame: i have put an extra check ... but PLEASE ... be careful if you change things. the index1 must not go beyond s_eo_canprot_functions_pollingAnalogSensor.
+            }  
+
+            // marco.accame: the msgtype is used as an index to a big sparse table. this solution gives quicker access.
+            *index1 = msgtype;
+            res = eores_OK;
+                       
             if(*index1 >= s_eo_canprot_functions_pollingAnalogSensor_maxnumber)
             {   // extra check
                 res = eores_NOK_generic;
-            }           
+            } 
+
+            
+//            // marco.accame: the used IDs are only 4 out of a maximum of 50 something. so, ... just get the used ids and remaps them into 0, 1, 2, 3
+//            //               actually there are also those of the skin polling commands. they are 5. i write a big switch-case
+//            switch(msgtype)
+//            {
+//                case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE:           { *index1 = 0; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE:      { *index1 = 1; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION:       { *index1 = 2; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES:      { *index1 = 3; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_SK_CMD__TACT_SETUP:           { *index1 = 4; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG:          { *index1 = 5; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2:          { *index1 = 6; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP:       { *index1 = 7; res = eores_OK; } break;
+//                case ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG:       { *index1 = 8; res = eores_OK; } break;
+//                default: { res = eores_NOK_generic; } break;            
+//            }
+//            
+//            // marco.accame: i have put an extra check ... but PLEASE ... be careful if you change things. the index1 must not go beyond s_eo_canprot_functions_pollingAnalogSensor.
+//            if(*index1 >= s_eo_canprot_functions_pollingAnalogSensor_maxnumber)
+//            {   // extra check
+//                res = eores_NOK_generic;
+//            }           
         } break;
 
         case eocanprot_msgclass_periodicMotorControl:
@@ -1393,7 +1485,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
         case eocanprot_msgclass_periodicSkin:
         {
             *index0 = msgclass;
-            *index1 = 0;        // there is only one type of message: Tactile Sensor Output at 8 bits resolution.  
+            *index1 = 0;        // there is only one type of message: or rather ... we use only one funtion to parse.  
             res = eores_OK;
             
             if(*index1 >= s_eo_canprot_functions_periodicSkin_maxnumber)

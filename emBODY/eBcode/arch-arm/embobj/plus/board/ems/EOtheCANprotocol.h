@@ -43,7 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"    
 #include "iCubCanProtocol.h"  
-//#include "EOtheCANmapping.h"
+#include "EOtheCANmapping.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -79,9 +79,14 @@ extern "C" {
 // creates the CAN ID given the class, origin and destination addresses
 #define EOCANPROT_CREATE_CANID(clss, orig, dest)                ( (((clss)&0xF) << 8) | (((orig)&0xF) << 4) | ((dest)&0xF) )  
 
+// creates the CAN ID for periodic messages
+#define EOCANPROT_CREATE_CANID_PERIODIC(clss, orig, type)       ( (((clss)&0xF) << 8) | (((orig)&0xF) << 4) | ((type)&0xF) )  
+
 // creates the DATA[0] byte for MC polling messages given the internalindex and the message type
 #define EOCANPROT_CREATE_POLLING_MC_DATA0(intindex, type)       ( (((intindex)&0x1) << 7) | ((type)&0x7F) )
 
+// creates the DATA[0] byte for AS polling messages given the message type
+#define EOCANPROT_CREATE_POLLING_AS_DATA0(type)                 ( ((type)&0x7F) )
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -90,17 +95,20 @@ extern "C" {
  **/  
 typedef struct EOtheCANprotocol_hid EOtheCANprotocol;
 
-
+// eocanprot_msgclass_pollingSkin is a fake class, as it is used eocanprot_msgclass_pollingAnalogSensor
 typedef enum
 {
     eocanprot_msgclass_pollingMotorControl          = ICUBCANPROTO_CLASS_POLLING_MOTORCONTROL,          // 0
     eocanprot_msgclass_periodicMotorControl         = ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL,         // 1
     eocanprot_msgclass_pollingAnalogSensor          = ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR,          // 2
     eocanprot_msgclass_periodicAnalogSensor         = ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR,         // 3
+    eocanprot_msgclass_pollingSkin                  = ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR,          // 2
     eocanprot_msgclass_periodicSkin                 = ICUBCANPROTO_CLASS_PERIODIC_SKIN                  // 4
 } eOcanprot_msgclass_t;
 
-enum { eocanprot_msgclass_numberofthem = 5 };
+enum { eocanprot_msgclass_maxvalue = 4 };
+
+enum { eocanprot_classperiodic_msgtypes_maxnumberof = 16, eocanprot_classpolling_msgtypes_maxnumberof = 128 };
 
 
 /** @typedef    typedef struct eOcanprot_descriptor_t
@@ -108,14 +116,33 @@ enum { eocanprot_msgclass_numberofthem = 5 };
  **/ 
 typedef struct
 {
-    uint8_t     msgclass;               // use eOcanprot_msgclass_t
-    uint8_t     msgtype;                // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
-    uint8_t     destinationaddress;     // it is the destination can address. at max 4 bits
-    uint8_t     internalindex;          // use eOcanmap_insideindex_t: 0, 1, none. it is used if the message is for a joint/motor inside the can board. otherwise it is not used.
-    void*       value;                  // keeps a pointer to the value to be put inside the can frame.
+    uint8_t     msgclass;       // use eOcanprot_msgclass_t
+    uint8_t     msgtype;        // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
+    uint8_t     address;        // it is the can address. at max 4 bits. it specifies the destination address execpt if msgclass is a eocanprot_msgclass_periodic* where is the origin address.
+    uint8_t     internalindex;  // use eOcanmap_insideindex_t: 0, 1, none. it is used if the message is for a joint/motor inside the can board. otherwise it is not used.
+    void*       value;          // keeps a pointer to the value to be put inside the can frame.
 } eOcanprot_descriptor_t;
 
 
+typedef struct
+{
+    uint8_t     class;          // use eOcanprot_msgclass_t
+    uint8_t     type;           // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
+    void*       value;          // keeps a pointer to the value to be put inside the can frame.    
+} eOcanprot_command_t;
+
+
+/** @typedef    typedef struct eOcanprot_descriptor_t
+    @brief      Contains whatever is required to form the can frame.
+ **/ 
+typedef struct
+{
+    eOcanprot_command_t     cmd;
+    eOcanmap_location_t     loc;
+} eOcanprot_descriptor2_t;  // maybe this type is better.
+
+
+//#warning -----------------> change eOcanprot_descriptor_t::address into simply address. because it is origin or destination depending on cases
 
 typedef eOresult_t (*eOcanprot_fp_parser_t)(eOcanframe_t *frame, eOcanport_t port);
 
