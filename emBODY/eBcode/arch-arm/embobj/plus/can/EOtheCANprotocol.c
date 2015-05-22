@@ -24,7 +24,7 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 
-#include "EOtheCANprotocolCfg.h" 
+#include "EOtheCANprotocol_functions.h" 
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"

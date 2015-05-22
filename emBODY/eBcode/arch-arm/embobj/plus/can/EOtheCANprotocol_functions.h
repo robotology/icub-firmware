@@ -18,15 +18,15 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHECANPROTOCOLCFG_H_
-#define _EOTHECANPROTOCOLCFG_H_
+#ifndef _EOTHECANPROTOCOL_FUNCTIONS_H_
+#define _EOTHECANPROTOCOL_FUNCTIONS_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/** @file       EOtheCANprotocolCfg.h
+/** @file       EOtheCANprotocol_functions.h
     @brief      This header file contains declaration of the functions used to parse / form can frames
     @author     marco.accame@iit.it
 	@date       12 mar 2015
