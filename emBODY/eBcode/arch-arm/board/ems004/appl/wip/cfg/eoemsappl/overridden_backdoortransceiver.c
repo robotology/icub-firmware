@@ -20,13 +20,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
-#include "string.h"
-#include "OPCprotocolManager_Cfg.h" 
-#include "EOMtheEMSbackdoortransceiver_hid.h"
+//#include "string.h"
+//#include "OPCprotocolManager_Cfg.h" 
+//#include "EOMtheEMSbackdoortransceiver_hid.h"
 #include "OPCprotocolManager.h"
 
-#include "EOtheEMSapplDiagnostics.h"
-#include "hal_trace.h"
+////#include "EOtheEMSapplDiagnostics.h"
+//#include "hal_trace.h"
 #include "stdio.h"
 
 
@@ -42,7 +42,7 @@
 
 //static void generic_on_rec(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
-static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
+//static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -68,31 +68,31 @@ static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, voi
 
 
 
-static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
-{   // for the ems
-    
-    eOdgn_commands_t* cmd_ptr = (eOdgn_commands_t*)recdata;
-    
-    switch(opc)
-    {
+//static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, void* recdata)
+//{   // for the ems
+//    
+//    eOdgn_commands_t* cmd_ptr = (eOdgn_commands_t*)recdata;
+//    
+//    switch(opc)
+//    {
 
-        case opcprotman_opc_say:    // someboby has replied to a ask we sent
-        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
-        {
-             
-        }
-        case opcprotman_opc_set:
-        default:
-        {   
-            char str[70];
-            snprintf(str, sizeof(str)-1, "diagnostics cmd=%d, extFault=%d ethCounters=%d canstat=%d", cmd_ptr->enable, cmd_ptr->signalExtFault, cmd_ptr->signalEthCounters, cmd_ptr->signalCanStatistics);
-            hal_trace_puts(str);
-            memcpy(&eo_dgn_cmds, (eOdgn_commands_t*)recdata, sizeof(eOdgn_commands_t));
-            eo_theEMSdgn_setEthError2check(eo_theEMSdgn_GetHandle(), (eOdgn_ethCounters_type_t)eo_dgn_cmds.signalEthCounters);
-        } break;
-    }       
-    
-}
+//        case opcprotman_opc_say:    // someboby has replied to a ask we sent
+//        case opcprotman_opc_sig:    // someboby has spontaneously sent some data
+//        {
+//             
+//        }
+//        case opcprotman_opc_set:
+//        default:
+//        {   
+//            char str[70];
+//            snprintf(str, sizeof(str)-1, "diagnostics cmd=%d, extFault=%d ethCounters=%d canstat=%d", cmd_ptr->enable, cmd_ptr->signalExtFault, cmd_ptr->signalEthCounters, cmd_ptr->signalCanStatistics);
+//            hal_trace_puts(str);
+//            memcpy(&eo_dgn_cmds, (eOdgn_commands_t*)recdata, sizeof(eOdgn_commands_t));
+//            eo_theEMSdgn_setEthError2check(eo_theEMSdgn_GetHandle(), (eOdgn_ethCounters_type_t)eo_dgn_cmds.signalEthCounters);
+//        } break;
+//    }       
+//    
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -105,108 +105,122 @@ static void on_rec_dgn_cmds(opcprotman_opc_t opc, opcprotman_var_map_t* map, voi
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+// use this in case you dont want use the backdoortransceiver
+extern opcprotman_cfg_t* opcprotman_getconfiguration(void)
+{
+    return(NULL);
+}
 
+
+// this one is used only in the ems board. use it if you dont want to use the backdoortransceiver.
+// otehrwise use calls to opcprotman_personalize_var() function 
 extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
 {
-    opcprotman_res_t res = opcprotman_OK;
-    
+    return(opcprotman_NOK_generic);
+}
 
-/* personalize eodgn_nvidbdoor_cmds var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_cmds,
-                                        (uint8_t*) &eo_dgn_cmds, 
-                                        on_rec_dgn_cmds);
 
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-    
-/* personalize eodgn_nvidbdoor_errorlog var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_errorlog,
-                                        (uint8_t*) &eo_dgn_errorlog, 
-                                        NULL);
+//extern opcprotman_res_t opcprotman_personalize_database(OPCprotocolManager *p)
+//{
+//    opcprotman_res_t res = opcprotman_OK;
+//    
 
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-    
-/* personalize eodgn_nvidbdoor_emsperiph var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_emsperiph,
-                                        (uint8_t*)&eo_dgn_emsperiph, 
-                                        NULL); //on ems i don't receive this data
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-    
-/* personalize eodgn_nvidbdoor_emsapplcore var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_emsapplcommon,
-                                        (uint8_t*)&eo_dgn_emsapplcore, 
-                                        NULL); //on ems i don't receive this data
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-    
-/* personalize eodgn_nvidbdoor_emsapplmc var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_emsapplmc,
-                                        (uint8_t*)&eo_dgn_emsappmc, 
-                                        NULL); //on ems i don't receive this data
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-  
-
-/* personalize eodgn_nvidbdoor_motorstatus var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_motorstatus,
-                                        (uint8_t*)&eo_dgn_motorstflag, 
-                                        NULL); //on ems i don't receive this data
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-
-    
-    /* personalize eodgn_nvidbdoor_motorstatus var*/
-	res = opcprotman_personalize_var(   p, 
-                                        eodgn_nvidbdoor_canQueueStatistics,
-                                        (uint8_t*)&eo_dgn_canstatistics, 
-                                        NULL); //on ems i don't receive this data
-
-    if(opcprotman_OK != res)
-    {
-        return(res);
-    }
-    
-    
-//#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
-//
-//    /* personalize eodgn_nvidbdoor_rxcheckSetpoints var*/
+///* personalize eodgn_nvidbdoor_cmds var*/
 //	res = opcprotman_personalize_var(   p, 
-//                                        eodgn_nvidbdoor_rxcheckSetpoints,
-//                                        (uint8_t*)&eo_dgn_rxchecksepoints, 
-//                                         NULL); //on ems i don't receive this data
-//
+//                                        eodgn_nvidbdoor_cmds,
+//                                        (uint8_t*) &eo_dgn_cmds, 
+//                                        on_rec_dgn_cmds);
+
 //    if(opcprotman_OK != res)
 //    {
 //        return(res);
 //    }
 //    
-//#endif   
-    return(res);
-}
+///* personalize eodgn_nvidbdoor_errorlog var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_errorlog,
+//                                        (uint8_t*) &eo_dgn_errorlog, 
+//                                        NULL);
+
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+///* personalize eodgn_nvidbdoor_emsperiph var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_emsperiph,
+//                                        (uint8_t*)&eo_dgn_emsperiph, 
+//                                        NULL); //on ems i don't receive this data
+
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+///* personalize eodgn_nvidbdoor_emsapplcore var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_emsapplcommon,
+//                                        (uint8_t*)&eo_dgn_emsapplcore, 
+//                                        NULL); //on ems i don't receive this data
+
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+///* personalize eodgn_nvidbdoor_emsapplmc var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_emsapplmc,
+//                                        (uint8_t*)&eo_dgn_emsappmc, 
+//                                        NULL); //on ems i don't receive this data
+
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+//  
+
+///* personalize eodgn_nvidbdoor_motorstatus var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_motorstatus,
+//                                        (uint8_t*)&eo_dgn_motorstflag, 
+//                                        NULL); //on ems i don't receive this data
+
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+
+//    
+//    /* personalize eodgn_nvidbdoor_motorstatus var*/
+//	res = opcprotman_personalize_var(   p, 
+//                                        eodgn_nvidbdoor_canQueueStatistics,
+//                                        (uint8_t*)&eo_dgn_canstatistics, 
+//                                        NULL); //on ems i don't receive this data
+
+//    if(opcprotman_OK != res)
+//    {
+//        return(res);
+//    }
+//    
+//    
+////#if defined(VERIFY_ROP_SETIMPEDANCE) | defined(VERIFY_ROP_SETPOSITIONRAW)
+////
+////    /* personalize eodgn_nvidbdoor_rxcheckSetpoints var*/
+////	res = opcprotman_personalize_var(   p, 
+////                                        eodgn_nvidbdoor_rxcheckSetpoints,
+////                                        (uint8_t*)&eo_dgn_rxchecksepoints, 
+////                                         NULL); //on ems i don't receive this data
+////
+////    if(opcprotman_OK != res)
+////    {
+////        return(res);
+////    }
+////    
+////#endif   
+//    return(res);
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

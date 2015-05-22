@@ -51,20 +51,23 @@ enum {eo_appMeasConv_hid_jntEncoderConvOffset_defaultValue = 0};
 
 typedef struct
 {
-    eOappMeasConv_encConversionFactor_t       factor;  /**< proportionalRatio between idg and encoder's ticks. */
-    eOappMeasConv_encConversionOffset_t      offset;  /**< offset to move encoder's zero out form joint's limit range */
+    eOappMeasConv_encConversionFactor_t     factor;  /**< proportionalRatio between idg and encoder's ticks. */
+    eOappMeasConv_encConversionOffset_t     offset;  /**< offset to move encoder's zero out form joint's limit range */
 } eOappMeasConv_encoderConversionData_t;
 
 struct EOappMeasConv_hid
 {
     eOappMeasConv_cfg_t                         cfg;
-    struct
-    {
-        uint8_t                                 jointVelocityShift;
-        uint8_t                                 jointVelocityEstimationShift;
-        uint8_t                                 jointAccEstimationShift;
-    } shiftvalues;
-    uint16_t                                    totalnumofjoint;
+//    struct
+//    {
+//        uint8_t                                 jointVelocityShift;
+//        uint8_t                                 jointVelocityEstimationShift;
+//        uint8_t                                 jointAccEstimationShift;
+//    } shiftvalues;
+    uint8_t                                     jointVelocityShift;
+    uint8_t                                     jointVelocityEstimationShift;
+    uint8_t                                     jointAccEstimationShift;
+    uint8_t                                     totalnumofjoint;
     eOappMeasConv_encoderConversionData_t       *jntEncConvDataList;  /**< forn each joint, encoder's propRatio and zero is differet from other 
                                                                                  So this list contains for each joint, managed by a given EMS, encoder's ratio and zero */ 
     //One day here there will be rotor ecoder info and torque info.
@@ -73,6 +76,7 @@ struct EOappMeasConv_hid
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
+
 inline extern eOappMeasConv_encConversionOffset_t eo_appMeasConv_hid_GetEncConv_offset(EOappMeasConv *p, eOmc_jointId_t jId)
 {
     return(p->jntEncConvDataList[jId].offset);
@@ -86,18 +90,18 @@ inline extern eOappMeasConv_encConversionFactor_t eo_appMeasConv_hid_GetEncConv_
 
 inline extern uint8_t eo_appMeasConv_hid_GetVelShift(EOappMeasConv *p, eOmc_jointId_t jId)
 {
-    return(p->shiftvalues.jointVelocityShift);
+    return(p->jointVelocityShift);
 }
 
 
 inline extern uint8_t eo_appMeasConv_hid_GetVelEstimShift(EOappMeasConv *p, eOmc_jointId_t jId)
 {
-    return(p->shiftvalues.jointVelocityEstimationShift);
+    return(p->jointVelocityEstimationShift);
 }
 
 inline extern uint8_t eo_appMeasConv_hid_GetAccEstimShift(EOappMeasConv *p, eOmc_jointId_t jId)
 {
-    return(p->shiftvalues.jointAccEstimationShift);
+    return(p->jointAccEstimationShift);
 }
 
 

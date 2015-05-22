@@ -43,7 +43,7 @@
 #include "EoMotionControl.h"
 #include "EoUtilities.h"
 #include "EoMeasures.h"
-#include "EOicubCanProto_specifications.h"
+#include "iCubCanProto_types.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -56,6 +56,9 @@ typedef struct EOappMeasConv_hid  EOappMeasConv;
 typedef struct
 {
     uint8_t dummy;
+    uint8_t jointVelocityShift;
+    uint8_t jointVelocityEstimationShift;
+    uint8_t jointAccEstimationShift;
 //     uint8_t     jointvelocityShift;                      read from DB
 //     uint8_t     jointVelocityEstimationShift;            read from DB
 //     uint8_t     jointAccelerationEstimationShift;        actually not used
@@ -79,8 +82,9 @@ typedef float eOappMeasConv_encConversionOffset_t;  /**< express in idg  */
     @param      cfg        configuration for the obj. (currently is not used)
     @return     NULL in case of errors or pointer to EOappMeasConv on successfully 
  **/
-extern EOappMeasConv* eo_appMeasConv_New(eOappMeasConv_cfg_t *cfg);
+extern EOappMeasConv* eo_appMeasConv_Initialise(eOappMeasConv_cfg_t *cfg);
 
+extern EOappMeasConv* eo_appMeasConv_GetHandle(void);
 
 /** @fn         extern eOresult_t eo_appMeasConv_SetJntEncoderPropRatio(EOappMeasConv *p, eOmc_jointId_t jId, eOappMeasConv_encConversionFactor_t propRatio)
     @brief      Set EncoderPropRatio of joint with @e jId

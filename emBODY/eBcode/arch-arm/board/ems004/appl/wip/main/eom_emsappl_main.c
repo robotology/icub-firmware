@@ -40,9 +40,7 @@
 #include "EOMtheEMSapplCfg.h"
 #include "EOMtheEMSappl.h"
 
-//#include "OPCprotocolManager_Cfg.h" 
-//#include "EOtheEMSapplDiagnostics.h"
-#include "emBODYrobot.h"
+
 
 #include "EOtheLEDpulser.h"
 
@@ -123,6 +121,7 @@ int main(void)
 }
 
 
+
 extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
 {   // the only reason of using the following two variables as static is: to reduce the use of stack.
     static int64_t delta = 0;
@@ -134,16 +133,29 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
         .par16          = 0,
         .par64          = 0
     };
-   
-    delta = rec_seqnum - expected_seqnum;
-    if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
-    else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
     
-    errdes.par16            = (int16_t)delta; 
-    errdes.par64            = expected_seqnum; 
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());    
-//    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon  , 0);
+    if(1 == rec_seqnum)
+    {
+        // it is the first packet received from a remote transmitter freshly initted (i.e., robotInterface has just re-started bu this board was alive well before)
+        // thus, we dont issue an error but an info: 
+        errdes.code  = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_restarted);
+        errdes.par64 = expected_seqnum;
+        errdes.par16 = 1;       
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);   
+        
+        // ok, now we must set back the error code as it is normal.
+        errdes.code = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error);
+    }  
+    else
+    {    
+        delta = rec_seqnum - expected_seqnum;
+        if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
+        else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
+        
+        errdes.par16            = (int16_t)delta; 
+        errdes.par64            = expected_seqnum; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -177,54 +189,54 @@ static void s_eom_emsappl_main_init(void)
 
     eo_ledpulser_Initialise(&ledpulsercfg);
     
-    {
-        eOprotID32_t id32 = 0;
-        eOresult_t res = eores_OK;
-        eOcanmap_location_t loc = {0};
-        uint8_t numoflocs = 0;
-        uint8_t index = 0;
-        eObrd_cantype_t boardtype = eobrd_cantype_unknown;
-        extern EOconstvector* eo_vectorof_boardprops_eb2;
-        extern EOconstvector* eo_vectorof_descriptor_jomo_eb2;
-        extern EOconstvector* eo_vectorof_descriptor_skin_eb2;
-        EOtheCANmapping * canmap = eo_canmap_Initialise(NULL);
-        
-        eo_canmap_LoadBoards(canmap, eo_vectorof_boardprops_eb2);        
-        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, eo_vectorof_descriptor_jomo_eb2); 
-//        eo_canmap_eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, eo_vectorof_descriptor_skin_eb2);
-        
-        // mc
-        id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 2, eoprot_tag_none);       
-        res = eo_canmap_GetEntityLocation(canmap, id32, &loc, &numoflocs, &boardtype);      
-        res  = res;   
+//    {
+//        eOprotID32_t id32 = 0;
+//        eOresult_t res = eores_OK;
+//        eOcanmap_location_t loc = {0};
+//        uint8_t numoflocs = 0;
+//        uint8_t index = 0;
+//        eObrd_cantype_t boardtype = eobrd_cantype_unknown;
+//        extern EOconstvector* eo_vectorof_boardprops_eb1;
+//        extern EOconstvector* eo_vectorof_descriptor_jomo_eb1;
+//        extern EOconstvector* eo_vectorof_descriptor_skin_eb1;
+//        EOtheCANmapping * canmap = eo_canmap_Initialise(NULL);
+//        
+//        eo_canmap_LoadBoards(canmap, eo_vectorof_boardprops_eb1);        
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, eo_vectorof_descriptor_jomo_eb1); 
+////        eo_canmap_eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, eo_vectorof_descriptor_skin_eb2);
+//        
+//        // mc
+//        id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 2, eoprot_tag_none);       
+//        res = eo_canmap_GetEntityLocation(canmap, id32, &loc, &numoflocs, &boardtype);      
+//        res  = res;   
 
-        index = eo_canmap_GetEntityIndex(canmap, loc);      
-        index = index; 
-        
-        // sk
-        id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 0, eoprot_tag_none);
-        res = eo_canmap_GetEntityLocation(canmap, id32, &loc, &numoflocs, &boardtype);      
-        res  = res;   
+//        index = eo_canmap_GetEntityIndex(canmap, loc);      
+//        index = index; 
+//        
+//        // sk
+//        id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 0, eoprot_tag_none);
+//        res = eo_canmap_GetEntityLocation(canmap, id32, &loc, &numoflocs, &boardtype);      
+//        res  = res;   
 
-        loc.port = 1;
-        loc.addr = 8;
-        index = eo_canmap_GetEntityIndex(canmap, loc);      
-        index = index; 
-        
-        EOconstarray *carray = eo_canmap_GetBoardLocations(canmap);
-        uint8_t size = eo_constarray_Size(carray);
-        uint8_t i = 0;
-        const eOcanmap_board_extended_t *extbrd = NULL;
-        for(i=0; i<size; i++)
-        {
-            eOcanmap_location_t *ll = (eOcanmap_location_t*) eo_constarray_At(carray, i);
-            extbrd = eo_canmap_GetBoard(canmap,  *ll);
-            uint8_t adr1 = extbrd->board.props.location.addr;
-            adr1 = adr1;
-            uint8_t adr2 = ll->addr;
-            adr2 = adr2;
-        }
-    }
+//        loc.port = 1;
+//        loc.addr = 8;
+//        index = eo_canmap_GetEntityIndex(canmap, loc);      
+//        index = index; 
+//        
+//        EOconstarray *carray = eo_canmap_GetBoardLocations(canmap);
+//        uint8_t size = eo_constarray_Size(carray);
+//        uint8_t i = 0;
+//        const eOcanmap_board_extended_t *extbrd = NULL;
+//        for(i=0; i<size; i++)
+//        {
+//            eOcanmap_location_t *ll = (eOcanmap_location_t*) eo_constarray_At(carray, i);
+//            extbrd = eo_canmap_GetBoard(canmap,  *ll);
+//            uint8_t adr1 = extbrd->board.props.location.addr;
+//            adr1 = adr1;
+//            uint8_t adr2 = ll->addr;
+//            adr2 = adr2;
+//        }
+//    }
     
     // init the ems application
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    

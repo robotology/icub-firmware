@@ -42,11 +42,15 @@
 
 
 
-#include "EOappTheDataBase.h"
-#include "EOappCanServicesProvider.h"
+//#include "EOappTheDataBase.h"
+//#include "EOappCanServicesProvider.h"
+
+#include "EoBoards.h"
 #include "EOappEncodersReader.h"
 #include "EOemsController.h"
 #include "EOappMeasuresConverter.h"
+
+#include "EOtheCANmapping.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -76,31 +80,40 @@ typedef struct
 } eo_emsapplbody_can_shiftvalues_t;   
 
 // broadcast policy to set to motor can boards (MC4 only, because 2FOC don't use icubCanProto)  
+enum {eoemsapplbody_bcastpolicylistsize = 4};
 typedef struct
 {
-    uint8_t             val2bcastList[4];
+    uint8_t             val2bcastList[eoemsapplbody_bcastpolicylistsize];
 } eo_emsapplbody_can_bcastpolicy_t;       
     
 
 
-// marco.accame: comment by valentina.gaggero referred to the following struct, which earlier was un-named and inside eOemsapplbody_cfg_t
-// -->
-// in actual fact, all config data of mc4 boards are about joints: they should be one for each joint managed by mc4 board;
-// anyway these data are not configured by pc104, so we use one data for any joint. 
+
 
 typedef struct
 {
-    eo_emsapplbody_can_shiftvalues_t    shiftvalues;    /**< for mc4 */    
+    eo_emsapplbody_can_shiftvalues_t    shiftvalues;    
     eo_emsapplbody_can_bcastpolicy_t    bcastpolicy;      
 } eo_emsapplbody_configMC4boards_t;
     
 
+typedef struct 
+{
+    uint8_t major;
+    uint8_t minor;
+} eOtmp_protocolVersion_t;
+
+typedef struct
+{
+    uint8_t estimShiftJointVel;
+    uint8_t estimShiftJointAcc;
+    uint8_t estimShiftMotorVel;
+    uint8_t estimShiftMotorAcc;
+} eOtmp_estimShift_t;
 
 typedef struct
 {
     eOappEncReader_stream_t             encoderstreams[eo_appEncReader_streams_numberof];
-    eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
-    eOicubCanProto_protocolVersion_t    icubcanprotoimplementedversion;  
     eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
 } eOemsapplbody_cfg_t;
 
@@ -108,7 +121,7 @@ typedef struct
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 
-extern const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default;
+//extern const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -119,26 +132,24 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
 extern EOtheEMSapplBody* eo_emsapplBody_GetHandle(void);
 
 extern const eOemsapplbody_cfg_t* eo_emsapplBody_GetConfig(EOtheEMSapplBody *p);
-
-extern EOappTheDB* eo_emsapplBody_GetDataBaseHandle(EOtheEMSapplBody *p);
-
-extern EOappCanSP* eo_emsapplBody_GetCanServiceHandle(EOtheEMSapplBody *p);
-    
-extern EOappEncReader* eo_emsapplBody_GetEncoderReaderHandle(EOtheEMSapplBody *p);
+   
+extern EOappEncReader* eo_emsapplBody_GetEncoderReader(EOtheEMSapplBody *p);
 
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
-extern EOappMeasConv* eo_emsapplBody_GetMeasuresConverterHandle(EOtheEMSapplBody *p);
 
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p);
 
 extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 
-extern eObool_t eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev);
 
 extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask);
+extern eObool_t eo_emsapplBody_areCanBoardsReady(EOtheEMSapplBody *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
 extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
+
+extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
+
 
 extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p);
@@ -156,11 +167,11 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p);
 
 extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
-extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type);
+//extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
-extern eObool_t eom_emsapplBody_IsCANboard_usedbyAS(EOtheEMSapplBody *p, eObrd_cantype_t type);
+//extern eObool_t eom_emsapplBody_IsCANboard_usedbyAS(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
-extern eObool_t eom_emsapplBody_IsCANboard_usedbySK(EOtheEMSapplBody *p, eObrd_cantype_t type);
+//extern eObool_t eom_emsapplBody_IsCANboard_usedbySK(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
 
 /** @}            

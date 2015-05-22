@@ -51,28 +51,20 @@ typedef enum
 } eOtheEMSapplBody_hid_states_t;
 
 
-typedef struct
-{
-    EOappTheDB                      *appDB;
-    EOappCanSP                      *appCanSP;
-    EOappEncReader                  *appEncReader;
-    EOemsController                 *emsController;
-    EOappMeasConv                   *appMeasConv;
-} eOtheEMSapplBody_hid_bodyobjs_t;
-
 struct EOtheEMSapplBody_hid
 {
     eOemsapplbody_cfg_t                 config; 
     eOtheEMSapplBody_hid_states_t       st;
     eOmn_appl_runMode_t                 appRunMode;
     EOtimer                             *checkCanBoards_timer;
-    eOtheEMSapplBody_hid_bodyobjs_t     bodyobjs;
+    EOappEncReader                      *appEncReader;
+    EOemsController                     *emsController;
+    eo_emsapplbody_configMC4boards_t    configMC4boards2use; 
+    eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-
-extern void eo_emsapplBody_hid_canSP_cbkonrx(void *arg);
 
 
 #endif  // include guard

@@ -65,19 +65,23 @@ extern EOtheProtocolWrapper* eo_protocolwrapper_GetHandle(void);
 
 // null if does not exists. the real pointer (use it with care!) if everything is ok
 
-extern eOmc_joint_config_t * eo_protocolwrapper_GetJointConfig(EOtheProtocolWrapper *p, eOmc_jointId_t id);
-extern eOmc_joint_status_t * eo_protocolwrapper_GetJointStatus(EOtheProtocolWrapper *p, eOmc_jointId_t id);
+extern eOmc_joint_t * eo_protocolwrapper_GetJoint(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOmc_joint_config_t * eo_protocolwrapper_GetJointConfig(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOmc_joint_status_t * eo_protocolwrapper_GetJointStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
 
-extern eOmc_motor_status_t * eo_protocolwrapper_GetMotorStatus(EOtheProtocolWrapper *p, eOmc_motorId_t id);
+extern eOmc_motor_t * eo_protocolwrapper_GetMotor(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOmc_motor_status_t * eo_protocolwrapper_GetMotorStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
 
-extern eOas_mais_config_t * eo_protocolwrapper_GetMaisConfig(EOtheProtocolWrapper *p, eOas_maisId_t id);
-extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrapper *p, eOas_maisId_t id);
+extern eOas_mais_t * eo_protocolwrapper_GetMais(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOas_mais_config_t * eo_protocolwrapper_GetMaisConfig(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
 
+extern eOas_strain_t * eo_protocolwrapper_GetStrain(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
 
-extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWrapper *p, eOas_strainId_t id);
-extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWrapper *p, eOas_strainId_t id);
-
-extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOsk_skinId_t id);
+extern eOsk_skin_t * eo_protocolwrapper_GetSkin(EOtheProtocolWrapper *p, eOprotIndex_t id);
+extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOprotIndex_t id);
 
 
 

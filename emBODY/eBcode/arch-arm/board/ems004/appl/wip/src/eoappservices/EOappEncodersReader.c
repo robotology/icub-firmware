@@ -39,7 +39,7 @@
 #include "EOtheMemoryPool.h"
 
 #include "OPCprotocolManager_Cfg.h" 
-#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplDiagnostics.h"
 
 #include "osal.h"
 
@@ -554,15 +554,16 @@ static void s_eo_appEncReader_check(EOappEncReader *p)
     
     if(1 == signal_error)
     {
-        res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p, p->dgninfo.count);
-        if(eores_OK == res)
-        {
-           eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
-        }
-        else
-        {
-            ;//if some error occured while updating var to send, signaling error comes to naught.
-        }
+        #warning marco.accame: TODO: put diagnostics
+//        res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p, p->dgninfo.count);
+//        if(eores_OK == res)
+//        {
+//           eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
+//        }
+//        else
+//        {
+//            ;//if some error occured while updating var to send, signaling error comes to naught.
+//        }
     }
 
     //reset all statistics 

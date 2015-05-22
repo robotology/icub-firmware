@@ -35,10 +35,23 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+enum 
+{  
+    eoprotwrap_max_joints   = 12, 
+    eoprotwrap_max_motors   = 12, 
+    eoprotwrap_max_skins    = 2,
+    eoprotwrap_max_strains  = 2,
+    eoprotwrap_max_maises   = 1
+};
 
 struct EOtheProtocolWrapper_hid
 {
-    eObool_t    initted;
+    eObool_t        initted;
+    eOmc_joint_t*   joints[eoprotwrap_max_joints];
+    eOmc_motor_t*   motors[eoprotwrap_max_motors];
+    eOsk_skin_t*    skins[eoprotwrap_max_skins];
+    eOas_strain_t*  strains[eoprotwrap_max_strains];
+    eOas_mais_t*    maises[eoprotwrap_max_maises];
 }; 
 
 

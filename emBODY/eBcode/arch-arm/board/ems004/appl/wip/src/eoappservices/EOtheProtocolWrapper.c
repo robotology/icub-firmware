@@ -72,7 +72,12 @@
 
 static EOtheProtocolWrapper s_eo_theprotocolwrapper = 
 {
-    .initted                 = eobool_false
+    .initted        = eobool_false,
+    .joints         = {NULL},
+    .motors         = {NULL},
+    .skins          = {NULL},
+    .strains        = {NULL},
+    .maises         = {NULL}
 };
 
 //static const char s_eobj_ownname[] = "EOtheProtocolWrapper";
@@ -85,7 +90,57 @@ static EOtheProtocolWrapper s_eo_theprotocolwrapper =
 
 extern EOtheProtocolWrapper* eo_protocolwrapper_Initialise(void)
 {
-    s_eo_theprotocolwrapper.initted = eobool_true;    
+    
+    if(eobool_true == s_eo_theprotocolwrapper.initted)
+    {
+        return(&s_eo_theprotocolwrapper);
+    }
+    
+    uint8_t i=0;
+    uint8_t max = 0;
+    
+    // joints
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    if(max>eoprotwrap_max_joints) max = eoprotwrap_max_joints;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theprotocolwrapper.joints[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)i);
+    }
+    
+    // motors
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+    if(max>eoprotwrap_max_motors) max = eoprotwrap_max_motors;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theprotocolwrapper.motors[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, (eOprotIndex_t)i);
+    } 
+    
+    // skins
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+    if(max>eoprotwrap_max_skins) max = eoprotwrap_max_skins;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theprotocolwrapper.skins[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin, (eOprotIndex_t)i);
+    }  
+    
+    // strains
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
+    if(max>eoprotwrap_max_strains) max = eoprotwrap_max_strains;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theprotocolwrapper.strains[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)i);
+    }  
+    
+    // maises
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
+    if(max>eoprotwrap_max_maises) max = eoprotwrap_max_maises;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theprotocolwrapper.maises[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)i);
+    }    
+    
+    s_eo_theprotocolwrapper.initted = eobool_true;   
+    
     return(&s_eo_theprotocolwrapper);
 }
 
@@ -95,12 +150,20 @@ extern EOtheProtocolWrapper* eo_protocolwrapper_GetHandle(void)
     return(eo_protocolwrapper_Initialise());
 }
 
-
-extern eOmc_joint_config_t * eo_protocolwrapper_GetJointConfig(EOtheProtocolWrapper *p, eOmc_jointId_t id)
+extern eOmc_joint_t * eo_protocolwrapper_GetJoint(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
+    if(id >= eoprotwrap_max_joints)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theprotocolwrapper.joints[id]);
+}
+
+extern eOmc_joint_config_t * eo_protocolwrapper_GetJointConfig(EOtheProtocolWrapper *p, eOprotIndex_t id)
+{
     eOmc_joint_config_t *ret = NULL;    
-    eOmc_joint_t *jo = (eOmc_joint_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)id);
+    eOmc_joint_t *jo = eo_protocolwrapper_GetJoint(p, id);
     
     if(NULL != jo)
     {
@@ -111,25 +174,34 @@ extern eOmc_joint_config_t * eo_protocolwrapper_GetJointConfig(EOtheProtocolWrap
 }
 
 
-extern eOmc_joint_status_t * eo_protocolwrapper_GetJointStatus(EOtheProtocolWrapper *p, eOmc_jointId_t id)
+extern eOmc_joint_status_t * eo_protocolwrapper_GetJointStatus(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
     eOmc_joint_status_t *ret = NULL;    
-    eOmc_joint_t *jo = (eOmc_joint_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)id);
+    eOmc_joint_t *jo = eo_protocolwrapper_GetJoint(p, id);
     
     if(NULL != jo)
     {
         ret = &(jo->status);
     }
 
-    return(ret);
+    return(ret);    
 }
 
-extern eOmc_motor_status_t * eo_protocolwrapper_GetMotorStatus(EOtheProtocolWrapper *p, eOmc_motorId_t id)
+
+extern eOmc_motor_t * eo_protocolwrapper_GetMotor(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
+    if(id >= eoprotwrap_max_motors)
+    {
+        return(NULL);
+    }
+   
+    return(s_eo_theprotocolwrapper.motors[id]);
+}
+
+extern eOmc_motor_status_t * eo_protocolwrapper_GetMotorStatus(EOtheProtocolWrapper *p, eOprotIndex_t id)
+{
     eOmc_motor_status_t *ret = NULL;    
-    eOmc_motor_t *mo = (eOmc_motor_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, (eOprotIndex_t)id);
+    eOmc_motor_t *mo = eo_protocolwrapper_GetMotor(p, id);
     
     if(NULL != mo)
     {
@@ -139,12 +211,20 @@ extern eOmc_motor_status_t * eo_protocolwrapper_GetMotorStatus(EOtheProtocolWrap
     return(ret);
 }
 
-
-extern eOas_mais_config_t * eo_protocolwrapper_GetMaisConfig(EOtheProtocolWrapper *p, eOas_maisId_t id)
+extern eOas_mais_t * eo_protocolwrapper_GetMais(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
+    if(id >= eoprotwrap_max_maises)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theprotocolwrapper.maises[id]);
+}
+
+extern eOas_mais_config_t * eo_protocolwrapper_GetMaisConfig(EOtheProtocolWrapper *p, eOprotIndex_t id)
+{
     eOas_mais_config_t *ret = NULL;    
-    eOas_mais_t *ma = (eOas_mais_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)id);
+    eOas_mais_t *ma = eo_protocolwrapper_GetMais(p, id);
     
     if(NULL != ma)
     {
@@ -155,11 +235,10 @@ extern eOas_mais_config_t * eo_protocolwrapper_GetMaisConfig(EOtheProtocolWrappe
 }
 
 
-extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrapper *p, eOas_maisId_t id)
+extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
     eOas_mais_status_t *ret = NULL;    
-    eOas_mais_t *ma = (eOas_mais_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)id);
+    eOas_mais_t *ma = eo_protocolwrapper_GetMais(p, id);
     
     if(NULL != ma)
     {
@@ -170,11 +249,20 @@ extern eOas_mais_status_t * eo_protocolwrapper_GetMaisStatus(EOtheProtocolWrappe
 }
 
 
-extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWrapper *p, eOas_strainId_t id)
+extern eOas_strain_t * eo_protocolwrapper_GetStrain(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
+    if(id >= eoprotwrap_max_strains)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theprotocolwrapper.strains[id]);
+}
+
+extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWrapper *p, eOprotIndex_t id)
+{
     eOas_strain_config_t *ret = NULL;    
-    eOas_strain_t *st = (eOas_strain_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)id);
+    eOas_strain_t *st = eo_protocolwrapper_GetStrain(p, id);
     
     if(NULL != st)
     {
@@ -184,11 +272,11 @@ extern eOas_strain_config_t * eo_protocolwrapper_GetStrainConfig(EOtheProtocolWr
     return(ret);
 }
 
-extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWrapper *p, eOas_strainId_t id)
+extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
     // don't do any control on p, as ... it is a dummy object
     eOas_strain_status_t *ret = NULL;    
-    eOas_strain_t *st = (eOas_strain_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)id);
+    eOas_strain_t *st = eo_protocolwrapper_GetStrain(p, id);
     
     if(NULL != st)
     {
@@ -198,11 +286,21 @@ extern eOas_strain_status_t * eo_protocolwrapper_GetStrainStatus(EOtheProtocolWr
     return(ret);
 }
 
-extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOsk_skinId_t id)
+
+extern eOsk_skin_t * eo_protocolwrapper_GetSkin(EOtheProtocolWrapper *p, eOprotIndex_t id)
 {
-    // don't do any control on p, as ... it is a dummy object
+    if(id >= eoprotwrap_max_skins)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theprotocolwrapper.skins[id]);
+}
+
+extern eOsk_status_t * eo_protocolwrapper_GetSkinStatus(EOtheProtocolWrapper *p, eOprotIndex_t id)
+{
     eOsk_status_t *ret = NULL;    
-    eOsk_skin_t *sk = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)id);
+    eOsk_skin_t *sk = eo_protocolwrapper_GetSkin(p, id);
     
     if(NULL != sk)
     {

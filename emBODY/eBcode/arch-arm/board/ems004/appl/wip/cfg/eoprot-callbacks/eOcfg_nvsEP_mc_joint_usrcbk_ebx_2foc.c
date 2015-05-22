@@ -42,8 +42,8 @@
 
 //application
 #include "EOtheEMSapplBody.h"
-#include "EOappTheDataBase.h"
-#include "EOicubCanProto_specifications.h"
+//#include "EOappTheDataBase.h"
+//#include "EOicubCanProto_specifications.h"
 #include "EOappMeasuresConverter.h"
 
 #include "EOtheProtocolWrapper.h"
@@ -51,6 +51,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+#include "EOtheCANservice.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -518,9 +519,49 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+#if 1
+    
+    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
+    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;    
+
+    // must send something to can: 
+    // ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD + ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN + ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE
+    
+    #ifdef EXPERIMENTAL_SPEED_CONTROL
+    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_velocity;
+    #else
+    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
+    #endif
+    
+    eOcanprot_descriptor_t descriptor = {0};
+    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+    
+    // first one:
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
+    descriptor.value = NULL;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+
+    // second one:
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
+    descriptor.value = NULL;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+
+    // third one:
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+    descriptor.value = &controlmode_2foc;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);    
+
+    eo_emsController_StartCalibration(jxx, 
+                                      calibrator->params.type3.position, 
+                                      calibrator->params.type3.velocity,
+                                      calibrator->params.type3.offset);
+                                      
+#else
+
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
+    
     eOappTheDB_jointOrMotorCanLocation_t    canLoc = {.emscanport = eOcanport1, .addr = 0, .indexinsidecanboard = eo_icubCanProto_jm_index_first};
     
     #ifdef EXPERIMENTAL_SPEED_CONTROL
@@ -564,6 +605,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                                       calibrator->params.type3.position, 
                                       calibrator->params.type3.velocity,
                                       calibrator->params.type3.offset);
+    
+#endif
 }
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eOropdescriptor_t* rd)

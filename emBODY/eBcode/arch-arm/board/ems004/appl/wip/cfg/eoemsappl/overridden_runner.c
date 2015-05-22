@@ -43,9 +43,9 @@
 
 #include "EOemsController_hid.h" 
 #include "OPCprotocolManager_Cfg.h" 
-#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplDiagnostics.h"
 
-#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplDiagnostics.h"
 
 #include "EOarray.h"
 
@@ -54,6 +54,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "EOtheCANservice.h"
+#include "EOtheCANmapping.h"
+#include "EOtheCANprotocol.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -136,6 +139,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port);
 
 //DO
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p);
+
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p);
 
 
@@ -157,10 +161,8 @@ static void s_checkEthLinks(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t motionDoneJoin2Use = 0;
+
 static uint16_t count_ethlink_status = 0;
-static uint8_t count_watchdog_virtaulStrain = 0;
-static uint8_t count_between_two_updates = 0;
 #if defined(EVIEWER_ENABLED) 
 static uint8_t event_view = 0;
 #endif 
@@ -208,9 +210,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 {
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
-    EOappCanSP                      *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    EOappCanSP                      *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
-    for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
+    for(port=eOcanport1; port<eOcanports_number; port++)
     {
         // marco.accame: the following strategy is ok if the bus containing skin does not contain any other board type
         // the bus has only skin? then i read at most a number of canframes equal to what the skin-data buffer can host
@@ -239,7 +241,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         }
         else
         {   // in this bus we dont have skin, thus ... i read everything in the rx can buffer
-            eo_appCanSP_GetNumOfRecCanframe(cansp, (eOcanport_t)port, &numofRXcanframe);
+            //eo_appCanSP_GetNumOfRecCanframe(cansp, (eOcanport_t)port, &numofRXcanframe);
+            numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port);
         }
         
     
@@ -249,7 +252,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 //        #endif
         
         // step 2: read the can frames. this function also parses them and triggers associated action ...
-        eo_appCanSP_read(cansp, (eOcanport_t)port, numofRXcanframe, NULL); 
+        eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
+        //eo_appCanSP_read(cansp, (eOcanport_t)port, numofRXcanframe, NULL); 
     }
 }
 
@@ -304,13 +308,15 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
-    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    uint8_t numofframes2betransmitted_can1 = 0;
-    uint8_t numofframes2betransmitted_can2 = 0;
+    //EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
+    //uint8_t numofframes2betransmitted_can1 = 0;
+    //uint8_t numofframes2betransmitted_can2 = 0;
     
+    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
+    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);
     // i enable transmission on both can buses. functions are not blocking as the transmission is done by the ISRs
-    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframes2betransmitted_can1);
-    eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numofframes2betransmitted_can2);
+    //eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframes2betransmitted_can1);
+    //eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numofframes2betransmitted_can2);
     
 //#ifdef _GET_CANQUEUE_STATISTICS_
 //    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport1, numoftxframe_p1);
@@ -322,7 +328,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
-    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
+    //EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOresult_t res[2] = {eores_NOK_generic, eores_NOK_generic};
  
     // before wait can, check link status!!
@@ -334,10 +340,11 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
         //this func chacks if one of link change state and notify it.
         //the pkt arrived on pc104 backdoor when one link change down->up.
         //eo_theEMSdgn_checkEthLinksStatus_quickly(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
-        if(eo_dgn_cmds.signalCanStatistics)
-        {
-            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
-        }
+        #warning marco.accame: TODO: put diagnostics
+//        if(eo_dgn_cmds.signalCanStatistics)
+//        {
+//            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
+//        }
         count_ethlink_status = 0;
     }
         
@@ -345,7 +352,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // can frames, so that at the rx cycle we can put some more canframes inside.
     uint8_t port = 0;
     EOarray *arrayofcandata = NULL;
-    for(port=eOcanport1; port<eo_appCanSP_emscanportnum; port++)
+    for(port=eOcanport1; port<eOcanports_number; port++)
     {
         if(NULL != (arrayofcandata = s_getSkinDataArray((eOcanport_t)port)))
         {   // ok, we have a skin   
@@ -357,12 +364,17 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     }
     
     // now we wait for the can tx to finish    
-    res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
-    res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
+    const uint32_t timeout = 3*osal_reltime1ms;
+    res[0] = eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
+    res[1] = eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);\
+    
+    //res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
+    //res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
     
     if((eores_NOK_timeout ==  res[0]) || (eores_NOK_timeout ==  res[1]))
     {
-        eo_dgn_emsapplcore.core.runst.cantxfailuretimeoutsemaphore++;
+        #warning marco.accame: TODO: put diagnostics
+//        eo_dgn_emsapplcore.core.runst.cantxfailuretimeoutsemaphore++;
         // marco.accame: for now we dont use this but the error manager inside function eo_appCanSP_wait_XXX()
         //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
     }
@@ -381,7 +393,7 @@ extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
         
     
-    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+    //eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
     // marco.accame: for now i remove the action of this object and i call only the errormanager. for later we can have both the error handlers
     //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);
 
@@ -398,7 +410,7 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
     
     // marco.accame: for now i remove the action of this object and i call only the errormanager. for later we can have both the error handlers
-    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+    //eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
     //eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , runner_timeout_send_diagnostics);    
 }
 
@@ -410,25 +422,41 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
 {   // tells if the can port has a skin entity in it 
     static EOarray* arraysofcandata[2] = {NULL, NULL};
     static eObool_t evaluated[2] = {eobool_false, eobool_false};
+    
 
     if(eobool_false == evaluated[port])
     {
         evaluated[port] = eobool_true;
         
-       // ok, now i prepare the value of retvalues[port] but i do it only once
-        eOappTheDB_SkinCanLocation_t skincanloc = {0};
-        skincanloc.emscanport = (eOcanport_t)port;
-        eOsk_skinId_t skid =  255;
-
-        if(eores_OK == eo_appTheDB_GetSkinId_BySkinCanLocation(eo_appTheDB_GetHandle(), skincanloc, &skid)) 
-        {
-            // ok, i can attempt to retrieve the pointer
-            eOsk_status_t * skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), skid);
-            if(NULL != skinstatus)
-            {
-                arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
+        //eOresult_t res = eores_NOK_generic;
+        //eOprotID32_t id32 = 0;
+        eOcanmap_location_t loc = {0};
+        
+        // is the first skin with index 0 or with index 1 on this can bus? 
+        
+        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 0, 0), &loc, NULL, NULL))
+        {   // found a skin-0
+            if(port == loc.port)
+            {   // and it is on the same can port
+                eOsk_status_t * skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), 0);
+                if(NULL != skinstatus)
+                {
+                    arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
+                }                
             }
-        }        
+            
+        }
+        else if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 1, 0), &loc, NULL, NULL))
+        {   // found a skin-1
+            if(port == loc.port)
+            {   // and it is on the same can port
+                eOsk_status_t * skinstatus = eo_protocolwrapper_GetSkinStatus(eo_protocolwrapper_GetHandle(), 1);
+                if(NULL != skinstatus)
+                {
+                    arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
+                }                
+            }            
+        }
     }
         
     return(arraysofcandata[port]);    
@@ -485,37 +513,77 @@ EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSappl
 //}
 //#endif
 
-//#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+
+// want to send a canframe with pwm onto can bus.
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
-    eOresult_t 				                res = eores_OK;
-    int16_t                                 pwm_aux[4] = {0, 0, 0, 0};
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOicubCanProto_msgDestination_t         dest;
-    eOicubCanProto_msgCommand_t             msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_periodicMotorControl,
-        EO_INIT(.cmdId) ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
-    };
-
-
-    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+    eOcanport_t port = eOcanport1;
+    eOcanprot_descriptor_t command = {0};
     
-    for (uint8_t jid = 0; jid <numofjoint; ++jid)
+    // now i need to assign port and command with correct values.
+    
+    // i manage 2foc boards. they are at most 4. they must be all in the same can bus. 
+    int16_t pwmValues[4] = {0, 0, 0, 0};
+    
+    #warning --> in the future change it with eo_mcserv_NumberOfJoints()
+    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    uint8_t i=0;
+    for(i=0; i<numofjomos; i++)
     {
-        res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jid,  &canLoc, NULL);
-        if(eores_OK != res)
+        eOcanmap_location_t loc = {0};
+        //eOresult_t res = eores_NOK_generic;
+        // search the address of motor i-th and fill the pwmValues[] in relevant position.
+        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i, 0), &loc, NULL, NULL))
         {
-            return(res); //i think i'll be never here
-        }
-        
-        pwm_aux[canLoc.addr-1] = pwmList[jid];    
+            port = (eOcanport_t)loc.port;  // marco.accame: i dont check if the port is not always the same ... it MUST be.          
+            if((loc.addr > 0) && (loc.addr <= 4))
+            {
+                pwmValues[loc.addr-1] = pwmList[i];
+            }            
+        }        
     }
-    //since msg is periodic, all 2foc received it so dest is useless.
-    dest.dest = 0;
-    eo_appCanSP_SendCmd(eo_emsapplBody_GetCanServiceHandle(p), (eOcanport_t)canLoc.emscanport, dest, msgCmd, (void*)pwm_aux);
     
-    return(res);    
+    // ok, now i fill port and command
+    port = port;
+    command.address = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
+    command.internalindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
+    command.msgclass = eocanprot_msgclass_periodicMotorControl;
+    command.msgtype = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
+    command.value = &pwmValues[0];    
+    
+    // and i send the command
+    return(eo_canserv_SendCommand(eo_canserv_GetHandle(), port, &command));
+    
+//    {
+//    eOresult_t 				                res = eores_OK;
+//    int16_t                                 pwm_aux[4] = {0, 0, 0, 0};
+//    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
+//    eOicubCanProto_msgDestination_t         dest;
+//    eOicubCanProto_msgCommand_t             msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_periodicMotorControl,
+//        EO_INIT(.cmdId) ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
+//    };
+//
+//
+//    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+//    
+//    for (uint8_t jid = 0; jid <numofjoint; ++jid)
+//    {
+//        res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jid,  &canLoc, NULL);
+//        if(eores_OK != res)
+//        {
+//            return(res); //i think i'll be never here
+//        }
+//        
+//        pwm_aux[canLoc.addr-1] = pwmList[jid];    
+//    }
+//    //since msg is periodic, all 2foc received it so dest is useless.
+//    dest.dest = 0;
+//    eo_appCanSP_SendCmd(eo_emsapplBody_GetCanServiceHandle(p), (eOcanport_t)canLoc.emscanport, dest, msgCmd, (void*)pwm_aux);
+//    
+//    return(res);    
+//    }
 }
 //#endif
 
@@ -528,10 +596,12 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     uint32_t            							encvalue[4]; // = {(uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID, (uint32_t)ENC_INVALID};
     hal_encoder_errors_flags					    encflags[4];
     int16_t             							pwm[4];
-    EOappEncReader      							*app_enc_reader = eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr);
+    EOappEncReader      							*app_enc_reader = eo_emsapplBody_GetEncoderReader(emsappbody_ptr);
     uint8_t             							error_mask = 0;
 
-    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+    //uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+    #warning --> in the future change it with eo_mcserv_NumberOfJoints()
+    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     
     //uint64_t start_read = osal_system_abstime_get();
     //uint64_t enc1_delta = start_read - eo_appEncReader_startSPI1(app_enc_reader);
@@ -564,11 +634,11 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     }
     */
     
-    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr)))
+    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReader(emsappbody_ptr)))
     {    
-        for (uint8_t enc = 0; enc < numofjoint; ++enc)
+        for (uint8_t enc = 0; enc < numofjomos; ++enc)
         {
-            res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReaderHandle(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]), &(encflags[enc]));
+            res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReader(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]), &(encflags[enc]));
             
             if (res != eores_OK)
             {
@@ -583,7 +653,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
     }
 
     // Restart the reading of the encoders
-    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
+    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
 		
     eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
         
@@ -609,14 +679,19 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     eOmc_joint_status_t             *jstatus = NULL;
     eOmc_motor_status_t             *mstatus = NULL;
     eOmc_jointId_t                  jId;
-    uint16_t                        numofjoint;
-    EOappTheDB                      *db = eo_appTheDB_GetHandle();
-    uint16_t                        numofmotors;
+//    uint16_t                        numofjoint;
+//    EOappTheDB                      *db = eo_appTheDB_GetHandle();
+//    uint16_t                        numofmotors;
     uint8_t                         transmit_decoupled_pwms = 1;
     
-    numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db);
-    for(jId = 0; jId<numofjoint; jId++)
+//    numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db);
+    
+    #warning --> in the future change it with eo_mcserv_NumberOfJoints() ... even better. just use EOmcService object
+    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);    
+
+    for(jId = 0; jId<numofjomos; jId++)
     {
+        #warning --> in the future use eo_mcserv_GetJoint()->status
         jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == jstatus)
         {
@@ -655,9 +730,10 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     
     
     
-    numofmotors =  eo_appTheDB_GetNumberOfConnectedMotors(db);
-    for(jId = 0; jId<numofmotors; jId++)
+    //numofmotors =  eo_appTheDB_GetNumberOfConnectedMotors(db);
+    for(jId = 0; jId<numofjomos; jId++)
     {
+        #warning --> in the future use eo_mcserv_GetMotor()->status
         mstatus = eo_protocolwrapper_GetMotorStatus(eo_protocolwrapper_GetHandle(), jId);
         if(NULL == mstatus)
         {
@@ -668,8 +744,17 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     }
 }
 
+#if   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 {
+ 
+    #warning TBD: re-write s_eom_emsrunner_hid_userdef_taskDO_activity_mc4()
+#if 0    
+    static uint16_t motionDoneJoin2Use = 0;
+    static uint8_t count_watchdog_virtaulStrain = 0;
+    static uint8_t count_between_two_updates = 0;
+    
     eOresult_t                              res;
     uint8_t                                 send_virtualStrainData;
     uint16_t                                numofjoint;
@@ -680,7 +765,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
     eOicubCanProto_msgDestination_t         msgdest;
     eOicubCanProto_msgCommand_t             msgCmd = 
     {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
+        EO_INIT(.class) eocanprot_msgclass_pollingMotorControl,
         EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__MOTION_DONE
     };
     
@@ -777,7 +862,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
         msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); // virtual ft sensor has address 12
         
         //set command (calss + id) and send it
-        msgCmd.class = icubCanProto_msgCmdClass_periodicAnalogSensor;
+        msgCmd.class = eocanprot_msgclass_periodicAnalogSensor;
         msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR;
         eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
         
@@ -808,9 +893,14 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 //         }
 
 //     }   
+#endif
 }
 
-
+#else
+static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
+{
+}
+#endif
 
 
 #define ethLinksCount_max 3000 //5 sec
@@ -834,7 +924,8 @@ static void s_checkEthLinks(void)
         evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
         #endif
         
-        eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
+        #warning marco.accame: TODO: put diagnostics
+        //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
         
         #if defined(EVIEWER_ENABLED)    
         eventviewer_switch_to(prev);
@@ -850,7 +941,8 @@ static void s_checkEthLinks(void)
             evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
             #endif
             
-            eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
+            #warning marco.accame: TODO: put diagnostics
+            //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
             
             #if defined(EVIEWER_ENABLED)    
             eventviewer_switch_to(prev);
@@ -858,11 +950,12 @@ static void s_checkEthLinks(void)
             linknum++;
             if(linknum == 3)
             {
-                if((eo_dgn_cmds.signalEthCounters) && (eo_theEMSdgn_EthLinksInError(eo_theEMSdgn_GetHandle())) )
-                //if((eo_dgn_cmds.signalEthCounters) )
-                {
-                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , 0);
-                }
+                #warning marco.accame: TODO: put diagnostics
+//                if((eo_dgn_cmds.signalEthCounters) && (eo_theEMSdgn_EthLinksInError(eo_theEMSdgn_GetHandle())) )
+//                //if((eo_dgn_cmds.signalEthCounters) )
+//                {
+//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , 0);
+//                }
 
                 linknum = 255;
                 ethLinksCount = 0;

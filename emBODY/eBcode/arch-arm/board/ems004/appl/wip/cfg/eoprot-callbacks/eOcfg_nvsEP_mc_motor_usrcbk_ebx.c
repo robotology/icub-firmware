@@ -40,12 +40,12 @@
 #include "EOMotionControl.h"
 #include "EoProtocol.h"
 
-
+#include "EOtheCANservice.h"
 
 //application
 #include "EOtheEMSapplBody.h"
-#include "EOappTheDataBase.h"
-#include "EOicubCanProto_specifications.h"
+//#include "EOappTheDataBase.h"
+//#include "EOicubCanProto_specifications.h"
 #include "EOappMeasuresConverter.h"
 
 
@@ -147,7 +147,48 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(const EOnv* nv)
 
 // motor-update
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
-{
+{    
+    // must send some can frames. however, in here i need the type of attached board: 1foc or mc4.
+    // there are many modes to do this, but in wait of the EOmcManager object we just use a trick.     
+    static eOmn_appl_runMode_t apprunmode = applrunMode__default;
+    if(applrunMode__default == apprunmode)
+    {
+        apprunmode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
+    }
+    
+    eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)nv->ram;
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+    
+    eOcanprot_descriptor_t descriptor = {0};
+    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+    
+    // in here i assume that all the mc boards are either 1foc or mc4
+    if(applrunMode__2foc == apprunmode)
+    {
+        // send current pid
+        descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+        descriptor.value = &cfg_ptr->pidcurrent;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+
+        // send current pid limits
+        descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
+        descriptor.value = &cfg_ptr->pidcurrent;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);             
+    }
+    
+    // set max velocity  
+    
+    icubCanProto_velocity_t vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(eo_appMeasConv_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
+    descriptor.value = &vel_icubCanProtValue;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+
+    // set current limit  
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    descriptor.value = &cfg_ptr->maxcurrentofmotor;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+    
+#if 0    
     eOresult_t                              res;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
     eObrd_cantype_t                         boardType;
@@ -163,7 +204,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+    EOappMeasConv* appMeasConv_ptr = eo_appMeasConv_GetHandle();
 
 	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, &boardType);
     if(eores_OK != res)
@@ -194,11 +235,30 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     // 3) set current limit  
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->maxcurrentofmotor);
-
+#endif
 }
 
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOmc_PID_t *pid = (eOmc_PID_t*)nv->ram;
+    
+    eOcanprot_descriptor_t descriptor = {0};
+    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+   
+    
+    // send current pid
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+    descriptor.value = pid;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+
+    // send current pid limits
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
+    descriptor.value = pid;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);             
+
+     
+    
+#if 0    
     eOresult_t                              res;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
@@ -227,12 +287,26 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
-
+#endif
 }
 
 
 extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOmeas_velocity_t *vel = (eOmeas_velocity_t*)nv->ram;
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+    
+    eOcanprot_descriptor_t descriptor = {0};
+    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+    
+    // set max velocity  
+    icubCanProto_velocity_t vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(eo_appMeasConv_GetHandle(), mxx, *vel);           
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
+    descriptor.value = &vel_icubCanProtValue;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+
+    
+#if 0    
     eOmeas_velocity_t                       *vel_ptr = (eOmeas_velocity_t*)nv->ram;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
     icubCanProto_velocity_t                 vel_icubCanProtValue;
@@ -244,17 +318,29 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
+    EOappMeasConv* appMeasConv_ptr = eo_appMeasConv_GetHandle();
 
 
     vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, mxx, *vel_ptr);           
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)&vel_icubCanProtValue);
-
+#endif
 }
 
 
 extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-{
+{    
+    eOmeas_current_t *curr = (eOmeas_current_t*)nv->ram;
+    
+    eOcanprot_descriptor_t descriptor = {0};
+    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+
+    // set current limit  
+    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    descriptor.value = curr;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);     
+    
+ 
+#if 0    
     eOmeas_current_t                        *curr_ptr = (eOmeas_current_t*)nv->ram;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
     eOicubCanProto_msgCommand_t             msgCmd = 
@@ -265,6 +351,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)curr_ptr);
+#endif    
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

@@ -31,10 +31,12 @@
 #include "EOtheEMSApplBody.h"
 #include "EOMtheEMSapplCfg.h"
 
-#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplDiagnostics.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
+
+#include "EOtheCANservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -93,6 +95,23 @@
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfigurator* p)
 {
+
+    // in here we want to read all can frames that we have on can1 and also on can2
+    
+    uint8_t numofrxframes = 0;
+    
+    if(0 != (numofrxframes = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), eOcanport1)))
+    {
+        eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, numofrxframes, NULL);        
+    }
+    
+    if(0 != (numofrxframes = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), eOcanport2)))
+    {
+        eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, numofrxframes, NULL);        
+    }
+    
+
+#if 0    
     eOresult_t  res;
     uint8_t     numofRXcanframe = 0;
 
@@ -107,7 +126,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
     }
     
 #ifdef _GET_CANQUEUE_STATISTICS_
-    eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
+    //eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
+    #warning marco.accame: TODO: put diagnostics
 #endif
     eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
     
@@ -120,9 +140,13 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
         return;
     }
 #ifdef _GET_CANQUEUE_STATISTICS_
-        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
+//        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
+    #warning marco.accame: TODO: put diagnostics
 #endif
     eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);   
+    
+#endif
+    
 }
 
 
@@ -187,20 +211,19 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask);
         return;
     }
-        
-    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());      
+          
 
-    // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiamo mandato la loro fw version
-    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &readyCanBoardsMask, &checkedmask))
+    // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiano mandato la loro fw version
+    if(eobool_true == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &readyCanBoardsMask, &checkedmask))
     {
         // se tutte le 1foc e le mc4 sono ready, allora setto che lo sono (stoppo il timer canBoardsReady_timer da 10 milli)
-        // e poi mando la configurazione alle board can
+        // e poi mando la configurazione alle board can mc4
         eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
-        eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
-        // poi abilito MAIS e BCastPolicy nel caso di MC4
+        // poi, nel caso mc4:  mando la configurazione alle board e abilito MAIS e BCastPolicy 
         eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
         if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
         {   
+            eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
             eo_emsapplBody_MAISstart(eo_emsapplBody_GetHandle());
         }
     }
@@ -216,7 +239,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
 // to transmit a udp packet.
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
-    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
+    //eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
     // marco.accame: for now i remove the action of this object and i call the errormanager. for later we can have both the error handlers
     // eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , configurator_timeout_send_diagnostics);    
     

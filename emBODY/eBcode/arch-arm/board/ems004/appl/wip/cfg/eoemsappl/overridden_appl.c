@@ -31,7 +31,7 @@
 
 #include "EOtheEMSapplBody.h"
 
-#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplDiagnostics.h"
 #include "EOaction.h"
 #include "hl_bits.h"
 
@@ -39,6 +39,13 @@
 
 #include "EOnvSet.h"
 #include "EoProtocolMC.h"
+
+#include "iCubCanProto_motorControlMessages.h"
+
+#include "EOtheCANservice.h"
+#include "EOtheCANprotocol.h"
+
+#include "EoCANnet.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -56,21 +63,21 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
-    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
-    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
-#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-#else
-    #error --> you must define an EBx
-#endif
+//#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
+//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
+//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
+//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
+//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
+//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
+//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
+//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
+//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
+//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
+//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
+//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
+//#else
+//    #error --> you must define an EBx
+//#endif
 
 
 #if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
@@ -322,15 +329,6 @@ static const eOemsapplbody_cfg_t theemsapplbodycfg =
             .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
         }
     },
-    .hasdevice  =
-    {
-        EOMTHEEMSAPPLCFG_EBX_hasSKIN, EOMTHEEMSAPPLCFG_EBX_hasMC4, EOMTHEEMSAPPLCFG_EBX_has2FOC
-    },
-    .icubcanprotoimplementedversion =
-    {
-        .major                      = 1,
-        .minor                      = 2
-    },
     .configdataofMC4boards          =
     {
         .shiftvalues    =
@@ -505,9 +503,38 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
      
     // pulse led3 forever at 20 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);
+    
+    {   // CAN-MAPPING
+        // marco.accame on 19 may 2015: here we load the map of can ... and also we map the entities into some can boards
+        // ... if we have any.
+        EOtheCANmapping * canmap = eo_canmap_Initialise(NULL);
+        // now i load the map of can boards
+        EOconstvector *canboards = eocannet_code2boards(s_boardnum);
+        eo_canmap_LoadBoards(canmap, canboards);
+        // now i load mc-joints, mc-motors, as-strain, as-mais, sk-skin
+        EOconstvector *entitydes = NULL;
+        // mc
+        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
+        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, entitydes); 
+        // as
+        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, entitydes);
+        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
+        // sk
+        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
+    }
+    
+    {   // CAN-PROTOCOL
+        EOtheCANprotocol * canprot = eo_canprot_Initialise(NULL);       
+        
+    }
 
 
-    {   
+    {   // ETH-PROTOCOL   
         // marco.accame on 24 apr 2015: here is how to customise the eth protocol from a generic to a specific board
         // so far, we can keep it in here. but further on we shall customise one endpoint at a time in runtime.
         
@@ -540,7 +567,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     
     // initialise diagnostics
-    eo_theEMSdgn_Initialize();
+    //eo_theEMSdgn_Initialize();
     
     // start the application body   
     //const eOemsapplbody_cfg_t *applbodycfg = &theemsapplbodycfg;   
@@ -554,13 +581,22 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     
     // pulse led3 forever at 0.50 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
-        
-    
+
+    // set the EOtheCANservice to be on event and force parsing of all packets in the RX queues.
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
+    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
+    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
+
+#if 0    
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appCanSP_SetRunMode(appCanSP_ptr, eo_appCanSP_runMode__onEvent);
   
+    // cambiare con: eo_canserv_NumberOfFramesInRXqueue(), eo_canserv_Parse().
+    // oppure: fare una funzione che .... triggeri una lettura e poi chiami il parse.
     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport1);
     eo_appCanSP_EmptyCanInputQueue(appCanSP_ptr, eOcanport2);
+#endif    
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
@@ -586,25 +622,41 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     
     // pulse led3 forever at 1 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0); 
-        
+     
+    // set mode on demand. then tx all canframes remained in the tx queue
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);
+   
+    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);    
+    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);    
+    
+    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, 5*eok_reltime1ms);
+    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, 5*eok_reltime1ms);
 
+    
+#if 0    
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+    
     // Before changing appCanRunMode it is important to be sure that can output queues are empty
     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport1);
     eo_appCanSP_EmptyCanOutputQueue(appCanSP_ptr, eOcanport2);
  
     eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onDemand);
+#endif
 	
     // Start reading the encoders
-    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
+    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
 }
+
 
 extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {
     eOresult_t res = eores_NOK_generic;
     
-    // set run mode on demand in order to send messages to can straight away as soon as they are generated one by one.
-    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+    // set run mode straigth. then read all can frames received
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
+    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
+    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
   
     
     // stop skin. the check whether to stop skin or not is done internally.
@@ -616,7 +668,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 	{
 		//handle the error
 	}
-    
+        
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
@@ -624,7 +676,10 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // pulse led3 forever at 4 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/4, 0);
    
-    eo_appCanSP_SetRunMode(eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()), eo_appCanSP_runMode__onEvent);
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
+    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
+    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
 }
 
 
