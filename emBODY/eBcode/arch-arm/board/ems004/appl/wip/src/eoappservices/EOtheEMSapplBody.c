@@ -1055,11 +1055,11 @@ static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p)
         } 
 
         // init the measure converter
-        eOappMeasConv_cfg_t cfg = {0};
+        eOmeasconv_cfg_t cfg = {0};
         cfg.jointVelocityShift = p->configMC4boards2use.shiftvalues.jointVelocityShift;
         cfg.jointVelocityEstimationShift = p->configMC4boards2use.shiftvalues.jointVelocityEstimationShift;    
         cfg.jointAccEstimationShift = p->configMC4boards2use.shiftvalues.jointAccelerationEstimationShift;
-        eo_appMeasConv_Initialise(&cfg);
+        eo_measconv_Initialise(&cfg);
         
     }
     

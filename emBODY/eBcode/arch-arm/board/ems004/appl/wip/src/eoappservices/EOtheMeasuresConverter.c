@@ -20,7 +20,7 @@
 // - doxy
 // --------------------------------------------------------------------------------------------------------------------
 
-/* @file       EOappMeasuresConverter.c
+/* @file       EOtheMeasuresConverter.c
     @brief     This file implements measures converter.
     @author    valentina.gaggero@iit.it
     @date      08/24/2012
@@ -45,7 +45,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
-#include "EOappMeasuresConverter.h"
+#include "EOtheMeasuresConverter.h"
 
 
 
@@ -53,7 +53,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOappMeasuresConverter_hid.h"
+#include "EOtheMeasuresConverter_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -78,14 +78,14 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_eo_appMeasConv_TableCreateAndInit(EOappMeasConv *p);
+static eOresult_t s_eo_measconv_TableCreateAndInit(EOtheMeasuresConverter *p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOappMeasConv s_eo_appmeas_singleton =
+static EOtheMeasuresConverter s_eo_appmeas_singleton =
 {
     .cfg                                = {0},
     .jointVelocityShift                 = 0,
@@ -101,7 +101,7 @@ static EOappMeasConv s_eo_appmeas_singleton =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOappMeasConv* eo_appMeasConv_Initialise(eOappMeasConv_cfg_t *cfg)
+extern EOtheMeasuresConverter* eo_measconv_Initialise(eOmeasconv_cfg_t *cfg)
 {
     eOresult_t res;
 
@@ -117,13 +117,13 @@ extern EOappMeasConv* eo_appMeasConv_Initialise(eOappMeasConv_cfg_t *cfg)
     
 
     //save in obj its configuration
-    memcpy(&(s_eo_appmeas_singleton.cfg), cfg, sizeof(eOappMeasConv_cfg_t));
+    memcpy(&(s_eo_appmeas_singleton.cfg), cfg, sizeof(eOmeasconv_cfg_t));
         
     s_eo_appmeas_singleton.jointVelocityShift = cfg->jointVelocityShift;
     s_eo_appmeas_singleton.jointVelocityEstimationShift = cfg->jointVelocityEstimationShift;
     s_eo_appmeas_singleton.jointAccEstimationShift = cfg->jointAccEstimationShift;
 
-    res = s_eo_appMeasConv_TableCreateAndInit(&s_eo_appmeas_singleton);
+    res = s_eo_measconv_TableCreateAndInit(&s_eo_appmeas_singleton);
 
     if(eores_OK != res)
     {
@@ -134,7 +134,7 @@ extern EOappMeasConv* eo_appMeasConv_Initialise(eOappMeasConv_cfg_t *cfg)
 }
 
 
-extern EOappMeasConv* eo_appMeasConv_GetHandle(void)
+extern EOtheMeasuresConverter* eo_measconv_GetHandle(void)
 {
     if(NULL == s_eo_appmeas_singleton.jntEncConvDataList)
     {
@@ -143,14 +143,14 @@ extern EOappMeasConv* eo_appMeasConv_GetHandle(void)
     return(&s_eo_appmeas_singleton);      
 }
 
-extern eOresult_t eo_appMeasConv_SetJntEncoderConversionFactor(EOappMeasConv *p, eOmc_jointId_t jId, eOappMeasConv_encConversionFactor_t convfactor)
+extern eOresult_t eo_measconv_SetJntEncoderConversionFactor(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeasconv_encConversionFactor_t convfactor)
 {
     p->jntEncConvDataList[jId].factor = convfactor;
 
     return(eores_OK);
 }
 
-extern eOresult_t eo_appMeasConv_SetJntEncoderConversionOffset(EOappMeasConv *p, eOmc_jointId_t jId, eOappMeasConv_encConversionOffset_t convoffset)
+extern eOresult_t eo_measconv_SetJntEncoderConversionOffset(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeasconv_encConversionOffset_t convoffset)
 {
     p->jntEncConvDataList[jId].offset = convoffset;
     
@@ -159,93 +159,93 @@ extern eOresult_t eo_appMeasConv_SetJntEncoderConversionOffset(EOappMeasConv *p,
 
 //#if 0
 
-//__weak extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_position_t e_pos)
+//__weak extern eOmeas_position_t eo_measconv_jntPosition_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_position_t e_pos)
 //{  
 //    return((eOmeas_position_t)e_pos);
 //}
 
-//__weak extern icubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
+//__weak extern icubCanProto_position_t eo_measconv_jntPosition_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
 //{
 //    return((icubCanProto_position_t)i_pos);
 //}
 
-//__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
+//__weak extern eOmeas_velocity_t eo_measconv_jntVelocity_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
 //{
 //    return((eOmeas_velocity_t)e_vel);
 //}
 
-//__weak extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
+//__weak extern eOmeas_velocity_t eo_measconv_jntVelocity_E2I_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
 //{
 //    return((eOmeas_velocity_t)e_vel);
 //}
 
 
-//__weak extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+//__weak extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 //{
 //    return((icubCanProto_velocity_t)i_vel);
 //}
 
 
-//__weak extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+//__weak extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 //{
 
-//    return((icubCanProto_velocity_t)(i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+//    return((icubCanProto_velocity_t)(i_vel * __fabs(eo_measconv_hid_GetEncConv_factor(p, jId))));
 //}
-//// __weak extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_forSetVelRefMC4(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+//// __weak extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E_forSetVelRefMC4(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 //// {
 ////     return((icubCanProto_velocity_t)i_vel);
 //// }
 
 
-//__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
+//__weak extern eOmeas_acceleration_t eo_measconv_jntAcceleration_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
 //{ 
 //    return((eOmeas_acceleration_t)e_acc);
 //}
 
 
-//__weak extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
+//__weak extern eOmeas_acceleration_t eo_measconv_jntAcceleration_E2I_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
 //{
 //    return((eOmeas_acceleration_t)e_acc);
 //}
-//__weak extern icubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+//__weak extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 //{
 //    return((icubCanProto_acceleration_t)i_acc);
 //}
 
-//__weak extern icubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+//__weak extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 //{
 //    return((icubCanProto_acceleration_t)i_acc);
 //}
-//__weak extern icubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
+//__weak extern icubCanProto_stiffness_t eo_measconv_impedenceStiffness_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
 //{ 
 //    return((icubCanProto_stiffness_t)i_stiff);
 //}
 
 
-//__weak extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
+//__weak extern eOmeas_stiffness_t eo_measconv_impedenceStiffness_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
 //{
 //    return((eOmeas_stiffness_t)s_stiff);
 //}
 
 
-//__weak extern icubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
+//__weak extern icubCanProto_damping_t eo_measconv_impedenceDamping_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
 //{
 //    return((icubCanProto_damping_t)i_damping);
 //}
 
-//__weak extern eOmeas_damping_t eo_appMeasConv_impedenceDamping_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_damping_t s_damping)
+//__weak extern eOmeas_damping_t eo_measconv_impedenceDamping_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_damping_t s_damping)
 //{
 //    return((eOmeas_damping_t)s_damping);
 //}
 
 
-//__weak extern icubCanProto_torque_t eo_appMeasConv_torque_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
+//__weak extern icubCanProto_torque_t eo_measconv_torque_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
 //{
 //    return((icubCanProto_torque_t)i_torque);
 //}
 
 
-//__weak extern eOmeas_torque_t eo_appMeasConv_torque_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
+//__weak extern eOmeas_torque_t eo_measconv_torque_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
 //{
 //     
 //    return((eOmeas_torque_t)s_torque);
@@ -254,97 +254,97 @@ extern eOresult_t eo_appMeasConv_SetJntEncoderConversionOffset(EOappMeasConv *p,
 //#endif
 
 
-extern eOmeas_torque_t eo_appMeasConv_torque_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
+extern eOmeas_torque_t eo_measconv_torque_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
 {    
     return((eOmeas_torque_t)s_torque);
 }
 
 
-extern eOmeas_position_t eo_appMeasConv_jntPosition_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_position_t e_pos)
+extern eOmeas_position_t eo_measconv_jntPosition_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_position_t e_pos)
 {    
-    return((eOmeas_position_t)((e_pos / eo_appMeasConv_hid_GetEncConv_factor(p, jId)) - eo_appMeasConv_hid_GetEncConv_offset(p, jId)));
+    return((eOmeas_position_t)((e_pos / eo_measconv_hid_GetEncConv_factor(p, jId)) - eo_measconv_hid_GetEncConv_offset(p, jId)));
 }
 
-extern icubCanProto_position_t eo_appMeasConv_jntPosition_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
+extern icubCanProto_position_t eo_measconv_jntPosition_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
 {
-    return((icubCanProto_position_t)((i_pos + eo_appMeasConv_hid_GetEncConv_offset(p, jId)) * eo_appMeasConv_hid_GetEncConv_factor(p, jId))); 
+    return((icubCanProto_position_t)((i_pos + eo_measconv_hid_GetEncConv_offset(p, jId)) * eo_measconv_hid_GetEncConv_factor(p, jId))); 
 }
 
-extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
+extern eOmeas_velocity_t eo_measconv_jntVelocity_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
 {
-    return(e_vel/eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    return(e_vel/eo_measconv_hid_GetEncConv_factor(p, jId));
 }
 
-extern eOmeas_velocity_t eo_appMeasConv_jntVelocity_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
+extern eOmeas_velocity_t eo_measconv_jntVelocity_E2I_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
 {
-    return((eOmeas_velocity_t)(e_vel/__fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+    return((eOmeas_velocity_t)(e_vel/__fabs(eo_measconv_hid_GetEncConv_factor(p, jId))));
 }
 
 
-extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
     int32_t tmp;
      
     //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms and after shift in order to obtain a small value
-    tmp = i_vel * eo_appMeasConv_hid_GetEncConv_factor(p, jId);
-    tmp = tmp *(1 << eo_appMeasConv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
+    tmp = i_vel * eo_measconv_hid_GetEncConv_factor(p, jId);
+    tmp = tmp *(1 << eo_measconv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
     tmp = tmp + 500;  //round to nearest integer
     tmp = tmp/1000; //convert from sec to ms
     return((icubCanProto_velocity_t)tmp);
 }
 
-extern icubCanProto_velocity_t eo_appMeasConv_jntVelocity_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
+extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
 {
     int32_t temp;
       
     //NEW VERSION:
     /*the velocity is dived by 10, because the reuslt of followiong moltiplication
-    (i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId)))
+    (i_vel * __fabs(eo_measconv_hid_GetEncConv_factor(p, jId)))
     can be bigger then 32767 (max value of int16)
     so thet result is divieded by 10.
     Note thet velocity is used to get the needed time to reach the setpoint, so in mc4 fw it is enogth to moltiply by 100 ensted of 1000 (1ms)
     This operation was already done by CanBusMotionControl
     */
 
-    temp = (i_vel * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
+    temp = (i_vel * __fabs(eo_measconv_hid_GetEncConv_factor(p, jId)));
     return((icubCanProto_velocity_t)(temp/10));
 }
 
-extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
+extern eOmeas_acceleration_t eo_measconv_jntAcceleration_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
 {   
-    return((eOmeas_acceleration_t)e_acc /eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    return((eOmeas_acceleration_t)e_acc /eo_measconv_hid_GetEncConv_factor(p, jId));
 }
 
-extern eOmeas_acceleration_t eo_appMeasConv_jntAcceleration_E2I_abs(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
+extern eOmeas_acceleration_t eo_measconv_jntAcceleration_E2I_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
 {
-    return((eOmeas_acceleration_t)(e_acc / __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId))));
+    return((eOmeas_acceleration_t)(e_acc / __fabs(eo_measconv_hid_GetEncConv_factor(p, jId))));
 }
 
-extern icubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 {
-    return((icubCanProto_acceleration_t)(i_acc * eo_appMeasConv_hid_GetEncConv_factor(p, jId)));
+    return((icubCanProto_acceleration_t)(i_acc * eo_measconv_hid_GetEncConv_factor(p, jId)));
 }
 
-extern icubCanProto_acceleration_t eo_appMeasConv_jntAcceleration_I2E_abs(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
+extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
 {
-    int32_t tmp = i_acc << eo_appMeasConv_hid_GetVelEstimShift(p, jId);
-    tmp = tmp * __fabs(eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    int32_t tmp = i_acc << eo_measconv_hid_GetVelEstimShift(p, jId);
+    tmp = tmp * __fabs(eo_measconv_hid_GetEncConv_factor(p, jId));
     tmp = tmp + 500000; //round to nearest integer
     tmp = tmp/1000000; // conver from sec^2 to millsec^2 
     return((icubCanProto_acceleration_t)tmp);
 }
 
- extern icubCanProto_torque_t eo_appMeasConv_torque_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
+ extern icubCanProto_torque_t eo_measconv_torque_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
  {
      return(i_torque );
  }
 
 
-extern icubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
+extern icubCanProto_stiffness_t eo_measconv_impedenceStiffness_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
 {
 //     char *str_err;
  //   char str_err[200];
-    float factor = eo_appMeasConv_hid_GetEncConv_factor(p, jId);
+    float factor = eo_measconv_hid_GetEncConv_factor(p, jId);
     int32_t stiff;
  //   eOmeas_stiffness_t prova = 18000;
     
@@ -368,15 +368,15 @@ extern icubCanProto_stiffness_t eo_appMeasConv_impedenceStiffness_I2S(EOappMeasC
     return((icubCanProto_stiffness_t)(((stiff / factor)) /1000.0f) );
 }
 
-extern eOmeas_stiffness_t eo_appMeasConv_impedenceStiffness_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
+extern eOmeas_stiffness_t eo_measconv_impedenceStiffness_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
 {
     eOmeas_stiffness_t aux = s_stiff;
     
-    return(aux*eo_appMeasConv_hid_GetEncConv_factor(p, jId)*1000);
+    return(aux*eo_measconv_hid_GetEncConv_factor(p, jId)*1000);
 }
 
 
-extern icubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOappMeasConv *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
+extern icubCanProto_damping_t eo_measconv_impedenceDamping_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
 {
     int32_t damping;
     if(i_damping > INT32_MAX)
@@ -390,15 +390,15 @@ extern icubCanProto_damping_t eo_appMeasConv_impedenceDamping_I2S(EOappMeasConv 
     
     //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
     //qui non divido per 1000 perche' devo estrimerlo al millisec.
-    return((icubCanProto_stiffness_t)((damping / eo_appMeasConv_hid_GetEncConv_factor(p, jId))) );
+    return((icubCanProto_stiffness_t)((damping / eo_measconv_hid_GetEncConv_factor(p, jId))) );
 }
 
 
-extern eOmeas_damping_t eo_appMeasConv_impedenceDamping_S2I(EOappMeasConv *p, eOmc_jointId_t jId, icubCanProto_damping_t s_damping)
+extern eOmeas_damping_t eo_measconv_impedenceDamping_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_damping_t s_damping)
 {
     eOmeas_damping_t aux = s_damping;
 
-    return(aux*eo_appMeasConv_hid_GetEncConv_factor(p, jId));
+    return(aux*eo_measconv_hid_GetEncConv_factor(p, jId));
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -411,7 +411,7 @@ extern eOmeas_damping_t eo_appMeasConv_impedenceDamping_S2I(EOappMeasConv *p, eO
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_eo_appMeasConv_TableCreateAndInit(EOappMeasConv *p)
+static eOresult_t s_eo_measconv_TableCreateAndInit(EOtheMeasuresConverter *p)
 {
     uint8_t i;
 
@@ -424,13 +424,13 @@ static eOresult_t s_eo_appMeasConv_TableCreateAndInit(EOappMeasConv *p)
         return(eores_NOK_generic);
     }
     
-    p->jntEncConvDataList = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eOappMeasConv_encoderConversionData_t), p->totalnumofjoint);
+    p->jntEncConvDataList = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(eOmeasconv_encoderConversionData_t), p->totalnumofjoint);
 
     /* 2) Init table */
     for(i=0; i<p->totalnumofjoint; i++)
     {
-        p->jntEncConvDataList[i].factor = eo_appMeasConv_hid_jntEncoderConvFactor_defaultValue;
-        p->jntEncConvDataList[i].offset = eo_appMeasConv_hid_jntEncoderConvOffset_defaultValue;
+        p->jntEncConvDataList[i].factor = eo_measconv_hid_jntEncoderConvFactor_defaultValue;
+        p->jntEncConvDataList[i].offset = eo_measconv_hid_jntEncoderConvOffset_defaultValue;
     }
     
     return(eores_OK);

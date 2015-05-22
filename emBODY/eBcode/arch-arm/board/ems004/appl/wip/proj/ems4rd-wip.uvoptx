@@ -1838,7 +1838,7 @@
 
   <Group>
     <GroupName>appl-services</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1876,8 +1876,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eoappservices\EOappMeasuresConverter.c</PathWithFileName>
-      <FilenameWithoutPath>EOappMeasuresConverter.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\EOtheMeasuresConverter.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheMeasuresConverter.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2338,7 +2338,7 @@
 
   <Group>
     <GroupName>eo-protocol-cfg-callbacks</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2479,7 +2479,7 @@
 
   <Group>
     <GroupName>eoprot-can-cfg-mapping</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2513,7 +2513,7 @@
 
   <Group>
     <GroupName>eoprot-can-cfg-protocol</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

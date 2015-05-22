@@ -48,7 +48,7 @@
 #include "EoBoards.h"
 #include "EOappEncodersReader.h"
 #include "EOemsController.h"
-#include "EOappMeasuresConverter.h"
+#include "EOtheMeasuresConverter.h"
 
 #include "EOtheCANmapping.h"
 

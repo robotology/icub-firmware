@@ -834,9 +834,9 @@
               <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
             </File>
             <File>
-              <FileName>EOappMeasuresConverter.c</FileName>
+              <FileName>EOtheMeasuresConverter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappMeasuresConverter.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheMeasuresConverter.c</FilePath>
             </File>
             <File>
               <FileName>EOtheEntities.c</FileName>
@@ -2078,9 +2078,9 @@
               <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
             </File>
             <File>
-              <FileName>EOappMeasuresConverter.c</FileName>
+              <FileName>EOtheMeasuresConverter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappMeasuresConverter.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheMeasuresConverter.c</FilePath>
             </File>
             <File>
               <FileName>EOtheEntities.c</FileName>

@@ -46,7 +46,7 @@
 #include "EOtheEMSapplBody.h"
 //#include "EOappTheDataBase.h"
 //#include "EOicubCanProto_specifications.h"
-#include "EOappMeasuresConverter.h"
+#include "EOtheMeasuresConverter.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     
     // set max velocity  
     
-    icubCanProto_velocity_t vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(eo_appMeasConv_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
+    icubCanProto_velocity_t vel_icubCanProtValue = eo_measconv_jntVelocity_I2E(eo_measconv_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     command.value = &vel_icubCanProtValue;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
@@ -204,7 +204,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv_ptr = eo_appMeasConv_GetHandle();
+    EOappMeasConv* appMeasConv_ptr = eo_measconv_GetHandle();
 
 	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, &boardType);
     if(eores_OK != res)
@@ -228,7 +228,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     }
     
     // 2) set max velocity  
-    vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, mxx, cfg_ptr->maxvelocityofmotor);           
+    vel_icubCanProtValue = eo_measconv_jntVelocity_I2E(appMeasConv_ptr, mxx, cfg_ptr->maxvelocityofmotor);           
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&vel_icubCanProtValue);
 
@@ -300,7 +300,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
     command.class = eocanprot_msgclass_pollingMotorControl;
     
     // set max velocity  
-    icubCanProto_velocity_t vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(eo_appMeasConv_GetHandle(), mxx, *vel);           
+    icubCanProto_velocity_t vel_icubCanProtValue = eo_measconv_jntVelocity_I2E(eo_measconv_GetHandle(), mxx, *vel);           
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     command.value = &vel_icubCanProtValue;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
@@ -318,10 +318,10 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv_ptr = eo_appMeasConv_GetHandle();
+    EOappMeasConv* appMeasConv_ptr = eo_measconv_GetHandle();
 
 
-    vel_icubCanProtValue = eo_appMeasConv_jntVelocity_I2E(appMeasConv_ptr, mxx, *vel_ptr);           
+    vel_icubCanProtValue = eo_measconv_jntVelocity_I2E(appMeasConv_ptr, mxx, *vel_ptr);           
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)&vel_icubCanProtValue);
 #endif
 }
