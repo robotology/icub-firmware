@@ -62,6 +62,8 @@ extern EOtheEntities* eo_entities_Initialise(void);
 
 extern EOtheEntities* eo_entities_GetHandle(void);
 
+extern eOresult_t eo_entities_Refresh(EOtheEntities *p);
+
 
 extern eOmc_joint_t * eo_entities_GetJoint(EOtheEntities *p, eOprotIndex_t id);
 extern eOmc_joint_config_t * eo_entities_GetJointConfig(EOtheEntities *p, eOprotIndex_t id);

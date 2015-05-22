@@ -96,8 +96,29 @@ extern EOtheEntities* eo_entities_Initialise(void)
         return(&s_eo_theentities);
     }
     
+    eo_entities_Refresh(&s_eo_theentities);
+    
+    s_eo_theentities.initted = eobool_true;   
+    
+    return(&s_eo_theentities);
+}
+
+
+extern EOtheEntities* eo_entities_GetHandle(void)
+{
+    return(eo_entities_Initialise());
+}
+
+extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
+{
     uint8_t i=0;
     uint8_t max = 0;
+    
+    memset(s_eo_theentities.joints, 0, sizeof(s_eo_theentities.joints));
+    memset(s_eo_theentities.motors, 0, sizeof(s_eo_theentities.motors));
+    memset(s_eo_theentities.skins, 0, sizeof(s_eo_theentities.skins));
+    memset(s_eo_theentities.strains, 0, sizeof(s_eo_theentities.strains));
+    memset(s_eo_theentities.maises, 0, sizeof(s_eo_theentities.maises));
     
     // joints
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
@@ -139,16 +160,9 @@ extern EOtheEntities* eo_entities_Initialise(void)
         s_eo_theentities.maises[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)i);
     }    
     
-    s_eo_theentities.initted = eobool_true;   
-    
-    return(&s_eo_theentities);
+    return(eores_OK);
 }
 
-
-extern EOtheEntities* eo_entities_GetHandle(void)
-{
-    return(eo_entities_Initialise());
-}
 
 extern eOmc_joint_t * eo_entities_GetJoint(EOtheEntities *p, eOprotIndex_t id)
 {
