@@ -312,15 +312,15 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
         uint8_t i=0;
         // get the broadcast policy. it is somewhere in this object. the bcast policy is equal for all joints...
         eo_emsapplbody_can_bcastpolicy_t *bcastpolicy = &p->configMC4boards2use.bcastpolicy;
-        eOcanprot_descriptor_t descriptor = {0};
-        descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
-        descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
-        descriptor.value = bcastpolicy;
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
+        command.value = bcastpolicy;
         for(i=0; i<numofjomos; i++)
         {
             // ok, now i send the value to the relevant address
             eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
         }
     }  
 
@@ -411,15 +411,15 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
         uint8_t i=0;
         // get a broadcast policy of all zeros.
         eo_emsapplbody_can_bcastpolicy_t bcastpolicy = {0};
-        eOcanprot_descriptor_t descriptor = {0};
-        descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
-        descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
-        descriptor.value = &bcastpolicy;
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
+        command.value = &bcastpolicy;
         for(i=0; i<numofjomos; i++)
         {
             // ok, now i send the value to the relevant address
             eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
         }
     }  
 
@@ -601,11 +601,11 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
     }
 
     
-    eOcanprot_descriptor_t descriptor = {0};
+    eOcanprot_command_t command = {0};
     icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-    descriptor.msgclass = eocanprot_msgclass_pollingSkin;
-    descriptor.msgtype = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
-    descriptor.value = &sigmode;
+    command.class = eocanprot_msgclass_pollingSkin;
+    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
+    command.value = &sigmode;
 
     uint8_t i=0;
     eOsk_skin_t *skin = NULL;
@@ -635,7 +635,7 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
         // the simplification we use is that they all are on the same CAN bus and all have consecutive addresses.
         // we send the same command to all of them
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, i, 0);
-        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), id32, &descriptor);    
+        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, id32);    
     }
     
     return(eores_OK);
@@ -1183,11 +1183,11 @@ static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_
             // not match then i dont send the command anymore.
             if(0 == board->detected.protocolversion.major)
             {  // must ask if the board has not responded yet
-                eOcanprot_descriptor_t descriptor = {0};
-                descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
-                descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
-                descriptor.value = (void*)&board->board.props.requiredprotocol;
-                eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);                  
+                eOcanprot_command_t command = {0};
+                command.class = eocanprot_msgclass_pollingMotorControl;
+                command.type  = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
+                command.value = (void*)&board->board.props.requiredprotocol;
+                eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);                  
             }                        
         }               
     }
@@ -1274,8 +1274,8 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
         uint8_t i=0;
         // get the shift value policy. it is somewhere in this object. the shift calues are equal for all joints...
         eo_emsapplbody_can_shiftvalues_t *shiftvalues = &p->configMC4boards2use.shiftvalues;
-        eOcanprot_descriptor_t descriptor = {0};
-        descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
 
         for(i=0; i<numofjomos; i++)
         {
@@ -1283,9 +1283,9 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
             
             // first is ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT
-            descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
-            descriptor.value = &shiftvalues->jointVelocityShift;                       
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
+            command.value = &shiftvalues->jointVelocityShift;                       
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
             
             // second is ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT
             eOtmp_estimShift_t estimshift = {0};
@@ -1293,9 +1293,9 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             estimshift.estimShiftJointAcc = 0;
             estimshift.estimShiftMotorVel = 0;
             estimshift.estimShiftMotorAcc = 0;
-            descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
-            descriptor.value = &estimshift;                       
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
+            command.value = &estimshift;                       
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
         }        
         
     }
@@ -1483,18 +1483,18 @@ static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
     eOenum08_t mode = cfg->mode;            // it must be eoas_maismode_txdatacontinuously
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, number, 0);
 
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingAnalogSensor;    
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingAnalogSensor;    
     
     // set txmode
-    descriptor.msgtype = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    descriptor.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    command.value = &mode;                       
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     
     // set datarate
-    descriptor.msgtype = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    descriptor.value = &datarate;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);    
+    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    command.value = &datarate;                       
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);    
     
     return(eores_OK);
     
@@ -1579,11 +1579,11 @@ static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
     eOenum08_t mode = cfg->mode;       
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, number, 0);
     // set txmode
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingAnalogSensor;    
-    descriptor.msgtype = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    descriptor.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingAnalogSensor;    
+    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    command.value = &mode;                       
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
 
     return(eores_OK);
         
@@ -1626,11 +1626,11 @@ static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
     eOenum08_t mode = eoas_strainmode_acquirebutdonttx;       
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, number, 0);
     // set txmode
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingAnalogSensor;    
-    descriptor.msgtype = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    descriptor.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingAnalogSensor;    
+    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    command.value = &mode;                       
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
 
     return(eores_OK);  
     

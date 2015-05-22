@@ -111,38 +111,27 @@ enum { eocanprot_msgclass_maxvalue = 4 };
 enum { eocanprot_classperiodic_msgtypes_maxnumberof = 16, eocanprot_classpolling_msgtypes_maxnumberof = 128 };
 
 
-/** @typedef    typedef struct eOcanprot_descriptor_t
-    @brief      Contains whatever is required to form the can frame.
+/** @typedef    typedef struct eOcanprot_command_t
+    @brief      Contains whatever is required to define a command over can.
  **/ 
 typedef struct
 {
-    uint8_t     msgclass;       // use eOcanprot_msgclass_t
-    uint8_t     msgtype;        // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
-    uint8_t     address;        // it is the can address. at max 4 bits. it specifies the destination address execpt if msgclass is a eocanprot_msgclass_periodic* where is the origin address.
-    uint8_t     internalindex;  // use eOcanmap_insideindex_t: 0, 1, none. it is used if the message is for a joint/motor inside the can board. otherwise it is not used.
-    void*       value;          // keeps a pointer to the value to be put inside the can frame.
-} eOcanprot_descriptor_t;
-
-
-typedef struct
-{
-    uint8_t     class;          // use eOcanprot_msgclass_t
-    uint8_t     type;           // they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.  one byte is required
-    void*       value;          // keeps a pointer to the value to be put inside the can frame.    
+    uint8_t     class;      /**< use eOcanprot_msgclass_t */
+    uint8_t     type;       /**< they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc. */
+    void*       value;      /**< keeps a pointer to the value to be put inside the can frame */   
 } eOcanprot_command_t;
 
 
 /** @typedef    typedef struct eOcanprot_descriptor_t
-    @brief      Contains whatever is required to form the can frame.
+    @brief      Contains whatever is required to form the can frame: the command and the location
  **/ 
 typedef struct
 {
-    eOcanprot_command_t     cmd;
-    eOcanmap_location_t     loc;
-} eOcanprot_descriptor2_t;  // maybe this type is better.
+    eOcanprot_command_t     cmd;        /**< the command */
+    eOcanmap_location_t     loc;        /**< the destination if polling message, the source if periodic */
+} eOcanprot_descriptor_t; 
 
 
-//#warning -----------------> change eOcanprot_descriptor_t::address into simply address. because it is origin or destination depending on cases
 
 typedef eOresult_t (*eOcanprot_fp_parser_t)(eOcanframe_t *frame, eOcanport_t port);
 

@@ -1347,24 +1347,24 @@ void config_2FOC(uint8_t motor)
 
     // we want to send two can frames 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;
     
     // first one: set current pid
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+    command.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     int8_t KpKiKdKs[7];
     ((int16_t*)KpKiKdKs)[0] =  8; //Kp
     ((int16_t*)KpKiKdKs)[1] =  2; //Ki
     ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
                KpKiKdKs [6] = 10; // shift
-    descriptor.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+    command.value = KpKiKdKs;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     
     // second one: set current limit
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    command.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     uint32_t max_current = 5000; // 5A
-    descriptor.value = &max_current;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);    
+    command.value = &max_current;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);    
     
     
 #else
@@ -1425,11 +1425,11 @@ void set_2FOC_idle(uint8_t motor)
     // we want to send one can frame: set control mode idle
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_idle; 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    descriptor.value = &controlmode_2foc;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+    command.value = &controlmode_2foc;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     
     // and then
     eo_motor_set_motor_status(ems->motors, motor, 0);
@@ -1478,11 +1478,11 @@ void set_2FOC_running(uint8_t motor)
     #endif
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    descriptor.value = &controlmode_2foc;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &descriptor);
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+    command.value = &controlmode_2foc;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
      
 
 #else    

@@ -74,10 +74,10 @@ typedef enum
 typedef struct
 {    
     eOcanserv_mode_t    mode;
-    uint8_t             rxqueuesize[2];
-    uint8_t             txqueuesize[2];
-    eOcallback_t        onrxcallback[2];
-    void*               onrxargument[2];
+    uint8_t             rxqueuesize[eOcanports_number];
+    uint8_t             txqueuesize[eOcanports_number];
+    eOcallback_t        onrxcallback[eOcanports_number];
+    void*               onrxargument[eOcanports_number];
 } eOcanserv_cfg_t;
 
 
@@ -113,7 +113,7 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t canport, uint
 
 
 // must specify all the entries in eOcanprot_descriptor_t
-extern eOresult_t eo_canserv_SendCommand(EOtheCANservice *p, eOcanport_t port, eOcanprot_descriptor_t *command);
+extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot_command_t *command, eOcanmap_location_t loc);
 
 /** @fn         extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanframe_t *frame, eOcanport_t port) 
     @brief      It parses a can frame and executes associated actions. 
@@ -123,9 +123,9 @@ extern eOresult_t eo_canserv_SendCommand(EOtheCANservice *p, eOcanport_t port, e
     @return     eores_OK if the parsing is successful, eores_NOK_nullpointer in case of NULL parameters, eores_NOK_generic if the frame is not recognised.  
  **/
 // of eOcanprot_descriptor_t we need fill only ...class, type, and value
-extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOprotID32_t id32, eOcanprot_descriptor_t *command); 
+extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32); 
 
-extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOprotID32_t id32, eOcanprot_descriptor_t *command);
+extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32);
 
 // it is meaningful only if the mode is ... otherwise .... 
 extern eOresult_t eo_canserv_TXstart(EOtheCANservice *p, eOcanport_t port, uint8_t *sizeofTXqueue);

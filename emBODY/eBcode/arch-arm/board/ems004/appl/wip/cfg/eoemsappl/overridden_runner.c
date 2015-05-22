@@ -518,7 +518,6 @@ EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSappl
 static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
     eOcanport_t port = eOcanport1;
-    eOcanprot_descriptor_t command = {0};
     
     // now i need to assign port and command with correct values.
     
@@ -543,16 +542,19 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
         }        
     }
     
-    // ok, now i fill port and command
-    port = port;
-    command.address = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
-    command.internalindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
-    command.msgclass = eocanprot_msgclass_periodicMotorControl;
-    command.msgtype = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
-    command.value = &pwmValues[0];    
+    // ok, now i fill command and location
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_periodicMotorControl;    
+    command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
+    command.value = &pwmValues[0];
     
+    eOcanmap_location_t location = {0};
+    location.port = port;
+    location.addr = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
+    location.insideindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
+
     // and i send the command
-    return(eo_canserv_SendCommand(eo_canserv_GetHandle(), port, &command));
+    return(eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location));
     
 //    {
 //    eOresult_t 				                res = eores_OK;

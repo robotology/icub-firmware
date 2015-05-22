@@ -127,7 +127,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_IDLE(eOcanpro
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_calibrator_t* calib = (icubCanProto_calibrator_t*)descriptor->value;
+    icubCanProto_calibrator_t* calib = (icubCanProto_calibrator_t*)descriptor->cmd.value;
    
     s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER);
 
@@ -261,7 +261,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOtmp_estimShift_t *shift = (eOtmp_estimShift_t*)descriptor->value;
+    eOtmp_estimShift_t *shift = (eOtmp_estimShift_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT);
     // now i prepare data[1] -> data[4]
     frame->data[1]  = shift->estimShiftJointVel;
@@ -274,7 +274,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT(eO
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__POSITION_MOVE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_setpoint_position_t *setpointp = (icubCanProto_setpoint_position_t *)descriptor->value;
+    icubCanProto_setpoint_position_t *setpointp = (icubCanProto_setpoint_position_t *)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 7, ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE);
     // now i prepare data[1] -> data[6]
     *((icubCanProto_position_t*)(&frame->data[1])) = setpointp->value;
@@ -285,7 +285,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__POSITION_MOVE(eOcanprot_
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__VELOCITY_MOVE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_setpoint_velocity_t *setpointv = (icubCanProto_setpoint_velocity_t *)descriptor->value;
+    icubCanProto_setpoint_velocity_t *setpointv = (icubCanProto_setpoint_velocity_t *)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE);
     // now i prepare data[1] -> data[4]
     *((icubCanProto_velocity_t*)(&frame->data[1])) = setpointv->value;
@@ -296,7 +296,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__VELOCITY_MOVE(eOcanprot_
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_TORQUE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_setpoint_torque_t *setpointt = (icubCanProto_setpoint_torque_t *)descriptor->value;
+    icubCanProto_setpoint_torque_t *setpointt = (icubCanProto_setpoint_torque_t *)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE);
     // now i prepare data[1] -> data[4]    
     // marco.accame: value is a int16_t but i have found it copied byte by byte, so i keep it in this way
@@ -324,7 +324,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_COMMAND_POSITION(eOc
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION);
     // now i prepare data[1] -> data[4]    
-    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->value);
+    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->cmd.value);
     
     return(eores_OK);    
 }
@@ -334,7 +334,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_POSITION(eOcanpr
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION);    
     // now i prepare data[1] -> data[4]   
-    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->value);    
+    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->cmd.value);    
     return(eores_OK);
 }
 
@@ -356,7 +356,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION(eOcanpr
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION);    
     // now i prepare data[1] -> data[4]   
-    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->value);    
+    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->cmd.value);    
     return(eores_OK);
 }
 
@@ -375,7 +375,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY(eOcanpr
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY);    
     // now i prepare data[1] -> data[2]   
-    *((icubCanProto_velocity_t*)(&frame->data[1])) = *((icubCanProto_velocity_t*)descriptor->value);    
+    *((icubCanProto_velocity_t*)(&frame->data[1])) = *((icubCanProto_velocity_t*)descriptor->cmd.value);    
     return(eores_OK);
 }
 
@@ -383,7 +383,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_LIMIT(eOcanp
 {
     // NOTE: eo-protocol uses 16 bits for current (sign+value), while icubcanprotocol uses 32bits.
     // in here we should not use negative currents, nevertheless we convert the value correctly
-    eOmeas_current_t *eomeasCurrent = (eOmeas_current_t*)descriptor->value;
+    eOmeas_current_t *eomeasCurrent = (eOmeas_current_t*)descriptor->cmd.value;
     int32_t maxcurrent = *eomeasCurrent;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT);    
     // now i prepare data[1] -> data[4]   
@@ -396,13 +396,13 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_BCAST_POLICY(eOcanpr
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY);    
     // now i prepare data[1] -> data[4]   
-    memcpy(&frame->data[1], descriptor->value, 4);
+    memcpy(&frame->data[1], descriptor->cmd.value, 4);
     return(eores_OK);
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VEL_SHIFT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_velocityShift_t shift = *((icubCanProto_velocityShift_t*)descriptor->value);
+    icubCanProto_velocityShift_t shift = *((icubCanProto_velocityShift_t*)descriptor->cmd.value);
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT);    
     // now i prepare data[1] -> data[2]  
     *((uint16_t*)(&frame->data[1])) = shift;    
@@ -485,14 +485,14 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VEL_TIMEOUT(eOcanpro
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT);  
     // now i prepare data[1] -> data[2]  
-    *((uint16_t*)(&frame->data[1])) = *((uint16_t*)descriptor->value);    
+    *((uint16_t*)(&frame->data[1])) = *((uint16_t*)descriptor->cmd.value);    
     return(eores_OK);
 }
 
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_IMPEDANCE_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_impedance_t *imp = (icubCanProto_impedance_t *)descriptor->value;
+    icubCanProto_impedance_t *imp = (icubCanProto_impedance_t *)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS);  
     // now i prepare data[1] -> data[7]  
     // stiffnes and damping occupy two bytes
@@ -516,7 +516,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_PARAMS(eOc
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_IMPEDANCE_OFFSET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_torque_t *offset = (icubCanProto_torque_t *)descriptor->value;
+    icubCanProto_torque_t *offset = (icubCanProto_torque_t *)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET);  
     // now i prepare data[1] -> data[2]  
     *((icubCanProto_torque_t*)(&frame->data[1])) = *((icubCanProto_torque_t*)(offset)); 
@@ -540,7 +540,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOc
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eObrd_version_t *reqprot = (eObrd_version_t*)descriptor->value;
+    eObrd_version_t *reqprot = (eObrd_version_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION);
     
     frame->data[1] = reqprot->major;
@@ -616,7 +616,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PIDLIMITS(e
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_CURRENT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOmeas_current_t *current = (eOmeas_current_t*)descriptor->value;
+    eOmeas_current_t *current = (eOmeas_current_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT);
    
     *((eOmeas_current_t*)(&frame->data[1])) = *current;
@@ -628,7 +628,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_CURRENT(eOca
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_I2T_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOmc_i2tParams_t *i2tparams = (eOmc_i2tParams_t*)descriptor->value;
+    eOmc_i2tParams_t *i2tparams = (eOmc_i2tParams_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS);   
     *((uint16_t*)(&frame->data[1])) = i2tparams->time;
     *((uint16_t*)(&frame->data[3])) = i2tparams->tresh;
@@ -637,7 +637,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_I2T_PARAMS(eOcanprot
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_OPENLOOP_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_setpoint_current_t *setpoint = (icubCanProto_setpoint_current_t*)descriptor->value;
+    icubCanProto_setpoint_current_t *setpoint = (icubCanProto_setpoint_current_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS);   
     *((int16_t*)(&frame->data[1])) = setpoint->value;
     return(eores_OK);    
@@ -684,7 +684,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    icubCanProto_interactionmode_t *imode = (icubCanProto_interactionmode_t*)descriptor->value;
+    icubCanProto_interactionmode_t *imode = (icubCanProto_interactionmode_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE);   
     *((icubCanProto_interactionmode_t*)(&frame->data[1])) = *imode;
     return(eores_OK);  
@@ -711,17 +711,17 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE(eOc
 
 static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type)
 {   // every message coming from the ems has actually id 0
-    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingMotorControl, 0, descriptor->address);
+    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingMotorControl, 0, descriptor->loc.addr);
     frame->id_type      = eocanframeID_std11bits;
     frame->frame_type   = eocanframetype_data; 
     frame->size         = len;
-    frame->data[0]      = EOCANPROT_CREATE_POLLING_MC_DATA0(descriptor->internalindex, type);    
+    frame->data[0]      = EOCANPROT_CREATE_POLLING_MC_DATA0(descriptor->loc.insideindex, type);    
 }
 
 
 static void s_former_POL_MC_CMD_setpid(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->value;    
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
     s_former_POL_MC_prepare_frame(descriptor, frame, 8, type);    
     // now i prepare data[1] -> data[7]  
     *((int16_t*)(&frame->data[1])) = (int16_t) pid->kp;
@@ -734,7 +734,7 @@ static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor
 {
     //  Currently in messages.h there is a check on frame_len equal to 8, else frame is discarded 
     //  so i left size = 8 even if correct size is 7 
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->value;    
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
     s_former_POL_MC_prepare_frame(descriptor, frame, 8, type);   
     // now i prepare data[1] -> data[7]  
     *((int16_t*)(&frame->data[1])) = (int16_t) pid->offset;
@@ -745,7 +745,7 @@ static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor
 
 static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->value;    
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
     s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);    
     // now i prepare data[1] -> data[6]  
     *((int16_t*)(&frame->data[1])) = (int16_t) pid->kp;
@@ -755,7 +755,7 @@ static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOc
 
 static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
 {
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->value;    
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
     s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);   
     // now i prepare data[1] -> data[6]  
     *((int16_t*)(&frame->data[1])) = (int16_t) pid->offset;

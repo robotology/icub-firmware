@@ -448,7 +448,7 @@ extern eOresult_t eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRE
 {
     s_former_PER_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT);     
     // all the data is in payload
-    int16_t *pwmList = (int16_t*)descriptor->value;    
+    int16_t *pwmList = (int16_t*)descriptor->cmd.value;    
     *((uint16_t*)(&frame->data[0])) = pwmList[0];
     *((uint16_t*)(&frame->data[2])) = pwmList[1];
     *((uint16_t*)(&frame->data[4])) = pwmList[2];
@@ -651,7 +651,7 @@ static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmc
 
 static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type)
 {   // the source address in actually inside descriptor->address
-    frame->id           = EOCANPROT_CREATE_CANID_PERIODIC(eocanprot_msgclass_periodicMotorControl, descriptor->address, type);
+    frame->id           = EOCANPROT_CREATE_CANID_PERIODIC(eocanprot_msgclass_periodicMotorControl, descriptor->loc.addr, type);
     frame->id_type      = eocanframeID_std11bits;
     frame->frame_type   = eocanframetype_data; 
     frame->size         = len;

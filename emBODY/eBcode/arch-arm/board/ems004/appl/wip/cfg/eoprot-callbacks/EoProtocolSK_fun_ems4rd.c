@@ -126,10 +126,10 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
 {
     eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)nv->ram;  
     //icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_dontsignal
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingSkin;    
-    descriptor.msgtype = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    descriptor.value = NULL;       
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingSkin;    
+    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    command.value = NULL;       
     
     switch(*sigmode)
     {
@@ -138,29 +138,29 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
             // in old way it does not exist
             // in new way:
             icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_dontsignal;
-            descriptor.value = &sigmode2use;
+            command.value = &sigmode2use;
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);
             
         } break;
         
         case eosk_sigmode_signal:
         {
             icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_signal;
-            descriptor.value = &sigmode2use;
+            command.value = &sigmode2use;
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
         } break;
 
         case eosk_sigmode_signal_oldway:
         {
             // we need to change the class and type as well
-            descriptor.msgclass = eocanprot_msgclass_pollingSkin;    
-            descriptor.msgtype = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
-            descriptor.value = NULL;     
+            command.class = eocanprot_msgclass_pollingSkin;    
+            command.type  = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
+            command.value = NULL;     
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);
             #warning -> see the following code, where we need also a special message to board with address 0xE
 
 //            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
@@ -313,13 +313,13 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOrop
     canProto_skcfg.period   = brdCfg->cfg.period;
     canProto_skcfg.noload   = brdCfg->cfg.noload;
     
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingSkin;    
-    descriptor.msgtype = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
-    descriptor.value = &canProto_skcfg; 
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingSkin;    
+    command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
+    command.value = &canProto_skcfg; 
     
     // and now we send the command to all the skin boards
-    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);
     
 #if 0    
     eOresult_t                      res;
@@ -372,17 +372,17 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_trianglescfg(const EOnv* nv, const eO
     canProto_trgscfg.shift     = trgsCfg->cfg.shift;
     canProto_trgscfg.CDCoffset = trgsCfg->cfg.CDCoffset;
     
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingSkin;    
-    descriptor.msgtype = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
-    descriptor.value = &canProto_trgscfg; 
     
-    #warning --> TBD: and now we send the command to the skin board with address trgsCfg->boardaddr
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingSkin;    
+    command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
+    command.value = &canProto_trgscfg; 
+    
     eOcanmap_location_t location = {0};
     eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), rd->id32, &location, NULL, NULL);
-    descriptor.address = trgsCfg->boardaddr;
-    descriptor.internalindex = location.insideindex;
-    eo_canserv_SendCommand(eo_canserv_GetHandle(), (eOcanport_t)location.port, &descriptor);
+    // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board. we want to override that.
+    location.addr = trgsCfg->boardaddr;
+    eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location);
     
 #if 0    
     eOresult_t                          res;

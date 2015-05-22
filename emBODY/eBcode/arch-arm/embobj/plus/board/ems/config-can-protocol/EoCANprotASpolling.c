@@ -100,7 +100,7 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_TXMODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__SET_TXMODE);    
-    eOenum08_t *txmode = (eOenum08_t *)descriptor->value;    
+    eOenum08_t *txmode = (eOenum08_t *)descriptor->cmd.value;    
     frame->data[1] = *txmode;  
     return(eores_OK);    
 }
@@ -108,7 +108,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_TXMODE(eOcanprot_des
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_CANDATARATE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE);    
-    uint8_t *datarate = (uint8_t*)descriptor->value;    
+    uint8_t *datarate = (uint8_t*)descriptor->cmd.value;    
     frame->data[1] = *datarate;  
     return(eores_OK);       
 }
@@ -116,7 +116,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_CANDATARATE(eOcanpro
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_RESOLUTION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION);       
-    eOas_maisresolution_t *maisresolution = (eOas_maisresolution_t*)descriptor->value;    
+    eOas_maisresolution_t *maisresolution = (eOas_maisresolution_t*)descriptor->cmd.value;    
     eOresult_t res = eores_OK;
     
     switch(*maisresolution)
@@ -148,7 +148,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_RESOLUTION(eOcanprot
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES);    
-    uint8_t *channel = (uint8_t*)descriptor->value;    
+    uint8_t *channel = (uint8_t*)descriptor->cmd.value;    
     frame->data[1] = *channel;  
     return(eores_OK);          
 }
@@ -219,7 +219,7 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_BRD_CFG(eOcanprot_de
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 4, ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG);    
     
-    icubCanProto_skinboard_config_t* bcfg = (icubCanProto_skinboard_config_t *)descriptor->value;    
+    icubCanProto_skinboard_config_t* bcfg = (icubCanProto_skinboard_config_t *)descriptor->cmd.value;    
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
     frame->data[0] = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;  
     frame->data[1] = (bcfg->skintype &0x07);
@@ -248,7 +248,7 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG(eOcanprot
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 7, ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG);    
 
-    icubCanProto_skintriangles_config_t * tcfg = (icubCanProto_skintriangles_config_t *)descriptor->value;
+    icubCanProto_skintriangles_config_t * tcfg = (icubCanProto_skintriangles_config_t *)descriptor->cmd.value;
 
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
 
@@ -305,7 +305,7 @@ extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descripto
 
 static void s_former_POL_AS_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type)
 {   // every message coming from the ems has actually id 0
-    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingAnalogSensor, 0, descriptor->address);
+    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingAnalogSensor, 0, descriptor->loc.addr);
     frame->id_type      = eocanframeID_std11bits;
     frame->frame_type   = eocanframetype_data; 
     frame->size         = len;
@@ -369,12 +369,12 @@ static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_str
         channel++;
         
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, index, 0);
-        eOcanprot_descriptor_t command = {0};
-        command.msgclass = eocanprot_msgclass_pollingAnalogSensor;
-        command.msgtype = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingAnalogSensor;
+        command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
         command.value = &channel;
         
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), id32, &command);
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     }
 }    
 

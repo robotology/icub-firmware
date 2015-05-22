@@ -533,23 +533,23 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
     #endif
     
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = eocanprot_msgclass_pollingMotorControl;
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;
     
     // first one:
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-    descriptor.value = NULL;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+    command.type  = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
+    command.value = NULL;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
     // second one:
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-    descriptor.value = NULL;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);
+    command.type  = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
+    command.value = NULL;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
     // third one:
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    descriptor.value = &controlmode_2foc;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);    
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+    command.value = &controlmode_2foc;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
 
     eo_emsController_StartCalibration(jxx, 
                                       calibrator->params.type3.position, 

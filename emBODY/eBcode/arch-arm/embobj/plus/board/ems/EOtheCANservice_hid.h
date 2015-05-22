@@ -34,6 +34,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "osal.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -71,8 +72,8 @@ struct EOtheCANservice_hid
 {    
     eObool_t                initted;
 	eOcanserv_cfg_t         config;
-//    eOcanserv_txwait_t      txwait[2]; // apparently used by emptytxqueues
-    eOcanserv_lockdata_t    locktilltxall[2];
+//    eOcanserv_txwait_t      txwait[eOcanports_number]; // apparently used by emptytxqueues
+    eOcanserv_lockdata_t    locktilltxall[eOcanports_number];
 };
 
 

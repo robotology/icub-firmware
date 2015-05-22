@@ -1355,7 +1355,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
     else if(NULL != des)
     {
         parsemode = eobool_false;
-        msgclass = des->msgclass;
+        msgclass = des->cmd.class;
     }
     else
     {   // only one between them is non NULL, not both
@@ -1381,7 +1381,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             }
             else
             {
-                msgtype = des->msgtype;
+                msgtype = des->cmd.type;
             }
 
             // marco.accame: the msgtype is used as an index to a big sparse table. this solution gives quicker access.
@@ -1403,7 +1403,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             }
             else
             {
-                msgtype = des->msgtype;
+                msgtype = des->cmd.type;
             }  
 
             // marco.accame: the msgtype is used as an index to a big sparse table. this solution gives quicker access.
@@ -1448,7 +1448,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             }
             else
             {
-                msgtype = des->msgtype;
+                msgtype = des->cmd.type;
             }  
             
             *index1 = msgtype; 
@@ -1470,7 +1470,7 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             }
             else
             {
-                msgtype = des->msgtype;
+                msgtype = des->cmd.type;
             }              
             
             *index1 = msgtype;    

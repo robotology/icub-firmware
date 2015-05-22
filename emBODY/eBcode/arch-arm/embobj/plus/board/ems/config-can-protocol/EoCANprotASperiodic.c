@@ -141,7 +141,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DE
 extern eOresult_t eocanprotASperiodic_former_PER_AS_MSG__FORCE_VECTOR(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_PER_AS_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR); 
-    memcpy(&frame->data[0], descriptor->value, 6);      
+    memcpy(&frame->data[0], descriptor->cmd.value, 6);      
     return(eores_OK);                
 }
 
@@ -157,7 +157,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__FORCE_VECTOR(eOcanframe
 extern eOresult_t eocanprotASperiodic_former_PER_AS_MSG__TORQUE_VECTOR(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_PER_AS_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR); 
-    memcpy(&frame->data[0], descriptor->value, 6);      
+    memcpy(&frame->data[0], descriptor->cmd.value, 6);      
     return(eores_OK);                
 }
 
@@ -321,7 +321,7 @@ static eOresult_t s_eocanprotASperiodic_parser_process_maisvalue(eOcanframe_t *f
 
 static void s_former_PER_AS_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type)
 {   // for periodic the descriptor->address contains ... the origin
-    uint8_t origin = descriptor->address;
+    uint8_t origin = descriptor->loc.addr;
     frame->id           = EOCANPROT_CREATE_CANID_PERIODIC(eocanprot_msgclass_periodicAnalogSensor, origin, type);
     frame->id_type      = eocanframeID_std11bits;
     frame->frame_type   = eocanframetype_data; 
