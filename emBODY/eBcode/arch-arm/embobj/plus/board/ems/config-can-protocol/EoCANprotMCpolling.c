@@ -64,7 +64,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#warning OPTIMISATION: instead of calling eOmc_joint_t *joint = eoprot_entity_ramof_get() call the protocol-wrapper
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -93,6 +93,12 @@ static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 static void s_former_POL_MC_CMD_setpid(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 
+static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
+static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
+
+static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
+static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
+static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -104,249 +110,6 @@ static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
-//extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__exceptions(eOcanframe_t *frame, eOcanport_t port)
-//{   // manage in here msgtype lower than ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
-//    
-//    eOresult_t res = eores_OK;
-//    
-//    uint8_t type = EOCANPROT_FRAME_POLLING_GET_TYPE(frame);
-//    
-//    switch(type)
-//    {
-//        case ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;
-//        
-//        case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;
-
-//        case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:
-//        {
-//            res = s_parser_POL_MC_CMD__MOTION_DONE(frame, port);          
-//        } break;
-
-//        case ICUBCANPROTO_POL_MC_CMD__GET_ADDITIONAL_INFO:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;
-//        
-//        case ICUBCANPROTO_POL_MC_CMD__GET_DEBUG_PARAM:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;        
-
-//        case ICUBCANPROTO_POL_MC_CMD__GET_ENCODER_POSITION:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break; 
-//        
-//        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break; 
-
-//        case ICUBCANPROTO_POL_MC_CMD__GET_BOARD_ID:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;  
-
-//        default:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;                 
-//    }
-//    
-//     
-//    return(res);    
-//}
-
-//extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__exceptions(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-//{   // manage in here msgtype lower than ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION
-//    eOresult_t res = eores_OK;
-//    
-//    uint8_t type = EOCANPROT_FRAME_POLLING_GET_TYPE(frame);
-//    
-//    switch(type)
-//    {
-//        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN(descriptor, frame);
-//        } break;
-//        
-//        case ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_IDLE(descriptor, frame);
-//        } break;
-//        
-//        case ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(descriptor, frame);
-//        } break;        
-//        
-//        case ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD(descriptor, frame);
-//        } break; 
-
-//        case ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD(descriptor, frame);
-//        } break;        
-
-//        case ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE(descriptor, frame);
-//        } break;  
-
-//        case ICUBCANPROTO_POL_MC_CMD__MOTION_DONE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(descriptor, frame);
-//        } break;  
-
-//        case ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(descriptor, frame);
-//        } break; 
-
-//        case ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT(descriptor, frame);
-//        } break; 
-//               
-//        case ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__POSITION_MOVE(descriptor, frame);
-//        } break;   
-
-//        case ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__VELOCITY_MOVE(descriptor, frame);
-//        } break; 
-
-//        case ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_TORQUE(descriptor, frame);
-//        } break; 
-
-////        case ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE:
-////        {   
-////            res = eocanprotMCpolling_former_POL_MC_CMD__GET_DESIRED_TORQUE(descriptor, frame);
-////        } break; 
-
-//        case ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__STOP_TRAJECTORY(descriptor, frame);
-//        } break; 
-
-//        case ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION:
-//        {   
-//            res = eocanprotMCpolling_former_POL_MC_CMD__SET_COMMAND_POSITION(descriptor, frame);
-//        } break;         
-//        
-//        default:
-//        {   // not managed
-//            res = eores_NOK_generic;
-//        } break;                 
-//    }   
-//     
-//    return(res);  
-//}
-
-
-
-extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port)
-{
-    // not expected. print a diagnostics error
-    return(eores_OK);
-}
-
-
-
-    
-extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port)
-{    
-#ifdef USE_PROTO_PROXY
-    
-    eOprotIndex_t index = EOK_uint08dummy;  
-
-    eOcanmap_location_t loc = {0};
-    loc.port            = port;
-    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
-    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
-    
-    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    if(EOK_uint08dummy == index)
-    {
-        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
-        return(eores_OK);
-    }
-    
-    
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_limitsofjoint);
-   
-
-    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-    if(NULL == param)
-    {
-        eOerrmanDescriptor_t errdes = {0};
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
-        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-        errdes.par16            = 0; 
-        errdes.par64            = id32; 
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-        return(eores_OK);
-    } 
-
-    eOmeas_position_limits_t *limits = (eOmeas_position_limits_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
-    
-    icubCanProto_position_t icub_pos =  *((icubCanProto_position_t*)(&frame->data[1]));
-    // ok, now i must convert from one to another ...
-    #warning marco.accame: must simplify teh conversion from one measure to another. why to call so many functions?
-    limits->min = eo_appMeasConv_jntPosition_E2I(eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle()), index, icub_pos);
-
-    param->p08_2 ++;
-    
-    if(param->p08_1 == param->p08_2)
-    {
-        // send back response
-        eOmeas_position_limits_t limits_aux = {0};
-               
-        if(limits->max < limits->min)
-        {
-            limits_aux.max = limits->min;
-            limits_aux.min = limits->max;
-        }
-        else
-        {
-            memcpy(&limits_aux, limits, sizeof(eOmeas_position_limits_t));
-        }
-        
-        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, &limits_aux);  
-        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
-    }
-    
-    
-#endif //USE_PROTO_PROXY
-    
-    return(eores_OK);
-}
-
-
-extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_MAX_POSITION(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
-
-
-
-// former public functions
 
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -433,9 +196,14 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__DISABLE_PWM_PAD(eOcanpro
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    #warning --> marco.accame: is this command used or not?
     s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE);
     return(eores_OK);         
+}
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_CONTROL_MODE(eOcanframe_t *frame, eOcanport_t port)
+{
+    #warning -> i am not sure it is still in use, thus i just put an error return
+    return(eores_NOK_generic);
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -443,6 +211,47 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_de
     s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__MOTION_DONE);
     return(eores_OK);     
 }
+
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
+{
+    eOresult_t res = eores_OK; 
+    
+    // retrieve the joint related to the frame
+    eOcanmap_location_t loc = {0};
+    loc.port = port;
+    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    eOprotIndex_t jointindex = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    
+    if(EOK_uint08dummy == jointindex)
+    {
+        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        return(eores_OK);
+    }
+    
+    eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jointindex);
+    
+    if(NULL == joint)
+    {
+        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        return(eores_OK);        
+    }
+    
+    eOmc_motionmonitorstatus_t motionmonitorstatus = (eOmc_motionmonitorstatus_t) joint->status.basic.motionmonitorstatus;
+    
+    if(eomc_motionmonitorstatus_notmonitored == motionmonitorstatus)
+    {
+        // pc104 isn't interested in motion monitoring
+        return(eores_OK);
+    }
+    
+    joint->status.basic.motionmonitorstatus = (eOmc_motionmonitorstatus_t)frame->data[1];    
+    
+    return(eores_OK);
+}
+
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -452,7 +261,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOicubCanProto_estimShift_t *shift = (eOicubCanProto_estimShift_t*)descriptor->value;
+    eOtmp_estimShift_t *shift = (eOtmp_estimShift_t*)descriptor->value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT);
     // now i prepare data[1] -> data[4]
     frame->data[1]  = shift->estimShiftJointVel;
@@ -498,6 +307,13 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_TORQUE(eOcan
     return(eores_OK);         
 }
 
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_DESIRED_TORQUE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_DESIRED_TORQUE);    
+    return(eores_OK);             
+}
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__STOP_TRAJECTORY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY);
@@ -529,6 +345,13 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION(eOcanpr
     return(eores_OK);  
 }
 
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port)
+{       
+    return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION));
+}
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION);    
@@ -541,6 +364,11 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MAX_POSITION(eOcanpr
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION);
     return(eores_OK);  
+}
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MAX_POSITION(eOcanframe_t *frame, eOcanport_t port)
+{  
+    return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION));    
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -593,17 +421,30 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_PID(eOcanprot
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_PID(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID));
+}
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_CMD_setpid_limits(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS);
     return(eores_OK);
 }
 
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS);    
     return(eores_OK);
 }
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_PIDLIMITS(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS));
+}
+
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -617,6 +458,12 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_PID(eOcanprot_de
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_PID(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_PID));
+}
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_CMD_setpid_limits(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS);
@@ -629,6 +476,10 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_PIDLIMITS(eOcanp
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_PIDLIMITS(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS));
+}
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VEL_TIMEOUT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -656,6 +507,13 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_IMPEDANCE_PARAMS(eOc
     return(eores_OK);
 }
 
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_PARAMS(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS));
+}
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_IMPEDANCE_OFFSET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     icubCanProto_torque_t *offset = (icubCanProto_torque_t *)descriptor->value;
@@ -671,14 +529,128 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOc
     return(eores_OK);
 }
 
-// parser functions
 
-//extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_CONTROL_MODE(eOcanframe_t *frame, eOcanport_t port)
-//{
-//       
-//}
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET));
+}
 
-extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
+
+
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    eObrd_version_t *reqprot = (eObrd_version_t*)descriptor->value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION);
+    
+    frame->data[1] = reqprot->major;
+    frame->data[2] = reqprot->minor;
+    
+    return(eores_OK);      
+}
+
+
+
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port)
+{
+    // must: retrieve the board given the location, assign the rx values, verify if the fw version is ok 
+    // then: (but it could be put somewhere else) ... if all boards are ready: stop, send config, start mais
+    // i would like to do it inside a method of ...
+    
+    eOcanmap_location_t loc = {0};
+    loc.port                = port;
+    loc.addr                = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex         = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    eObool_t match = (1 == frame->data[7]) ? eobool_true : eobool_false;    
+    
+    eObrd_typeandversions_t detected    = {0};
+    detected.boardtype                  = frame->data[1];
+    detected.firmwareversion.major      = frame->data[2];
+    detected.firmwareversion.minor      = frame->data[3];
+    detected.firmwarebuildnumber        = frame->data[4];
+    detected.protocolversion.major      = frame->data[5];
+    detected.protocolversion.minor      = frame->data[6];   
+    
+    
+    // pass it all to the relevant object, which will do what it needs. everything in one file
+    eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(eo_emsapplBody_GetHandle(), loc, match, &detected);
+          
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    // ... apparently s_former_POL_MC_CMD_setpid uses len 8 and not len 7 and has pid->scale
+    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID has len 7 or 8 as some other SET_xxx_PID 
+    s_former_POL_MC_CMD_setpid_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID);  
+    return(eores_OK);      
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
+    s_former_POL_MC_CMD_setpid_limits_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS);
+    return(eores_OK);      
+}
+
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    // ... apparently s_former_POL_MC_CMD_setpid uses len 8 and not len 7 and has pid->scale
+    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID has len 7 or 8 as some other SET_xxx_PID 
+    s_former_POL_MC_CMD_setpid_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);
+    return(eores_OK);      
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    // ... apparently s_former_POL_MC_CMD_setpid_limits uses len 8 and not len 7 
+    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
+    s_former_POL_MC_CMD_setpid_limits_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS);
+    return(eores_OK);      
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_DESIRED_CURRENT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    eOmeas_current_t *current = (eOmeas_current_t*)descriptor->value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_CURRENT);
+   
+    *((eOmeas_current_t*)(&frame->data[1])) = *current;
+    frame->data[3] = 0; // LSB Id
+    frame->data[4] = 0; // MSB Id
+    return(eores_OK);       
+}
+
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_I2T_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    eOmc_i2tParams_t *i2tparams = (eOmc_i2tParams_t*)descriptor->value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_I2T_PARAMS);   
+    *((uint16_t*)(&frame->data[1])) = i2tparams->time;
+    *((uint16_t*)(&frame->data[3])) = i2tparams->tresh;
+    return(eores_OK);     
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_OPENLOOP_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    icubCanProto_setpoint_current_t *setpoint = (icubCanProto_setpoint_current_t*)descriptor->value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS);   
+    *((int16_t*)(&frame->data[1])) = setpoint->value;
+    return(eores_OK);    
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS);   
+    return(eores_OK);        
+}
+
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
     eOresult_t res = eores_OK; 
     
@@ -703,19 +675,21 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
         #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);        
     }
+   
+    joint->status.ofpid.positionreference = *((int16_t*)&frame->data[1]);    
     
-    eOmc_motionmonitorstatus_t motionmonitorstatus = (eOmc_motionmonitorstatus_t) joint->status.basic.motionmonitorstatus;
-    
-    if(eomc_motionmonitorstatus_notmonitored == motionmonitorstatus)
-    {
-        // pc104 isn't interested in motion monitoring
-        return(eores_OK);
-    }
-    
-    joint->status.basic.motionmonitorstatus = (eOmc_motionmonitorstatus_t)frame->data[1];    
-    
-    return(eores_OK);
+    return(eores_OK);    
 }
+
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    icubCanProto_interactionmode_t *imode = (icubCanProto_interactionmode_t*)descriptor->value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE);   
+    *((icubCanProto_interactionmode_t*)(&frame->data[1])) = *imode;
+    return(eores_OK);  
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -736,8 +710,8 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
 // former helper funtions
 
 static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type)
-{
-    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingMotorControl, 0, descriptor->destinationaddress);
+{   // every message coming from the ems has actually id 0
+    frame->id           = EOCANPROT_CREATE_CANID(eocanprot_msgclass_pollingMotorControl, 0, descriptor->address);
     frame->id_type      = eocanframeID_std11bits;
     frame->frame_type   = eocanframetype_data; 
     frame->size         = len;
@@ -766,6 +740,269 @@ static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor
     *((int16_t*)(&frame->data[1])) = (int16_t) pid->offset;
     *((int16_t*)(&frame->data[3])) = (int16_t) pid->limitonoutput;
     *((int16_t*)(&frame->data[5])) = (int16_t) pid->limitonintegral;
+}
+
+
+static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
+{
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->value;    
+    s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);    
+    // now i prepare data[1] -> data[6]  
+    *((int16_t*)(&frame->data[1])) = (int16_t) pid->kp;
+    *((int16_t*)(&frame->data[3])) = (int16_t) pid->ki;
+    *((int16_t*)(&frame->data[5])) = (int16_t) pid->kd;
+}
+
+static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
+{
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->value;    
+    s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);   
+    // now i prepare data[1] -> data[6]  
+    *((int16_t*)(&frame->data[1])) = (int16_t) pid->offset;
+    *((int16_t*)(&frame->data[3])) = (int16_t) pid->limitonoutput;
+    *((int16_t*)(&frame->data[5])) = (int16_t) pid->limitonintegral;
+}
+
+
+// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION
+static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
+{
+#ifdef USE_PROTO_PROXY
+    
+    eOprotIndex_t index = EOK_uint08dummy;  
+
+    eOcanmap_location_t loc = {0};
+    loc.port            = port;
+    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    if(EOK_uint08dummy == index)
+    {
+        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
+        return(eores_OK);
+    }
+    
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_limitsofjoint);
+   
+
+    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
+    if(NULL == param)
+    {
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        return(eores_OK);
+    } 
+
+    eOmeas_position_limits_t *limits = (eOmeas_position_limits_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
+    
+    icubCanProto_position_t icub_pos =  *((icubCanProto_position_t*)(&frame->data[1]));
+    // ok, now i must convert from one to another ...
+    eOmeas_position_t pos = eo_appMeasConv_jntPosition_E2I(eo_appMeasConv_GetHandle(), index, icub_pos);
+    
+    if(ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION == type)
+    {
+        limits->min = pos;
+    }
+    else if(ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION == type)
+    {
+        limits->max = pos;
+    }
+    else
+    {   // i must have called it badly
+        return(eores_NOK_generic);
+    }
+
+    param->p08_2 ++;
+    
+    if(param->p08_1 == param->p08_2)
+    {
+        // send back response               
+        if(limits->max < limits->min)
+        {   // exchange them
+            eOmeas_position_t tmp = limits->min;
+            limits->min = limits->max;
+            limits->max = tmp;
+        }
+       
+        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
+    }
+       
+#endif //USE_PROTO_PROXY
+    
+    return(eores_OK);
+}
+
+
+// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, 
+//             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS
+static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
+{
+#ifdef USE_PROTO_PROXY
+    
+    eOprotIndex_t index = EOK_uint08dummy;  
+
+    eOcanmap_location_t loc = {0};
+    loc.port            = port;
+    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    if(EOK_uint08dummy == index)
+    {
+        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
+        return(eores_OK);
+    }
+    
+    eOprotTag_t tag = eoprot_tag_none;
+    
+    switch(type)
+    {
+        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID:
+        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS:     tag = eoprot_tag_mc_joint_config_pidtorque;  
+        break;
+
+        case ICUBCANPROTO_POL_MC_CMD__GET_POS_PID:
+        case ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS:        tag = eoprot_tag_mc_joint_config_pidposition;  
+        break; 
+
+        default:                                                tag = eoprot_tag_none;
+        break;
+    }
+    
+    if(eoprot_tag_none == tag)
+    {   // returns NOK because it is something i cannot parse. i must have called this function badly ...
+        return(eores_NOK_generic);
+    }
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, tag);
+   
+
+    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
+    if(NULL == param)
+    {
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        return(eores_OK);
+    } 
+    
+    eOmc_PID_t* pid = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+    
+    if((ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID == type) || (ICUBCANPROTO_POL_MC_CMD__GET_POS_PID == type))
+    {
+        pid->kp = *((int16_t*)&frame->data[1]);
+        pid->ki = *((int16_t*)&frame->data[3]);
+        pid->kd = *((int16_t*)&frame->data[5]); 
+    }
+    else// no need to verify that type value is a LIMITS i already did it in the switch-case part.
+    {
+        pid->offset = *((int16_t*)(&frame->data[1]));
+        pid->limitonoutput = *((int16_t*)(&frame->data[3]));
+        pid->limitonintegral = *((int16_t*)(&frame->data[5]));  
+    }    
+    
+
+    
+    param->p08_2 ++;
+    
+    if(param->p08_1 == param->p08_2)
+    {
+        // send back response
+        #warning marco.accame -> can eo_proxy_ReplyROP_Load() use the same memory as the nv? much be better using NULL. think of using memmove.
+        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  // if NULL it does not copy dat into the nv and uses ram inside the netvar
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
+    }
+    
+    
+#endif //USE_PROTO_PROXY
+    
+    return(eores_OK);
+}
+
+
+// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET
+static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
+{
+#ifdef USE_PROTO_PROXY
+    
+    eOprotIndex_t index = EOK_uint08dummy;  
+
+    eOcanmap_location_t loc = {0};
+    loc.port            = port;
+    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    if(EOK_uint08dummy == index)
+    {
+        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
+        return(eores_OK);
+    }
+    
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_impedance);
+   
+
+    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
+    if(NULL == param)
+    {
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        return(eores_OK);
+    } 
+
+    eOmc_impedance_t *impedance = (eOmc_impedance_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
+    
+    if(ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS == type)
+    {
+        icubCanProto_stiffness_t icub_stiff = *((icubCanProto_stiffness_t*)(&frame->data[1]));
+        icubCanProto_damping_t icub_dump = *((icubCanProto_damping_t*)(&frame->data[3]));
+        impedance->stiffness = eo_appMeasConv_impedenceStiffness_S2I(eo_appMeasConv_GetHandle(), index, icub_stiff);
+        impedance->damping = eo_appMeasConv_impedenceDamping_S2I(eo_appMeasConv_GetHandle(), index, icub_dump);        
+        
+    }
+    else if(ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET == type)
+    {
+        icubCanProto_torque_t icub_trq = *((icubCanProto_torque_t*)(&frame->data[1]));
+        impedance->offset = eo_appMeasConv_torque_S2I(eo_appMeasConv_GetHandle(), index, icub_trq);        
+    }
+    else
+    {   // i must have called it badly
+        return(eores_NOK_generic);
+    }
+
+    param->p08_2 ++;
+    
+    if(param->p08_1 == param->p08_2)
+    {
+        // send back response               
+        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
+    }
+       
+#endif //USE_PROTO_PROXY
+    
+    return(eores_OK);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
