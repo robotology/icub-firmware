@@ -824,6 +824,11 @@
           <GroupName>appl-services</GroupName>
           <Files>
             <File>
+              <FileName>EOtheBoardConfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
+            </File>
+            <File>
               <FileName>EOtheEMSapplBody.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEMSapplBody.c</FilePath>
@@ -842,6 +847,21 @@
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>board-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>EoEncoderMapEB1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB1.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapNONE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapNONE.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1132,11 +1152,6 @@
               <FileName>EOtheCANservice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoCANnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\EoCANnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2068,6 +2083,11 @@
           <GroupName>appl-services</GroupName>
           <Files>
             <File>
+              <FileName>EOtheBoardConfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
+            </File>
+            <File>
               <FileName>EOtheEMSapplBody.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEMSapplBody.c</FilePath>
@@ -2086,6 +2106,21 @@
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>board-cfg</GroupName>
+          <Files>
+            <File>
+              <FileName>EoEncoderMapEB1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB1.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapNONE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapNONE.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2316,11 +2351,6 @@
               <FileName>EOtheCANservice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoCANnet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\EoCANnet.c</FilePath>
             </File>
           </Files>
         </Group>

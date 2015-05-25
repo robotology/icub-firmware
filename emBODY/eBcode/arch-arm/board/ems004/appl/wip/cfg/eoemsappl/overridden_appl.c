@@ -45,7 +45,7 @@
 #include "EOtheCANservice.h"
 #include "EOtheCANprotocol.h"
 
-#include "EoCANnet.h"
+#include "EOtheBoardConfig.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -509,22 +509,22 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // ... if we have any.
         EOtheCANmapping * canmap = eo_canmap_Initialise(NULL);
         // now i load the map of can boards
-        EOconstvector *canboards = eocannet_code2boards(s_boardnum);
+        EOconstvector *canboards = eoboardconfig_code2canboards(s_boardnum);
         eo_canmap_LoadBoards(canmap, canboards);
         // now i load mc-joints, mc-motors, as-strain, as-mais, sk-skin
         EOconstvector *entitydes = NULL;
         // mc
-        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
-        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, entitydes); 
         // as
-        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
+        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, entitydes);
-        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
+        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
         // sk
-        entitydes = eocannet_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
     }
     
@@ -571,8 +571,20 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     // start the application body   
     //const eOemsapplbody_cfg_t *applbodycfg = &theemsapplbodycfg;   
-    const eOemsapplbody_cfg_t * applbodycfg   = (const eOemsapplbody_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
-    eo_emsapplBody_Initialise(applbodycfg);       
+//    const eOemsapplbody_cfg_t * applbodycfg   = (const eOemsapplbody_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
+    eOemsapplbody_cfg_t applbodyconfig;
+    
+    memcpy(&applbodyconfig, &theemsapplbodycfg, sizeof(eOemsapplbody_cfg_t));
+    
+    // now i get the encoder streams
+    EOconstvector *encstreams = eoboardconfig_code2encoderstreams(s_boardnum);
+    
+    eOappEncReader_stream_t *encstr = NULL;
+    encstr = (eOappEncReader_stream_t*) eo_constvector_At(encstreams, 0);
+    memcpy(&applbodyconfig.encoderstreams[0], encstr, sizeof(eOappEncReader_stream_t));   
+    encstr = (eOappEncReader_stream_t*) eo_constvector_At(encstreams, 1);    
+    memcpy(&applbodyconfig.encoderstreams[1], encstr, sizeof(eOappEncReader_stream_t)); 
+    eo_emsapplBody_Initialise(&applbodyconfig);       
 }
 
 
