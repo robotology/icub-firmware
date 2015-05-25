@@ -45,12 +45,12 @@
 #include "EOtheEMSapplBody.h"
 //#include "EOappTheDataBase.h"
 //#include "EOicubCanProto_specifications.h"
-#include "EOappMeasuresConverter.h"
-#include "EOappMeasuresConverter_hid.h"
+#include "EOtheMeasuresConverter.h"
+#include "EOtheMeasuresConverter_hid.h"
 
 #include "EOtheEMSapplDiagnostics.h"
 
-#include "EOtheProtocolWrapper.h"
+#include "EOtheEntities.h"
 
 #ifdef USE_PROTO_PROXY
 #include "EOMtheEMSbackdoor.h"
@@ -136,38 +136,38 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     
     // first of all: set conversion factor
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle();
-    eo_appMeasConv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOappMeasConv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
-    eo_appMeasConv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOappMeasConv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
+    EOtheMeasuresConverter* appMeasConv = eo_measconv_GetHandle();
+    eo_measconv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
+    eo_measconv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
 
 
-    eOcanprot_descriptor_t descriptor = {0};
-    descriptor.msgclass = icubCanProto_msgCmdClass_pollingMotorControl;
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;
     
     // 1) send pid position 
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
-    descriptor.value = &cfg->pidposition;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);    
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
+    command.value = &cfg->pidposition;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
     
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
-    descriptor.value = &cfg->pidposition;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
+    command.value = &cfg->pidposition;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
 
 
     // 2) send torque pid
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
-    descriptor.value = &cfg->pidtorque;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);    
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
+    command.value = &cfg->pidtorque;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
     
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
-    descriptor.value = &cfg->pidtorque;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);     
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
+    command.value = &cfg->pidtorque;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
     
     // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
 
     // 4) set limits
-    icubCanProto_position_t minpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.min);
-    icubCanProto_position_t maxpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.max);
+    icubCanProto_position_t minpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.min);
+    icubCanProto_position_t maxpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.max);
 
     if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
     {
@@ -176,38 +176,38 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         minpos_icubCanProtValue = maxpos_icubCanProtValue;
         maxpos_icubCanProtValue = pos_icubCanProtValue;
     }
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
-    descriptor.value = &minpos_icubCanProtValue;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
+    command.value = &minpos_icubCanProtValue;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
     
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
-    descriptor.value = &maxpos_icubCanProtValue;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
+    command.value = &maxpos_icubCanProtValue;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
     
 
     // 5) set vel timeout
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
-    descriptor.value = &cfg->velocitysetpointtimeout;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);     
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
+    command.value = &cfg->velocitysetpointtimeout;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
     
 
     // 6) set impedance 
     icubCanProto_impedance_t impedence_icubCanProtValues = {0};  
-    impedence_icubCanProtValues.stiffness = eo_appMeasConv_impedenceStiffness_I2S(appMeasConv, jxx, cfg->impedance.stiffness);
-    impedence_icubCanProtValues.damping = eo_appMeasConv_impedenceDamping_I2S(appMeasConv, jxx, cfg->impedance.damping);
-    impedence_icubCanProtValues.offset = eo_appMeasConv_torque_I2S(appMeasConv, jxx, cfg->impedance.offset);
+    impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(appMeasConv, jxx, cfg->impedance.stiffness);
+    impedence_icubCanProtValues.damping = eo_measconv_impedenceDamping_I2S(appMeasConv, jxx, cfg->impedance.damping);
+    impedence_icubCanProtValues.offset = eo_measconv_torque_I2S(appMeasConv, jxx, cfg->impedance.offset);
 
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
-    descriptor.value = &impedence_icubCanProtValues;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor);        
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
+    command.value = &impedence_icubCanProtValues;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
     
-    descriptor.msgtype = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
-    descriptor.value = &impedence_icubCanProtValues.offset;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), rd->id32, &descriptor); 
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
+    command.value = &impedence_icubCanProtValues.offset;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
     
     
     // 7) set monitormode status
-    eOmc_joint_status_t *jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
 
     if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
     {
@@ -237,7 +237,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     /* Since icub can proto uses encoder tack like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle(); 
+    EOappMeasConv* appMeasConv = eo_measconv_GetHandle(); 
 
     res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jxx,  &canLoc, NULL);
     if(eores_OK != res)
@@ -246,12 +246,12 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     }
     
     //first of all set conversion factor
-    res = eo_appMeasConv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOappMeasConv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
+    res = eo_measconv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
     if(eores_OK != res)
     {
         return;
     }
-    res = eo_appMeasConv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOappMeasConv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
+    res = eo_measconv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
     if(eores_OK != res)
     {
         return;
@@ -280,8 +280,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
 
     // 4) set limits
-    minpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.min);
-    maxpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.max);
+    minpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.min);
+    maxpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.max);
     
     if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
     {
@@ -301,9 +301,9 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg->velocitysetpointtimeout);
 
     // 6) set impedance
-    impedence_icubCanProtValues.stiffness = eo_appMeasConv_impedenceStiffness_I2S(appMeasConv, jxx, cfg->impedance.stiffness);
-    impedence_icubCanProtValues.damping = eo_appMeasConv_impedenceDamping_I2S(appMeasConv, jxx, cfg->impedance.damping);
-    impedence_icubCanProtValues.offset = eo_appMeasConv_torque_I2S(appMeasConv, jxx, cfg->impedance.offset);
+    impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(appMeasConv, jxx, cfg->impedance.stiffness);
+    impedence_icubCanProtValues.damping = eo_measconv_impedenceDamping_I2S(appMeasConv, jxx, cfg->impedance.damping);
+    impedence_icubCanProtValues.offset = eo_measconv_torque_I2S(appMeasConv, jxx, cfg->impedance.offset);
 
     msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues);
@@ -312,7 +312,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues.offset);
     
     // 7) set monitormode status
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -423,6 +423,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    #error MUST DO THEM
+    
 #if 0
     eOresult_t                              res;
     eObrd_cantype_t                         boardType;
@@ -518,6 +520,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    #error MUST DO THEM
+    
 #if 0    
     eOresult_t                              res;
     eObrd_cantype_t                         boardType;
@@ -535,7 +539,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     EOappTheDB *db = eo_appTheDB_GetHandle();
     /*Since icub can proto uses encoder tack like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle();
+    EOappMeasConv* appMeasConv = eo_measconv_GetHandle();
 
 
     res = eo_appTheDB_GetJointCanLocation(db, jxx,  &canLoc, &boardType);
@@ -550,9 +554,9 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
     
     if(eo_ropcode_set == rd->ropcode)
     {
-        impedence_icubCanProtValues.stiffness = eo_appMeasConv_impedenceStiffness_I2S(appMeasConv, jxx, impedance_ptr->stiffness);
-        impedence_icubCanProtValues.damping = eo_appMeasConv_impedenceDamping_I2S(appMeasConv, jxx, impedance_ptr->damping);
-        impedence_icubCanProtValues.offset = eo_appMeasConv_torque_I2S(appMeasConv, jxx, impedance_ptr->offset);
+        impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(appMeasConv, jxx, impedance_ptr->stiffness);
+        impedence_icubCanProtValues.damping = eo_measconv_impedenceDamping_I2S(appMeasConv, jxx, impedance_ptr->damping);
+        impedence_icubCanProtValues.offset = eo_measconv_torque_I2S(appMeasConv, jxx, impedance_ptr->offset);
 
         msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
         eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&impedence_icubCanProtValues);
@@ -618,6 +622,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 
 extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    #error MUST DO THEM
+    
 #if 0
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOresult_t                              res;
@@ -654,10 +660,10 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
     if(eo_ropcode_set == rd->ropcode)
     {
         /*Since icub can proto uses encoder tack like position unit, i need of the converter: from icub to encoder*/
-        EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle();
+        EOappMeasConv* appMeasConv = eo_measconv_GetHandle();
         
-        minpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, limits_ptr->min);
-        maxpos_icubCanProtValue = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, limits_ptr->max);
+        minpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, limits_ptr->min);
+        maxpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, limits_ptr->max);
     
         if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
         {
@@ -732,6 +738,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
 
 extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    #error MUST DO THEM
+    
 #if 0    
     eOmeas_time_t                          *time_ptr = (eOmeas_time_t*)nv->ram;
     eOmc_jointId_t                         jxx = eoprot_ID2index(rd->id32);
@@ -753,7 +761,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
     eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
     eOmc_joint_status_t     *jstatus = NULL;
 
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -777,10 +785,10 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* 
     eOutil_emulfloat32_t                    *encfactor = (eOutil_emulfloat32_t*)nv->ram;
 
 
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle(); 
+    EOappMeasConv* appMeasConv = eo_measconv_GetHandle(); 
 
 
-    res = eo_appMeasConv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOappMeasConv_encConversionFactor_t)eo_common_Q17_14_to_float(*encfactor));
+    res = eo_measconv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(*encfactor));
     if(eores_OK != res)
     {
         return; //error 
@@ -794,9 +802,9 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* 
     eOutil_emulfloat32_t                    *encoffset = (eOutil_emulfloat32_t*)nv->ram;
 
 
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle(); 
+    EOappMeasConv* appMeasConv = eo_measconv_GetHandle(); 
 
-    res = eo_appMeasConv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOappMeasConv_encConversionOffset_t)eo_common_Q17_14_to_float(*encoffset));
+    res = eo_measconv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(*encoffset));
     if(eores_OK != res)
     {
         return; //error 
@@ -806,6 +814,9 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* 
 //#warning TODO: the setpoint cannot be read, thus in here the reception of a eo_ropcode_ask is illegal. if the variable is proxied, and we receive an ask .... issue a diagnostics warning
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    
+    #error MUST DO THEM
+    
 #if 0    
     eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
     void                                    *val_ptr = NULL;
@@ -823,10 +834,10 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle();
+    EOappMeasConv* appMeasConv = eo_measconv_GetHandle();
 
     // 1) set monitor status = notreachedyet if monitormode is forever
-    jconfig = eo_protocolwrapper_GetJointConfig(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jconfig = eo_entities_GetJointConfig(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jconfig)
     {
         return; //error
@@ -838,7 +849,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         //if(eomc_motionmonitormode_forever == (eOmc_motionmonitormode_t)jconfig->motionmonitormode)
         if(eomc_motionmonitormode_forever == jconfig->motionmonitormode)        
         {
-            jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+            jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
             if(NULL == jstatus)
             {
                 return; //error
@@ -860,9 +871,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             {
                 icubCanProto_setpoint_position_t  setpoint_pos;
                 
-                setpoint_pos.value = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, setPoint->to.position.value);
+                setpoint_pos.value = eo_measconv_jntPosition_I2E(appMeasConv, jxx, setPoint->to.position.value);
                 //reference velocity of position set point must be always >0, so here absolute func is used.
-                setpoint_pos.withvelocity = eo_appMeasConv_jntVelocity_I2E_abs(appMeasConv,jxx, setPoint->to.position.withvelocity);
+                setpoint_pos.withvelocity = eo_measconv_jntVelocity_I2E_abs(appMeasConv,jxx, setPoint->to.position.withvelocity);
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE; 
                 val_ptr =  &setpoint_pos; 
             } break;
@@ -871,8 +882,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             {
                 icubCanProto_setpoint_velocity_t  setpoint_vel;
                 
-                setpoint_vel.withacceleration = eo_appMeasConv_jntAcceleration_I2E_abs(appMeasConv, jxx, setPoint->to.velocity.withacceleration);           
-                setpoint_vel.value = eo_appMeasConv_jntVelocity_I2E(appMeasConv, jxx, setPoint->to.velocity.value);
+                setpoint_vel.withacceleration = eo_measconv_jntAcceleration_I2E_abs(appMeasConv, jxx, setPoint->to.velocity.withacceleration);           
+                setpoint_vel.value = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, setPoint->to.velocity.value);
                 
                 if (setpoint_vel.withacceleration < 1)
                 {
@@ -888,7 +899,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             {
                 icubCanProto_setpoint_torque_t setpoint_torque;
                 
-                setpoint_torque.value = eo_appMeasConv_torque_I2S(appMeasConv,jxx, setPoint->to.torque.value);
+                setpoint_torque.value = eo_measconv_torque_I2S(appMeasConv,jxx, setPoint->to.torque.value);
                 
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE;           
                 val_ptr =  &setpoint_torque;    
@@ -930,7 +941,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_positionraw:
             {    
-                pos = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, setPoint->to.position.value);
+                pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, setPoint->to.position.value);
                 msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
                 val_ptr =  &pos; 
             } break;
@@ -1034,6 +1045,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    
+    #error MUST DO THEM
+    
 #if 0    
     eObool_t                                *cmd = (eObool_t*)nv->ram;
     eOmc_jointId_t                         jxx = eoprot_ID2index(rd->id32);
@@ -1055,6 +1069,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    #error MUST DO THEM
+    
 #if 0    
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
@@ -1071,11 +1087,11 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
-    EOappMeasConv* appMeasConv = eo_appMeasConv_GetHandle();
+    EOappMeasConv* appMeasConv = eo_measconv_GetHandle();
 
     // 1) set control mode in status nv (a mirror nv)
     #warning --> marco.accame: removed function as it is useless
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -1104,20 +1120,20 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
         case eomc_calibration_type0_hard_stops:
         {
             iCubCanProtCalibrator.params.type0.pwmlimit = calibrator->params.type0.pwmlimit;
-//            iCubCanProtCalibrator.params.type0.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type0.velocity);           
+//            iCubCanProtCalibrator.params.type0.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type0.velocity);           
             iCubCanProtCalibrator.params.type0.velocity = calibrator->params.type0.velocity;
         }break;
             
         case eomc_calibration_type1_abs_sens_analog:
         {
-//             icubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type1.position);
+//             icubCanProto_position_t pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type1.position);
 //             /*sice pos param is a word of 16 bits i must check min and max*/
 //             if((pos < INT16_MIN)||(pos>INT16_MAX))
 //             {
 //                 return;
 //             }
 //             iCubCanProtCalibrator.params.type1.position = (icubCanProto_position4calib_t)pos; 
-//             iCubCanProtCalibrator.params.type1.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type1.velocity);
+//             iCubCanProtCalibrator.params.type1.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type1.velocity);
              iCubCanProtCalibrator.params.type1.position = calibrator->params.type1.position; 
              iCubCanProtCalibrator.params.type1.velocity =  calibrator->params.type1.velocity;
         }break;
@@ -1125,20 +1141,20 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
         case eomc_calibration_type2_hard_stops_diff:
         {
             iCubCanProtCalibrator.params.type2.pwmlimit = calibrator->params.type2.pwmlimit;
-//            iCubCanProtCalibrator.params.type2.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type2.velocity);           
+//            iCubCanProtCalibrator.params.type2.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type2.velocity);           
             iCubCanProtCalibrator.params.type2.velocity = calibrator->params.type2.velocity;           
         }break;
 
         case eomc_calibration_type3_abs_sens_digital:
         {
-//              icubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type3.position);
+//              icubCanProto_position_t pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type3.position);
 //             /*sice pos param is a word of 16 bits i must check min and max*/
 //             if((pos < INT16_MIN)||(pos>INT16_MAX))
 //             {
 //                 return;
 //             }
 //             iCubCanProtCalibrator.params.type1.position = (icubCanProto_position4calib_t)pos; 
-//             iCubCanProtCalibrator.params.type3.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type3.velocity);           
+//             iCubCanProtCalibrator.params.type3.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type3.velocity);           
             iCubCanProtCalibrator.params.type1.position = calibrator->params.type3.position; 
             iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type3.velocity;            
             iCubCanProtCalibrator.params.type3.offset = calibrator->params.type3.offset;
@@ -1146,7 +1162,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
         case eomc_calibration_type4_abs_and_incremental:
         {
-//             icubCanProto_position_t pos = eo_appMeasConv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type4.position);
+//             icubCanProto_position_t pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type4.position);
 //             //here position is in int16_t ==> so i must verify if pos is out of int16_t range
 //             if((pos > INT16_MAX) || (pos < INT16_MIN))
 //             {
@@ -1154,7 +1170,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 //                 #warning VALE --> how to manage this error???
 //             }
 //             iCubCanProtCalibrator.params.type4.position = (icubCanProto_position4calib_t)pos; 
-//            iCubCanProtCalibrator.params.type4.velocity = eo_appMeasConv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type4.velocity);            
+//            iCubCanProtCalibrator.params.type4.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type4.velocity);            
             iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
             iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
             iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
@@ -1170,6 +1186,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    
+    #error MUST DO THEM
+    
 #if 0    
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
@@ -1189,7 +1208,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
     #warning --> marco.accame: the following function is useless, thus i remove it
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -1331,6 +1350,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    
+    #error MUST DO THEM
+    
 #if 0    
     eOmc_interactionmode_t                  *interaction = (eOmc_interactionmode_t*)rd->data;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
@@ -1340,7 +1362,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
     EOappTheDB                              *db = eo_appTheDB_GetHandle();
     
     #warning --> marco.accame: the following function is useless, thus i remove it
-    jstatus = eo_protocolwrapper_GetJointStatus(eo_protocolwrapper_GetHandle(), (eOmc_jointId_t)jxx);
+    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
     if(NULL == jstatus)
     {
         return; //error
@@ -1377,13 +1399,15 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
 
 extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    #error MUST DO THEM
+    
 #if 0    
     eOmeas_torque_t *torquevalue_ptr = (eOmeas_torque_t*)nv->ram;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     icubCanProto_torque_t icub_torque;
     
 //     EOappMeasConv* appMeasConv = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
-//     icubCanProto_torque_t icub_torque =  eo_appMeasConv_torque_I2S(appMeasConv, jxx, *torquevalue_ptr);
+//     icubCanProto_torque_t icub_torque =  eo_measconv_torque_I2S(appMeasConv, jxx, *torquevalue_ptr);
 
     icub_torque = *torquevalue_ptr +0x8000;
     eo_appTheDB_SetVirtualStrainValue(eo_appTheDB_GetHandle(), jxx, icub_torque);
@@ -1409,31 +1433,31 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         case eomc_controlmode_cmd_position:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_position;
-        }break;
+        } break;
         case eomc_controlmode_cmd_velocity:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_velocity;
-        }break;
+        } break;
         case eomc_controlmode_cmd_torque:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_torque;
-        }break;
+        } break;
         case eomc_controlmode_cmd_impedance_pos:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_impedance_pos;
-        }break;
+        } break;
         case eomc_controlmode_cmd_impedance_vel:
         {
              *icubcanProto_controlmode = icubCanProto_controlmode_impedance_vel;
-        }break;
+        } break;
         case eomc_controlmode_cmd_current:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_current;
-        }break;
+        } break;
         case eomc_controlmode_cmd_openloop:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_openloop;
-        }break;
+        } break;
         case eomc_controlmode_cmd_switch_everything_off:
         {
             return(eores_NOK_generic);
@@ -1441,19 +1465,19 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         case eomc_controlmode_cmd_force_idle:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_forceIdle;
-        }break;
+        } break;
         case eomc_controlmode_cmd_mixed:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_mixed;
-        }break;
+        } break;
         case eomc_controlmode_cmd_direct:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_direct;
-        }break;
+        } break;
         case eomc_controlmode_cmd_idle:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_idle;
-        }break;
+        } break;
         default:
         {
             return(eores_NOK_generic);
