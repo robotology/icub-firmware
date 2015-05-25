@@ -199,57 +199,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>587</LineNumber>
+          <LineNumber>1146</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134410422</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>580</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134410376</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>577</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134410366</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>1133</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134472408</Address>
+          <Address>134472444</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -258,7 +210,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\src\eoappservices\EOtheEMSapplBody.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../src/eoappservices/EOtheEMSapplBody.c\1133</Expression>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -1859,7 +1811,7 @@
 
   <Group>
     <GroupName>eo-emsappl-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1979,7 +1931,7 @@
 
   <Group>
     <GroupName>appl-services</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
