@@ -77,7 +77,12 @@ static EOtheEntities s_eo_theentities =
     .motors         = {NULL},
     .skins          = {NULL},
     .strains        = {NULL},
-    .maises         = {NULL}
+    .maises         = {NULL},
+    .numofjoints    = 0,
+    .numofmotors    = 0,
+    .numofskins     = 0,
+    .numofstrains   = 0,
+    .numofmaises    = 0
 };
 
 //static const char s_eobj_ownname[] = "EOtheEntities";
@@ -123,6 +128,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     // joints
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(max>eoprotwrap_max_joints) max = eoprotwrap_max_joints;
+    s_eo_theentities.numofjoints = max;
     for(i=0; i<max; i++)
     {
         s_eo_theentities.joints[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)i);
@@ -130,6 +136,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // motors
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+    s_eo_theentities.numofmotors = max;
     if(max>eoprotwrap_max_motors) max = eoprotwrap_max_motors;
     for(i=0; i<max; i++)
     {
@@ -138,6 +145,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // skins
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+    s_eo_theentities.numofskins = max;
     if(max>eoprotwrap_max_skins) max = eoprotwrap_max_skins;
     for(i=0; i<max; i++)
     {
@@ -146,6 +154,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // strains
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
+    s_eo_theentities.numofstrains = max;
     if(max>eoprotwrap_max_strains) max = eoprotwrap_max_strains;
     for(i=0; i<max; i++)
     {
@@ -154,6 +163,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // maises
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
+    s_eo_theentities.numofmaises = max;
     if(max>eoprotwrap_max_maises) max = eoprotwrap_max_maises;
     for(i=0; i<max; i++)
     {
@@ -163,7 +173,11 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     return(eores_OK);
 }
 
-
+extern uint8_t eo_entities_NumOfJoints(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofjoints);    
+}
+    
 extern eOmc_joint_t * eo_entities_GetJoint(EOtheEntities *p, eOprotIndex_t id)
 {
     if(id >= eoprotwrap_max_joints)
@@ -202,6 +216,11 @@ extern eOmc_joint_status_t * eo_entities_GetJointStatus(EOtheEntities *p, eOprot
 }
 
 
+extern uint8_t eo_entities_NumOfMotors(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofmotors);    
+}
+
 extern eOmc_motor_t * eo_entities_GetMotor(EOtheEntities *p, eOprotIndex_t id)
 {
     if(id >= eoprotwrap_max_motors)
@@ -223,6 +242,12 @@ extern eOmc_motor_status_t * eo_entities_GetMotorStatus(EOtheEntities *p, eOprot
     }
 
     return(ret);
+}
+
+
+extern uint8_t eo_entities_NumOfMaises(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofmaises);    
 }
 
 extern eOas_mais_t * eo_entities_GetMais(EOtheEntities *p, eOprotIndex_t id)
@@ -262,6 +287,10 @@ extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIn
     return(ret);
 }
 
+extern uint8_t eo_entities_NumOfStrains(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofstrains);    
+}
 
 extern eOas_strain_t * eo_entities_GetStrain(EOtheEntities *p, eOprotIndex_t id)
 {
@@ -300,6 +329,11 @@ extern eOas_strain_status_t * eo_entities_GetStrainStatus(EOtheEntities *p, eOpr
     return(ret);
 }
 
+
+extern uint8_t eo_entities_NumOfSkins(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofskins);    
+}
 
 extern eOsk_skin_t * eo_entities_GetSkin(EOtheEntities *p, eOprotIndex_t id)
 {

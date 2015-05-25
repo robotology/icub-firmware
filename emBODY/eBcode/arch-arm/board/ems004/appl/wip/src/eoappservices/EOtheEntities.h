@@ -65,21 +65,26 @@ extern EOtheEntities* eo_entities_GetHandle(void);
 extern eOresult_t eo_entities_Refresh(EOtheEntities *p);
 
 
+extern uint8_t eo_entities_NumOfJoints(EOtheEntities *p);
 extern eOmc_joint_t * eo_entities_GetJoint(EOtheEntities *p, eOprotIndex_t id);
 extern eOmc_joint_config_t * eo_entities_GetJointConfig(EOtheEntities *p, eOprotIndex_t id);
 extern eOmc_joint_status_t * eo_entities_GetJointStatus(EOtheEntities *p, eOprotIndex_t id);
 
+extern uint8_t eo_entities_NumOfMotors(EOtheEntities *p);
 extern eOmc_motor_t * eo_entities_GetMotor(EOtheEntities *p, eOprotIndex_t id);
 extern eOmc_motor_status_t * eo_entities_GetMotorStatus(EOtheEntities *p, eOprotIndex_t id);
 
+extern uint8_t eo_entities_NumOfMaises(EOtheEntities *p);
 extern eOas_mais_t * eo_entities_GetMais(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_mais_config_t * eo_entities_GetMaisConfig(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIndex_t id);
 
+extern uint8_t eo_entities_NumOfStrains(EOtheEntities *p);
 extern eOas_strain_t * eo_entities_GetStrain(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_strain_config_t * eo_entities_GetStrainConfig(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_strain_status_t * eo_entities_GetStrainStatus(EOtheEntities *p, eOprotIndex_t id);
 
+extern uint8_t eo_entities_NumOfSkins(EOtheEntities *p);
 extern eOsk_skin_t * eo_entities_GetSkin(EOtheEntities *p, eOprotIndex_t id);
 extern eOsk_status_t * eo_entities_GetSkinStatus(EOtheEntities *p, eOprotIndex_t id);
 

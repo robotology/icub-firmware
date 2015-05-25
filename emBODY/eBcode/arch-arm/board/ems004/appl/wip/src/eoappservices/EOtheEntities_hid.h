@@ -52,6 +52,11 @@ struct EOtheEntities_hid
     eOsk_skin_t*    skins[eoprotwrap_max_skins];
     eOas_strain_t*  strains[eoprotwrap_max_strains];
     eOas_mais_t*    maises[eoprotwrap_max_maises];
+    uint8_t         numofjoints;
+    uint8_t         numofmotors;
+    uint8_t         numofskins;
+    uint8_t         numofstrains;
+    uint8_t         numofmaises;
 }; 
 
 
