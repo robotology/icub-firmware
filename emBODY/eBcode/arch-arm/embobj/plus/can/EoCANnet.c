@@ -136,14 +136,22 @@ extern EOconstvector * eocannet_code2boards(uint32_t code)
     // so far the code is just an index equal to board number but starting from 0. eb1 is 0, etc....
     switch(code)
     {
-        case 0:     ret = eo_vectorof_boardprops_eb1; 
-        break;
+        case 0:    
+        case 2:
+        {            
+            ret = eo_vectorof_boardprops_eb1; 
+        } break;
         
-        case 1:     ret = eo_vectorof_boardprops_eb2; 
-        break;        
+        case 1:     
+        case 3:
+        {
+            ret = eo_vectorof_boardprops_eb2; 
+        } break;        
     
-        default:    ret = ret;
-        break;
+        default:    
+        {
+            ret = ret;
+        } break;
     
     }
 
@@ -160,14 +168,22 @@ extern EOconstvector * eocannet_code2entitydescriptors(uint32_t code, eOprotEndp
     // so far the code is just an index equal to board number but starting from 0. eb1 is 0, etc....
     switch(code)
     {
-        case 0:     ret = (EOconstvector*)entitiesmapB1[ep][entity]; 
-        break;
+        case 0:    
+        case 2:
+        {       
+            ret = (EOconstvector*)entitiesmapB1[ep][entity]; 
+        } break;
         
-        case 1:     ret = ret; 
-        break;        
+        case 1:
+        case 3: 
+        {   
+            ret = ret; 
+        } break;        
     
-        default:    ret = ret;
-        break;
+        default:    
+        {
+            ret = ret;
+        } break;
     
     }
 
