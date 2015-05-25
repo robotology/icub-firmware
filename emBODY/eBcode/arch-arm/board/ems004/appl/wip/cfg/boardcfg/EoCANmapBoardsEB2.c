@@ -364,6 +364,9 @@ EOconstvector s_eo_vectorof_des_mais_eb2 =
 EOconstvector* eo_vectorof_descriptor_mais_eb2 = &s_eo_vectorof_des_mais_eb2;
 
 
+
+// in case, as in eb10 / eb11, there are two skins, in here we put in .index: entindex00 or entindex00 depending on the cases. 
+// as i s_des_jomo ...
 static const eOcanmap_entitydescriptor_t s_des_skin[] = 
 {
     {   // skin 0

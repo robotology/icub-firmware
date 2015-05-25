@@ -67,22 +67,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// - skins
 
-// this variable tells how many skins there are
-const uint8_t eo_canmapcfg_skins_numberof = 0;
-
-// this array tells for each skin in value [0, eo_canmapcfg_skins_numberof-1] how many boards are used to implement it
-const uint8_t eo_canmapcfg_skins_boardsinside[] = 
-{
-    0
-};
-
-// this variable contains for each skin in value [0, eo_canmapcfg_skins_numberof-1] the array of the skin boards 
-const eOcanmap_board_extended_t * const *const eo_canmapcfg_skins_boards[] =
-{
-    NULL
-};
 
 
 static const eOcanmap_board_properties_t s_boardprops[] = 
@@ -134,7 +119,7 @@ static const eOcanmap_board_properties_t s_boardprops[] =
     }    
 };
 
-EOconstvector s_eo_vectorof_boardprops_eb1 = 
+static EOconstvector s_eo_vectorof_boardprops_eb1 = 
 {
     .capacity       = sizeof(s_boardprops)/sizeof(eOcanmap_board_properties_t),
     .size           = sizeof(s_boardprops)/sizeof(eOcanmap_board_properties_t),
@@ -240,7 +225,7 @@ EOconstvector s_eo_vectorof_des_mais_eb1 =
 EOconstvector* eo_vectorof_descriptor_mais_eb1 = &s_eo_vectorof_des_mais_eb1;
  
 
-EOconstvector s_eo_vectorof_des_skin_eb1 = 
+static EOconstvector s_eo_vectorof_des_skin_eb1 = 
 {
     .capacity       = 0,
     .size           = 0,

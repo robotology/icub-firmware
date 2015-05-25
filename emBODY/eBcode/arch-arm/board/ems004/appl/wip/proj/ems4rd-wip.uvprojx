@@ -863,6 +863,21 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoEncoderMapNONE.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANmapBoardsEB1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB1.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB2.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEBnoCAN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEBnoCAN.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1152,21 +1167,6 @@
               <FileName>EOtheCANservice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eoprot-can-cfg-mapping</GroupName>
-          <Files>
-            <File>
-              <FileName>EoCANmapBoardsEB1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB1.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoCANmapBoardsEB2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2122,6 +2122,21 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoEncoderMapNONE.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANmapBoardsEB1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB1.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB2.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEBnoCAN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEBnoCAN.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2351,21 +2366,6 @@
               <FileName>EOtheCANservice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eoprot-can-cfg-mapping</GroupName>
-          <Files>
-            <File>
-              <FileName>EoCANmapBoardsEB1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB1.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoCANmapBoardsEB2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-mapping\EoCANmapBoardsEB2.c</FilePath>
             </File>
           </Files>
         </Group>

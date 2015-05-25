@@ -73,13 +73,18 @@
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const EOconstvector * const eo_vectorof_descriptor_jomo_eb1;
-extern const EOconstvector * const eo_vectorof_descriptor_strain_eb1;
-extern const EOconstvector * const eo_vectorof_descriptor_mais_eb1;
+//extern const EOconstvector * const eo_vectorof_descriptor_jomo_eb1;
+//extern const EOconstvector * const eo_vectorof_descriptor_strain_eb1;
+//extern const EOconstvector * const eo_vectorof_descriptor_mais_eb1;
 
 extern EOconstvector s_eo_vectorof_des_jomo_eb1;
 extern EOconstvector s_eo_vectorof_des_strain_eb1;
 extern EOconstvector s_eo_vectorof_des_mais_eb1;
+
+extern EOconstvector s_eo_vectorof_des_jomo_eb2;
+extern EOconstvector s_eo_vectorof_des_strain_eb2;
+extern EOconstvector s_eo_vectorof_des_mais_eb2;
+extern EOconstvector eo_vectorof_descriptor_skin_eb2;
 
 const EOconstvector s_eo_empty_constvector_board = 
 {
@@ -130,6 +135,26 @@ const EOconstvector * const entitiesmapB1[eoprot_endpoints_numberof][3] =
     }
 
 };
+
+const EOconstvector * const entitiesmapB2[eoprot_endpoints_numberof][3] =
+{
+    { // mn
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    },
+   
+    { // mc
+        &s_eo_vectorof_des_jomo_eb2, &s_eo_vectorof_des_jomo_eb2, &s_eo_empty_constvector_entity
+    }, 
+
+    { // as
+        &s_eo_vectorof_des_strain_eb2, &s_eo_vectorof_des_mais_eb2, &s_eo_empty_constvector_entity
+    },
+    { // sk
+        &eo_vectorof_descriptor_skin_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    }
+
+};
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -188,7 +213,7 @@ extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOpro
         case 1:
         case 3: 
         {   
-            ret = ret; 
+            ret = (EOconstvector*)entitiesmapB2[ep][entity]; ; 
         } break;        
     
         default:    
