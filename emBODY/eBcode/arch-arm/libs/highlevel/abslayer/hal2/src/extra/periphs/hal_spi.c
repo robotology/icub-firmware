@@ -41,7 +41,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal_sys.h"
-
+#include "hal_5v.h"
 
 #include "hl_bits.h"
 #include "hl_fifo.h"
@@ -633,6 +633,10 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     {
         return(hal_res_NOK_generic);
     }
+    
+    
+    hal_5v_init(NULL);
+    hal_5v_on();
     
     // acemor: very important info.
     // init the miso and mosi gpio before calling hw_init. 

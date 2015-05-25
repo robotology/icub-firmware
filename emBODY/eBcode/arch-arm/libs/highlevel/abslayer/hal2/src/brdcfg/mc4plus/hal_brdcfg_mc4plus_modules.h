@@ -63,6 +63,7 @@
 
 // -- peripherals: define what you need (beware of cross dependencies)
 
+#define     HAL_USE_5V
 #define     HAL_USE_CAN
 #define     HAL_USE_ETH
 #define     HAL_USE_GPIO

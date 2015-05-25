@@ -217,9 +217,9 @@
 // - begin: used by HAL_USE_CANTRANSCEIVER and in hal_brdcfg__start()
     
 
-static void s_hal_brdcfg_ems4rd_vaux_5v0_init(void);
-static void s_hal_brdcfg_ems4rd_vaux_5v0_on(void);
-static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
+//static void s_hal_brdcfg_ems4rd_vaux_5v0_init(void);
+//static void s_hal_brdcfg_ems4rd_vaux_5v0_on(void);
+//static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
     
 
@@ -305,6 +305,27 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
    
 
 // --  extra: mpu peripherals
+
+
+#ifdef  HAL_USE_5V
+    
+    #include "hal_5v_hid.h"
+    
+    extern const hal_5v_boardconfig_t hal_5v__theboardconfig =
+    {
+        .supported          = 1,
+        .gpiomap            =
+        {
+            .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin1 }, 
+            .af32   = hal_NA32
+        },
+        .gpiocfg            =
+        {
+            .dir = hal_gpio_dirOUT,     .speed = hal_gpio_speed_low,        .altcfg = NULL
+        }
+    };
+#endif
+
 
 #ifdef  HAL_USE_CAN
     
@@ -687,9 +708,12 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
         const hal_gpio_map_t* map = &s_hal_cantransceiver__gpiomapof_enable[(uint8_t)id];        
         const hal_gpio_cfg_t* cfg = &s_hal_cantransceiver__gpiocfgof_enable[(uint8_t)id];   
         hal_gpio_init(map->gpio, cfg);        
-        s_hal_cantransceiver_simple_disable(id);     
-        s_hal_brdcfg_ems4rd_vaux_5v0_init();
-        s_hal_brdcfg_ems4rd_vaux_5v0_on();
+        s_hal_cantransceiver_simple_disable(id);    
+        //s_hal_brdcfg_ems4rd_vaux_5v0_init();
+        //s_hal_brdcfg_ems4rd_vaux_5v0_on();
+        hal_5v_init(NULL);
+        hal_5v_on();        
+       
         return(hal_res_OK);
     }
 
@@ -1305,8 +1329,11 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void);
 
 extern hal_result_t hal_brdcfg__start(void)
 {
-    s_hal_brdcfg_ems4rd_vaux_5v0_init();
-    s_hal_brdcfg_ems4rd_vaux_5v0_on();
+// marco.accame on 25 may 2015: 
+// i do not init the 5v now because i want to delay it until it is really necessary.
+// it may be that the ems does not have yet the 12v required for the 5v with enough power.                              
+//    s_hal_brdcfg_ems4rd_vaux_5v0_init();
+//    s_hal_brdcfg_ems4rd_vaux_5v0_on();
 
     return(hal_res_OK);    
 }
@@ -1369,7 +1396,8 @@ extern void hl_system_stm32fx_before_setsysclock(void)
 // - definition of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#if 0
+// marco.accame: REMOVED AND PUT INTO hal_5v.c as it may be needed some more usability at user-level
 static const hal_gpio_map_t s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap = 
 {
     .gpio   = { .port = hal_gpio_portE,     .pin = hal_gpio_pin1 }, 
@@ -1442,7 +1470,7 @@ static void s_hal_brdcfg_ems4rd_vaux_5v0_off(void)
 #endif    
     hal_gpio_setval(s_hal_brdcfg_ems4rd_vaux_5v0_gpiomap.gpio, hal_gpio_valLOW);
 }  
-
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
