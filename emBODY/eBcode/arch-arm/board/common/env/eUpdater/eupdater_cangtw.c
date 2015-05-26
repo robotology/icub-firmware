@@ -203,6 +203,16 @@ static void errcallback(void* p) {};
 #endif
 extern void cangateway_hid_hal_init(void)
 {  
+    static uint8_t can_initted = 0;
+    
+    if(1 == can_initted)
+    {
+        return;
+    }
+    
+    
+    can_initted = 1;
+    
 #if     defined(HAL_USE_VERSION_2) || defined(HAL_IS_VERSION_2)
     hal_can_cfg_t canxcfg = 
     {

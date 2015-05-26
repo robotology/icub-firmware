@@ -44,6 +44,7 @@
 
 #include "hal.h"
 
+#include "hal_5v.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -452,7 +453,11 @@ static void s_stayforever(eOipv4addr_t remaddress)
 #ifdef _START_CANGTW_WHEN_STAY_FOREVER_    
     // if updater we also start the can gateway
     eupdater_cangtw_start(remaddress);
-#endif    
+#endif  
+    // i init the 5v0 as soon as i know i stay in here forever.
+    // BUT it dont init the can so that things are not changed with respect to prev version
+    hal_5v_init(NULL);
+    hal_5v_on();
 #endif       
 }
 

@@ -347,15 +347,15 @@ static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EEN
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 10
+                    .minor = 11
                 },  
                 .builddate  = 
                 {
-                    .year  = 2014,
-                    .month = 12,
-                    .day   = 11,
-                    .hour  = 14,
-                    .min   = 0
+                    .year  = 2015,
+                    .month = 5,
+                    .day   = 26,
+                    .hour  = 11,
+                    .min   = 11
                 }
             },
             .rom        = 

@@ -192,15 +192,15 @@ const eEmoduleExtendedInfo_t emaintainer_modinfo_extended __attribute__((at(EENV
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 11
+                    .minor = 12
                 },  
                 .builddate  = 
                 {
-                    .year  = 2014,
-                    .month = 12,
-                    .day   = 22,
+                    .year  = 2015,
+                    .month = 5,
+                    .day   = 26,
                     .hour  = 11,
-                    .min   = 15
+                    .min   = 11
                 }
             },
             .rom        = 
