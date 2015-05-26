@@ -148,7 +148,7 @@ extern uint32_t hl_sys_sysclock_get(void);
  **/
 extern hl_result_t hl_sys_systemreset(void);
 
-extern hl_result_t hal_sys_canjump(uint32_t addr);
+extern hl_result_t hl_sys_canjump(uint32_t addr);
 
 extern hl_result_t hl_sys_jumpto(uint32_t addr);
 

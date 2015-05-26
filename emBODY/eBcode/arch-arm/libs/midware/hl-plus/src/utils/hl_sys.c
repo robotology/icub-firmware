@@ -242,13 +242,19 @@ extern hl_result_t hl_sys_systemreset(void)
     return(hl_res_NOK_generic);
 }
 
-extern hl_result_t hal_sys_canjump(uint32_t addr)
-{    
+extern hl_result_t hl_sys_canjump(uint32_t addr)
+{   
+    // the address of the stack pointer (__initial_sp in armcc compiler) is the first word32 of the binary. 
+    // it must be inside valid ram space  
     if(((*(volatile uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
-    {
+    {   // it is on bank 0x20000000, and its offset must be within 128k (no more tha 128kb on stm32f407 on this memory bank)
         return(hl_res_OK);
     }
-    else 
+    else if(((*(volatile uint32_t*)addr) & 0x1FFF0000 ) == 0x10000000)
+    {   // it is on bank 0x20000000 and its offset must be within 64k (no more than 64kb on stm32f407 on this memory bank)
+        return(hl_res_OK);
+    }
+    else
     {
         return(hl_res_NOK_generic);
     }
@@ -260,7 +266,7 @@ extern hl_result_t hl_sys_jumpto(uint32_t addr)
     volatile uint32_t jumpaddr;
     void (*app_fn)(void) = NULL;
 
-    if(hl_res_NOK_generic == hal_sys_canjump(addr))
+    if(hl_res_NOK_generic == hl_sys_canjump(addr))
     {
         return(hl_res_NOK_generic);
     }
