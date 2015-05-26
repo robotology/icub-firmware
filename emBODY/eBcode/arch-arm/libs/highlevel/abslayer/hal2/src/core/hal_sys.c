@@ -200,7 +200,7 @@ extern hal_result_t hal_sys_canexecuteataddress(uint32_t addr)
     }
 #endif
     
-    return((hal_result_t)hal_sys_canjump(addr));
+    return((hal_result_t)hl_sys_canjump(addr));
 }
 
 extern hal_result_t hal_sys_executenowataddress(uint32_t addr) 
