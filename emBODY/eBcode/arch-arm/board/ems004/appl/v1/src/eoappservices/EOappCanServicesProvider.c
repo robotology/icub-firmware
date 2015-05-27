@@ -90,6 +90,17 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#define HALCAN1capacityofrxfifoofframes     64 
+#define HALCAN1capacityoftxfifoofframes     64 
+#define HALCAN1capacityoftxfifohighprio     0
+
+
+#define HALCAN2capacityofrxfifoofframes     64      
+#define HALCAN2capacityoftxfifoofframes     64 
+#define HALCAN2capacityoftxfifohighprio     0
+
+
 #define eoappCanSP_timeoutsenddiagnostics           1000
 #define eoappCanSP_onEvtMode_timeoutSendFrame       2000
 //#define eoappCanSP_onDemandMode_timeoutSendFrame    17000
