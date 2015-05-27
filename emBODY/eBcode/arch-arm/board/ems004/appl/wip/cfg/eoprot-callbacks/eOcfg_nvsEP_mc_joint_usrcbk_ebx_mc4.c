@@ -86,12 +86,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+typedef enum 
+{ 
+    pid_typePOS = 0,
+    pid_typeTOR = 1
+} pid_type_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type);
+
 static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOmc_jointId_t jId,
                                                                       icubCanProto_controlmode_t *icubcanProto_controlmode);
 
@@ -133,7 +141,7 @@ extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
 extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)nv->ram;
-    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     
     // first of all: set conversion factor
     EOtheMeasuresConverter* appMeasConv = eo_measconv_GetHandle();
@@ -207,7 +215,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     
     
     // 7) set monitormode status
-    eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
+    eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jxx);
 
     if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
     {
@@ -332,187 +340,12 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    #error MUST DO THEM
-#if 0    
-    eOresult_t                              res;
-    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOicubCanProto_msgDestination_t         msgdest;
-    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOicubCanProto_msgCommand_t             msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    EOappTheDB *db = eo_appTheDB_GetHandle();
-    res = eo_appTheDB_GetJointCanLocation(db, jxx,  &canLoc, NULL);
-    if(eores_OK != res)
-    {
-        return;
-    }
-    
-    //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-    
-    if(eo_ropcode_set == rd->ropcode)
-    {
-        // send pid position 
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
-        
-        return;
-    }
-    
-#ifdef USE_PROTO_PROXY
-    if(eo_ropcode_ask == rd->ropcode)
-    {
-#if 0        
-//        eOappTheDB_hid_ethProtoRequest_t req = 
-//        {
-//            .id32 = rd->id32,
-//            .signature = rd->signature,
-//            .nvRam_ptr = nv->ram,
-//            .numOfExpectedResp = 2,
-//            .numOfREceivedResp = 0
-//        };
-//        
-//        eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
-//        if(eores_OK != res)
-//        {
-//            eOerrmanDescriptor_t errdes = {0};
-//            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//            errdes.sourceaddress    = 0;
-//            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
-//            errdes.par16            = 0; 
-//            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
-//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//            return;
-//        }
-#else        
-        EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-        eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
-        if(NULL == param)
-        {
-            eOerrmanDescriptor_t errdes = {0};
-            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress    = 0;
-            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
-            errdes.par16            = 0; 
-            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-            return;
-        }
-        param->p08_1 = 2;       // we expect two can frames
-        param->p08_2 = 0;       // and we havent received any yet
-#endif        
-        // send pid position 
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_POS_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
-    }
-#endif
-#endif //0    
+    s_onpid(nv, rd, pid_typePOS);
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    #error MUST DO THEM
-    
-#if 0
-    eOresult_t                              res;
-    eObrd_cantype_t                         boardType;
-    eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-    eOicubCanProto_msgDestination_t         msgdest;
-    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOicubCanProto_msgCommand_t             msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    EOappTheDB *db = eo_appTheDB_GetHandle();
-    res = eo_appTheDB_GetJointCanLocation(db, jxx,  &canLoc, &boardType);
-    if(eores_OK != res)
-    {
-        return;
-    }
-
-    //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-
-    
-    if(eo_ropcode_set == rd->ropcode)
-    {
-        // send pid torque
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
-        return;
-    }
-    
-    
-#ifdef USE_PROTO_PROXY
-    if(eo_ropcode_ask == rd->ropcode)
-    {
-#if 0        
-//        eOappTheDB_hid_ethProtoRequest_t req = 
-//        {
-//            .id32 = rd->id32,
-//            .signature = rd->signature,
-//            .nvRam_ptr = nv->ram,
-//            .numOfExpectedResp = 2,
-//            .numOfREceivedResp = 0
-//        };
-//        
-//        eOresult_t res = eo_appTheDB_appendEthProtoRequest(db, eoprot_entity_mc_joint, jxx, &req);
-//        if(eores_OK != res)
-//        {
-//            eOerrmanDescriptor_t errdes = {0};
-//            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//            errdes.sourceaddress    = 0;
-//            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
-//            errdes.par16            = 0; 
-//            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
-//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//            return;
-//        }
-#else        
-        EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-        eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
-        if(NULL == param)
-        {
-            eOerrmanDescriptor_t errdes = {0};
-            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress    = 0;
-            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
-            errdes.par16            = 0; 
-            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-            return;
-        }
-        param->p08_1 = 2;       // we expect two can frames
-        param->p08_2 = 0;       // and we havent received any yet
-#endif         
-        // send pid position 
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
-
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
-    }
-#endif
-#endif //0
+    s_onpid(nv, rd, pid_typeTOR);
 }
 
 
@@ -520,7 +353,37 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOmc_impedance_t *impedance = (eOmc_impedance_t*)nv->ram;
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+
+
+    if(eo_ropcode_set == rd->ropcode)
+    {    
+        EOtheMeasuresConverter* appMeasConv = eo_measconv_GetHandle();
+        icubCanProto_impedance_t impedence_icubCanProtValues = {0};  
+        impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(appMeasConv, jxx, impedance->stiffness);
+        impedence_icubCanProtValues.damping = eo_measconv_impedenceDamping_I2S(appMeasConv, jxx, impedance->damping);
+        impedence_icubCanProtValues.offset = eo_measconv_torque_I2S(appMeasConv, jxx, impedance->offset);
+
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
+        
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
+        command.value = &impedence_icubCanProtValues;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
+        
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
+        command.value = &impedence_icubCanProtValues.offset;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+
+        return;
+    }
+    
+    
     #error MUST DO THEM
+    
+    
+    
     
 #if 0    
     eOresult_t                              res;
@@ -738,7 +601,13 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
 
 extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    #error MUST DO THEM
+    eOmeas_time_t *time = (eOmeas_time_t*)nv->ram;
+    
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;    
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
+    command.value = time;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
     
 #if 0    
     eOmeas_time_t                          *time_ptr = (eOmeas_time_t*)nv->ram;
@@ -757,11 +626,9 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 
 extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {   
-//    eOresult_t              res;
-    eOmc_jointId_t          jxx = eoprot_ID2index(rd->id32);
-    eOmc_joint_status_t     *jstatus = NULL;
-
-    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), (eOmc_jointId_t)jxx);
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jxx);
+    
     if(NULL == jstatus)
     {
         return; //error
@@ -780,31 +647,27 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
 
 extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
 {  
-    eOresult_t                              res;    
-    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOutil_emulfloat32_t                    *encfactor = (eOutil_emulfloat32_t*)nv->ram;
+    eOresult_t res = eores_NOK_generic;    
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOutil_emulfloat32_t *encfactor = (eOutil_emulfloat32_t*)nv->ram;
 
 
-    EOappMeasConv* appMeasConv = eo_measconv_GetHandle(); 
-
-
-    res = eo_measconv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(*encfactor));
+    res = eo_measconv_SetJntEncoderConversionFactor(eo_measconv_GetHandle(), jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(*encfactor));
     if(eores_OK != res)
     {
         return; //error 
     }
 }
 
+
+
 extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd)
 { 
-    eOresult_t                              res;    
-    eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOutil_emulfloat32_t                    *encoffset = (eOutil_emulfloat32_t*)nv->ram;
+    eOresult_t res = eores_NOK_generic;     
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOutil_emulfloat32_t *encoffset = (eOutil_emulfloat32_t*)nv->ram;
 
-
-    EOappMeasConv* appMeasConv = eo_measconv_GetHandle(); 
-
-    res = eo_measconv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(*encoffset));
+    res = eo_measconv_SetJntEncoderConversionOffset(eo_measconv_GetHandle(), jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(*encoffset));
     if(eores_OK != res)
     {
         return; //error 
@@ -1574,7 +1437,68 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
 //     return(eores_OK);
 // }
 
+// type is: 0 pos, 1 torque
+static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, s_pid_type_t type)
+{
+    static const uint8_t cmd_set_pid[2] = {ICUBCANPROTO_POL_MC_CMD__SET_POS_PID, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PID};
+    static const uint8_t cmd_set_pidlimits[2] = {ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS};
+    static const uint8_t cmd_get_pid[2] = {ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID};
+    static const uint8_t cmd_set_pidlimits[2] = {ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS};
+        
+    eOmc_PID_t *pid = (eOmc_PID_t*)nv->ram;
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    
+    eOcanprot_command_t command = {0};
+    command.class = eocanprot_msgclass_pollingMotorControl;    
+    
+    // if set, we just send two commands
+    if(eo_ropcode_set == rd->ropcode)
+    {
+        command.type  = cmd_set_pid[type]; // ICUBCANPROTO_POL_MC_CMD__SET_POS_PID or ..
+        command.value = pid;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
+        
+        command.type  = cmd_set_pidlimits[type]; // ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS or ..
+        command.value = pid;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+        
+        return;
+    }
+    
+#ifdef USE_PROTO_PROXY
+    // if ask and we have the proxy, we ask to can about two values
+    else if(eo_ropcode_ask == rd->ropcode)
+    {
+       
+        EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+        eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
+        if(NULL == param)
+        {
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+            errdes.par16            = 0; 
+            errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+            return;
+        }
+        param->p08_1 = 2;       // we expect two can frames
+        param->p08_2 = 0;       // and we havent received any yet
 
+        command.type  = cmd_get_pid[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_PID or ..
+        command.value = NULL;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
+        
+        command.type  = cmd_get_pidlimits[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS or ..
+        command.value = NULL;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+        
+        return;
+    }
+#endif//USE_PROTO_PROXY    
+    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
