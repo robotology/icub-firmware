@@ -46,6 +46,7 @@
 
 #include "EOtheCANmapping.h"
 
+#include "EOtheCANdiscovery.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -575,7 +576,8 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
     
     
     // pass it all to the relevant object, which will do what it needs. everything in one file
-    eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(eo_emsapplBody_GetHandle(), loc, match, &detected);
+    eo_candiscovery_ManageDetectedBoard(eo_candiscovery_GetHandle(), loc, match, &detected);
+    //eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(eo_emsapplBody_GetHandle(), loc, match, &detected);
           
     return(eores_OK);
 }
