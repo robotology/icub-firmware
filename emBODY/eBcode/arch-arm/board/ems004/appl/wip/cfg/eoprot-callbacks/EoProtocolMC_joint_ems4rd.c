@@ -225,10 +225,7 @@ const eOmc_joint_t joint_default_value =
     #warning --> no eoprotocol callbacks for motion-control are defined
 #endif
 
-//this file is equal for all ems except eb10 and eb11
-#if !defined(EOMTHEEMSAPPLCFG_USE_EB10) & !defined(EOMTHEEMSAPPLCFG_USE_EB11)
-    #include    "eOcfg_nvsEP_mc_motor_usrcbk_ebx.c"
-#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
