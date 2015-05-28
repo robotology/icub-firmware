@@ -36,7 +36,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EoProtocol.h"
 
 
@@ -58,6 +58,8 @@ enum { eo_virtualstrain_canaddress = 12 };
 extern EOtheVirtualStrain* eo_virtualstrain_Initialise(void);
 
 extern EOtheVirtualStrain* eo_virtualstrain_GetHandle(void);
+
+extern eOresult_t eo_virtualstrain_SetTorque(EOtheVirtualStrain *p, eOprotIndex_t jindex, icubCanProto_torque_t value);
 
 // so far only the tick is implemented. it is to be called in the control loop in the do phase.
 extern eOresult_t eo_virtualstrain_Tick(EOtheVirtualStrain *p);
