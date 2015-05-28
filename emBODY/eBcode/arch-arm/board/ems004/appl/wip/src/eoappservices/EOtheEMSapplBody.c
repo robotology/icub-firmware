@@ -38,7 +38,7 @@
 //hal
 #include "hal.h"
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EOtheErrorManager.h"
 
 

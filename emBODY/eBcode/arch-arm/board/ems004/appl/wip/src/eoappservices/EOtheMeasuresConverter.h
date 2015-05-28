@@ -39,7 +39,7 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EoUtilities.h"
 #include "EoMeasures.h"

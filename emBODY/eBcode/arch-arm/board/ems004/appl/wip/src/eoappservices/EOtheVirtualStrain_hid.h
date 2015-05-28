@@ -27,7 +27,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EOtheCANprotocol.h"
 #include "EOtheCANmapping.h"
 

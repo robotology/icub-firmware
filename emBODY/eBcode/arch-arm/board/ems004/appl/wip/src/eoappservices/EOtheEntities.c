@@ -24,7 +24,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EOtheErrorManager.h"
 
 
