@@ -151,8 +151,8 @@ extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
 extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
 
 
-extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
-extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p);
 
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 

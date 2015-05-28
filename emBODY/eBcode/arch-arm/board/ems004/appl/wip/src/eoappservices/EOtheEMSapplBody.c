@@ -721,47 +721,47 @@ extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
 
 static eObool_t maisfound = eobool_false;
 
-extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    // marco.accame: in here is should start a discovery procedure about mais board.
-    // proposal:
-    // we instantiate a timer with a callback that checks its fw version by sending a can frame
-    // when the mais sends it back, the callback call eo_emsapplBody_discovery_Mais_Stop()
-    // whcih in turns call s_eo_emsapplBody_MaisStart().
-    
-    
-    // this variable or a similar one will be set to true by the can callback upon rx of the correct fw version
-    maisfound = eobool_true;
-    
-    eo_emsapplBody_discovery_Mais_Stop(p);
-        
-        
-    return(eores_OK);
-}
+//extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    // marco.accame: in here is should start a discovery procedure about mais board.
+//    // proposal:
+//    // we instantiate a timer with a callback that checks its fw version by sending a can frame
+//    // when the mais sends it back, the callback call eo_emsapplBody_discovery_Mais_Stop()
+//    // whcih in turns call s_eo_emsapplBody_MaisStart().
+//    
+//    
+//    // this variable or a similar one will be set to true by the can callback upon rx of the correct fw version
+//    maisfound = eobool_true;
+//    
+//    eo_emsapplBody_discovery_Mais_Stop(p);
+//        
+//        
+//    return(eores_OK);
+//}
 
 
-extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    // after i have found the mais, then i start it.
-    // this 
-    
-    if(eobool_true == maisfound)
-    {
-        s_eo_emsapplBody_MaisStart(p);
-    }
-    
-    return(eores_OK);   
-}
+//extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    // after i have found the mais, then i start it.
+//    // this 
+//    
+//    if(eobool_true == maisfound)
+//    {
+//        s_eo_emsapplBody_MaisStart(p);
+//    }
+//    
+//    return(eores_OK);   
+//}
 
 
 extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
