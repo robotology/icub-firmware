@@ -35,7 +35,7 @@
 #include "stdio.h"
 
 #include "EoCommon.h"
-#include "EOnv_hid.h"
+#include "EOnv.h"
 
 #include "EOMotionControl.h"
 
@@ -136,13 +136,13 @@
                     
 extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
 {
-    eOmc_joint_config_t             *cfg = (eOmc_joint_config_t*)nv->ram;
+    eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)eo_nv_RAM(nv);
     memcpy(cfg, &joint_default_value.config, sizeof(eOmc_joint_config_t));
 }
 
 extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
 {
-    eOmc_joint_status_t             *cfg = (eOmc_joint_status_t*)nv->ram;
+    eOmc_joint_status_t *cfg = (eOmc_joint_status_t*)eo_nv_RAM(nv);
     memcpy(cfg, &joint_default_value.status, sizeof(eOmc_joint_status_t));
 }
 
@@ -156,7 +156,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     float                   rescaler_pos;
     float                   rescaler_trq;
     eOmc_joint_status_t     *jstatus = NULL;
-    eOmc_joint_config_t     *cfg = (eOmc_joint_config_t*)nv->ram;
+    eOmc_joint_config_t     *cfg = (eOmc_joint_config_t*)rd->data;
 
     //currently no joint config param must be sent to 2foc board. (for us called 1foc :) )
     //(currently no pid velocity is sent to 2foc)
@@ -227,7 +227,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->ram;
+    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)rd->data;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
 
@@ -243,7 +243,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)nv->ram;
+    eOmc_PID_t      *pid_ptr = (eOmc_PID_t*)rd->data;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     float           rescaler = 1.0f/(float)(1<<pid_ptr->scale);
     
@@ -260,7 +260,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 
 extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmc_motor_params_t *params_ptr = (eOmc_motor_params_t*)nv->ram;
+    eOmc_motor_params_t *params_ptr = (eOmc_motor_params_t*)rd->data;
     eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
     
     eo_emsController_SetMotorParams ((uint8_t)jxx, *params_ptr);
@@ -306,14 +306,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 
 
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
-    eOmc_impedance_t *cfg = (eOmc_impedance_t*)nv->ram;   
+    eOmc_impedance_t *cfg = (eOmc_impedance_t*)rd->data;   
     eo_emsController_SetImpedance(jxx, cfg->stiffness, cfg->damping, cfg->offset);
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t                 jxx = eoprot_ID2index(rd->id32);
-    eOmeas_position_limits_t       *limit_ptr = (eOmeas_position_limits_t*)nv->ram;
+    eOmeas_position_limits_t       *limit_ptr = (eOmeas_position_limits_t*)rd->data;
 
     eo_emsController_SetPosMin(jxx, limit_ptr->min);
     eo_emsController_SetPosMax(jxx, limit_ptr->max);
@@ -324,7 +324,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
 
 extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_time_t                           *time_ptr = (eOmeas_time_t*)nv->ram;
+    eOmeas_time_t                           *time_ptr = (eOmeas_time_t*)rd->data;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
 
     eo_emsController_SetVelTimeout(jxx, *time_ptr);
@@ -347,7 +347,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
     }
     
     //#warning marco.accame: better using cast to eOmc_motionmonitormode_t
-    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)nv->ram))
+    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)rd->data))
     {
         jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
     }
@@ -365,7 +365,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)nv->ram;
+    eOmc_setpoint_t                         *setPoint = (eOmc_setpoint_t*)rd->data;
     eOmc_joint_config_t                     *jconfig = NULL;
     eOmc_joint_status_t                     *jstatus = NULL;
 
@@ -522,7 +522,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 #if 1
     
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;    
+    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)rd->data;    
 
     // must send something to can: 
     // ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD + ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN + ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE
@@ -560,7 +560,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
-    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
+    eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)rd->data;
     
     eOappTheDB_jointOrMotorCanLocation_t    canLoc = {.emscanport = eOcanport1, .addr = 0, .indexinsidecanboard = eo_icubCanProto_jm_index_first};
     
@@ -611,7 +611,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_controlmode_command_t *controlmode_ptr = (eOmc_controlmode_command_t*)nv->ram;
+    eOmc_controlmode_command_t *controlmode_ptr = (eOmc_controlmode_command_t*)rd->data;
     eOmc_jointId_t             jxx = eoprot_ID2index(rd->id32);
     
     /*
@@ -694,20 +694,20 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
 extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
-    eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->ram);
+    eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)rd->data);
 }
 
 extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
-    int32_t      *gbx_ptr = (int32_t*)nv->ram;
+    int32_t      *gbx_ptr = (int32_t*)rd->data;
     eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
 }
 
 extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
-    int32_t      *gbx_ptr = (int32_t*)nv->ram;
+    int32_t      *gbx_ptr = (int32_t*)rd->data;
     eo_emsController_SetRotorEncoder(jxx, *gbx_ptr);
 }
 
