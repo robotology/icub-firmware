@@ -36,7 +36,7 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 
 #include "hal_encoder.h"
 
