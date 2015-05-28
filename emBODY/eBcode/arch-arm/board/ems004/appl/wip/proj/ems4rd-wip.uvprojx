@@ -848,6 +848,16 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMotionDone.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMotionDone.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheVirtualStrain.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheVirtualStrain.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2106,6 +2116,16 @@
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMotionDone.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMotionDone.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheVirtualStrain.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheVirtualStrain.c</FilePath>
             </File>
           </Files>
         </Group>
