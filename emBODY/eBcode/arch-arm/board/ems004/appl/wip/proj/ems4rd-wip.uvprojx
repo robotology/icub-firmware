@@ -873,6 +873,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheSKIN.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheCANdiscovery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheCANdiscovery.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2156,6 +2161,11 @@
               <FileName>EOtheSKIN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheSKIN.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheCANdiscovery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheCANdiscovery.c</FilePath>
             </File>
           </Files>
         </Group>

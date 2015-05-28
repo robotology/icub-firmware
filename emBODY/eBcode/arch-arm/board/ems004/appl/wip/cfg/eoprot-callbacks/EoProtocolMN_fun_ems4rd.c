@@ -353,7 +353,8 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         {
             uint32_t canBoardsReady = 0;
             uint32_t canBoardsChecked = 0;
-            if(eobool_false == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &canBoardsReady, &canBoardsChecked))
+            if(eobool_false == eo_candiscovery_areCanBoardsReady(eo_candiscovery_GetHandle(), &canBoardsReady, &canBoardsChecked))
+            //if(eobool_false == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &canBoardsReady, &canBoardsChecked))
             {
                 //#warning marco.accame: put a dedicated diagnostics message with list of missing can boards
                 //snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);

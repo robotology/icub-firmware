@@ -143,12 +143,12 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 
 
-extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask);
-extern eObool_t eo_emsapplBody_areCanBoardsReady(EOtheEMSapplBody *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
-extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
-extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask);
+//extern eObool_t eo_emsapplBody_areCanBoardsReady(EOtheEMSapplBody *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
+//extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
 
-extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
+//extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
 
 
 //extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
@@ -163,9 +163,9 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 //extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p);
 
 
-extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p);
 
-extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type);
+//extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
 //extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type);
 

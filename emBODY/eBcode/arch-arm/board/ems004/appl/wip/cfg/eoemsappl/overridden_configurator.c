@@ -40,6 +40,8 @@
 
 #include "EOtheMAIS.h"
 
+#include "EOtheCANdiscovery.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -210,17 +212,20 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     if(count_times == 1)
     {
         uint32_t dontaskmask = 0; // the first time we ask to every board
-        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask);
+        eo_candiscovery_CheckCanBoardsAreReady(eo_candiscovery_GetHandle(), dontaskmask);
+        //eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask);
         return;
     }
           
 
     // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiano mandato la loro fw version
-    if(eobool_true == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &readyCanBoardsMask, &checkedmask))
+    //if(eobool_true == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &readyCanBoardsMask, &checkedmask))
+    if(eobool_true == eo_candiscovery_areCanBoardsReady(eo_candiscovery_GetHandle(), &readyCanBoardsMask, &checkedmask))
     {
         // se tutte le 1foc e le mc4 sono ready, allora setto che lo sono (stoppo il timer canBoardsReady_timer da 10 milli)
         // e poi mando la configurazione alle board can mc4
-        eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
+        //eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
+        eo_candiscovery_Stop(eo_candiscovery_GetHandle());
         // poi, nel caso mc4:  mando la configurazione alle board e abilito MAIS e BCastPolicy 
         eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
         if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
@@ -232,7 +237,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     else
     {  
         // i check again if the can boards are ready. however, i dont check the boards already ready
-        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), readyCanBoardsMask);
+        eo_candiscovery_CheckCanBoardsAreReady(eo_candiscovery_GetHandle(), readyCanBoardsMask);
+        //eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), readyCanBoardsMask);
     }
     
 }

@@ -69,6 +69,8 @@
 
 #include "EOtheSTRAIN.h"
 
+#include "EOtheCANdiscovery.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -164,7 +166,7 @@ static eOresult_t s_eo_emsapplBody_computeRunMode(EOtheEMSapplBody *p);
 //static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
 //static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask);
+//static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask);
 
 static void s_eo_emsapplBody_hid_canSP_cbkonrx(void *arg);
 
@@ -179,7 +181,7 @@ static EOtheEMSapplBody s_applBody =
     .config                 = {0},  // marco.accame on 12jan2015: the warning will be removed when a final version of the config is released.
     .st                     = eo_emsApplBody_st__NOTinitted,
     .appRunMode             = applrunMode__default,
-    .checkCanBoards_timer   = NULL,
+//    .checkCanBoards_timer   = NULL,
     .appEncReader           = NULL,
     .emsController          = NULL,
     .configMC4boards2use    = {0},
@@ -228,8 +230,10 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
 
     
     // and i start some services   
-    p->checkCanBoards_timer = eo_timer_New();    
-    eo_emsapplBody_checkCanBoards_Start(p);
+    //p->checkCanBoards_timer = eo_timer_New();    
+    //eo_emsapplBody_checkCanBoards_Start(p);
+    eo_candiscovery_Initialise();
+    eo_candiscovery_Start(eo_candiscovery_GetHandle());
             
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "EOtheEMSapplBody started", s_eobj_ownname, &eo_errman_DescrRunningHappily);
        
@@ -492,72 +496,72 @@ static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_d
 }
 
 
-extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    return(s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask));
-}
+//extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    return(s_eo_emsapplBody_sendGetFWVersion(p, dontaskmask));
+//}
 
-// must return true only if all can boards have replied and their protocol version matches with target
-extern eObool_t eo_emsapplBody_areCanBoardsReady(EOtheEMSapplBody *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked)
-{
-    eObool_t res = eobool_true;
-    
-    if((NULL == p) || (NULL == canBoardsReady))
-    {
-        return(eobool_false);
-    }
-    
-    *canBoardsReady = 0;
-    
-    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    uint8_t i=0;
-    for(i=0; i<numofjomos; i++)
-    {
-        if(NULL != canBoardsChecked)
-        {
-            *canBoardsChecked |= (1<<i);
-        }
-        
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);        
-        eOcanmap_location_t location = {0};
-        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL))
-        {
-            // must retrieve the extended board info 
-            const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), location);
-            eObool_t ready = eobool_false;
-            uint8_t major = board->detected.protocolversion.major;
-            uint8_t minor = board->detected.protocolversion.minor;
-            if(0 != major)
-            {  // if not zero, then the board has replied and everything is filled. however i must check if there is a match
-                if((board->board.props.requiredprotocol.major == major) && (board->board.props.requiredprotocol.minor == minor))
-                {
-                    ready = eobool_true;
-                    *canBoardsReady |= (1<<i);
-                }
-            } 
-            res &= ready;
-        }               
-    }
-    
-    return(res);       
-}
+//// must return true only if all can boards have replied and their protocol version matches with target
+//extern eObool_t eo_emsapplBody_areCanBoardsReady(EOtheEMSapplBody *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked)
+//{
+//    eObool_t res = eobool_true;
+//    
+//    if((NULL == p) || (NULL == canBoardsReady))
+//    {
+//        return(eobool_false);
+//    }
+//    
+//    *canBoardsReady = 0;
+//    
+//    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//    uint8_t i=0;
+//    for(i=0; i<numofjomos; i++)
+//    {
+//        if(NULL != canBoardsChecked)
+//        {
+//            *canBoardsChecked |= (1<<i);
+//        }
+//        
+//        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);        
+//        eOcanmap_location_t location = {0};
+//        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL))
+//        {
+//            // must retrieve the extended board info 
+//            const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), location);
+//            eObool_t ready = eobool_false;
+//            uint8_t major = board->detected.protocolversion.major;
+//            uint8_t minor = board->detected.protocolversion.minor;
+//            if(0 != major)
+//            {  // if not zero, then the board has replied and everything is filled. however i must check if there is a match
+//                if((board->board.props.requiredprotocol.major == major) && (board->board.props.requiredprotocol.minor == minor))
+//                {
+//                    ready = eobool_true;
+//                    *canBoardsReady |= (1<<i);
+//                }
+//            } 
+//            res &= ready;
+//        }               
+//    }
+//    
+//    return(res);       
+//}
 
 
-extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
-    return(eo_timer_Stop(p->checkCanBoards_timer));
-}
+//extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
+//    return(eo_timer_Stop(p->checkCanBoards_timer));
+//}
 
 
 extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
@@ -769,83 +773,83 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 //}
 
 
-extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    EOaction_strg astg = {0};
-    EOaction *action = (EOaction*)&astg;
-       
-    eo_action_SetEvent(action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 250*eok_reltime1ms, eo_tmrmode_FOREVER, action);
-    
-    return(eores_OK);
-}
-
-
-extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    eOerrmanDescriptor_t des = {0};
-    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_board_detected);
-    
-    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    uint8_t i=0;
-    for(i=0; i<numofjomos; i++)
-    {        
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);        
-        eOcanmap_location_t loc = {0};
-        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &loc, NULL, NULL))
-        {
-            // send a message... must retrieve the board info 
-            const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), loc);
-            des.sourcedevice    = (eOcanport1 == loc.port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-            des.sourceaddress   = loc.addr;
-            des.par16           = i; 
-            memcpy(&des.par64, &board->detected, sizeof(eObrd_typeandversions_t));
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
-        }               
-    }
-     
-    return(eores_OK);
-    
-//#if OLDMODE    
-//    
-//    // maybe in here we can put an info diagnostics message    
-//    // send message about the ready boards
-//    uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
-//    uint8_t i = 0;
-//    eOappTheDB_board_canlocation_t loc = {0};
-//    //eObrd_cantype_t exptype = eobrd_cantype_unknown;
-//    eObrd_typeandversions_t expected = {0};
-//    expected.boardtype = eobrd_cantype_unknown;
-//    eObrd_typeandversions_t detected = {0};
-//    
-//    eOerrmanDescriptor_t des = {0};
-//    des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
-//    
-//    for(i=0; i<numcanboards; i++)
+//extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
 //    {
-//        if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &expected, &detected))
-//        {
-//            // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
-//            des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//            des.sourceaddress   = loc.addr;
-//            des.par16           = (expected.boardtype << 8) | ((detected.boardtype) & 0xff); 
-//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
-//        }                    
+//        return(eores_NOK_nullpointer);
 //    }
 //    
+//    EOaction_strg astg = {0};
+//    EOaction *action = (EOaction*)&astg;
+//       
+//    eo_action_SetEvent(action, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+//    eo_timer_Start(p->checkCanBoards_timer, eok_abstimeNOW, 250*eok_reltime1ms, eo_tmrmode_FOREVER, action);
+//    
 //    return(eores_OK);
-//#endif    
-}
+//}
+
+
+//extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+
+//    eOerrmanDescriptor_t des = {0};
+//    des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_board_detected);
+//    
+//    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//    uint8_t i=0;
+//    for(i=0; i<numofjomos; i++)
+//    {        
+//        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);        
+//        eOcanmap_location_t loc = {0};
+//        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &loc, NULL, NULL))
+//        {
+//            // send a message... must retrieve the board info 
+//            const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), loc);
+//            des.sourcedevice    = (eOcanport1 == loc.port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//            des.sourceaddress   = loc.addr;
+//            des.par16           = i; 
+//            memcpy(&des.par64, &board->detected, sizeof(eObrd_typeandversions_t));
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
+//        }               
+//    }
+//     
+//    return(eores_OK);
+//    
+////#if OLDMODE    
+////    
+////    // maybe in here we can put an info diagnostics message    
+////    // send message about the ready boards
+////    uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
+////    uint8_t i = 0;
+////    eOappTheDB_board_canlocation_t loc = {0};
+////    //eObrd_cantype_t exptype = eobrd_cantype_unknown;
+////    eObrd_typeandversions_t expected = {0};
+////    expected.boardtype = eobrd_cantype_unknown;
+////    eObrd_typeandversions_t detected = {0};
+////    
+////    eOerrmanDescriptor_t des = {0};
+////    des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+////    
+////    for(i=0; i<numcanboards; i++)
+////    {
+////        if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &expected, &detected))
+////        {
+////            // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
+////            des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+////            des.sourceaddress   = loc.addr;
+////            des.par16           = (expected.boardtype << 8) | ((detected.boardtype) & 0xff); 
+////            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
+////        }                    
+////    }
+////    
+////    return(eores_OK);
+////#endif    
+//}
 
 
 //extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type)
@@ -943,68 +947,68 @@ extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p)
 //    return(ret);
 //}
 
-// for now it is the same as eom_emsapplBody_IsCANboard_usedbyMC()
-extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type)
-{
-    eObool_t ret = eobool_true;
-    
-    switch(type)
-    {
-        case eobrd_cantype_mc4: 
-        case eobrd_cantype_1foc:
-        { 
-            ret = eobool_true; 
-        } break;
-        
-        case eobrd_cantype_strain:
-        { 
-            ret = eobool_false; 
-        } break;            
-        
-        case eobrd_cantype_mais:
-        case eobrd_cantype_skin:            
-        case eobrd_cantype_unknown:
-        default:
-        {
-            ret = eobool_false; 
-        } break;                    
-    }
- 
-    return(ret);
-}
-
-extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected)
-{
-    eOresult_t res = eores_OK;
-    
-    // at first we send diagnostics
-    if(eobool_false == match)
-    {
-        char str[64] = {0};
-        snprintf(str, sizeof(str), "wrong fwver: %d %d", detected->firmwareversion.major, detected->firmwareversion.minor); 
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &eo_errman_DescrUnspecified);
-    }
-    
-    // then we put the detected inside the EOtheCANmapping
-    eo_canmap_BoardSetDetected(eo_canmap_GetHandle(), loc, detected);
- 
-
-    #warning marco.accame: i prefer not to stop the request procedure in here. i would rather do it at tick of the timer inside eom_emsconfigurator_hid_userdef_ProcessUserdef01Event()
-//    // if all connected can boards are ready, then we stop the request procedure
-//    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &canBoardsReady, NULL))
+//// for now it is the same as eom_emsapplBody_IsCANboard_usedbyMC()
+//extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type)
+//{
+//    eObool_t ret = eobool_true;
+//    
+//    switch(type)
 //    {
-//        eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
-//        eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
-//        //if MC4, enable MAIS and BCastPolicy
-//        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-//        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
-//        {   
-//			eo_emsapplBody_MAISstart(eo_emsapplBody_GetHandle());
-//        }
-//    }    
-    
-    return(res);
-}
+//        case eobrd_cantype_mc4: 
+//        case eobrd_cantype_1foc:
+//        { 
+//            ret = eobool_true; 
+//        } break;
+//        
+//        case eobrd_cantype_strain:
+//        { 
+//            ret = eobool_false; 
+//        } break;            
+//        
+//        case eobrd_cantype_mais:
+//        case eobrd_cantype_skin:            
+//        case eobrd_cantype_unknown:
+//        default:
+//        {
+//            ret = eobool_false; 
+//        } break;                    
+//    }
+// 
+//    return(ret);
+//}
+
+//extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected)
+//{
+//    eOresult_t res = eores_OK;
+//    
+//    // at first we send diagnostics
+//    if(eobool_false == match)
+//    {
+//        char str[64] = {0};
+//        snprintf(str, sizeof(str), "wrong fwver: %d %d", detected->firmwareversion.major, detected->firmwareversion.minor); 
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &eo_errman_DescrUnspecified);
+//    }
+//    
+//    // then we put the detected inside the EOtheCANmapping
+//    eo_canmap_BoardSetDetected(eo_canmap_GetHandle(), loc, detected);
+// 
+
+//    #warning marco.accame: i prefer not to stop the request procedure in here. i would rather do it at tick of the timer inside eom_emsconfigurator_hid_userdef_ProcessUserdef01Event()
+////    // if all connected can boards are ready, then we stop the request procedure
+////    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &canBoardsReady, NULL))
+////    {
+////        eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
+////        eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
+////        //if MC4, enable MAIS and BCastPolicy
+////        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
+////        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
+////        {   
+////			eo_emsapplBody_MAISstart(eo_emsapplBody_GetHandle());
+////        }
+////    }    
+//    
+//    return(res);
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1165,107 +1169,107 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 
 
 
-static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask)
-{  
-    // i check only mc. thus, i get the number of mc jomos, i search for the i-th board and i send a get fw version query to it.
-    
-    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    uint8_t i=0;
-    for(i=0; i<numofjomos; i++)
-    {
-        if( ((1<<i) & dontaskmask) == (1<<i))
-        {
-            continue;
-        }
-        
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);        
-        eOcanmap_location_t location = {0};
-        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL))
-        {
-            // send a message... must retrieve the board info 
-            const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), location);
-            // i decide to send the request only if the board has not replied. if it replied but the protocol does
-            // not match then i dont send the command anymore.
-            if(0 == board->detected.protocolversion.major)
-            {  // must ask if the board has not responded yet
-                eOcanprot_command_t command = {0};
-                command.class = eocanprot_msgclass_pollingMotorControl;
-                command.type  = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
-                command.value = (void*)&board->board.props.requiredprotocol;
-                eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);                  
-            }                        
-        }               
-    }
-    
-    return(eores_OK);
-                
-//#if OLDMODE    
+//static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask)
+//{  
+//    // i check only mc. thus, i get the number of mc jomos, i search for the i-th board and i send a get fw version query to it.
 //    
-//    eOicubCanProto_msgCommand_t             msgCmd = 
+//    uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//    uint8_t i=0;
+//    for(i=0; i<numofjomos; i++)
 //    {
-//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-//        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION
-//    };
-
-//    eOicubCanProto_msgDestination_t     msgdest;
-//    uint16_t                            numofboard = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
-//    uint16_t                            i;
-//    eOresult_t                          res;
-//    eOappTheDB_canboardinfo_t           *canboardinfo;
-//    EOappTheDB                          *db = eo_appTheDB_GetHandle();
-
-//    for(i=0; i<numofboard; i++)
-//    {
-//        
 //        if( ((1<<i) & dontaskmask) == (1<<i))
 //        {
 //            continue;
 //        }
 //        
-//        res = eo_appTheDB_GetCanBoardInfo(db, (eObrd_boardId_t)i, &canboardinfo);
-//        if(eores_OK != res)
+//        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);        
+//        eOcanmap_location_t location = {0};
+//        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL))
 //        {
-//            continue;
-//        }
-//        
-////        if((eobrd_cantype_mc4 != canboardinfo->type) && (eobrd_cantype_1foc != canboardinfo->type))
-////        {
-////            continue; // m.a: i dont process this board index and i go to the next one
-////        }
-
-//        if(eobool_false == eom_emsapplBody_IsCANboardToBeChecked(eo_emsapplBody_GetHandle(), canboardinfo->type))
-//        {
-//            continue;
-//        }
-//        
-//        // marco.accame: dont know why if i add the strain to the types of board to be checked, then the strain (orn can2) does not reply
-//        // maybe it is because it exits the bootloader 5 seconds after the application starts ... so, i have tried to delay the query about 6-7 seconds
-//        // but it does not solve. 
-//        //if(eobrd_cantype_strain == canboardinfo->type)
-//        //{
-//        //    eOabstime_t timefromboot = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-//        //    
-//        //    if(timefromboot < 7*eok_reltime1sec)
-//        //    {
-//        //        continue;
-//        //    }
-//        //}
-//        
-//        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canboardinfo->addr);
-//                        
-//        res = eo_appCanSP_SendCmd(p->appCanSP, (eOcanport_t)canboardinfo->port, msgdest, msgCmd, (void*)&canboardinfo->canprotversion);
-//        if(eores_OK != res)
-//        {
-//            return(res);
-//        }
+//            // send a message... must retrieve the board info 
+//            const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), location);
+//            // i decide to send the request only if the board has not replied. if it replied but the protocol does
+//            // not match then i dont send the command anymore.
+//            if(0 == board->detected.protocolversion.major)
+//            {  // must ask if the board has not responded yet
+//                eOcanprot_command_t command = {0};
+//                command.class = eocanprot_msgclass_pollingMotorControl;
+//                command.type  = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;
+//                command.value = (void*)&board->board.props.requiredprotocol;
+//                eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);                  
+//            }                        
+//        }               
 //    }
-
-//    return(eores_OK);
 //    
-//#endif
+//    return(eores_OK);
+//                
+////#if OLDMODE    
+////    
+////    eOicubCanProto_msgCommand_t             msgCmd = 
+////    {
+////        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
+////        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION
+////    };
 
-    
-}
+////    eOicubCanProto_msgDestination_t     msgdest;
+////    uint16_t                            numofboard = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
+////    uint16_t                            i;
+////    eOresult_t                          res;
+////    eOappTheDB_canboardinfo_t           *canboardinfo;
+////    EOappTheDB                          *db = eo_appTheDB_GetHandle();
+
+////    for(i=0; i<numofboard; i++)
+////    {
+////        
+////        if( ((1<<i) & dontaskmask) == (1<<i))
+////        {
+////            continue;
+////        }
+////        
+////        res = eo_appTheDB_GetCanBoardInfo(db, (eObrd_boardId_t)i, &canboardinfo);
+////        if(eores_OK != res)
+////        {
+////            continue;
+////        }
+////        
+//////        if((eobrd_cantype_mc4 != canboardinfo->type) && (eobrd_cantype_1foc != canboardinfo->type))
+//////        {
+//////            continue; // m.a: i dont process this board index and i go to the next one
+//////        }
+
+////        if(eobool_false == eom_emsapplBody_IsCANboardToBeChecked(eo_emsapplBody_GetHandle(), canboardinfo->type))
+////        {
+////            continue;
+////        }
+////        
+////        // marco.accame: dont know why if i add the strain to the types of board to be checked, then the strain (orn can2) does not reply
+////        // maybe it is because it exits the bootloader 5 seconds after the application starts ... so, i have tried to delay the query about 6-7 seconds
+////        // but it does not solve. 
+////        //if(eobrd_cantype_strain == canboardinfo->type)
+////        //{
+////        //    eOabstime_t timefromboot = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+////        //    
+////        //    if(timefromboot < 7*eok_reltime1sec)
+////        //    {
+////        //        continue;
+////        //    }
+////        //}
+////        
+////        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canboardinfo->addr);
+////                        
+////        res = eo_appCanSP_SendCmd(p->appCanSP, (eOcanport_t)canboardinfo->port, msgdest, msgCmd, (void*)&canboardinfo->canprotversion);
+////        if(eores_OK != res)
+////        {
+////            return(res);
+////        }
+////    }
+
+////    return(eores_OK);
+////    
+////#endif
+
+//    
+//}
 
 
 static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)

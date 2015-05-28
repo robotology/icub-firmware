@@ -41,6 +41,8 @@
 
 #include "EOtheEntities.h"
 
+#include "EOtheCANdiscovery.h"
+
 #include "EOemsController_hid.h" 
 #include "OPCprotocolManager_Cfg.h" 
 //#include "EOtheEMSapplDiagnostics.h"
@@ -192,7 +194,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     
     if(1 == count)
     {
-        eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
+        eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
+        //eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
     }
     
     /*    
