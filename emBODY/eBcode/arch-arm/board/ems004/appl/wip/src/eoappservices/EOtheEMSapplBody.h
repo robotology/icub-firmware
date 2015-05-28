@@ -156,11 +156,11 @@ extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEM
 
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
-extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p);
 //Note: eo_emsapplBody_sendConfig2canboards function send only one time the configuration; so the second call of this func will send anything!
 extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 
-extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p);
 
 
 extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p);

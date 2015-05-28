@@ -106,28 +106,28 @@ static void s_signalGetFullScales(uint32_t id32, eObool_t signaloncefullscale);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void eoprot_fun_INIT_as_mais_config(const EOnv* nv)
-{
-    eOas_mais_config_t* maiscfg = eo_nv_RAM(nv);
-    
-    maiscfg->datarate = 10;
-    maiscfg->mode = eoas_maismode_txdatacontinuously;
-    maiscfg->resolution = eoas_maisresolution_08;
-}
+//extern void eoprot_fun_INIT_as_mais_config(const EOnv* nv)
+//{
+//    eOas_mais_config_t* maiscfg = eo_nv_RAM(nv);
+//    
+//    maiscfg->datarate = 10;
+//    maiscfg->mode = eoas_maismode_txdatacontinuously;
+//    maiscfg->resolution = eoas_maisresolution_08;
+//}
 
 
-extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
-{
-    eOas_mais_status_t *status = eo_nv_RAM(nv);  
-    
-    // marco.accame: i init as for eoas_maisresolution_08 
-    //               the array the15values can be initted for size 0 or 15 as i now use teh proper eo_array_Assign() method
-    uint8_t capacity    = 15;
-    uint8_t itemsize    = 1;
-    uint8_t size        = 15;
-    EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
-    eo_array_Resize(array, size);
-}
+//extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
+//{
+//    eOas_mais_status_t *status = eo_nv_RAM(nv);  
+//    
+//    // marco.accame: i init as for eoas_maisresolution_08 
+//    //               the array the15values can be initted for size 0 or 15 as i now use teh proper eo_array_Assign() method
+//    uint8_t capacity    = 15;
+//    uint8_t itemsize    = 1;
+//    uint8_t size        = 15;
+//    EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
+//    eo_array_Resize(array, size);
+//}
 
 
 
@@ -172,54 +172,54 @@ extern void eoprot_fun_UPDT_as_mais_config(const EOnv* nv, const eOropdescriptor
     s_process_mais_resolution((eOas_maisresolution_t)maiscfg->resolution, status);
     
     
-#if 0    
-    eOas_mais_status_t                  *status = NULL;
-    eOsmStatesEMSappl_t                 currentstate;
-    eOicubCanProto_msgDestination_t     msgdest;
-    eOappTheDB_board_canlocation_t      canLoc;
-    eOas_maisId_t                       maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); // this should be always 0
-    eOicubCanProto_msgCommand_t         msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) 0
-    };
+//#if 0    
+//    eOas_mais_status_t                  *status = NULL;
+//    eOsmStatesEMSappl_t                 currentstate;
+//    eOicubCanProto_msgDestination_t     msgdest;
+//    eOappTheDB_board_canlocation_t      canLoc;
+//    eOas_maisId_t                       maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); // this should be always 0
+//    eOicubCanProto_msgCommand_t         msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) 0
+//    };
 
-    eOas_mais_config_t                  *maiscfg = (eOas_mais_config_t*)rd->data;
-    
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), maisId, &canLoc);
-    
-    //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
-    // if yes ==> ok no problem
-    // if no ==> i'll send cmd when go to RUN state
-    if(eoas_maismode_txdatacontinuously == maiscfg->mode)
-    {
-        //only if the appl is in RUN state enable mais tx
-        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-        if(eo_sm_emsappl_STrun == currentstate)
-        {
-            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
-            msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-            eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->mode));
-        }
-    }
-    
-    
-    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->datarate));
+//    eOas_mais_config_t                  *maiscfg = (eOas_mais_config_t*)rd->data;
+//    
+//    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    eo_appTheDB_GetSnsrMaisCanLocation(eo_appTheDB_GetHandle(), maisId, &canLoc);
+//    
+//    //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
+//    // if yes ==> ok no problem
+//    // if no ==> i'll send cmd when go to RUN state
+//    if(eoas_maismode_txdatacontinuously == maiscfg->mode)
+//    {
+//        //only if the appl is in RUN state enable mais tx
+//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+//        if(eo_sm_emsappl_STrun == currentstate)
+//        {
+//            msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
+//            msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+//            eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->mode));
+//        }
+//    }
+//    
+//    
+//    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+//    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->datarate));
 
-    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->resolution));
-    
+//    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
+//    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(maiscfg->resolution));
+//    
 
-    status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisId);
-    if(NULL == status)
-    {
-        return; //error
-    }     
+//    status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisId);
+//    if(NULL == status)
+//    {
+//        return; //error
+//    }     
 
-    s_process_mais_resolution((eOas_maisresolution_t)maiscfg->resolution, status);
-#endif    
+//    s_process_mais_resolution((eOas_maisresolution_t)maiscfg->resolution, status);
+//#endif    
 }
 
 
@@ -250,37 +250,37 @@ extern void eoprot_fun_UPDT_as_mais_config_mode(const EOnv* nv, const eOropdescr
          eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
     }
     
-#if 0    
-    
-    eOsmStatesEMSappl_t           currentstate;
-    eOas_maisId_t                 maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
-    eOicubCanProto_msgCommand_t   msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-    };
+//#if 0    
+//    
+//    eOsmStatesEMSappl_t           currentstate;
+//    eOas_maisId_t                 maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
+//    eOicubCanProto_msgCommand_t   msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+//    };
 
-    eOas_maismode_t                *maismode = (eOas_maismode_t*)rd->data;
-    
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
-    // if yes ==> ok no problem
-    // if no ==> i'll send cmd when go to RUN state
-    if(eoas_maismode_txdatacontinuously == *maismode)
-    {
-        //only if the appl is in RUN state enable mais tx
-        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-        if(eo_sm_emsappl_STrun == currentstate)
-        {
-           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maismode);
-        }
-    }
-    else
-    {
-        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maismode);
-    }
-#endif    
+//    eOas_maismode_t                *maismode = (eOas_maismode_t*)rd->data;
+//    
+//    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    
+//    //if pc104 tell me to enable maistx, before to send cmd verify if i'm in RUN state:
+//    // if yes ==> ok no problem
+//    // if no ==> i'll send cmd when go to RUN state
+//    if(eoas_maismode_txdatacontinuously == *maismode)
+//    {
+//        //only if the appl is in RUN state enable mais tx
+//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+//        if(eo_sm_emsappl_STrun == currentstate)
+//        {
+//           eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maismode);
+//        }
+//    }
+//    else
+//    {
+//        eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maismode);
+//    }
+//#endif    
 }
 
 
@@ -294,20 +294,20 @@ extern void eoprot_fun_UPDT_as_mais_config_datarate(const EOnv* nv, const eOropd
     
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
     
-#if 0    
-    eOas_maisId_t                  maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
-    eOicubCanProto_msgCommand_t    msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
-    };
+//#if 0    
+//    eOas_maisId_t                  maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
+//    eOicubCanProto_msgCommand_t    msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
+//    };
 
-    uint8_t               *maisdatarate = (uint8_t*)rd->data;
+//    uint8_t               *maisdatarate = (uint8_t*)rd->data;
 
-	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisdatarate);
-#endif
+//	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    
+//    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisdatarate);
+//#endif
 }
 
 
@@ -332,73 +332,73 @@ extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOro
 
     s_process_mais_resolution(*maisresolution, status);   
 
-#if 0    
-    eOas_mais_status_t              *status = NULL;
-    eOas_maisId_t                   maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
-    eOicubCanProto_msgCommand_t     msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION
-    };
+//#if 0    
+//    eOas_mais_status_t              *status = NULL;
+//    eOas_maisId_t                   maisId = (eOas_maisId_t)eoprot_ID2index(rd->id32); //this should be always 0
+//    eOicubCanProto_msgCommand_t     msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION
+//    };
 
-    eOas_maisresolution_t           *maisresolution = (eOas_maisresolution_t*)rd->data;
+//    eOas_maisresolution_t           *maisresolution = (eOas_maisresolution_t*)rd->data;
 
-	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisresolution);
-    
-    status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisId);
-    if(NULL == status)
-    {
-        return; //error
-    } 
+//	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    
+//    eo_appCanSP_SendCmd2SnrMais(appCanSP_ptr, maisId, msgCmd, (void*)maisresolution);
+//    
+//    status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisId);
+//    if(NULL == status)
+//    {
+//        return; //error
+//    } 
 
-    s_process_mais_resolution(*maisresolution, status);   
-#endif    
+//    s_process_mais_resolution(*maisresolution, status);   
+//#endif    
 }
 
 
-extern void eoprot_fun_INIT_as_strain_config(const EOnv* nv)
-{
-    eOas_strain_config_t* straincfg = eo_nv_RAM(nv);
-    
-    straincfg->datarate = 10;
-    straincfg->mode = eoas_strainmode_acquirebutdonttx;
-    straincfg->signaloncefullscale = eobool_false;
-}
+//extern void eoprot_fun_INIT_as_strain_config(const EOnv* nv)
+//{
+//    eOas_strain_config_t* straincfg = eo_nv_RAM(nv);
+//    
+//    straincfg->datarate = 10;
+//    straincfg->mode = eoas_strainmode_acquirebutdonttx;
+//    straincfg->signaloncefullscale = eobool_false;
+//}
 
 
-extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
-{
-    eOas_strain_status_t *status = eo_nv_RAM(nv);
-    uint8_t capacity = 0;
-    uint8_t itemsize = 0;
-    uint8_t size = 0;
-    EOarray* array = NULL;
-    
-    // marco.accame: cannot understand why in here size is zero and in others it was not zero. see why. 
-    //               probably fullscale, being of itemsize = 2 is treated without the proper eo_array_ methods
-    capacity    = 6;
-    itemsize    = 2;
-    size        = 0; 
-    array = eo_array_New(capacity, itemsize, &status->fullscale);
-    eo_array_Resize(array, size);
+//extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
+//{
+//    eOas_strain_status_t *status = eo_nv_RAM(nv);
+//    uint8_t capacity = 0;
+//    uint8_t itemsize = 0;
+//    uint8_t size = 0;
+//    EOarray* array = NULL;
+//    
+//    // marco.accame: cannot understand why in here size is zero and in others it was not zero. see why. 
+//    //               probably fullscale, being of itemsize = 2 is treated without the proper eo_array_ methods
+//    capacity    = 6;
+//    itemsize    = 2;
+//    size        = 0; 
+//    array = eo_array_New(capacity, itemsize, &status->fullscale);
+//    eo_array_Resize(array, size);
 
 
-    // marco.accame: size can be 0 or 6. now i use teh proper eo_array_Assign method for calibratedvalues/uncalibratedvalues 
-    //
-    capacity    = 6;
-    itemsize    = 2;
-    size        = 6;
-    array = eo_array_New(capacity, itemsize, &status->calibratedvalues);
-    eo_array_Resize(array, size);   
+//    // marco.accame: size can be 0 or 6. now i use teh proper eo_array_Assign method for calibratedvalues/uncalibratedvalues 
+//    //
+//    capacity    = 6;
+//    itemsize    = 2;
+//    size        = 6;
+//    array = eo_array_New(capacity, itemsize, &status->calibratedvalues);
+//    eo_array_Resize(array, size);   
 
-    capacity    = 6;
-    itemsize    = 2;
-    size        = 6;
-    array = eo_array_New(capacity, itemsize, &status->uncalibratedvalues);
-    eo_array_Resize(array, size); 
-}
+//    capacity    = 6;
+//    itemsize    = 2;
+//    size        = 6;
+//    array = eo_array_New(capacity, itemsize, &status->uncalibratedvalues);
+//    eo_array_Resize(array, size); 
+//}
 
 
 extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -424,45 +424,45 @@ extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescript
     
     s_signalGetFullScales(rd->id32, straincfg->signaloncefullscale);       
     
-#if 0    
-    eOicubCanProto_msgDestination_t     msgdest;
-    eOappTheDB_board_canlocation_t      canLoc;
-    eOsmStatesEMSappl_t                 currentstate;
-    eOas_strainId_t                     strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
-    eOicubCanProto_msgCommand_t         msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) 0
-    };
+//#if 0    
+//    eOicubCanProto_msgDestination_t     msgdest;
+//    eOappTheDB_board_canlocation_t      canLoc;
+//    eOsmStatesEMSappl_t                 currentstate;
+//    eOas_strainId_t                     strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
+//    eOicubCanProto_msgCommand_t         msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) 0
+//    };
 
-    eOas_strain_config_t               *straincfg = (eOas_strain_config_t*)rd->data;
-    
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), strainId, &canLoc);
-    
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
+//    eOas_strain_config_t               *straincfg = (eOas_strain_config_t*)rd->data;
+//    
+//    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    eo_appTheDB_GetSnsrStrainCanLocation(eo_appTheDB_GetHandle(), strainId, &canLoc);
+//    
+//    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, canLoc.addr); 
 
-    // only if the appl is in RUN state enable strain tx
-    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-    if(eo_sm_emsappl_STrun == currentstate)
-    {
-        msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));  
+//    // only if the appl is in RUN state enable strain tx
+//    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+//    if(eo_sm_emsappl_STrun == currentstate)
+//    {
+//        msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+//        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->mode));  
 
-        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 0); 
-    }
-    else
-    {
-        //s_send_diagnostics(eo_errortype_error, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 0);
-    }
+//        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 0); 
+//    }
+//    else
+//    {
+//        //s_send_diagnostics(eo_errortype_error, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 0);
+//    }
 
-    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
-    
-    //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 1);
+//    msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+//    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&(straincfg->datarate));
+//    
+//    //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 1);
 
-    s_signalGetFullScales(strainId, straincfg->signaloncefullscale);
-#endif    
+//    s_signalGetFullScales(strainId, straincfg->signaloncefullscale);
+//#endif    
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -490,33 +490,33 @@ extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdes
         }
     }   
     
-#if 0
-    eOsmStatesEMSappl_t            currentstate;
-    eOas_strainId_t                strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); // this should be always 0
-    eOicubCanProto_msgCommand_t    msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-    };
+//#if 0
+//    eOsmStatesEMSappl_t            currentstate;
+//    eOas_strainId_t                strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); // this should be always 0
+//    eOicubCanProto_msgCommand_t    msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+//    };
 
-    eOas_strainmode_t *strainmode = (eOas_strainmode_t*)rd->data;
-    
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    eOas_strainmode_t *strainmode = (eOas_strainmode_t*)rd->data;
+//    
+//    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
-    if(eoas_strainmode_acquirebutdonttx == *strainmode) 
-    {
-        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)strainmode);
-    }
-    else //if pc104 configures strain mode to send data
-    {
-        //only if the appl is in RUN state enable mais tx
-        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-        if(eo_sm_emsappl_STrun == currentstate)
-        {
-            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)strainmode);
-        }
-    }  
-#endif    
+//    if(eoas_strainmode_acquirebutdonttx == *strainmode) 
+//    {
+//        eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)strainmode);
+//    }
+//    else //if pc104 configures strain mode to send data
+//    {
+//        //only if the appl is in RUN state enable mais tx
+//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+//        if(eo_sm_emsappl_STrun == currentstate)
+//        {
+//            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)strainmode);
+//        }
+//    }  
+//#endif    
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -530,27 +530,26 @@ extern void eoprot_fun_UPDT_as_strain_config_datarate(const EOnv* nv, const eOro
     
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
     
-#if 0    
-    eOas_strainId_t                strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
-    eOicubCanProto_msgCommand_t    msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
-    };
+//#if 0    
+//    eOas_strainId_t                strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
+//    eOicubCanProto_msgCommand_t    msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE
+//    };
 
-    uint8_t               *straindatarate = (uint8_t*)rd->data;
+//    uint8_t               *straindatarate = (uint8_t*)rd->data;
 
-	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)straindatarate);
-#endif    
+//	EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    
+//    eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, (void*)straindatarate);
+//#endif    
 }
 
 
 extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eObool_t                    *signaloncefullscale = (eObool_t*)rd->data;
-//    eOas_strainId_t             strainId = (eOas_strainId_t)eoprot_ID2index(rd->id32); //this should be always 0
     s_signalGetFullScales(rd->id32, *signaloncefullscale);
 }
 
@@ -631,42 +630,42 @@ static void s_signalGetFullScales(uint32_t id32, eObool_t signaloncefullscale)
     }
     
     
-#if 0    
-    eOas_strain_status_t        *status;
-    uint8_t                     channel = 0;
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
-    };
+//#if 0    
+//    eOas_strain_status_t        *status;
+//    uint8_t                     channel = 0;
+//    eOicubCanProto_msgCommand_t msgCmd = 
+//    {
+//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES
+//    };
 
-    if(eobool_true == signaloncefullscale)
-    {
-        EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-        //clear array in strainstatus
-        
-        
-        status = eo_entities_GetStrainStatus(eo_entities_GetHandle(), strainId);
-        if(NULL != status)
-        {
-            // impose that fullscale is an empty array of itemsize 2 and capacity 6. 
-            // we have already done it inside the eoprot_fun_INIT_as_strain_status() function, but we do it again with eo_array_New()
-            EOarray *array = eo_array_New(6, 2, &status->fullscale);
-            
-            // then we send a command to strain to send us the value of channel 0. 
-            // this oepration triggers a new request until we receive all the 6 values
-            channel = 0;
-            msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
-            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, &channel);
-             
-            //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 2);                     
-        }
-    }
-    else
-    {
-        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 4);
-    }
-#endif
+//    if(eobool_true == signaloncefullscale)
+//    {
+//        EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//        //clear array in strainstatus
+//        
+//        
+//        status = eo_entities_GetStrainStatus(eo_entities_GetHandle(), strainId);
+//        if(NULL != status)
+//        {
+//            // impose that fullscale is an empty array of itemsize 2 and capacity 6. 
+//            // we have already done it inside the eoprot_fun_INIT_as_strain_status() function, but we do it again with eo_array_New()
+//            EOarray *array = eo_array_New(6, 2, &status->fullscale);
+//            
+//            // then we send a command to strain to send us the value of channel 0. 
+//            // this oepration triggers a new request until we receive all the 6 values
+//            channel = 0;
+//            msgCmd.cmdId =  ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
+//            eo_appCanSP_SendCmd2SnrStrain(appCanSP_ptr, strainId, msgCmd, &channel);
+//             
+//            //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 2);                     
+//        }
+//    }
+//    else
+//    {
+//        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 4);
+//    }
+//#endif
 }
 
 

@@ -38,6 +38,8 @@
 
 #include "EOtheCANservice.h"
 
+#include "EOtheMAIS.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -224,7 +226,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
         {   
             eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
-            eo_emsapplBody_MAISstart(eo_emsapplBody_GetHandle());
+            eo_mais_Start(eo_mais_GetHandle());
         }
     }
     else

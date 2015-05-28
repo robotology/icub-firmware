@@ -34,9 +34,9 @@
 
 #include "EoCommon.h"
 #include "EOarray.h"
-#include "EOnv_hid.h"
+#include "EOnv.h"
 
-#include "EOSkin.h"
+#include "EoSkin.h"
 #include "EoProtocol.h"
 
 
@@ -99,32 +99,32 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// marco.accame: we start with a silent skin and with an empty status_arrayofcandata.
-// then we put skin in sigmode eosk_sigmode_signal only if robotInterface orders it to the board.
+//// marco.accame: we start with a silent skin and with an empty status_arrayofcandata.
+//// then we put skin in sigmode eosk_sigmode_signal only if robotInterface orders it to the board.
 
 
-extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
-{
-    eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)nv->ram;
-    
-    *sigmode = eosk_sigmode_dontsignal; 
-}
+//extern void eoprot_fun_INIT_sk_skin_config_sigmode(const EOnv* nv)
+//{
+//    eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)eo_nv_RAM(nv);
+//    
+//    *sigmode = eosk_sigmode_dontsignal; 
+//}
 
 
-extern void eoprot_fun_INIT_sk_skin_status_arrayofcandata(const EOnv* nv)
-{
-    EOarray_of_skincandata_t *tmp = (EOarray_of_skincandata_t*)nv->ram;
-    tmp = tmp;
-    // marco.accame: items of array are eOsk_candata_t. its capacity is:
-    uint16_t capacity = sizeof(tmp->data) / sizeof(eOsk_candata_t);    
-    // eo_array_New() initialises capacity and itemsize and also sets size to 0 
-    EOarray *array = eo_array_New(capacity, sizeof(eOsk_candata_t), nv->ram);
-}
+//extern void eoprot_fun_INIT_sk_skin_status_arrayofcandata(const EOnv* nv)
+//{
+//    EOarray_of_skincandata_t *tmp = (EOarray_of_skincandata_t*)eo_nv_RAM(nv);
+//    tmp = tmp;
+//    // marco.accame: items of array are eOsk_candata_t. its capacity is:
+//    uint16_t capacity = sizeof(tmp->data) / sizeof(eOsk_candata_t);    
+//    // eo_array_New() initialises capacity and itemsize and also sets size to 0 
+//    EOarray *array = eo_array_New(capacity, sizeof(eOsk_candata_t), eo_nv_RAM(nv));
+//}
 
 
 extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)nv->ram;  
+    eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)rd->data;  
     //icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_dontsignal
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingSkin;    
@@ -199,7 +199,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
     eOresult_t                      res;
     uint8_t                         i;
     eOsk_skinId_t                   skId = eoprot_ID2index(rd->id32);
-    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)nv->ram;
+    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)rd->data;
     EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
     uint8_t                         boardEndAddr;
@@ -306,7 +306,7 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
 
 extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOsk_cmd_boardsCfg_t *brdCfg = (eOsk_cmd_boardsCfg_t*)nv->ram;
+    eOsk_cmd_boardsCfg_t *brdCfg = (eOsk_cmd_boardsCfg_t*)rd->data;
     
     icubCanProto_skinboard_config_t canProto_skcfg = {0};
     canProto_skcfg.skintype = (icubCanProto_skinType_t)brdCfg->cfg.skintype; 
@@ -325,7 +325,7 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOrop
     eOresult_t                      res;
     uint8_t                         i;
     eOsk_skinId_t                   skId = eoprot_ID2index(rd->id32);
-    eOsk_cmd_boardsCfg_t            *brdCfg = (eOsk_cmd_boardsCfg_t*)nv->ram;
+    eOsk_cmd_boardsCfg_t            *brdCfg = (eOsk_cmd_boardsCfg_t*)rd->data;
     EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
     eOicubCanProto_msgDestination_t msgdest;
@@ -363,7 +363,7 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOrop
 
 extern void eoprot_fun_UPDT_sk_skin_cmmnds_trianglescfg(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOsk_cmd_trianglesCfg_t *trgsCfg = (eOsk_cmd_trianglesCfg_t*)nv->ram;
+    eOsk_cmd_trianglesCfg_t *trgsCfg = (eOsk_cmd_trianglesCfg_t*)rd->data;
     
     icubCanProto_skintriangles_config_t canProto_trgscfg = {0};
     canProto_trgscfg.idstart   = trgsCfg->idstart;
@@ -387,7 +387,7 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_trianglescfg(const EOnv* nv, const eO
 #if 0    
     eOresult_t                          res;
     eOsk_skinId_t                       skId = eoprot_ID2index(rd->id32);
-    eOsk_cmd_trianglesCfg_t             *trgsCfg = (eOsk_cmd_trianglesCfg_t*)nv->ram;
+    eOsk_cmd_trianglesCfg_t             *trgsCfg = (eOsk_cmd_trianglesCfg_t*)rd->data;
     EOappCanSP                          *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eOappTheDB_cfg_skinInfo_t           *skconfig_ptr = NULL;
     eOappTheDB_cfg_skinInfo_t           **prova = NULL;

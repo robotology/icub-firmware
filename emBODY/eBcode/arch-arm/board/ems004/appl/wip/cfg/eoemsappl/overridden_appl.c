@@ -45,6 +45,9 @@
 #include "EOtheCANservice.h"
 #include "EOtheCANprotocol.h"
 
+#include "EOtheSTRAIN.h"
+#include "EOtheSKIN.h"
+
 #include "EOtheBoardConfig.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -626,11 +629,15 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
     eOresult_t res = eores_NOK_generic;
     
+    // enable joints
     res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
 	{
 		//handle the error
 	}
+    
+    // enable the tx mode of strain, if present and as configured
+    eo_strain_SendTXmode(eo_strain_GetHandle());
     
     // pulse led3 forever at 1 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0); 
@@ -672,7 +679,8 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
   
     
     // stop skin. the check whether to stop skin or not is done internally.
-    eo_emsapplBody_StopSkin(eo_emsapplBody_GetHandle());
+    eo_skin_DisableTX(eo_skin_GetHandle());
+    //eo_emsapplBody_StopSkin(eo_emsapplBody_GetHandle());
 
     // stop motion control
  	res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
@@ -680,7 +688,9 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 	{
 		//handle the error
 	}
-        
+    
+    // stop tx of strain, if present
+    eo_strain_DisableTX(eo_strain_GetHandle());        
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)

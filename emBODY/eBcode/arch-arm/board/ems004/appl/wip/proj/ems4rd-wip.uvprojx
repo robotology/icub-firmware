@@ -858,6 +858,21 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheVirtualStrain.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMAIS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMAIS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSTRAIN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheSTRAIN.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSKIN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheSKIN.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2126,6 +2141,21 @@
               <FileName>EOtheVirtualStrain.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheVirtualStrain.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMAIS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMAIS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSTRAIN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheSTRAIN.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSKIN.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheSKIN.c</FilePath>
             </File>
           </Files>
         </Group>

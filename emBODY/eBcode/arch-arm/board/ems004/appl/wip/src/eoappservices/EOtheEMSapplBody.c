@@ -67,6 +67,8 @@
 
 #include "EOtheCANservice.h"
 
+#include "EOtheSTRAIN.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -157,10 +159,10 @@ static eOresult_t s_eo_emsapplBody_computeRunMode(EOtheEMSapplBody *p);
 // marco.accame on 19feb15: we dont want to disable mais transmission unless robotinterface does that.
 //static eOresult_t s_eo_emsapplBody_MaisTXdisable(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p);
+//static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
-static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
+//static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p);
+//static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p);
 
 static eOresult_t s_eo_emsapplBody_sendGetFWVersion(EOtheEMSapplBody *p, uint32_t dontaskmask);
 
@@ -275,21 +277,21 @@ extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p)
 
 
 
-extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }    
-    
-    
-    //return(s_eo_emsapplBody_MaisTXenable(p));
+//extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }    
+//    
+//    
+//    //return(s_eo_emsapplBody_MaisTXenable(p));
 
-    // the following sets tx and datarate according to config of mais.
-    return(s_eo_emsapplBody_MaisStart(p));    
-}
+//    // the following sets tx and datarate according to config of mais.
+//    return(s_eo_emsapplBody_MaisStart(p));    
+//}
 
-#warning marco.accame: in here it would be good to separate as-strain from mc.
+
 extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 {
 
@@ -304,7 +306,9 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 
     if(applrunMode__2foc == p->appRunMode)
     {
-        return(s_eo_emsapplBody_SendTxMode2Strain(p));
+        return(eores_OK);
+        //return(eo_strain_SendTXmode(eo_strain_GetHandle()));
+        //return(s_eo_emsapplBody_SendTxMode2Strain(p));
     } 
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
@@ -402,8 +406,9 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
     if(applrunMode__2foc == p->appRunMode)
     {
         eo_emsMotorController_GoIdle();
-        eOresult_t res = s_eo_emsapplBody_DisableTxStrain(p);
-        return(res);
+        //eOresult_t res = s_eo_emsapplBody_DisableTxStrain(p);
+        //eOresult_t res = eo_strain_DisableTX(eo_strain_GetHandle());
+        return(eores_OK);
     } 
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
@@ -583,143 +588,143 @@ extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
 
 
 
-extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
-{ 
-    // i must see if there are skin entities.
-    // if any, then for each skin: for each board in teh skin i send a SET_TX_MODE equal to icubCanProto_as_sigmode_dontsignal
-    
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    uint8_t numofskins = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-    
-    if(0 == numofskins)
-    {
-        return(eores_OK); 
-    }
-
-    
-    eOcanprot_command_t command = {0};
-    icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-    command.class = eocanprot_msgclass_pollingSkin;
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
-    command.value = &sigmode;
-
-    uint8_t i=0;
-    eOsk_skin_t *skin = NULL;
-    for(i=0;i<numofskins; i++)
-    {
-        // i stop this skin only if it was started before
-        if(NULL == (skin = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)i)))
-        {   
-            continue;   // i dont have this skin ... i go the next one
-        }
-            
-        if(eosk_sigmode_dontsignal == skin->config.sigmode)
-        {   
-            // if the skin was not initted by robot-interface, then i dont deinit it. the reason is twofold:
-            // 1. if the skin boards dont transmit, there is no need to silence them,
-            // 2. in case the .ini file of robotinterface has disable the skin because the skin is not mounted, i dont want to tx on a disconnected can bus.
-            continue;   // i dont need to silence this skin ... i go the next one
-        }
-            
-        // i set the skin as not transmitting as soon as possible. because in such a way, can messages being received
-        // are not pushed back in skin->status.arrayofcandata and its does not overflow.
-        skin->config.sigmode = eosk_sigmode_dontsignal;
-              
-        // then i stop transmission of each skin can board
-       
-        // i get the addresses of the can boards of the i-th skin.
-        // the simplification we use is that they all are on the same CAN bus and all have consecutive addresses.
-        // we send the same command to all of them
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, i, 0);
-        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, id32);    
-    }
-    
-    return(eores_OK);
-    
-    
-
-//#if OLDMODE    
+//extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p)
+//{ 
+//    // i must see if there are skin entities.
+//    // if any, then for each skin: for each board in teh skin i send a SET_TX_MODE equal to icubCanProto_as_sigmode_dontsignal
+//    
 //    if(NULL == p)
 //    {
 //        return(eores_NOK_nullpointer);
 //    }
 //    
-//    uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-//    EOappCanSP *appCanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//    eOresult_t res = eores_NOK_generic;
-//            
-//    if(numofskin > 0)
+//    uint8_t numofskins = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+//    
+//    if(0 == numofskins)
 //    {
-//        uint8_t                         i, j;
-//        eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
-//        uint8_t                         boardEndAddr = 0;;
-//        eOicubCanProto_msgDestination_t msgdest = {0};
+//        return(eores_OK); 
+//    }
+
+//    
+//    eOcanprot_command_t command = {0};
+//    icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
+//    command.class = eocanprot_msgclass_pollingSkin;
+//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
+//    command.value = &sigmode;
+
+//    uint8_t i=0;
+//    eOsk_skin_t *skin = NULL;
+//    for(i=0;i<numofskins; i++)
+//    {
+//        // i stop this skin only if it was started before
+//        if(NULL == (skin = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)i)))
+//        {   
+//            continue;   // i dont have this skin ... i go the next one
+//        }
+//            
+//        if(eosk_sigmode_dontsignal == skin->config.sigmode)
+//        {   
+//            // if the skin was not initted by robot-interface, then i dont deinit it. the reason is twofold:
+//            // 1. if the skin boards dont transmit, there is no need to silence them,
+//            // 2. in case the .ini file of robotinterface has disable the skin because the skin is not mounted, i dont want to tx on a disconnected can bus.
+//            continue;   // i dont need to silence this skin ... i go the next one
+//        }
+//            
+//        // i set the skin as not transmitting as soon as possible. because in such a way, can messages being received
+//        // are not pushed back in skin->status.arrayofcandata and its does not overflow.
+//        skin->config.sigmode = eosk_sigmode_dontsignal;
 //              
-//        eOicubCanProto_msgCommand_t msgCmd = 
-//        {
-//            EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-//            EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-//        };
-//        
-//        
-//        for(j=0; j<numofskin; j++) 
-//        {
-//            // i stop the skin only if it was started before
-//            eOsk_skin_t *skin = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)j);
-//            if(NULL == skin)
-//            {   // i dont have a skin on j
-//                return(eores_NOK_generic);
-//            }
-//            
-//            if(eosk_sigmode_dontsignal == skin->config.sigmode)
-//            {   
-//                // if the skin was not initted by robot-interface, then i dont deinit it. the reason is twofold:
-//                // 1. if the skin boards dont transmit, there is no need to silence them,
-//                // 2. in case the .ini file of robotinterface has disable the skin because the skin is not mounted, i dont want to tx on a disconnected can bus.
-//                return(eores_OK);
-//            }
-//            
-//            
-//            res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
-//            if(eores_OK != res)
-//            {  
-//                return(eores_NOK_generic);
-//            }
-//            
-//            // i set the skin as not transmitting as soon as possible. because in such a way, can messages being received
-//            // are not pushed back in skin->status.arrayofcandata and its does not overflow.
-//            skin->config.sigmode = eosk_sigmode_dontsignal;
-//              
-//            // then i stop transmission of each skin can board
-//            
-//            boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
-//                             
-//            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) 
-//            {   // for each skin board 
-//                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-//                icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-//                
-//                res = eo_appCanSP_SendCmd(appCanSP, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
-//                if(eores_OK != res)
-//                {
-//                    return(eores_NOK_generic);
-//                }
-//            }
-//        }    
+//        // then i stop transmission of each skin can board
+//       
+//        // i get the addresses of the can boards of the i-th skin.
+//        // the simplification we use is that they all are on the same CAN bus and all have consecutive addresses.
+//        // we send the same command to all of them
+//        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, i, 0);
+//        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, id32);    
 //    }
 //    
 //    return(eores_OK);
-//#endif    
-}
+//    
+//    
+
+////#if OLDMODE    
+////    if(NULL == p)
+////    {
+////        return(eores_NOK_nullpointer);
+////    }
+////    
+////    uint8_t numofskin = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+////    EOappCanSP *appCanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+////    eOresult_t res = eores_NOK_generic;
+////            
+////    if(numofskin > 0)
+////    {
+////        uint8_t                         i, j;
+////        eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
+////        uint8_t                         boardEndAddr = 0;;
+////        eOicubCanProto_msgDestination_t msgdest = {0};
+////              
+////        eOicubCanProto_msgCommand_t msgCmd = 
+////        {
+////            EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+////            EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+////        };
+////        
+////        
+////        for(j=0; j<numofskin; j++) 
+////        {
+////            // i stop the skin only if it was started before
+////            eOsk_skin_t *skin = (eOsk_skin_t *)eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eosk_entity_skin, (eOprotIndex_t)j);
+////            if(NULL == skin)
+////            {   // i dont have a skin on j
+////                return(eores_NOK_generic);
+////            }
+////            
+////            if(eosk_sigmode_dontsignal == skin->config.sigmode)
+////            {   
+////                // if the skin was not initted by robot-interface, then i dont deinit it. the reason is twofold:
+////                // 1. if the skin boards dont transmit, there is no need to silence them,
+////                // 2. in case the .ini file of robotinterface has disable the skin because the skin is not mounted, i dont want to tx on a disconnected can bus.
+////                return(eores_OK);
+////            }
+////            
+////            
+////            res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), j,  &skconfig_ptr);
+////            if(eores_OK != res)
+////            {  
+////                return(eores_NOK_generic);
+////            }
+////            
+////            // i set the skin as not transmitting as soon as possible. because in such a way, can messages being received
+////            // are not pushed back in skin->status.arrayofcandata and its does not overflow.
+////            skin->config.sigmode = eosk_sigmode_dontsignal;
+////              
+////            // then i stop transmission of each skin can board
+////            
+////            boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
+////                             
+////            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++) 
+////            {   // for each skin board 
+////                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
+////                icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
+////                
+////                res = eo_appCanSP_SendCmd(appCanSP, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
+////                if(eores_OK != res)
+////                {
+////                    return(eores_NOK_generic);
+////                }
+////            }
+////        }    
+////    }
+////    
+////    return(eores_OK);
+////#endif    
+//}
 
 
 // marco.accame: at the date of 20feb2015 it highly temporary.
 
-static eObool_t maisfound = eobool_false;
+//static eObool_t maisfound = eobool_false;
 
 //extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p)
 //{
@@ -1466,194 +1471,194 @@ static eOresult_t s_eo_emsapplBody_computeRunMode(EOtheEMSapplBody *p)
 //    return(res);
 //}
 
-#warning marco.accame: see THIS...
+//#warning marco.accame: see THIS...
 
 
-static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
-{
-    const uint8_t number = 0; 
-    eOas_mais_config_t *cfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), number);
+//static eOresult_t s_eo_emsapplBody_MaisStart(EOtheEMSapplBody *p)
+//{
+//    const uint8_t number = 0; 
+//    eOas_mais_config_t *cfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), number);
 
-    if(NULL == cfg)
-    {   // we dont have mais
-        return(eores_OK);
-    }
-
-    uint8_t datarate = cfg->datarate;       // it must be 10
-    eOenum08_t mode = cfg->mode;            // it must be eoas_maismode_txdatacontinuously
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, number, 0);
-
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingAnalogSensor;    
-    
-    // set txmode
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    command.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-    
-    // set datarate
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    command.value = &datarate;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);    
-    
-    return(eores_OK);
-    
-    
-//#if OLDMODE
-////    eOerrmanDescriptor_t errdes = {0};
-//            
-//    // we start the mais with the values inside the mais.config data structure.
-//    eOresult_t res = eores_NOK_generic;
-//    const eOas_maisId_t maisId = 0; 
-//    eOas_mais_config_t *maiscfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), maisId);
-//    
-//    if(NULL == maiscfg)
+//    if(NULL == cfg)
 //    {   // we dont have mais
 //        return(eores_OK);
 //    }
+
+//    uint8_t datarate = cfg->datarate;       // it must be 10
+//    eOenum08_t mode = cfg->mode;            // it must be eoas_maismode_txdatacontinuously
+//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, number, 0);
+
+//    eOcanprot_command_t command = {0};
+//    command.class = eocanprot_msgclass_pollingAnalogSensor;    
 //    
-//    uint8_t datarate = maiscfg->datarate;       // it must be 10
-//    eOenum08_t mode = maiscfg->mode;            // it must be eoas_maismode_txdatacontinuously
+//    // set txmode
+//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+//    command.value = &mode;                       
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
 //    
-//    // ok, now i go on
+//    // set datarate
+//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+//    command.value = &datarate;                       
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);    
 //    
-//    eOicubCanProto_msgCommand_t msgCmd = {0};
-//    EOappCanSP *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    return(eores_OK);
 //    
-
-////    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
-////    errdes.par16                = 1;
-////    errdes.par64                = 0x112233;
-////    errdes.sourcedevice         = 0;
-////    errdes.sourceaddress        = 0;                
-////    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);  
 //    
-//          
-//    // set txmode       
-//    msgCmd.class = eocanprot_msgclass_pollingAnalogSensor;
-//    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-//    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&mode);     
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }  
+////#if OLDMODE
+//////    eOerrmanDescriptor_t errdes = {0};
+////            
+////    // we start the mais with the values inside the mais.config data structure.
+////    eOresult_t res = eores_NOK_generic;
+////    const eOas_maisId_t maisId = 0; 
+////    eOas_mais_config_t *maiscfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), maisId);
+////    
+////    if(NULL == maiscfg)
+////    {   // we dont have mais
+////        return(eores_OK);
+////    }
+////    
+////    uint8_t datarate = maiscfg->datarate;       // it must be 10
+////    eOenum08_t mode = maiscfg->mode;            // it must be eoas_maismode_txdatacontinuously
+////    
+////    // ok, now i go on
+////    
+////    eOicubCanProto_msgCommand_t msgCmd = {0};
+////    EOappCanSP *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+////    
 
-////    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
-////    errdes.par16                = 2;
-////    errdes.par64                = 0x112233;
-////    errdes.sourcedevice         = 0;
-////    errdes.sourceaddress        = 0;                
-////    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);   
+//////    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
+//////    errdes.par16                = 1;
+//////    errdes.par64                = 0x112233;
+//////    errdes.sourcedevice         = 0;
+//////    errdes.sourceaddress        = 0;                
+//////    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);  
+////    
+////          
+////    // set txmode       
+////    msgCmd.class = eocanprot_msgclass_pollingAnalogSensor;
+////    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+////    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&mode);     
+////    if(eores_OK != res)
+////    {
+////        return(res);
+////    }  
 
-//    // set datarate    
-//    msgCmd.class = eocanprot_msgclass_pollingAnalogSensor;
-//    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-//    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&datarate); 
-//    if(eores_OK != res)
-//    {
-//        return(res);
-//    }    
+//////    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
+//////    errdes.par16                = 2;
+//////    errdes.par64                = 0x112233;
+//////    errdes.sourcedevice         = 0;
+//////    errdes.sourceaddress        = 0;                
+//////    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);   
 
-////    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
-////    errdes.par16                = 3;
-////    errdes.par64                = 0x112233;
-////    errdes.sourcedevice         = 0;
-////    errdes.sourceaddress        = 0;                
-////    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);    
-//        
-//    return(res);     
-//#endif
-}
+////    // set datarate    
+////    msgCmd.class = eocanprot_msgclass_pollingAnalogSensor;
+////    msgCmd.cmdId = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+////    res = eo_appCanSP_SendCmd2SnrMais(cansp, maisId, msgCmd, (void*)&datarate); 
+////    if(eores_OK != res)
+////    {
+////        return(res);
+////    }    
 
-
-static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
-{
-    const uint8_t number = 0; 
-    eOas_strain_config_t *cfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), number);
-
-    if(NULL == cfg)
-    {   // we dont have strain
-        return(eores_OK);
-    }
-
-    eOenum08_t mode = cfg->mode;       
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, number, 0);
-    // set txmode
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingAnalogSensor;    
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    command.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-
-    return(eores_OK);
-        
-//#if OLDMODE    
-//    eOresult_t                  res = eores_NOK_generic;
-//    eOas_strainId_t             sId = 0; //exist only one mais per ep
-//    eOas_strain_config_t        *straincfg = NULL;
-//    eOicubCanProto_msgCommand_t msgCmd = 
-//    {
-//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-//    };
-
-//    
-//    straincfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), sId);
-//    if(NULL == straincfg)
-//    {
-//         //if no strain is connected to ems ==> nothing to do ==> ok
-//        return(eores_OK); 
-//    }    
-//   
-//    
-//    res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(straincfg->mode));
-
-//    return(res);
-//#endif    
-}
+//////    errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_DEB_tag02);
+//////    errdes.par16                = 3;
+//////    errdes.par64                = 0x112233;
+//////    errdes.sourcedevice         = 0;
+//////    errdes.sourceaddress        = 0;                
+//////    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, s_eobj_ownname, &errdes);    
+////        
+////    return(res);     
+////#endif
+//}
 
 
-static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
-{
-    const uint8_t number = 0; 
-    eOas_strain_config_t *cfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), number);
+//static eOresult_t s_eo_emsapplBody_SendTxMode2Strain(EOtheEMSapplBody *p)
+//{
+//    const uint8_t number = 0; 
+//    eOas_strain_config_t *cfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), number);
 
-    if(NULL == cfg)
-    {   // we dont have strain
-        return(eores_OK);
-    }
-
-    eOenum08_t mode = eoas_strainmode_acquirebutdonttx;       
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, number, 0);
-    // set txmode
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingAnalogSensor;    
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    command.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-
-    return(eores_OK);  
-    
-//#if OLDMODE    
-//    eOresult_t                  res;
-//    eOas_strainId_t             sId = 0; //exist only one mais per ep
-//    eOas_strainmode_t           mode = eoas_strainmode_acquirebutdonttx;
-//    eOicubCanProto_msgCommand_t msgCmd = 
-//    {
-//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-//        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-//    };
-
-//    
-//    res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&mode);
-//    if(eores_NOK_nodata == res)
-//    {
-//        //if no strain is connected to ems ==> nothing to do ==>ok
+//    if(NULL == cfg)
+//    {   // we dont have strain
 //        return(eores_OK);
 //    }
-//    return(res);
-//#endif    
-}
+
+//    eOenum08_t mode = cfg->mode;       
+//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, number, 0);
+//    // set txmode
+//    eOcanprot_command_t command = {0};
+//    command.class = eocanprot_msgclass_pollingAnalogSensor;    
+//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+//    command.value = &mode;                       
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+
+//    return(eores_OK);
+//        
+////#if OLDMODE    
+////    eOresult_t                  res = eores_NOK_generic;
+////    eOas_strainId_t             sId = 0; //exist only one mais per ep
+////    eOas_strain_config_t        *straincfg = NULL;
+////    eOicubCanProto_msgCommand_t msgCmd = 
+////    {
+////        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+////        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+////    };
+
+////    
+////    straincfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), sId);
+////    if(NULL == straincfg)
+////    {
+////         //if no strain is connected to ems ==> nothing to do ==> ok
+////        return(eores_OK); 
+////    }    
+////   
+////    
+////    res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&(straincfg->mode));
+
+////    return(res);
+////#endif    
+//}
+
+
+//static eOresult_t s_eo_emsapplBody_DisableTxStrain(EOtheEMSapplBody *p)
+//{
+//    const uint8_t number = 0; 
+//    eOas_strain_config_t *cfg = eo_entities_GetStrainConfig(eo_entities_GetHandle(), number);
+
+//    if(NULL == cfg)
+//    {   // we dont have strain
+//        return(eores_OK);
+//    }
+
+//    eOenum08_t mode = eoas_strainmode_acquirebutdonttx;       
+//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, number, 0);
+//    // set txmode
+//    eOcanprot_command_t command = {0};
+//    command.class = eocanprot_msgclass_pollingAnalogSensor;    
+//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+//    command.value = &mode;                       
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+
+//    return(eores_OK);  
+//    
+////#if OLDMODE    
+////    eOresult_t                  res;
+////    eOas_strainId_t             sId = 0; //exist only one mais per ep
+////    eOas_strainmode_t           mode = eoas_strainmode_acquirebutdonttx;
+////    eOicubCanProto_msgCommand_t msgCmd = 
+////    {
+////        EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
+////        EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+////    };
+
+////    
+////    res = eo_appCanSP_SendCmd2SnrStrain(p->bodyobjs.appCanSP, sId, msgCmd, (void*)&mode);
+////    if(eores_NOK_nodata == res)
+////    {
+////        //if no strain is connected to ems ==> nothing to do ==>ok
+////        return(eores_OK);
+////    }
+////    return(res);
+////#endif    
+//}
 
 
 
