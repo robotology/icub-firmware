@@ -58,6 +58,9 @@
 #include "EOtheCANmapping.h"
 #include "EOtheCANprotocol.h"
 
+#include "EOtheMotionDone.h"
+#include "EOtheVirtualStrain.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -75,14 +78,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-//if defined SET_DESIRED_CURR_IN_ONLY_ONE_MSG, the appl sends all desered current to 2fon in only one msg
-#define SET_DESIRED_CURR_IN_ONLY_ONE_MSG
+
 #define runner_timeout_send_diagnostics         1000
 #define runner_countmax_check_ethlink_status    5000 //every one second
-
-#define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        10
-#define COUNT_BETWEEN_TWO_UPDATES_MAx           200 /* equal to timeout in mc4 before mc4 considers useless strain values
-                                                       see macro "STRAIN_SAFE" in iCub\firmware\motorControllerDsp56f807\common_source_code\include\strain_board.h*/
 
 
 
@@ -103,32 +101,32 @@ void userDef_hwErrCntr(void){}
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-/*
-extern uint64_t startofcycletime;
-    
-extern uint64_t eom_emsrunner_rxstart;
-extern uint64_t eom_emsrunner_dostart;
-extern uint64_t eom_emsrunner_txstart;
-    
-extern uint64_t eom_emsrunner_rxduration;
-extern uint64_t eom_emsrunner_doduration;
-extern uint64_t eom_emsrunner_txduration;
-
-extern uint64_t eom_emsrunner_rxprevduration;
-extern uint64_t eom_emsrunner_doprevduration;
-extern uint64_t eom_emsrunner_txprevduration;
-*/
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+//// implement object motiondone
+//typedef struct
+//{
+//    eObool_t            initted;
+//    eObool_t            itismc4can;
+//    uint8_t             currjoint;
+//    uint8_t             numofjoints;
+//    eOcanprot_command_t motiondonecommand;   
+//} EOtheMotionDone;
 
 
     
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+    
+
+//static EOtheMotionDone * s_eomotiondone_Initialise(void);
+//static EOtheMotionDone * s_eomotiondone_GetHandle(void);
+//static eOresult_t s_eomotiondone_Tick(EOtheMotionDone *p);
+
 
 static EOarray* s_getSkinDataArray(eOcanport_t port);
 
@@ -145,7 +143,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p);
 
 
 //utils
-static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
+//static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p);
 
 //#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
@@ -153,8 +151,8 @@ static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_inOneMsgOnly(EOtheEMSap
 //#else
 //static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
 //#endif
-EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
-static void s_checkEthLinks(void);
+static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
+//static void s_checkEthLinks(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,10 +160,21 @@ static void s_checkEthLinks(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
+//static EOtheMotionDone s_themotiondone =
+//{
+//    .initted            = eobool_false,
+//    .itismc4can         = eobool_false,
+//    .currjoint          = 0,
+//    .numofjoints        = 0,
+//    .motiondonecommand  = {0}
+//};
+
+
 static uint16_t count_ethlink_status = 0;
 #if defined(EVIEWER_ENABLED) 
 static uint8_t event_view = 0;
 #endif 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -203,7 +212,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 
 
 }
-
 
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
@@ -266,18 +274,6 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
 
-    /* TAG_ALE */
-//     if(applrunMode__skinAndMc4 == runmode)
-//     {
-//         #warning VALE--> remove this code after test on semaphore-can
-//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-//         s_eom_emsrunner_hid_SetCurrentsetpoint(appTheSP, pwm, 0);
-//     }
-    
 
     switch(runmode)
     {
@@ -294,14 +290,14 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
         
         case applrunMode__skinOnly:
         {
-            return; //currently nothing to do 
-        }//break;
+            //currently nothing to do 
+        } break;
         
         default:
         {
-            return;
-        }
-    };
+
+        } break;
+    }
   
 }
 
@@ -331,22 +327,22 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     //EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOresult_t res[2] = {eores_NOK_generic, eores_NOK_generic};
  
-    // before wait can, check link status!!
-    count_ethlink_status ++;
-    if(runner_countmax_check_ethlink_status == count_ethlink_status)
-    {
-        //uint8_t link1_isup;
-        //uint8_t link2_isup;
-        //this func chacks if one of link change state and notify it.
-        //the pkt arrived on pc104 backdoor when one link change down->up.
-        //eo_theEMSdgn_checkEthLinksStatus_quickly(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
-        #warning marco.accame: TODO: put diagnostics
-//        if(eo_dgn_cmds.signalCanStatistics)
-//        {
-//            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
-//        }
-        count_ethlink_status = 0;
-    }
+//    // before wait can, check link status!!
+//    count_ethlink_status ++;
+//    if(runner_countmax_check_ethlink_status == count_ethlink_status)
+//    {
+//        //uint8_t link1_isup;
+//        //uint8_t link2_isup;
+//        //this func chacks if one of link change state and notify it.
+//        //the pkt arrived on pc104 backdoor when one link change down->up.
+//        //eo_theEMSdgn_checkEthLinksStatus_quickly(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
+//        #warning marco.accame: TODO: put diagnostics
+////        if(eo_dgn_cmds.signalCanStatistics)
+////        {
+////            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
+////        }
+//        count_ethlink_status = 0;
+//    }
         
     // if we have skin and we have just transmitted the regulars, then we must reset the status->array containing the
     // can frames, so that at the rx cycle we can put some more canframes inside.
@@ -366,7 +362,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // now we wait for the can tx to finish    
     const uint32_t timeout = 3*osal_reltime1ms;
     res[0] = eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
-    res[1] = eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);\
+    res[1] = eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);
     
     //res[0] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1);
     //res[1] = eo_appCanSP_wait_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2);
@@ -464,7 +460,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
 
 
 
-EO_static_inline  eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
+static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
     
 //#ifdef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
@@ -671,7 +667,7 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_2foc(EOMtheEMSrunner *p)
 
     /*Note: motor status is updated with data sent by 2foc by can */
 
-    s_checkEthLinks();
+    //s_checkEthLinks();
 
 }
 
@@ -746,13 +742,24 @@ static void s_eom_emsrunner_hid_UpdateJointstatus(EOMtheEMSrunner *p)
     }
 }
 
-#if   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
 
 static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 {
+    
+    // motion done
+    eo_motiondone_Tick(eo_motiondone_GetHandle());
+    
+    // virtual strain
+    eo_virtualstrain_Tick(eo_virtualstrain_GetHandle());
+    
  
-    #warning TBD: re-write s_eom_emsrunner_hid_userdef_taskDO_activity_mc4()
+    //#error TBD: re-write s_eom_emsrunner_hid_userdef_taskDO_activity_mc4()
 #if 0    
+    
+    #define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        10
+#define COUNT_BETWEEN_TWO_UPDATES_MAx           200 /* equal to timeout in mc4 before mc4 considers useless strain values
+                                                       see macro "STRAIN_SAFE" in iCub\firmware\motorControllerDsp56f807\common_source_code\include\strain_board.h*/
+
     static uint16_t motionDoneJoin2Use = 0;
     static uint8_t count_watchdog_virtaulStrain = 0;
     static uint8_t count_between_two_updates = 0;
@@ -898,74 +905,69 @@ static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
 #endif
 }
 
-#else
-static void s_eom_emsrunner_hid_userdef_taskDO_activity_mc4(EOMtheEMSrunner *p)
-{
-}
-#endif
 
 
-#define ethLinksCount_max 3000 //5 sec
-static void s_checkEthLinks(void)
-{
-    static uint32_t ethLinksCount;
-    static uint32_t ethLinksCount_partial;
-    static uint8_t linknum = 255;
-    
-    ethLinksCount++;
-    
-    if((ethLinksCount< ethLinksCount_max) && (255 == linknum))
-    {
-        return;
-    }
+//#define ethLinksCount_max 3000 //5 sec
+//static void s_checkEthLinks(void)
+//{
+//    static uint32_t ethLinksCount;
+//    static uint32_t ethLinksCount_partial;
+//    static uint8_t linknum = 255;
+//    
+//    ethLinksCount++;
+//    
+//    if((ethLinksCount< ethLinksCount_max) && (255 == linknum))
+//    {
+//        return;
+//    }
 
-    if(255 == linknum)
-    {
-        linknum = 0;
-        #if defined(EVIEWER_ENABLED)    
-        evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
-        #endif
-        
-        #warning marco.accame: TODO: put diagnostics
-        //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
-        
-        #if defined(EVIEWER_ENABLED)    
-        eventviewer_switch_to(prev);
-        #endif  
-        linknum++;
-    }
-    else
-    {
-        if(ethLinksCount_partial == 20)
-        {
-            ethLinksCount_partial = 0;
-            #if defined(EVIEWER_ENABLED)    
-            evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
-            #endif
-            
-            #warning marco.accame: TODO: put diagnostics
-            //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
-            
-            #if defined(EVIEWER_ENABLED)    
-            eventviewer_switch_to(prev);
-            #endif  
-            linknum++;
-            if(linknum == 3)
-            {
-                #warning marco.accame: TODO: put diagnostics
-//                if((eo_dgn_cmds.signalEthCounters) && (eo_theEMSdgn_EthLinksInError(eo_theEMSdgn_GetHandle())) )
-//                //if((eo_dgn_cmds.signalEthCounters) )
-//                {
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , 0);
-//                }
+//    if(255 == linknum)
+//    {
+//        linknum = 0;
+//        #if defined(EVIEWER_ENABLED)    
+//        evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
+//        #endif
+//        
+//        #warning marco.accame: TODO: put diagnostics
+//        //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
+//        
+//        #if defined(EVIEWER_ENABLED)    
+//        eventviewer_switch_to(prev);
+//        #endif  
+//        linknum++;
+//    }
+//    else
+//    {
+//        if(ethLinksCount_partial == 20)
+//        {
+//            ethLinksCount_partial = 0;
+//            #if defined(EVIEWER_ENABLED)    
+//            evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
+//            #endif
+//            
+//            #warning marco.accame: TODO: put diagnostics
+//            //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
+//            
+//            #if defined(EVIEWER_ENABLED)    
+//            eventviewer_switch_to(prev);
+//            #endif  
+//            linknum++;
+//            if(linknum == 3)
+//            {
+//                #warning marco.accame: TODO: put diagnostics
+////                if((eo_dgn_cmds.signalEthCounters) && (eo_theEMSdgn_EthLinksInError(eo_theEMSdgn_GetHandle())) )
+////                //if((eo_dgn_cmds.signalEthCounters) )
+////                {
+////                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , 0);
+////                }
 
-                linknum = 255;
-                ethLinksCount = 0;
-            }
-        }
-    }
-    ethLinksCount_partial++;
-}
+//                linknum = 255;
+//                ethLinksCount = 0;
+//            }
+//        }
+//    }
+//    ethLinksCount_partial++;
+//}
 
 
 // marco.accame: commented it out on nov 26 2014 because it is not used and the compiler complains
@@ -989,6 +991,97 @@ static void s_checkEthLinks(void)
 //        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
 //    #endif
 //    eo_appCanSP_read(cansp, port, numofRXcanframe, NULL); 
+//}
+
+
+//static EOtheMotionDone * s_eomotiondone_Initialise(void)
+//{
+//    if(eobool_true == s_themotiondone.initted)
+//    {
+//        return(&s_themotiondone);
+//    }
+//    
+//    
+//    s_themotiondone.currjoint = 0;
+//    s_themotiondone.numofjoints = eo_entities_NumOfJoints(eo_entities_GetHandle());
+//    
+//    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
+//    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
+//    
+//    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
+//    {
+//        s_themotiondone.itismc4can = eobool_true;
+//    }
+//    else
+//    {
+//        s_themotiondone.itismc4can = eobool_false;
+//    }
+//    
+//    s_themotiondone.motiondonecommand.class = eocanprot_msgclass_pollingMotorControl;    
+//    s_themotiondone.motiondonecommand.type  = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
+//    s_themotiondone.motiondonecommand.value = NULL;
+//    
+//    s_themotiondone.initted = eobool_true;
+//    
+//    return(&s_themotiondone);   
+//}
+
+
+//static EOtheMotionDone * s_eomotiondone_GetHandle(void)
+//{
+//    return(s_eomotiondone_Initialise());
+//}
+
+
+//static eOresult_t s_eomotiondone_Tick(EOtheMotionDone *p)
+//{
+//    if(eobool_false == s_themotiondone.itismc4can)
+//    {   // nothing to do because we dont have a mc4can board
+//        return(eores_OK);
+//    }
+//    
+//    // now, i do things. 
+//    // i cycle all the joints, one at a time. and in some cases i send a can frame to the relevant board
+//    
+//    eOmc_joint_t * joint = eo_entities_GetJoint(eo_entities_GetHandle(), s_themotiondone.currjoint);
+//    
+//    if(NULL == joint)
+//    {   // but it should never happen
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    // marco.accame on 28 may 2015: the motion done mechanism for mc4-based control is to be reviewed.
+//    // the mechanism works but marco.randazzo saw that too many motion done messages are sent over can.
+//    // so far, i have not changed the existing mechanism but we need to review it later on.
+//    // my proposal is to group in some functions called eomotiondone_* what is in here and in can rx handlers and
+//    // in eth-protocol callbacks so that we have everything in only one place.
+//    // it can be the EOtheMotionDone object ....
+//    if( (eomc_controlmode_position == joint->status.basic.controlmodestatus) ||
+//        (eomc_controlmode_mixed    == joint->status.basic.controlmodestatus) ||
+//        (eomc_controlmode_calib    == joint->status.basic.controlmodestatus) )
+//    {
+//        if(eomc_motionmonitorstatus_setpointnotreachedyet == joint->status.basic.motionmonitorstatus)
+//        {
+//            /* -- marco.accame on 28 may 2015: i have not changed the behaviour and i have found the following note.
+//                - if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+//                - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+//                  message because the setpoint is alredy reached. this means that:
+//                  - if monitormode is forever, no new set point has been configured 
+//                  - if monitormode is _untilreached, the joint reached the setpoint already.
+//                - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+//                  message because pc104 is not interested in getting motion done.
+//            */
+
+//            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, s_themotiondone.currjoint, eoprot_tag_none);
+//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_themotiondone.motiondonecommand, id32);
+//        }
+//    }
+//    
+//    // now i prepare for the next joint. i must cycle 0, 1, 2, (s_themotiondone.numofjoints
+//    s_themotiondone.currjoint ++;
+//    s_themotiondone.currjoint %= s_themotiondone.numofjoints;
+//    
+//    return(eores_OK);
 //}
 
 // --------------------------------------------------------------------------------------------------------------------
