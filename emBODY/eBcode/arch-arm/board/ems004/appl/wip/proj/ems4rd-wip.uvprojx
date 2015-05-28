@@ -1144,9 +1144,14 @@
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
+              <FileName>EoProtocolMC_fun_joint_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_joint_ems4rd.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_fun_motor_ems4rd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_motor_ems4rd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2353,9 +2358,14 @@
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolSK_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
+              <FileName>EoProtocolMC_fun_joint_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_joint_ems4rd.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtocolMC_fun_motor_ems4rd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_motor_ems4rd.c</FilePath>
             </File>
           </Files>
         </Group>
