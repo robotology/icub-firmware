@@ -44,6 +44,7 @@ struct EOtheSKIN_hid
     eObool_t            initted;
     eObool_t            thereisskin;
     uint8_t             numofskins;
+    eOcanprot_command_t command;
 }; 
 
 

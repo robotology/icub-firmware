@@ -43,7 +43,8 @@
 #include "EOtheCANService.h"
 
 #include "EOtheEMSapplBody.h"
-//#include "EOicubCanProto_specifications.h"
+
+#include "EOtheSKIN.h"
 
 
 
@@ -124,6 +125,11 @@
 
 extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+#if 1
+    eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)rd->data;  
+    eOprotIndex_t index = eoprot_ID2index(rd->id32);
+    eo_skin_ConfigTXMode(eo_skin_GetHandle(), index, *sigmode); 
+#else    
     eOsk_sigmode_t *sigmode = (eOsk_sigmode_t*)rd->data;  
     //icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_dontsignal
     eOcanprot_command_t command = {0};
@@ -161,7 +167,8 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
             command.value = NULL;     
             // and now we send the command to all the skin boards
             eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);
-            #warning -> see the following code, where we need also a special message to board with address 0xE
+            
+            #warning TBD: VERY IMPORTANT -> see the following code, where we need also a special message to board with address 0xE
 
 //            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
 //            {
@@ -194,118 +201,17 @@ extern void eoprot_fun_UPDT_sk_skin_config_sigmode(const EOnv* nv, const eOropde
         {
         } break;
     }    
-    
-#if 0    
-    eOresult_t                      res;
-    uint8_t                         i;
-    eOsk_skinId_t                   skId = eoprot_ID2index(rd->id32);
-    eOsk_sigmode_t                  *sigmode = (eOsk_sigmode_t*)rd->data;
-    EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
-    uint8_t                         boardEndAddr;
-    eOicubCanProto_msgDestination_t msgdest;
-    
-    
-    
-    res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
-    if(eores_OK != res)
-    {
-        return;
-    }
-            
-    boardEndAddr = skconfig_ptr->boardAddrStart + skconfig_ptr->numofboards;
-    
-   
-    switch(*sigmode)
-    {
-        case eosk_sigmode_dontsignal:
-        {
-            //in old way it not exist
-            //in new way:
-            icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-            
-            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
-            {
-                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-                eOicubCanProto_msgCommand_t   msgCmd = 
-                {
-                    EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-                    EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-                };
-                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
-                if(eores_OK != res)
-                {
-                    return;
-                }
-            }
-        } break;
-        
-        case eosk_sigmode_signal:
-        {
-            icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_signal;
-            
-            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
-            {
-                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-                eOicubCanProto_msgCommand_t   msgCmd = 
-                {
-                    EO_INIT(.class) icubCanProto_msgCmdClass_pollingAnalogSensor,
-                    EO_INIT(.cmdId) ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
-                };
-                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &sigmode);
-                if(eores_OK != res)
-                {
-                    return;
-                }
-            }
-        } break;
-
-        case eosk_sigmode_signal_oldway:
-        {
-            eOicubCanProto_msgCommand_t msgCmd = 
-            {
-                EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
-                EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP
-            };
-            
-            for(i=skconfig_ptr->boardAddrStart; i<boardEndAddr; i++)
-            {
-                
-                msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-                res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd, NULL);
-                if(eores_OK != res)
-                {
-                    return;
-                }
-                
-                if(0xE == i)
-                {
-                    eOicubCanProto_msgCommand_t msgCmd2 = 
-                    {
-                        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
-                        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2
-                    };
-                    
-                    res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd2, NULL);
-                    if(eores_OK != res)
-                    {
-                        return;
-                    }
-                }
-            }
-        } break;
-        
-        default:
-        {
-        } break;
-    }
-#endif
-    
+#endif        
 }
 
 
 extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+#if 1
+    eOsk_cmd_boardsCfg_t *brdCfg = (eOsk_cmd_boardsCfg_t*)rd->data;
+    eOprotIndex_t index = eoprot_ID2index(rd->id32);
+    eo_skin_ConfigBoards(eo_skin_GetHandle(), index, brdCfg);
+#else    
     eOsk_cmd_boardsCfg_t *brdCfg = (eOsk_cmd_boardsCfg_t*)rd->data;
     
     icubCanProto_skinboard_config_t canProto_skcfg = {0};
@@ -319,50 +225,18 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_boardscfg(const EOnv* nv, const eOrop
     command.value = &canProto_skcfg; 
     
     // and now we send the command to all the skin boards
-    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);
-    
-#if 0    
-    eOresult_t                      res;
-    uint8_t                         i;
-    eOsk_skinId_t                   skId = eoprot_ID2index(rd->id32);
-    eOsk_cmd_boardsCfg_t            *brdCfg = (eOsk_cmd_boardsCfg_t*)rd->data;
-    EOappCanSP                      *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_cfg_skinInfo_t       *skconfig_ptr = NULL;
-    eOicubCanProto_msgDestination_t msgdest;
-    icubCanProto_skinboard_config_t canProto_skcfg;
-    
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG
-    };
-    
-    res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
-    if(eores_OK != res)
-    {
-        return;
-    }
-
-    
-    canProto_skcfg.skintype = (icubCanProto_skinType_t)brdCfg->cfg.skintype; // the cast is safe as there are the asserts above
-    canProto_skcfg.period   = brdCfg->cfg.period;
-    canProto_skcfg.noload   = brdCfg->cfg.noload;
-    
-    for(i = brdCfg->addrstart; i<=brdCfg->addrend; i++ )
-    {
-        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, i);
-        res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &canProto_skcfg);
-        if(eores_OK != res)
-        {
-            return;
-        }
-    }
-#endif
+    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &command, rd->id32);   
+#endif    
 }
 
 
 extern void eoprot_fun_UPDT_sk_skin_cmmnds_trianglescfg(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+#if 1
+    eOsk_cmd_trianglesCfg_t *trgsCfg = (eOsk_cmd_trianglesCfg_t*)rd->data;
+    eOprotIndex_t index = eoprot_ID2index(rd->id32);
+    eo_skin_ConfigTriangles(eo_skin_GetHandle(), index, trgsCfg);
+#else    
     eOsk_cmd_trianglesCfg_t *trgsCfg = (eOsk_cmd_trianglesCfg_t*)rd->data;
     
     icubCanProto_skintriangles_config_t canProto_trgscfg = {0};
@@ -383,49 +257,7 @@ extern void eoprot_fun_UPDT_sk_skin_cmmnds_trianglescfg(const EOnv* nv, const eO
     // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board. we want to override that.
     location.addr = trgsCfg->boardaddr;
     eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location);
-    
-#if 0    
-    eOresult_t                          res;
-    eOsk_skinId_t                       skId = eoprot_ID2index(rd->id32);
-    eOsk_cmd_trianglesCfg_t             *trgsCfg = (eOsk_cmd_trianglesCfg_t*)rd->data;
-    EOappCanSP                          *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_cfg_skinInfo_t           *skconfig_ptr = NULL;
-    eOappTheDB_cfg_skinInfo_t           **prova = NULL;
-    eOicubCanProto_msgDestination_t     msgdest;
-    icubCanProto_skintriangles_config_t canProto_trgscfg;
-    
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
-        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG
-    };
-
-    prova = &skconfig_ptr;
-    prova = prova;
-    res = eo_appTheDB_GetSkinConfigPtr(eo_appTheDB_GetHandle(), skId,  &skconfig_ptr);
-    if(eores_OK != res)
-    {
-        return;
-    }
-    
-    
-    canProto_trgscfg.idstart   = trgsCfg->idstart;
-    canProto_trgscfg.idend     = trgsCfg->idend;
-    canProto_trgscfg.flags     = trgsCfg->cfg.enable;
-    canProto_trgscfg.shift     = trgsCfg->cfg.shift;
-    canProto_trgscfg.CDCoffset = trgsCfg->cfg.CDCoffset;
-
-    
-
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, trgsCfg->boardaddr);
-
-    res = eo_appCanSP_SendCmd(appCanSP_ptr, skconfig_ptr->connected2emsport, msgdest, msgCmd,  &canProto_trgscfg);
-    if(eores_OK != res)
-    {
-        return;
-    }
-#endif
-    
+#endif        
 }
 
 // --------------------------------------------------------------------------------------------------------------------

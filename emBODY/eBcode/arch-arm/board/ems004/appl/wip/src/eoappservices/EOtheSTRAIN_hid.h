@@ -43,8 +43,9 @@ struct EOtheSTRAIN_hid
 {
     eObool_t            initted;
     eObool_t            thereisstrain;
-    uint8_t             datarate;
-    eOenum08_t          mode;
+    uint8_t             protindex;
+    eOprotID32_t        id32;
+    eOcanprot_command_t command;
 }; 
 
 

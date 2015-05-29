@@ -26,15 +26,16 @@
 
 #include "EoCommon.h"
 #include "EOtheErrorManager.h"
+#include "EoError.h"
 #include "EOtheEntities.h"
 
 #include "EOtheCANservice.h"
 #include "EOtheCANmapping.h"
 #include "EOtheCANprotocol.h"
 
-#include "EOtheEMSapplBody.h"
-
 #include "EoProtocolAS.h"
+
+#include "EOMtheEMSappl.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -71,7 +72,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -82,8 +84,9 @@ static EOtheMAIS s_eo_themais =
 {
     .initted            = eobool_false,
     .thereismais        = eobool_false,
-    .datarate           = 0,
-    .mode               = 0
+    .protindex          = 0,
+    .id32               = eo_prot_ID32dummy,
+    .command            = {0}
 };
 
 //static const char s_eobj_ownname[] = "EOtheMAIS";
@@ -109,6 +112,8 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     else
     {
         s_eo_themais.thereismais = eobool_true;
+        s_eo_themais.protindex = 0;
+        s_eo_themais.id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, s_eo_themais.protindex, eoprot_tag_none);
     }
 
     s_eo_themais.initted = eobool_true;
@@ -137,37 +142,162 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
     
        
     // now, i do things. 
-    
-    const uint8_t number = 0; 
-    eOas_mais_config_t *cfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), number);
+    eOas_mais_config_t *cfg = eo_entities_GetMaisConfig(eo_entities_GetHandle(), s_eo_themais.protindex);
 
     if(NULL == cfg)
     {   // we dont have mais
         return(eores_OK);
     }
 
-    s_eo_themais.datarate = cfg->datarate;       // it must be 10
-    s_eo_themais.mode = cfg->mode;            // it must be eoas_maismode_txdatacontinuously
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, number, eoprot_tag_none);
+//    s_eo_themais.datarate = cfg->datarate;      // it must be 10
+//    s_eo_themais.mode = cfg->mode;              // it must be eoas_maismode_txdatacontinuously
 
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingAnalogSensor;    
+    s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;    
     
     // set txmode
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    command.value = &s_eo_themais.mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    s_eo_themais.command.value = &cfg->mode;                       
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);
     
     // set datarate
-    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    command.value = &s_eo_themais.datarate;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);    
+    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    s_eo_themais.command.value = &cfg->datarate;                       
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);    
     
     return(eores_OK);       
 }
 
 
+extern eOresult_t eo_mais_Config(EOtheMAIS *p, eOas_mais_config_t* maiscfg)
+{
+    if((NULL == p) || (NULL == maiscfg))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themais.thereismais)
+    {   // nothing to do because we dont have a mais board
+        return(eores_OK);
+    }  
 
+    // ok, now we do something. 
+    
+    eOresult_t res = eores_OK;
+    
+    if(eores_OK != (res = eo_mais_ConfigMode(p, (eOas_maismode_t)maiscfg->mode)))
+    {
+        return(res);
+    }
+    
+    if(eores_OK != (res = eo_mais_ConfigDataRate(p, maiscfg->datarate)))
+    {
+        return(res);
+    }   
+    
+    if(eores_OK != (res = eo_mais_ConfigResolution(p, (eOas_maisresolution_t)maiscfg->resolution)))
+    {
+        return(res);
+    }
+       
+    return(eores_OK);     
+}
+
+
+extern eOresult_t eo_mais_ConfigMode(EOtheMAIS *p, eOas_maismode_t mode)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themais.thereismais)
+    {   // nothing to do because we dont have a mais board
+        return(eores_OK);
+    }  
+
+    // ok, now we do something.     
+ 
+    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
+
+    s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    s_eo_themais.command.value = &mode;
+    
+    // if pc104 tell me to enable mais tx, before to send cmd verify if i'm in RUN state:
+    // if yes ==> ok no problem
+    // if no ==> i'll send cmd when go to RUN state
+    if(eoas_maismode_txdatacontinuously == mode)
+    {
+        // only if the appl is in RUN state enable mais tx
+        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+        if(eo_sm_emsappl_STrun == currentstate)
+        {
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);
+        }
+    }
+    else
+    {
+         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);
+    }
+    
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_mais_ConfigDataRate(EOtheMAIS *p, uint8_t datarate)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themais.thereismais)
+    {   // nothing to do because we dont have a mais board
+        return(eores_OK);
+    }  
+
+    // ok, now we do something.     
+ 
+
+    s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    s_eo_themais.command.value = &datarate;
+    
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);    
+    
+    return(eores_OK);  
+}
+
+extern eOresult_t eo_mais_ConfigResolution(EOtheMAIS *p, eOas_maisresolution_t resolution)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themais.thereismais)
+    {   // nothing to do because we dont have a mais board
+        return(eores_OK);
+    }  
+
+    // ok, now we do something.     
+ 
+    s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
+    s_eo_themais.command.value = &resolution;
+    
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);    
+    
+    eOas_mais_status_t *status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), s_eo_themais.protindex);
+    if(NULL == status)
+    {
+        return(eores_NOK_generic); //error
+    }     
+
+    s_eo_mais_process_mais_resolution(resolution, status);  
+    
+    return(eores_OK);          
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -202,9 +332,95 @@ extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status)
+{
+    uint8_t size = 0;
+    uint8_t itemsize = 1;
+    uint8_t capacity = 0;
+    
+    if(eoas_maisresolution_08 == resolution)
+    {
+        capacity    = 15;
+        itemsize    = 1;
+        size        = 15;
+        //#warning acemor-> nella mais nel caso di risoluzione a 8 bit perche' la capacity di the15values e' 16 e non 15?
+        // penso sia un errore. metto a 15. anche perche' nel parser dei pacchetti can la size viene messa a 15
+        //status->the15values.head.capacity = 16;
+        //status->the15values.head.itemsize = 1;
+        //status->the15values.head.size = 16;
+    }
+    else if(eoas_maisresolution_16 == resolution)
+    {
+        capacity    = 15;
+        itemsize    = 2;
+        size        = 15;
+        //#warning acemor-> nella mais ho messo la capacity di the15values a 15 anche nel caso di risoluzione a 16 bit
+        //status->the15values.head.capacity = 16;
+        //status->the15values.head.itemsize = 2;
+        //status->the15values.head.size = 16;
+    } 
+
+    EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
+    eo_array_Resize(array, size);      
+}
 
 
+// -- oldies
+
+//extern eOresult_t eo_mais_Config(EOtheMAIS *p, eOas_mais_config_t* maiscfg)
+//{
+//    if((NULL == p) || (NULL == maiscfg))
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    if(eobool_false == s_eo_themais.thereismais)
+//    {   // nothing to do because we dont have a mais board
+//        return(eores_OK);
+//    }  
+
+//    // ok, now we do something. 
+
+//    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
+
+//    s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;
+//    
+//    // if robotInterface orders to enable mais tx, before to send the command over can i must verify if i'm in the RUN state:
+//    // if yes -> i send the command
+//    // if no  -> i'll send the command at entry in the RUN state
+//    if(eoas_maismode_txdatacontinuously == maiscfg->mode)
+//    {
+//        // only if the appl is in RUN state we enable mais tx
+//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
+//        if(eo_sm_emsappl_STrun == currentstate)
+//        {
+//            s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+//            s_eo_themais.command.value = &(maiscfg->mode);
+//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);
+//        }
+//    }    
+//    
+//    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+//    s_eo_themais.command.value = &(maiscfg->datarate);
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);
+
+//    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
+//    s_eo_themais.command.value = &(maiscfg->resolution);
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);    
+//    
+//    
+//    eOas_mais_status_t *status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), s_eo_themais.protindex);
+//    if(NULL == status)
+//    {
+//        return(eores_NOK_generic); //error
+//    }     
+
+//    s_eo_mais_process_mais_resolution((eOas_maisresolution_t)maiscfg->resolution, status);    
+
+
+//    return(eores_OK);     
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -62,6 +62,15 @@ extern EOtheMAIS* eo_mais_GetHandle(void);
 extern eOresult_t eo_mais_Start(EOtheMAIS *p);
 
 
+extern eOresult_t eo_mais_Config(EOtheMAIS *p, eOas_mais_config_t* maiscfg);
+
+extern eOresult_t eo_mais_ConfigMode(EOtheMAIS *p, eOas_maismode_t mode);
+
+extern eOresult_t eo_mais_ConfigDataRate(EOtheMAIS *p, uint8_t datarate);
+
+extern eOresult_t eo_mais_ConfigResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
+
+
 
 
 /** @}            

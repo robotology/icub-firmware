@@ -64,7 +64,13 @@ extern eOresult_t eo_strain_SendTXmode(EOtheSTRAIN *p);
 // it disables the tx mode ..
 extern eOresult_t eo_strain_DisableTX(EOtheSTRAIN *p);
 
+extern eOresult_t eo_strain_Config(EOtheSTRAIN *p, eOas_strain_config_t *cfg);
 
+extern eOresult_t eo_strain_ConfigMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
+
+extern eOresult_t eo_strain_ConfigDataRate(EOtheSTRAIN *p, uint8_t datarate);
+
+extern eOresult_t eo_strain_FullScale_StartRequest(EOtheSTRAIN *p);
 
 
 /** @}            
