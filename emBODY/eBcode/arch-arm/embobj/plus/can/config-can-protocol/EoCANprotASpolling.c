@@ -154,7 +154,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 }
 
 
-__weak extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel, uint16_t *data)
+__weak extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel,  uint16_t *data, eOas_strain_t* strain)
 {
     // if anybody wnats to redefine this, it must make retrun eobool_true
     return(eobool_false);
@@ -189,7 +189,7 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     
     // now we do some more ... or not
     #warning marco.accame: much better redefining eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() so that everything is done in here
-    if(eobool_false == eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(channel, data))
+    if(eobool_false == eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(channel, data, strain))
     {   
         s_eocanprotASpolling_getfullscale_nextstep(channel, strain, index);        
     }
