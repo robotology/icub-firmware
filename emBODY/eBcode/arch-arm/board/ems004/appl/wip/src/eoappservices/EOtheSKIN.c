@@ -351,70 +351,70 @@ extern eOresult_t eo_skin_ConfigTriangles(EOtheSKIN *p, uint8_t skinindex, eOsk_
     return(eores_OK);          
 }
 
-extern eOresult_t eo_skin_ProcessRXframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port)
-{
-    if((NULL == p) || (NULL == frame))
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(eobool_false == s_eo_theskin.thereisskin)
-    {   // nothing to do because we dont have a skin board
-        return(eores_OK);
-    }    
+//extern eOresult_t eo_skin_ProcessRXframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port)
+//{
+//    if((NULL == p) || (NULL == frame))
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    if(eobool_false == s_eo_theskin.thereisskin)
+//    {   // nothing to do because we dont have a skin board
+//        return(eores_OK);
+//    }    
 
 
-    // marco.accame:        
-    // if skin->config.sigmode is eosk_sigmode_dontsignal then we dont need using the payload of the can frame. 
-    // however, also if skin->config.sigmode is eosk_sigmode_signal but we are not in RUN mode we should not put 
-    // frames inside the arrayofcandata. this latter for example is tha case if we are still in the cfg->run transition 
-    // and thus not  yet inside the control-loop which empties the arrayofcandata, or also if  the udp packet with go2run 
-    // rop<> gets lost.
-    
-    
-    eOsk_skin_t *skin = NULL;
-    eOprotIndex_t index = EOK_uint08dummy;
-    
-    if(NULL == (skin = s_eo_skin_get_entity(eoprot_endpoint_skin, eoprot_entity_sk_skin, frame, port, &index)))
-    {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-        return(eores_OK);  
-    }            
-    
-    
-    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffered in the rx-fifo    
-    if(eosk_sigmode_dontsignal == skin->config.sigmode)
-    {
-        return(eores_OK);
-    } 
+//    // marco.accame:        
+//    // if skin->config.sigmode is eosk_sigmode_dontsignal then we dont need using the payload of the can frame. 
+//    // however, also if skin->config.sigmode is eosk_sigmode_signal but we are not in RUN mode we should not put 
+//    // frames inside the arrayofcandata. this latter for example is tha case if we are still in the cfg->run transition 
+//    // and thus not  yet inside the control-loop which empties the arrayofcandata, or also if  the udp packet with go2run 
+//    // rop<> gets lost.
+//    
+//    
+//    eOsk_skin_t *skin = NULL;
+//    eOprotIndex_t index = EOK_uint08dummy;
+//    
+//    if(NULL == (skin = s_eo_skin_get_entity(eoprot_endpoint_skin, eoprot_entity_sk_skin, frame, port, &index)))
+//    {
+//        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+//        return(eores_OK);  
+//    }            
+//    
+//    
+//    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffered in the rx-fifo    
+//    if(eosk_sigmode_dontsignal == skin->config.sigmode)
+//    {
+//        return(eores_OK);
+//    } 
 
-    eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STcfg;
-    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
-    if(eo_sm_emsappl_STrun != applstate)
-    {
-        return(eores_OK);
-    }
-    
-    // otherwise we put the canframe content inside the arrayofcandata
-    eOsk_candata_t candata = {0};
-    uint16_t info = EOSK_CANDATA_INFO(frame->size, frame->id);
-    candata.info = info;    
-    memcpy(candata.data, frame->data, sizeof(candata.data));   
-    
-    if(eores_OK != eo_array_PushBack((EOarray*)(&skin->status.arrayofcandata), &candata))
-    {   
-        eOerrmanDescriptor_t des = {0};
-        des.code            = eoerror_code_get(eoerror_category_Skin, eoerror_value_SK_arrayofcandataoverflow);
-        des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-        des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-        des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
-        des.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des); 
-    }
+//    eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STcfg;
+//    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
+//    if(eo_sm_emsappl_STrun != applstate)
+//    {
+//        return(eores_OK);
+//    }
+//    
+//    // otherwise we put the canframe content inside the arrayofcandata
+//    eOsk_candata_t candata = {0};
+//    uint16_t info = EOSK_CANDATA_INFO(frame->size, frame->id);
+//    candata.info = info;    
+//    memcpy(candata.data, frame->data, sizeof(candata.data));   
+//    
+//    if(eores_OK != eo_array_PushBack((EOarray*)(&skin->status.arrayofcandata), &candata))
+//    {   
+//        eOerrmanDescriptor_t des = {0};
+//        des.code            = eoerror_code_get(eoerror_category_Skin, eoerror_value_SK_arrayofcandataoverflow);
+//        des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+//        des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+//        des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+//        des.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des); 
+//    }
 
 
-    return(eores_OK);
-}
+//    return(eores_OK);
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -444,6 +444,37 @@ extern void eoprot_fun_INIT_sk_skin_status_arrayofcandata(const EOnv* nv)
     // eo_array_New() initialises capacity and itemsize and also sets size to 0 
     EOarray *array = eo_array_New(capacity, sizeof(eOsk_candata_t), eo_nv_RAM(nv));
 }
+
+extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_MSG(eOsk_skin_t *skin)
+{    
+    if(NULL == skin)
+    {
+        return(eobool_true);
+    }
+    
+    // marco.accame:        
+    // if skin->config.sigmode is eosk_sigmode_dontsignal then we dont need using the payload of the can frame. 
+    // however, also if skin->config.sigmode is eosk_sigmode_signal but we are not in RUN mode we should not put 
+    // frames inside the arrayofcandata. this latter for example is tha case if we are still in the cfg->run transition 
+    // and thus not  yet inside the control-loop which empties the arrayofcandata, or also if  the udp packet with go2run 
+    // rop<> gets lost.
+    
+    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffered in the rx-fifo    
+    if(eosk_sigmode_dontsignal == skin->config.sigmode)
+    {
+        return(eobool_true);
+    } 
+
+    eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STcfg;
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
+    if(eo_sm_emsappl_STrun != applstate)
+    {
+        return(eobool_true);
+    }
+    
+    return(eobool_false);
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

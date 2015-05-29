@@ -68,7 +68,6 @@ extern eOresult_t eo_skin_ConfigBoards(EOtheSKIN *p, uint8_t skinindex, eOsk_cmd
 
 extern eOresult_t eo_skin_ConfigTriangles(EOtheSKIN *p, uint8_t skinindex, eOsk_cmd_trianglesCfg_t *trgcfg);
 
-extern eOresult_t eo_skin_ProcessRXframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port);
 
 
 
