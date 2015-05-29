@@ -29,9 +29,6 @@
 #include "EoProtocol.h"
 #include "EoProtocolSK.h"
 
-// but also to retrieve information of other things ...
-
-#include "EOMtheEMSappl.h"
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
@@ -86,8 +83,13 @@ static void* s_eocanprotSKperiodic_get_entity(eOprotEndpoint_t endpoint, eOprot_
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t *frame, eOcanport_t port)
+__weak extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_MSG(eOsk_skin_t *skin)
 {
+    return(eobool_false);
+}
+
+extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t *frame, eOcanport_t port)
+{   
     // this can frame is from skin only ... i dont do the check that the board must be a skin
     // i retrieve the skin entity related to the frame    
     eOsk_skin_t *skin = NULL;
@@ -99,23 +101,7 @@ extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t 
         return(eores_OK);  
     }        
        
-    
-    // marco.accame:        
-    // if skin->config.sigmode is eosk_sigmode_dontsignal then we dont need using the payload of the can frame. 
-    // however, also if skin->config.sigmode is eosk_sigmode_signal but we are not in RUN mode we should not put 
-    // frames inside the arrayofcandata. this latter for example is tha case if we are still in the cfg->run transition 
-    // and thus not  yet inside the control-loop which empties the arrayofcandata, or also if  the udp packet with go2run 
-    // rop<> gets lost.
-    
-    // we may decode some canframes of this kind if we pass from run to config mode and we process frame buffered in the rx-fifo    
-    if(eosk_sigmode_dontsignal == skin->config.sigmode)
-    {
-        return(eores_OK);
-    } 
-
-    eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STcfg;
-    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
-    if(eo_sm_emsappl_STrun != applstate)
+    if(eobool_true == eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_MSG(skin))
     {
         return(eores_OK);
     }
