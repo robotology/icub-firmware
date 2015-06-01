@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -145,6 +145,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -365,7 +366,7 @@
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\board\ems001;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\src\eoappservices\mc</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\src\eoappservices\mc;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -601,27 +602,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -631,22 +632,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -656,12 +657,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -711,62 +712,62 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
             <File>
               <FileName>OPCprotocolManager.c</FileName>
@@ -1184,7 +1185,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1315,6 +1316,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1771,27 +1773,27 @@
             <File>
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
             <File>
               <FileName>EOMtask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtask.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtask.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheCallbackManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheSystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheSystem.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1801,22 +1803,22 @@
             <File>
               <FileName>EOMtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
             </File>
             <File>
               <FileName>EOsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOsocketDatagram.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheIPnet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1826,12 +1828,12 @@
             <File>
               <FileName>EOtheARMenvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
             </File>
             <File>
               <FileName>EOVtheEnvironment.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1881,62 +1883,62 @@
             <File>
               <FileName>eOcfg_sm_EMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\eOcfg_sm_EMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSappl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSapplCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSapplCfg.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSconfigurator.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSconfigurator.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverylistener.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverylistener.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSdiscoverytransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiscoverytransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSerror.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSsocket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSsocket.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMStransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMStransceiver.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoor.c</FilePath>
             </File>
             <File>
               <FileName>EOMtheEMSbackdoortransceiver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSbackdoortransceiver.c</FilePath>
             </File>
             <File>
               <FileName>OPCprotocolManager.c</FileName>
