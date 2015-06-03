@@ -72,6 +72,8 @@ extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOpro
 extern EOconstvector * eoboardconfig_code2encoderstreams(uint32_t code);
 
 
+// of eOprot_EPcfg_t
+extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
 
 
 /** @}            

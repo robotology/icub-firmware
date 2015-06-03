@@ -327,30 +327,30 @@ extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOpro
         case 1:
         case 3: 
         {   
-            ret = (EOconstvector*)entitiesmapB2[ep][entity]; ; 
+            ret = (EOconstvector*)entitiesmapB2[ep][entity];  
         } break;  
 
         case 4:
         {   
-            ret = (EOconstvector*)entitiesmapB5[ep][entity]; ; 
+            ret = (EOconstvector*)entitiesmapB5[ep][entity];  
         } break;          
 
         case 5:
         case 7:    
         {   
-            ret = (EOconstvector*)entitiesmapB6[ep][entity]; ; 
+            ret = (EOconstvector*)entitiesmapB6[ep][entity];  
         } break;
 
         case 6:
         case 8:    
         {   
-            ret = (EOconstvector*)entitiesmapB7[ep][entity]; ; 
+            ret = (EOconstvector*)entitiesmapB7[ep][entity];  
         } break;
 
         case 9:
         case 10:    
         {   
-            ret = (EOconstvector*)entitiesmapB10[ep][entity]; ; 
+            ret = (EOconstvector*)entitiesmapB10[ep][entity]; 
         } break;
         
         default:    
@@ -422,6 +422,77 @@ extern EOconstvector * eoboardconfig_code2encoderstreams(uint32_t code)
 
 
 }
+
+
+const EOconstvector s_eo_empty_constvector_epdes = 
+{
+    .capacity       = 0,
+    .size           = 0,
+    .item_size      = sizeof(eOprot_EPcfg_t),
+    .dummy          = 0,
+    .stored_items   = NULL,
+    .functions      = NULL   
+};
+
+extern EOconstvector s_eo_vectorof_EPcfg_eb1eb3;
+extern EOconstvector s_eo_vectorof_EPcfg_eb2eb4;
+extern EOconstvector s_eo_vectorof_EPcfg_eb5;
+extern EOconstvector s_eo_vectorof_EPcfg_eb6eb8;
+extern EOconstvector s_eo_vectorof_EPcfg_eb7eb9;
+extern EOconstvector s_eo_vectorof_EPcfg_eb10eb11;
+
+extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
+{
+    EOconstvector *ret = (EOconstvector*) &s_eo_empty_constvector_epdes;
+    
+    // so far the code is just an index equal to board number but starting from 0. eb1 is 0, etc....
+    switch(code)
+    {
+        case 0:    
+        case 2:
+        {       
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb1eb3; 
+        } break;
+        
+        case 1:
+        case 3: 
+        {   
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb2eb4; 
+        } break;  
+
+        case 4:
+        {   
+            ret = ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb5; 
+        } break;          
+
+        case 5:
+        case 7:    
+        {   
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb6eb8;  
+        } break;
+
+        case 6:
+        case 8:    
+        {   
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb7eb9;  
+        } break;
+
+        case 9:
+        case 10:    
+        {   
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb10eb11; 
+        } break;
+        
+        default:    
+        {
+            ret = ret;
+        } break;
+    
+    }
+
+    return(ret);
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
