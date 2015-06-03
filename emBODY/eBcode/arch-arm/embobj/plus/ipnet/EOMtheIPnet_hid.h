@@ -41,6 +41,7 @@ extern "C" {
 
 #include "osal.h"
 #include "ipal.h"
+#include "EOpacket.h"    
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  

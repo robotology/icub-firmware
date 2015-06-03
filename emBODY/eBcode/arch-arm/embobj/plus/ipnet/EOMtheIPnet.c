@@ -402,6 +402,17 @@ extern EOMtheIPnet* eom_ipnet_GetHandle(void)
     return(&s_eom_theipnet);
 }
 
+
+extern eOipv4addr_t eom_ipnet_GetIPaddress(EOMtheIPnet *ip)
+{
+    if(NULL == ip)
+    {
+        return(0);
+    }
+    
+    return(s_eom_theipnet.ipcfg.eth_ip);
+}
+
 extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip)
 {
     if(NULL == ip)

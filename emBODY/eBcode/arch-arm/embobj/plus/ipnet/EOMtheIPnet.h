@@ -176,6 +176,9 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     @return     The handle to the IP net (or NULL upon in-initialised singleton)
  **/
 extern EOMtheIPnet* eom_ipnet_GetHandle(void);
+                                          
+                                          
+extern eOipv4addr_t eom_ipnet_GetIPaddress(EOMtheIPnet *ip);
 
 
 /** @fn         extern eOresult_t eom_ipnet_Deactivate(EOMtheIPnet *ip)
