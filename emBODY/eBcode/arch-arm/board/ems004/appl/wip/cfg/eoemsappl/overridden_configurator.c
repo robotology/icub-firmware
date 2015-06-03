@@ -60,8 +60,8 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define configurator_timeout_send_diagnostics   1000
-#define MAX_WAITFOR2FOC                         300
+//#define configurator_timeout_send_diagnostics   1000
+//#define MAX_WAITFOR2FOC                         300
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,41 +115,41 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
     }
     
 
-#if 0    
-    eOresult_t  res;
-    uint8_t     numofRXcanframe = 0;
+//#if 0    
+//    eOresult_t  res;
+//    uint8_t     numofRXcanframe = 0;
 
-    
-    EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
-   
-    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
-    if(eores_OK != res)
-    {
-        return;
-    }
-    
-#ifdef _GET_CANQUEUE_STATISTICS_
-    //eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
-    #warning marco.accame: TODO: put diagnostics
-#endif
-    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
-    
+//    
+//    EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
+//    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
+//   
+//    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
+//    if(eores_OK != res)
+//    {
+//        return;
+//    }
+//    
+//#ifdef _GET_CANQUEUE_STATISTICS_
+//    //eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
+//    #warning marco.accame: TODO: put diagnostics
+//#endif
+//    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
+//    
 
-    // before version 1.70, this part was skipped if the skin was connected on CAN bus 2
-    numofRXcanframe = 0;
-    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
-    if(eores_OK != res)
-    { // se c'e un errore sui parametri passati ovvero mai., 
-        return;
-    }
-#ifdef _GET_CANQUEUE_STATISTICS_
-//        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
-    #warning marco.accame: TODO: put diagnostics
-#endif
-    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);   
-    
-#endif
+//    // before version 1.70, this part was skipped if the skin was connected on CAN bus 2
+//    numofRXcanframe = 0;
+//    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
+//    if(eores_OK != res)
+//    { // se c'e un errore sui parametri passati ovvero mai., 
+//        return;
+//    }
+//#ifdef _GET_CANQUEUE_STATISTICS_
+////        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
+//    #warning marco.accame: TODO: put diagnostics
+//#endif
+//    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);   
+//    
+//#endif
     
 }
 
