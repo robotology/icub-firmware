@@ -249,28 +249,18 @@ extern eOresult_t eo_candiscovery_ManageDetectedBoard(EOtheCANdiscovery *p, eOca
     // at first we send diagnostics
     if(eobool_false == match)
     {
-        char str[64] = {0};
-        snprintf(str, sizeof(str), "wrong fwver: %d %d", detected->firmwareversion.major, detected->firmwareversion.minor); 
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, NULL, &eo_errman_DescrUnspecified);
+        const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), loc);  
+        eOerrmanDescriptor_t des = {0};
+        des.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_board_wrongprotversion);
+        des.sourcedevice    = (eOcanport1 == loc.port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        des.sourceaddress   = loc.addr;
+        des.par16           = (board->board.props.requiredprotocol.major << 8) | (board->board.props.requiredprotocol.minor); 
+        memcpy(&des.par64, detected, sizeof(eObrd_typeandversions_t));
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &des);        
     }
     
     // then we put the detected inside the EOtheCANmapping
-    eo_canmap_BoardSetDetected(eo_canmap_GetHandle(), loc, detected);
- 
-
-    #warning marco.accame: i prefer not to stop the request procedure in here. i would rather do it at tick of the timer inside eom_emsconfigurator_hid_userdef_ProcessUserdef01Event()
-//    // if all connected can boards are ready, then we stop the request procedure
-//    if(eobool_true == eo_appTheDB_areConnectedCanBoardsReady(db, &canBoardsReady, NULL))
-//    {
-//        eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
-//        eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
-//        //if MC4, enable MAIS and BCastPolicy
-//        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-//        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
-//        {   
-//			eo_emsapplBody_MAISstart(eo_emsapplBody_GetHandle());
-//        }
-//    }    
+    eo_canmap_BoardSetDetected(eo_canmap_GetHandle(), loc, detected); 
     
     return(res);
 }
