@@ -54,7 +54,7 @@ extern "C" {
 // <i> It holds ...
 
 
-//  <o> ID of the EMS board     <0=> Use external file <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
+//  <o> ID of the EMS board     <255=> Unique FW  <0=> Use external file <1=> EB1    <2=> EB2    <3=> EB3    <4=> EB4    <5=> EB5    
 //                              <6=> EB6    <7=> EB7    <8=> EB8    <9=> EB9   <10=>EB10   <11=>EB11
 
 #define EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD     0
@@ -737,19 +737,19 @@ extern "C" {
     
 	#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_AFTER    0
 	
-	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))
-		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     350
-		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   	    450
-		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     50
-		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		550
-		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     350
-	#else
+//	#if ((EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 2) || (EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 4))
+//		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     350
+//		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   	    450
+//		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     50
+//		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		550
+//		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     350
+//	#else
 		#define EOMTHEEMSAPPLCFG_RUNOBJ_RX_SAFETIME     300
 		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_AFTER   		400
 		#define EOMTHEEMSAPPLCFG_RUNOBJ_DO_SAFETIME     200
 		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_AFTER   		700
 		#define EOMTHEEMSAPPLCFG_RUNOBJ_TX_SAFETIME     250
-	#endif
+//	#endif
 #endif
 
 //  </e> enable custom timings
@@ -984,6 +984,10 @@ extern "C" {
 #elif   (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
         #define     EOMTHEEMSAPPLCFG_USE_EB11
         #define     NUM     11
+        #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
+#elif   (255 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+        //#define     EOMTHEEMSAPPLCFG_USE_EB11
+        #define     NUM     00
         #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
 #endif
 
