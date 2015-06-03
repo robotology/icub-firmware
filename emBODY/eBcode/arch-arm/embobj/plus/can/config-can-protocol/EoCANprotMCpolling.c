@@ -256,7 +256,10 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE);
+    icubCanProto_controlmode_t *controlmode = (icubCanProto_controlmode_t*)descriptor->cmd.value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE);
+    frame->data[1] = *controlmode;
+    
     return(eores_OK);       
 }
 
