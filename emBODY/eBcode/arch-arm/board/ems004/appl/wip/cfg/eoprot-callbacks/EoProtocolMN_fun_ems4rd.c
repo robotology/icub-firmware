@@ -48,6 +48,8 @@
 
 #include "eEsharedServices.h"
 
+#include "EOtheCANdiscovery.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -374,6 +376,8 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
                 {
                     #warning -> marco.accame: send the 4 messages with the searched and found on can1 and can2                   
                 }
+                
+                //eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
                 
                 return;
             }
