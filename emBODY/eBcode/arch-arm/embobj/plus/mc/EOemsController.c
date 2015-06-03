@@ -144,8 +144,15 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, uin
             ems->motor_velocity_gbx[j] = 0;
             ems->motor_acceleration[j] = 0;
             ems->motor_position[j] = 0;
-            ems->gearbox_ratio[j]  = 1;
-            ems->rotorencoder[j]  = 1;
+            ems->motor_config_gearbox_ratio[j]  = 1;
+            ems->motor_config_rotorencoder[j]  = 1;
+            ems->motor_config_hasHallSensor[j] = eobool_false;
+            ems->motor_config_hasRotorEncoder[j] = eobool_false;
+            ems->motor_config_hasTempSensor[j] = eobool_false;
+            ems->motor_config_maxcurrentofmotor[j] = 0;
+            ems->motor_config_maxvelocityofmotor[j] = 0;
+            ems->motor_config_motorPoles[j] = 0;
+            ems->motor_config_rotorIndexOffset[j] = 0;
         }
         
         ems->motors = eo_motors_New(ems->naxles, ems->board);
@@ -185,11 +192,11 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     
     ems->motor_current [motor] = (2*current)/3; // Iq = sqrt(3)/2*Imeas, 32768 = 25000 mA ==> 0.66 scale factor
     ems->motor_velocity[motor] = 1000*velocity;
-    ems->motor_velocity_gbx[motor] = ems->motor_velocity[motor]/ems->gearbox_ratio[motor];
+    ems->motor_velocity_gbx[motor] = ems->motor_velocity[motor]/ems->motor_config_gearbox_ratio[motor];
     ems->motor_position[motor] = position;
     
     //change the sign of motor position and motor velocity according to the sign of rotorencoder
-    if (ems->rotorencoder[motor]<0)
+    if (ems->motor_config_rotorencoder[motor]<0)
     {
        ems->motor_velocity[motor]     = - ems->motor_velocity[motor];
        ems->motor_velocity_gbx[motor] = - ems->motor_velocity_gbx[motor];
@@ -654,7 +661,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     JOINTS(j)
     {
         #ifdef USE_2FOC_FAST_ENCODER
-            eo_axleVirtualEncoder_Acquire(ems->gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
+            eo_axleVirtualEncoder_Acquire(ems->motor_config_gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
             eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else
@@ -1414,12 +1421,29 @@ extern void eo_emsController_SetVelMax(uint8_t joint, int32_t vel_max)
 
 extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio)
 {
-    if (ems) ems->gearbox_ratio[joint]=gearboxratio;
+    if (ems) ems->motor_config_gearbox_ratio[joint]=gearboxratio;
 }
 
 extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder)
 {
-    if (ems) ems->rotorencoder[joint]=rotorencoder;
+    if (ems) ems->motor_config_rotorencoder[joint]=rotorencoder;
+}
+
+extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t motorconfig)
+{
+    if (ems)
+    {
+      ems->motor_config_rotorencoder[joint]=motorconfig.rotorencoder;
+      ems->motor_config_gearbox_ratio[joint]=motorconfig.gearboxratio;
+      //placeholder filler01
+      ems->motor_config_maxvelocityofmotor[joint]=motorconfig.maxvelocityofmotor;
+      ems->motor_config_maxcurrentofmotor[joint]=motorconfig.maxcurrentofmotor;
+      ems->motor_config_rotorIndexOffset[joint]=motorconfig.rotorIndexOffset;
+      ems->motor_config_motorPoles[joint]=motorconfig.motorPoles;
+      ems->motor_config_hasHallSensor[joint]=motorconfig.hasHallSensor;
+      ems->motor_config_hasTempSensor[joint]=motorconfig.hasTempSensor;
+      ems->motor_config_hasRotorEncoder[joint]=motorconfig.hasRotorEncoder;
+    }
 }
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state)
