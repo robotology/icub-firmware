@@ -943,6 +943,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB10.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtConfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoProtConfig.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2266,6 +2271,11 @@
               <FileName>EoCANmapBoardsEB10.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB10.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoProtConfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoProtConfig.c</FilePath>
             </File>
           </Files>
         </Group>
