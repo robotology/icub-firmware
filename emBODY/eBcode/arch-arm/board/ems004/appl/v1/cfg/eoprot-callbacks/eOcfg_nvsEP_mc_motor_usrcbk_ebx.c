@@ -105,9 +105,14 @@ const eOmc_motor_t motor_default_dvalue =
         },
         EO_INIT(.gearboxratio)              0,
         EO_INIT(.rotorencoder)              0,
+        EO_INIT(.filler01)                  0,
         EO_INIT(.maxvelocityofmotor)        0,
         EO_INIT(.maxcurrentofmotor)         0,
-        EO_INIT(.filler02)                  {0}
+        EO_INIT(.rotorIndexOffset)          0,
+        EO_INIT(.motorPoles)                0,
+        EO_INIT(.hasHallSensor)             eobool_false,
+        EO_INIT(.hasTempSensor)             eobool_false,
+        EO_INIT(.hasRotorEncoder)           eobool_false
     },
     EO_INIT(.status)                       {0}
 }; 
@@ -142,9 +147,29 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(const EOnv* nv)
     memcpy(cfg, &motor_default_dvalue.status, sizeof(eOmc_motor_status_t));
 }
 
+extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    int32_t      *gbx_ptr = (int32_t*)nv->ram;
+    eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
+}
 
+extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    int32_t      *rot_ptr = (int32_t*)nv->ram;
+    eo_emsController_SetRotorEncoder(jxx, *rot_ptr);
+}
 
+extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_motor_config_t *motor_config_ptr = (eOmc_motor_config_t*)nv->ram;
+    eo_emsController_SetMotorConfig(jxx, *motor_config_ptr);
+}
 
+/*************************************************************************************
+// DEPRECATED
 // motor-update
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -162,7 +187,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
+    //Since icub can proto uses encoder ticks like position unit, i need of the converter: from icub to encoder
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
 	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, &boardType);
@@ -196,7 +221,10 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->maxcurrentofmotor);
 
 }
+*/
 
+/*************************************************************************************
+// DEPRECATED
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
@@ -229,8 +257,10 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 
 }
+*/
 
-
+/*************************************************************************************
+// DEPRECATED
 extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_velocity_t                       *vel_ptr = (eOmeas_velocity_t*)nv->ram;
@@ -243,7 +273,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
+    //Since icub can proto uses encoder ticks like position unit, i need of the converter: from icub to encoder
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
 
@@ -251,7 +281,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)&vel_icubCanProtValue);
 
 }
-
+*/
 
 extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -266,6 +296,8 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)curr_ptr);
 }
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

@@ -77,8 +77,16 @@ struct EOemsController_hid
     int32_t motor_velocity[MAX_NAXLES];
     int32_t motor_velocity_gbx[MAX_NAXLES];
     int32_t motor_position[MAX_NAXLES];
-    int32_t gearbox_ratio[MAX_NAXLES];
-    int32_t rotorencoder[MAX_NAXLES];
+  
+    int32_t           motor_config_gearbox_ratio[MAX_NAXLES];
+    int32_t           motor_config_rotorencoder[MAX_NAXLES];
+    eOmeas_velocity_t motor_config_maxvelocityofmotor[MAX_NAXLES];
+    eOmeas_current_t  motor_config_maxcurrentofmotor[MAX_NAXLES];
+    uint16_t          motor_config_rotorIndexOffset[MAX_NAXLES];
+    uint8_t           motor_config_motorPoles[MAX_NAXLES];
+    eObool_t          motor_config_hasHallSensor[MAX_NAXLES];
+    eObool_t          motor_config_hasTempSensor[MAX_NAXLES];
+    eObool_t          motor_config_hasRotorEncoder[MAX_NAXLES];
     
     //float torque_meas[NJOINTS];
 }; 
