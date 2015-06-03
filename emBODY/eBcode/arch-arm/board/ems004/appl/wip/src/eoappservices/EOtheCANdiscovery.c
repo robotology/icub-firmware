@@ -76,6 +76,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static eOresult_t s_eo_candiscovery_sendGetFWVersion(uint32_t dontaskmask);
+static eObool_t s_eo_candiscovery_IsProtocolVersionCompatible(const eObrd_version_t *required, const eObrd_version_t *detected);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -217,16 +218,22 @@ extern eObool_t eo_candiscovery_areCanBoardsReady(EOtheCANdiscovery *p, uint32_t
             // must retrieve the extended board info 
             const eOcanmap_board_extended_t * board = eo_canmap_GetBoard(eo_canmap_GetHandle(), location);
             eObool_t ready = eobool_false;
-            uint8_t major = board->detected.protocolversion.major;
-            uint8_t minor = board->detected.protocolversion.minor;
-            if(0 != major)
-            {  // if not zero, then the board has replied and everything is filled. however i must check if there is a match
-                if((board->board.props.requiredprotocol.major == major) && (board->board.props.requiredprotocol.minor == minor))
-                {
-                    ready = eobool_true;
-                    *canBoardsReady |= (1<<i);
-                }
-            } 
+            if(eobool_true == s_eo_candiscovery_IsProtocolVersionCompatible(&board->board.props.requiredprotocol, &board->detected.protocolversion))
+            {
+                ready = eobool_true;
+                *canBoardsReady |= (1<<i);                
+            }
+//            eObool_t ready = eobool_false;
+//            uint8_t major = board->detected.protocolversion.major;
+//            uint8_t minor = board->detected.protocolversion.minor;
+//            if(0 != major)
+//            {  // if not zero, then the board has replied and everything is filled. however i must check if there is a match
+//                if((board->board.props.requiredprotocol.major == major) && (board->board.props.requiredprotocol.minor <= minor))
+//                {
+//                    ready = eobool_true;
+//                    *canBoardsReady |= (1<<i);
+//                }
+//            } 
             res &= ready;
         }               
     }
@@ -313,6 +320,15 @@ static eOresult_t s_eo_candiscovery_sendGetFWVersion(uint32_t dontaskmask)
     return(eores_OK);
 }
 
+static eObool_t s_eo_candiscovery_IsProtocolVersionCompatible(const eObrd_version_t *required, const eObrd_version_t *detected)
+{
+    eObool_t ret = eobool_false;
+    if((required->major == detected->major) && (required->minor <= detected->minor))
+    {
+        ret = eobool_true;
+    }    
+    return(ret);    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
