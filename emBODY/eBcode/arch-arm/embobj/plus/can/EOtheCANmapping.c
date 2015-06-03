@@ -288,21 +288,20 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
         //memset(&s_eo_canmap_singleton.entitylocation[ep][entity], 0, sizeof(s_eo_canmap_singleton.entitylocation[ep][entity]));
     }   
 
-
-    uint8_t num = eo_constvector_Size(vectorof_entitydescriptors);
-    uint8_t max = s_eo_canmap_max_entities(ep, entity);
+    // numofcanlocations is the number of canlocations used to define the entity. for instance: 
+    // - for mc4can-based motion control of eb2 with 12 joints we have 12 can locations (3 mc4 boards, each with two 
+    //   can addresses, each can address with two indices).
+    // - for skin of board eb2 which as only one entity but uses 7 can boards we have 7 can locations. but we have only ONE index.
+    uint8_t numofcanlocations = eo_constvector_Size(vectorof_entitydescriptors);
+    uint8_t maxnumofentities = s_eo_canmap_max_entities(ep, entity);
     
-//    if(num > max)
-//    {
-//        return(eores_NOK_generic);
-//    }
     
     // ok, i allocate the pointers     
     uint8_t i = 0;
-    for(i=0; i<num; i++)
+    for(i=0; i<numofcanlocations; i++)
     {
         eOcanmap_entitydescriptor_t *des = (eOcanmap_entitydescriptor_t*) eo_constvector_At(vectorof_entitydescriptors, i); 
-        if(des->index >= max)
+        if(des->index >= maxnumofentities)
         {   // something is going wrong
             continue;
         }
@@ -366,7 +365,7 @@ extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eOcanmap_locat
     {
         return(eobrd_cantype_unknown);
     }
-    return(brd->board.props.type);
+    return((eObrd_cantype_t)brd->board.props.type);
 }
 
 
