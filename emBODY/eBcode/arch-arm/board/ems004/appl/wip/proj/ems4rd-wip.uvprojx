@@ -908,6 +908,36 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoCANmapBoardsEBnoCAN.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANmapBoardsEB5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB5.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapEB5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB5.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB6.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapEB6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB6.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB7.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapEB7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB7.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2196,6 +2226,36 @@
               <FileName>EoCANmapBoardsEBnoCAN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoCANmapBoardsEBnoCAN.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB5.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapEB5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB5.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB6.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapEB6.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB6.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB7.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoEncoderMapEB7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoEncoderMapEB7.c</FilePath>
             </File>
           </Files>
         </Group>
