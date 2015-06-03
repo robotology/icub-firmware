@@ -1035,16 +1035,15 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     else // mc4can
     {
         icubCanProto_controlmode_t icubcanProto_controlmode = icubCanProto_controlmode_idle;
+        if(eores_OK != s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode, jxx, &icubcanProto_controlmode))
+        {
+            return;
+        }        
         eOcanprot_command_t command = {0};
         command.class = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
         command.value = &icubcanProto_controlmode;   
-              
-        if(eores_OK != s_translate_eOmcControlMode2icubCanProtoControlMode(*controlmode, jxx, &icubcanProto_controlmode))
-        {
-            return;
-        }
-        
+                   
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
     }    
 }
@@ -1313,6 +1312,8 @@ static eObool_t s_motorcontrol_is2foc_based(void)
 static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOprotIndex_t jId,
                                                                       icubCanProto_controlmode_t *icubcanProto_controlmode)
 {
+    eOresult_t res = eores_OK;
+    
     switch(eomc_controlmode)
     {
         case eomc_controlmode_cmd_position:
@@ -1345,8 +1346,8 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         } break;
         case eomc_controlmode_cmd_switch_everything_off:
         {
-            return(eores_NOK_generic);
-        }
+            res = eores_NOK_generic;
+        } break;
         case eomc_controlmode_cmd_force_idle:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_forceIdle;
@@ -1365,11 +1366,11 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         } break;
         default:
         {
-            return(eores_NOK_generic);
-        }
+            res = eores_NOK_generic;
+        } break;
             
     }
-    return(eores_OK);
+    return(res);
 }
 
 
