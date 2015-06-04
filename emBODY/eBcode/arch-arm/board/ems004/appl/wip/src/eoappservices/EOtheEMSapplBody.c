@@ -1146,61 +1146,61 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 
 }
 
-//static eOemscontroller_board_t s_emscontroller_getboard(void)
-//{
-//    eOemscontroller_board_t type = emscontroller_board_DONTCARE;
-//    
-//    uint8_t n = eoprot_board_local_get();
-//    
-//    switch(n)
-//    {
-//        case 1:
-//        case 3:
-//        case 9:
-//        case 10:
-//        {
-//            type = emscontroller_board_NO_LOCAL_CONTROL;
-//        } break;
+static eOemscontroller_board_t s_emscontroller_getboard(void)
+{
+    eOemscontroller_board_t type = emscontroller_board_DONTCARE;
+    
+    uint8_t n = eoprot_board_local_get();
+    
+    switch(n)
+    {
+        case 1:
+        case 3:
+        case 9:
+        case 10:
+        {
+            type = emscontroller_board_NO_LOCAL_CONTROL;
+        } break;
 
-//        case 0:
-//        case 2:
-//        {
-//            type = emscontroller_board_SHOULDER;
-//        } break;
+        case 0:
+        case 2:
+        {
+            type = emscontroller_board_SHOULDER;
+        } break;
 
-//        case 4:
-//        {
-//            type = emscontroller_board_WAIST;
-//        } break;
+        case 4:
+        {
+            type = emscontroller_board_WAIST;
+        } break;
 
-//        case 5:
-//        case 7:
-//        {
-//            type = emscontroller_board_UPPERLEG;
-//        } break;
-//        
-//        case 6:
-//        case 8:
-//        {
-//            type = emscontroller_board_ANKLE;
-//        } break;
+        case 5:
+        case 7:
+        {
+            type = emscontroller_board_UPPERLEG;
+        } break;
+        
+        case 6:
+        case 8:
+        {
+            type = emscontroller_board_ANKLE;
+        } break;
 
-//        default:
-//        {
-//        } break;
-//    }
-//    
-//    
-//    return(type);   
-//}
+        default:
+        {
+        } break;
+    }
+    
+    
+    return(type);   
+}
 
 static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 {
     uint8_t numofjoints = eo_entities_NumOfJoints(eo_entities_GetHandle());
     
-//    eOemscontroller_board_t boardtype = s_emscontroller_getboard();  
-//    p->emsController = eo_emsController_Init(boardtype, numofjoints);
-    p->emsController = eo_emsController_Init(numofjoints);
+    eOemscontroller_board_t boardtype = s_emscontroller_getboard();  
+    p->emsController = eo_emsController_Init(boardtype, numofjoints);
+//    p->emsController = eo_emsController_Init(numofjoints);
 
 //NOTE: removed check because eo_emsController_Init returns NULL if any 2foc board is connected to ems. (i.e, eb2, eb4, eb10, eb11)
 //     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
