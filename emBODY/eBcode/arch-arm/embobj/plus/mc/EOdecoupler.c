@@ -413,7 +413,7 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         }
      
     }
-    else if((emscontroller_board_NECKyaw_EYES == o->board)) 
+    else if((emscontroller_board_HEAD_neckyaw_eyes == o->board)) 
     {
         #warning TODO: for head v3
         // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.

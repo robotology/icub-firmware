@@ -362,7 +362,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     }    
     //#endif
     
-    if((emscontroller_board_NECKpitch_NECKroll == ems->board) || (emscontroller_board_NECKyaw_EYES == ems->board))
+    if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
     {
         #warning TODO: for head v3
         // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
@@ -901,7 +901,7 @@ extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_contr
         eo_emsController_SetControlMode(joint, mode);
       }
   }
-  else if(emscontroller_board_NECKpitch_NECKroll == ems->board)  
+  else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)  
   {
        #warning TODO: for head v3
         // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
@@ -933,7 +933,7 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
         eo_emsController_SetInteractionMode(joint, mode);
       }
     }
-    else if(emscontroller_board_NECKpitch_NECKroll == ems->board)  
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)  
     {
         #warning TODO: for head v3
         // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
@@ -1042,7 +1042,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                 }
             }
         } 
-        else if((emscontroller_board_NECKpitch_NECKroll == ems->board))
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board))
         {
           #warning TODO: for head v3
           // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
@@ -1124,7 +1124,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             
         //#endif
         }
-        else if((emscontroller_board_NECKpitch_NECKroll == ems->board))
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board))
         {
           #warning TODO: for head v3
           // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
@@ -1194,7 +1194,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             
         //#endif
         }
-        else if((emscontroller_board_NECKpitch_NECKroll == ems->board))
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board))
         {
             #warning TODO: for head v3
             // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
