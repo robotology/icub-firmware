@@ -413,7 +413,14 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         }
      
     }
-    else
+    else if((emscontroller_board_NECKyaw_EYES == o->board)) 
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // mettere formula di disaccoppiamento. probabilmente il neck e' come le prime due righe del waist.         
+    }
+    else    // marco.accame: this board does not have coupled joints
     {    
     //#else
         MOTORS(m) pwm_motor[m] = 0;

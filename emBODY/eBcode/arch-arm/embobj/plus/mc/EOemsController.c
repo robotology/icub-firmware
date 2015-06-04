@@ -362,6 +362,16 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     }    
     //#endif
     
+    if((emscontroller_board_NECKpitch_NECKroll == ems->board) || (emscontroller_board_NECKyaw_EYES == ems->board))
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+    }
+    
     #endif // jacobian
 
     //uint8_t changed = 0;
@@ -823,8 +833,10 @@ extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
     }
-    else
+    else    
     {
+        // marco.accame: for head-v3 this case is ok. no need to differentiate according to used board
+        // the reason is that ... there is no torque control
     //#else
           *torque_motor=ems->axis_controller[joint_id]->torque_meas_jnt;
     //#endif  
@@ -863,8 +875,10 @@ extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
     }
-    else
-    {        
+    else 
+    { 
+        // marco.accame: for head-v3 this case is ok. no need to differentiate according to used board
+        // the reason is that ... there is no torque control       
 //    #else
           *torque_motor=ems->axis_controller[joint_id]->torque_ref_jnt;
 //    #endif  
@@ -887,8 +901,16 @@ extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_contr
         eo_emsController_SetControlMode(joint, mode);
       }
   }
-  else
+  else if(emscontroller_board_NECKpitch_NECKroll == ems->board)  
   {
+       #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3 che presentano 
+        // coupled joints. in tal caso si deve chiamare eo_emsController_SetControlMode() per tutti i joint insieme. 
+        // quindi: se il 1 e 2 sono accoppiati farli sempre insieme
+  }
+  else  // marco.accame: the joint is not coupled to any other joint 
+  { 
   //#else
         eo_emsController_SetControlMode(joint, mode);
   //#endif 
@@ -911,7 +933,15 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
         eo_emsController_SetInteractionMode(joint, mode);
       }
     }
-    else
+    else if(emscontroller_board_NECKpitch_NECKroll == ems->board)  
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3 che presentano 
+        // coupled joints. in tal caso si deve chiamare eo_emsController_SetInteractionMode() per tutti i joint insieme. 
+        // quindi: se il 1 e 2 sono accoppiati farli sempre insieme
+    }    
+    else    // marco.accame: joint is not coupled
     {
   //#else
         eo_emsController_SetInteractionMode(joint, mode);
@@ -1011,7 +1041,15 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                     eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_force_idle);
                 }
             }
-        }    
+        } 
+        else if((emscontroller_board_NECKpitch_NECKroll == ems->board))
+        {
+          #warning TODO: for head v3
+          // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+          // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3.
+          // se ci sono coupled joints: per tutti i joint insieme ->  mettere in idle, clear fualts, e set controlmode force idle
+          // altrimenti: per il solo joint -> eo_axisController_SetControlMode()            
+        }
         //#endif
         #endif // ! USE_JACOBIAN
     }
@@ -1086,6 +1124,14 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             
         //#endif
         }
+        else if((emscontroller_board_NECKpitch_NECKroll == ems->board))
+        {
+          #warning TODO: for head v3
+          // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+          // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3.
+          // se ci sono coupled joints: procedere come nel caso di emscontroller_board_SHOULDER
+          // altrimenti: per il solo joint -> metto in idle            
+        }
         #endif // ! USE_JACOBIAN
     }
     else // not an idle mode
@@ -1147,6 +1193,13 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             }
             
         //#endif
+        }
+        else if((emscontroller_board_NECKpitch_NECKroll == ems->board))
+        {
+            #warning TODO: for head v3
+            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3.
+            // se il joint non e' accoppiato faccio come per upperleg, altrimenti faccio come per il emscontroller_board_SHOULDER  
         }
         #endif // ! USE_JACOBIAN
         }
@@ -1279,6 +1332,13 @@ extern void eo_emsController_CheckCalibrations(void)
         }
     //#endif
     }
+    
+   #warning TODO: for head v3
+    // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+    // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3.
+    // se il joint non e' accoppiato la calibrazione e' indipendnte, altrimenti altrimenti la calib finisce solo se tutti gli accoppiati sono calbrati      
+
+    
     #endif // ! USE_JACOBIAN        
 }
 
@@ -1543,6 +1603,11 @@ void config_2FOC(uint8_t motor)
 //#endif    
 }
 
+
+#warning TODO: for head v3
+// dubbio: si deve fare overriding questa funzione nel caso mc4plus? cosa si fa? si mette pwm off?
+// se c'e' external fault allora si .... ?
+// e nel caso di set_2FOC_running() ?
 void set_2FOC_idle(uint8_t motor)
 {
     if(emscontroller_actuation_2FOC != ems->act)

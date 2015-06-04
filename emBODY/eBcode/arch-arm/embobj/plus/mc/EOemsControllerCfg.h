@@ -34,6 +34,11 @@ extern "C" {
     #define USE_2FOC_FAST_ENCODER
 #endif
 
+#if defined(HEAD_V3)
+    #undef USE_2FOC_FAST_ENCODER
+#endif
+//#warning in v3 fare in modo che NON venga definito USE_2FOC_FAST_ENCODER 
+
 #ifdef USE_2FOC_FAST_ENCODER
 //#define USE_4BIT_INC_ENC_PRECISION
 #endif
