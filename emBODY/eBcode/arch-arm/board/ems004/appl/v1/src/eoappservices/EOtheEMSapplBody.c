@@ -64,6 +64,8 @@
 
 #include "EOicubCanProto_hid.h"
 
+#include "EOMtheEMSapplCfg_cfg.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -970,13 +972,40 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 
 }
 
+#if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 
+    const uint8_t naxles = 2; 
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_ANKLE; // LEFT
+#elif (9==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const uint8_t naxles = 2;
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_ANKLE; // RIGHT
+#elif (5==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const uint8_t naxles = 3;
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_WAIST;
+#elif (1==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const uint8_t naxles = 4;
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_SHOULDER; // LEFT
+#elif (3==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const uint8_t naxles = 4;
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_SHOULDER; // RIGHT
+#elif (6==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const uint8_t naxles = 4;
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_UPPERLEG; // LEFT
+#elif (8==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const uint8_t naxles = 4;
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_UPPERLEG; // RIGHT
+#elif (2==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (10==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+    const eOemscontroller_board_t emscontrBOARDtype = emscontroller_board_NO_LOCAL_CONTROL;
+    const uint8_t naxles = 0;
+#else
+    #error invalid board
+#endif
 
 
 static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 {
     //uint16_t i, numofjoint = 0;
     
-    p->bodyobjs.emsController = eo_emsController_Init(NAXLES);
+    p->bodyobjs.emsController = eo_emsController_Init(emscontrBOARDtype, naxles);
 
 //NOTE: removed check because eo_emsController_Init returns NULL if any 2foc board is connected to ems. (i.e, eb2, eb4, eb10, eb11)
 //     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p->bodyobjs.emsController), 
