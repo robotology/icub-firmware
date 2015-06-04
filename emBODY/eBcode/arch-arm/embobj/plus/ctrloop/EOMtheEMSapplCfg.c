@@ -244,7 +244,7 @@ static EOMtheEMSapplCfg s_emsapplcfg_singleton =
     },
     .getipaddrFROMenvironment   =   EOMTHEEMSAPPLCFG_IPADDR_FROM_ENVIRONMENT,
     .errmng_haltrace_enabled    =   EOMTHEEMSAPPLCFG_HALTRACE_ENABLED,
-    .boardid                    =   EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD,
+    .boardid                    =   255,
     .disclistcfg    =
     {
         .taskpriority           = EOMTHEEMSAPPLCFG_LISTENER_TASK_PRIORITYof,
