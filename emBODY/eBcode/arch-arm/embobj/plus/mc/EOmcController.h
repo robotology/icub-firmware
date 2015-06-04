@@ -34,13 +34,24 @@ extern "C" {
 
 typedef enum
 {
-    emscontroller_board_DONTCARE            = 16,
-    emscontroller_board_NO_LOCAL_CONTROL    = 0,
-    emscontroller_board_ANKLE               = 1,
-    emscontroller_board_UPPERLEG            = 2,
-    emscontroller_board_WAIST               = 3,
-    emscontroller_board_SHOULDER            = 4    
+    emscontroller_board_DONTCARE                = 16,
+    emscontroller_board_NO_CONTROL              = 0,
+    emscontroller_board_ANKLE                   = 1,
+    emscontroller_board_UPPERLEG                = 2,
+    emscontroller_board_WAIST                   = 3,
+    emscontroller_board_SHOULDER                = 4,
+    emscontroller_board_NECKpitch_NECKroll      = 5,
+    emscontroller_board_NECKyaw_EYES            = 6,
+    emscontroller_board_EYELIDS_JAW             = 7,
+    emscontroller_board_LIPS                    = 8
 } eOemscontroller_board_t;
+
+
+typedef enum
+{
+    emscontroller_actuation_2FOC                = 0,
+    emscontroller_actuation_LOCAL               = 1
+} eOemscontroller_actuation_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section

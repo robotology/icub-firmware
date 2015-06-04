@@ -20,7 +20,7 @@
 #include "EOemsControllerCfg.h"
 
 
-#if !defined(EMSCONTROLLER_DONT_USE_2FOC) 
+//#if !defined(EMSCONTROLLER_DONT_USE_2FOC) 
  // we need to communicate over can 
  //#define USE_CANCOMM_V2
  #if defined(USE_CANCOMM_V2)
@@ -29,7 +29,7 @@
     #include "EOicubCanProto_specifications.h"
     #include "EOtheEMSapplBody.h"
  #endif
-#endif
+//#endif
 
 
 
@@ -107,14 +107,14 @@ static EOemsController *ems = NULL;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, uint8_t nax) 
+extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOemscontroller_actuation_t act, uint8_t nax) 
 {  
     if(0 == nax)
     {
         return(NULL);
     }
     
-    if(emscontroller_board_NO_LOCAL_CONTROL == board)
+    if(emscontroller_board_NO_CONTROL == board)
     {
         return(NULL);
     }
@@ -126,6 +126,7 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, uin
     if (ems)
     {
         ems->board = board;
+        ems->act = act;
         
         if (nax>MAX_NAXLES) nax = MAX_NAXLES;
         
@@ -1463,7 +1464,11 @@ extern void eo_emsMotorController_GoIdle(void)
 
 void config_2FOC(uint8_t motor)
 {
-#if !defined(EMSCONTROLLER_DONT_USE_2FOC)
+    if(emscontroller_actuation_2FOC != ems->act)
+    {
+        return;
+    }
+//#if !defined(EMSCONTROLLER_DONT_USE_2FOC)
     
 #if defined(USE_CANCOMM_V2)    
 
@@ -1535,12 +1540,17 @@ void config_2FOC(uint8_t motor)
 
 #endif
 
-#endif    
+//#endif    
 }
 
 void set_2FOC_idle(uint8_t motor)
 {
-#if !defined(EMSCONTROLLER_DONT_USE_2FOC)
+    if(emscontroller_actuation_2FOC != ems->act)
+    {
+        return;
+    }
+    
+//#if !defined(EMSCONTROLLER_DONT_USE_2FOC)
     
 #if defined(USE_CANCOMM_V2)    
 
@@ -1580,12 +1590,16 @@ void set_2FOC_idle(uint8_t motor)
     
 #endif
     
-#endif    
+//#endif    
 }
 
 void set_2FOC_running(uint8_t motor)
 {
-#if !defined(EMSCONTROLLER_DONT_USE_2FOC)    
+    if(emscontroller_actuation_2FOC != ems->act)
+    {
+        return;
+    }
+//#if !defined(EMSCONTROLLER_DONT_USE_2FOC)    
     
 #if defined(USE_CANCOMM_V2)   
 
@@ -1635,7 +1649,7 @@ void set_2FOC_running(uint8_t motor)
     
 #endif
     
-#endif    
+//#endif    
 }
 
 
