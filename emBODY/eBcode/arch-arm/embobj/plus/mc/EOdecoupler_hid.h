@@ -37,6 +37,8 @@ extern "C" {
  
 struct EOmotors_hid 
 {
+    eOemscontroller_board_t board;
+    
     uint8_t nMotors;
     
     uint16_t motor_state_watchdog[MAX_NAXLES];

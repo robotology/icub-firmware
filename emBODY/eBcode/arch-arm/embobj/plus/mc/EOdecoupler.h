@@ -23,7 +23,10 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOmcController.h"
+    
 #include "EOemsControllerCfg.h"
+#include "EOemsController.h" 
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -68,7 +71,7 @@ typedef struct EOmotors_hid EOmotors;
     @brief      Creates a new trajectory object 
     @return     The pointer to the required object.
  **/
-extern EOmotors* eo_motors_New(uint8_t nmotors);
+extern EOmotors* eo_motors_New(uint8_t nmotors, eOemscontroller_board_t board);
 extern void eo_motors_reset_wdog(EOmotors *o, uint8_t motor);
 extern void eo_motors_check_wdog(EOmotors *o);
 extern void eo_motors_set_Jacobian(EOmotors *o, int32_t **Ji32);

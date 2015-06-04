@@ -24,6 +24,7 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOmcController.h"
 #include "EOdecoupler.h"
 #include "EOaxisController.h"
 #include "EoMotionControl.h"
@@ -42,6 +43,7 @@ extern "C" {
 typedef struct EOemsController_hid EOemsController;
 
 
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 // empty-section
 
@@ -53,7 +55,7 @@ typedef struct EOemsController_hid EOemsController;
     @brief      Creates a new trajectory object 
     @return     The pointer to the required object.
  **/
-extern EOemsController* eo_emsController_Init(uint8_t nax);
+extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, uint8_t nax);
 extern void eo_emsController_set_Jacobian(int32_t **Ji32);
 
 /* @fn         extern void eo_trajectory_Set(EOtrajectory *o, float p0, float pf, float v0, float speed)

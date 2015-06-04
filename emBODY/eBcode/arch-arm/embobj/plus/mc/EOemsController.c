@@ -20,7 +20,7 @@
 #include "EOemsControllerCfg.h"
 
 
-#if !defined(DONT_USE_2FOC) 
+#if !defined(EMSCONTROLLER_DONT_USE_2FOC) 
  // we need to communicate over can 
  //#define USE_CANCOMM_V2
  #if defined(USE_CANCOMM_V2)
@@ -107,14 +107,26 @@ static EOemsController *ems = NULL;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOemsController* eo_emsController_Init(uint8_t nax) 
-{    
+extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, uint8_t nax) 
+{  
+    if(0 == nax)
+    {
+        return(NULL);
+    }
+    
+    if(emscontroller_board_NO_LOCAL_CONTROL == board)
+    {
+        return(NULL);
+    }
+    
 #ifndef NO_LOCAL_CONTROL
     ems = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOemsController), 1);
 #endif
     
     if (ems)
     {
+        ems->board = board;
+        
         if (nax>MAX_NAXLES) nax = MAX_NAXLES;
         
         ems->naxles = nax;
@@ -136,7 +148,7 @@ extern EOemsController* eo_emsController_Init(uint8_t nax)
             ems->rotorencoder[j]  = 1;
         }
         
-        ems->motors = eo_motors_New(ems->naxles);
+        ems->motors = eo_motors_New(ems->naxles, ems->board);
     }
     
     return ems;
@@ -261,7 +273,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     
     #else
     
-    #if defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+//    #if defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+    if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))
+    {
     
         uint8_t  ef0 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[0]);
         uint8_t  ef1 = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[1]);
@@ -299,15 +313,31 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             ems_fault_mask_new[1] |= mf1;
             ems_fault_mask_new[2] |= mf2;
         }
-    #endif
+    }   
+    //#endif
         
-    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) || defined(SHOULDER_BOARD)
+    //#if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) || defined(SHOULDER_BOARD)
+    if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_SHOULDER == ems->board))    
+    {
+        uint8_t first = 0;
+        uint8_t last = 0;
         
-        #if defined(SHOULDER_BOARD)
-        static const uint8_t j = 3;
-        #else
-        JOINTS(j)
-        #endif
+        //#if defined(SHOULDER_BOARD)
+        if(emscontroller_board_SHOULDER == ems->board)
+        {
+            first = 3;
+            last = 3;
+        }
+        else
+        {
+            first = 0;
+            last = ems->naxles-1;            
+        }
+        //static const uint8_t j = 3;
+        //#else
+        //JOINTS(j)
+        //#endif
+        for (uint8_t j=first; j<=last; ++j)
         {
             uint8_t  efj = eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[j]);
             uint16_t mfj = eo_get_motor_fault_mask(ems->motors, j);
@@ -328,9 +358,10 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
                 ems_fault_mask_new[j] |= mfj;
             }
         }
-        
-    #endif
-    #endif
+    }    
+    //#endif
+    
+    #endif // jacobian
 
     //uint8_t changed = 0;
         
@@ -506,7 +537,10 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     // CHECK HARDWARE AEA ENCODER & MOTOR FAULT
     ////////////////////////////////////////////////////
         
-    #if defined(SHOULDER_BOARD) && defined(V1_MECHANICS)
+    //#if defined(SHOULDER_BOARD) && defined(V1_MECHANICS)
+    #if defined(V1_MECHANICS)
+    if((emscontroller_board_SHOULDER == ems->board))    
+    {
         // |J0|   |  1     0    0   |   |E0|     
         // |J1| = |  0     1    0   | * |E1|
         // |J2|   |  1    -1  40/65 |   |E2|
@@ -514,6 +548,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         #ifndef USE_2FOC_FAST_ENCODER
         axle_abs_vel[2] = axle_abs_vel[0]-axle_abs_vel[1]+(40*axle_abs_vel[2])/65;
         #endif
+    }
     #endif
     
 #ifdef USE_2FOC_FAST_ENCODER
@@ -539,7 +574,11 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             axle_virt_vel[j] *= FOC_2_EMS_SPEED;
         }
     
-    #elif defined(SHOULDER_BOARD)
+    #else
+        
+    //#if defined(SHOULDER_BOARD)
+    if(emscontroller_board_SHOULDER == ems->board)
+    {
     
         //             | 1     0       0    0 |
         // J = dq/dm = | 1   40/65     0    0 |
@@ -555,8 +594,10 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[1] = ems->motor_position[0]+(40*ems->motor_position[1])/65;
         axle_virt_pos[2] = (40*(-ems->motor_position[1]+ems->motor_position[2]))/65;
         axle_virt_pos[3] = ems->motor_position[3];
-    
-    #elif defined(WAIST_BOARD)
+    }
+    else if(emscontroller_board_WAIST == ems->board)
+    {        
+    //#elif defined(WAIST_BOARD)
     
         //beware: this matrix is valid inside the firmare only
         //             |   0.5   0.5    0   |
@@ -576,7 +617,10 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[1] = (   -ems->motor_position[0] + ems->motor_position[1]) * 0.5;
         axle_virt_pos[2] =      ems->motor_position[0]*0.022/0.08 + ems->motor_position[1]*0.022/0.08 + ems->motor_position[2]*0.022/0.04;
 
-    #elif defined(UPPERLEG_BOARD)
+    }
+    else if(emscontroller_board_UPPERLEG == ems->board)
+    {
+    //#elif defined(UPPERLEG_BOARD)
     
         axle_virt_vel[0] = (50*ems->motor_velocity_gbx[0])/75;
         axle_virt_vel[1] =     ems->motor_velocity_gbx[1]    ;
@@ -587,18 +631,23 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[1] =     ems->motor_position[1]    ;
         axle_virt_pos[2] =     ems->motor_position[2]    ;
         axle_virt_pos[3] =     ems->motor_position[3]    ;
-        
-    #elif defined(ANKLE_BOARD)
+    }
+    else if(emscontroller_board_ANKLE == ems->board) 
+    {        
+    //#elif defined(ANKLE_BOARD)
         
         axle_virt_vel[0] = ems->motor_velocity_gbx[0];
         axle_virt_vel[1] = ems->motor_velocity_gbx[1];
         
         axle_virt_pos[0] = ems->motor_position[0];
         axle_virt_pos[1] = ems->motor_position[1];
-        
-    #else
+     
+    }        
+    //#else
         //#error undefined board type
-    #endif
+    //#endif
+    
+    #endif // not USE_JACOBIAN
     
 #endif
     
@@ -744,56 +793,88 @@ extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
 extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_t * torque_motor)
 {
     if (!ems) return; 
-    #if   defined(SHOULDER_BOARD)
+    //#if   defined(SHOULDER_BOARD)
+    if(emscontroller_board_SHOULDER == ems->board)
+    {
           if (joint_id==0) {*torque_motor= ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=(ems->axis_controller[1]->torque_meas_jnt - ems->axis_controller[2]->torque_meas_jnt)* 0.625; return;}
           if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt * 0.625; return;}
           if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_meas_jnt; return;}
-    #elif defined(WAIST_BOARD)
+    }
+    else if(emscontroller_board_WAIST == ems->board)
+    {
+    //#elif defined(WAIST_BOARD)
           if (joint_id==0) {*torque_motor=(ems->axis_controller[0]->torque_meas_jnt - ems->axis_controller[1]->torque_meas_jnt)*0.5 + ems->axis_controller[2]->torque_meas_jnt*0.275; return;}
           if (joint_id==1) {*torque_motor=(ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt)*0.5 + ems->axis_controller[2]->torque_meas_jnt*0.275; return;}
           if (joint_id==2) {*torque_motor= ems->axis_controller[2]->torque_meas_jnt*0.55; return;}
-    #elif defined(UPPERLEG_BOARD)
+    }
+    else if(emscontroller_board_UPPERLEG == ems->board)
+    {
+    //#elif defined(UPPERLEG_BOARD)
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
           if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt; return;}
           if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_meas_jnt; return;}
-    #elif defined(ANKLE_BOARD)
+    }
+    else if(emscontroller_board_ANKLE == ems->board)  
+    {        
+    //#elif defined(ANKLE_BOARD)
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
-    #else
+    }
+    else
+    {
+    //#else
           *torque_motor=ems->axis_controller[joint_id]->torque_meas_jnt;
-    #endif  
+    //#endif  
+    }
 }
 
 extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32_t * torque_motor)
 {
     if (!ems) return; 
-    #if   defined(SHOULDER_BOARD)
+    if(emscontroller_board_SHOULDER == ems->board)
+    {
+//    #if   defined(SHOULDER_BOARD)
           if (joint_id==0) {*torque_motor= ems->axis_controller[0]->torque_ref_jnt + ems->axis_controller[1]->torque_ref_jnt; return;}
           if (joint_id==1) {*torque_motor=(ems->axis_controller[1]->torque_ref_jnt - ems->axis_controller[2]->torque_ref_jnt)* 0.625; return;}
           if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_ref_jnt * 0.625; return;}
           if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_ref_jnt; return;}
-    #elif defined(WAIST_BOARD)
+    }
+    else if(emscontroller_board_WAIST == ems->board)
+    {      
+//    #elif defined(WAIST_BOARD)
           if (joint_id==0) {*torque_motor=(ems->axis_controller[0]->torque_ref_jnt - ems->axis_controller[1]->torque_ref_jnt)*0.5 + ems->axis_controller[2]->torque_ref_jnt*0.275; return;}
           if (joint_id==1) {*torque_motor=(ems->axis_controller[0]->torque_ref_jnt + ems->axis_controller[1]->torque_ref_jnt)*0.5 + ems->axis_controller[2]->torque_ref_jnt*0.275; return;}
           if (joint_id==2) {*torque_motor= ems->axis_controller[2]->torque_ref_jnt*0.55; return;}
-    #elif defined(UPPERLEG_BOARD)
+    }
+    else if(emscontroller_board_UPPERLEG == ems->board)
+    {
+//    #elif defined(UPPERLEG_BOARD)
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
           if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_ref_jnt; return;}
           if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_ref_jnt; return;}
-    #elif defined(ANKLE_BOARD)
+    }
+    else if(emscontroller_board_ANKLE == ems->board)
+    {        
+//    #elif defined(ANKLE_BOARD)
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
-    #else
+    }
+    else
+    {        
+//    #else
           *torque_motor=ems->axis_controller[joint_id]->torque_ref_jnt;
-    #endif  
+//    #endif  
+    }
 }
 
 extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_controlmode_command_t mode)
 {
-  #if   defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+  //#if   defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+    if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))    
+    {
       if (joint <3) 
       {
         eo_emsController_SetControlMode(0, mode);
@@ -804,14 +885,20 @@ extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_contr
       {
         eo_emsController_SetControlMode(joint, mode);
       }
-  #else
+  }
+  else
+  {
+  //#else
         eo_emsController_SetControlMode(joint, mode);
-  #endif  
+  //#endif 
+  }      
 }
 
 extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eOmc_interactionmode_t mode)
 {
-  #if   defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+    if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))
+    {
+  //#if   defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
       if (joint <3) 
       {
         eo_emsController_SetInteractionMode(0, mode);
@@ -822,9 +909,13 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
       {
         eo_emsController_SetInteractionMode(joint, mode);
       }
-  #else
+    }
+    else
+    {
+  //#else
         eo_emsController_SetInteractionMode(joint, mode);
-  #endif
+  //#endif
+    }
   return eobool_true;
 }
 
@@ -871,24 +962,29 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         
         #else // ! USE_JACOBIAN
         
-        #if defined(SHOULDER_BOARD)
-        
+        //#if defined(SHOULDER_BOARD)
+        if(emscontroller_board_SHOULDER == ems->board)
+        {        
             if (joint == 3)
             {
                 set_2FOC_idle(3);
                 eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[3]);
                 eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_force_idle);
             }
+        }
+        //#endif
         
-        #endif
-        
-        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board))
+        {
+        //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         
             set_2FOC_idle(joint);
             eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[joint]);
             eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_force_idle);
-        
-        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+        }
+        else if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))
+        {
+        //#elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
             
             if (joint < 3)
             {
@@ -914,8 +1010,8 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                     eo_axisController_SetControlMode(ems->axis_controller[joint], eomc_controlmode_cmd_force_idle);
                 }
             }
-            
-        #endif
+        }    
+        //#endif
         #endif // ! USE_JACOBIAN
     }
     else if ((mode == eomc_controlmode_cmd_idle) || (mode == eomc_controlmode_cmd_switch_everything_off))
@@ -952,17 +1048,25 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         
         #else // ! USE_JACOBIAN
         
-        #if   defined(SHOULDER_BOARD)
+        if(emscontroller_board_SHOULDER == ems->board) 
+        {
+        //#if   defined(SHOULDER_BOARD)
         
             if (joint == 3) set_2FOC_idle(3);
         
-        #endif
+        //#endif
+        }
         
-        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board))
+        {
+        //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         
             set_2FOC_idle(joint);
         
-        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+        }
+        else if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))
+        {
+        //#elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
 
             if (joint < 3)
             {
@@ -979,7 +1083,8 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                 }
             }
             
-        #endif
+        //#endif
+        }
         #endif // ! USE_JACOBIAN
     }
     else // not an idle mode
@@ -999,8 +1104,10 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         }
         
         #else // ! USE_JACOBIAN
-            
-        #if   defined(SHOULDER_BOARD)
+         
+        if((emscontroller_board_SHOULDER == ems->board))       
+        {            
+        //#if   defined(SHOULDER_BOARD)
             
             if (joint == 3)
             {
@@ -1010,16 +1117,21 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                 set_2FOC_running(3);
             }
             
-        #endif
-            
-        #if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
+        //#endif
+        }
+          
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board))
+        {
+        //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
        
             // external fault reset
             if (eo_is_motor_ext_fault(ems->motors, joint)) set_2FOC_idle(joint);
             
             set_2FOC_running(joint);
-        
-        #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+        }
+        else if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))
+        {
+        //#elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
         
             if (joint < 3)
             {
@@ -1033,7 +1145,8 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
                 set_2FOC_running(2);
             }
             
-        #endif
+        //#endif
+        }
         #endif // ! USE_JACOBIAN
         }
     }
@@ -1114,7 +1227,9 @@ extern void eo_emsController_CheckCalibrations(void)
     
     #else // ! USE_JACOBIAN
     
-    #if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) //|| defined(WAIST_BOARD) || defined(V2_MECHANICS)
+    if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board))
+    {
+    //#if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) //|| defined(WAIST_BOARD) || defined(V2_MECHANICS)
         JOINTS(j)
         {
             if (eo_axisController_IsCalibrated(ems->axis_controller[j]))
@@ -1127,7 +1242,10 @@ extern void eo_emsController_CheckCalibrations(void)
                 eo_axisController_SetCalibrated(ems->axis_controller[j]);
             }
         }
-    #elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
+    }
+    else if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))
+    {
+    //#elif defined(SHOULDER_BOARD) || defined(WAIST_BOARD)
         if (eo_axisController_IsCalibrated(ems->axis_controller[0]) &&
             eo_axisController_IsCalibrated(ems->axis_controller[1]) &&
             eo_axisController_IsCalibrated(ems->axis_controller[2]))
@@ -1143,9 +1261,12 @@ extern void eo_emsController_CheckCalibrations(void)
             eo_axisController_SetCalibrated(ems->axis_controller[1]);
             eo_axisController_SetCalibrated(ems->axis_controller[2]);
         }
-    #endif
-        
-    #if defined(SHOULDER_BOARD)
+    //#endif
+    }
+      
+    if((emscontroller_board_SHOULDER == ems->board))  
+    {        
+    //#if defined(SHOULDER_BOARD)
         if (eo_axisController_IsCalibrated(ems->axis_controller[3]))
         {
             ems->n_calibrated++;
@@ -1155,7 +1276,8 @@ extern void eo_emsController_CheckCalibrations(void)
             ems->n_calibrated++;
             eo_axisController_SetCalibrated(ems->axis_controller[3]);
         }
-    #endif
+    //#endif
+    }
     #endif // ! USE_JACOBIAN        
 }
 
@@ -1341,7 +1463,7 @@ extern void eo_emsMotorController_GoIdle(void)
 
 void config_2FOC(uint8_t motor)
 {
-#if !defined(DONT_USE_2FOC)
+#if !defined(EMSCONTROLLER_DONT_USE_2FOC)
     
 #if defined(USE_CANCOMM_V2)    
 
@@ -1418,7 +1540,7 @@ void config_2FOC(uint8_t motor)
 
 void set_2FOC_idle(uint8_t motor)
 {
-#if !defined(DONT_USE_2FOC)
+#if !defined(EMSCONTROLLER_DONT_USE_2FOC)
     
 #if defined(USE_CANCOMM_V2)    
 
@@ -1463,7 +1585,7 @@ void set_2FOC_idle(uint8_t motor)
 
 void set_2FOC_running(uint8_t motor)
 {
-#if !defined(DONT_USE_2FOC)    
+#if !defined(EMSCONTROLLER_DONT_USE_2FOC)    
     
 #if defined(USE_CANCOMM_V2)   
 
@@ -1518,6 +1640,7 @@ void set_2FOC_running(uint8_t motor)
 
 
 #ifdef EXPERIMENTAL_MOTOR_TORQUE
+ccr
     #if defined(SHOULDER_BOARD)
         //         |    1       0       0   |
         // J^-1  = | -65/40   65/40     0   |

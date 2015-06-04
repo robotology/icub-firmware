@@ -14,7 +14,7 @@ extern "C" {
         
  // - external dependencies --------------------------------------------------------------------------------------------
  
-#include "EOMtheEMSapplCfg_cfg.h"
+//#include "EOMtheEMSapplCfg_cfg.h"
  
  // - public #define  --------------------------------------------------------------------------------------------------
  
@@ -55,42 +55,42 @@ extern "C" {
 
 #define MAX_NAXLES 4
 
-#if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 
-    #define ANKLE_BOARD // LEFT
-    #define NAXLES 2
-#elif (9==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define ANKLE_BOARD // RIGHT
-    #define NAXLES 2
-#elif (5==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define WAIST_BOARD
-    #define NAXLES 3
-#elif (1==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define SHOULDER_BOARD // LEFT
-    #define NAXLES 4
-#elif (3==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define SHOULDER_BOARD // RIGHT
-    #define NAXLES 4
-#elif (6==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define UPPERLEG_BOARD // LEFT
-    #define NAXLES 4
-#elif (8==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define UPPERLEG_BOARD // RIGHT
-    #define NAXLES 4
-#elif (2==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (10==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NO_LOCAL_CONTROL
-    #define NAXLES 1
-#elif (12==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NAXLES 2
-    #define DONT_USE_2FOC
-#elif (13==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NAXLES 2
-    #define DONT_USE_2FOC  
-#elif (15==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NAXLES 1
-    #define DONT_USE_2FOC  
-#else
-    #error invalid board
-#endif
+//#if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 
+//    #define ANKLE_BOARD // LEFT
+//    #define NAXLES 2
+//#elif (9==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define ANKLE_BOARD // RIGHT
+//    #define NAXLES 2
+//#elif (5==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define WAIST_BOARD
+//    #define NAXLES 3
+//#elif (1==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define SHOULDER_BOARD // LEFT
+//    #define NAXLES 4
+//#elif (3==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define SHOULDER_BOARD // RIGHT
+//    #define NAXLES 4
+//#elif (6==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define UPPERLEG_BOARD // LEFT
+//    #define NAXLES 4
+//#elif (8==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define UPPERLEG_BOARD // RIGHT
+//    #define NAXLES 4
+//#elif (2==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (10==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NO_LOCAL_CONTROL
+//    #define NAXLES 1
+//#elif (12==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NAXLES 2
+//    #define EMSCONTROLLER_DONT_USE_2FOC
+//#elif (13==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NAXLES 2
+//    #define EMSCONTROLLER_DONT_USE_2FOC  
+//#elif (15==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NAXLES 1
+//    #define EMSCONTROLLER_DONT_USE_2FOC  
+//#else
+//    #error invalid board
+//#endif
  
 // utilities
     

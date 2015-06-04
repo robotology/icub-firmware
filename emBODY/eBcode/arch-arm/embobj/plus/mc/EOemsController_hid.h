@@ -56,6 +56,7 @@ extern "C" {
 
 struct EOemsController_hid 
 {
+    eOemscontroller_board_t board;
     uint8_t n_calibrated;
     
     //uint16_t state_mask;
