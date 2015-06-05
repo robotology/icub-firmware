@@ -24,8 +24,8 @@
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hl_spi.h
-	@brief      This file contains basic initialisation api for hl SPI utilities.
-	@author     marco.accame@iit.it
+    @brief      This file contains basic initialisation api for hl SPI utilities.
+    @author     marco.accame@iit.it
     @date       02/12/2014
 **/
 
@@ -143,11 +143,11 @@ extern const hl_spi_mapping_t* hl_spi_map;  // it must be defined externally. If
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-/** @fn			extern uint32_t hl_spi_speedofbus_get(hl_spi_t id)
-    @brief  	this function tells what is the internal bus speed of an spi id. it can be used to chose the right value of the
+/** @fn            extern uint32_t hl_spi_speedofbus_get(hl_spi_t id)
+    @brief      this function tells what is the internal bus speed of an spi id. it can be used to chose the right value of the
                 prescaler to be assigned inside the hl_spi_cfg_t argument to be passed to hl_spi_init().
-    @param  	id 	        the id of spi
-    @return 	the speed of the internal bus or 0 if the specified spi is not supported
+    @param      id             the id of spi
+    @return     the speed of the internal bus or 0 if the specified spi is not supported
   */
 extern uint32_t hl_spi_speedofbus_get(hl_spi_t id);
 
@@ -195,7 +195,7 @@ extern hl_result_t hl_spi_disable(hl_spi_t id);
 /** @fn         extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte)
     @brief      This function send a raw byte using an SPI bus.
     @param      id              identifies SPI port
-		@param      byte            byte value to be sent 
+    @param      byte            byte value to be sent 
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
 extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte);
@@ -203,7 +203,7 @@ extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte);
 /** @fn         extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* byte)
     @brief      This function receive a raw byte using an SPI bus. The value is written on the variable byte
     @param      id              identifies SPI port
-		@param      byte            pointer to the variable in which the received bbyte will be stored
+    @param      byte            pointer to the variable in which the received bbyte will be stored
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
 extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* value);
