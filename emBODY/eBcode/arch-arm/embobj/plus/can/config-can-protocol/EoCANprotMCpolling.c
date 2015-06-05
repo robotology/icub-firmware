@@ -771,9 +771,7 @@ static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descript
 
 // cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION
 static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
-{
-#ifdef USE_PROTO_PROXY
-    
+{   
     eOprotIndex_t index = EOK_uint08dummy;  
 
     eOcanmap_location_t loc = {0};
@@ -840,9 +838,7 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
-       
-#endif //USE_PROTO_PROXY
-    
+          
     return(eores_OK);
 }
 
@@ -850,9 +846,7 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
 // cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, 
 //             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS
 static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
-{
-#ifdef USE_PROTO_PROXY
-    
+{    
     eOprotIndex_t index = EOK_uint08dummy;  
 
     eOcanmap_location_t loc = {0};
@@ -931,10 +925,7 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  // if NULL it does not copy dat into the nv and uses ram inside the netvar
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
-    
-    
-#endif //USE_PROTO_PROXY
-    
+       
     return(eores_OK);
 }
 
@@ -942,7 +933,6 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
 // cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET
 static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
 {
-#ifdef USE_PROTO_PROXY
     
     eOprotIndex_t index = EOK_uint08dummy;  
 
@@ -1005,8 +995,7 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
        
-#endif //USE_PROTO_PROXY
-    
+
     return(eores_OK);
 }
 

@@ -50,10 +50,8 @@
 #include "EOtheCANservice.h"
 
 
-#ifdef USE_PROTO_PROXY
 #include "EOproxy.h"
 #include "EOtheBOARDtransceiver.h"
-#endif
 
 #include "EOtheVirtualStrain.h"
 
@@ -506,7 +504,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 
             return;
         }
-    #ifdef USE_PROTO_PROXY
         else if(eo_ropcode_ask == rd->ropcode)
         {      
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
@@ -534,8 +531,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
             eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);         
             
             return;
-        }
-    #endif         
+        }     
     }
 }
 
@@ -577,7 +573,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
             
             return;
         }
-    #ifdef USE_PROTO_PROXY
         else if(eo_ropcode_ask == rd->ropcode)
         {     
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
@@ -606,8 +601,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
             
             return;        
 
-        }
-    #endif        
+        }     
     }
 }
 
@@ -1401,8 +1395,6 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
         
         return;
     }
-    
-#ifdef USE_PROTO_PROXY
     // if ask and we have the proxy, we ask to can about two values
     else if(eo_ropcode_ask == rd->ropcode)
     {
@@ -1433,7 +1425,6 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
         
         return;
     }
-#endif//USE_PROTO_PROXY    
     
 }
 
