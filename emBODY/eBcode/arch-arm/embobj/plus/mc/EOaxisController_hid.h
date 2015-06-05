@@ -113,6 +113,9 @@ struct EOaxisController_hid
     eOmc_interactionmode_t interact_mode;
     
     uint16_t state_mask;
+    
+    eOmc_calibration_type_t calibration_type;
+    float pwm_limit_calib;
 }; 
 
 
