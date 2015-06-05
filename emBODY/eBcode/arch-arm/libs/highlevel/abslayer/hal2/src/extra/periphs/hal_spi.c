@@ -87,13 +87,13 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .sizeofframe                = 4,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
-    //.dummytxvalue               = 0x00,	//removable?
-		//.starttxvalue               = 0x00,	//removable?
+    //.dummytxvalue               = 0x00,    //removable?
+        //.starttxvalue               = 0x00,    //removable?
     .onframetransm              = NULL,
     .argonframetransm           = NULL,
     .onframereceiv              = NULL,
     .argonframereceiv           = NULL,
-		.cpolarity									= hal_spi_cpolarity_high,
+    .cpolarity                  = hal_spi_cpolarity_high,
 };
 
 
@@ -105,7 +105,7 @@ const hal_spi_cfg_t hal_spi_cfg_default =
 typedef struct
 {
     hal_spi_cfg_t       config;
-    //hl_spi_cfg_t				adv_config;
+    //hl_spi_cfg_t                adv_config;
     //uint8_t*            dummytxframe; //removable?
     uint8_t*            isrrxframe;
     uint8_t             isrrxcounter;
@@ -179,14 +179,14 @@ const hl_spi_mapping_t* hl_spi_map = NULL;
 // --------------------------------------------------------------------------------------------------------------------
 
 // this is not implemented in here.
-// /** @fn			extern hal_result_t hal_spi_send(hal_spi_t id, uint8_t* txframe, uint8_t size)
-//     @brief  	this function adds the frame to the transmission buffer.  
+// /** @fn            extern hal_result_t hal_spi_send(hal_spi_t id, uint8_t* txframe, uint8_t size)
+//     @brief      this function adds the frame to the transmission buffer.  
 //                 if the id is configured having activity hal_spi_act_continuous, then the sendnow enables or disables the activity.
 //                 the txframe, if its size is not zero, is sent as soon as a new frame starts. otherwise, frames are taken from the 
 //                 txfifoofframes or are just zero data.
-//     @param  	id	        the id
-//     @param  	txframe 	    the frame to transmit
-//     @return 	hal_res_OK or hal_res_NOK_generic on failure
+//     @param      id            the id
+//     @param      txframe         the frame to transmit
+//     @return     hal_res_OK or hal_res_NOK_generic on failure
 //   */
 // extern hal_result_t hal_spi_put(hal_spi_t id, uint8_t* txframe);
 //
@@ -213,65 +213,66 @@ extern hal_boolval_t hal_spi_initted_is(hal_spi_t id)
     return(s_hal_spi_initted_is(id));
 }
 
-#if 0
-extern hal_result_t hal_spi_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte)
-{
-    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
-    hal_spi_cfg_t* cfg = NULL;
-    volatile uint32_t timeout = 0;
-    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    
-    
-    if(hal_false == hal_spi_initted_is(id))
-    {
-        return(hal_res_NOK_generic);
-    }
-    
-    cfg = &intitem->config;    
-        
-    if(hal_spi_act_raw != cfg->activity)
-    {
-        return(hal_res_NOK_generic);
-    }
-    
-    // before we write we need to wait for the spi has txe set
-    timeout = s_hal_spi_timeout_flag;        
-    while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE))
-    {
-        if(0 == (timeout--)) s_hal_spi_timeoutexpired();
-    }         
-    
-    // ok. we send the byte
-    SPI_I2S_SendData(SPIx, byte);
-    
-    // we need to wait for a reply from the slave
-    timeout = s_hal_spi_timeout_flag;
-    while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE))
-    {
-        if(0 == (timeout--)) s_hal_spi_timeoutexpired();
-    }  
-    
-    // ok. here it is
-    uint8_t rb = SPI_I2S_ReceiveData(SPIx);
+// keep it just in case. it is a very simple way of spi operations using stm32 api. 
+//#if 0
+//extern hal_result_t hal_spi_writeread(hal_spi_t id, uint8_t byte, uint8_t* readbyte)
+//{
+//    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
+//    hal_spi_cfg_t* cfg = NULL;
+//    volatile uint32_t timeout = 0;
+//    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+//    
+//    
+//    if(hal_false == hal_spi_initted_is(id))
+//    {
+//        return(hal_res_NOK_generic);
+//    }
+//    
+//    cfg = &intitem->config;    
+//        
+//    if(hal_spi_act_raw != cfg->activity)
+//    {
+//        return(hal_res_NOK_generic);
+//    }
+//    
+//    // before we write we need to wait for the spi has txe set
+//    timeout = s_hal_spi_timeout_flag;        
+//    while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE))
+//    {
+//        if(0 == (timeout--)) s_hal_spi_timeoutexpired();
+//    }         
+//    
+//    // ok. we send the byte
+//    SPI_I2S_SendData(SPIx, byte);
+//    
+//    // we need to wait for a reply from the slave
+//    timeout = s_hal_spi_timeout_flag;
+//    while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE))
+//    {
+//        if(0 == (timeout--)) s_hal_spi_timeoutexpired();
+//    }  
+//    
+//    // ok. here it is
+//    uint8_t rb = SPI_I2S_ReceiveData(SPIx);
 
-    // if we want to retrieve it we copy into return value
-    if(NULL != readbyte)   
-    {
-        *readbyte = rb;
-    }  
-  
-    return(hal_res_OK);     
-}
-#endif
+//    // if we want to retrieve it we copy into return value
+//    if(NULL != readbyte)   
+//    {
+//        *readbyte = rb;
+//    }  
+//  
+//    return(hal_res_OK);     
+//}
+//#endif
 
    
 extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
-	
-		//SPI low level identifier
+    
+        //SPI low level identifier
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-	  //numberofframes is ignored. 1 is always used
+      //numberofframes is ignored. 1 is always used
     const uint8_t num2use = 1;
 
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
@@ -281,19 +282,19 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
     } 
 #endif    
 
-#if 0    
-    if(hal_spi_act_framebased != intitem->config.activity)
-    {
-        return(hal_res_NOK_generic);
-    }    
-#endif
+//#if 0    
+//    if(hal_spi_act_framebased != intitem->config.activity)
+//    {
+//        return(hal_res_NOK_generic);
+//    }    
+//#endif
       
     // protect ... may be not needed
     s_hal_spi_rx_isr_disable(id);       
     
     // tells how many frames to use
     intitem->frameburstcountdown = num2use;
-		
+        
     // reset isrrxframe, isrtxframe and its counter  
     memset(intitem->isrrxframe, 0, intitem->config.sizeofframe);
     intitem->isrrxcounter = 0;
@@ -302,9 +303,9 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 
     s_hal_spi_periph_enable(id);        // enable spi peripheral
     
-		//Need to send the first value inside the isrtxframe array
-		while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-		SPI_I2S_SendData(SPIx, intitem->isrtxframe[0]);
+    //Need to send the first value inside the isrtxframe array
+    while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPIx, intitem->isrtxframe[0]);
 
     // ok, the isr shall read n frames of m bytes each and then issue a callback to me.
     // n = intitem->frameburstcountdown (=1 for encoder), and m = intitem->config.sizeofframe (=3 for encoder)
@@ -345,10 +346,10 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
     return(s_hal_spi_get(id, rxframe, remainingrxframes));       
 }
 
-// /** @fn			extern hal_result_t hal_spi_stop(hal_spi_t id)
-//     @brief  	this function stops communication. 
-//     @param  	id	            the id
-//     @return 	hal_res_OK or hal_res_NOK_generic on failure
+// /** @fn            extern hal_result_t hal_spi_stop(hal_spi_t id)
+//     @brief      this function stops communication. 
+//     @param      id                the id
+//     @return     hal_res_OK or hal_res_NOK_generic on failure
 //   */
 /*
 // extern hal_result_t hal_spi_stop(hal_spi_t id);
@@ -394,8 +395,9 @@ extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
         return(hal_res_NOK_generic);
     }
 #endif
-		s_hal_spi_rx_isr_enable(id);
-		return (hal_res_OK);
+    
+    s_hal_spi_rx_isr_enable(id);
+    return (hal_res_OK);
 }
 
 extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
@@ -406,8 +408,9 @@ extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
         return(hal_res_NOK_generic);
     }
 #endif
-		s_hal_spi_rx_isr_disable(id);
-		return (hal_res_OK);
+    
+    s_hal_spi_rx_isr_disable(id);
+    return (hal_res_OK);
 }
 
 extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
@@ -418,8 +421,9 @@ extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
         return(hal_res_NOK_generic);
     }
 #endif
-		s_hal_spi_periph_enable(id);
-		return (hal_res_OK);
+    
+    s_hal_spi_periph_enable(id);
+    return (hal_res_OK);
 }
 
 extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
@@ -430,56 +434,65 @@ extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
         return(hal_res_NOK_generic);
     }
 #endif
-		s_hal_spi_periph_disable(id);
-		return (hal_res_OK);
+    
+    s_hal_spi_periph_disable(id);
+    return (hal_res_OK);
 }
 
 extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
 {
-		hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
 #if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 #endif
-		// Maybe to be changed
-		memcpy(intitem->isrtxframe, txframe, (intitem->config.sizeofframe)*sizeof(uint8_t));
-		return (hal_res_OK);
+    
+    // Maybe to be changed
+    memcpy(intitem->isrtxframe, txframe, (intitem->config.sizeofframe)*sizeof(uint8_t));
+    return (hal_res_OK);
 }
 
 extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize)
 {
-		hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
 #if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 #endif
-		intitem->config.sizeofframe = framesize;
-		return (hal_res_OK);
+    
+    intitem->config.sizeofframe = framesize;
+    return (hal_res_OK);
 }
 
-extern hal_result_t hal_spi_deinit(hal_spi_t id){
+extern hal_result_t hal_spi_deinit(hal_spi_t id)
+{
 #if   !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
-			if(hal_false == hal_spi_initted_is(id))
-			{
+    if(hal_false == hal_spi_initted_is(id))
+    {
         return(hal_res_NOK_generic);
-			}
+    }
 #endif
-			hl_result_t res;
-			res = hl_spi_deinit((hl_spi_t)id);
-			if ( hl_res_NOK_generic == res )
-				return hal_res_NOK_generic;
-			
-			s_hal_spi_initted_reset(id);
-			
-			hal_heap_delete((void**)&(s_hal_spi_theinternals.items[HAL_spi_id2index(id)]));
-			//hal_heap_delete((void**)&intitem);
-			
-			return (hal_res_OK);
+            
+    hl_result_t res;
+    res = hl_spi_deinit((hl_spi_t)id);
+            
+    if ( hl_res_NOK_generic == res )
+    {
+        return hal_res_NOK_generic;
+    }
+    
+    s_hal_spi_initted_reset(id);
+    
+    hal_heap_delete((void**)&(s_hal_spi_theinternals.items[HAL_spi_id2index(id)]));
+    //hal_heap_delete((void**)&intitem);
+    
+    return (hal_res_OK);
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -489,19 +502,19 @@ extern hal_result_t hal_spi_deinit(hal_spi_t id){
 
 void SPI1_IRQHandler(void)
 {
-	s_hal_spi_read_isr(hal_spi1);
+    s_hal_spi_read_isr(hal_spi1);
 }
 
 
 void SPI2_IRQHandler(void)
 {
-	s_hal_spi_read_isr(hal_spi2);
+    s_hal_spi_read_isr(hal_spi2);
 }
 
 
 void SPI3_IRQHandler(void)
 {
-	s_hal_spi_read_isr(hal_spi3);
+    s_hal_spi_read_isr(hal_spi3);
 }
 
 // ---- isr of the module: end ------
@@ -522,7 +535,7 @@ static void s_hal_spi_periph_enable(hal_spi_t id)
 static void s_hal_spi_periph_disable(hal_spi_t id) 
 {
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);    // wait until it's free	                                   
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);    // wait until it's free                                       
     SPI_Cmd(SPIx, DISABLE);
 }
 
@@ -543,15 +556,15 @@ static void s_hal_spi_read_isr(hal_spi_t id)
     {   // ok. the frame is finished
         // 1. stop spi 
         s_hal_spi_periph_disable(id);           // disable periph
-				s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
-				
+        s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
+                
         // set back to zero the frame burst
         intitem->frameburstcountdown = 0;
         // set rx counter to zero again
         intitem->isrrxcounter = 0;
-			
-				// Erase the isrtxframe
-				memset(intitem->isrtxframe, 0, intitem->config.sizeofframe);
+            
+        // Erase the isrtxframe
+        memset(intitem->isrtxframe, 0, intitem->config.sizeofframe);
         
         // copy the rxframe into the rx fifo
         
@@ -572,9 +585,9 @@ static void s_hal_spi_read_isr(hal_spi_t id)
     else
     {
         // transmit one dummy byte to trigger yet another reception
-				// SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);
-				// transmit the corresponding byte to trigger another reception
-				SPI_I2S_SendData(SPIx, intitem->isrtxframe[intitem->isrrxcounter]);
+        // SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);
+        // transmit the corresponding byte to trigger another reception
+        SPI_I2S_SendData(SPIx, intitem->isrtxframe[intitem->isrrxcounter]);
     }
 }
 
@@ -656,20 +669,20 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .SPI_FirstBit           = SPI_FirstBit_MSB, // SPI_FirstBit_MSB is ok with display, su stm3210c e' indifferente
         .SPI_CRCPolynomial      = 0x0007 // reset value
     };
-		
+        
     if(cfg->cpolarity == hal_spi_cpolarity_low)
     {
         hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
     }
 
-		//SPI1 has a different clock
-		if (hal_spi1 == id)
-		{
-			hl_spi_advcfg_ems4rd.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
-		}
-		
-		//We should set the correct baud rate also...?
-		//The prescaler used is the one defined in advcfg, if it's not null
+    //SPI1 has a different clock
+    if (hal_spi1 == id)
+    {
+        hl_spi_advcfg_ems4rd.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
+    }
+        
+    //We should set the correct baud rate also...?
+    //The prescaler used is the one defined in advcfg, if it's not null
     hl_spi_cfg_t hlcfg =
     {
         .mode       = hl_spi_mode_master,
@@ -677,8 +690,8 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .advcfg     = &hl_spi_advcfg_ems4rd                
     };
     hlcfg.mode = (hal_spi_ownership_master == cfg->ownership) ? (hl_spi_mode_master) : (hl_spi_mode_slave); 
-		
-		//Compute the prescaler and substitute it inside hlcfg structure
+        
+    //Compute the prescaler and substitute it inside hlcfg structure
     hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);
     
     hl_result_t r = hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
@@ -710,13 +723,13 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // - the isr rx frame (heap allocation)  
     intitem->isrrxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
     intitem->isrrxcounter = 0;
-		
-		// - the isr tx frame (heap allocation)
+        
+        // - the isr tx frame (heap allocation)
     intitem->isrtxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
  
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
     intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
-		
+        
     // - the id
     intitem->id = id;
 

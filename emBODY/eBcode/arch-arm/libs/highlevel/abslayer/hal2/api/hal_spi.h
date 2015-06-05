@@ -114,8 +114,8 @@ typedef enum
 
 typedef enum
 {
-    hal_spi_cpolarity_low             = 0,
-    hal_spi_cpolarity_high      			= 1
+    hal_spi_cpolarity_low       = 0,
+    hal_spi_cpolarity_high      = 1
 } hal_spi_cpolarity_t;
 
 
@@ -133,12 +133,12 @@ typedef struct
     uint8_t                 capacityoftxfifoofframes; /**< if direction is not hal_spi_dir_rxonly, it specifies the capacity of the fifo of frames to tx */
     uint8_t                 capacityofrxfifoofframes; /**< if direction is not hal_spi_dir_txonly, it specifies the capacity of the fifo of frames to rx */
     //uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */
-		//uint8_t                 starttxvalue;	
+    //uint8_t                 starttxvalue;    
     hal_callback_t          onframetransm;      /**< if not NULL and direction is not hal_spi_dir_rxonly it is called by the ISR when a frame is transmitted */
     void*                   argonframetransm;
     hal_callback_t          onframereceiv;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when a frame is received */
     void*                   argonframereceiv;
-		hal_spi_cpolarity_t			cpolarity;					// if 0 SPI_CPOL_Low, if 1 SPI_CPOL_High
+    hal_spi_cpolarity_t     cpolarity;                    // if 0 SPI_CPOL_Low, if 1 SPI_CPOL_High
 } hal_spi_cfg_t;
 
  
@@ -153,20 +153,20 @@ extern const hal_spi_cfg_t hal_spi_cfg_default; /**< = { .ownership = hal_spi_ow
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn			extern uint32_t hal_spi_speedofbus_get(hal_spi_t id)
-    @brief  	this function tells what is the internal bus speed of an spi id. it can be used to chose the right value of the
+/** @fn         extern uint32_t hal_spi_speedofbus_get(hal_spi_t id)
+    @brief      this function tells what is the internal bus speed of an spi id. it can be used to chose the right value of the
                 prescaler to be assigned inside the hal_spi_cfg_t argument to be passed to hal_spi_init().
-    @param  	id 	    the id
-    @return 	the speed of the internal bus or 0 if the specified spi is not supported
+    @param      id         the id
+    @return     the speed of the internal bus or 0 if the specified spi is not supported
   */
 extern uint32_t hal_spi_speedofbus_get(hal_spi_t id);
 
 
-/** @fn			extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
-    @brief  	this function initializes an spi id
-    @param  	id	        the id
-    @param  	cfg 	    the configuration
-    @return 	hal_res_OK or hal_res_NOK_generic on failure
+/** @fn         extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
+    @brief      this function initializes an spi id
+    @param      id            the id
+    @param      cfg         the configuration
+    @return     hal_res_OK or hal_res_NOK_generic on failure
     @warning    a given SPI id can be configured only once. The second call of hal_spi_init(cfg) will do nothing.
                 The return value will be hal_res_OK if the parameter cfg is the same as one used the first time,
                 otherwise it will be hal_res_NOK_generic to express the fact that the CAN is not initted as wanted.    
@@ -174,104 +174,112 @@ extern uint32_t hal_spi_speedofbus_get(hal_spi_t id);
 extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg);
 
 
-/** @fn			extern hal_boolval_t hal_spi_initted_is(hal_spi_t id)
-    @brief  	this function tells if the spi is initted
-    @param  	id	        the id
-    @return 	hal_true or hal_false
+/** @fn         extern hal_boolval_t hal_spi_initted_is(hal_spi_t id)
+    @brief      this function tells if the spi is initted
+    @param      id            the id
+    @return     hal_true or hal_false
   */
 extern hal_boolval_t hal_spi_initted_is(hal_spi_t id);
 
 
-/** @fn			extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
-    @brief  	this function starts communication. in case of hal_spi_ownership_master, hal_spi_dir_rxonly, and hal_spi_act_framebased
+/** @fn         extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
+    @brief      this function starts communication. in case of hal_spi_ownership_master, hal_spi_dir_rxonly, and hal_spi_act_framebased
                 the function sends numberofframes dummy frames filled with values specified by cfg->dummytxvalue. upon reception of a
                 frame from the slave, it stores it inside its internal fifo and triggers the cfg->onframereceiv(arg) callback.
                 when all the numberofframes frames are received, then the spi is automatically stopped.
-    @param  	id	            the id
-    @param  	numberofframes   the number of frames to manage (FOR FUTURE USE. NOW IT IS IS ALWAYS 1)
-    @return 	hal_res_OK or hal_res_NOK_generic on failure
+    @param      id                    the id
+    @param      numberofframes      the number of frames to manage (FOR FUTURE USE. NOW IT IS IS ALWAYS 1)
+    @return     hal_res_OK or hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes);
 
 
-/** @fn			extern hal_bool_t hal_spi_active_is(hal_spi_t id)
-    @brief  	this function tells if the spi is active. 
-    @param  	id	            the id
-    @return 	hal_true if there is communication activity, hal_false if it has finished transferring data or spi was not initted yet.
+/** @fn         extern hal_bool_t hal_spi_active_is(hal_spi_t id)
+    @brief      this function tells if the spi is active. 
+    @param      id                the id
+    @return     hal_true if there is communication activity, hal_false if it has finished transferring data or spi was not initted yet.
   */
 extern hal_bool_t hal_spi_active_is(hal_spi_t id);
 
 
-/** @fn			extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes)
-    @brief  	this function retrieves a received frame. it can be called when all the frames have been received and thus hal_spi_active_is() returns
+/** @fn         extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes)
+    @brief      this function retrieves a received frame. it can be called when all the frames have been received and thus hal_spi_active_is() returns
                 hal_false. However, it can also be called inside the cfg->onframereceiv(arg) callback after the reception of each frame.
-    @param  	id	                the id
-    @param  	rxframe             the received frame
-    @param  	remainingrxframes   if not NULL, it is filled with the number of frames remaining in the internal fifo.
-    @return 	hal_res_OK if a valid frame is available, hal_res_NOK_nodata if no frame is available, or hal_res_NOK_generic on failure
+    @param      id                    the id
+    @param      rxframe             the received frame
+    @param      remainingrxframes   if not NULL, it is filled with the number of frames remaining in the internal fifo.
+    @return     hal_res_OK if a valid frame is available, hal_res_NOK_nodata if no frame is available, or hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes);
 
 
-/** @fn			extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
-    @brief  	this function allows changing the cfg->onframereceiv(arg) callback originally configured at hal_spi_init().
-    @param  	id	                the id
-    @param  	onframereceiv       the callback (it can be NULL).
-    @param  	arg                 its argument
-    @return 	hal_res_OK if spi is initted, hal_res_NOK_generic on failure
+/** @fn         extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
+    @brief      this function allows changing the cfg->onframereceiv(arg) callback originally configured at hal_spi_init().
+    @param      id                    the id
+    @param      onframereceiv       the callback (it can be NULL).
+    @param      arg                 its argument
+    @return     hal_res_OK if spi is initted, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg); 
 
-/** @fn			extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
-    @brief  	this function enable the rx isr for the SPI
-    @param  	id	                the id
-    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
+    @brief      this function enable the rx isr for the SPI
+    @param      id                    the id
+    @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id);
 
-/** @fn			extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
-    @brief  	this function disable the rx isr for the SPI
-    @param  	id	                the id
-    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id)
+    @brief      this function disable the rx isr for the SPI
+    @param      id                    the id
+    @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_rx_isr_disable(hal_spi_t id);
 
-/** @fn			extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
-    @brief  	this function enable the SPI peripherical
-    @param  	id	                the id
-    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_periph_enable(hal_spi_t id)
+    @brief      this function enable the SPI peripherical
+    @param      id                    the id
+    @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_periph_enable(hal_spi_t id);
 
-/** @fn			extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
-    @brief  	this function disable the SPI peripherical
-    @param  	id	                the id
-    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_periph_disable(hal_spi_t id)
+    @brief      this function disable the SPI peripherical
+    @param      id                    the id
+    @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_periph_disable(hal_spi_t id);
 
-/** @fn			extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
-    @brief  	this function set the size of frame to be used by the isr to call the callback function
-    @param  	id	                the id
-							framesize						number of bytes contained in the frame
-    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
+    @brief      this function set the size of frame to be used by the isr to call the callback function
+    @param      id              the id
+    @param      framesize       number of bytes contained in the frame
+    @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
 
-/** @fn			extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
-    @brief  	this function set the tx frame by copying the bytes array pointed by txframe 
-    @param  	id	                the id
-							txframe							pointer to the transmission frame
-    @return 	hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
+    @brief      this function set the tx frame by copying the bytes array pointed by txframe 
+    @param      id          the id
+    @param      txframe     pointer to the transmission frame
+    @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe);
 
-/** @fn			extern hal_result_t hal_spi_deinit(hal_spi_t id)
-    @brief  	this function deinitializes an SPI id and all the associated resources
-    @param  	id	        the id
-    @return 	hal_res_OK or hal_res_NOK_generic on failure
+
+/** @fn         extern hal_result_t hal_spi_deinit(hal_spi_t id)
+    @brief      this function deinitializes an SPI id and all the associated resources
+    @param      id            the id
+    @return     hal_res_OK or hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_deinit(hal_spi_t id);
+
 /** @}            
     end of group doxy_group_hal_spi  
  **/
