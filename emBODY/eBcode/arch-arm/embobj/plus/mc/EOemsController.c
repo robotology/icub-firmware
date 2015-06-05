@@ -704,7 +704,11 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     eObool_t torque_protection[MAX_NAXLES];
     eObool_t stiffness[MAX_NAXLES];
     
-    eo_motors_check_wdog(ems->motors);
+    //check watchdog only if not local actuation
+    if(emscontroller_actuation_LOCAL != ems->act)
+    {
+        eo_motors_check_wdog(ems->motors);
+    }
     
     //PWM computation (PID ecc)
     JOINTS(j)
@@ -1232,15 +1236,40 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     if (ems) eo_pid_Reset(eo_axisController_GetPosPidPtr(ems->axis_controller[joint]));
 }
 
-extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
+extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
 {
     if (!ems) return;
     
     ems->n_calibrated = 0;
         
+    //Set the right calibration type
+    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type3_abs_sens_digital;
+    
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
     
-    eo_axisController_StartCalibration(ems->axis_controller[joint]);
+    eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
+}
+extern void eo_emsController_StartCalibration_type0(uint8_t joint, int16_t pwmlimit, int16_t vel)
+{
+    if (!ems) return;
+    
+    ems->n_calibrated = 0;
+        
+    //calibrating procedure
+    //comments:
+    //we don't need to set an offset to the encoder in this case! at the startup, the value is 0
+    //how to implement the procedure of setting a constant PWM to the motor until it reaches the hardware limit?
+    //nice solution -> do an incremental procedure modifying the PWM and CheckCalibration functions...a flag will notify the end of the procedure
+    
+    //Just for test...try to move the motor using the incremental encoder using it's initial raw position (it should be 0)
+    
+    //Set the right calibration type
+    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type0_hard_stops;
+    
+    //offset is 0 in this case
+    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
+    eo_axisController_StartCalibration_type0(ems->axis_controller[joint], pwmlimit, vel);
+    
 }
     
 extern void eo_emsController_CheckCalibrations(void)
@@ -1256,18 +1285,20 @@ extern void eo_emsController_CheckCalibrations(void)
     JOINTS(j)
     {
         joint_ok[j] = eobool_true;
-        
         ENCODERS(e)
         {
-            if (eo_motors_are_coupled(ems->motors, j, e))
+       
+          if (eo_motors_are_coupled(ems->motors, j, e))
+          {
+            //if encoder not calibrated OR calibration type 0, then the axis is not calibrated yet
+            if ((!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[e])) || (ems->axis_controller[j]->calibration_type == eomc_calibration_type0_hard_stops))
             {
-                if (!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[e]))
-                {
-                    joint_ok[j] = eobool_false;
-                    break;
-                }
+                joint_ok[j] = eobool_false;
+                break;
             }
+           }
         }
+        
     }
     
     JOINTS(j)
@@ -1290,7 +1321,8 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 ems->n_calibrated++;
             }
-            else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
+            //it's valid only for calibration type 3 (we do the check for all the other boards also)
+            else if ((eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j])) && (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital))
             {    
                 ems->n_calibrated++;
                 eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1306,9 +1338,9 @@ extern void eo_emsController_CheckCalibrations(void)
         {
             ems->n_calibrated+=3;
         }
-        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]) && 
-                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1]) &&
-                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2]))
+        else if ((eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0])  && (ems->axis_controller[0]->calibration_type == eomc_calibration_type3_abs_sens_digital) &&
+                  eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1])  && (ems->axis_controller[1]->calibration_type == eomc_calibration_type3_abs_sens_digital) &&
+                  eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2])) && (ems->axis_controller[2]->calibration_type == eomc_calibration_type3_abs_sens_digital))
         {
             ems->n_calibrated+=3;
             eo_axisController_SetCalibrated(ems->axis_controller[0]);
@@ -1325,7 +1357,7 @@ extern void eo_emsController_CheckCalibrations(void)
         {
             ems->n_calibrated++;
         }
-        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[3]))
+        else if ((eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[3])) && (ems->axis_controller[3]->calibration_type == eomc_calibration_type3_abs_sens_digital))
         {    
             ems->n_calibrated++;
             eo_axisController_SetCalibrated(ems->axis_controller[3]);
@@ -1513,7 +1545,20 @@ extern void eo_emsMotorController_GoIdle(void)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+__weak extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint8_t motor)
+{
 
+}
+
+__weak extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,uint8_t motor)
+{
+
+}
+
+__weak extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor)
+{
+
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1524,6 +1569,8 @@ extern void eo_emsMotorController_GoIdle(void)
 
 void config_2FOC(uint8_t motor)
 {
+    eo_emsController_hid_userdef_config_motor(ems, motor);
+    /*
     if(emscontroller_actuation_2FOC != ems->act)
     {
         return;
@@ -1600,7 +1647,8 @@ void config_2FOC(uint8_t motor)
 
 #endif
 
-//#endif    
+//#endif
+*/
 }
 
 
@@ -1610,6 +1658,8 @@ void config_2FOC(uint8_t motor)
 // e nel caso di set_2FOC_running() ?
 void set_2FOC_idle(uint8_t motor)
 {
+    eo_emsController_hid_userdef_set_motor_idle(ems, motor);
+    /*
     if(emscontroller_actuation_2FOC != ems->act)
     {
         return;
@@ -1655,11 +1705,14 @@ void set_2FOC_idle(uint8_t motor)
     
 #endif
     
-//#endif    
+//#endif
+*/
 }
 
 void set_2FOC_running(uint8_t motor)
 {
+    eo_emsController_hid_userdef_set_motor_running(ems, motor);
+    /*
     if(emscontroller_actuation_2FOC != ems->act)
     {
         return;
@@ -1714,12 +1767,13 @@ void set_2FOC_running(uint8_t motor)
     
 #endif
     
-//#endif    
+//#endif
+    */
 }
 
 
 #ifdef EXPERIMENTAL_MOTOR_TORQUE
-ccr
+
     #if defined(SHOULDER_BOARD)
         //         |    1       0       0   |
         // J^-1  = | -65/40   65/40     0   |

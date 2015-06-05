@@ -3,7 +3,7 @@
     @author     davide.pollarolo@iit.it
     @date       06/05/2015
 **/
-// ciao
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -51,13 +51,8 @@ extern int32_t joint2ticksperrevolution (uint8_t joint_n)
 {
     if (joint_n >= MAX_NAXLES)
         return 0;
-    
-    EoMCConfigurations* mccfg_ptr = eOmcconfig_GetHandle();
-    
-    if (mccfg_ptr == NULL)
-        return 0;
-    
-    eOmcconfig_code_t code = Get_Active_Code(mccfg_ptr);
+        
+    eOmcconfig_code_t code = eOmcconfig_Get_Active_Code();
     if (code == eOmcconfig_code_dummy)
         return 0;
     
@@ -70,6 +65,7 @@ extern int32_t joint2ticksperrevolution (uint8_t joint_n)
         
         return ticks_per_revolution[jomoscfg[joint_n].encoder.etype].ticks;
     }
+    return 0;
 }
 
 //get the encoder type given a joint number
@@ -78,24 +74,21 @@ extern eo_appEncReader_enc_type_t joint2encodertype (uint8_t joint_n)
     if (joint_n >= MAX_NAXLES)
         return eo_appEncReader_enc_type_NONE;
     
-    EoMCConfigurations* mccfg_ptr = eOmcconfig_GetHandle();
-    
-    if (mccfg_ptr == NULL)
-        return 0;
-    
-    eOmcconfig_code_t code = Get_Active_Code(mccfg_ptr);
+    eOmcconfig_code_t code = eOmcconfig_Get_Active_Code();
     if (code == eOmcconfig_code_dummy)
-        return 0;
+        return eo_appEncReader_enc_type_NONE;
     
     const eOmcconfig_jomo_cfg_t* jomoscfg = eOmcconfig_code2config(code);
     
     if (jomoscfg != NULL)
     {
        if( jomoscfg[joint_n].encoder.etype >= (sizeof(ticks_per_revolution)/sizeof(eo_emsControllerCfg_ticksencoder_t)))
-            return 0;
+            return eo_appEncReader_enc_type_NONE;
        
        return (eo_appEncReader_enc_type_t)jomoscfg[joint_n].encoder.etype;
     }
+    
+    return eo_appEncReader_enc_type_NONE;
 }
 
 

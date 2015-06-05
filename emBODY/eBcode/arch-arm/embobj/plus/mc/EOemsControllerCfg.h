@@ -13,8 +13,11 @@ extern "C" {
  **/
         
  // - external dependencies --------------------------------------------------------------------------------------------
- 
+
+//#include "EoCommon.h"
 //#include "EOMtheEMSapplCfg_cfg.h"
+    
+//#include "EOappEncodersReader.h"
  
  // - public #define  --------------------------------------------------------------------------------------------------
  
@@ -104,7 +107,13 @@ extern "C" {
 #define CHK_BITS(mask,bits) (((mask) & (bits)) == (bits))
 #define LIMIT(x,L) { if (x>(L)) x=(L); else if (x<-(L)) x=-(L); }
 #define LIMIT2(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
- 
+
+// - declaration of extern public functions ---------------------------------------------------------------------------
+/* NOT USED
+extern int32_t joint2ticksperrevolution (uint8_t joint_n);
+
+extern eo_appEncReader_enc_type_t joint2encodertype (uint8_t joint_n);
+*/
  #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 

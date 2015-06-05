@@ -255,15 +255,22 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         }
         else
         {
-            //message "spike encoder error"
-            eOerrmanDescriptor_t descriptor = {0};
-            descriptor.par16 = check;   // unless required
-            descriptor.par64 = 0;       // unless required
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
-            descriptor.sourceaddress = o->ID; // oppure l'id del can che ha dato errore
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
-          
+            static uint16_t count = 0;
+            count++;
+            //we don't want to send up too many messages...
+            if (count == 100)
+            {
+                //message "spike encoder error"
+                eOerrmanDescriptor_t descriptor = {0};
+                descriptor.par16 = check;   // unless required
+                descriptor.par64 = 0;       // unless required
+                descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
+                descriptor.sourceaddress = o->ID; // oppure l'id del can che ha dato errore
+                descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
+                
+                count = 0;
+            }  
             #ifndef USE_2FOC_FAST_ENCODER
             o->velocity = (7*o->velocity) >> 3;
             #endif
@@ -366,6 +373,18 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
         return;
     }
     
+	// check if it's working now...
+    // for incremental encoders this function has only to set a flag in a bit mask
+    // how can I detect that the encoder is incremental?
+    
+    //old method using function encoder type dependent
+    /*
+    if (joint2encodertype(o->ID) == 2)
+    {
+        RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
+    }
+    */
+    // nb: for inc encoders, this part is never executed 
     if (++o->first_valid_data >= 3)
     {
         //o->time = 0;

@@ -920,7 +920,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
         command.value = &controlmode_2foc;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
 
-        eo_emsController_StartCalibration(jxx, 
+        eo_emsController_StartCalibration_type3(jxx, 
                                           calibrator->params.type3.position, 
                                           calibrator->params.type3.velocity,
                                           calibrator->params.type3.offset);
