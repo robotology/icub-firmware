@@ -31,7 +31,6 @@
 #include "EOtheEMSApplBody.h"
 #include "EOMtheEMSapplCfg.h"
 
-//#include "EOtheEMSapplDiagnostics.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
@@ -60,8 +59,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define configurator_timeout_send_diagnostics   1000
-//#define MAX_WAITFOR2FOC                         300
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -99,7 +96,6 @@
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfigurator* p)
 {
-
     // in here we want to read all can frames that we have on can1 and also on can2
     
     uint8_t numofrxframes = 0;
@@ -113,44 +109,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
     {
         eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, numofrxframes, NULL);        
     }
-    
-
-//#if 0    
-//    eOresult_t  res;
-//    uint8_t     numofRXcanframe = 0;
-
-//    
-//    EOappCanSP  *appcanSP = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//    EOappTheDB  *db = eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle());
-//   
-//    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport1, &numofRXcanframe);
-//    if(eores_OK != res)
-//    {
-//        return;
-//    }
-//    
-//#ifdef _GET_CANQUEUE_STATISTICS_
-//    //eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport1, numofRXcanframe);
-//    #warning marco.accame: TODO: put diagnostics
-//#endif
-//    eo_appCanSP_read(appcanSP, eOcanport1, numofRXcanframe, NULL);
-//    
-
-//    // before version 1.70, this part was skipped if the skin was connected on CAN bus 2
-//    numofRXcanframe = 0;
-//    res = eo_appCanSP_GetNumOfRecCanframe(appcanSP, eOcanport2, &numofRXcanframe);
-//    if(eores_OK != res)
-//    { // se c'e un errore sui parametri passati ovvero mai., 
-//        return;
-//    }
-//#ifdef _GET_CANQUEUE_STATISTICS_
-////        eo_theEMSdgn_updateCanRXqueueStatisticsOnConfigMode(eOcanport2, numofRXcanframe);
-//    #warning marco.accame: TODO: put diagnostics
-//#endif
-//    eo_appCanSP_read(appcanSP, eOcanport2, numofRXcanframe, NULL);   
-//    
-//#endif
-    
+       
 }
 
 
@@ -213,7 +172,6 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     {
         uint32_t dontaskmask = 0; // the first time we ask to every board
         eo_candiscovery_CheckCanBoardsAreReady(eo_candiscovery_GetHandle(), dontaskmask);
-        //eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask);
         return;
     }
           
@@ -224,7 +182,6 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     {
         // se tutte le 1foc e le mc4 sono ready, allora setto che lo sono (stoppo il timer canBoardsReady_timer da 10 milli)
         // e poi mando la configurazione alle board can mc4
-        //eo_emsapplBody_checkCanBoards_Stop(eo_emsapplBody_GetHandle());
         eo_candiscovery_Stop(eo_candiscovery_GetHandle());
         // poi, nel caso mc4:  mando la configurazione alle board e abilito MAIS e BCastPolicy 
         eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
@@ -238,7 +195,6 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     {  
         // i check again if the can boards are ready. however, i dont check the boards already ready
         eo_candiscovery_CheckCanBoardsAreReady(eo_candiscovery_GetHandle(), readyCanBoardsMask);
-        //eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), readyCanBoardsMask);
     }
     
 }
@@ -247,10 +203,6 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
 // to transmit a udp packet.
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
-    //eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-    // marco.accame: for now i remove the action of this object and i call the errormanager. for later we can have both the error handlers
-    // eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , configurator_timeout_send_diagnostics);    
-    
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_configurator_udptxfailure);
     errdes.par16            = 0;

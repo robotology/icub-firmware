@@ -78,20 +78,6 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//#warning --> marco.accame eom_emserror_OnError_userdefined_call_OLDONE() is not used anymore ... see if tehre are things which are still needed.
-//extern void eom_emserror_OnError_userdefined_call_OLDONE(eOerrmanErrorType_t errtype, eOid08_t taskid, const char *eobjstr, const char *info)
-//{
-//    if(errtype < eo_errortype_warning)
-//    {
-//        return;
-//    }
-//    const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-//    char str[128];
-//    snprintf(str, sizeof(str)-1, "EOMtheEMSerror %s: %s-%s", err[(uint8_t)errtype], eobjstr, info);
-//    eo_theEMSdgn_UpdateErrorLog(eo_theEMSdgn_GetHandle(), &str[0], sizeof(str));
-//    eom_emsbackdoor_Signal(eom_emsbackdoor_GetHandle(), eodgn_nvidbdoor_errorlog , 3000);         
-//}
-
 
 
 
