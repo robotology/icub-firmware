@@ -40,7 +40,7 @@
 
 #include "OPCprotocolManager_Cfg.h" 
 //#include "EOtheEMSapplDiagnostics.h"
-
+#include "EOemsControllerCfg.h"
 #include "osal.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -58,16 +58,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-#define CHECK_ENC_IS_CONNECTED(joint_enc)   (joint_enc != eo_appEncReader_enc_type_NONE)
-#define CHECK_ENC_IS_ON_SPI(joint_enc)      ((joint_enc == eo_appEncReader_enc_type_AEA) || (joint_enc == eo_appEncReader_enc_type_AMO))
+#define CHECK_ENC_IS_CONNECTED(joint_enc)       (joint_enc != eo_appEncReader_enc_type_NONE)
+#define CHECK_ENC_IS_ON_SPI(joint_enc)          ((joint_enc == eo_appEncReader_enc_type_AEA) || (joint_enc == eo_appEncReader_enc_type_AMO))
 
-#define INTPRIO_SPI_ENCODERS                hal_int_priority05
-#define DGN_COUNT_MAX                       10000 //1 sec
-#define DGN_THRESHOLD                       0
+#define INTPRIO_SPI_ENCODERS                    hal_int_priority05
+#define DGN_COUNT_MAX                           10000 //1 sec
+#define DGN_THRESHOLD                           0
 
-#define ENCODER_NULL                        255
-#define ENCODER_VALUE_NOT_SUPPORTED         0xFFFFFFFF
+#define ENCODER_NULL                            255
+#define ENCODER_VALUE_NOT_SUPPORTED             0xFFFFFFFF
 
+#define RESCALE_IN_ICUB_DEGREES(val,fullscale)  (TICKS_PER_REVOLUTION*val)/fullscale             
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -118,6 +119,15 @@ static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncR
     /* 3 */     eo_appEncReader_stream_position1,
     /* 4 */     eo_appEncReader_stream_position2,
     /* 5 */     eo_appEncReader_stream_position2
+};
+
+static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
+{
+    /* AEA */     65520,
+    /* AMO */     65535,
+    /* INC */     28671,
+    /* ADH */     0,
+    /* ... */
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -255,7 +265,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 //val_raw >>= 6;
                 //*value = (val_raw & 0x0FFF);
                 //*value <<= 4; // 65536 ticks/revolution normalization;
-                *primary_value = (val_raw>>2) & 0xFFF0;
+                val_raw = (val_raw>>2) & 0xFFF0;
+                *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
                 break;
             }   			
 
@@ -285,13 +296,15 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                     return((eOresult_t)res1);
                 }
             
-                *primary_value = (val_raw>>4) & 0xFFFF;
+                val_raw = (val_raw>>4) & 0xFFFF;
+                *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AMO]);
                 break;
             }
             case eo_appEncReader_enc_type_INC:
             {
                 val_raw = hal_quad_enc_getCounter(this_joint.primary_enc_position);
-                *primary_value = val_raw & 0xFFFF;
+                val_raw = val_raw & 0xFFFF;
+                *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
                 res1 = eores_OK;
                 break;
             }
@@ -349,7 +362,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 //val_raw >>= 6;
                 //*value = (val_raw & 0x0FFF);
                 //*value <<= 4; // 65536 ticks/revolution normalization;
-                *extra_value = (val_raw>>2) & 0xFFF0;
+                val_raw = (val_raw>>2) & 0xFFF0;
+                *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
                 break;
             }   			
 
@@ -378,12 +392,14 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                     return((eOresult_t)res2);
                 }
             
-                *extra_value = (val_raw>>4) & 0xFFFF;
+                val_raw = (val_raw>>4) & 0xFFFF;
+                *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AMO]);
                 break;
             }
             case eo_appEncReader_enc_type_INC:
             {
-                *extra_value = hal_quad_enc_getCounter(this_joint.extra_enc_position);
+                val_raw = hal_quad_enc_getCounter(this_joint.extra_enc_position);
+                *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
                 res2 = eores_OK;
                 break;
             }
@@ -412,7 +428,7 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     //work-around (fully working) for backward compatibility:
     //if enc is = 0,2,4 --> stream0
     //if enc is = 1,3,5 --> stream1
-    // the rule is valid for both EMS & MC4 plus
+    // the rule is valid for both EMS & MC4plus
     
     eo_appEncReader_stream_number_t current_stream;
     
@@ -725,10 +741,13 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream0(void *arg)
    p->times[0][3] = osal_system_abstime_get(); 
  
    p->configuredEnc_SPI_stream0.st = eOEncReader_readSt__finished;
-   //if reading on spi stream1 are already finished and the user has configured a callback ==> then invoke it
-   if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st) && (NULL != p->cfg.SPI_callbackOnLastRead))
+   //if the user has configured a callback and reading on spi stream1 are already finished ==> then invoke it
+   if (NULL != p->cfg.SPI_callbackOnLastRead)
    {
-        p->cfg.SPI_callbackOnLastRead(p->cfg.SPI_callback_arg);
+       if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st) || (eOEncReader_readSt__idle == p->configuredEnc_SPI_stream1.st)) 
+       {
+            p->cfg.SPI_callbackOnLastRead(p->cfg.SPI_callback_arg);
+       }
    }
 }
 
@@ -741,10 +760,13 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1(void *arg)
    //set status of reding on spi stream1
    p->configuredEnc_SPI_stream1.st = eOEncReader_readSt__finished;
 
-   //if reading on spi stream0 are already finished and the user has configured a callback ==> then invoke it
-   if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st) && (NULL != p->cfg.SPI_callbackOnLastRead))
+   //if the user has configured a callback and reading on spi stream0 are already finished ==> then invoke it
+   if (NULL != p->cfg.SPI_callbackOnLastRead)
    {
-        p->cfg.SPI_callbackOnLastRead(p->cfg.SPI_callback_arg);
+       if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st) || (eOEncReader_readSt__idle == p->configuredEnc_SPI_stream0.st)) 
+       {
+            p->cfg.SPI_callbackOnLastRead(p->cfg.SPI_callback_arg);
+       }
    }
 }
 

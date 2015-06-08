@@ -76,7 +76,7 @@ typedef enum
     eo_appEncReader_stream_positionNONE = 255,    
 } eo_appEncReader_stream_position_t;
 
-enum { eo_appEncReader_stream_position_numberof     = 3 };
+enum { eo_appEncReader_stream_position_numberof = 3 };
 
 typedef enum
 {
@@ -87,6 +87,8 @@ typedef enum
     //eo_appEncReader_enc_type_MAIS = 4,  /* Encoder position coming from MAIS Can board */ // --> it will be probably managed at another level
     eo_appEncReader_enc_type_NONE = 255 /* Encoder NOT DEFINED */
 } eo_appEncReader_enc_type_t;
+
+enum { eo_appEncReader_enc_type_numberof = 4 };
 
 typedef enum
 {
