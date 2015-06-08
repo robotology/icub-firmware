@@ -56,7 +56,6 @@ struct EOtheEMSapplBody_hid
     eOemsapplbody_cfg_t                 config; 
     eOtheEMSapplBody_hid_states_t       st;
     eOmn_appl_runMode_t                 appRunMode;
-//    EOtimer                             *checkCanBoards_timer;
     EOappEncReader                      *appEncReader;
     EOemsController                     *emsController;
     eo_emsapplbody_configMC4boards_t    configMC4boards2use; 
