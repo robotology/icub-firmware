@@ -29,12 +29,14 @@ extern "C" {
 //#define SHOULDER_3rd_JOINT_COUPLING
 //#define USE_JACOBIAN
 
-#ifdef ICUB_GENOVA04
+#if     defined(ICUB_MEC_V1) | defined(ICUB_GENOVA04)
     #define V1_MECHANICS
     #define USE_2FOC_FAST_ENCODER
-#else
+#elif   defined(ICUB_MEC_V2) | defined(ICUB_DARMSTADT01)
     #define V2_MECHANICS
     #define USE_2FOC_FAST_ENCODER
+#else
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
 #endif
 
 #if defined(HEAD_V3)

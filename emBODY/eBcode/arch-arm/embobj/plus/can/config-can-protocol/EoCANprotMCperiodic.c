@@ -112,7 +112,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *fram
             // for this board we must not issue the error and we must do nothing
             return(eores_OK);            
         }        
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);  
     }    
     
@@ -147,7 +146,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
     {
         if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }
         
@@ -176,7 +174,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
     {
         if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }
         #if 1
@@ -228,7 +225,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
             {
                 return(eores_OK);
             }
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }        
         
@@ -249,7 +245,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
         // s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
               
     }
-    else
+    else if(eobrd_cantype_mc4 == boardtype)
     {   // we have a mc4, thus we must manage two joints
         uint8_t j=0;
         // the two joints have ...
@@ -261,7 +257,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
             // joint i-th
             if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
             {
-                #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
                 return(eores_OK);        
             }  
             // manage controlmode
@@ -284,8 +279,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
         }  
     }
     
-    return(eores_OK);
-    
+    return(eores_OK);    
 }
 
 
@@ -305,7 +299,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT(eOcanframe_t *f
     {
         if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, insideindex[m], &motorindex)))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }        
         motor->status.basic.mot_current = *((uint16_t*)&(frame->data[offset[m]]));          
@@ -349,7 +342,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
     {
         if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }
         vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[offsetvelocity[j]]));
@@ -386,7 +378,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
     {
         if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }
         
@@ -427,13 +418,11 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     {
         if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }
         
         if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
         {
-            #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
             return(eores_OK);        
         }
         joint->status.interactionmodestatus = tmp;        

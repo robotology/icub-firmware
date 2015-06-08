@@ -30,7 +30,7 @@
     @date       09/19/2012
 **/
 
-/** @defgroup eo_TheemapplBody Object eOTheemapplBody
+/** @defgroup eo_TheEmsAppBody Object eOTheemapplBody
     ...... 
     @{        
  **/
@@ -39,11 +39,6 @@
 
 #include "EoCommon.h"
 #include "EoManagement.h"
-
-
-
-//#include "EOappTheDataBase.h"
-//#include "EOappCanServicesProvider.h"
 
 #include "EoBoards.h"
 #include "EOappEncodersReader.h"
@@ -120,9 +115,7 @@ typedef struct
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
-
-//extern const eOemsapplbody_cfg_t eo_emsapplbody_cfg_default;
-
+// empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
@@ -143,35 +136,10 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 
 
-//extern eOresult_t eo_emsapplBody_checkCanBoardsAreReady(EOtheEMSapplBody *p, uint32_t dontaskmask);
-//extern eObool_t eo_emsapplBody_areCanBoardsReady(EOtheEMSapplBody *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
-//extern eOresult_t eo_emsapplBody_checkCanBoards_Start(EOtheEMSapplBody *p);
-//extern eOresult_t eo_emsapplBody_checkCanBoards_Stop(EOtheEMSapplBody *p);
-
-//extern eOresult_t eom_emsapplBody_checkCanBoards_ManageDetectedFWversion(EOtheEMSapplBody *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
-
-
-//extern eOresult_t eo_emsapplBody_discovery_Mais_Start(EOtheEMSapplBody *p);
-//extern eOresult_t eo_emsapplBody_discovery_Mais_Stop(EOtheEMSapplBody *p);
-
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
-//extern eOresult_t eo_emsapplBody_MAISstart(EOtheEMSapplBody *p);
-//Note: eo_emsapplBody_sendConfig2canboards function send only one time the configuration; so the second call of this func will send anything!
+
 extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
-
-//extern eOresult_t eo_emsapplBody_StopSkin(EOtheEMSapplBody *p);
-
-
-//extern eOresult_t eo_emsapplBody_SignalDetectedCANboards(EOtheEMSapplBody *p);
-
-//extern eObool_t eom_emsapplBody_IsCANboardToBeChecked(EOtheEMSapplBody *p, eObrd_cantype_t type);
-
-//extern eObool_t eom_emsapplBody_IsCANboard_usedbyMC(EOtheEMSapplBody *p, eObrd_cantype_t type);
-
-//extern eObool_t eom_emsapplBody_IsCANboard_usedbyAS(EOtheEMSapplBody *p, eObrd_cantype_t type);
-
-//extern eObool_t eom_emsapplBody_IsCANboard_usedbySK(EOtheEMSapplBody *p, eObrd_cantype_t type);
 
 
 /** @}            

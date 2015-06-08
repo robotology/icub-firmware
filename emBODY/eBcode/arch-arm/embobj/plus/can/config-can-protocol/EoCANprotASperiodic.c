@@ -108,7 +108,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEB
     
     if(NULL == (strain = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);  
     }    
     
@@ -127,7 +126,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DE
     
     if(NULL == (strain = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);  
     }    
     
@@ -259,7 +257,6 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
     
     if(NULL == (strain = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);  
     }    
         
@@ -302,7 +299,6 @@ static eOresult_t s_eocanprotASperiodic_parser_process_maisvalue(eOcanframe_t *f
     
     if(NULL == (mais = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, frame, port, &index)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);  
     }  
 
