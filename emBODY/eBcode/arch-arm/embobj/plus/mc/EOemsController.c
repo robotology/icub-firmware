@@ -19,20 +19,6 @@
 // keep it before any evaluation of macros ...
 #include "EOemsControllerCfg.h"
 
-
-//#if !defined(EMSCONTROLLER_DONT_USE_2FOC) 
- // we need to communicate over can 
- //#define USE_CANCOMM_V2
- #if defined(USE_CANCOMM_V2)
-    #include "EOtheCANservice.h"
- #else
-    #include "EOicubCanProto_specifications.h"
-    #include "EOtheEMSapplBody.h"
- #endif
-//#endif
-
-
-
 //////////////////////////////////
 #include "EOtheBOARDtransceiver.h"
 #include "EOrop.h"
@@ -41,7 +27,6 @@
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
-
 
 
 #if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
