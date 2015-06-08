@@ -930,14 +930,17 @@ extern "C" {
 // -------------------------------------------------------------------------------------------------------------------
 
 // in here we put only the macros required for the reference application
-#if defined(ICUB_GENOVA04)
+#if     defined(ICUB_MEC_V1)
     #define NAME_PREFIX     aEMS
     //#define NAME_POSTFIX    v1mec
     #define NAME_POSTFIX    gen04
-#else
+#elif   defined(ICUB_MEC_V2)
     #define NAME_PREFIX     aEMS
     #define NAME_POSTFIX    v2mec
+#else
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
 #endif    
+  
 
 #define PPCAT_NX(A, B, C)   A ## B ## C
 #define PPCAT(A, B, C)      PPCAT_NX(A, B, C)

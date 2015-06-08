@@ -125,12 +125,13 @@
         }      
     };
 
-
-    #if defined(ICUB_DARMSTADT01)
-        #define EB7EB9_NUMBEROFSTRAINS     1
-    #else
-        #define EB7EB9_NUMBEROFSTRAINS     0
-    #endif
+#if     defined(ICUB_MEC_V1)
+    #define EB7EB9_NUMBEROFSTRAINS     0
+#elif   defined(ICUB_MEC_V2)
+    #define EB7EB9_NUMBEROFSTRAINS     1
+#else
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
+#endif    
     
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB7EB9[] =
     {  

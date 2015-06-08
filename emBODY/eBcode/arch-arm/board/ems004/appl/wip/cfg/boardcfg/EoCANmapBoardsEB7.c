@@ -90,7 +90,9 @@ static const eOcanmap_board_properties_t s_boardprops[] =
         },
         .requiredprotocol   = {.major = 1, .minor = 2}
     }
-#if     defined(ICUB_DARMSTADT01)  | defined(ICUB_MEC_V2)
+#if     defined(ICUB_MEC_V1)
+    // no strain
+#elif   defined(ICUB_MEC_V2)
     ,{
         .type               = eobrd_cantype_strain,
         .location =
@@ -100,7 +102,9 @@ static const eOcanmap_board_properties_t s_boardprops[] =
         },
         .requiredprotocol   = {.major = 0, .minor = 0}
     }  
-#endif    
+#else
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
+#endif   
 };
 
 static EOconstvector s_eo_vectorof_boardprops_eb7 = 
@@ -151,8 +155,21 @@ EOconstvector s_eo_vectorof_des_jomo_eb7 =
 
 EOconstvector* eo_vectorof_descriptor_jomo_eb7 = &s_eo_vectorof_des_jomo_eb7;
 
-#if     defined(ICUB_DARMSTADT01)  | defined(ICUB_MEC_V2)
 
+#if     defined(ICUB_MEC_V1)
+// no strains
+EOconstvector s_eo_vectorof_des_strain_eb7 = 
+{
+    .capacity       = 0,
+    .size           = 0,
+    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+    .dummy          = 0,
+    .stored_items   = NULL,
+    .functions      = NULL    
+};
+
+#elif   defined(ICUB_MEC_V2)
+// one strain
 static const eOcanmap_entitydescriptor_t s_des_strain[] = 
 {
     {   // strain 0
@@ -176,20 +193,12 @@ EOconstvector s_eo_vectorof_des_strain_eb7 =
     .functions      = NULL   
 };
 
+
 #else
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
+#endif 
 
-EOconstvector s_eo_vectorof_des_strain_eb7 = 
-{
-    .capacity       = 0,
-    .size           = 0,
-    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
-    .dummy          = 0,
-    .stored_items   = NULL,
-    .functions      = NULL    
-};
-
-#endif
-
+    
 EOconstvector* eo_vectorof_descriptor_strain_eb7 = &s_eo_vectorof_des_strain_eb7;
 
 
