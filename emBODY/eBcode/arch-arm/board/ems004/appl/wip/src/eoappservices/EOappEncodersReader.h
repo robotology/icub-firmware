@@ -66,7 +66,6 @@ enum { eo_appEncReader_streams_numberof = 2 };
 typedef struct
 {
     eOappEncReader_stream_t     streams[eo_appEncReader_streams_numberof]; /**< array of encoder streams, used to inizialize the sensors*/    
-    //uint16_t                    connectedEncodersMask;  /**< bitmask that rappresents connected encoders*/
     eOcallback_t                callbackOnLastRead;     /**< callback called when the last encoder has been read     */
     void*                       callback_arg;           /**< argument of callback */
 } eOappEncReader_cfg_t;
