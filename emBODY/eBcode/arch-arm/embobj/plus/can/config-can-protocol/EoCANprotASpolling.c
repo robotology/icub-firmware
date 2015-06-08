@@ -173,7 +173,6 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     
     if(NULL == (strain = s_eocanprotASpolling_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);  
     }      
     
