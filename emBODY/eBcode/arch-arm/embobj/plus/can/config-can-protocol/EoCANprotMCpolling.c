@@ -65,7 +65,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning OPTIMISATION: instead of calling eOmc_joint_t *joint = eoprot_entity_ramof_get() call the protocol-wrapper
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -82,6 +81,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
+
 
 // parser helper funtions
 
@@ -216,29 +218,18 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_de
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
 {
-    eOresult_t res = eores_OK; 
+//    eOresult_t res = eores_OK; 
+    eOmc_joint_t *joint = NULL;
+    //eOprotIndex_t jointindex = 0;
     
     // retrieve the joint related to the frame
-    eOcanmap_location_t loc = {0};
-    loc.port = port;
-    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-    loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
     
-    eOprotIndex_t jointindex = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    
-    if(EOK_uint08dummy == jointindex)
+    if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-        return(eores_OK);
-    }
-    
-    eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jointindex);
-    
-    if(NULL == joint)
-    {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);        
     }
+
+    
     
     eOmc_motionmonitorstatus_t motionmonitorstatus = (eOmc_motionmonitorstatus_t) joint->status.basic.motionmonitorstatus;
     
@@ -659,27 +650,14 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
 {
     eOresult_t res = eores_OK; 
     
-    // retrieve the joint related to the frame
-    eOcanmap_location_t loc = {0};
-    loc.port = port;
-    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-    loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    eOmc_joint_t *joint = NULL;
     
-    eOprotIndex_t jointindex = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-    
-    if(EOK_uint08dummy == jointindex)
+    if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
     {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-        return(eores_OK);
-    }
-    
-    eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jointindex);
-    
-    if(NULL == joint)
-    {
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(eores_OK);        
     }
+    
+
    
     joint->status.ofpid.positionreference = *((int16_t*)&frame->data[1]);    
     
@@ -706,6 +684,36 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE(eOc
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index)
+{
+    void * ret = NULL;
+    uint8_t ii = 0;
+    eOcanmap_location_t loc = {0};
+    
+    loc.port = port;
+    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
+    loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+       
+    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, entity);
+    
+    if(EOK_uint08dummy == ii)
+    {     
+        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        return(NULL);
+    }
+    
+    ret = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, entity, ii);
+    
+    if(NULL != index)
+    {
+        *index = ii;        
+    }  
+
+    return(ret);   
+}
+
+
 
 // - parser helper funtions
 
