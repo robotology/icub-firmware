@@ -229,7 +229,7 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 {
 
     // in here we want to:
-    // 1. case 2foc: do nothing for mc and start strain ....
+    // 1. case 2foc: do nothing for mc 
     // 2. case mc4: send broadcast policies
     
     if(NULL == p)
@@ -241,7 +241,6 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     {
         return(eores_OK);
         //return(eo_strain_SendTXmode(eo_strain_GetHandle()));
-        //return(s_eo_emsapplBody_SendTxMode2Strain(p));
     } 
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
@@ -267,10 +266,9 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
 
 
 extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
-{
-    
+{    
     // in here we want to:
-    // 1. case 2foc: stop mc and stop strain ....
+    // 1. case 2foc: stop mc ....
     // 2. case mc4: reset broadcast policies 
     
     if(NULL == p)
@@ -281,8 +279,6 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
     if(applrunMode__2foc == p->appRunMode)
     {
         eo_emsMotorController_GoIdle();
-        //eOresult_t res = s_eo_emsapplBody_DisableTxStrain(p);
-        //eOresult_t res = eo_strain_DisableTX(eo_strain_GetHandle());
         return(eores_OK);
     } 
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))

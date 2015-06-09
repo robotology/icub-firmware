@@ -177,7 +177,6 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
           
 
     // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiano mandato la loro fw version
-    //if(eobool_true == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &readyCanBoardsMask, &checkedmask))
     if(eobool_true == eo_candiscovery_areCanBoardsReady(eo_candiscovery_GetHandle(), &readyCanBoardsMask, &checkedmask))
     {
         // se tutte le 1foc e le mc4 sono ready, allora setto che lo sono (stoppo il timer canBoardsReady_timer da 10 milli)

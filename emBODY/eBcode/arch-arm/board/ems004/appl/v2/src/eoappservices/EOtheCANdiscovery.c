@@ -223,17 +223,6 @@ extern eObool_t eo_candiscovery_areCanBoardsReady(EOtheCANdiscovery *p, uint32_t
                 ready = eobool_true;
                 *canBoardsReady |= (1<<i);                
             }
-//            eObool_t ready = eobool_false;
-//            uint8_t major = board->detected.protocolversion.major;
-//            uint8_t minor = board->detected.protocolversion.minor;
-//            if(0 != major)
-//            {  // if not zero, then the board has replied and everything is filled. however i must check if there is a match
-//                if((board->board.props.requiredprotocol.major == major) && (board->board.props.requiredprotocol.minor <= minor))
-//                {
-//                    ready = eobool_true;
-//                    *canBoardsReady |= (1<<i);
-//                }
-//            } 
             res &= ready;
         }               
     }

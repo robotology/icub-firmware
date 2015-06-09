@@ -69,259 +69,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-//#if     defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4)
-//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_true
-//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3) || defined(EOMTHEEMSAPPLCFG_USE_EB5) || defined(EOMTHEEMSAPPLCFG_USE_EB6) || defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB8) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_false
-//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_true
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-//    #define EOMTHEEMSAPPLCFG_EBX_hasSKIN    eobool_true
-//    #define EOMTHEEMSAPPLCFG_EBX_hasMC4     eobool_false
-//    #define EOMTHEEMSAPPLCFG_EBX_has2FOC    eobool_false
-//#else
-//    #error --> you must define an EBx
-//#endif
 
 
-//#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
-//                                                        (1 << eOeOappEncReader_encoder1) |  \
-//                                                        (1 << eOeOappEncReader_encoder2) |  \
-//                                                        (1 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
-//                                                        (1 << eOeOappEncReader_encoder1) |  \
-//                                                        (0 << eOeOappEncReader_encoder2) |  \
-//                                                        (0 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (1 << eOeOappEncReader_encoder0) |  \
-//                                                        (1 << eOeOappEncReader_encoder1) |  \
-//                                                        (1 << eOeOappEncReader_encoder2) |  \
-//                                                        (0 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-//        #define EOMTHEEMSAPPLCFG_EBX_encodersMASK   (   (0 << eOeOappEncReader_encoder0) |  \
-//                                                        (0 << eOeOappEncReader_encoder1) |  \
-//                                                        (0 << eOeOappEncReader_encoder2) |  \
-//                                                        (0 << eOeOappEncReader_encoder3) |  \
-//                                                        (0 << eOeOappEncReader_encoder4) |  \
-//                                                        (0 << eOeOappEncReader_encoder5)    \
-//                                                    )
-
-//#else
-//    #error --> you must define an EBx
-//#endif
-
-
-//// encoders
-//#if     defined(EOMTHEEMSAPPLCFG_USE_EB1) || defined(EOMTHEEMSAPPLCFG_USE_EB3)  || defined(EOMTHEEMSAPPLCFG_USE_EB6)  || defined(EOMTHEEMSAPPLCFG_USE_EB8)
-// 
-//    #define encstream0_type         hal_encoder_t1
-//    #define encstream0_numberof     2
-//    #define encstream0_encoders0    hal_encoder1
-//    #define encstream0_encoders1    hal_encoder2
-//    #define encstream0_encoders2    hal_encoderNONE
-//    #define encstream0_encoders3    hal_encoderNONE
-//    #define encstream0_encoders4    hal_encoderNONE
-//    #define encstream0_encoders5    hal_encoderNONE
-
-//    
-//    #define encstream1_type         hal_encoder_t1
-//    #define encstream1_numberof     2
-//    #define encstream1_encoders0    hal_encoder4
-//    #define encstream1_encoders1    hal_encoder5
-//    #define encstream1_encoders2    hal_encoderNONE
-//    #define encstream1_encoders3    hal_encoderNONE
-//    #define encstream1_encoders4    hal_encoderNONE
-//    #define encstream1_encoders5    hal_encoderNONE
-
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB7) || defined(EOMTHEEMSAPPLCFG_USE_EB9)
-
-//    #define encstream0_type         hal_encoder_t1
-//		//#define encstream0_type     		hal_encoder_t2
-//    #define encstream0_numberof     1
-//    #define encstream0_encoders0    hal_encoder1
-//    #define encstream0_encoders1    hal_encoderNONE
-//    #define encstream0_encoders2    hal_encoderNONE
-//    #define encstream0_encoders3    hal_encoderNONE
-//    #define encstream0_encoders4    hal_encoderNONE
-//    #define encstream0_encoders5    hal_encoderNONE
-
-//    
-//    #define encstream1_type         hal_encoder_t1
-//    #define encstream1_numberof     1
-//    #define encstream1_encoders0    hal_encoder4
-//    #define encstream1_encoders1    hal_encoderNONE
-//    #define encstream1_encoders2    hal_encoderNONE
-//    #define encstream1_encoders3    hal_encoderNONE
-//    #define encstream1_encoders4    hal_encoderNONE
-//    #define encstream1_encoders5    hal_encoderNONE
-//    
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB5)
-
-//    #define encstream0_type         hal_encoder_t1
-//    #define encstream0_numberof     2
-//    #define encstream0_encoders0    hal_encoder1
-//    #define encstream0_encoders1    hal_encoder2
-//    #define encstream0_encoders2    hal_encoderNONE
-//    #define encstream0_encoders3    hal_encoderNONE
-//    #define encstream0_encoders4    hal_encoderNONE
-//    #define encstream0_encoders5    hal_encoderNONE
-
-//    
-//    #define encstream1_type         hal_encoder_t1
-//    #define encstream1_numberof     1
-//    #define encstream1_encoders0    hal_encoder4
-//    #define encstream1_encoders1    hal_encoderNONE
-//    #define encstream1_encoders2    hal_encoderNONE
-//    #define encstream1_encoders3    hal_encoderNONE
-//    #define encstream1_encoders4    hal_encoderNONE
-//    #define encstream1_encoders5    hal_encoderNONE
-//                                                    
-//#elif   defined(EOMTHEEMSAPPLCFG_USE_EB2) || defined(EOMTHEEMSAPPLCFG_USE_EB4) || defined(EOMTHEEMSAPPLCFG_USE_EB10) || defined(EOMTHEEMSAPPLCFG_USE_EB11)
-
-//    #define encstream0_type         hal_encoder_t1
-//    #define encstream0_numberof     0
-//    #define encstream0_encoders0    hal_encoderNONE
-//    #define encstream0_encoders1    hal_encoderNONE
-//    #define encstream0_encoders2    hal_encoderNONE
-//    #define encstream0_encoders3    hal_encoderNONE
-//    #define encstream0_encoders4    hal_encoderNONE
-//    #define encstream0_encoders5    hal_encoderNONE
-
-//    
-//    #define encstream1_type         hal_encoder_t1
-//    #define encstream1_numberof     0
-//    #define encstream1_encoders0    hal_encoderNONE
-//    #define encstream1_encoders1    hal_encoderNONE
-//    #define encstream1_encoders2    hal_encoderNONE
-//    #define encstream1_encoders3    hal_encoderNONE
-//    #define encstream1_encoders4    hal_encoderNONE
-//    #define encstream1_encoders5    hal_encoderNONE
-//                                                    
-
-//#else
-//    #error --> you must define an EBx
-//#endif
-
-
-
-// - now we specialise the eth protocol for each board
-
-//#if     (1 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (3 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)       
-//    
-//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-//    {  
-//        {           
-//            .endpoint           = eoprot_endpoint_motioncontrol,
-//            .numberofentities  = {4, 4, 1, 0, 0, 0, 0}     
-//        },     
-//        {        
-//            .endpoint           = eoprot_endpoint_analogsensors,
-//            .numberofentities  = {1, 0, 1, 0, 0, 0, 0}        
-//        }      
-//    };
-// 
-//#elif   (2 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-
-//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-//    {  
-//        {           
-//            .endpoint           = eoprot_endpoint_motioncontrol,
-//            .numberofentities  = {12, 12, 1, 0, 0, 0, 0}     
-//        },     
-//        {        
-//            .endpoint           = eoprot_endpoint_analogsensors,
-//            .numberofentities  = {0, 1, 0, 0, 0, 0, 0}        
-//        },
-//        {           
-//            .endpoint           = eoprot_endpoint_skin,
-//            .numberofentities  = {1, 0, 0, 0, 0, 0, 0}     
-//        }          
-//    };
-// 
-//#elif   (5 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-
-//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-//    {  
-//        {           
-//            .endpoint           = eoprot_endpoint_motioncontrol,
-//            .numberofentities  = {3, 3, 1, 0, 0, 0, 0}     
-//        },     
-//        {        
-//            .endpoint           = eoprot_endpoint_analogsensors,
-//            .numberofentities  = {0, 0, 1, 0, 0, 0, 0}        
-//        }      
-//    };
-
-//#elif   (6 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (8 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-
-//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-//    {  
-//        {           
-//            .endpoint           = eoprot_endpoint_motioncontrol,
-//            .numberofentities  = {4, 4, 1, 0, 0, 0, 0}     
-//        },     
-//        {        
-//            .endpoint           = eoprot_endpoint_analogsensors,
-//            .numberofentities  = {1, 0, 1, 0, 0, 0, 0}        
-//        }      
-//    };
-
-//#elif   (7 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (9 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-
-//    #if defined(ICUB_DARMSTADT01)
-//        #define EB7EB9_NUMBEROFSTRAINS     1
-//    #else
-//        #define EB7EB9_NUMBEROFSTRAINS     0
-//    #endif
-//    
-//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-//    {  
-//        {           
-//            .endpoint           = eoprot_endpoint_motioncontrol,
-//            .numberofentities  = {2, 2, 1, 0, 0, 0, 0}     
-//        },     
-//        {        
-//            .endpoint           = eoprot_endpoint_analogsensors,
-//            .numberofentities  = {EB7EB9_NUMBEROFSTRAINS, 0, 1, 0, 0, 0, 0}        
-//        }      
-//    };
-
-//#elif   (10 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-
-//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-//    {  
-//        {           
-//            .endpoint           = eoprot_endpoint_skin,
-//            .numberofentities  = {2, 0, 0, 0, 0, 0, 0}     
-//        }     
-//    };
-//    
-//#endif
-
-
-
-//static const uint8_t s_boardnum = EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD - 1;
-uint8_t s_boardnum = 0;
-
-//static const uint8_t s_theEPcfgsOthers_NumberOf = sizeof(s_theEPcfgsOthers) / sizeof(eOprot_EPcfg_t);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-    
+   
 #define EB_NO_ENCODERS
 
 #if defined(EB_NO_ENCODERS)
@@ -402,6 +156,8 @@ static void overridden_appl_led_error_init(void);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
+static uint8_t s_boardnum = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -519,8 +275,8 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
         default:
         {
             return(eobool_false);
-        };
-     };
+        }
+     }
 }
 
 
@@ -572,8 +328,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     }
     
     {   // CAN-PROTOCOL
-        EOtheCANprotocol * canprot = eo_canprot_Initialise(NULL);       
-        
+        EOtheCANprotocol * canprot = eo_canprot_Initialise(NULL);              
     }
 
 
@@ -602,7 +357,6 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         
         // now we must define the .... proxy rules
         // if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
-        // in teh future we can set this proxy mode on teh basis of the board number received
         eOprotBRD_t localboard = eoprot_board_local_get();
         if((1 == localboard) || (3 == localboard))
         {
@@ -612,8 +366,6 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         
     
     // start the application body   
-    //const eOemsapplbody_cfg_t *applbodycfg = &theemsapplbodycfg;   
-//    const eOemsapplbody_cfg_t * applbodycfg   = (const eOemsapplbody_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
     eOemsapplbody_cfg_t applbodyconfig;
     
     memcpy(&applbodyconfig, &theemsapplbodycfg, sizeof(eOemsapplbody_cfg_t));
@@ -626,6 +378,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     memcpy(&applbodyconfig.encoderstreams[0], encstr, sizeof(eOappEncReader_stream_t));   
     encstr = (eOappEncReader_stream_t*) eo_constvector_At(encstreams, 1);    
     memcpy(&applbodyconfig.encoderstreams[1], encstr, sizeof(eOappEncReader_stream_t)); 
+    
     eo_emsapplBody_Initialise(&applbodyconfig);       
 }
 
@@ -692,13 +445,13 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     
     // stop skin. the check whether to stop skin or not is done internally.
     eo_skin_DisableTX(eo_skin_GetHandle());
-    //eo_emsapplBody_StopSkin(eo_emsapplBody_GetHandle());
+
 
     // stop motion control
  	res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
 	{
-		//handle the error
+		// handle the error ... not important
 	}
     
     // stop tx of strain, if present
@@ -746,166 +499,8 @@ static void overridden_appl_led_error_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// -- oldies
-
-//#if 0
 
 
-////static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par);
-////static void s_eom_emsappl_startBlinkLed(uint32_t counttick);
-////static void s_eom_emsappl_InitLeds(void);
-
-//#ifdef _TEST_SEQNUM_
-//extern void my_cbk_onErrorSeqNum(eOethLowLevParser_packetInfo_t *pktInfo_ptr, uint32_t rec_seqNum, uint32_t expected_seqNum);
-//extern void my_cbk_onNVfound(eOethLowLevParser_packetInfo_t *pktInfo_ptr, eODeb_eoProtoParser_ropAdditionalInfo_t *ropAddInfo_ptr);
-////this variable is a function ptr.if is is not null, the isr invoked on rx pkt, will call the function ponted by this variable
-//extern void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size);
-//extern void EthLowLevParser_callbackInHAL(uint8_t *packet, uint32_t size);
-//static void s_eom_emsappl_ethLowLevelParser_configure(void)
-//{
-//    
-//    hal_eth_lowLevelUsePacket_ptr = EthLowLevParser_callbackInHAL;
-////     //4.1) init application parser: embObjParser
-////     const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg = 
-////     {
-////         EO_INIT(.checks)
-////         {
-////             EO_INIT(.seqNum)
-////             {
-////                 EO_INIT(.cbk_onErrSeqNum)           my_cbk_onErrorSeqNum,
-////             },
-////             
-////             EO_INIT(.nv)                            {0},
-////             
-////             EO_INIT(.invalidRopFrame)               {0}
-////         }
-////     };
-//    
-//    
-//        //4.1) init application parser: embObjParser 
-//    const eODeb_eoProtoParser_cfg_t  deb_eoParserCfg =  
-//    { 
-//        EO_INIT(.checks) 
-//        { 
-//            EO_INIT(.seqNum) 
-//            { 
-//                EO_INIT(.cbk_onErrSeqNum)           my_cbk_onErrorSeqNum, 
-//            }, 
-//             
-//            EO_INIT(.nv) 
-//            { 
-//                EO_INIT(.NVs2searchArray) 
-//                { 
-//                    EO_INIT(.head) 
-//                    { 
-//                        EO_INIT(.capacity)       eODeb_eoProtoParser_maxNV2find, 
-//                        EO_INIT(.itemsize)       sizeof(eODeb_eoProtoParser_nvidEp_couple_t), 
-//                        EO_INIT(.size)           1, 
-//                    }, 
-//                    EO_INIT(.data) 
-//                    { 
-//                        {0x14, 0x9c00} 
-//                    } 
-//                 
-//                }, 
-//                EO_INIT(.cbk_onNVfound)            my_cbk_onNVfound 
-//            }, 
-//             
-//            EO_INIT(.invalidRopFrame)               {0} 
-//        } 
-//    };
-
-//    
-//    eODeb_eoProtoParser_Initialise(&deb_eoParserCfg);
-//    
-//    
-//    //4.2) init low level parser: eOethLowLevParser
-///*    const eOethLowLevParser_cfg_t  ethLowLevParserCfg = 
-//    {
-//        EO_INIT(.conFiltersData) 
-//        {
-//            EO_INIT(.filtersEnable)     0,
-//            EO_INIT(.filters)           {0}, //use pcap filter
-//        },
-//        
-//        EO_INIT(.appParserData)
-//        {
-//            EO_INIT(.func)             eODeb_eoProtoParser_RopFrameDissect
-//            EO_INIT(.arg)              eODeb_eoProtoParser_GetHandle(),
-//        }
-//    };
-//*/
-//    //currently use thelow level parser and appl paser separately
-//    const eOethLowLevParser_cfg_t  ethLowLevParserCfg = {0}; 
-//    eo_ethLowLevParser_Initialise(&ethLowLevParserCfg);
-
-//}
-//#endif
-
-//#ifdef _TEST_SEQNUM_
-//static void s_eom_emsrunner_emsappl_toogleallled(osal_timer_t* tmr, void* par)
-//{
-
-//    hal_led_toggle(emsappl_ledgreen);
-//    hal_led_toggle(emsappl_ledyellow);
-//    #warning acemor asks: who sets the variable can_out_queue_full to true? 
-//    if(can_out_queue_full)
-//    {
-//        hal_led_toggle(emsappl_ledred);
-//    }
-//}
-//#endif
-
-////static void s_eom_emsappl_InitLeds(void)
-////{
-////    hal_led_cfg_t cfg = {.dummy=0};
-////    
-////    hal_led_init(emsappl_ledred, &cfg);
-////    hal_led_off(emsappl_ledred);
-////    hal_led_init(emsappl_ledgreen, &cfg); //led green
-////    hal_led_off(emsappl_ledgreen);
-////    hal_led_init(emsappl_ledyellow, &cfg);
-////    hal_led_off(emsappl_ledyellow);
-////    hal_led_init(emsappl_ledorange, &cfg);
-////    hal_led_off(emsappl_ledorange); 
-////
-//////     eOmledpulser_cfg_t ledpulsercfg = 
-//////     {
-//////         .numberofleds   = 3,
-//////         .leds           = { eom_ledpulser_led_zero, eom_ledpulser_led_one, eom_ledpulser_led_two }
-//////     };
-////
-//////     eom_ledpulser_Initialise(&ledpulsercfg);
-////
-////    //eom_ledpulser_Start(eom_ledpulser_GetHandle(), eom_ledpulser_led_zero, 400*1000, 10);
-////}
-
-////static void s_eom_emsappl_startBlinkLed(uint32_t counttick)
-////{
-////    osal_timer_timing_t timing;
-////    osal_timer_onexpiry_t onexpiry;
-////    
-////    timing.startat  = OSAL_abstimeNONE;
-////    timing.count    = counttick * osal_info_get_tick(); 
-////    timing.mode     = osal_tmrmodeFOREVER; 
-////
-////    onexpiry.cbk    = s_eom_emsrunner_emsappl_toogleled;
-////    onexpiry.par    = eom_emsappl_GetHandle();        
-////
-////
-////    if(NULL == timer4led)
-////    {
-////        timer4led = osal_timer_new(); 
-////    }
-////    osal_timer_start(timer4led, &timing, &onexpiry, osal_callerTSK);
-////}
-
-////static void s_eom_emsrunner_emsappl_toogleled(osal_timer_t* tmr, void* par)
-////{
-////    hal_led_toggle(emsappl_ledorange);
-////}
-
-//#endif
 
 
 

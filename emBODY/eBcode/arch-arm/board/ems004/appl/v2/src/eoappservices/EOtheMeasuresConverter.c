@@ -157,101 +157,6 @@ extern eOresult_t eo_measconv_SetJntEncoderConversionOffset(EOtheMeasuresConvert
     return(eores_OK);
 }
 
-//#if 0
-
-//__weak extern eOmeas_position_t eo_measconv_jntPosition_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_position_t e_pos)
-//{  
-//    return((eOmeas_position_t)e_pos);
-//}
-
-//__weak extern icubCanProto_position_t eo_measconv_jntPosition_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_position_t i_pos)
-//{
-//    return((icubCanProto_position_t)i_pos);
-//}
-
-//__weak extern eOmeas_velocity_t eo_measconv_jntVelocity_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
-//{
-//    return((eOmeas_velocity_t)e_vel);
-//}
-
-//__weak extern eOmeas_velocity_t eo_measconv_jntVelocity_E2I_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_velocity_t e_vel)
-//{
-//    return((eOmeas_velocity_t)e_vel);
-//}
-
-
-//__weak extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
-//{
-//    return((icubCanProto_velocity_t)i_vel);
-//}
-
-
-//__weak extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
-//{
-
-//    return((icubCanProto_velocity_t)(i_vel * __fabs(eo_measconv_hid_GetEncConv_factor(p, jId))));
-//}
-//// __weak extern icubCanProto_velocity_t eo_measconv_jntVelocity_I2E_forSetVelRefMC4(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_velocity_t i_vel)
-//// {
-////     return((icubCanProto_velocity_t)i_vel);
-//// }
-
-
-//__weak extern eOmeas_acceleration_t eo_measconv_jntAcceleration_E2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
-//{ 
-//    return((eOmeas_acceleration_t)e_acc);
-//}
-
-
-//__weak extern eOmeas_acceleration_t eo_measconv_jntAcceleration_E2I_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_acceleration_t e_acc)
-//{
-//    return((eOmeas_acceleration_t)e_acc);
-//}
-//__weak extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
-//{
-//    return((icubCanProto_acceleration_t)i_acc);
-//}
-
-//__weak extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E_abs(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_acceleration_t i_acc)
-//{
-//    return((icubCanProto_acceleration_t)i_acc);
-//}
-//__weak extern icubCanProto_stiffness_t eo_measconv_impedenceStiffness_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
-//{ 
-//    return((icubCanProto_stiffness_t)i_stiff);
-//}
-
-
-//__weak extern eOmeas_stiffness_t eo_measconv_impedenceStiffness_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_stiffness_t s_stiff)
-//{
-//    return((eOmeas_stiffness_t)s_stiff);
-//}
-
-
-//__weak extern icubCanProto_damping_t eo_measconv_impedenceDamping_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_damping_t i_damping)
-//{
-//    return((icubCanProto_damping_t)i_damping);
-//}
-
-//__weak extern eOmeas_damping_t eo_measconv_impedenceDamping_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_damping_t s_damping)
-//{
-//    return((eOmeas_damping_t)s_damping);
-//}
-
-
-//__weak extern icubCanProto_torque_t eo_measconv_torque_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_torque_t i_torque)
-//{
-//    return((icubCanProto_torque_t)i_torque);
-//}
-
-
-//__weak extern eOmeas_torque_t eo_measconv_torque_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
-//{
-//     
-//    return((eOmeas_torque_t)s_torque);
-//}
-
-//#endif
 
 
 extern eOmeas_torque_t eo_measconv_torque_S2I(EOtheMeasuresConverter *p, eOmc_jointId_t jId, icubCanProto_torque_t s_torque)
@@ -342,16 +247,8 @@ extern icubCanProto_acceleration_t eo_measconv_jntAcceleration_I2E_abs(EOtheMeas
 
 extern icubCanProto_stiffness_t eo_measconv_impedenceStiffness_I2S(EOtheMeasuresConverter *p, eOmc_jointId_t jId, eOmeas_stiffness_t i_stiff)
 {
-//     char *str_err;
- //   char str_err[200];
     float factor = eo_measconv_hid_GetEncConv_factor(p, jId);
     int32_t stiff;
- //   eOmeas_stiffness_t prova = 18000;
-    
-//     if(factor<0)
-//     {
-//         factor = -factor;
-//     }
     
     if(i_stiff > INT32_MAX)
     {
@@ -416,7 +313,7 @@ static eOresult_t s_eo_measconv_TableCreateAndInit(EOtheMeasuresConverter *p)
     uint8_t i;
 
     /* 1) Create table */
-//    p->totalnumofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
+
     p->totalnumofjoint = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     
     if(0 == p->totalnumofjoint)

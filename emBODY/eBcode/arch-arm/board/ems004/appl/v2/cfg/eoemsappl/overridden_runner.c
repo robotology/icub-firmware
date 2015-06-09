@@ -152,16 +152,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     if(1 == count)
     {
         eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-        //eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
     }
     
-    /*    
-    eOmn_appl_runMode_t runmode =  eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-    if(applrunMode__2foc == runmode)
-    {
-         eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReaderHandle(eo_emsapplBody_GetHandle()));
-    }
-    */
+
     #if defined(EVIEWER_ENABLED)   
     if(0 == event_view)
     {   
@@ -178,7 +171,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 {
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
-//    EOappCanSP                      *cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     
     for(port=eOcanport1; port<eOcanports_number; port++)
     {
@@ -190,38 +182,22 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         
         EOarray *arrayofcandata = s_getSkinDataArray((eOcanport_t)port);
         if(NULL != arrayofcandata)
-        {   // ok, we have a skin   
+        {   // ok, in this can bus we have a skin 
 
             // i read from bus at most the number of can frame that the array can host. 
             // that does not depend on the fact that in this cycle we transmit the regulars.
-            // the array is emptied only after the regulars are transmitted, so that non can frame is lost.
-            // this opertion is done in function eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()
+            // the array is emptied only after the regulars are transmitted, so that no can frame is lost.
+            // this operation is done in function eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()
             numofRXcanframe = eo_array_Available(arrayofcandata);
-//            if(eobool_false == eom_emsrunner_CycleIsTransmitting(eom_emsrunner_GetHandle()))
-//            {   // if we dont transmit in this cycle then i dont read any frame from this bus
-//                numofRXcanframe = 0;                
-//            }
-//            else
-//            {   // we read at most the capacity of the skin patch. but we also need to reset the array so that new can frames can be pushed back inside
-//                numofRXcanframe = eo_array_Capacity(arrayofcandata);
-//                eo_array_Reset(arrayofcandata);                
-//            }  
         }
         else
-        {   // in this bus we dont have skin, thus ... i read everything in the rx can buffer
-            //eo_appCanSP_GetNumOfRecCanframe(cansp, (eOcanport_t)port, &numofRXcanframe);
+        {   // in this can bus we dont have skin, thus ... i read everything in the rx can buffer
             numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port);
         }
-        
-    
-//        // step x: update diagnostics (marco.accame: maybe we remove it later on)
-//        #ifdef _GET_CANQUEUE_STATISTICS_
-//        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
-//        #endif
-        
+
         // step 2: read the can frames. this function also parses them and triggers associated action ...
+        
         eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
-        //eo_appCanSP_read(cansp, (eOcanport_t)port, numofRXcanframe, NULL); 
     }
 }
 
@@ -263,46 +239,15 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
-{
-    //EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    //uint8_t numofframes2betransmitted_can1 = 0;
-    //uint8_t numofframes2betransmitted_can2 = 0;
-    
+{   
     eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
     eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);
-    // i enable transmission on both can buses. functions are not blocking as the transmission is done by the ISRs
-    //eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport1, &numofframes2betransmitted_can1);
-    //eo_appCanSP_starttransmit_XXX(eo_emsapplBody_GetCanServiceHandle(emsappbody_ptr), eOcanport2, &numofframes2betransmitted_can2);
-    
-//#ifdef _GET_CANQUEUE_STATISTICS_
-//    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport1, numoftxframe_p1);
-//    eo_theEMSdgn_updateCanTXqueueStatisticsOnRunMode(eOcanport2, numoftxframe_p2);
-//#endif
 }
 
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
-{
-//    static uint16_t count_ethlink_status = 0;
-//#define runner_countmax_check_ethlink_status    5000 //every one second 
-//    // before wait can, check link status!!
-//    count_ethlink_status ++;
-//    if(runner_countmax_check_ethlink_status == count_ethlink_status)
-//    {
-//        //uint8_t link1_isup;
-//        //uint8_t link2_isup;
-//        //this func chacks if one of link change state and notify it.
-//        //the pkt arrived on pc104 backdoor when one link change down->up.
-//        //eo_theEMSdgn_checkEthLinksStatus_quickly(eo_theEMSdgn_GetHandle(), &link1_isup, &link2_isup);
-//        #warning marco.accame: TODO: put diagnostics
-////        if(eo_dgn_cmds.signalCanStatistics)
-////        {
-////            eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_canQueueStatistics , 0);
-////        }
-//        count_ethlink_status = 0;
-//    }
-        
+{        
     // if we have skin and we have just transmitted the regulars, then we must reset the status->array containing the
     // can frames, so that at the rx cycle we can put some more canframes inside.
     uint8_t port = 0;
@@ -310,9 +255,9 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     for(port=eOcanport1; port<eOcanports_number; port++)
     {
         if(NULL != (arrayofcandata = s_getSkinDataArray((eOcanport_t)port)))
-        {   // ok, we have a skin   
+        {   // ok, in this can bus we have a skin   
             if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
-            {   // ok, we can reset the array
+            {   // ok, we can reset the array of can data
                 eo_array_Reset(arrayofcandata);
             }            
         }
@@ -322,8 +267,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // diagnostics about tx failure within the specified timeout is managed internally 
     const uint32_t timeout = 3*osal_reltime1ms;
     eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
-    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);
-       
+    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);       
 }
 
 
@@ -361,10 +305,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
 
     if(eobool_false == evaluated[port])
     {
-        evaluated[port] = eobool_true;
-        
-        //eOresult_t res = eores_NOK_generic;
-        //eOprotID32_t id32 = 0;
+        evaluated[port] = eobool_true;       
         eOcanmap_location_t loc = {0};
         
         // is the first skin with index 0 or with index 1 on this can bus? 
@@ -372,7 +313,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
         if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 0, 0), &loc, NULL, NULL))
         {   // found a skin-0
             if(port == loc.port)
-            {   // and it is on the same can port
+            {   // and it is on the same can port passed as function argument
                 eOsk_status_t * skinstatus = eo_entities_GetSkinStatus(eo_entities_GetHandle(), 0);
                 if(NULL != skinstatus)
                 {
@@ -384,7 +325,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
         else if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 1, 0), &loc, NULL, NULL))
         {   // found a skin-1
             if(port == loc.port)
-            {   // and it is on the same can port
+            {   // and it is on the same can port passed as function argument
                 eOsk_status_t * skinstatus = eo_entities_GetSkinStatus(eo_entities_GetHandle(), 1);
                 if(NULL != skinstatus)
                 {
@@ -400,48 +341,7 @@ static EOarray* s_getSkinDataArray(eOcanport_t port)
 
 
 
-
-//#ifndef SET_DESIRED_CURR_IN_ONLY_ONE_MSG
-//static eOresult_t s_eom_emsrunner_hid_SetCurrentsetpoint_with4msg(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
-//{
-//    eOresult_t 				err;
-//	eOmeas_current_t            value;
-//    eOresult_t 				    res = eores_OK;
-//    eOicubCanProto_msgCommand_t msgCmd = 
-//    {
-//        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-//        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__SET_DISIRED_CURRENT
-//    };	
-//
-//#warning VALE --> solo per test
-//    pwmList[0] = 0x11AA;
-//    pwmList[1] = 0x12AA;
-//    pwmList[2] = 0x13AA;
-//    pwmList[3] = 0x14AA;
-//    uint16_t numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(eo_appTheDB_GetHandle());
-//
-//    for (uint8_t jid = 0; jid <numofjoint; jid++)
-//    {
-//        value = pwmList[jid];
-//    
-//        /*Since in run mode the frame are sent on demnad...here i can punt in tx queue frame to send.
-//        they will be sent by transmitter */
-//
-//        err = eo_appCanSP_SendCmd2Joint(eo_emsapplBody_GetCanServiceHandle(p), jid, msgCmd, (void*)&value);
-//        
-//        if (err != eores_OK)
-//        {
-//            res = err;
-//        }
-//    }
-//    
-//    return(res);
-//   
-//}
-//#endif
-
-
-// want to send a canframe with pwm onto can bus. we use 
+// want to send a canframe with pwm onto can bus. 
 static eOresult_t s_SetCurrentSetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size)
 {
     eOcanport_t port = eOcanport1;
@@ -456,7 +356,6 @@ static eOresult_t s_SetCurrentSetpoint(EOtheEMSapplBody *p, int16_t *pwmList, ui
     for(i=0; i<numofjomos; i++)
     {
         eOcanmap_location_t loc = {0};
-        //eOresult_t res = eores_NOK_generic;
         // search the address of motor i-th and fill the pwmValues[] in relevant position.
         if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i, 0), &loc, NULL, NULL))
         {
@@ -480,8 +379,7 @@ static eOresult_t s_SetCurrentSetpoint(EOtheEMSapplBody *p, int16_t *pwmList, ui
     location.insideindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
 
     // and i send the command
-    return(eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location));
-    
+    return(eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location));   
 }
 
 
@@ -496,11 +394,7 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
     uint8_t             							error_mask = 0;
 
     uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
-    
-    //uint64_t start_read = osal_system_abstime_get();
-    //uint64_t enc1_delta = start_read - eo_appEncReader_startSPI1(app_enc_reader);
-    //uint64_t stop_read = 0;
-    
+        
     uint8_t spi1 = 0, spi3 = 0;
     
     for(uint8_t i=0; i<30; ++i)
@@ -518,15 +412,6 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
         }
     }
     
-    /*
-    static char msg[31];
-    
-    if (spi1 || spi3)
-    {
-        snprintf(msg,sizeof(msg),"ENC TOUT %d %d",spi1,spi3);
-        send_diagnostics_to_server(msg, 0xffffffff, 1);        
-    }
-    */
     
     if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReader(emsappbody_ptr)))
     {    
@@ -563,8 +448,6 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
 
     /*Note: motor status is updated with data sent by 2foc by can */
 
-    //s_checkEthLinks();
-
 }
 
 
@@ -576,7 +459,6 @@ static void s_UpdateJointstatus(EOMtheEMSrunner *p)
 
     uint8_t                         transmit_decoupled_pwms = 1;
     
-
     
     uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());    
 
@@ -588,7 +470,6 @@ static void s_UpdateJointstatus(EOMtheEMSrunner *p)
             return; //error
         }
         
-        //eo_emsController_GetJointStatus(jId, &jstatus_ptr->basic);
         eo_emsController_GetJointStatus(jId, jstatus);
         
         eo_emsController_GetActivePidStatus(jId, &jstatus->ofpid);
@@ -641,245 +522,7 @@ static void s_taskDO_activity_mc4(EOMtheEMSrunner *p)
     // virtual strain
     eo_virtualstrain_Tick(eo_virtualstrain_GetHandle());
     
- 
-//#if 0    
-//    
-//    #define COUNT_WATCHDOG_VIRTUALSTRAIN_MAX        10
-//#define COUNT_BETWEEN_TWO_UPDATES_MAx           200 /* equal to timeout in mc4 before mc4 considers useless strain values
-//                                                       see macro "STRAIN_SAFE" in iCub\firmware\motorControllerDsp56f807\common_source_code\include\strain_board.h*/
-
-//    static uint16_t motionDoneJoin2Use = 0;
-//    static uint8_t count_watchdog_virtaulStrain = 0;
-//    static uint8_t count_between_two_updates = 0;
-//    
-//    eOresult_t                              res;
-//    uint8_t                                 send_virtualStrainData;
-//    uint16_t                                numofjoint;
-//    eOmc_joint_status_t                     *jstatus = NULL;
-//    uint16_t                                *virtStrain_ptr;
-//    eOappTheDB_jointOrMotorCanLocation_t    canLoc;
-//    EOappTheDB                              *db_ptr; 
-//    eOicubCanProto_msgDestination_t         msgdest;
-//    eOicubCanProto_msgCommand_t             msgCmd = 
-//    {
-//        EO_INIT(.class) eocanprot_msgclass_pollingMotorControl,
-//        EO_INIT(.cmdId) ICUBCANPROTO_POL_MC_CMD__MOTION_DONE
-//    };
-//    
-//    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//    
-//    db_ptr = eo_appTheDB_GetHandle();
-//    
-//    numofjoint = eo_appTheDB_GetNumberOfConnectedJoints(db_ptr);
-
-//    jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), motionDoneJoin2Use);
-//    if(NULL == jstatus)
-//    {
-//        return; //error
-//    }
-//    
-//    if (jstatus->basic.controlmodestatus == eomc_controlmode_position
-//     || jstatus->basic.controlmodestatus == eomc_controlmode_mixed
-//     || jstatus->basic.controlmodestatus == eomc_controlmode_calib)
-//    {
-//       if(jstatus->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
-//       {
-//        /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-//        - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-//        message because the setpoint is alredy reached. this means that:
-//            - if monitormode is forever, no new set point has been configured 
-//            - if monitormode is _untilreached, the joint reached the setpoint already.
-//        - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-//        message because pc104 is not interested in getting motion done.
-//        */
-//            eo_appCanSP_SendCmd2Joint(appCanSP_ptr, motionDoneJoin2Use, msgCmd, NULL);
-//        }
-//    }
-//    
-//    motionDoneJoin2Use++;
-//    if(motionDoneJoin2Use == numofjoint)
-//    {
-//        motionDoneJoin2Use = 0;
-//    }
-//    
-// 
-
-//    /*prepare virtual strain data:
-//      i send virtual strain data to mc4 if:
-//        - pc104 send me new values
-//        - or if have been not passede more then COUNT_BETWEEN_TWO_UPDATES_MAx millisec from last received value.
-//      More over, i send message every 10 millisec
-//    */
-//    send_virtualStrainData = 0;
-//    if(eo_appTheDB_IsVirtualStrainDataUpdated(db_ptr))
-//    {
-//        send_virtualStrainData = 1;
-//        count_watchdog_virtaulStrain = 0;
-//        count_between_two_updates = 0;
-//        eo_appTheDB_ClearVirtualStrainDataUpdatedFlag(db_ptr);
-//    }
-//    else
-//    {
-//        count_between_two_updates ++;
-//        count_watchdog_virtaulStrain++;
-//        
-//        if(count_between_two_updates <= COUNT_BETWEEN_TWO_UPDATES_MAx)
-//        {
-//            if(count_watchdog_virtaulStrain == COUNT_WATCHDOG_VIRTUALSTRAIN_MAX)
-//            {
-//                send_virtualStrainData = 1;
-//                count_watchdog_virtaulStrain = 0;
-//            }
-//            else
-//            {
-//                send_virtualStrainData = 0;
-//            }
-//        }
-//        else
-//        {
-//            send_virtualStrainData = 0;
-//        }
-
-//    }
-//    
-//    
-//    
-//    if(send_virtualStrainData)
-//    {
-//        eo_appTheDB_GetVirtualStrainDataPtr(db_ptr, &virtStrain_ptr);
-//        
-//        res = eo_appTheDB_GetJointCanLocation(db_ptr, 0,  &canLoc, NULL);
-//        if(eores_OK != res)
-//        {
-//            return;
-//        }
-
-//        //#warning marco.accame: ecco qui il messaggio verso il can address 12 ...........................
-//        //set destination of all messages 
-//        msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(0, 12); // virtual ft sensor has address 12
-//        
-//        //set command (calss + id) and send it
-//        msgCmd.class = eocanprot_msgclass_periodicAnalogSensor;
-//        msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR;
-//        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[0]);
-//        
-//        msgCmd.cmdId = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR;
-//        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&virtStrain_ptr[3]);
-//    }
-//    s_checkEthLinks();
-//    
-////     for(jId = 0; jId<numofjoint; jId++)
-////     {
-////         res = eo_appTheDB_GetJointStatusPtr(eo_appTheDB_GetHandle(), jId, &jstatus_ptr);
-////         if(eores_OK != res)
-////         {
-////             return; //error
-////         }
-////         
-////         if(jstatus_ptr->basic.motionmonitorstatus == eomc_motionmonitorstatus_setpointnotreachedyet)
-////         {
-////             /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-////             - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-////             message because the setpoint is alredy reached. this means that:
-////                 - if monitormode is forever, no new set point has been configured 
-////                 - if monitormode is _untilreached, the joint reached the setpoint already.
-////             - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-////             message because pc104 is not interested in getting motion done.
-////             */
-////             eo_appCanSP_SendCmd2Joint(appCanSP_ptr, jId, msgCmd, NULL);
-////         }
-
-////     }   
-//#endif
 }
-
-
-
-//#define ethLinksCount_max 3000 //5 sec
-//static void s_checkEthLinks(void)
-//{
-//    static uint32_t ethLinksCount;
-//    static uint32_t ethLinksCount_partial;
-//    static uint8_t linknum = 255;
-//    
-//    ethLinksCount++;
-//    
-//    if((ethLinksCount< ethLinksCount_max) && (255 == linknum))
-//    {
-//        return;
-//    }
-
-//    if(255 == linknum)
-//    {
-//        linknum = 0;
-//        #if defined(EVIEWER_ENABLED)    
-//        evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
-//        #endif
-//        
-//        #warning marco.accame: TODO: put diagnostics
-//        //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
-//        
-//        #if defined(EVIEWER_ENABLED)    
-//        eventviewer_switch_to(prev);
-//        #endif  
-//        linknum++;
-//    }
-//    else
-//    {
-//        if(ethLinksCount_partial == 20)
-//        {
-//            ethLinksCount_partial = 0;
-//            #if defined(EVIEWER_ENABLED)    
-//            evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_hwErrCntr);
-//            #endif
-//            
-//            #warning marco.accame: TODO: put diagnostics
-//            //eo_theEMSdgn_checkEthLinkErrors(eo_theEMSdgn_GetHandle(), linknum);
-//            
-//            #if defined(EVIEWER_ENABLED)    
-//            eventviewer_switch_to(prev);
-//            #endif  
-//            linknum++;
-//            if(linknum == 3)
-//            {
-//                #warning marco.accame: TODO: put diagnostics
-////                if((eo_dgn_cmds.signalEthCounters) && (eo_theEMSdgn_EthLinksInError(eo_theEMSdgn_GetHandle())) )
-////                //if((eo_dgn_cmds.signalEthCounters) )
-////                {
-////                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsperiph , 0);
-////                }
-
-//                linknum = 255;
-//                ethLinksCount = 0;
-//            }
-//        }
-//    }
-//    ethLinksCount_partial++;
-//}
-
-
-// marco.accame: commented it out on nov 26 2014 because it is not used and the compiler complains
-//static void s_eom_emsrunner_hid_read_can_messages(eOcanport_t port, eObool_t all, uint8_t max)
-//{
-//    EOappCanSP*  cansp = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-//    uint8_t      numofRXcanframe = 0;
-//    eOresult_t   res;
-//    
-//    if(all)
-//    {
-//        res = eo_appCanSP_GetNumOfRecCanframe(cansp, port, &numofRXcanframe);
-//        eo_errman_Assert(eo_errman_GetHandle(), (eores_OK == res), "err in GetNumOfRecCanframe", "EOMtheEMSrunner", &eo_errman_DescrTobedecided);
-//    }
-//    else
-//    {
-//        numofRXcanframe = max;
-//    }
-//    
-//    #ifdef _GET_CANQUEUE_STATISTICS_
-//        eo_theEMSdgn_updateCanRXqueueStatisticsOnRunMode(port, numofRXcanframe);
-//    #endif
-//    eo_appCanSP_read(cansp, port, numofRXcanframe, NULL); 
-//}
 
 
 
