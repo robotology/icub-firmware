@@ -111,7 +111,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p);
-static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p);
+static void s_eo_emsapplBody_CanServices_Init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p);
 
@@ -171,8 +171,10 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
       
     eo_mc4boards_Initialise(NULL);
     
-    s_eo_emsapplBody_mc4data_init(p);    
-    s_eo_emsapplBody_canServicesProvider_init(p);
+    s_eo_emsapplBody_mc4data_init(p);  
+
+    
+    s_eo_emsapplBody_CanServices_Init(p);
     s_eo_emsapplBody_encodersReader_init(p);        
     s_eo_emsapplBody_emsController_init(p);
     
@@ -381,7 +383,7 @@ static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p)
       
     if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
-        // must init the bcast policy and the shitvalues and put it into configMC4boards2use
+        // must init the bcast policy and the shiftvalues and put it into configMC4boards2use
         eo_emsapplbody_configMC4boards_t *cfgmc4 = &p->configMC4boards2use;
         
         // shiftvalues are all equal for the mc4 boards
@@ -420,7 +422,7 @@ static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p)
 
 }
 
-static void s_eo_emsapplBody_canServicesProvider_init(EOtheEMSapplBody *p)
+static void s_eo_emsapplBody_CanServices_Init(EOtheEMSapplBody *p)
 {
     eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};
     
