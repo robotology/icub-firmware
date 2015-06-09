@@ -71,6 +71,9 @@
 
 #include "EOtheCANdiscovery.h"
 
+
+#include "EOtheMC4boards.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -165,7 +168,9 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     s_eo_emsapplBody_computeRunMode(p); // the run mode depends on connected can board (mc4, 2foc, only skin, etc)
         
     eo_entities_Initialise();
-        
+      
+    eo_mc4boards_Initialise(NULL);
+    
     s_eo_emsapplBody_mc4data_init(p);    
     s_eo_emsapplBody_canServicesProvider_init(p);
     s_eo_emsapplBody_encodersReader_init(p);        
@@ -174,6 +179,12 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     // now i set the appl body as initted
     p->st = eo_emsApplBody_st__initted;
     
+
+// debug   
+//    eo_emsapplBody_EnableTxAllJointOnCan(p);
+//    eo_mc4boards_BroadcastStart(eo_mc4boards_GetHandle());
+//    s_eo_emsapplBody_sendConfig2canboards(p);
+//    eo_mc4boards_ConfigShiftValues(eo_mc4boards_GetHandle());
 
     
     // and i start some services   
@@ -527,9 +538,9 @@ static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
             eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
             
             // second is ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT
-            eOtmp_estimShift_t estimshift = {0};
-            estimshift.estimShiftJointVel= shiftvalues->jointVelocityEstimationShift;
-            estimshift.estimShiftJointAcc = 0;
+            icubCanProto_estimShift_t estimshift = {0};
+            estimshift.estimShiftJointVel = shiftvalues->jointVelocityEstimationShift;
+            estimshift.estimShiftJointAcc = shiftvalues->jointAccelerationEstimationShift;
             estimshift.estimShiftMotorVel = 0;
             estimshift.estimShiftMotorAcc = 0;
             command.type  = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;

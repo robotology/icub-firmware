@@ -69,7 +69,7 @@ enum {eo_emsapplbody_deviceid_numberof = 3};
 // values of shifts to send to motor can board (MC4 only, because 2foc use a different way to coding data) 
 typedef struct
 {
-    uint8_t             jointVelocityShift;
+    uint16_t            jointVelocityShift;
     uint8_t             jointVelocityEstimationShift;
     uint8_t             jointAccelerationEstimationShift;
 } eo_emsapplbody_can_shiftvalues_t;   
@@ -83,8 +83,6 @@ typedef struct
     
 
 
-
-
 typedef struct
 {
     eo_emsapplbody_can_shiftvalues_t    shiftvalues;    
@@ -92,19 +90,14 @@ typedef struct
 } eo_emsapplbody_configMC4boards_t;
     
 
-typedef struct 
-{
-    uint8_t major;
-    uint8_t minor;
-} eOtmp_protocolVersion_t;
 
-typedef struct
-{
-    uint8_t estimShiftJointVel;
-    uint8_t estimShiftJointAcc;
-    uint8_t estimShiftMotorVel;
-    uint8_t estimShiftMotorAcc;
-} eOtmp_estimShift_t;
+//typedef struct
+//{
+//    uint8_t estimShiftJointVel;
+//    uint8_t estimShiftJointAcc;
+//    uint8_t estimShiftMotorVel;
+//    uint8_t estimShiftMotorAcc;
+//} eOtmp_estimShift_t;
 
 typedef struct
 {
