@@ -883,6 +883,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheCANdiscovery.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMC4boards.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMC4boards.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2216,6 +2221,11 @@
               <FileName>EOtheCANdiscovery.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheCANdiscovery.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMC4boards.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMC4boards.c</FilePath>
             </File>
           </Files>
         </Group>

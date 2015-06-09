@@ -301,6 +301,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
             //return;
             s_boardnum = 0;
         }
+        
+        //s_boardnum = 1; it imposes taht teh board is the eb2
     }
     
     {   // CAN-MAPPING
