@@ -164,7 +164,7 @@ extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_
     
     //set the value to start procedure
     o->pwm_limit_calib = pwmlimit;
-    //what about velocity? it's useful?
+    //what about velocity? is it useful?
     o->control_mode = eomc_controlmode_calib;
 }
 
@@ -959,21 +959,24 @@ static void axisMotionReset(EOaxisController *o)
 static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
 {
     static int32_t current_pos = 0, veryold_pos = 0;
-    static uint16_t count = 0;
+    static uint16_t count_equal = 0, count_calib = 0;
+    
+    count_calib++;
     current_pos = GET_AXIS_POSITION();
     if (current_pos == veryold_pos)
     {
-        count++;
-        //if for 100 consecutive times (~100ms) I'm in the same position, it means that I reached the hardware limit
-        if (count == 100)
+        count_equal++;
+        //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+        if ((count_equal == 20) && (count_calib > 1200))
         {
-            count = 0;
+            count_equal = 0;
+            count_calib = 0;
             return eobool_true;
         }
     }
     else
     {
-        count = 0;
+        count_equal = 0;
     }
     veryold_pos = current_pos;
     return eobool_false;
