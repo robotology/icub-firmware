@@ -256,7 +256,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eOtmp_estimShift_t *shift = (eOtmp_estimShift_t*)descriptor->cmd.value;
+    icubCanProto_estimShift_t *shift = (icubCanProto_estimShift_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT);
     // now i prepare data[1] -> data[4]
     frame->data[1]  = shift->estimShiftJointVel;
@@ -400,7 +400,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VEL_SHIFT(eOcanprot_
     icubCanProto_velocityShift_t shift = *((icubCanProto_velocityShift_t*)descriptor->cmd.value);
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT);    
     // now i prepare data[1] -> data[2]  
-    *((uint16_t*)(&frame->data[1])) = shift;    
+    *((icubCanProto_velocityShift_t*)(&frame->data[1])) = shift;    
     return(eores_OK);
 }
 
