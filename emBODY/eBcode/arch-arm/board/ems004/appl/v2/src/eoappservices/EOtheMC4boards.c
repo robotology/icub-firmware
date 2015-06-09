@@ -114,7 +114,8 @@ static EOtheMC4boards s_eo_themc4boards =
     .config             = {0},
     .config2use         = {0},
     .command            = {0},
-    .configured         = eobool_false
+    .configured         = eobool_false,
+    .convencoder        = {0}
 };
 
 //static const char s_eobj_ownname[] = "EOtheMC4boards";
@@ -178,6 +179,12 @@ extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config_t *cfg)
         s_eo_themc4boards.numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);      
         
         s_eo_themc4boards.configured = eobool_false;
+        
+        for(i=0; i<s_eo_themc4boards.numofjomos; i++)
+        {
+            s_eo_themc4boards.convencoder[i].factor = 1;
+            s_eo_themc4boards.convencoder[i].offset = 0;
+        }
     }
 
     s_eo_themc4boards.initted = eobool_true;
@@ -300,6 +307,257 @@ extern eOresult_t eo_mc4boards_ConfigShiftValues(EOtheMC4boards *p)
     
     return(eores_OK);       
 }
+
+
+extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_factor_t factor)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themc4boards.therearemc4s)
+    {   // nothing to do because we dont have a mc4 board
+        return(eores_NOK_generic);
+    }
+
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   // nothing to do because dont have that joint
+        return(eores_NOK_generic);
+    }
+
+    s_eo_themc4boards.convencoder[joint].factor = factor;
+
+    return(eores_OK);    
+}
+
+extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_offset_t offset)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themc4boards.therearemc4s)
+    {   // nothing to do because we dont have a mc4 board
+        return(eores_NOK_generic);
+    }
+
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   // nothing to do because dont have that joint
+        return(eores_NOK_generic);
+    }
+
+    s_eo_themc4boards.convencoder[joint].offset = offset;
+
+    return(eores_OK);  
+
+}
+
+extern eOmeas_position_t eo_mc4boards_Convert_Position_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return((eOmeas_position_t)((pos / s_eo_themc4boards.convencoder[joint].factor) - s_eo_themc4boards.convencoder[joint].offset));
+}
+
+extern icubCanProto_position_t eo_mc4boards_Convert_Position_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return((icubCanProto_position_t)((pos + s_eo_themc4boards.convencoder[joint].offset) * s_eo_themc4boards.convencoder[joint].factor)); 
+}
+
+
+extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_E2I_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return((eOmeas_velocity_t)(vel/__fabs(s_eo_themc4boards.convencoder[joint].factor)));    
+}
+
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+
+     
+    //NEW VERSION:
+    /*the velocity is dived by 10, because the reuslt of followiong moltiplication
+    (vel * __fabs(s_eo_themc4boards.convencoder[joint].factor))
+    can be bigger then 32767 (max value of int16)
+    so the result is divieded by 10.
+    Note thet velocity is used to get the needed time to reach the setpoint, so in mc4 fw it is enogth to moltiply by 100 ensted of 1000 (1ms)
+    This operation was already done by CanBusMotionControl
+    */
+
+    int32_t temp = (vel * __fabs(s_eo_themc4boards.convencoder[joint].factor));
+    return((icubCanProto_velocity_t)(temp/10));    
+}
+
+
+extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return(vel/s_eo_themc4boards.convencoder[joint].factor);
+}
+
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    
+    //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms and after shift in order to obtain a small value
+    int32_t tmp = vel * s_eo_themc4boards.convencoder[joint].factor;
+    tmp = tmp *(1 << s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel); //eo_measconv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
+    tmp = tmp + 500;  //round to nearest integer
+    tmp = tmp/1000; //convert from sec to ms
+    return((icubCanProto_velocity_t)tmp);
+}
+
+
+extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return((eOmeas_acceleration_t)acc / s_eo_themc4boards.convencoder[joint].factor);
+}
+
+extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return((icubCanProto_acceleration_t)(acc * s_eo_themc4boards.convencoder[joint].factor));    
+}
+
+extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    return((eOmeas_acceleration_t)(acc / __fabs(s_eo_themc4boards.convencoder[joint].factor)));
+}
+
+extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    int32_t tmp = acc << s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel;
+    tmp = tmp * __fabs(s_eo_themc4boards.convencoder[joint].factor);
+    tmp = tmp + 500000; //round to nearest integer
+    tmp = tmp/1000000; // conver from sec^2 to millsec^2 
+    return((icubCanProto_acceleration_t)tmp);    
+}
+
+
+extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_stiffness_t stiff)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    float factor = s_eo_themc4boards.convencoder[joint].factor;
+    int32_t tmpstiff = (int32_t)stiff;
+    
+    if(stiff > INT32_MAX)
+    {
+        tmpstiff = INT32_MAX;
+    }
+    else
+    {
+        tmpstiff = (int32_t)stiff;
+    }
+    //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
+    //inoltre lo divido per mille perche' su robot interface e' moltiplicato per 1000 per avere piu' precisione possibile
+    //return((icubCanProto_stiffness_t)(((i_stiff / factor)) /1000.0) );
+    
+    return((icubCanProto_stiffness_t)(((tmpstiff / factor)) /1000.0f) );    
+}
+
+extern eOmeas_stiffness_t       eo_mc4boards_Convert_impedanceStiffness_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_stiffness_t stiff)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    
+    eOmeas_stiffness_t aux = stiff;
+    
+    return(aux*s_eo_themc4boards.convencoder[joint].factor*1000);    
+}
+
+extern icubCanProto_damping_t eo_mc4boards_Convert_impedanceDamping_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_damping_t damping)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    
+    int32_t tmpdamping = (int32_t)damping;;
+    if(damping > INT32_MAX)
+    {
+        tmpdamping = INT32_MAX;
+    }
+    else
+    {
+        tmpdamping = (int32_t)damping;
+    }
+    
+    //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
+    //qui non divido per 1000 perche' devo estrimerlo al millisec.
+    return((icubCanProto_stiffness_t)((tmpdamping / s_eo_themc4boards.convencoder[joint].factor)) );    
+}
+
+extern eOmeas_damping_t       eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_damping_t damping)
+{
+    if(joint >= s_eo_themc4boards.numofjomos)
+    {   
+        return(0);
+    }
+    eOmeas_damping_t aux = damping;
+
+    return(aux*s_eo_themc4boards.convencoder[joint].factor);    
+}
+
+extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_torque_t torque)
+{
+//    if(joint >= s_eo_themc4boards.numofjomos)
+//    {   
+//        return(0);
+//    }
+    
+    return(torque);   
+}
+
+extern eOmeas_torque_t       eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t torque)
+{
+//    if(joint >= s_eo_themc4boards.numofjomos)
+//    {   
+//        return(0);
+//    }
+    return((eOmeas_torque_t)torque);
+}
+
 
 
 

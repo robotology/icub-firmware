@@ -38,16 +38,22 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    eOmc4boards_conv_encoder_factor_t   factor;
+    eOmc4boards_conv_encoder_offset_t   offset;
+} eOmc4boards_conv_encoder_t;
 
 struct EOtheMC4boards_hid
 {
-    eObool_t                initted;
-    eObool_t                therearemc4s;
-    uint8_t                 numofjomos;
-    eOmc4boards_config_t    config;
-    eOmc4boards_config_t    config2use;
-    eOcanprot_command_t     command;
-    eObool_t                configured;
+    eObool_t                    initted;
+    eObool_t                    therearemc4s;
+    uint8_t                     numofjomos;
+    eOmc4boards_config_t        config;
+    eOmc4boards_config_t        config2use;
+    eOcanprot_command_t         command;
+    eObool_t                    configured;
+    eOmc4boards_conv_encoder_t  convencoder[12];
 }; 
 
 
