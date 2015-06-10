@@ -75,7 +75,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>18</CpuCode>
+      <CpuCode>255</CpuCode>
       <Books>
         <Book>
           <Number>0</Number>
@@ -143,6 +143,7 @@
         <tRtrace>0</tRtrace>
         <sRSysVw>1</sRSysVw>
         <tRSysVw>1</tRSysVw>
+        <tPdscDbg>1</tPdscDbg>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>7</nTsel>
@@ -208,7 +209,6 @@
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
           <ItemText>ipaddr</ItemText>
-          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
@@ -216,7 +216,6 @@
           <WinNumber>2</WinNumber>
           <SubType>0</SubType>
           <ItemText>loc_device_def</ItemText>
-          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow2>
       <MemoryWindow3>
@@ -224,7 +223,6 @@
           <WinNumber>3</WinNumber>
           <SubType>0</SubType>
           <ItemText>xxx</ItemText>
-          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow3>
       <Tracepoint>
@@ -316,7 +314,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>18</CpuCode>
+      <CpuCode>255</CpuCode>
       <Books>
         <Book>
           <Number>0</Number>
@@ -384,6 +382,7 @@
         <tRtrace>0</tRtrace>
         <sRSysVw>1</sRSysVw>
         <tRSysVw>1</tRSysVw>
+        <tPdscDbg>1</tPdscDbg>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>7</nTsel>
@@ -647,7 +646,6 @@
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
           <ItemText>0x2000e190</ItemText>
-          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
       <MemoryWindow2>
@@ -655,7 +653,6 @@
           <WinNumber>2</WinNumber>
           <SubType>0</SubType>
           <ItemText>loc_device_def</ItemText>
-          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow2>
       <MemoryWindow3>
@@ -663,7 +660,6 @@
           <WinNumber>3</WinNumber>
           <SubType>0</SubType>
           <ItemText>xxx</ItemText>
-          <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow3>
       <Tracepoint>
@@ -1601,7 +1597,7 @@
 
   <Group>
     <GroupName>eo-emsappl-cfg</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

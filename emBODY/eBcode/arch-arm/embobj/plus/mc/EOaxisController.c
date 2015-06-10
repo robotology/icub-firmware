@@ -593,6 +593,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 eo_trajectory_Init(o->trajectory, pos, vel, 0);
                 eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION()); 
                 o->control_mode = eomc_controlmode_position;
+                eo_emsController_SetControlMode(o->axisID, eomc_controlmode_cmd_position);
             }
             
             o->interact_mode = eOmc_interactionmode_stiff;
