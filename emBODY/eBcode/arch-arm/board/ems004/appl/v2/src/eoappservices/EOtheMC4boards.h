@@ -86,31 +86,33 @@ extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config_t *cfg);
 
 extern EOtheMC4boards* eo_mc4boards_GetHandle(void);
 
+extern eObool_t eo_mc4boards_AreThere(EOtheMC4boards *p);
+
 extern eOresult_t eo_mc4boards_BroadcastStart(EOtheMC4boards *p);
 
 extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p);
 
-extern eOresult_t eo_mc4boards_ConfigShiftValues(EOtheMC4boards *p);
+extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p);
 
 
 extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_factor_t factor);
 extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_offset_t offset);
 
-extern eOmeas_position_t       eo_mc4boards_Convert_Position_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos);
+extern eOmeas_position_t       eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos);
 extern icubCanProto_position_t eo_mc4boards_Convert_Position_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos);
 
 
-extern eOmeas_velocity_t       eo_mc4boards_Convert_Velocity_E2I_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel);
-extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel);
+extern eOmeas_velocity_t       eo_mc4boards_Convert_Velocity_fromCAN_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel);
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel);
 
-extern eOmeas_velocity_t       eo_mc4boards_Convert_Velocity_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel);
-extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel);
+extern eOmeas_velocity_t       eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel);
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel);
 
 
-extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc);
-extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc);
-extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc);
-extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc);
+extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc);
+extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc);
+extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_fromCAN_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc);
+extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc);
 
 
 extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_stiffness_t stiff);
@@ -121,6 +123,9 @@ extern eOmeas_damping_t       eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4
 
 extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_torque_t i_torque);
 extern eOmeas_torque_t       eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t s_torque);
+
+extern uint8_t eo_mc4boards_VelocityEstimationShift_Get(EOtheMC4boards *p, uint8_t joint);
+extern uint8_t eo_mc4boards_AccelerationEstimationShift_Get(EOtheMC4boards *p, uint8_t joint);
 
 /** @}            
     end of group eo_EOtheMC4boards

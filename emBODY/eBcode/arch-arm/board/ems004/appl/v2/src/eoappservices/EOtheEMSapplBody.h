@@ -43,7 +43,7 @@
 #include "EoBoards.h"
 #include "EOappEncodersReader.h"
 #include "EOemsController.h"
-#include "EOtheMeasuresConverter.h"
+//#include "EOtheMeasuresConverter.h"
 
 #include "EOtheCANmapping.h"
 
@@ -67,27 +67,27 @@ enum {eo_emsapplbody_deviceid_numberof = 3};
 
 
 // values of shifts to send to motor can board (MC4 only, because 2foc use a different way to coding data) 
-typedef struct
-{
-    uint16_t            jointVelocityShift;
-    uint8_t             jointVelocityEstimationShift;
-    uint8_t             jointAccelerationEstimationShift;
-} eo_emsapplbody_can_shiftvalues_t;   
+//typedef struct
+//{
+//    uint16_t            jointVelocityShift;
+//    uint8_t             jointVelocityEstimationShift;
+//    uint8_t             jointAccelerationEstimationShift;
+//} eo_emsapplbody_can_shiftvalues_t;   
 
-// broadcast policy to set to motor can boards (MC4 only, because 2FOC don't use icubCanProto)  
-enum {eoemsapplbody_bcastpolicylistsize = 4};
-typedef struct
-{
-    uint8_t             val2bcastList[eoemsapplbody_bcastpolicylistsize];
-} eo_emsapplbody_can_bcastpolicy_t;       
+//// broadcast policy to set to motor can boards (MC4 only, because 2FOC don't use icubCanProto)  
+//enum {eoemsapplbody_bcastpolicylistsize = 4};
+//typedef struct
+//{
+//    uint8_t             val2bcastList[eoemsapplbody_bcastpolicylistsize];
+//} eo_emsapplbody_can_bcastpolicy_t;       
     
 
 
-typedef struct
-{
-    eo_emsapplbody_can_shiftvalues_t    shiftvalues;    
-    eo_emsapplbody_can_bcastpolicy_t    bcastpolicy;      
-} eo_emsapplbody_configMC4boards_t;
+//typedef struct
+//{
+//    eo_emsapplbody_can_shiftvalues_t    shiftvalues;    
+//    eo_emsapplbody_can_bcastpolicy_t    bcastpolicy;      
+//} eo_emsapplbody_configMC4boards_t;
     
 
 
@@ -102,7 +102,7 @@ typedef struct
 typedef struct
 {
     eOappEncReader_stream_t             encoderstreams[eo_appEncReader_streams_numberof];
-    eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
+    //eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
 } eOemsapplbody_cfg_t;
 
 
@@ -132,7 +132,7 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
 
-extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
+//extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 
 
 /** @}            

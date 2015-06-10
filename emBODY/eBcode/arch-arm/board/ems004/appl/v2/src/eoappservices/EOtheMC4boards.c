@@ -199,6 +199,11 @@ extern EOtheMC4boards* eo_mc4boards_GetHandle(void)
 }
 
 
+extern eObool_t eo_mc4boards_AreThere(EOtheMC4boards *p)
+{
+    return(s_eo_themc4boards.therearemc4s);
+}
+
 extern eOresult_t eo_mc4boards_BroadcastStart(EOtheMC4boards *p)
 {   
     if(NULL == p)
@@ -261,7 +266,7 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
     return(eores_OK);       
 }
 
-extern eOresult_t eo_mc4boards_ConfigShiftValues(EOtheMC4boards *p)
+extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
 {   
     if(NULL == p)
     {
@@ -354,7 +359,7 @@ extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint
 
 }
 
-extern eOmeas_position_t eo_mc4boards_Convert_Position_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos)
+extern eOmeas_position_t eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -363,7 +368,7 @@ extern eOmeas_position_t eo_mc4boards_Convert_Position_E2I(EOtheMC4boards *p, ui
     return((eOmeas_position_t)((pos / s_eo_themc4boards.convencoder[joint].factor) - s_eo_themc4boards.convencoder[joint].offset));
 }
 
-extern icubCanProto_position_t eo_mc4boards_Convert_Position_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos)
+extern icubCanProto_position_t eo_mc4boards_Convert_Position_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -373,7 +378,7 @@ extern icubCanProto_position_t eo_mc4boards_Convert_Position_I2E(EOtheMC4boards 
 }
 
 
-extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_E2I_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
+extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -382,7 +387,7 @@ extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_E2I_abs(EOtheMC4boards *p
     return((eOmeas_velocity_t)(vel/__fabs(s_eo_themc4boards.convencoder[joint].factor)));    
 }
 
-extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -404,7 +409,7 @@ extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E_abs(EOtheMC4boa
 }
 
 
-extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
+extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -413,7 +418,7 @@ extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_E2I(EOtheMC4boards *p, ui
     return(vel/s_eo_themc4boards.convencoder[joint].factor);
 }
 
-extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -429,7 +434,7 @@ extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_I2E(EOtheMC4boards 
 }
 
 
-extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
+extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -438,7 +443,7 @@ extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I(EOtheMC
     return((eOmeas_acceleration_t)acc / s_eo_themc4boards.convencoder[joint].factor);
 }
 
-extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
+extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -447,7 +452,7 @@ extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E(EOtheMC
     return((icubCanProto_acceleration_t)(acc * s_eo_themc4boards.convencoder[joint].factor));    
 }
 
-extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
+extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_fromCAN_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -456,7 +461,7 @@ extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_E2I_abs(EOt
     return((eOmeas_acceleration_t)(acc / __fabs(s_eo_themc4boards.convencoder[joint].factor)));
 }
 
-extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_I2E_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
+extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
@@ -559,7 +564,15 @@ extern eOmeas_torque_t       eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, 
 }
 
 
+extern uint8_t eo_mc4boards_VelocityEstimationShift_Get(EOtheMC4boards *p, uint8_t joint)
+{
+    return(s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel);
+}
 
+extern uint8_t eo_mc4boards_AccelerationEstimationShift_Get(EOtheMC4boards *p, uint8_t joint)
+{
+    return(s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointAcc);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

@@ -110,12 +110,12 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p);
+//static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_CanServices_Init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p);
 static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p);
 
-static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
+//static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
 static eOresult_t s_eo_emsapplBody_computeRunMode(EOtheEMSapplBody *p);
 
 
@@ -134,7 +134,7 @@ static EOtheEMSapplBody s_applBody =
     .appRunMode             = applrunMode__default,
     .appEncReader           = NULL,
     .emsController          = NULL,
-    .configMC4boards2use    = {0},
+//    .configMC4boards2use    = {0},
     .hasdevice              = {eobool_false, eobool_false, eobool_false}
 };
 
@@ -164,14 +164,15 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     memcpy(&p->config, cfg, sizeof(eOemsapplbody_cfg_t));
     
    
+    eo_entities_Initialise();  
+
     
     s_eo_emsapplBody_computeRunMode(p); // the run mode depends on connected can board (mc4, 2foc, only skin, etc)
         
-    eo_entities_Initialise();
-      
+
     eo_mc4boards_Initialise(NULL);
     
-    s_eo_emsapplBody_mc4data_init(p);  
+    //s_eo_emsapplBody_mc4data_init(p);  
 
     
     s_eo_emsapplBody_CanServices_Init(p);
@@ -257,20 +258,21 @@ extern eOresult_t eo_emsapplBody_EnableTxAllJointOnCan(EOtheEMSapplBody *p)
     } 
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
-        uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-        uint8_t i=0;
-        // get the broadcast policy. it is somewhere in this object. the bcast policy is equal for all joints...
-        eo_emsapplbody_can_bcastpolicy_t *bcastpolicy = &p->configMC4boards2use.bcastpolicy;
-        eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
-        command.value = bcastpolicy;
-        for(i=0; i<numofjomos; i++)
-        {
-            // ok, now i send the value to the relevant address
-            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-        }
+        eo_mc4boards_BroadcastStart(eo_mc4boards_GetHandle());
+//        uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//        uint8_t i=0;
+//        // get the broadcast policy. it is somewhere in this object. the bcast policy is equal for all joints...
+//        eo_emsapplbody_can_bcastpolicy_t *bcastpolicy = &p->configMC4boards2use.bcastpolicy;
+//        eOcanprot_command_t command = {0};
+//        command.class = eocanprot_msgclass_pollingMotorControl;
+//        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
+//        command.value = bcastpolicy;
+//        for(i=0; i<numofjomos; i++)
+//        {
+//            // ok, now i send the value to the relevant address
+//            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
+//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+//        }
     }  
 
     return(eores_OK);
@@ -296,20 +298,22 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
     } 
     else if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
     {
-        uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-        uint8_t i=0;
-        // get a broadcast policy of all zeros.
-        eo_emsapplbody_can_bcastpolicy_t bcastpolicy = {0};
-        eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
-        command.value = &bcastpolicy;
-        for(i=0; i<numofjomos; i++)
-        {
-            // ok, now i send the value to the relevant address
-            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-        }
+        eo_mc4boards_BroadcastStop(eo_mc4boards_GetHandle());
+        
+//        uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//        uint8_t i=0;
+//        // get a broadcast policy of all zeros.
+//        eo_emsapplbody_can_bcastpolicy_t bcastpolicy = {0};
+//        eOcanprot_command_t command = {0};
+//        command.class = eocanprot_msgclass_pollingMotorControl;
+//        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
+//        command.value = &bcastpolicy;
+//        for(i=0; i<numofjomos; i++)
+//        {
+//            // ok, now i send the value to the relevant address
+//            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
+//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+//        }
     }  
 
     return(eores_OK);
@@ -329,31 +333,31 @@ static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_d
 
 
 
-extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
-{    
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    static eObool_t already_send = eobool_false;
-    eOresult_t res;
-    
-    if(eobool_true == already_send)
-    {
-        return(eores_OK);
-    }
-        
-    
-    res = s_eo_emsapplBody_sendConfig2canboards(p);
-    
-    if(eores_OK == res)
-    {
-        already_send = eobool_true;
-    }
-    
-    return(res);
-}
+//extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
+//{    
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    static eObool_t already_send = eobool_false;
+//    eOresult_t res;
+//    
+//    if(eobool_true == already_send)
+//    {
+//        return(eores_OK);
+//    }
+//        
+//    
+//    res = s_eo_emsapplBody_sendConfig2canboards(p);
+//    
+//    if(eores_OK == res)
+//    {
+//        already_send = eobool_true;
+//    }
+//    
+//    return(res);
+//}
 
 
 
@@ -378,49 +382,49 @@ static void s_eo_emsapplBody_hid_canSP_cbkonrx(void *arg)
 
 
 
-static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p)
-{
-      
-    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
-    {
-        // must init the bcast policy and the shiftvalues and put it into configMC4boards2use
-        eo_emsapplbody_configMC4boards_t *cfgmc4 = &p->configMC4boards2use;
-        
-        // shiftvalues are all equal for the mc4 boards
-        cfgmc4->shiftvalues.jointVelocityShift                  = p->config.configdataofMC4boards.shiftvalues.jointVelocityShift;
-        cfgmc4->shiftvalues.jointVelocityEstimationShift        = p->config.configdataofMC4boards.shiftvalues.jointVelocityEstimationShift;
-        cfgmc4->shiftvalues.jointAccelerationEstimationShift    = p->config.configdataofMC4boards.shiftvalues.jointAccelerationEstimationShift;  
-        
-        // bcast policies are all equal for mc4 boards. we just convert them into flags
-        memset(&cfgmc4->bcastpolicy, 0, sizeof(cfgmc4->bcastpolicy)); 
-        uint8_t i = 0;
-        for(i=0; i<eoemsapplbody_bcastpolicylistsize; i++)
-        {
-            if(0 == p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i])
-            {
-                continue;
-            }
-            if(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]<9)
-            {
-                cfgmc4->bcastpolicy.val2bcastList[0] |= (1 <<(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
-            }
-            else if(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]<17)
-            {
-                cfgmc4->bcastpolicy.val2bcastList[1] |= (1<<(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
-            }
-        } 
+//static void s_eo_emsapplBody_mc4data_init(EOtheEMSapplBody *p)
+//{
+//      
+//    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
+//    {
+////        // must init the bcast policy and the shiftvalues and put it into configMC4boards2use
+////        eo_emsapplbody_configMC4boards_t *cfgmc4 = &p->configMC4boards2use;
+////        
+////        // shiftvalues are all equal for the mc4 boards
+////        cfgmc4->shiftvalues.jointVelocityShift                  = p->config.configdataofMC4boards.shiftvalues.jointVelocityShift;
+////        cfgmc4->shiftvalues.jointVelocityEstimationShift        = p->config.configdataofMC4boards.shiftvalues.jointVelocityEstimationShift;
+////        cfgmc4->shiftvalues.jointAccelerationEstimationShift    = p->config.configdataofMC4boards.shiftvalues.jointAccelerationEstimationShift;  
+////        
+////        // bcast policies are all equal for mc4 boards. we just convert them into flags
+////        memset(&cfgmc4->bcastpolicy, 0, sizeof(cfgmc4->bcastpolicy)); 
+////        uint8_t i = 0;
+////        for(i=0; i<eoemsapplbody_bcastpolicylistsize; i++)
+////        {
+////            if(0 == p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i])
+////            {
+////                continue;
+////            }
+////            if(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]<9)
+////            {
+////                cfgmc4->bcastpolicy.val2bcastList[0] |= (1 <<(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+////            }
+////            else if(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]<17)
+////            {
+////                cfgmc4->bcastpolicy.val2bcastList[1] |= (1<<(p->config.configdataofMC4boards.bcastpolicy.val2bcastList[i]-1));
+////            }
+////        } 
 
-        // init the measure converter
-        eOmeasconv_cfg_t cfg = {0};
-        cfg.jointVelocityShift = p->configMC4boards2use.shiftvalues.jointVelocityShift;
-        cfg.jointVelocityEstimationShift = p->configMC4boards2use.shiftvalues.jointVelocityEstimationShift;    
-        cfg.jointAccEstimationShift = p->configMC4boards2use.shiftvalues.jointAccelerationEstimationShift;
-        eo_measconv_Initialise(&cfg);
-        
-    }
-    
+//        // init the measure converter
+////        eOmeasconv_cfg_t cfg = {0};
+////        cfg.jointVelocityShift = p->configMC4boards2use.shiftvalues.jointVelocityShift;
+////        cfg.jointVelocityEstimationShift = p->configMC4boards2use.shiftvalues.jointVelocityEstimationShift;    
+////        cfg.jointAccEstimationShift = p->configMC4boards2use.shiftvalues.jointAccelerationEstimationShift;
+////        eo_measconv_Initialise(&cfg);
+//        
+//    }
+//    
 
-}
+//}
 
 static void s_eo_emsapplBody_CanServices_Init(EOtheEMSapplBody *p)
 {
@@ -515,46 +519,46 @@ static void s_eo_emsapplBody_emsController_init(EOtheEMSapplBody *p)
 }
 
 
-static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
-{
-    // in here i send to mc4 boards the commands to assign the shift values
+//static eOresult_t s_eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p)
+//{
+//    // in here i send to mc4 boards the commands to assign the shift values
 
-    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
-    {
-        // only mc4
-        uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-        uint8_t i=0;
-        // get the shift value policy. it is somewhere in this object. the shift calues are equal for all joints...
-        eo_emsapplbody_can_shiftvalues_t *shiftvalues = &p->configMC4boards2use.shiftvalues;
-        eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+//    if((applrunMode__skinAndMc4 == p->appRunMode) || (applrunMode__mc4Only == p->appRunMode))
+//    {
+//        // only mc4
+//        uint8_t numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//        uint8_t i=0;
+//        // get the shift value policy. it is somewhere in this object. the shift calues are equal for all joints...
+//        eo_emsapplbody_can_shiftvalues_t *shiftvalues = &p->configMC4boards2use.shiftvalues;
+//        eOcanprot_command_t command = {0};
+//        command.class = eocanprot_msgclass_pollingMotorControl;
 
-        for(i=0; i<numofjomos; i++)
-        {
-            // ok, now i send the value to the relevant address
-            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
-            
-            // first is ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT
-            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
-            command.value = &shiftvalues->jointVelocityShift;                       
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-            
-            // second is ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT
-            icubCanProto_estimShift_t estimshift = {0};
-            estimshift.estimShiftJointVel = shiftvalues->jointVelocityEstimationShift;
-            estimshift.estimShiftJointAcc = shiftvalues->jointAccelerationEstimationShift;
-            estimshift.estimShiftMotorVel = 0;
-            estimshift.estimShiftMotorAcc = 0;
-            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
-            command.value = &estimshift;                       
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-        }        
-        
-    }
-    
-    return(eores_OK);
+//        for(i=0; i<numofjomos; i++)
+//        {
+//            // ok, now i send the value to the relevant address
+//            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
+//            
+//            // first is ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT
+//            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
+//            command.value = &shiftvalues->jointVelocityShift;                       
+//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+//            
+//            // second is ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT
+//            icubCanProto_estimShift_t estimshift = {0};
+//            estimshift.estimShiftJointVel = shiftvalues->jointVelocityEstimationShift;
+//            estimshift.estimShiftJointAcc = shiftvalues->jointAccelerationEstimationShift;
+//            estimshift.estimShiftMotorVel = 0;
+//            estimshift.estimShiftMotorAcc = 0;
+//            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
+//            command.value = &estimshift;                       
+//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+//        }        
+//        
+//    }
+//    
+//    return(eores_OK);
 
-}
+//}
 
 
 static eOresult_t s_eo_emsapplBody_computeRunMode(EOtheEMSapplBody *p)

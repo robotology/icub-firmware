@@ -48,6 +48,8 @@
 
 #include "EOtheCANdiscovery.h"
 
+#include "EOtheMC4boards.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -816,7 +818,7 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
     
     icubCanProto_position_t icub_pos =  *((icubCanProto_position_t*)(&frame->data[1]));
     // ok, now i must convert from one to another ...
-    eOmeas_position_t pos = eo_measconv_jntPosition_E2I(eo_measconv_GetHandle(), index, icub_pos);
+    eOmeas_position_t pos = eo_mc4boards_Convert_Position_fromCAN(eo_mc4boards_GetHandle(), index, icub_pos);
     
     if(ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION == type)
     {
@@ -980,14 +982,14 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
     {
         icubCanProto_stiffness_t icub_stiff = *((icubCanProto_stiffness_t*)(&frame->data[1]));
         icubCanProto_damping_t icub_dump = *((icubCanProto_damping_t*)(&frame->data[3]));
-        impedance->stiffness = eo_measconv_impedenceStiffness_S2I(eo_measconv_GetHandle(), index, icub_stiff);
-        impedance->damping = eo_measconv_impedenceDamping_S2I(eo_measconv_GetHandle(), index, icub_dump);        
+        impedance->stiffness = eo_mc4boards_Convert_impedanceStiffness_S2I(eo_mc4boards_GetHandle(), index, icub_stiff);
+        impedance->damping = eo_mc4boards_Convert_impedanceDamping_S2I(eo_mc4boards_GetHandle(), index, icub_dump);        
         
     }
     else if(ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET == type)
     {
         icubCanProto_torque_t icub_trq = *((icubCanProto_torque_t*)(&frame->data[1]));
-        impedance->offset = eo_measconv_torque_S2I(eo_measconv_GetHandle(), index, icub_trq);        
+        impedance->offset = eo_mc4boards_Convert_torque_S2I(eo_mc4boards_GetHandle(), index, icub_trq);        
     }
     else
     {   // i must have called it badly

@@ -34,8 +34,10 @@
 // but also to retrieve information of other things ...
 
 #include "EOemsController.h"
-#include "EOtheMeasuresConverter.h"
-#include "EOtheMeasuresConverter_hid.h" // to see a bunch of inline functions ...
+//#include "EOtheMeasuresConverter.h"
+//#include "EOtheMeasuresConverter_hid.h" // to see a bunch of inline functions ...
+
+#include "EOtheMC4boards.h"
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
@@ -150,7 +152,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
         }
         
         pos = *((icubCanProto_position_t*)&(frame->data[offset[j]])); 
-        joint->status.basic.jnt_position = eo_measconv_jntPosition_E2I(eo_measconv_GetHandle(), jointindex, pos);                      
+        joint->status.basic.jnt_position = eo_mc4boards_Convert_Position_fromCAN(eo_mc4boards_GetHandle(), jointindex, pos);                      
     }
 
     return(eores_OK);        
@@ -348,11 +350,11 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
         vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[offsetvelocity[j]]));
         acc_icubCanProtValue = *((icubCanProto_acceleration_t*)&(frame->data[offsetacceleration[j]]));
         
-        vel_icubCanProtValue = (vel_icubCanProtValue*1000) >> eo_measconv_hid_GetVelEstimShift(eo_measconv_GetHandle(), jointindex);
-        joint->status.basic.jnt_velocity = eo_measconv_jntVelocity_E2I(eo_measconv_GetHandle(), jointindex, vel_icubCanProtValue);
+        vel_icubCanProtValue = (vel_icubCanProtValue*1000) >> eo_mc4boards_VelocityEstimationShift_Get(eo_mc4boards_GetHandle(), jointindex);
+        joint->status.basic.jnt_velocity = eo_mc4boards_Convert_Velocity_fromCAN(eo_mc4boards_GetHandle(), jointindex, vel_icubCanProtValue);
     
-        acc_icubCanProtValue = (acc_icubCanProtValue * 1000000) >> (eo_measconv_hid_GetVelEstimShift(eo_measconv_GetHandle(), jointindex) + eo_measconv_hid_GetAccEstimShift(eo_measconv_GetHandle(), jointindex));
-        joint->status.basic.jnt_acceleration = eo_measconv_jntAcceleration_E2I(eo_measconv_GetHandle(), jointindex, acc_icubCanProtValue);               
+        acc_icubCanProtValue = (acc_icubCanProtValue * 1000000) >> (eo_mc4boards_VelocityEstimationShift_Get(eo_mc4boards_GetHandle(), jointindex) + eo_mc4boards_AccelerationEstimationShift_Get(eo_mc4boards_GetHandle(), jointindex));
+        joint->status.basic.jnt_acceleration = eo_mc4boards_Convert_Acceleration_fromCAN(eo_mc4boards_GetHandle(), jointindex, acc_icubCanProtValue);               
     }
    
     return(eores_OK);
@@ -407,13 +409,13 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
-    icubCanProto_interactionmode_t caninteractionmodes[2] = {0, 0};
+    icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
        
     uint8_t j=0;
     // the two joints have ...
     const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
-    caninteractionmodes[0] = (frame->data[0] & 0x0f);          // for first joint
-    caninteractionmodes[1] = (frame->data[0] & 0xf0) >> 4;     // for second joint
+    caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
+    caninteractionmodes[1] = (icubCanProto_interactionmode_t)(frame->data[0] & 0xf0) >> 4;     // for second joint
     eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
     for(j=0; j<2; j++)
     {

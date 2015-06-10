@@ -40,7 +40,8 @@
 
 
 #include "EOtheEMSapplBody.h"
-#include "EOtheMeasuresConverter.h"
+//#include "EOtheMeasuresConverter.h"
+#include "EOtheMC4boards.h"
 
 #include "EOtheEntities.h"
 
@@ -328,11 +329,13 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     else
     {
         // first of all: set conversion factor
-        EOtheMeasuresConverter* appMeasConv = eo_measconv_GetHandle();
-        eo_measconv_SetJntEncoderConversionFactor(appMeasConv, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
-        eo_measconv_SetJntEncoderConversionOffset(appMeasConv, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
-
-
+//        EOtheMeasuresConverter* mc4boards = eo_measconv_GetHandle();
+//        eo_measconv_SetJntEncoderConversionFactor(mc4boards, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
+//        eo_measconv_SetJntEncoderConversionOffset(mc4boards, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
+        EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
+        eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_factor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
+        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_offset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
+        
         eOcanprot_command_t command = {0};
         command.class = eocanprot_msgclass_pollingMotorControl;
         
@@ -358,9 +361,12 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
 
         // 4) set limits
-        icubCanProto_position_t minpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.min);
-        icubCanProto_position_t maxpos_icubCanProtValue = eo_measconv_jntPosition_I2E(appMeasConv, jxx, cfg->limitsofjoint.max);
+//        icubCanProto_position_t minpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, cfg->limitsofjoint.min);
+//        icubCanProto_position_t maxpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, cfg->limitsofjoint.max);
 
+        icubCanProto_position_t minpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, cfg->limitsofjoint.min);
+        icubCanProto_position_t maxpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, cfg->limitsofjoint.max);
+        
         if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
         {
             //swap min and max
@@ -385,10 +391,14 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 
         // 6) set impedance 
         icubCanProto_impedance_t impedence_icubCanProtValues = {0};  
-        impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(appMeasConv, jxx, cfg->impedance.stiffness);
-        impedence_icubCanProtValues.damping = eo_measconv_impedenceDamping_I2S(appMeasConv, jxx, cfg->impedance.damping);
-        impedence_icubCanProtValues.offset = eo_measconv_torque_I2S(appMeasConv, jxx, cfg->impedance.offset);
+//        impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(mc4boards, jxx, cfg->impedance.stiffness);
+//        impedence_icubCanProtValues.damping = eo_mc4boards_Convert_impedanceDamping_I2S(mc4boards, jxx, cfg->impedance.damping);
+//        impedence_icubCanProtValues.offset = eo_mc4boards_Convert_torque_I2S(mc4boards, jxx, cfg->impedance.offset);
 
+        impedence_icubCanProtValues.stiffness = eo_mc4boards_Convert_impedanceStiffness_I2S(eo_mc4boards_GetHandle(), jxx, cfg->impedance.stiffness);
+        impedence_icubCanProtValues.damping = eo_mc4boards_Convert_impedanceDamping_I2S(eo_mc4boards_GetHandle(), jxx, cfg->impedance.damping);
+        impedence_icubCanProtValues.offset = eo_mc4boards_Convert_torque_I2S(eo_mc4boards_GetHandle(), jxx, cfg->impedance.offset);
+        
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
         command.value = &impedence_icubCanProtValues;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
@@ -487,11 +497,11 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 
         if(eo_ropcode_set == rd->ropcode)
         {    
-            EOtheMeasuresConverter* appMeasConv = eo_measconv_GetHandle();
+            EOtheMC4boards* mc4boards = eo_mc4boards_GetHandle();
             icubCanProto_impedance_t impedence_icubCanProtValues = {0};  
-            impedence_icubCanProtValues.stiffness = eo_measconv_impedenceStiffness_I2S(appMeasConv, jxx, impedance->stiffness);
-            impedence_icubCanProtValues.damping = eo_measconv_impedenceDamping_I2S(appMeasConv, jxx, impedance->damping);
-            impedence_icubCanProtValues.offset = eo_measconv_torque_I2S(appMeasConv, jxx, impedance->offset);
+            impedence_icubCanProtValues.stiffness = eo_mc4boards_Convert_impedanceStiffness_I2S(mc4boards, jxx, impedance->stiffness);
+            impedence_icubCanProtValues.damping = eo_mc4boards_Convert_impedanceDamping_I2S(mc4boards, jxx, impedance->damping);
+            impedence_icubCanProtValues.offset = eo_mc4boards_Convert_torque_I2S(mc4boards, jxx, impedance->offset);
 
             
             command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
@@ -553,8 +563,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
 
         if(eo_ropcode_set == rd->ropcode)
         {    
-            icubCanProto_position_t minpos_icubCanProtValue = eo_measconv_jntPosition_I2E(eo_measconv_GetHandle(), jxx, limitsofjoint->min);
-            icubCanProto_position_t maxpos_icubCanProtValue = eo_measconv_jntPosition_I2E(eo_measconv_GetHandle(), jxx, limitsofjoint->max);
+            icubCanProto_position_t minpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(eo_mc4boards_GetHandle(), jxx, limitsofjoint->min);
+            icubCanProto_position_t maxpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(eo_mc4boards_GetHandle(), jxx, limitsofjoint->max);
 
             if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
             {
@@ -658,7 +668,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* 
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOutil_emulfloat32_t *encfactor = (eOutil_emulfloat32_t*)rd->data;
 
-    res = eo_measconv_SetJntEncoderConversionFactor(eo_measconv_GetHandle(), jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(*encfactor));
+    res = eo_mc4boards_Convert_encoderfactor_Set(eo_mc4boards_GetHandle(), jxx, (eOmc4boards_conv_encoder_factor_t)eo_common_Q17_14_to_float(*encfactor));
     if(eores_OK != res)
     {
         return; //error 
@@ -676,7 +686,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* 
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOutil_emulfloat32_t *encoffset = (eOutil_emulfloat32_t*)rd->data;
 
-    res = eo_measconv_SetJntEncoderConversionOffset(eo_measconv_GetHandle(), jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(*encoffset));
+    res = eo_mc4boards_Convert_encoderoffset_Set(eo_mc4boards_GetHandle(), jxx, (eOmc4boards_conv_encoder_offset_t)eo_common_Q17_14_to_float(*encoffset));
     if(eores_OK != res)
     {
         return; //error 
@@ -744,7 +754,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     }
     else // mc4can
     {
-        EOtheMeasuresConverter *appMeasConv = eo_measconv_GetHandle();
+        EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
         eOcanprot_command_t command = {0};
         command.class = eocanprot_msgclass_pollingMotorControl;    
         command.type  = 0;
@@ -764,9 +774,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         {
             case eomc_setpoint_position:
             {                
-                setpoint_pos.value = eo_measconv_jntPosition_I2E(appMeasConv, jxx, setpoint->to.position.value);
+                setpoint_pos.value = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.position.value);
                 //reference velocity of position set point must be always >0, so here absolute func is used.
-                setpoint_pos.withvelocity = eo_measconv_jntVelocity_I2E_abs(appMeasConv, jxx, setpoint->to.position.withvelocity);
+                setpoint_pos.withvelocity = eo_mc4boards_Convert_Velocity_toCAN_abs(mc4boards, jxx, setpoint->to.position.withvelocity);
                 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE; 
                 command.value =  &setpoint_pos; 
@@ -774,8 +784,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_velocity:
             {   
-                setpoint_vel.withacceleration = eo_measconv_jntAcceleration_I2E_abs(appMeasConv, jxx, setpoint->to.velocity.withacceleration);           
-                setpoint_vel.value = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, setpoint->to.velocity.value);
+                setpoint_vel.withacceleration = eo_mc4boards_Convert_Acceleration_toCAN_abs(mc4boards, jxx, setpoint->to.velocity.withacceleration);           
+                setpoint_vel.value = eo_mc4boards_Convert_Velocity_toCAN(mc4boards, jxx, setpoint->to.velocity.value);
                 
                 if (setpoint_vel.withacceleration < 1)
                 {
@@ -788,7 +798,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_torque:
             {                
-                setpoint_torque.value = eo_measconv_torque_I2S(appMeasConv,jxx, setpoint->to.torque.value);
+                setpoint_torque.value = eo_mc4boards_Convert_torque_I2S(mc4boards,jxx, setpoint->to.torque.value);
                   
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE; 
                 command.value =  &setpoint_torque;                  
@@ -828,7 +838,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_positionraw:
             {    
-                pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, setpoint->to.position.value);
+                pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.position.value);
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
                 command.value =  &pos;                   
             } break;
@@ -938,21 +948,21 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             case eomc_calibration_type0_hard_stops:
             {
                 iCubCanProtCalibrator.params.type0.pwmlimit = calibrator->params.type0.pwmlimit;
-    //            iCubCanProtCalibrator.params.type0.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type0.velocity);           
+    //            iCubCanProtCalibrator.params.type0.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type0.velocity);           
                 iCubCanProtCalibrator.params.type0.velocity = calibrator->params.type0.velocity;  
                 found = eobool_true;            
             } break;
                 
             case eomc_calibration_type1_abs_sens_analog:
             {
-    //             icubCanProto_position_t pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type1.position);
+    //             icubCanProto_position_t pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, calibrator->params.type1.position);
     //             /*sice pos param is a word of 16 bits i must check min and max*/
     //             if((pos < INT16_MIN)||(pos>INT16_MAX))
     //             {
     //                 return;
     //             }
     //             iCubCanProtCalibrator.params.type1.position = (icubCanProto_position4calib_t)pos; 
-    //             iCubCanProtCalibrator.params.type1.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type1.velocity);
+    //             iCubCanProtCalibrator.params.type1.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type1.velocity);
                 iCubCanProtCalibrator.params.type1.position = calibrator->params.type1.position; 
                 iCubCanProtCalibrator.params.type1.velocity =  calibrator->params.type1.velocity;
                 found = eobool_true; 
@@ -961,21 +971,21 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             case eomc_calibration_type2_hard_stops_diff:
             {
                 iCubCanProtCalibrator.params.type2.pwmlimit = calibrator->params.type2.pwmlimit;
-    //            iCubCanProtCalibrator.params.type2.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type2.velocity);           
+    //            iCubCanProtCalibrator.params.type2.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type2.velocity);           
                 iCubCanProtCalibrator.params.type2.velocity = calibrator->params.type2.velocity;   
                 found = eobool_true;             
             } break;
 
             case eomc_calibration_type3_abs_sens_digital:
             {
-    //              icubCanProto_position_t pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type3.position);
+    //              icubCanProto_position_t pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, calibrator->params.type3.position);
     //             /*sice pos param is a word of 16 bits i must check min and max*/
     //             if((pos < INT16_MIN)||(pos>INT16_MAX))
     //             {
     //                 return;
     //             }
     //             iCubCanProtCalibrator.params.type1.position = (icubCanProto_position4calib_t)pos; 
-    //             iCubCanProtCalibrator.params.type3.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type3.velocity);           
+    //             iCubCanProtCalibrator.params.type3.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type3.velocity);           
                 iCubCanProtCalibrator.params.type1.position = calibrator->params.type3.position; 
                 iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type3.velocity;            
                 iCubCanProtCalibrator.params.type3.offset = calibrator->params.type3.offset;
@@ -984,7 +994,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
             case eomc_calibration_type4_abs_and_incremental:
             {
-    //             icubCanProto_position_t pos = eo_measconv_jntPosition_I2E(appMeasConv, jxx, calibrator->params.type4.position);
+    //             icubCanProto_position_t pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, calibrator->params.type4.position);
     //             //here position is in int16_t ==> so i must verify if pos is out of int16_t range
     //             if((pos > INT16_MAX) || (pos < INT16_MIN))
     //             {
@@ -992,7 +1002,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     //                 #warning VALE --> how to manage this error???
     //             }
     //             iCubCanProtCalibrator.params.type4.position = (icubCanProto_position4calib_t)pos; 
-    //            iCubCanProtCalibrator.params.type4.velocity = eo_measconv_jntVelocity_I2E(appMeasConv, jxx, calibrator->params.type4.velocity);            
+    //            iCubCanProtCalibrator.params.type4.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type4.velocity);            
                 iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
                 iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
                 iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
@@ -1209,7 +1219,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     }
     
     // set max velocity      
-    icubCanProto_velocity_t vel_icubCanProtValue = eo_measconv_jntVelocity_I2E(eo_measconv_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
+    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     command.value = &vel_icubCanProtValue;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
@@ -1250,11 +1260,10 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
     command.class = eocanprot_msgclass_pollingMotorControl;
     
     // set max velocity  
-    icubCanProto_velocity_t vel_icubCanProtValue = eo_measconv_jntVelocity_I2E(eo_measconv_GetHandle(), mxx, *vel);           
+    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, *vel);           
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     command.value = &vel_icubCanProtValue;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
-
 }
 
 

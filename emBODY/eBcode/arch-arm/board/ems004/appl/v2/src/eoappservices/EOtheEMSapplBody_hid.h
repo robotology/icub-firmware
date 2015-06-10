@@ -58,7 +58,7 @@ struct EOtheEMSapplBody_hid
     eOmn_appl_runMode_t                 appRunMode;
     EOappEncReader                      *appEncReader;
     EOemsController                     *emsController;
-    eo_emsapplbody_configMC4boards_t    configMC4boards2use; 
+    //eo_emsapplbody_configMC4boards_t    configMC4boards2use; 
     eObool_t                            hasdevice[eo_emsapplbody_deviceid_numberof];
 }; 
 

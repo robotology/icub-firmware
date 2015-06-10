@@ -41,6 +41,8 @@
 
 #include "EOtheCANdiscovery.h"
 
+#include "EOtheMC4boards.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -183,12 +185,18 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         // e poi mando la configurazione alle board can mc4
         eo_candiscovery_Stop(eo_candiscovery_GetHandle());
         // poi, nel caso mc4:  mando la configurazione alle board e abilito MAIS e BCastPolicy 
-        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
-        {   
-            eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
+        if(eobool_true == eo_mc4boards_AreThere(eo_mc4boards_GetHandle()))
+        {
+            eo_mc4boards_Config(eo_mc4boards_GetHandle());
             eo_mais_Start(eo_mais_GetHandle());
         }
+//        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
+//        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
+//        {   
+//            eo_mc4boards_ConfigShiftValues(eo_mc4boards_GetHandle());
+//            //eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
+//            eo_mais_Start(eo_mais_GetHandle());
+//        }
     }
     else
     {  
