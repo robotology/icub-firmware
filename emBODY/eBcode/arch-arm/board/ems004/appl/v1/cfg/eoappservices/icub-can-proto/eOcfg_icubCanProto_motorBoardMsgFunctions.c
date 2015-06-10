@@ -2064,16 +2064,14 @@ extern eOresult_t eo_icubCanProto_parser_pol_mb_cmd__getModelParams(EOicubCanPro
 
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCurrentPid(EOicubCanProto* p, void *val_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
 {
-    eOmc_PID_t *cur_pid_ptr = (eOmc_PID_t*)val_ptr;
+    //eOmc_PID_t *cur_pid_ptr = (eOmc_PID_t*)val_ptr;
 
     canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
     canFrame->id_type = 0; //standard id
     canFrame->frame_type = 0; //data frame
-    canFrame->size = 7;
+    canFrame->size = 8;
     canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    *((uint16_t*)(&canFrame->data[1])) = cur_pid_ptr->kp;
-    *((uint16_t*)(&canFrame->data[3])) = cur_pid_ptr->ki;
-    *((uint16_t*)(&canFrame->data[5])) = cur_pid_ptr->kd;
+    memcpy(canFrame->data+1, val_ptr, 7);
 
     return(eores_OK);
 }
@@ -2375,6 +2373,19 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setInteractionMode(EOicubCa
     *((icubCanProto_interactionmode_t*)(&canFrame->data[1])) = *((icubCanProto_interactionmode_t*)nv_ptr);
     return(eores_OK);
 
+}
+
+
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMotorConfig(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame)
+{
+    canFrame->id = ICUBCANPROTO_POL_MC_CREATE_ID(dest.s.canAddr);
+    canFrame->id_type = 0; //standard id
+    canFrame->frame_type = 0; //data frame
+    canFrame->size = 7;
+    canFrame->data[0] = ((dest.s.jm_indexInBoard&0x1)  <<7) | ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+    canFrame->data[1] = 1; // etc.
+    memcpy(canFrame->data+1,nv_ptr,6);
+    return(eores_OK);
 }
 
 

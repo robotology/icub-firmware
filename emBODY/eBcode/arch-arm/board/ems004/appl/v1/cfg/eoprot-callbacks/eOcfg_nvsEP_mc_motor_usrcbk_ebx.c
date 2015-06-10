@@ -202,13 +202,17 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
     if(eobrd_cantype_1foc == boardType)
     {
+        #warning ALE: not to be managed directly
+            
         // 1) send current pid
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+        //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+        //eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
 
         // 2) send current pid limits
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+        //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
+        //eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+    
+        return;
     }
     
     // 2) set max velocity  
@@ -229,6 +233,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 {
     eOresult_t                              res;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
+    eObrd_cantype_t                         boardType;
     eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -240,12 +245,19 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
-	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, NULL);
+	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, &boardType);
     if(eores_OK != res)
     {
         return;
     }
 
+    if(eobrd_cantype_1foc == boardType)
+    {
+        #warning ALE: not to be managed directly
+            
+        return;
+    }
+    
   	//set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
 

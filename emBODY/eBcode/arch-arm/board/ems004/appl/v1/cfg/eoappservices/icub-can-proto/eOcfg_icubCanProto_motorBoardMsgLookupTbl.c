@@ -55,7 +55,7 @@
 
 /* Since in the fist 64th messages most of them are obsolete, the table start at msg 64 and manage other such as exception*/
 #define eo_icubCanProto_pollingMotorBoardMsg_inParserTbl_max          (ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS -64 +1) 
-#define eo_icubCanProto_pollingMotorBoardMsg_inFormerTbl_max          (ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE -64 +1) 
+#define eo_icubCanProto_pollingMotorBoardMsg_inFormerTbl_max          (ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG -64 +1) 
 #define eo_icubCanProto_pollingMotorBoardMsg_maxNum                    ICUBCANPROTO_POL_MC_CMD_MAXNUM
 
 #define eo_icubCanProto_periodicMotorBoardMsg_inParserTbl_max   13 // until ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS 
@@ -299,16 +299,22 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
 
     {   // 115  ICUBCANPROTO_POL_MC_CMD__GET_OPENLOOP_PARAMS
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams
-    },
-//     
-//     {   // 116  ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
-//         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
-//     },
-//     
-//     {   // 117  ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE
-//         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
-//     }
+    }
     
+ //   {   // 116  ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
+ //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+ //   },
+ //   
+ //   {   // 117  ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE
+ //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+ //   },
+ //   
+ //   {   // 118  ICUBCANPROTO_POL_MC_CMD__SET_TCFILTER_TYPE
+ //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+ //   },
+ //   {   // 119  ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG
+ //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__setMotorConfig
+ //   }     
 };        
 
 /* DECLARATION OF POLLING MOTOR BOARD PARSER LOOKUP TBL */
@@ -542,8 +548,15 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingMotorBo
 
     {   // 117  ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
-    }
-
+    },
+    
+    {   // 118  ICUBCANPROTO_POL_MC_CMD__SET_TCFILTER_TYPE
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
+    },
+    
+    {   // 119  ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG
+        EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setMotorConfig
+    }    
 };        
 
 

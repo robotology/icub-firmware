@@ -167,7 +167,7 @@ extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setCmdPos(EOicubCanProto* p
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setInteractionMode(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setOpenLoopParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__getOpenLoopParams(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
-
+extern eOresult_t eo_icubCanProto_former_pol_mb_cmd__setMotorConfig(EOicubCanProto* p, void *nv_ptr, eOicubCanProto_msgDestination_t dest, eOcanframe_t *canFrame);
 
 //********************** P A R S E R       PERIODIC     F U N C T I O N S  ******************************************************
 extern eOresult_t eo_icubCanProto_parser_per_mb_cmd__2foc(EOicubCanProto* p, eOcanframe_t *frame, eOcanport_t canPort);

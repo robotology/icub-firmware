@@ -61,7 +61,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void axisMotionReset(EOaxisController *o);
-static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -136,21 +135,7 @@ extern eObool_t eo_axisController_IsTorqueSensorFault(EOaxisController* o)
     return (o->state_mask & AC_TORQUE_SENS_FAULT) != 0;
 }
 
-extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
-{
-    if (!o) return;
-    
-    if (NOT_READY() && (o->state_mask !=  AC_NOT_CALIBRATED))
-    {
-        o->control_mode = eomc_controlmode_hwFault;
-        return;
-    }
-    
-    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
-    o->control_mode = eomc_controlmode_calib;
-}
-
-extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel)
+extern void eo_axisController_StartCalibration(EOaxisController *o)
 {
     if (!o) return;
     
@@ -162,9 +147,6 @@ extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
     
-    //set the value to start procedure
-    o->pwm_limit_calib = pwmlimit;
-    //what about velocity? is it useful?
     o->control_mode = eomc_controlmode_calib;
 }
 
@@ -605,47 +587,19 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         
         case eomc_controlmode_calib:
         {
-            //calib type 0
-            if (o->calibration_type == eomc_calibration_type0_hard_stops)
+            if (IS_CALIBRATED())
             {
-                if (s_eo_axisController_isHardwareLimitReached(o))
-                {
-                    eo_pid_Reset(o->pidP);
-                    eo_trajectory_Init(o->trajectory, pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
-                    
-                    eo_axisController_SetCalibrated (o);
-                    o->control_mode = eomc_controlmode_position;
-                    // acemor: define how to go back                    
-                    //Set position reference and return
-                    eo_axisController_SetPosRef(o, 0, (pos-0)/2); //how to know the right return position and velocity?
-                    return 0;
-                    
-                }
-                //if still not calibrated I need to continue my search for the hardware limit
-                if (!eo_axisController_IsCalibrated(o))
-                {
-                    o->interact_mode = eOmc_interactionmode_stiff;
-                    *stiff = eobool_true;
-                    o->err = 0;
-                    return o->pwm_limit_calib;
-                }
+                eo_pid_Reset(o->pidP);
+                eo_trajectory_Init(o->trajectory, pos, vel, 0);
+                eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION()); 
+                o->control_mode = eomc_controlmode_position;
+                eo_emsController_SetControlMode(o->axisID, eomc_controlmode_cmd_position);
             }
-            // calib type 3
-            else
-            {
-                if (IS_CALIBRATED())
-                {
-                    eo_pid_Reset(o->pidP);
-                    eo_trajectory_Init(o->trajectory, pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION()); 
-                    o->control_mode = eomc_controlmode_position;
-                }
-                o->interact_mode = eOmc_interactionmode_stiff;
-                *stiff = eobool_true;
-                o->err = 0;
-                return 0;
-            }
+            
+            o->interact_mode = eOmc_interactionmode_stiff;
+            *stiff = eobool_true;
+            o->err = 0;
+            return 0;
         }
         case eomc_controlmode_idle:
         {
@@ -954,32 +908,6 @@ static void axisMotionReset(EOaxisController *o)
         o->torque_ref_jnt = 0;
         o->torque_ref_mot = 0;
         o->err = 0;
-}
-
-static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
-{
-    static int32_t current_pos = 0, veryold_pos = 0;
-    static uint16_t count_equal = 0, count_calib = 0;
-    
-    count_calib++;
-    current_pos = GET_AXIS_POSITION();
-    if (current_pos == veryold_pos)
-    {
-        count_equal++;
-        //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
-        if ((count_equal == 20) && (count_calib > 1200))
-        {
-            count_equal = 0;
-            count_calib = 0;
-            return eobool_true;
-        }
-    }
-    else
-    {
-        count_equal = 0;
-    }
-    veryold_pos = current_pos;
-    return eobool_false;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
