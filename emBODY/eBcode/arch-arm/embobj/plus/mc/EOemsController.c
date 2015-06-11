@@ -296,6 +296,17 @@ extern void eo_emsController_CheckFaults()
                         eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);                             
                     }
                 }
+                /*
+                else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+                {
+                    #warning TODO: for head v3
+                    // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+                    // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+                    // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+                    // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+                    // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+                }
+                */
                 else
                 {
                     set_2FOC_idle(j);
@@ -425,6 +436,17 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             axle_virt_pos[0] = ems->motor_position[0];
             axle_virt_pos[1] = ems->motor_position[1];
         }
+        /*
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+        {
+            #warning TODO: for head v3
+            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+         }
+         */
     
 #endif //USE_2FOC_FAST_ENCODER
     
@@ -593,6 +615,17 @@ extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
     }
+    /*
+    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+    }
+    */
     else
     {
           *torque_motor=ems->axis_controller[joint_id]->torque_meas_jnt;
@@ -629,6 +662,17 @@ extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32
         if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
         if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
     }
+    /*
+    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+    }
+    */
     else
     {
         *torque_motor=ems->axis_controller[joint_id]->torque_ref_jnt;
@@ -648,6 +692,17 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
         eo_emsController_SetInteractionMode(1, mode);
         eo_emsController_SetInteractionMode(2, mode);
     }
+    /*
+    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+    }
+    */
     else
     {
         eo_emsController_SetInteractionMode(joint, mode);
@@ -700,6 +755,17 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[2]);
             eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_force_idle);
         }
+        /*
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+        {
+            #warning TODO: for head v3
+            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        }
+        */
         else
         {
             force_2FOC_idle(joint);
@@ -727,6 +793,17 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_idle);
             eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);
         }
+        /*
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+        {
+            #warning TODO: for head v3
+            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        }
+        */
         else
         {
             set_2FOC_idle(joint);
@@ -768,6 +845,17 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             set_2FOC_running(1);
             set_2FOC_running(2);
         }
+        /*
+        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+        {
+            #warning TODO: for head v3
+            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        }
+        */
         else
         {
             if (eo_axisController_IsHardwareFault(ems->axis_controller[joint])) return;
@@ -803,7 +891,7 @@ extern void eo_emsController_ResetPosPid(uint8_t joint)
     if (ems) eo_pid_Reset(eo_axisController_GetPosPidPtr(ems->axis_controller[joint]));
 }
 
-extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
+extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
 {
     if (!ems) return;
     
@@ -811,9 +899,32 @@ extern void eo_emsController_StartCalibration(uint8_t joint, int32_t pos, int32_
         
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
     
-    eo_axisController_StartCalibration(ems->axis_controller[joint]);
+    eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
 }
+
+extern void eo_emsController_StartCalibration_type0(uint8_t joint, int16_t pwmlimit, int16_t vel)
+{
+    if (!ems) return;
     
+    ems->n_calibrated = 0;
+        
+    //calibrating procedure
+    //comments:
+    //we don't need to set an offset to the encoder in this case! at the startup, the value is 0
+    //how to implement the procedure of setting a constant PWM to the motor until it reaches the hardware limit?
+    //nice solution -> do an incremental procedure modifying the PWM and CheckCalibration functions...a flag will notify the end of the procedure
+    
+    //Just for test...try to move the motor using the incremental encoder using it's initial raw position (it should be 0)
+    
+    //Set the right calibration type
+    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type0_hard_stops;
+    
+    //offset is 0 in this case
+    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
+    eo_axisController_StartCalibration_type0(ems->axis_controller[joint], pwmlimit, vel);
+    
+}
+
 extern void eo_emsController_CheckCalibrations(void)
 {
     if (!ems) return;
@@ -898,6 +1009,17 @@ extern void eo_emsController_CheckCalibrations(void)
             }
         }
     }
+    /*
+    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+    }
+    */
     #endif // ! USE_JACOBIAN        
 }
 

@@ -233,10 +233,8 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
 {
     //if (!o) return;
     
-    //#if defined(SHOULDER_BOARD)
     if(emscontroller_board_SHOULDER == o->board)
     {
-    
         //             | 1     0       0   |
         // J = dq/dm = | 1   40/65     0   |
         //             | 0  -40/65   40/65 | 
@@ -248,65 +246,60 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         //      | 1     1       0   |
         // Jt = | 0   40/65  -40/65 |
         //      | 0     0     40/65 | 
-    
-        {
-            int32_t buff;
-            
-            pwm_motor[0] = pwm_joint[0];
-            
-            if (stiff[0])
-            {    
-                pwm_motor[1] = (-65*pwm_joint[0])/40;
-                #ifdef SHOULDER_3rd_JOINT_COUPLING
-                pwm_motor[2] = pwm_motor[1];
-                #else
-                pwm_motor[2] = 0;
-                #endif
-            }
-            else
-            {
-                pwm_motor[0] = pwm_joint[0];
-            }
-            
-            if (stiff[1])
-            {
-                buff = (65*pwm_joint[1])/40;
-                pwm_motor[1] += buff;
-                #ifdef SHOULDER_3rd_JOINT_COUPLING
-                pwm_motor[2] += buff;
-                #endif
-            }
-            else
-            {
-                pwm_motor[1] = pwm_joint[1];
-            }
-            
-            if (stiff[2])
-            {
-                pwm_motor[2] += (65*pwm_joint[2])/40;
-            }
-            else
-            {
-                pwm_motor[2] = pwm_joint[2];
-            }
-            // stiff
-            //pwm_motor[0] = (int16_t)(pwm_joint[0]);
-            //pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
-            //pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
-            
-            // compliant
-            //pwm_motor[0] = (int16_t)(pwm_joint[0]+pwm_joint[1]);
-            //pwm_motor[1] = (int16_t)((40*(pwm_joint[1]-pwm_joint[2]))/65);
-            //pwm_motor[2] = (int16_t)((40*pwm_joint[2])/65);
+
+        int32_t buff;
         
-            pwm_motor[3] = pwm_joint[3];
+        pwm_motor[0] = pwm_joint[0];
+        
+        if (stiff[0])
+        {    
+            pwm_motor[1] = (-65*pwm_joint[0])/40;
+            #ifdef SHOULDER_3rd_JOINT_COUPLING
+            pwm_motor[2] = pwm_motor[1];
+            #else
+            pwm_motor[2] = 0;
+            #endif
         }
-     
+        else
+        {
+            pwm_motor[0] = pwm_joint[0];
+        }
+        
+        if (stiff[1])
+        {
+            buff = (65*pwm_joint[1])/40;
+            pwm_motor[1] += buff;
+            #ifdef SHOULDER_3rd_JOINT_COUPLING
+            pwm_motor[2] += buff;
+            #endif
+        }
+        else
+        {
+            pwm_motor[1] = pwm_joint[1];
+        }
+        
+        if (stiff[2])
+        {
+            pwm_motor[2] += (65*pwm_joint[2])/40;
+        }
+        else
+        {
+            pwm_motor[2] = pwm_joint[2];
+        }
+        // stiff
+        //pwm_motor[0] = (int16_t)(pwm_joint[0]);
+        //pwm_motor[1] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]))/40);
+        //pwm_motor[2] = (int16_t)((65*(-pwm_joint[0]+pwm_joint[1]+pwm_joint[2]))/40);
+        
+        // compliant
+        //pwm_motor[0] = (int16_t)(pwm_joint[0]+pwm_joint[1]);
+        //pwm_motor[1] = (int16_t)((40*(pwm_joint[1]-pwm_joint[2]))/65);
+        //pwm_motor[2] = (int16_t)((40*pwm_joint[2])/65);
+    
+        pwm_motor[3] = pwm_joint[3];
     }        
     else if(emscontroller_board_WAIST == o->board)
     {
-    //#elif defined(WAIST_BOARD)
-        
         //             |   1     1     0   |
         // J = dq/dm = |  -1     1     0   |
         //             | 44/80 44/80 44/80 | 
@@ -319,41 +312,35 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         // Jt = | 1   1  44/80 |
         //      | 0   0  44/80 | 
         
-        {
-            if (stiff[0]) {pwm_motor[0] = (pwm_joint[0]-pwm_joint[1])/2;} else {pwm_motor[0] = pwm_joint[0];}
-            if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
-            if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
-        }
+        if (stiff[0]) {pwm_motor[0] = (pwm_joint[0]-pwm_joint[1])/2;} else {pwm_motor[0] = pwm_joint[0];}
+        if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
+        if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
     }        
-    else if(emscontroller_board_UPPERLEG == o->board)
+    else if (emscontroller_board_UPPERLEG == o->board)
     {    
-    //#elif defined(UPPERLEG_BOARD)
-        {
-            pwm_motor[0] = pwm_joint[0];
-            pwm_motor[1] = pwm_joint[1];
-            pwm_motor[2] = pwm_joint[2];
-            pwm_motor[3] = pwm_joint[3];
-        }
+        pwm_motor[0] = pwm_joint[0];
+        pwm_motor[1] = pwm_joint[1];
+        pwm_motor[2] = pwm_joint[2];
+        pwm_motor[3] = pwm_joint[3];
     }        
-    else if(emscontroller_board_ANKLE == o->board)
+    else if (emscontroller_board_ANKLE == o->board)
     {    
-    //#elif defined(ANKLE_BOARD)
-        {
-            pwm_motor[0] = pwm_joint[0];
-            pwm_motor[1] = pwm_joint[1];
-        }
-     
+        pwm_motor[0] = pwm_joint[0];
+        pwm_motor[1] = pwm_joint[1];
     }
-    else if((emscontroller_board_HEAD_neckyaw_eyes == o->board)) 
+    /*
+    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
     {
         #warning TODO: for head v3
         // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
         // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // mettere formula di disaccoppiamento. probabilmente il neck e' come le prime due righe del waist.         
+        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
+        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
+        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
     }
+    */
     else    // marco.accame: this board does not have coupled joints
     {    
-    //#else
         MOTORS(m) pwm_motor[m] = 0;
     }
     //#endif

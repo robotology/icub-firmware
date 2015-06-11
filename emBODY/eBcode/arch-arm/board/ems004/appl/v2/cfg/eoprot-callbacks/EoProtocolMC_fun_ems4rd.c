@@ -230,9 +230,14 @@ const eOmc_motor_t motor_default_value =
         },
         .gearboxratio =              0,
         .rotorencoder =              0,
+        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
-        .filler02 =                  {0}
+        .rotorIndexOffset =          0,
+        .motorPoles =                0,
+        .hasHallSensor =             0,
+        .hasTempSensor =             0,
+        .hasRotorEncoder =           0  
     },
     .status =                       {0}
 }; 

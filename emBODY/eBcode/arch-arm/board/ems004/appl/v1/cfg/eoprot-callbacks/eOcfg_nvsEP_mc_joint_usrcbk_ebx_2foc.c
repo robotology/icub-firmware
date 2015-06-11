@@ -522,7 +522,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
         
-    eo_emsController_StartCalibration(jxx, 
+    eo_emsController_StartCalibration_type3(jxx, 
                                       calibrator->params.type3.position, 
                                       calibrator->params.type3.velocity,
                                       calibrator->params.type3.offset);
@@ -610,7 +610,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
 
 
 // __ALE__
-
 extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
