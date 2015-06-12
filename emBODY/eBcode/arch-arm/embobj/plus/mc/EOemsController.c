@@ -1211,7 +1211,29 @@ extern void eo_emsMotorController_GoIdle(void)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
 
+__weak extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint8_t motor)
+{
+
+}
+
+__weak extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,uint8_t motor)
+{
+
+}
+
+__weak extern void eo_emsController_hid_userdef_force_motor_idle(EOemsController* ctrl,uint8_t motor)
+{
+
+}
+
+__weak extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor)
+{
+
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1222,7 +1244,9 @@ extern void eo_emsMotorController_GoIdle(void)
 
 void config_2FOC(uint8_t motor)
 {
-    if (ems->act != emscontroller_actuation_2FOC) return;
+    //eo_emsController_hid_userdef_config_motor(ems, motor);
+    
+    //if (ems->act != emscontroller_actuation_2FOC) return;
     
     //eOmc_i2tParams_t i2t;
     //icubCanProto_current_t max_current;
@@ -1248,20 +1272,24 @@ void config_2FOC(uint8_t motor)
     #if defined(USE_CANCOMM_V2)
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
-
-    command.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    command.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     
-    command.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    command.value = &max_current;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+    eOcanprot_command_t cmdPid;
+    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+    cmdPid.value = KpKiKdKs;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+    
+    eOcanprot_command_t cmdMaxCurrent;
+    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    cmdMaxCurrent.value = &max_current;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
-    command.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-    command.value = motor_config;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);      
+    eOcanprot_command_t cmdMotorConfig;
+    cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+    cmdMotorConfig.value = motor_config;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);      
 
     #else
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
@@ -1294,7 +1322,9 @@ void config_2FOC(uint8_t motor)
 
 void set_2FOC_idle(uint8_t motor)
 {
-    if (ems->act != emscontroller_actuation_2FOC) return;
+    //eo_emsController_hid_userdef_set_motor_idle(ems, motor);
+    
+    //if (ems->act != emscontroller_actuation_2FOC) return;
     
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_idle;
 
@@ -1332,7 +1362,9 @@ void set_2FOC_idle(uint8_t motor)
 
 void force_2FOC_idle(uint8_t motor)
 {
-    if (ems->act != emscontroller_actuation_2FOC) return;
+    //eo_emsController_hid_userdef_force_motor_idle(ems, motor);
+    
+    //if (ems->act != emscontroller_actuation_2FOC) return;
     
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_forceIdle;
     
@@ -1370,7 +1402,9 @@ void force_2FOC_idle(uint8_t motor)
 
 void set_2FOC_running(uint8_t motor)
 {
-    if (ems->act != emscontroller_actuation_2FOC) return;
+    //eo_emsController_hid_userdef_set_motor_running(ems, motor);
+    
+    //if (ems->act != emscontroller_actuation_2FOC) return;
     
     icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
     
@@ -1407,82 +1441,7 @@ void set_2FOC_running(uint8_t motor)
 
     eo_motors_new_state_req(ems->motors, motor, icubCanProto_controlmode_openloop);
 }
-
-#if 0
-#ifdef EXPERIMENTAL_MOTOR_TORQUE
-    #if defined(SHOULDER_BOARD)
-        //         |    1       0       0   |
-        // J^-1  = | -65/40   65/40     0   |
-        //         | -65/40   65/40   65/40 |
     
-        //         | 1  -65/40  -65/40 |
-        // Jt^-1 = | 0   65/40   65/40 |
-        //         | 0     0     65/40 |
-    
-        int16_t axle_trq_2 = (65*ems->motor_current[2])/40;
-        int16_t axle_trq_1 = axle_trq_2 + (65*ems->motor_current[1])/40;
-    
-        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0] - axle_trq_1);
-        eo_axisController_SetTorque(ems->axis_controller[1], axle_trq_1);
-        eo_axisController_SetTorque(ems->axis_controller[2], axle_trq_2);
-        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
-    
-    #elif defined(WAIST_BOARD)
-        //         | 1/2  -1/2    0   |
-        // J^-1 =  | 1/2   1/2    0   |
-        //         | -1     0   80/44 |
-
-        //         |  1/2  1/2   -1   |
-        // Jt^-1 = | -1/2  1/2    0   |
-        //         |   0    0   80/44 |
-        
-        eo_axisController_SetTorque(ems->axis_controller[0], (ems->motor_current[0]+ems->motor_current[1])/2 - ems->motor_current[2]);
-        eo_axisController_SetTorque(ems->axis_controller[1], (ems->motor_current[1]-ems->motor_current[0])/2);
-        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[2])/44);
-        
-    #elif defined(UPPERLEG_BOARD)
-    
-        eo_axisController_SetTorque(ems->axis_controller[0], (75*ems->motor_current[0])/50);
-        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
-        eo_axisController_SetTorque(ems->axis_controller[2], ems->motor_current[2]);
-        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
-    
-    #elif defined(ANKLE_BOARD)
-    
-        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0]);
-        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
-    
-    #else
-        #error undefined board type
-    #endif
-#endif
-#endif
-
-    /*
-    //@@@@MR: use this block for nice print debugging
-    static int count =0;
-    if (count == 1000)
-    {
-    eOerrmanDescriptor_t errdes = {0};
-    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-    errdes.par16                = 0;
-    errdes.par64                = 0;
-    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress        = 0;  
-    //char *str = NULL;
-    char str[eomn_info_status_extra_sizeof] = {0};
-    snprintf(str, sizeof(str), "I%f T%f F%f R%f", pwm_input, o->Ktau, o->Kff, Tr);             
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
-    count =0;
-    }
-    count++;
-    */
-    
-// --------------------------------------------------------------------------------------------------------------------
-// - end-of-file (leave a blank line after)
-// --------------------------------------------------------------------------------------------------------------------
-
-
 /*
     BYTE 0
 
@@ -1694,7 +1653,59 @@ void set_2FOC_running(uint8_t motor)
     }
 }
 
+#if 0
+#ifdef EXPERIMENTAL_MOTOR_TORQUE
+    #if defined(SHOULDER_BOARD)
+        //         |    1       0       0   |
+        // J^-1  = | -65/40   65/40     0   |
+        //         | -65/40   65/40   65/40 |
+    
+        //         | 1  -65/40  -65/40 |
+        // Jt^-1 = | 0   65/40   65/40 |
+        //         | 0     0     65/40 |
+    
+        int16_t axle_trq_2 = (65*ems->motor_current[2])/40;
+        int16_t axle_trq_1 = axle_trq_2 + (65*ems->motor_current[1])/40;
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0] - axle_trq_1);
+        eo_axisController_SetTorque(ems->axis_controller[1], axle_trq_1);
+        eo_axisController_SetTorque(ems->axis_controller[2], axle_trq_2);
+        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
+    
+    #elif defined(WAIST_BOARD)
+        //         | 1/2  -1/2    0   |
+        // J^-1 =  | 1/2   1/2    0   |
+        //         | -1     0   80/44 |
 
+        //         |  1/2  1/2   -1   |
+        // Jt^-1 = | -1/2  1/2    0   |
+        //         |   0    0   80/44 |
+        
+        eo_axisController_SetTorque(ems->axis_controller[0], (ems->motor_current[0]+ems->motor_current[1])/2 - ems->motor_current[2]);
+        eo_axisController_SetTorque(ems->axis_controller[1], (ems->motor_current[1]-ems->motor_current[0])/2);
+        eo_axisController_SetTorque(ems->axis_controller[2], (80*ems->motor_current[2])/44);
+        
+    #elif defined(UPPERLEG_BOARD)
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], (75*ems->motor_current[0])/50);
+        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
+        eo_axisController_SetTorque(ems->axis_controller[2], ems->motor_current[2]);
+        eo_axisController_SetTorque(ems->axis_controller[3], ems->motor_current[3]);
+    
+    #elif defined(ANKLE_BOARD)
+    
+        eo_axisController_SetTorque(ems->axis_controller[0], ems->motor_current[0]);
+        eo_axisController_SetTorque(ems->axis_controller[1], ems->motor_current[1]);
+    
+    #else
+        #error undefined board type
+    #endif
+#endif
+#endif
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
 
 
 

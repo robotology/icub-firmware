@@ -435,6 +435,8 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
     eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
 		
     eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
+    
+    eo_emsController_CheckFaults();
         
     /* 2) pid calc */
     eo_emsController_PWM(pwm);

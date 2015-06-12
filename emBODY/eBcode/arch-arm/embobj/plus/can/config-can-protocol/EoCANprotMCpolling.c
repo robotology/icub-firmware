@@ -582,10 +582,9 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    // ... apparently s_former_POL_MC_CMD_setpid uses len 8 and not len 7 and has pid->scale
-    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID has len 7 or 8 as some other SET_xxx_PID 
-    s_former_POL_MC_CMD_setpid_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID);  
-    return(eores_OK);      
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID);   
+    memcpy(frame->data+1,descriptor->cmd.value,7);
+    return(eores_OK);    
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -674,6 +673,14 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE(eOc
     *((icubCanProto_interactionmode_t*)(&frame->data[1])) = *imode;
     return(eores_OK);  
 }
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 7, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG);   
+    memcpy(frame->data+1,descriptor->cmd.value,6);
+    return(eores_OK);  
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

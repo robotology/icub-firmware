@@ -582,7 +582,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .parser     = NULL
     },
     {   // 119      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG 
-        .former     = NULL,
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG,
         .parser     = NULL
     }   
 };  EO_VERIFYsizeof(s_eo_canprot_functions_pollingMotorControl, (ICUBCANPROTO_POL_MC_CMD_MAXNUM)*sizeof(eOcanprot_functions_t));

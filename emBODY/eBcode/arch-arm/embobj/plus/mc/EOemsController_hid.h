@@ -104,6 +104,8 @@ extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint
 
 extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,uint8_t motor);
     
+extern void eo_emsController_hid_userdef_force_motor_idle(EOemsController* ctrl,uint8_t motor);
+
 extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor);
 
 #ifdef __cplusplus
