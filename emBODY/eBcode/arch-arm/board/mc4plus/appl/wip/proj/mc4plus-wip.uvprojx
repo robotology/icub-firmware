@@ -837,11 +837,6 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
-            <File>
-              <FileName>EOappEncodersReader.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1124,6 +1119,11 @@
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\board\EOtheEntities.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappEncodersReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\board\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2025,11 +2025,6 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
-            <File>
-              <FileName>EOappEncodersReader.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2312,6 +2307,11 @@
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\board\EOtheEntities.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappEncodersReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\board\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>
