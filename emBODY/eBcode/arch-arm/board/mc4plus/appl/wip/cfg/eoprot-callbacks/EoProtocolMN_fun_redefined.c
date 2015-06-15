@@ -32,7 +32,6 @@
 #include "stdio.h"
 
 #include "EoManagement.h"
-#include "EOnv_hid.h"
 
 #include "EOtheBOARDtransceiver.h"
 #include "EOMtheEMSappl.h"
@@ -42,6 +41,8 @@
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
+
+#include "eEsharedServices.h"
 
 #include "EOtheServices.h"
 #include "EOmcService.h"
@@ -75,9 +76,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd);
-
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
+
 
 static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command);
 
@@ -103,7 +103,7 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command);
 
 extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
 {
-    eOmn_comm_status_t* status = (eOmn_comm_status_t*)nv->ram;
+    eOmn_comm_status_t* status = (eOmn_comm_status_t*)eo_nv_RAM(nv);
     
     // 1. init the management protocol version
     
@@ -137,14 +137,13 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
     
-    if(eobool_true == eo_nv_hid_isLocal(nv))
-    {   // function is called from within the local board
-           
+//    if(eo_nv_ownership_local == eo_nv_GetOwnership(nv))
+//    {   // function is called from within the local board          
         switch(opc)
         {
 
@@ -160,11 +159,10 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
             } break;
             
         }        
-    }
-    else
-    {   // function is called from within the remote host because it has received a say or a sig
-
-    }    
+//    }
+//    else
+//    {   // function is called from within the remote host because it has received a say or a sig
+//    }    
 
 }
 
@@ -172,7 +170,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_queryarray(const EOnv* nv, co
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
@@ -208,7 +206,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
@@ -242,6 +240,21 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
+extern void eoprot_fun_INIT_mn_appl_config(const EOnv* nv)
+{
+    eOmn_appl_config_t config = {0};
+    
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    config.cycletime        = emscfg->runobjcfg.period;
+    config.txratedivider    = emscfg->runobjcfg.defaultTXdecimationfactor;
+          
+    // set it
+    eo_nv_Set(nv, &config, eobool_true, eo_nv_upd_dontdo);        
+}
+
+
+
 extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 {
     // i init the application status to ...     
@@ -250,20 +263,21 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
     
     // build date
-    status.buildate.year    = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
-    status.buildate.month   = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
-    status.buildate.day     = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
-    status.buildate.hour    = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
-    status.buildate.min     = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
+    status.buildate.year        = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
+    status.buildate.month       = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
+    status.buildate.day         = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
+    status.buildate.hour        = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
+    status.buildate.min         = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
     
     // version
-    status.version.major    = emscfg->applcfg.emsappinfo->info.entity.version.major;
-    status.version.minor    = emscfg->applcfg.emsappinfo->info.entity.version.minor;
+    status.version.major        = emscfg->applcfg.emsappinfo->info.entity.version.major;
+    status.version.minor        = emscfg->applcfg.emsappinfo->info.entity.version.minor;
 		
 	// control loop timings 
-    status.cloop_timings[0] = emscfg->runobjcfg.execDOafter;
-	status.cloop_timings[1] = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
-	status.cloop_timings[2] = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
+    status.cloop_timings[0]     = emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[1]     = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[2]     = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
+    status.txdecimationfactor   = emscfg->runobjcfg.defaultTXdecimationfactor;
     
     uint16_t min = EO_MIN(sizeof(status.name), sizeof(emscfg->applcfg.emsappinfo->info.name));
     memcpy(status.name, emscfg->applcfg.emsappinfo->info.name, min);
@@ -277,6 +291,23 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
 }
 
+extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmn_appl_config_t *cfg = (eOmn_appl_config_t*)rd->data;
+    
+    if(1000 != cfg->cycletime)
+    {
+        cfg->cycletime = 1000;
+        #warning marco.accame: send up a warning about unsuppported feature
+    }
+    
+    if(0 == cfg->txratedivider)
+    {
+        cfg->txratedivider = 1;
+    }
+    
+    s_eoprot_ep_mn_fun_apply_config_txratedivider(cfg->txratedivider);   
+}
 
 
 extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -290,9 +321,11 @@ extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const e
     
     s_eoprot_ep_mn_fun_apply_config_txratedivider(*txratedivider);   
 }
+
+
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
+    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)rd->data;
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -304,6 +337,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         case applstate_config:
         {
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+            res = res;
             // the new currstate is set inside the on-entry of the state machine
             //if(eores_OK == res)
             //{   
@@ -346,6 +380,21 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
             // the new currstate is set inside the relevant on-entry of the state machine
         } break;
+
+        case applstate_resetmicro:
+        {
+            // i just reset the micro ... straight away
+            osal_system_scheduling_suspend();
+            ee_sharserv_sys_restart();
+        } break;
+        
+        case applstate_restartapp:
+        {
+            osal_system_scheduling_suspend();
+            ee_sharserv_ipc_gotoproc_set(ee_procApplication);
+            ee_sharserv_sys_restart();           
+        } break;
+        
         
         default:
         {
@@ -689,7 +738,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning --------------> send error up
+                    #warning marco.accame: TODO: put diagnostics
                 }
             }        
         } break;
@@ -714,7 +763,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning --------------> send error up
+                    #warning marco.accame: TODO: put diagnostics
                 }
             }         
         } break;        
@@ -850,6 +899,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
 
 }
 
+
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
 {
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
@@ -858,6 +908,8 @@ static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
     
     eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
 }
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

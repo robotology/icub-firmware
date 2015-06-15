@@ -32,18 +32,15 @@
 #include "stdio.h"
 
 #include "EoManagement.h"
-#include "EOnv_hid.h"
 
 #include "EOtheBOARDtransceiver.h"
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
 
-// - for ems 
 #include "EOMtheEMSappl.h"
 #include "EOtheEMSapplBody.h"
-//#include "EOtheEMSapplDiagnostics.h"
-#include "EOtheErrorManager.h"
 
+#include "EOtheErrorManager.h"
 #include "EoError.h"
 
 #include "eEsharedServices.h"
@@ -81,7 +78,6 @@
 
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
 
-//static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd);
 
 static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command);
 
@@ -107,7 +103,7 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command);
 
 extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
 {
-    eOmn_comm_status_t* status = (eOmn_comm_status_t*)nv->ram;
+    eOmn_comm_status_t* status = (eOmn_comm_status_t*)eo_nv_RAM(nv);
     
     // 1. init the management protocol version
     
@@ -141,14 +137,13 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
     
-    if(eobool_true == eo_nv_hid_isLocal(nv))
-    {   // function is called from within the local board
-           
+//    if(eo_nv_ownership_local == eo_nv_GetOwnership(nv))
+//    {   // function is called from within the local board          
         switch(opc)
         {
 
@@ -164,11 +159,10 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
             } break;
             
         }        
-    }
-    else
-    {   // function is called from within the remote host because it has received a say or a sig
-
-    }    
+//    }
+//    else
+//    {   // function is called from within the remote host because it has received a say or a sig
+//    }    
 
 }
 
@@ -176,7 +170,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_queryarray(const EOnv* nv, co
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
@@ -212,7 +206,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
@@ -331,7 +325,7 @@ extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const e
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
+    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)rd->data;
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -762,8 +756,6 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 if(eores_OK != res)
                 {
                     #warning marco.accame: TODO: put diagnostics
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
                 }
             }        
         } break;
@@ -789,8 +781,6 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 if(eores_OK != res)
                 {
                     #warning marco.accame: TODO: put diagnostics
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
                 }
             }         
         } break;        

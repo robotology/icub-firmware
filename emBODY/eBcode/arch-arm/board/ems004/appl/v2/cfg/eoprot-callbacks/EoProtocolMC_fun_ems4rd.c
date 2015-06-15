@@ -40,7 +40,6 @@
 
 
 #include "EOtheEMSapplBody.h"
-//#include "EOtheMeasuresConverter.h"
 #include "EOtheMC4boards.h"
 
 #include "EOtheEntities.h"
@@ -260,8 +259,8 @@ extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
 
 extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
 {
-    eOmc_joint_status_t *cfg = (eOmc_joint_status_t*)eo_nv_RAM(nv);
-    memcpy(cfg, &joint_default_value.status, sizeof(eOmc_joint_status_t));
+    eOmc_joint_status_t *sta = (eOmc_joint_status_t*)eo_nv_RAM(nv);
+    memcpy(sta, &joint_default_value.status, sizeof(eOmc_joint_status_t));
 }
 
 extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -270,7 +269,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jxx);
     
-    // now we see if it is a mc4can or a 2foc
+    // now we see if it is a mc4can or a 2foc or a mc4plus
     
     if(eobool_true == s_motorcontrol_is2foc_based())
     {
@@ -1188,8 +1187,8 @@ extern void eoprot_fun_INIT_mc_motor_config(const EOnv* nv)
 
 extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
 {
-    eOmc_motor_status_t *cfg = (eOmc_motor_status_t*)eo_nv_RAM(nv);
-    memcpy(cfg, &motor_default_value.status, sizeof(eOmc_motor_status_t));
+    eOmc_motor_status_t *sta = (eOmc_motor_status_t*)eo_nv_RAM(nv);
+    memcpy(sta, &motor_default_value.status, sizeof(eOmc_motor_status_t));
 }
 
 
