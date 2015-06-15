@@ -113,26 +113,7 @@ static const eOemsapplbody_cfg_t theemsapplbodycfg =
             .numberof   = encstream1_numberof,
             .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
         }
-    }//,
-//    .configdataofMC4boards          =
-//    {
-//        .shiftvalues    =
-//        {
-//            .jointVelocityShift                 = 8,
-//            .jointVelocityEstimationShift       = 8,
-//            .jointAccelerationEstimationShift   = 5
-//        },
-//        .bcastpolicy            =
-//        {   // we use pid_val in order to have the value of joint.status.ofpid.output regularly updated 
-//            .val2bcastList      =
-//            {
-//            /* 0 */ ICUBCANPROTO_PER_MC_MSG__POSITION,
-//            /* 1 */ ICUBCANPROTO_PER_MC_MSG__STATUS,
-//            /* 2 */ ICUBCANPROTO_PER_MC_MSG__PRINT,
-//            /* 3 */ ICUBCANPROTO_PER_MC_MSG__PID_VAL
-//            }
-//        }
-//    }       
+    } 
 };
 
 const EOVtheEMSapplCfgBody theapplbodyconfig = 
@@ -400,7 +381,7 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
-//    #warning -> marco.accame: maybe it is better enabling the tx on can for all joints not on exit-cfg but on enytry-run (i may go to err).
+//    #warning -> marco.accame: we enable the tx on can for all joints not on exit-cfg but on enytry-run (i may go to err).
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
@@ -410,9 +391,9 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     // enable joints
     res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
-	{
-		//handle the error
-	}
+    {
+        //handle the error
+    }
     
     // enable the tx mode of strain, if present and as configured
     eo_strain_SendTXmode(eo_strain_GetHandle());
@@ -450,11 +431,11 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 
 
     // stop motion control
- 	res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+    res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
 	{
 		// handle the error ... not important
-	}
+    }
     
     // stop tx of strain, if present
     eo_strain_DisableTX(eo_strain_GetHandle());        

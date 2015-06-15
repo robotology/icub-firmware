@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -84,6 +84,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -361,6 +363,8 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls>-DUSE_EMS4RD</MiscControls>
               <Define>ICUB_MEC_V1 USE_CANCOMM_V2</Define>
@@ -844,54 +848,6 @@
               <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheMeasuresConverter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheMeasuresConverter.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>2</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
@@ -1039,6 +995,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1359,6 +1317,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1396,7 +1356,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.1.0.8</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1466,6 +1426,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -1743,6 +1705,8 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls>-DemBODYrobot_ROBOT_NAME=icubANY -DemBODYrobot_BOARD_NAME=boardEMS4RD -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 EOPROT_USE_MN_VERSION_2_0 HAL_IS_VERSION_2 USE_PROTO_PROXY EENV_EAPPLICATION_FORCE_CODE_OFFSET_TO_ZERO</Define>
@@ -2226,11 +2190,6 @@
               <FilePath>..\src\eoappservices\EOappEncodersReader.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheMeasuresConverter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheMeasuresConverter.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheEntities.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheEntities.c</FilePath>
@@ -2638,6 +2597,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
