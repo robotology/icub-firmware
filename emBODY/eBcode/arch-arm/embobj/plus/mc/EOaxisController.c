@@ -440,6 +440,8 @@ extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq)
 
 extern void eo_axisController_SetHardwareFault(EOaxisController *o)
 {
+        axisMotionReset(o);
+    
 		o->control_mode = eomc_controlmode_hwFault;
 }
 
@@ -513,6 +515,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         if (o->control_mode == eomc_controlmode_position) return eobool_true;
         o->control_mode = eomc_controlmode_position;
         eo_pid_Reset(o->pidP);
+        eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), 0, 0);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
         o->torque_ref_jnt = 0;
@@ -631,8 +634,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     return o->pwm_limit_calib;
                 }
             }
-            // calib type 3
-            else
+            /*
+            else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
                 if (IS_CALIBRATED())
                 {
@@ -646,6 +649,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 o->err = 0;
                 return 0;
             }
+            */
+            return 0;
         }
         case eomc_controlmode_idle:
         {
