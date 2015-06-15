@@ -794,9 +794,9 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                     
                     //let's imagine that we have received also a code number with MC config
                     // 1) we want to use the experimental setup, so let's create the code
-                    //eOmcconfig_value_t val = eOmcconfig_value_MC4PLUS_experimental_aea1joint;
-                    eOmcconfig_value_t val = eOmcconfig_value_MC4PLUS_experimental;
-                    eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val);
+                    eOmcconfig_value_t val1 = eOmcconfig_value_MC4PLUS_experimental;
+                    eOmcconfig_value_t val2 = eOmcconfig_value_MC4PLUS_experimental_inc2joint;
+                    eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val1);
                     
                     // 2) extract the config type to set in the config structure
                     mcconfig.type = eOmcconfig_code2type(cfg_code);

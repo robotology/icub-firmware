@@ -29,6 +29,7 @@
 
 #include "eOcommon.h"
 #include "EOemsController.h"
+#include "EOappEncodersReader.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 

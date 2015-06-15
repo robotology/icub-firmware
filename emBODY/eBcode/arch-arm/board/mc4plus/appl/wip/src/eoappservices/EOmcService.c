@@ -38,7 +38,7 @@
 #include "EOMtheEMStransceiver.h"
 
 #include "EoProtocol.h"
-
+#include "EOMtheIPnet.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -283,20 +283,18 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
     {
         case eOmcconfig_type_mc4plus:
         {
-            // must start the first reading of encoders and ... enable teh joints and ........
-            #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
+            // must start the first reading of encoders and ... enable the joints and...?
             eo_appEncReader_StartRead(p->thelocalencoderreader);
             res = eores_OK;            
         } break;
         case eOmcconfig_type_mc4can:
         {
-            // must send the broadcast policy to mc4 ... what else
+            // must send the broadcast policy to mc4 ... what else?
             res = eores_OK;     
         } break;   
         case eOmcconfig_type_2foc:
         {
-            // must start the first reading of encoders and ... enable teh joints and ........ 
-            #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
+            // must start the first reading of encoders and ... enable the joints and...? 
             eo_appEncReader_StartRead(p->thelocalencoderreader);    
             res = eores_OK;     
         } break;    
@@ -447,7 +445,20 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // ems controller. it is used only in some control types
     if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
     {
-        p->thelocalcontroller = eo_emsController_Init(p->config.jomosnumber);        
+        //fix it...don't know if mapping s_boardnum <-> eOemscontroller_board_t fits perfectly
+        uint8_t s_boardnum = 0;
+        {   // board number is from IP address
+            eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
+            s_boardnum = ipaddress >> 24;  
+            s_boardnum --;
+            if(s_boardnum > 16)
+            {
+                //return;
+                s_boardnum = 0;
+            }
+        }
+        //use the ankle for test experimental setup
+        p->thelocalcontroller = eo_emsController_Init(emscontroller_board_ANKLE, emscontroller_actuation_LOCAL,p->config.jomosnumber);        
     }
     else
     {
@@ -622,9 +633,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
         for(jm=0; jm<p->config.jomosnumber; jm++)
         {
             //for some type of encoder I need to get the values from EOappEncodersReader, for the others we get the value in other ways
-            if(     (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_AEA)
-                ||  (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_AMO)
-                ||  (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_INC))
+            if (LOCAL_ENCODER(p->config.jomos[jm].encoder.etype))
             {
                 res = eo_appEncReader_GetJointValue (app_enc_reader,
                                                     (eo_appEncReader_joint_position_t)p->config.jomos[jm].encoder.enc_joint,
