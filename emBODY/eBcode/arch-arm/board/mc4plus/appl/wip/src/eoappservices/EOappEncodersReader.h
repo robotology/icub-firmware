@@ -36,10 +36,10 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 
 #include "hal_encoder.h"
-#include "hal_quad_enc.h"
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -175,7 +175,6 @@ typedef struct
 // - declaration of extern public functions ---------------------------------------------------------------------------
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
 extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p); 
-extern eOresult_t eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *data_ptr); //dataptr must be vector of[6]
 
 EO_extern_inline eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p);  //p is not checked
 EO_extern_inline eOboolvalues_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p);
