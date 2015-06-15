@@ -42,6 +42,7 @@
 #include "EOnvSet.h"
 #include "EoProtocolMC.h"
 
+#include "EOtheEntities.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -238,6 +239,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 //            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
 //            {
 //                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+//                eo_entities_Refresh(eo_entities_GetHandle());
 //            }                        
 //        }
 //        
@@ -249,6 +251,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 //    }      
 */    
     
+    eo_entities_Initialise();
   
     #warning -> marco.accame: put in here the main builder of the application EOapplication    
     eOserv_cfg_t * servicescfg   = (eOserv_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
