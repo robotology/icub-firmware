@@ -39,6 +39,8 @@
 
 #include "EoProtocol.h"
 #include "EOMtheIPnet.h"
+#include "EOtheEntities.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -408,6 +410,7 @@ static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p)
     if(eobool_true == eoprot_EPcfg_isvalid(&epcfgmc))
     {
         eo_nvset_LoadEP(nvset, &epcfgmc, eobool_true);
+        eo_entities_Refresh(eo_entities_GetHandle());
     }                        
         
     // now we must define the .... proxy rules
