@@ -32,16 +32,14 @@
 #include "hal_eeprom.h"
 #include "hal_led.h"
 
-#if		defined(HAL_IS_VERSION_2)
+//#if		defined(HAL_IS_VERSION_2)
 
 #include "hal_uniqueid.h"
 
-#else	// must be version 1
-	
-#include "hal_arch.h"
-#define hal_uniqueid_id64bit_get hal_arch_arm_uniqueid64_get
-
-#endif
+//#else	// must be version 1	
+//#include "hal_arch.h"
+//#define hal_uniqueid_id64bit_get hal_arch_arm_uniqueid64_get
+//#endif
 
 #include "string.h"
 #include "stdlib.h"
@@ -133,205 +131,6 @@ static void s_eeprom_erase(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-#if (emBODYrobot_BOARD_NAME == boardEMS001)
-
-static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_process,
-            .signature  = ee_procLoader,
-            .version    = 
-            { 
-                .major = 2, 
-                .minor = 4
-            },  
-            .builddate  = 
-            {
-                .year  = 2014,
-                .month = 3,
-                .day   = 13,
-                .hour  = 18,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
-        },
-        .communication  = ee_commtype_none,
-        .name           = "eLoader"
-    },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
-};
-
-
-static eEboardInfo_t s_loader_boardinfo =                        
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_board,
-            .signature  = 0x11,
-            .version    = 
-            { 
-                .major = 1, 
-                .minor = 0
-            },  
-            .builddate  = 
-            {
-                .year  = 2011,
-                .month = 11,
-                .day   = 3,
-                .hour  = 18,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_ROMSTART,
-            .size   = EENV_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_RAMSTART,
-            .size   = EENV_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_eeprom,
-            .size   = EENV_STGSIZE,
-            .addr   = EENV_STGSTART
-        },
-        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
-        .name           = "ems001"
-    },
-    .uniqueid       = 0,
-    .extra          = {0}
-};
-
-#elif (emBODYrobot_BOARD_NAME == boardMCBSTM32C)
-
-static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_process,
-            .signature  = ee_procLoader,
-            .version    = 
-            { 
-                .major = 2, 
-                .minor = 3
-            },  
-            .builddate  = 
-            {
-                .year  = 2014,
-                .month = 1,
-                .day   = 13,
-                .hour  = 18,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
-        },
-        .communication  = ee_commtype_none,
-        .name           = "eLoader"
-    },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
-};
-
-static eEboardInfo_t s_loader_boardinfo =                        
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_board,
-            .signature  = 0x11,
-            .version    = 
-            { 
-                .major = 1, 
-                .minor = 0
-            },  
-            .builddate  = 
-            {
-                .year  = 2010,
-                .month = 1,
-                .day   = 1,
-                .hour  = 0,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_ROMSTART,
-            .size   = EENV_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_RAMSTART,
-            .size   = EENV_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_eeprom,
-            .size   = EENV_STGSIZE,
-            .addr   = EENV_STGSTART
-        },
-        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
-        .name           = "mcbstm32c"
-    },
-    .uniqueid       = 0,
-    .extra          = {0}
-};
-
-#elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
-
 
 
 static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
@@ -390,56 +189,104 @@ static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EEN
     .userdefined            = {0}
 };
 
-//static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-//{
-//    .info           =
-//    {
-//        .entity     =
-//        {
-//            .type       = ee_entity_process,
-//            .signature  = ee_procLoader,
-//            .version    = 
-//            { 
-//                .major = 2, 
-//                .minor = 9
-//            },  
-//            .builddate  = 
-//            {
-//                .year  = 2014,
-//                .month = 9,
-//                .day   = 17,
-//                .hour  = 16,
-//                .min   = 0
-//            }
-//        },
-//        .rom        = 
-//        {   
-//            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-//            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
-//        },
-//        .ram        = 
-//        {   
-//            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-//            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
-//        },
-//        .storage    = 
-//        {
-//            .type   = ee_strg_none,
-//            .size   = 0,
-//            .addr   = 0
-//        },
-//        .communication  = ee_commtype_none,
-//        .name           = "eLoader"
-//    },
-//    .protocols  =
-//    {
-//        .udpprotversion  = { .major = 0, .minor = 0},
-//        .can1protversion = { .major = 0, .minor = 0},
-//        .can2protversion = { .major = 0, .minor = 0},
-//        .gtwprotversion  = { .major = 0, .minor = 0}
-//    },
-//    .extra      = {0}
-//};
+
+#if (emBODYrobot_BOARD_NAME == boardEMS001)
+
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = 0x11,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2011,
+                .month = 11,
+                .day   = 3,
+                .hour  = 18,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "ems001"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
+
+#elif (emBODYrobot_BOARD_NAME == boardMCBSTM32C)
+
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = 0x11,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2010,
+                .month = 1,
+                .day   = 1,
+                .hour  = 0,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "mcbstm32c"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
+
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
 
 
 static eEboardInfo_t s_loader_boardinfo =                        
@@ -492,57 +339,6 @@ static eEboardInfo_t s_loader_boardinfo =
 
 #error --> MISSING THE CORRECT HAL for boardMCBSTM32F400
 
-static const eEmoduleInfo_t s_loader_info __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-{
-    .info           =
-    {
-        .entity     =
-        {
-            .type       = ee_entity_process,
-            .signature  = ee_procLoader,
-            .version    = 
-            { 
-                .major = 2, 
-                .minor = 7
-            },  
-            .builddate  = 
-            {
-                .year  = 2014,
-                .month = 4,
-                .day   = 28,
-                .hour  = 13,
-                .min   = 0
-            }
-        },
-        .rom        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_ROMADDR,
-            .size   = EENV_MEMMAP_ELOADER_ROMSIZE
-        },
-        .ram        = 
-        {   
-            .addr   = EENV_MEMMAP_ELOADER_RAMADDR,
-            .size   = EENV_MEMMAP_ELOADER_RAMSIZE
-        },
-        .storage    = 
-        {
-            .type   = ee_strg_none,
-            .size   = 0,
-            .addr   = 0
-        },
-        .communication  = ee_commtype_none,
-        .name           = "eLoader"
-    },
-    .protocols  =
-    {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
-    },
-    .extra      = {0}
-};
-
 
 static eEboardInfo_t s_loader_boardinfo =                        
 {
@@ -584,6 +380,53 @@ static eEboardInfo_t s_loader_boardinfo =
         },
         .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
         .name           = "mcbstm32f400"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
+
+#elif   defined(boardMC4PLUS)
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = 0x11,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2015,
+                .month = 1,
+                .day   = 1,
+                .hour  = 12,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "mc4plus"
     },
     .uniqueid       = 0,
     .extra          = {0}
@@ -946,7 +789,7 @@ static void s_loader_HW_init(void)
         hw_initted = 1;
     }
 
-#if		defined(HAL_IS_VERSION_2)
+//#if		defined(HAL_IS_VERSION_2)
 
     extern const hal_core_cfg_t* hal_coreCFGptr;
 
@@ -956,24 +799,24 @@ static void s_loader_HW_init(void)
 
 	hal_uniqueid_init(NULL);
 
-#else	// it must be hal version 1
-
-    extern const hal_cfg_t *hal_cfgMINE;
-    uint32_t size04aligned;
-    uint32_t *data32aligned = NULL;
-
-    hal_base_memory_getsize(hal_cfgMINE, &size04aligned); 
-
-    if(0 != size04aligned)
-    {
-        data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
-    }
-
-    hal_base_initialise(hal_cfgMINE, data32aligned);
-
-    hal_sys_systeminit();
-
-#endif
+//#else	// it must be hal version 1
+//
+//    extern const hal_cfg_t *hal_cfgMINE;
+//    uint32_t size04aligned;
+//    uint32_t *data32aligned = NULL;
+//
+//    hal_base_memory_getsize(hal_cfgMINE, &size04aligned); 
+//
+//    if(0 != size04aligned)
+//    {
+//        data32aligned = (uint32_t*)calloc(size04aligned/4, sizeof(uint32_t));   
+//    }
+//
+//    hal_base_initialise(hal_cfgMINE, data32aligned);
+//
+//    hal_sys_systeminit();
+//
+//#endif
 
     hal_eeprom_init(hal_eeprom_i2c_01, NULL); 
 

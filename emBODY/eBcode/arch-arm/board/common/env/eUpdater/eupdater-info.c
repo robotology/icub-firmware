@@ -74,6 +74,7 @@ extern const ipal_cfg_t    ipal_cfg;
 
 #if (emBODYrobot_BOARD_NAME == boardEMS001)
 
+#error -> add a const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET)))""
 //const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 //{
 //    .info           =
@@ -125,58 +126,8 @@ extern const ipal_cfg_t    ipal_cfg;
 //    .extra      = {0}
 //};
 
-#elif (emBODYrobot_BOARD_NAME == boardEMS4RD)
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS)
 
-//const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
-//{
-//    .info           =
-//    {
-//        .entity     =
-//        {
-//            .type       = ee_entity_process,
-//            .signature  = ee_procUpdater,
-//            .version    = 
-//            { 
-//                .major = 2, 
-//                .minor = 133
-//            },  
-//            .builddate  = 
-//            {
-//                .year  = 2014,
-//                .month = 10,
-//                .day   = 1,
-//                .hour  = 12,
-//                .min   = 0
-//            }
-//        },
-//        .rom        = 
-//        {   
-//            .addr   = EENV_MEMMAP_EUPDATER_ROMADDR,
-//            .size   = EENV_MEMMAP_EUPDATER_ROMSIZE
-//        },
-//        .ram        = 
-//        {   
-//            .addr   = EENV_MEMMAP_EUPDATER_RAMADDR,
-//            .size   = EENV_MEMMAP_EUPDATER_RAMSIZE
-//        },
-//        .storage    = 
-//        {
-//            .type   = ee_strg_none,
-//            .size   = 0,
-//            .addr   = 0
-//        },
-//        .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-//        .name           = "eUpdGWTopen"
-//    },
-//    .protocols  =
-//    {
-//        .udpprotversion  = { .major = 1, .minor = 1},
-//        .can1protversion = { .major = 0, .minor = 0},
-//        .can2protversion = { .major = 0, .minor = 1},
-//        .gtwprotversion  = { .major = 1, .minor = 0}
-//    },
-//    .extra      = {0}
-//};
 
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -191,15 +142,15 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 16
+                    .minor = 17
                 },  
                 .builddate  = 
                 {
                     .year  = 2015,
-                    .month = 5,
-                    .day   = 26,
+                    .month = 6,
+                    .day   = 15,
                     .hour  = 11,
-                    .min   = 11
+                    .min   = 37
                 }
             },
             .rom        = 
@@ -233,6 +184,7 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
     .compilationdatetime    = __DATE__ " " __TIME__,
     .userdefined            = {0}
 };
+
 
 
 #else
