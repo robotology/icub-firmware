@@ -32,6 +32,7 @@
 #include "stdio.h"
 
 #include "EoManagement.h"
+#include "EOnv_hid.h"
 
 #include "EOtheBOARDtransceiver.h"
 #include "EOMtheEMSappl.h"
@@ -103,7 +104,7 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command);
 
 extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
 {
-    eOmn_comm_status_t* status = (eOmn_comm_status_t*)eo_nv_RAM(nv);
+    eOmn_comm_status_t* status = (eOmn_comm_status_t*)nv->ram;
     
     // 1. init the management protocol version
     
@@ -137,13 +138,14 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)rd->data;
+    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
     
-//    if(eo_nv_ownership_local == eo_nv_GetOwnership(nv))
-//    {   // function is called from within the local board          
+    if(eobool_true == eo_nv_hid_isLocal(nv))
+    {   // function is called from within the local board
+           
         switch(opc)
         {
 
@@ -159,10 +161,11 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
             } break;
             
         }        
-//    }
-//    else
-//    {   // function is called from within the remote host because it has received a say or a sig
-//    }    
+    }
+    else
+    {   // function is called from within the remote host because it has received a say or a sig
+
+    }    
 
 }
 
@@ -170,7 +173,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_queryarray(const EOnv* nv, co
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)rd->data;
+    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
@@ -206,7 +209,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 {
     //eOprotIndex_t index = eoprot_ID2index(nv->ep, nv->id);
     
-    eOmn_command_t* command = (eOmn_command_t*)rd->data;
+    eOmn_command_t* command = (eOmn_command_t*)nv->ram;
     
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
     
@@ -325,7 +328,7 @@ extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const e
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)rd->data;
+    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
