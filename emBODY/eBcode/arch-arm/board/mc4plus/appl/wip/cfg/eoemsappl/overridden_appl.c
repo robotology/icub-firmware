@@ -62,25 +62,25 @@
 
 // - now we specialise the eth protocol for each board
 
-#if     (15 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)     
+//#if     (15 == EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)     
 
-    #define NJOMO 1
-    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
-    {  
-        {           
-            .endpoint           = eoprot_endpoint_motioncontrol,
-            .numberofentities  = {NJOMO, NJOMO, 1, 0, 0, 0, 0}     
-        }    
-    };
-    
-#else
-    #error -> must specify a board number   
-#endif
+//    #define NJOMO 1
+//    static const eOprot_EPcfg_t s_theEPcfgsOthers[] =
+//    {  
+//        {           
+//            .endpoint           = eoprot_endpoint_motioncontrol,
+//            .numberofentities  = {NJOMO, NJOMO, 1, 0, 0, 0, 0}     
+//        }    
+//    };
+//    
+//#else
+//    #error -> must specify a board number   
+//#endif
 
 
 
-static const uint8_t s_boardnum = EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD - 1;
-static const uint8_t s_theEPcfgsOthers_NumberOf = sizeof(s_theEPcfgsOthers) / sizeof(eOprot_EPcfg_t);
+//static const uint8_t s_boardnum = EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD - 1;
+//static const uint8_t s_theEPcfgsOthers_NumberOf = sizeof(s_theEPcfgsOthers) / sizeof(eOprot_EPcfg_t);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -112,6 +112,10 @@ static void overridden_appl_led_error_init(void);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
+
+static uint8_t s_boardnum = 0;
+
 static char debug_string[128];
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -205,58 +209,123 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
 // which enters in the CFG state. it is the place where to launch new services.
 
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
-{  
+{
+    //common data useful for init
+    eOmcconfig_cfg_t mc_config = {0};
+    const eOmcconfig_jomo_cfg_t* jomos_ptr;
+
+    
     EOMtheEMSapplCfg* emsapplcfg = eom_emsapplcfg_GetHandle();
     // the led-pulser is initted as first thing
      
     // pulse led3 forever at 20 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);
 
-    //now is done in a callback of an eth message from pc104
-    /*
-    {    
+    
+    {   // board number is from IP address
+        s_boardnum = 0;
+        eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
+        s_boardnum = ipaddress >> 24;  
+        s_boardnum --;
+        if(s_boardnum > 24)
+        {
+            //return;
+            s_boardnum = 0;
+        }
+        
+        s_boardnum = 98; //it imposes that the board is number x
+    }
+    
+    {   // CAN-MAPPING
+//        // marco.accame on 19 may 2015: here we load the map of can ... and also we map the entities into some can boards
+//        // ... if we have any.
+//        EOtheCANmapping * canmap = eo_canmap_Initialise(NULL);
+//        // now i load the map of can boards
+//        EOconstvector *canboards = eoboardconfig_code2canboards(s_boardnum);
+//        eo_canmap_LoadBoards(canmap, canboards);
+//        // now i load mc-joints, mc-motors, as-strain, as-mais, sk-skin
+//        EOconstvector *entitydes = NULL;
+//        // mc
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, entitydes); 
+//        // as
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, entitydes);
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
+//        // sk
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
+    }
+    
+    {   // CAN-PROTOCOL
+//        EOtheCANprotocol * canprot = eo_canprot_Initialise(NULL);              
+    }
+
+
+    
+    {   // ETH-PROTOCOL   
+        // marco.accame on 24 apr 2015: here is how to customise the eth protocol from a generic to a specific board
+        // so far, we can keep it in here. but further on we shall customise one endpoint at a time in runtime.
+        
         EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
         // 1. set the board number. the value of the generic board is 99. 
         //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
         eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
-    }
-    */
-/*    
-//    {   
-//        // marco.accame on 24 apr 2015: here is how to customise the eth protocol from a generic to a specific board
-//        // so far, we can keep it in here. but further on we shall customise one endpoint at a time in runtime.
-//        
-//        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        
+        // 2. now retrieve the right MC config using the s_boardnum value as a key
+        #warning IMPORTANT: is there a way to know the type of control? here it's MC4plus, but with a unique firmware it could be 2foc-based, mc4-based etc...
+        
+        //fill the config structure
+        uint8_t jomosn = eOmcconfig_board2jomosnumber(s_boardnum);
+        if (EOMCCONFIG_BOARD_DUMMY != jomosn)
+        {
+            mc_config.jomosnumber = jomosn;
+            mc_config.type = eOmcconfig_type_mc4plus;
+            jomos_ptr = eOmcconfig_board2config(s_boardnum, eOmcconfig_type_mc4plus);
+            
+            //the configuration exists
+            if (jomos_ptr != NULL)
+            {
+                memcpy(mc_config.jomos, jomos_ptr,mc_config.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t));        
+            }
+        }
+//        2. load all the endpoints specific to this board. the generic board loads only management
 //        uint8_t i = 0;
-//        // 1. set the board number. the value of the generic board is 99. 
-//        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
-//        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
-//        
-//        // 2. load all the endpoints specific to this board. the generic board loads only management
-//        for(i=0; i<s_theEPcfgsOthers_NumberOf; i++)
+//        EOconstvector* epcfg_cvector = eoboardconfig_code2EPcfg(s_boardnum);
+//        uint16_t numofepcfgs = eo_constvector_Size(epcfg_cvector);
+//        for(i=0; i<numofepcfgs; i++)
 //        {
-//            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) &s_theEPcfgsOthers[i];
+//            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(epcfg_cvector, i);
 //            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
 //            {
 //                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
 //                eo_entities_Refresh(eo_entities_GetHandle());
 //            }                        
 //        }
-//        
-//        // now we must define the .... proxy rules
-//        // e.g., if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
-//        // in teh future we can set this proxy mode on teh basis of the board number received
-//        //eOprotBRD_t localboard = eoprot_board_local_get();
 
-//    }      
-*/    
-    
+        // 3. ...
+        // how to load the other endpoints? it seems that also the SKIN is needed for MC4plus         
+                
+    }        
+   
     eo_entities_Initialise();
-  
-    #warning -> marco.accame: put in here the main builder of the application EOapplication    
-    eOserv_cfg_t * servicescfg   = (eOserv_cfg_t *)emsapplcfg->applbodycfg->thetrueconfig;
 
-    eo_serv_Initialise(servicescfg);
+    // config initializer has no effect
+    eo_serv_Initialise(NULL);
+    
+    
+    //init the MCService
+    eo_serv_ConfigMC(eo_serv_GetHandle(), &mc_config);  
+    eo_mcserv_CheckResources(eo_mcserv_GetHandle());
+     
+    // to do:
+    // 1. read ip adddress and get board number
+    // 2. load all the config it is needed:
+    //    a. endpoint mc (read for instance the num of joints, etc....)
+    //    
     
     //now is done in a callback of an eth message from pc104 
     /*
