@@ -176,9 +176,9 @@ typedef struct
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
 extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p); 
 
-EO_extern_inline eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p);  //p is not checked
-EO_extern_inline eOboolvalues_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p);
-EO_extern_inline eOboolvalues_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p);
+EO_extern_inline eObool_t eo_appEncReader_isReady(EOappEncReader *p);  //p is not checked
+EO_extern_inline eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p);
+EO_extern_inline eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p);
 
 extern uint64_t eo_appEncReader_startSPI_stream0(EOappEncReader *p);
 extern uint64_t eo_appEncReader_startSPI_stream1(EOappEncReader *p);
@@ -190,7 +190,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                                                 uint32_t *extra_value, hal_encoder_errors_flags *flags);
 
 // maintaned for backward compatibility (the values are returned only in case of SPI encoder)
-extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value,hal_encoder_errors_flags *flags);
+extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_encoder_errors_flags *flags);
 
 //extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p);
 
