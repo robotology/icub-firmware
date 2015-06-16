@@ -98,6 +98,7 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if     defined(USE_MC4PLUS)
 // SPI Encoders MAP
 static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_numberof] =
 {
@@ -120,6 +121,34 @@ static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncR
     /* 5 */     eo_appEncReader_stream_position2
 };
 
+#elif   defined(USE_EMS4RD)
+
+// SPI Encoders MAP
+static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_numberof] =
+{
+    /* 0 */     eo_appEncReader_stream0,
+    /* 1 */     eo_appEncReader_stream0,
+    /* 2 */     eo_appEncReader_stream0,
+    /* 3 */     eo_appEncReader_stream1,
+    /* 4 */     eo_appEncReader_stream1,
+    /* 5 */     eo_appEncReader_stream1
+};
+
+// SPI Stream Positioning MAP
+static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncReader_encoder_position_numberof] =
+{
+    /* 0 */     eo_appEncReader_stream_position0,
+    /* 1 */     eo_appEncReader_stream_position1,
+    /* 2 */     eo_appEncReader_stream_position2,
+    /* 3 */     eo_appEncReader_stream_position0,
+    /* 4 */     eo_appEncReader_stream_position1,
+    /* 5 */     eo_appEncReader_stream_position2
+};
+
+#else
+    #error -> either USE_EMS4RD or USE_MC4PLUS
+#endif
+    
 static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
 {
     /* AEA */     65520,
@@ -132,6 +161,7 @@ static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
 {
     EOappEncReader *retptr = NULL;
@@ -199,7 +229,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncReader_joint_position_t joint_number, uint32_t *primary_value,
                                             uint32_t *extra_value, hal_encoder_errors_flags *flags)
 {
-    uint32_t val_raw;
+    uint32_t val_raw = 0;;
     eOresult_t res1 = eores_NOK_generic;
     eOresult_t res2 = eores_NOK_generic;
     eOappEncReader_errortype_t errortype;
@@ -283,9 +313,13 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_INC:
             {
+                #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+                *primary_value = 0;
+                #else
                 val_raw = hal_quad_enc_getCounter(this_joint.primary_enc_position);
                 val_raw = val_raw & 0xFFFF;
                 *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                #endif
                 res1 = eores_OK;
                 break;
             }
@@ -379,8 +413,12 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_INC:
             {
+                #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+                *extra_value = 0;
+                #else
                 val_raw = hal_quad_enc_getCounter(this_joint.extra_enc_position);
                 *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                #endif
                 res2 = eores_OK;
                 break;
             }
@@ -413,7 +451,8 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     // the rule is valid for both EMS & MC4plus
     
     eo_appEncReader_stream_number_t current_stream;
-    
+
+#if     defined(USE_MC4PLUS)    
     if (enc % 2 == 0)
     {
         current_stream = eo_appEncReader_stream0;
@@ -422,7 +461,18 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     {
         current_stream = eo_appEncReader_stream1;
     }
-    
+#elif   defined(USE_EMS4RD)
+    if (enc <= 2)
+    {
+        current_stream = eo_appEncReader_stream0;
+    }
+    else
+    {
+        current_stream = eo_appEncReader_stream1;
+    }
+#else
+    #error use either USE_MC4PLUS or USE_EMS4RD
+#endif    
     //If AEA encoder
     if(p->cfg.SPI_streams[current_stream].type == hal_encoder_t1)
     {
@@ -723,11 +773,17 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p)
         eOappEncReader_joint_t current_joint = p->cfg.joints[i];
         if(current_joint.primary_encoder == eo_appEncReader_enc_type_INC)
         {
+            #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+            #else
             hal_quad_enc_single_init(current_joint.primary_enc_position);
+            #endif
         }
         if(current_joint.extra_encoder == eo_appEncReader_enc_type_INC)
         {
+            #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+            #else
             hal_quad_enc_single_init(current_joint.extra_enc_position);
+            #endif
         }
         // handle other cases...
         /*
