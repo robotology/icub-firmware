@@ -1091,14 +1091,14 @@
           <GroupName>eo-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolMN_fun_redefined.c</FileName>
+              <FileName>EoProtocolMN_fun_mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_redefined.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_mc4plus.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_redefined.c</FileName>
+              <FileName>EoProtocolMC_fun_mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_redefined.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_mc4plus.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2279,14 +2279,14 @@
           <GroupName>eo-protocol-cfg-callbacks</GroupName>
           <Files>
             <File>
-              <FileName>EoProtocolMN_fun_redefined.c</FileName>
+              <FileName>EoProtocolMN_fun_mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_redefined.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMN_fun_mc4plus.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_redefined.c</FileName>
+              <FileName>EoProtocolMC_fun_mc4plus.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_redefined.c</FilePath>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_mc4plus.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       EoProtocolMC_fun_redefined.c
+/* @file       EoProtocolMC_fun_mc4plus.c
     @brief      This file keeps the redefinition of protocol mc callbacks for mc4plus boards
     @author     marco.accame@iit.it
     @date       16 april 2015
