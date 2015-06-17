@@ -289,7 +289,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
             //the configuration exists
             if (jomos_ptr != NULL)
             {
-                memcpy(mc_config.jomos, jomos_ptr,mc_config.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t));        
+                memcpy(mc_config.jomos, jomos_ptr,jomosn*sizeof(eOmcconfig_jomo_cfg_t));        
             }
         }
 //        2. load all the endpoints specific to this board. the generic board loads only management
