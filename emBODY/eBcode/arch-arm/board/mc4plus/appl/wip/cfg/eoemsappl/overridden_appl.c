@@ -317,7 +317,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_serv_Initialise(NULL);
     
     
-    //init the MCService
+    //init the MCService (must be done only if the service is initialized)
     eo_serv_ConfigMC(eo_serv_GetHandle(), &mc_config);  
     eo_mcserv_CheckResources(eo_mcserv_GetHandle());
      

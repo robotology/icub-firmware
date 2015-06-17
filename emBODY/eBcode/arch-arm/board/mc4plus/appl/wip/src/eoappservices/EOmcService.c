@@ -85,6 +85,8 @@ static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p);
 
+static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void);
+
 static void myhal_pwm_set(uint8_t i, int16_t v);
 
 
@@ -448,20 +450,11 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // ems controller. it is used only in some control types
     if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
     {
-        //fix it...don't know if mapping s_boardnum <-> eOemscontroller_board_t fits perfectly
-        uint8_t s_boardnum = 0;
-        {   // board number is from IP address
-            eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
-            s_boardnum = ipaddress >> 24;  
-            s_boardnum --;
-            if(s_boardnum > 16)
-            {
-                //return;
-                s_boardnum = 0;
-            }
-        }
+      
+        eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
+        
         //use the ankle for test experimental setup
-        p->thelocalcontroller = eo_emsController_Init(emscontroller_board_ANKLE, emscontroller_actuation_LOCAL,p->config.jomosnumber);        
+        p->thelocalcontroller = eo_emsController_Init(board_control, emscontroller_actuation_LOCAL,p->config.jomosnumber);        
     }
     else
     {
@@ -714,6 +707,60 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     } // propagate status
     
     return(res);
+}
+
+static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
+{
+    eOemscontroller_board_t type = emscontroller_board_NO_CONTROL;
+    
+    uint8_t n = eoprot_board_local_get();
+    
+    switch(n)
+    {
+        case 1:
+        case 3:
+        case 9:
+        case 10:
+        {
+            type = emscontroller_board_NO_CONTROL;
+        } break;
+
+        case 0:
+        case 2:
+        {
+            type = emscontroller_board_SHOULDER;
+        } break;
+
+        case 4:
+        {
+            type = emscontroller_board_WAIST;
+        } break;
+
+        case 5:
+        case 7:
+        {
+            type = emscontroller_board_UPPERLEG;
+        } break;
+        
+        case 6:
+        case 8:
+        {
+            type = emscontroller_board_ANKLE;
+        } break;
+
+        case 98:
+        {
+            type = emscontroller_board_ANKLE;
+        } break;
+        
+        default:
+        {
+            type = emscontroller_board_NO_CONTROL;
+        } break;
+    }
+    
+    
+    return(type);   
 }
 
 // --------------------------------------------------------------------------------------------------------------------
