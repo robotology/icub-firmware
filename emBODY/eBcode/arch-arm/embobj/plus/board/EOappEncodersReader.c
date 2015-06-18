@@ -34,12 +34,12 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal.h"
-//#include "hal_debugPin.h"
+#include "hal_quad_enc.h"
 
 #include "EOtheMemoryPool.h"
 
 #include "OPCprotocolManager_Cfg.h" 
-//#include "EOtheEMSapplDiagnostics.h"
+
 #include "EOemsControllerCfg.h"
 #include "osal.h"
 
@@ -89,8 +89,7 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1(void *arg);
 
 static void s_eo_appEncReader_prepareSPIEncodersList(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
 static void s_eo_appEncReader_configure_initSPIConnectedEncoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
-static eOboolvalues_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error);
-//static void s_eo_appEncReader_mapStreams2HalNumbering(EOappEncReader *p);
+static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error);
 static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p);
 
 //static void s_eo_appEncReader_check(EOappEncReader *p);
@@ -99,6 +98,7 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if     defined(USE_MC4PLUS)
 // SPI Encoders MAP
 static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_numberof] =
 {
@@ -121,6 +121,34 @@ static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncR
     /* 5 */     eo_appEncReader_stream_position2
 };
 
+#elif   defined(USE_EMS4RD)
+
+// SPI Encoders MAP
+static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_numberof] =
+{
+    /* 0 */     eo_appEncReader_stream0,
+    /* 1 */     eo_appEncReader_stream0,
+    /* 2 */     eo_appEncReader_stream0,
+    /* 3 */     eo_appEncReader_stream1,
+    /* 4 */     eo_appEncReader_stream1,
+    /* 5 */     eo_appEncReader_stream1
+};
+
+// SPI Stream Positioning MAP
+static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncReader_encoder_position_numberof] =
+{
+    /* 0 */     eo_appEncReader_stream_position0,
+    /* 1 */     eo_appEncReader_stream_position1,
+    /* 2 */     eo_appEncReader_stream_position2,
+    /* 3 */     eo_appEncReader_stream_position0,
+    /* 4 */     eo_appEncReader_stream_position1,
+    /* 5 */     eo_appEncReader_stream_position2
+};
+
+#else
+    #error -> either USE_EMS4RD or USE_MC4PLUS
+#endif
+    
 static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
 {
     /* AEA */     65520,
@@ -133,6 +161,7 @@ static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
 {
     EOappEncReader *retptr = NULL;
@@ -195,30 +224,12 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
     return(eores_OK);
 }
 
-extern eOresult_t  eo_appEncReader_getValuesRaw(EOappEncReader *p, uint32_t *data_ptr)
-{
-    if((NULL == p) || (NULL == data_ptr))
-    {
-        return(eores_NOK_nullpointer);
-    }
-	// Feature disabled at the moment
-		
-    //hal_encoder_get_value(HALv2_encoder1, &data_ptr[0]);
-    //hal_encoder_get_value(HALv2_encoder2, &data_ptr[2]);
-    //hal_encoder_get_value(HALv2_encoder3, &data_ptr[4]);
-
-    //hal_encoder_get_value(HALv2_encoder7, &data_ptr[1]);
-    //hal_encoder_get_value(HALv2_encoder8, &data_ptr[3]);
-    //hal_encoder_get_value(HALv2_encoder9, &data_ptr[5]);
-
-    return(eores_OK);
-}
 
 
 extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncReader_joint_position_t joint_number, uint32_t *primary_value,
                                             uint32_t *extra_value, hal_encoder_errors_flags *flags)
 {
-    uint32_t val_raw;
+    uint32_t val_raw = 0;;
     eOresult_t res1 = eores_NOK_generic;
     eOresult_t res2 = eores_NOK_generic;
     eOappEncReader_errortype_t errortype;
@@ -302,9 +313,13 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_INC:
             {
+                #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+                *primary_value = 0;
+                #else
                 val_raw = hal_quad_enc_getCounter(this_joint.primary_enc_position);
                 val_raw = val_raw & 0xFFFF;
                 *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                #endif
                 res1 = eores_OK;
                 break;
             }
@@ -398,8 +413,12 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_INC:
             {
+                #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+                *extra_value = 0;
+                #else
                 val_raw = hal_quad_enc_getCounter(this_joint.extra_enc_position);
                 *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                #endif
                 res2 = eores_OK;
                 break;
             }
@@ -419,6 +438,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
     //return value based only on the reading of the primary encoder
     return res1;
 }
+
 extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_encoder_errors_flags *flags)
 {
     uint32_t val_raw;
@@ -431,7 +451,8 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     // the rule is valid for both EMS & MC4plus
     
     eo_appEncReader_stream_number_t current_stream;
-    
+
+#if     defined(USE_MC4PLUS)    
     if (enc % 2 == 0)
     {
         current_stream = eo_appEncReader_stream0;
@@ -440,7 +461,18 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
     {
         current_stream = eo_appEncReader_stream1;
     }
-    
+#elif   defined(USE_EMS4RD)
+    if (enc <= 2)
+    {
+        current_stream = eo_appEncReader_stream0;
+    }
+    else
+    {
+        current_stream = eo_appEncReader_stream1;
+    }
+#else
+    #error use either USE_MC4PLUS or USE_EMS4RD
+#endif    
     //If AEA encoder
     if(p->cfg.SPI_streams[current_stream].type == hal_encoder_t1)
     {
@@ -505,7 +537,7 @@ extern uint32_t eo_appEncReader_deltaSPI_stream1(EOappEncReader *p)
     return((uint32_t)d);    
 }
 
-__inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
+__inline extern eObool_t eo_appEncReader_isReady(EOappEncReader *p)
 {
     // no SPI encoders
     if((p->configuredEnc_SPI_stream0.readSeq.first == ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first == ENCODER_NULL))
@@ -534,7 +566,7 @@ __inline extern eOboolvalues_t eo_appEncReader_isReady(EOappEncReader *p)
 	return(eobool_false);
 }
 
-__inline extern eOboolvalues_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
+__inline extern eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
 {
     if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st))
     {
@@ -543,7 +575,7 @@ __inline extern eOboolvalues_t eo_appEncReader_isReadySPI_stream0(EOappEncReader
     return(eobool_false);
 }
 
-__inline extern eOboolvalues_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
+__inline extern eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
 {
     if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st))
     {
@@ -551,17 +583,7 @@ __inline extern eOboolvalues_t eo_appEncReader_isReadySPI_stream1(EOappEncReader
     }
     return(eobool_false);
 }
-/*
-extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EOappEncReader *p)
-{
-    if(NULL == p)
-    {
-        return(NULL);
-    }
 
-    return(&p->dgninfo);
-}
-*/
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -571,63 +593,7 @@ extern eOappEncReader_diagnosticsinfo_t* eo_appEncReader_GetDiagnosticsHandle(EO
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-/*
-//static void s_eo_appEncReader_prepareSPIEncodersList(EOappEncReader *p, EOappEncReader_configEncSPIXReadSequence_hid_t *cfgEncSPIX, eo_appEncReader_stream_number_t stream_number)
-//{
-//    uint8_t i = 0, j = 0;
-//    
-//    //initialize data struct
-//    cfgEncSPIX->first   = ENCODER_NULL;
-//    cfgEncSPIX->list[0] = ENCODER_NULL;
-//    cfgEncSPIX->list[1] = ENCODER_NULL;
-//    cfgEncSPIX->list[2] = ENCODER_NULL;
-//    cfgEncSPIX->list[3] = ENCODER_NULL; //is dummy, but useful cause it signals the end of the list
 
-//    //reference to useful info
-//    eOappEncReader_stream_t this_stream = p->cfg.SPI_streams[stream_number];
-//    uint8_t enc_numbers = p->cfg.SPI_streams[stream_number].numberof;
-//    
-//    for (i = 0; i < enc_numbers; i++)
-//    {
-//         //set the first if it's still NULL
-//         if((ENCODER_NULL == cfgEncSPIX->first) && (this_stream.encoders[i] != hal_encoderNONE))
-//         {
-//            cfgEncSPIX->first = this_stream.encoders[i];    
-//         }
-//         // set all the other encoders in list
-//         for(j = i; j < enc_numbers; j++)
-//         {
-//            if (this_stream.encoders[j] != hal_encoderNONE)
-//            {
-//                cfgEncSPIX->list[j] = this_stream.encoders[j];
-//            }
-//            break;
-//         }
-//    }
-//    
-//    
-//    for(i = 0; i < p->cfg.joints_number; i++)
-//    {
-//        if (CHECK_ENC_IS_ON_SPI(p->cfg.joints[i].primary_encoder))
-//        {
-//            //set the first if it's still NULL
-//            if(ENCODER_NULL == cfgEncSPIX->first)
-//            {
-//                cfgEncSPIX->first = p->cfg.SPI_streams[stream_number].encoders;    
-//            }
-//            for(j = i+1; j<= p->cfg.joints_number; j++)
-//            {
-//                if (CHECK_ENC_IS_ON_SPI(p->cfg.joints[j].primary_encoder))       
-//                {
-//                    cfgEncSPIX->list[(i-p->cfg.joints_number)] = SPIencodersMap[j] ;
-//                    break;    
-//                }
-//            }
-//        }
-//    }
-//    
-//}
-*/
 
 static void s_eo_appEncReader_prepareSPIEncodersList(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number)
 {
@@ -771,7 +737,7 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1(void *arg)
 }
 
 //return 0 in case of error else 1
-static eOboolvalues_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error)
+static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error)
 {
     uint8_t parity_error = 0;
     uint8_t b = 0;
@@ -796,44 +762,9 @@ static eOboolvalues_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOa
     
     return(eobool_true);
     
-    //return(eobool_true);
+
 }
 
-//obsolete
-/*
-static void s_eo_appEncReader_mapStreams2HalNumbering(EOappEncReader *p)
-{
-	// Apply a remapping based on hal numbering
-    uint8_t i,j;
-	uint8_t complete_stream_length = eOeOappEncReader_encoderMaxNum/eo_appEncReader_streams_numberof;
-	// For all the possible streams
-	for (j=0; j < eo_appEncReader_streams_numberof; j++)
-    {
-        // Cycle on all the possible encoder indexes
-        for(i=0; i < complete_stream_length; i++)
-        {
-            // Check if present
-            if(p->cfg.streams[j].encoders[i] == hal_encoderNONE)
-            {
-                //p->halConfigEncMask[i+j*complete_stream_length] = hal_encoder_tundefined;
-                continue;
-            }
-                    
-            //Set the right type
-            if (p->cfg.streams[j].type == hal_encoder_t1)
-            {
-                p->halConfigEncMask[i+j*complete_stream_length] = hal_encoder_t1;
-                p->halConfigEncMask[p->cfg.streams[j].encoders[i]] = hal_encoder_t1;
-            }
-            else if(p->cfg.streams[j].type == hal_encoder_t2)
-            {
-                p->halConfigEncMask[i+j*complete_stream_length] = hal_encoder_t2;
-                p->halConfigEncMask[p->cfg.streams[j].encoders[i]] = hal_encoder_t2;
-            }
-        }
-    }
-}
-*/
 
 static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p)
 {    
@@ -842,11 +773,17 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p)
         eOappEncReader_joint_t current_joint = p->cfg.joints[i];
         if(current_joint.primary_encoder == eo_appEncReader_enc_type_INC)
         {
+            #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+            #else
             hal_quad_enc_single_init(current_joint.primary_enc_position);
+            #endif
         }
         if(current_joint.extra_encoder == eo_appEncReader_enc_type_INC)
         {
+            #if defined(EOAPPENCODERREADER_DONTUSE_INC)
+            #else
             hal_quad_enc_single_init(current_joint.extra_enc_position);
+            #endif
         }
         // handle other cases...
         /*
@@ -858,48 +795,7 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p)
     }
 }
 
-/*
-static void s_eo_appEncReader_check(EOappEncReader *p)
-{
-   uint32_t index, errtype;
-   eOresult_t res;
-   uint8_t signal_error = 0;
-    
-    if(p->dgninfo.count < DGN_COUNT_MAX)
-    {
-        p->dgninfo.count++;
-        return;
-    }
-        
-    for(index=0; (index< eOappEncReader_joint_numberof) && (0 == signal_error); index++)
-    {
-        for(errtype=0; (errtype<eOappEncReader_errtype_MaxNum)  && (0 == signal_error); errtype++)
-        {
-            if(p->dgninfo.enclist[index][errtype] > DGN_THRESHOLD)
-            {
-                signal_error = 1;
-            }
-        }
-    }
-    
-    if(1 == signal_error)
-    {
-        res = eo_theEMSdgn_UpdateApplWithMc(eo_theEMSdgn_GetHandle(), p, p->dgninfo.count);
-        if(eores_OK == res)
-        {
-           eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplmc , 0);
-        }
-        else
-        {
-            ;//if some error occured while updating var to send, signaling error comes to naught.
-        }
-    }
 
-    //reset all statistics 
-    memset(&p->dgninfo, 0, sizeof(eOappEncReader_diagnosticsinfo_t));
-    p->dgninfo.count = 0;
-}
-*/
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

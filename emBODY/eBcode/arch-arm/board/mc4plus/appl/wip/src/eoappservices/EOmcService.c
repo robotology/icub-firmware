@@ -38,6 +38,8 @@
 #include "EOMtheEMStransceiver.h"
 
 #include "EoProtocol.h"
+#include "EOMtheIPnet.h"
+#include "EOtheEntities.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -82,6 +84,8 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p);
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p);
+
+static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void);
 
 static void myhal_pwm_set(uint8_t i, int16_t v);
 
@@ -283,20 +287,18 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
     {
         case eOmcconfig_type_mc4plus:
         {
-            // must start the first reading of encoders and ... enable teh joints and ........
-            #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
+            // must start the first reading of encoders and ... enable the joints and...?
             eo_appEncReader_StartRead(p->thelocalencoderreader);
             res = eores_OK;            
         } break;
         case eOmcconfig_type_mc4can:
         {
-            // must send the broadcast policy to mc4 ... what else
+            // must send the broadcast policy to mc4 ... what else?
             res = eores_OK;     
         } break;   
         case eOmcconfig_type_2foc:
         {
-            // must start the first reading of encoders and ... enable teh joints and ........ 
-            #warning TBD: in eo_mcserv_Start() put the first reading of encoders eo_appEncReader_StartRead() or similar
+            // must start the first reading of encoders and ... enable the joints and...? 
             eo_appEncReader_StartRead(p->thelocalencoderreader);    
             res = eores_OK;     
         } break;    
@@ -410,6 +412,7 @@ static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p)
     if(eobool_true == eoprot_EPcfg_isvalid(&epcfgmc))
     {
         eo_nvset_LoadEP(nvset, &epcfgmc, eobool_true);
+        eo_entities_Refresh(eo_entities_GetHandle());
     }                        
         
     // now we must define the .... proxy rules
@@ -447,7 +450,11 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // ems controller. it is used only in some control types
     if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
     {
-        p->thelocalcontroller = eo_emsController_Init(p->config.jomosnumber);        
+      
+        eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
+        
+        //use the ankle for test experimental setup
+        p->thelocalcontroller = eo_emsController_Init(board_control, emscontroller_actuation_LOCAL,p->config.jomosnumber);        
     }
     else
     {
@@ -622,9 +629,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
         for(jm=0; jm<p->config.jomosnumber; jm++)
         {
             //for some type of encoder I need to get the values from EOappEncodersReader, for the others we get the value in other ways
-            if(     (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_AEA)
-                ||  (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_AMO)
-                ||  (p->config.jomos[jm].encoder.etype == eo_appEncReader_enc_type_INC))
+            if (LOCAL_ENCODER(p->config.jomos[jm].encoder.etype))
             {
                 res = eo_appEncReader_GetJointValue (app_enc_reader,
                                                     (eo_appEncReader_joint_position_t)p->config.jomos[jm].encoder.enc_joint,
@@ -702,6 +707,60 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     } // propagate status
     
     return(res);
+}
+
+static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
+{
+    eOemscontroller_board_t type = emscontroller_board_NO_CONTROL;
+    
+    uint8_t n = eoprot_board_local_get();
+    
+    switch(n)
+    {
+        case 1:
+        case 3:
+        case 9:
+        case 10:
+        {
+            type = emscontroller_board_NO_CONTROL;
+        } break;
+
+        case 0:
+        case 2:
+        {
+            type = emscontroller_board_SHOULDER;
+        } break;
+
+        case 4:
+        {
+            type = emscontroller_board_WAIST;
+        } break;
+
+        case 5:
+        case 7:
+        {
+            type = emscontroller_board_UPPERLEG;
+        } break;
+        
+        case 6:
+        case 8:
+        {
+            type = emscontroller_board_ANKLE;
+        } break;
+
+        case 98:
+        {
+            type = emscontroller_board_ANKLE;
+        } break;
+        
+        default:
+        {
+            type = emscontroller_board_NO_CONTROL;
+        } break;
+    }
+    
+    
+    return(type);   
 }
 
 // --------------------------------------------------------------------------------------------------------------------

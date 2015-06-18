@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       EoProtocolMN_fun_ems4rd.c
+/* @file       EoProtocolMN_fun_mc4plus.c
     @brief      This file keeps c...
     @author     marco.accame@iit.it
     @date       06/06/2013
@@ -42,6 +42,8 @@
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
+
+#include "eEsharedServices.h"
 
 #include "EOtheServices.h"
 #include "EOmcService.h"
@@ -75,9 +77,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd);
-
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
+
 
 static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command);
 
@@ -242,6 +243,21 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
+extern void eoprot_fun_INIT_mn_appl_config(const EOnv* nv)
+{
+    eOmn_appl_config_t config = {0};
+    
+    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
+    
+    config.cycletime        = emscfg->runobjcfg.period;
+    config.txratedivider    = emscfg->runobjcfg.defaultTXdecimationfactor;
+          
+    // set it
+    eo_nv_Set(nv, &config, eobool_true, eo_nv_upd_dontdo);        
+}
+
+
+
 extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
 {
     // i init the application status to ...     
@@ -250,20 +266,21 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
     
     // build date
-    status.buildate.year    = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
-    status.buildate.month   = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
-    status.buildate.day     = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
-    status.buildate.hour    = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
-    status.buildate.min     = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
+    status.buildate.year        = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
+    status.buildate.month       = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
+    status.buildate.day         = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
+    status.buildate.hour        = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
+    status.buildate.min         = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
     
     // version
-    status.version.major    = emscfg->applcfg.emsappinfo->info.entity.version.major;
-    status.version.minor    = emscfg->applcfg.emsappinfo->info.entity.version.minor;
+    status.version.major        = emscfg->applcfg.emsappinfo->info.entity.version.major;
+    status.version.minor        = emscfg->applcfg.emsappinfo->info.entity.version.minor;
 		
 	// control loop timings 
-    status.cloop_timings[0] = emscfg->runobjcfg.execDOafter;
-	status.cloop_timings[1] = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
-	status.cloop_timings[2] = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
+    status.cloop_timings[0]     = emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[1]     = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
+	status.cloop_timings[2]     = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
+    status.txdecimationfactor   = emscfg->runobjcfg.defaultTXdecimationfactor;
     
     uint16_t min = EO_MIN(sizeof(status.name), sizeof(emscfg->applcfg.emsappinfo->info.name));
     memcpy(status.name, emscfg->applcfg.emsappinfo->info.name, min);
@@ -277,6 +294,23 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
 }
 
+extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmn_appl_config_t *cfg = (eOmn_appl_config_t*)rd->data;
+    
+    if(1000 != cfg->cycletime)
+    {
+        cfg->cycletime = 1000;
+        #warning marco.accame: send up a warning about unsuppported feature
+    }
+    
+    if(0 == cfg->txratedivider)
+    {
+        cfg->txratedivider = 1;
+    }
+    
+    s_eoprot_ep_mn_fun_apply_config_txratedivider(cfg->txratedivider);   
+}
 
 
 extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -290,6 +324,8 @@ extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const e
     
     s_eoprot_ep_mn_fun_apply_config_txratedivider(*txratedivider);   
 }
+
+
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
@@ -304,6 +340,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         case applstate_config:
         {
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+            res = res;
             // the new currstate is set inside the on-entry of the state machine
             //if(eores_OK == res)
             //{   
@@ -346,6 +383,21 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
             // the new currstate is set inside the relevant on-entry of the state machine
         } break;
+
+        case applstate_resetmicro:
+        {
+            // i just reset the micro ... straight away
+            osal_system_scheduling_suspend();
+            ee_sharserv_sys_restart();
+        } break;
+        
+        case applstate_restartapp:
+        {
+            osal_system_scheduling_suspend();
+            ee_sharserv_ipc_gotoproc_set(ee_procApplication);
+            ee_sharserv_sys_restart();           
+        } break;
+        
         
         default:
         {
@@ -689,7 +741,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning --------------> send error up
+                    #warning marco.accame: TODO: put diagnostics
                 }
             }        
         } break;
@@ -714,7 +766,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning --------------> send error up
+                    #warning marco.accame: TODO: put diagnostics
                 }
             }         
         } break;        
@@ -751,96 +803,104 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
             eOprot_EPcfg_t *epcfg = (eOprot_EPcfg_t*) &command->cmd.config.array[0];
             if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
             {
-                if(eoprot_endpoint_motioncontrol == epcfg->endpoint)
+                if(eobool_false == eoprot_endpoint_configured_is(eoprot_board_localboard, epcfg->endpoint))
                 {
-                    //configuration & init for motion control service
-                    eOmcconfig_cfg_t mcconfig = {0};
-                    mcconfig.jomosnumber  = epcfg->numberofentities[eoprot_entity_mc_joint];
-                    
-                    //API test 1 - retrieve config from string
-                    /*
+                     //init is done inside the initializer in the overriden_appl...do nothing
+                    if(eoprot_endpoint_motioncontrol == epcfg->endpoint)
                     {
-                    const char str[] = {"MC4Plus_experimental_jig"};
- 
-                    eOmcconfig_value_t val = eOmcconfig_string2value(str,eOmcconfig_type_mc4plus);
-                    
-                    if (val != eOmcconfig_value_dummy)
-                    {
-                        eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val);
-                        
-                        mcconfig.type = eOmcconfig_code2type(cfg_code);
-                        
-                        const eOmcconfig_jomo_cfg_t* jm_ref = eOmcconfig_code2config(cfg_code);
-                        
-                        if (jm_ref != NULL)
-                        {
-                            //instead of memcpy it's better to cycle on the jomosnumber
-                            //with memcpy we could have problem with the last joints not set (garbage memory)
-                            memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
-                        
-                        }
-                        {
-                            // handle the error
-                            // probably sending up an error saying "Not existing configuration" is a good practice
-                        }
+//                        //configuration & init for motion control service
+//                        eOmcconfig_cfg_t mcconfig = {0};
+//                        mcconfig.jomosnumber  = epcfg->numberofentities[eoprot_entity_mc_joint];
+//                        
+//                        //API test 1 - retrieve config from string
+//                        /*
+//                        {
+//                        const char str[] = {"MC4Plus_experimental_jig"};
+
+//                        eOmcconfig_value_t val = eOmcconfig_string2value(str,eOmcconfig_type_mc4plus);
+//                        
+//                        if (val != eOmcconfig_value_dummy)
+//                        {
+//                            eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val);
+//                            
+//                            mcconfig.type = eOmcconfig_code2type(cfg_code);
+//                            
+//                            const eOmcconfig_jomo_cfg_t* jm_ref = eOmcconfig_code2config(cfg_code);
+//                            
+//                            if (jm_ref != NULL)
+//                            {
+//                                //instead of memcpy it's better to cycle on the jomosnumber
+//                                //with memcpy we could have problem with the last joints not set (garbage memory)
+//                                memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
+//                            
+//                            }
+//                            {
+//                                // handle the error
+//                                // probably sending up an error saying "Not existing configuration" is a good practice
+//                            }
+//                        }
+//                        else
+//                        {
+//                            return;
+//                        }
+//                        }
+//                        */
+//                        //API test 2 - retrieve config from code
+//                        
+//                        //let's imagine that we have received also a code number with MC config
+//                        // 1) we want to use the experimental setup, so let's create the code
+//                        eOmcconfig_value_t val1 = eOmcconfig_value_MC4PLUS_experimental;
+//                        eOmcconfig_value_t val2 = eOmcconfig_value_MC4PLUS_experimental_inc2joint;
+//                        eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val1);
+//                        
+//                        // 2) extract the config type to set in the config structure
+//                        mcconfig.type = eOmcconfig_code2type(cfg_code);
+//                        
+//                        // 3) Now extract with the code the right joints/motor config
+//                        const eOmcconfig_jomo_cfg_t* jm_ref = eOmcconfig_code2config(cfg_code);
+//                        
+//                        if (jm_ref != NULL)
+//                        {
+//                             //set the active code for a common entry point to the mc config from the entire application
+//                             eOmcconfig_Set_Active_Code(cfg_code);
+//                             //instead of memcpy it's better to cycle on the jomosnumber
+//                             //with memcpy we could have problem with the last joints not set (garbage memory)
+//                             memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
+//                            
+//                        }
+//                        else 
+//                        {
+//                             // handle the error
+//                             // probably sending up an error saying "Not existing configuration" is a good practice
+//                        }
+//                       
+//                        //old working version
+//                        /*
+//                        mcconfig.type         = eomcserv_type_mc4plus; 
+//                        // example for board 15 (MC4 Plus JIG) --> one joint controlled by one AEA encoder
+//                        #warning think about how to store this information inside the project (const structure?...)
+//                        mcconfig.jomos[0].actuator.local.type   = 1;        // on board
+//                        mcconfig.jomos[0].actuator.local.index  = 2;        // motor 2
+//                        mcconfig.jomos[0].encoder.etype         = 0;        // aea
+//                        mcconfig.jomos[0].encoder.index         = 0;        // position index for low level mapping (hal)
+//                        //mcconfig.jomos[0].encoder.etype         = 2;        // incremental
+//                        //mcconfig.jomos[0].encoder.index         = 2;        // position index for low level mapping (hal)
+//                        */
+//                        
+//                        //inside the MC initializer we also define the encoder reader configuration, using jomos info
+//                        eo_serv_ConfigMC(eo_serv_GetHandle(), &mcconfig);  
+
+//                        eo_mcserv_CheckResources(eo_mcserv_GetHandle());
                     }
                     else
                     {
-                        return;
+                        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle());
+                        eo_nvset_LoadEP(nvset, epcfg, eobool_true);                        
                     }
-                    }
-                    */
-                    //API test 2 - retrieve config from code
-                    
-                    //let's imagine that we have received also a code number with MC config
-                    // 1) we want to use the experimental setup, so let's create the code
-                    //eOmcconfig_value_t val = eOmcconfig_value_MC4PLUS_experimental_aea1joint;
-                    eOmcconfig_value_t val = eOmcconfig_value_MC4PLUS_experimental;
-                    eOmcconfig_code_t cfg_code = eOmcconfig_code_get(eOmcconfig_type_mc4plus, val);
-                    
-                    // 2) extract the config type to set in the config structure
-                    mcconfig.type = eOmcconfig_code2type(cfg_code);
-                    
-                    // 3) Now extract with the code the right joints/motor config
-                    const eOmcconfig_jomo_cfg_t* jm_ref = eOmcconfig_code2config(cfg_code);
-                    
-                    if (jm_ref != NULL)
-                    {
-                         //set the active code for a common entry point to the mc config from the entire application
-                         eOmcconfig_Set_Active_Code(cfg_code);
-                         //instead of memcpy it's better to cycle on the jomosnumber
-                         //with memcpy we could have problem with the last joints not set (garbage memory)
-                         memcpy(mcconfig.jomos, jm_ref, mcconfig.jomosnumber*sizeof(eOmcconfig_jomo_cfg_t)); 
-                        
-                    }
-                    else 
-                    {
-                         // handle the error
-                         // probably sending up an error saying "Not existing configuration" is a good practice
-                    }
-                   
-                    //old working version
-                    /*
-                    mcconfig.type         = eomcserv_type_mc4plus; 
-                    // example for board 15 (MC4 Plus JIG) --> one joint controlled by one AEA encoder
-                    #warning think about how to store this information inside the project (const structure?...)
-                    mcconfig.jomos[0].actuator.local.type   = 1;        // on board
-                    mcconfig.jomos[0].actuator.local.index  = 2;        // motor 2
-                    mcconfig.jomos[0].encoder.etype         = 0;        // aea
-                    mcconfig.jomos[0].encoder.index         = 0;        // position index for low level mapping (hal)
-                    //mcconfig.jomos[0].encoder.etype         = 2;        // incremental
-                    //mcconfig.jomos[0].encoder.index         = 2;        // position index for low level mapping (hal)
-                    */
-                    
-                    //inside the MC initializer we also define the encoder reader configuration, using jomos info
-                    eo_serv_ConfigMC(eo_serv_GetHandle(), &mcconfig);  
-
-                    eo_mcserv_CheckResources(eo_mcserv_GetHandle());
                 }
-            }        
+            }                
         } break;
-
-            
+           
         default:
         {
             
@@ -850,6 +910,7 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
 
 }
 
+
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
 {
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
@@ -858,6 +919,8 @@ static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
     
     eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
 }
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

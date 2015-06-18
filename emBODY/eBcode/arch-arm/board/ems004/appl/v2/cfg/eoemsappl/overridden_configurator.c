@@ -124,45 +124,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
     uint32_t checkedmask = 0;           // keeps the boards that are checked
     static uint32_t count_times = 0;
     count_times++;
-    /*
-    // marco.accame on 4 feb 2014:
-    // if the 2foc receives a get-fw-version request in initial period of life of the application then it remains silent forever.
-    // in the meantime that this bug is fixed in the 2foc application, we introduce the following work-around.
-    // we wait for 500 ticks, each of 10 ms for a total of 5 seconds before we send the can message.
-    // it is a lot of time (maybe 3 seconds is enough), but in this way we are sure that the the 2foc is surely out of the bootloader
-    // and beyond its first second of life (the timer starts after not before 1-2 seconds of bootstrap after the ipnet has connected
-    // the sockets with ip address 10.0.1.104)
-    // to remove the delay: just change onlyAFTER to value 1 (not 0!!!)
-    static uint32_t times = 0;
-    static const uint32_t onlyAFTER = 500; 
     
-    times++;
-    
-    
-//    if(times == 1)
-//    {    
-//        eo_emsapplBody_discovery_Mais_Start(eo_emsapplBody_GetHandle());
-//    }
-    
-    if(times < onlyAFTER)
-    {
-        return;
-    }    
-    else if(times == onlyAFTER)
-    {
-        uint32_t dontaskmask = 0; // the first time we ask to every board
-        eo_emsapplBody_checkCanBoardsAreReady(eo_emsapplBody_GetHandle(), dontaskmask); 
-        
-        // marco.accame on 24feb14: if we launch it only in here then it is not OK.
-        // redmine issue #494
-        // eo_emsapplBody_discovery_Mais_Start(eo_emsapplBody_GetHandle());
-        
-        //eo_emsapplBody_discovery_Mais_Start(eo_emsapplBody_GetHandle());
-        //eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-        
-        return;        
-    }
-    */
     //  davide on 25 feb 2015:
     //  it seems that the problem of the 2foc is due to the high frequency of the messages sent via CAN.
     //  Now the messages are sent with a frequency of 4HZ (timer countdown = 250ms), and the problem should be fixed without
@@ -177,7 +139,6 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         return;
     }
           
-
     // verifico che le board mc4 ed 1foc siano ready, ovvero che abbiano mandato la loro fw version
     if(eobool_true == eo_candiscovery_areCanBoardsReady(eo_candiscovery_GetHandle(), &readyCanBoardsMask, &checkedmask))
     {
@@ -190,13 +151,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
             eo_mc4boards_Config(eo_mc4boards_GetHandle());
             eo_mais_Start(eo_mais_GetHandle());
         }
-//        eOmn_appl_runMode_t appl_run_mode = eo_emsapplBody_GetAppRunMode(eo_emsapplBody_GetHandle());
-//        if((applrunMode__skinAndMc4 == appl_run_mode) || (applrunMode__mc4Only == appl_run_mode))
-//        {   
-//            eo_mc4boards_ConfigShiftValues(eo_mc4boards_GetHandle());
-//            //eo_emsapplBody_sendConfig2canboards(eo_emsapplBody_GetHandle());
-//            eo_mais_Start(eo_mais_GetHandle());
-//        }
+
     }
     else
     {  

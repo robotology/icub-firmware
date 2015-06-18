@@ -39,7 +39,6 @@
 #include "EoAnalogSensors.h"
 #include "EoManagement.h"
 
-#include "EOtheProtocolWrapper.h"
 
 //#include "EOemsController_hid.h" 
 
