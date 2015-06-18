@@ -105,9 +105,14 @@ const eOmc_motor_t motor_default_dvalue =
         },
         EO_INIT(.gearboxratio)              0,
         EO_INIT(.rotorencoder)              0,
+        EO_INIT(.filler01)                  0,
         EO_INIT(.maxvelocityofmotor)        0,
         EO_INIT(.maxcurrentofmotor)         0,
-        EO_INIT(.filler02)                  {0}
+        EO_INIT(.rotorIndexOffset)          0,
+        EO_INIT(.motorPoles)                0,
+        EO_INIT(.hasHallSensor)             eobool_false,
+        EO_INIT(.hasTempSensor)             eobool_false,
+        EO_INIT(.hasRotorEncoder)           eobool_false
     },
     EO_INIT(.status)                       {0}
 }; 
@@ -141,7 +146,7 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(const EOnv* nv)
     eOmc_motor_status_t             *cfg = (eOmc_motor_status_t*)nv->ram;
     memcpy(cfg, &motor_default_dvalue.status, sizeof(eOmc_motor_status_t));
 }
-/* TOBEADDED_new_fw_ems: add those
+
 extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
@@ -162,7 +167,9 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *motor_config_ptr = (eOmc_motor_config_t*)nv->ram;
     eo_emsController_SetMotorConfig(jxx, *motor_config_ptr);
 }
- */
+
+/*************************************************************************************
+// DEPRECATED
 // motor-update
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -195,13 +202,17 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
     if(eobrd_cantype_1foc == boardType)
     {
+        #warning ALE: not to be managed directly
+            
         // 1) send current pid
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+        //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+        //eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
 
         // 2) send current pid limits
-        msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
-        eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+        //msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
+        //eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->pidcurrent);
+    
+        return;
     }
     
     // 2) set max velocity  
@@ -214,11 +225,15 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)&cfg_ptr->maxcurrentofmotor);
 
 }
+*/
 
+/*************************************************************************************
+// DEPRECATED
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOresult_t                              res;
     eOmc_motorId_t                          mxx = eoprot_ID2index(rd->id32);
+    eObrd_cantype_t                         boardType;
     eOmc_PID_t                              *pid_ptr = (eOmc_PID_t*)nv->ram;
     eOappTheDB_jointOrMotorCanLocation_t    canLoc;
     eOicubCanProto_msgDestination_t         msgdest;
@@ -230,12 +245,19 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
 
-	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, NULL);
+	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, &boardType);
     if(eores_OK != res)
     {
         return;
     }
 
+    if(eobrd_cantype_1foc == boardType)
+    {
+        #warning ALE: not to be managed directly
+            
+        return;
+    }
+    
   	//set destination of all messages 
     msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
 
@@ -247,8 +269,10 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, (void*)pid_ptr);
 
 }
+*/
 
-
+/*************************************************************************************
+// DEPRECATED
 extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_velocity_t                       *vel_ptr = (eOmeas_velocity_t*)nv->ram;
@@ -261,7 +285,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
+    //Since icub can proto uses encoder ticks like position unit, i need of the converter: from icub to encoder
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
 
@@ -269,7 +293,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)&vel_icubCanProtValue);
 
 }
-
+*/
 
 extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -284,6 +308,8 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
     eo_appCanSP_SendCmd2Motor(appCanSP_ptr, (eOmc_motorId_t)mxx, msgCmd, (void*)curr_ptr);
 }
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
