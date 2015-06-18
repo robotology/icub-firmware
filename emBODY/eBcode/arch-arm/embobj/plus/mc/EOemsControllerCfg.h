@@ -24,7 +24,9 @@ extern "C" {
 //#define FORCE_ZERO_PWM_OUT
 //#define EXPERIMENTAL_MOTOR_TORQUE
 //#define EXPERIMENTAL_SPEED_CONTROL
+
 //#define USE_ONLY_QE
+//#define USE_4BIT_INC_ENC_PRECISION
     
 //#define SHOULDER_3rd_JOINT_COUPLING
 //#define USE_JACOBIAN

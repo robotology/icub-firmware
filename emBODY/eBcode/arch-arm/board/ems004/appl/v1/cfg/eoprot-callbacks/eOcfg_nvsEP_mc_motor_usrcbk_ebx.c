@@ -141,10 +141,28 @@ extern void eo_cfg_nvsEP_mc_hid_INIT_Mxx_mstatus(const EOnv* nv)
     eOmc_motor_status_t             *cfg = (eOmc_motor_status_t*)nv->ram;
     memcpy(cfg, &motor_default_dvalue.status, sizeof(eOmc_motor_status_t));
 }
+/* TOBEADDED_new_fw_ems: add those
+extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    int32_t      *gbx_ptr = (int32_t*)nv->ram;
+    eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
+}
 
+extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    int32_t      *rot_ptr = (int32_t*)nv->ram;
+    eo_emsController_SetRotorEncoder(jxx, *rot_ptr);
+}
 
-
-
+extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_motor_config_t *motor_config_ptr = (eOmc_motor_config_t*)nv->ram;
+    eo_emsController_SetMotorConfig(jxx, *motor_config_ptr);
+}
+ */
 // motor-update
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -162,7 +180,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     };
 
     EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    /*Since icub can proto uses encoder tacks like position unit, i need of the converter: from icub to encoder*/
+    //Since icub can proto uses encoder ticks like position unit, i need of the converter: from icub to encoder
     EOappMeasConv* appMeasConv_ptr = eo_emsapplBody_GetMeasuresConverterHandle(eo_emsapplBody_GetHandle());
 
 	res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mxx,  &canLoc, &boardType);

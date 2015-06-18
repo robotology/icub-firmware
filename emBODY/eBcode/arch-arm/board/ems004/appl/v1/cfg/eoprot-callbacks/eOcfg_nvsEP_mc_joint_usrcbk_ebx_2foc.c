@@ -559,7 +559,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
     
 
-
+// TOBEADDED_new_fw_ems: remove the above
     eo_emsController_StartCalibration_type3(jxx, 
                                       calibrator->params.type3.position, 
                                       calibrator->params.type3.velocity,
@@ -653,14 +653,14 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->ram);
 }
-
+// TOBEADDED_new_fw_ems: remove function
 extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     int32_t      *gbx_ptr = (int32_t*)nv->ram;
     eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
 }
-
+// TOBEADDED_new_fw_ems: remove function
 extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);

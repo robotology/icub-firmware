@@ -1206,6 +1206,8 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     // in here i assume that all the mc boards are either 1foc or mc4
     if(eobool_true == s_motorcontrol_is2foc_based())
     {
+#if 1
+// TOBEADDED_new_fw_ems dont do itwith new ems fw
         // send current pid
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
         command.value = &cfg_ptr->pidcurrent;
@@ -1215,6 +1217,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
         command.value = &cfg_ptr->pidcurrent;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);             
+#endif
     }
     
     // set max velocity      
@@ -1232,6 +1235,15 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+#if 0
+// TOBEADDED_new_fw_ems: add this code for new ems fw
+    if(eobool_true == s_motorcontrol_is2foc_based())
+    {
+        #warning ALE: not to be managed directly
+        return;
+    }
+#endif
+    
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
     
     eOcanprot_command_t command = {0};
