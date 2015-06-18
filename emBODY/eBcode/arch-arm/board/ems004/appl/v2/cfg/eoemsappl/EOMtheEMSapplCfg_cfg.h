@@ -81,7 +81,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          2
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          3
 //  </h>version
 
 //  <h> build date

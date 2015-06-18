@@ -48,7 +48,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EOconstvector.h"
 #include "EoProtocol.h"
-
+#include "EOappEncodersReader.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -68,9 +68,8 @@ extern EOconstvector * eoboardconfig_code2canboards(uint32_t code);
 // or ... is empty in case of no such an entity on teh board or entity being served not by can
 extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOprotEndpoint_t ep, eOprotEntity_t entity); 
 
-// of eOappEncReader_stream_t
-extern EOconstvector * eoboardconfig_code2encoderstreams(uint32_t code);
 
+extern const eOappEncReader_cfg_t * eoboardconfig_code2encoderconfig(uint32_t code);
 
 // of eOprot_EPcfg_t
 extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);

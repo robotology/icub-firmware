@@ -54,29 +54,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-#define EB7_9
-
-#if defined(EB7_9)
-    #define encstream0_type         hal_encoder_t1
-		//#define encstream0_type     		hal_encoder_t2
-    #define encstream0_numberof     1
-    #define encstream0_encoders0    hal_encoder1
-    #define encstream0_encoders1    hal_encoderNONE
-    #define encstream0_encoders2    hal_encoderNONE
-    #define encstream0_encoders3    hal_encoderNONE
-    #define encstream0_encoders4    hal_encoderNONE
-    #define encstream0_encoders5    hal_encoderNONE
-
-    
-    #define encstream1_type         hal_encoder_t1
-    #define encstream1_numberof     1
-    #define encstream1_encoders0    hal_encoder4
-    #define encstream1_encoders1    hal_encoderNONE
-    #define encstream1_encoders2    hal_encoderNONE
-    #define encstream1_encoders3    hal_encoderNONE
-    #define encstream1_encoders4    hal_encoderNONE
-    #define encstream1_encoders5    hal_encoderNONE
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -88,33 +65,63 @@
 // - definition (and initialisation) of extern variables
 // --------------------------------------------------------------------------------------------------------------------
 
+// for EB7_9
 
-static const eOappEncReader_stream_t s_enc_streams[] = 
+const eOappEncReader_cfg_t encoder_reader_config_eb7 =
 {
-        {   // stream 0
-            .type       = encstream0_type,
-            .numberof   = encstream0_numberof,
-            .encoders   = { encstream0_encoders0, encstream0_encoders1, encstream0_encoders2, encstream0_encoders3, encstream0_encoders4, encstream0_encoders5 }   
+    .joints = 
+    {   // there are managed 4 joints, all served by an AEA
+        {   // pos 0
+            .primary_encoder        = eo_appEncReader_enc_type_AEA,
+            .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder1,
+            .extra_encoder          = eo_appEncReader_enc_type_NONE,
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
         },
-        {   // stream 1
-            .type       = encstream1_type,
-            .numberof   = encstream1_numberof,
-            .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
-        }  
+        {   // pos 1
+            .primary_encoder        = eo_appEncReader_enc_type_AEA,
+            .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder4,
+            .extra_encoder          = eo_appEncReader_enc_type_NONE,
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+        },
+        {   // pos 2
+            .primary_encoder        = eo_appEncReader_enc_type_NONE,
+            .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder          = eo_appEncReader_enc_type_NONE,
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+        },
+        {   // pos 3
+            .primary_encoder        = eo_appEncReader_enc_type_NONE,
+            .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder          = eo_appEncReader_enc_type_NONE,
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                 
+        }, 
+        {   // pos 4
+            .primary_encoder        = eo_appEncReader_enc_type_NONE,
+            .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder          = eo_appEncReader_enc_type_NONE,
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+        },
+        {   // pos 5
+            .primary_encoder        = eo_appEncReader_enc_type_NONE,
+            .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder          = eo_appEncReader_enc_type_NONE,
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+        }            
+    },
+    .SPI_streams    =
+    {   // at most 2 streams: one over spix and one over spiy
+        {
+            .type       = hal_encoder_t1, // or hal_encoder_t1 for aea
+            .numberof   = 1
+        },
+        {
+            .type       = hal_encoder_t1, // or hal_encoder_t1 for aea
+            .numberof   = 1
+        }
+    },
+    .SPI_callbackOnLastRead = NULL,
+    .SPI_callback_arg       = NULL       
 };
-
-EOconstvector s_eo_vectorof_encoderstreams_eb7 = 
-{
-    .capacity       = sizeof(s_enc_streams)/sizeof(eOappEncReader_stream_t),
-    .size           = sizeof(s_enc_streams)/sizeof(eOappEncReader_stream_t),
-    .item_size      = sizeof(eOappEncReader_stream_t),
-    .dummy          = 0,
-    .stored_items   = (void*)s_enc_streams,
-    .functions      = NULL   
-};
-
-EOconstvector* eo_vectorof_encoderstreams_eb7 = &s_eo_vectorof_encoderstreams_eb7;
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions

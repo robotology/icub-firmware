@@ -366,40 +366,37 @@ extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOpro
 
 
 
-extern EOconstvector* eo_vectorof_encoderstreams_none;
-extern EOconstvector* eo_vectorof_encoderstreams_eb1;
-extern EOconstvector* eo_vectorof_encoderstreams_eb5;
-extern EOconstvector* eo_vectorof_encoderstreams_eb6;
-extern EOconstvector* eo_vectorof_encoderstreams_eb7;
 
-extern EOconstvector * eoboardconfig_code2encoderstreams(uint32_t code)
+extern const eOappEncReader_cfg_t encoder_reader_config_none;
+extern const eOappEncReader_cfg_t encoder_reader_config_eb1;
+extern const eOappEncReader_cfg_t encoder_reader_config_eb5;
+extern const eOappEncReader_cfg_t encoder_reader_config_eb7;
+
+extern const eOappEncReader_cfg_t * eoboardconfig_code2encoderconfig(uint32_t code)
 {
-    EOconstvector *ret = (EOconstvector*) &s_eo_empty_constvector_encstream;
+    const eOappEncReader_cfg_t *ret = (eOappEncReader_cfg_t*) &encoder_reader_config_none;
     
     // so far the code is just an index equal to board number but starting from 0. eb1 is 0, etc....
     switch(code)
     {
         case 0:    
         case 2:
+        case 5:
+        case 7:            
         {       
-            ret = eo_vectorof_encoderstreams_eb1; // eb1/3/6/8
+            ret = &encoder_reader_config_eb1; // eb1/3/6/8
         } break;
         
         case 4:
         {       
-            ret = eo_vectorof_encoderstreams_eb5;
+            ret = &encoder_reader_config_eb5;
         } break;   
-        
-        case 5:
-        case 7:
-        {       
-            ret = eo_vectorof_encoderstreams_eb6; // eb6/8
-        } break;        
+         
 
         case 6:
         case 8:
         {       
-            ret = eo_vectorof_encoderstreams_eb7; // eb7/9
+            ret = &encoder_reader_config_eb7; // eb7/9
         } break;        
         
         case 1:
@@ -407,7 +404,7 @@ extern EOconstvector * eoboardconfig_code2encoderstreams(uint32_t code)
         case 9:
         case 10:
         {   // no encoder is boards eb2 / eb4 / eb10 / eb 11
-            ret = eo_vectorof_encoderstreams_none; 
+            ret = &encoder_reader_config_none; 
         } break;        
     
         default:    
@@ -418,8 +415,6 @@ extern EOconstvector * eoboardconfig_code2encoderstreams(uint32_t code)
     }
 
     return(ret);
-
-
 
 }
 

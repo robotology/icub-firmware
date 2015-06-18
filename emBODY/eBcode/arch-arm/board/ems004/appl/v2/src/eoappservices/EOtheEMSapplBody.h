@@ -101,8 +101,7 @@ enum {eo_emsapplbody_deviceid_numberof = 3};
 
 typedef struct
 {
-    eOappEncReader_stream_t             encoderstreams[eo_appEncReader_streams_numberof];
-    //eo_emsapplbody_configMC4boards_t    configdataofMC4boards;
+    eOappEncReader_cfg_t    encoderreaderconfig;
 } eOemsapplbody_cfg_t;
 
 

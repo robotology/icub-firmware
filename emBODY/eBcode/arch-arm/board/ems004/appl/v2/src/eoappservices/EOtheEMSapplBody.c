@@ -337,9 +337,9 @@ static void s_eo_emsapplBody_encodersReader_init(EOtheEMSapplBody *p)
 {
     eOappEncReader_cfg_t cfg = { 0 }; // marco.accame on 12jan2015: the warning will be removed when a final version of the config is released.
     
-    memcpy(&cfg.streams, &p->config.encoderstreams, sizeof(cfg.streams));
-    cfg.callbackOnLastRead = NULL;
-    cfg.callback_arg = NULL;
+    memcpy(&cfg, &p->config.encoderreaderconfig, sizeof(cfg));
+    cfg.SPI_callbackOnLastRead = NULL;
+    cfg.SPI_callback_arg = NULL;
     
     p->appEncReader = eo_appEncReader_New(&cfg);
 

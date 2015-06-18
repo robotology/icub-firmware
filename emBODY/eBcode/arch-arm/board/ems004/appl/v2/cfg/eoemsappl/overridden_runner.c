@@ -387,15 +387,16 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
 {
     eOresult_t          							res;
     EOtheEMSapplBody    							*emsappbody_ptr = eo_emsapplBody_GetHandle();
-    uint32_t            							encvalue[4]; 
-    hal_encoder_errors_flags					    encflags[4];
-    int16_t             							pwm[4];
+    uint32_t            							encvalue[4] = {0}; 
+    hal_encoder_errors_flags					    encflags[4] = {0};
+    int16_t             							pwm[4] = {0};
     EOappEncReader      							*app_enc_reader = eo_emsapplBody_GetEncoderReader(emsappbody_ptr);
     uint8_t             							error_mask = 0;
 
     uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
         
-    uint8_t spi1 = 0, spi3 = 0;
+    uint8_t spistream0 = 0;
+    uint8_t spistream1 = 0;
     
     for(uint8_t i=0; i<30; ++i)
     {
@@ -406,22 +407,22 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
         }
         else
         {
-            if (!eo_appEncReader_isReadySPI1(app_enc_reader)) ++spi1;
-            if (!eo_appEncReader_isReadySPI3(app_enc_reader)) ++spi3;
+            if (!eo_appEncReader_isReadySPI_stream0(app_enc_reader)) ++spistream0;
+            if (!eo_appEncReader_isReadySPI_stream1(app_enc_reader)) ++spistream1;
             hal_sys_delay(5);
         }
     }
     
     
-    if (eo_appEncReader_isReady(eo_emsapplBody_GetEncoderReader(emsappbody_ptr)))
+    if (eo_appEncReader_isReady(app_enc_reader))
     {    
-        for (uint8_t enc = 0; enc < numofjomos; ++enc)
+        for (uint8_t jo=0; jo<numofjomos; jo++)
         {
-            res = eo_appEncReader_GetValue(eo_emsapplBody_GetEncoderReader(emsappbody_ptr), (eOappEncReader_encoder_t)enc, &(encvalue[enc]), &(encflags[enc]));
-            
+            uint32_t extra = 0;
+            res = eo_appEncReader_GetJointValue(app_enc_reader, jo, &(encvalue[jo]), &extra, &(encflags[jo]));
             if (res != eores_OK)
             {
-                error_mask |= 1<<(enc<<1);
+                error_mask |= 1<<(jo<<1);
                 //encvalue[enc] = (uint32_t)ENC_INVALID;
             }
         }        
@@ -432,7 +433,7 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
     }
 
     // Restart the reading of the encoders
-    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
+    eo_appEncReader_StartRead(app_enc_reader);
 		
     eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
     

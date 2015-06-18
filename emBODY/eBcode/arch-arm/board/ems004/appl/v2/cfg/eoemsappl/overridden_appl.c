@@ -76,44 +76,64 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
    
-#define EB_NO_ENCODERS
-
-#if defined(EB_NO_ENCODERS)
-    #define encstream0_type         hal_encoder_t1
-    #define encstream0_numberof     0
-    #define encstream0_encoders0    hal_encoderNONE
-    #define encstream0_encoders1    hal_encoderNONE
-    #define encstream0_encoders2    hal_encoderNONE
-    #define encstream0_encoders3    hal_encoderNONE
-    #define encstream0_encoders4    hal_encoderNONE
-    #define encstream0_encoders5    hal_encoderNONE
-
-    
-    #define encstream1_type         hal_encoder_t1
-    #define encstream1_numberof     0
-    #define encstream1_encoders0    hal_encoderNONE
-    #define encstream1_encoders1    hal_encoderNONE
-    #define encstream1_encoders2    hal_encoderNONE
-    #define encstream1_encoders3    hal_encoderNONE
-    #define encstream1_encoders4    hal_encoderNONE
-    #define encstream1_encoders5    hal_encoderNONE
-#endif    
 
 static const eOemsapplbody_cfg_t theemsapplbodycfg =
 {
-    .encoderstreams =
-    {   
-        {   // stream 0
-            .type       = encstream0_type,
-            .numberof   = encstream0_numberof,
-            .encoders   = { encstream0_encoders0, encstream0_encoders1, encstream0_encoders2, encstream0_encoders3, encstream0_encoders4, encstream0_encoders5 }   
+    .encoderreaderconfig    =
+    {
+        .joints = 
+        {   // at most 6 joints can be managed. one with an encoder each 
+            {   // pos 0
+                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            },
+            {   // pos 1
+                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            },
+            {   // pos 2
+                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            },
+            {   // pos 3
+                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            }, 
+            {   // pos 4
+                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            },
+            {   // pos 5
+                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            }            
         },
-        {   // stream 1
-            .type       = encstream1_type,
-            .numberof   = encstream1_numberof,
-            .encoders   = { encstream1_encoders0, encstream1_encoders1, encstream1_encoders2, encstream1_encoders3, encstream1_encoders4, encstream1_encoders5 }        
-        }
-    } 
+        .SPI_streams    =
+        {   // at most 2 streams: one over spix and one over spiy
+            {
+                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
+                .numberof   = 0
+            },
+            {
+                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
+                .numberof   = 0
+            }
+        },
+        .SPI_callbackOnLastRead = NULL,
+        .SPI_callback_arg       = NULL       
+    }
 };
 
 const EOVtheEMSapplCfgBody theapplbodyconfig = 
@@ -283,7 +303,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
             s_boardnum = 0;
         }
         
-        //s_boardnum = 1; it imposes taht teh board is the eb2
+        //s_boardnum = 0; //it imposes that the board is the eb1
     }
     
     {   // CAN-MAPPING
@@ -353,14 +373,10 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     memcpy(&applbodyconfig, &theemsapplbodycfg, sizeof(eOemsapplbody_cfg_t));
     
-    // now i get the encoder streams
-    EOconstvector *encstreams = eoboardconfig_code2encoderstreams(s_boardnum);
+    // now i get the encoder config
     
-    eOappEncReader_stream_t *encstr = NULL;
-    encstr = (eOappEncReader_stream_t*) eo_constvector_At(encstreams, 0);
-    memcpy(&applbodyconfig.encoderstreams[0], encstr, sizeof(eOappEncReader_stream_t));   
-    encstr = (eOappEncReader_stream_t*) eo_constvector_At(encstreams, 1);    
-    memcpy(&applbodyconfig.encoderstreams[1], encstr, sizeof(eOappEncReader_stream_t)); 
+    const eOappEncReader_cfg_t *enccfg = eoboardconfig_code2encoderconfig(s_boardnum);
+    memcpy(&applbodyconfig.encoderreaderconfig, enccfg, sizeof(eOappEncReader_cfg_t)); 
     
     eo_emsapplBody_Initialise(&applbodyconfig);       
 }
