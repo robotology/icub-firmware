@@ -193,7 +193,7 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     ems->motor_position[motor] = position;
     
     //change the sign of motor position and motor velocity according to the sign of rotorencoder
-    //if (ems->rotorencoder[motor]<0)
+    //if (ems->motor_config_rotorencoder[motor]<0)
     //{
     //   ems->motor_velocity[motor]     = - ems->motor_velocity[motor];
     //   ems->motor_velocity_gbx[motor] = - ems->motor_velocity_gbx[motor];
@@ -717,11 +717,13 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
     
     static eObool_t motors_not_configured = eobool_true;
     
+    /*
     if (motors_not_configured)
     {
         motors_not_configured = eobool_false;
         MOTORS(m) config_2FOC(m);   
     }
+    */
     
     if (mode == eomc_controlmode_cmd_force_idle)
     {
@@ -1214,6 +1216,8 @@ extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t m
       ems->motor_config_hasHallSensor[joint]=motorconfig.hasHallSensor;
       ems->motor_config_hasTempSensor[joint]=motorconfig.hasTempSensor;
       ems->motor_config_hasRotorEncoder[joint]=motorconfig.hasRotorEncoder;
+        
+      config_2FOC(joint);
     }
 }
 
@@ -1288,7 +1292,7 @@ void config_2FOC(uint8_t motor)
 
     uint8_t motor_config[6];
     motor_config[0] = HAS_QE|HAS_HALL;
-    *(int16_t*)(motor_config+1) = -8192;
+    *(int16_t*)(motor_config+1) = ems->motor_config_rotorencoder[motor];//-14400;//-8192;
     *(int16_t*)(motor_config+3) = 0; // offset (degrees)
     motor_config[5] = 8; // num motor poles
     

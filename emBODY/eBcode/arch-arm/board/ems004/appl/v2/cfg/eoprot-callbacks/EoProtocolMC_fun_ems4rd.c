@@ -1183,7 +1183,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     // in here i assume that all the mc boards are either 1foc or mc4
     if(eobool_true == s_motorcontrol_is2foc_based())
     {
-        #warning ALE: not to be managed directly
+        eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
         return;
         
         // send current pid
