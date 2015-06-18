@@ -437,7 +437,7 @@ static void s_taskDO_activity_2foc(EOMtheEMSrunner *p)
 		
     eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
     
-    // eo_emsController_CheckFaults(); TOBEADDED_new_fw_ems: code added by ale for new_fw_ems branch, dot use in master so far
+    eo_emsController_CheckFaults();
         
     /* 2) pid calc */
     eo_emsController_PWM(pwm);

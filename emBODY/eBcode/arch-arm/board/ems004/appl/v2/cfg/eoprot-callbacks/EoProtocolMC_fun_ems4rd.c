@@ -229,9 +229,14 @@ const eOmc_motor_t motor_default_value =
         },
         .gearboxratio =              0,
         .rotorencoder =              0,
+        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
-        .filler02 =                  {0}
+        .rotorIndexOffset =          0,
+        .motorPoles =                0,
+        .hasHallSensor =             0,
+        .hasTempSensor =             0,
+        .hasRotorEncoder =           0  
     },
     .status =                       {0}
 }; 
@@ -892,37 +897,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t *calibrator = (eOmc_calibrator_t*)rd->data;    
     
-    
     if(eobool_true == s_motorcontrol_is2foc_based()) 
     {
-        
-        // must send something to can: 
-        // ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD + ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN + ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE
-        
-        #ifdef EXPERIMENTAL_SPEED_CONTROL
-        icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_velocity;
-        #else
-        icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
-        #endif
-        
-        eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
-        
-        // first one:
-        command.type  = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-        command.value = NULL;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-
-        // second one:
-        command.type  = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-        command.value = NULL;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-
-        // third one:
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-        command.value = &controlmode_2foc;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
-
         eo_emsController_StartCalibration_type3(jxx, 
                                           calibrator->params.type3.position, 
                                           calibrator->params.type3.velocity,
@@ -1206,18 +1182,18 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     // in here i assume that all the mc boards are either 1foc or mc4
     if(eobool_true == s_motorcontrol_is2foc_based())
     {
-#if 1
-// TOBEADDED_new_fw_ems dont do itwith new ems fw
+        eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
+        return;
+        
         // send current pid
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-        command.value = &cfg_ptr->pidcurrent;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
+        //command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+        //command.value = &cfg_ptr->pidcurrent;
+        //eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
         // send current pid limits
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
-        command.value = &cfg_ptr->pidcurrent;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);             
-#endif
+        //command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
+        //command.value = &cfg_ptr->pidcurrent;
+        //eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);             
     }
     
     // set max velocity      
@@ -1235,14 +1211,11 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-#if 0
-// TOBEADDED_new_fw_ems: add this code for new ems fw
     if(eobool_true == s_motorcontrol_is2foc_based())
     {
         #warning ALE: not to be managed directly
         return;
     }
-#endif
     
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
     
