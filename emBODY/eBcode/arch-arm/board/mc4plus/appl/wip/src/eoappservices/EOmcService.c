@@ -454,7 +454,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
         
         //use the ankle for test experimental setup
-        p->thelocalcontroller = eo_emsController_Init(board_control, emscontroller_actuation_LOCAL,p->config.jomosnumber);        
+        p->thelocalcontroller = eo_emsController_Init(board_control, emscontroller_actuation_LOCAL, p->config.jomosnumber);        
     }
     else
     {
@@ -746,6 +746,11 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
         case 8:
         {
             type = emscontroller_board_ANKLE;
+        } break;
+        
+        case 14:
+        {
+            type = emscontroller_board_FACE_lips;
         } break;
 
         case 98:

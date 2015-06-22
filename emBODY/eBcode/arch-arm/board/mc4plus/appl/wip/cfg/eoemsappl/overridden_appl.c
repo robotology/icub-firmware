@@ -233,7 +233,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
             s_boardnum = 0;
         }
         
-        s_boardnum = 98; //it imposes that the board is number x
+        //s_boardnum = 98; //it imposes that the board is number x
     }
     
     {   // CAN-MAPPING
@@ -276,7 +276,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
         
         // 2. now retrieve the right MC config using the s_boardnum value as a key
-        #warning IMPORTANT: is there a way to know the type of control? here it's MC4plus, but with a unique firmware it could be 2foc-based, mc4-based etc...
+        //#warning IMPORTANT: is there a way to know the type of control? here it's MC4plus, but with a unique firmware it could be 2foc-based, mc4-based etc...
         
         //fill the config structure
         uint8_t jomosn = eOmcconfig_board2jomosnumber(s_boardnum);

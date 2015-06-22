@@ -304,7 +304,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         
     //#if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) || defined(SHOULDER_BOARD)
     if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_SHOULDER == ems->board) ||
-       (emscontroller_board_HEAD_lips == ems->board))  // HEAD LIPS has 4 joints that SHOULD be completely independent  
+       (emscontroller_board_FACE_lips == ems->board))  // FACE LIPS has 4 joints that SHOULD be completely independent  
     {
         uint8_t first = 0;
         uint8_t last = 0;
@@ -640,7 +640,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[1] = ems->motor_position[1];
      
     }
-    else if(emscontroller_board_HEAD_lips == ems->board) 
+    else if(emscontroller_board_FACE_lips == ems->board) 
     {        
         axle_virt_vel[0] = ems->motor_velocity_gbx[0];
         axle_virt_vel[1] = ems->motor_velocity_gbx[1];
@@ -1020,7 +1020,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         }
         //#endif
         
-        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_HEAD_lips == ems->board))
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board))
         {
         //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         
@@ -1111,7 +1111,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         //#endif
         }
         
-        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_HEAD_lips == ems->board))
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board))
         {
         //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         
@@ -1182,7 +1182,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         //#endif
         }
           
-        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_HEAD_lips == ems->board))
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board))
         {
         //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
        
@@ -1376,7 +1376,7 @@ extern void eo_emsController_CheckCalibrations(void)
     // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
     // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3.
     // se il joint non e' accoppiato la calibrazione e' indipendnte, altrimenti altrimenti la calib finisce solo se tutti gli accoppiati sono calbrati      
-    if(emscontroller_board_HEAD_lips == ems->board)
+    if(emscontroller_board_FACE_lips == ems->board)
     {
         JOINTS(j)
         {
