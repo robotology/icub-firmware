@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -84,6 +84,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -145,7 +147,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -362,9 +363,11 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
-              <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 HEAD_V3</Define>
+              <Define>ICUB_HEAD_V3</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\board;..\src\eoappservices\mc</IncludePath>
             </VariousControls>
@@ -878,6 +881,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1158,6 +1163,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1195,7 +1202,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1265,6 +1272,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -1326,7 +1335,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1543,6 +1551,8 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
@@ -2059,6 +2069,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2339,6 +2351,8 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>

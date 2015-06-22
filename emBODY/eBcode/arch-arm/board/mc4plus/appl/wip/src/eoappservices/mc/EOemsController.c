@@ -29,7 +29,7 @@
 #include "EOtheErrorManager.h"
 
 
-#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
+#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS) && !defined(V3_MECHANICS)
 #error mechanics is undefined
 #endif
 
