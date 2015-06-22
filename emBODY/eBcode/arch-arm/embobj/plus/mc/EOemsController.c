@@ -715,9 +715,8 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
 {
     if (!ems) return;
     
-    static eObool_t motors_not_configured = eobool_true;
-    
     /*
+    static eObool_t motors_not_configured = eobool_true;
     if (motors_not_configured)
     {
         motors_not_configured = eobool_false;
@@ -1587,7 +1586,7 @@ void set_2FOC_running(uint8_t motor)
         managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
-        descriptor.par64 = par64;
+        descriptor.par64 = eo_motors_getQEError(ems->motors, j);
         descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder);

@@ -49,6 +49,7 @@ struct EOmotors_hid
     uint8_t motor_run_state_req[MAX_NAXLES];
     uint16_t motor_run_state_req_wdog[MAX_NAXLES];
     
+    uint8_t motor_qe_error[MAX_NAXLES];
     uint32_t motor_fault_mask[MAX_NAXLES];
     int32_t J[MAX_NAXLES][MAX_NAXLES];
     int32_t Ji[MAX_NAXLES][MAX_NAXLES];

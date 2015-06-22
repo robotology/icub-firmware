@@ -54,6 +54,7 @@ typedef struct EOmotors_hid EOmotors;
     @return     The pointer to the required object.
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors, eOemscontroller_board_t board);
+extern uint8_t eo_motors_getQEError(EOmotors *o, uint8_t motor);
 extern void eo_motors_new_state_req(EOmotors *o, uint8_t motor, uint8_t control_mode);
 extern eObool_t eo_motor_check_state_req(EOmotors *o, uint8_t m);
 extern void eo_motors_rearm_wdog(EOmotors *o, uint8_t motor);
