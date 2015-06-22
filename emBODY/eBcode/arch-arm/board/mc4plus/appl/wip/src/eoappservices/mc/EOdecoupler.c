@@ -68,7 +68,7 @@ static char invert_matrix(float** M, float** I, char n);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOmotors* eo_motors_New(uint8_t nMotors) 
+extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board) 
 {
     if (!nMotors) return NULL;
     if (nMotors > MAX_NAXLES) nMotors = MAX_NAXLES;
@@ -77,6 +77,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors)
 
     if (o)
     {
+        o->board = board;
         o->nMotors = nMotors;
         o->Jok = eobool_false;
         
@@ -301,7 +302,9 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
 {
     //if (!o) return;
     
-    #if defined(SHOULDER_BOARD)
+    //#if defined(SHOULDER_BOARD)
+    if(emscontroller_board_SHOULDER == o->board)
+    {
     
         //             | 1     0       0   |
         // J = dq/dm = | 1   40/65     0   |
@@ -367,8 +370,11 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         
             pwm_motor[3] = pwm_joint[3];
         }
-        
-    #elif defined(WAIST_BOARD)
+     
+    }        
+    else if(emscontroller_board_WAIST == o->board)
+    {
+    //#elif defined(WAIST_BOARD)
         
         //             |   1     1     0   |
         // J = dq/dm = |  -1     1     0   |
@@ -387,24 +393,47 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
             if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
         }
-        
-    #elif defined(UPPERLEG_BOARD)
+    }        
+    else if(emscontroller_board_UPPERLEG == o->board)
+    {    
+    //#elif defined(UPPERLEG_BOARD)
         {
             pwm_motor[0] = pwm_joint[0];
             pwm_motor[1] = pwm_joint[1];
             pwm_motor[2] = pwm_joint[2];
             pwm_motor[3] = pwm_joint[3];
         }
-        
-    #elif defined(ANKLE_BOARD)
+    }        
+    else if(emscontroller_board_ANKLE == o->board)
+    {    
+    //#elif defined(ANKLE_BOARD)
         {
             pwm_motor[0] = pwm_joint[0];
             pwm_motor[1] = pwm_joint[1];
         }
-        
-    #else
+     
+    }
+    else if((emscontroller_board_HEAD_neckyaw_eyes == o->board)) 
+    {
+        #warning TODO: for head v3
+        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
+        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
+        // mettere formula di disaccoppiamento. probabilmente il neck e' come le prime due righe del waist.         
+    }
+    else if((emscontroller_board_HEAD_lips == o->board)) 
+    {
+        pwm_motor[0] = pwm_joint[0];
+        pwm_motor[1] = pwm_joint[1];
+        pwm_motor[2] = pwm_joint[2];
+        pwm_motor[3] = pwm_joint[3];        
+    }
+    else    // marco.accame: this board does not have coupled joints
+            // davide: to me seems more like that your trying to find the PWM of an undefined board
+    {    
+    //#else
         MOTORS(m) pwm_motor[m] = 0;
-    #endif
+    }
+    //#endif
 }
 
 #endif

@@ -56,6 +56,9 @@ extern "C" {
 
 struct EOemsController_hid 
 {
+    eOemscontroller_board_t board;
+    eOemscontroller_actuation_t act;
+    
     uint8_t n_calibrated;
     
     //uint16_t state_mask;
@@ -89,6 +92,11 @@ extern void eo_emsController_hid_DEBUG_reset(void);
 extern void eo_emsController_hid_DEBUG_evaltransmission(void);
 #endif
 
+extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint8_t motor);
+
+extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,uint8_t motor);
+    
+extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

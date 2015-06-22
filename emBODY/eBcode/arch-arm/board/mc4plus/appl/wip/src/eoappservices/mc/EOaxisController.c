@@ -84,7 +84,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->pidP = eo_pid_New();    
         o->pidT = eo_pid_New();
         
-        o->trajectory = eo_trajectory_New(id);
+        o->trajectory = eo_trajectory_New();
         
         o->rot_sign = 0;
         
@@ -92,7 +92,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->torque_timer = 0;
 
         ///////////////////////////
-        o->pos_min = o->pos_max = joint2ticksperrevolution(id)/2;
+        o->pos_min = o->pos_max = TICKS_PER_HALF_REVOLUTION;
         
         o->torque_ref_jnt = 0;
         o->torque_ref_mot = 0;
@@ -120,8 +120,14 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         
         o->state_mask = AC_NOT_READY;
         
-        o->calibration_type = eomc_calibration_type3_abs_sens_digital; //default behaviour
+        o->calibration_type = eomc_calibration_type3_abs_sens_digital; //default behaviour (AEA abs encoders)
         o->pwm_limit_calib = 0;
+        o->calib_count = 0;
+        o->calib_stable = 0;
+        o->old_pos = o->pos_max;
+        o->pos_to_reach = 0;
+        o->offset = 0;
+        o->goback_vel = 0;
     }
 
     return o;
@@ -153,7 +159,7 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     o->control_mode = eomc_controlmode_calib;
 }
 
-extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel)
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int16_t pwmlimit, int16_t vel, int32_t final_position)
 {
     if (!o) return;
     
@@ -165,9 +171,19 @@ extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
     
-    //set the value to start procedure
+    //set the values to start procedure
     o->pwm_limit_calib = pwmlimit;
-    //what about velocity? it's useful?
+    
+    if (o->pwm_limit_calib > 0)
+        o->pos_to_reach = final_position;
+    else
+        o->pos_to_reach = -final_position;
+    
+    o->goback_vel = vel;
+
+    //reset the offset
+    o->offset = 0;
+    
     o->control_mode = eomc_controlmode_calib;
 }
 
@@ -608,25 +624,56 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         
         case eomc_controlmode_calib:
         {
-            //calib type 0
-            if (o->calibration_type == eomc_calibration_type0_hard_stops)
+            //calib type 5
+            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
             {
                 if (s_eo_axisController_isHardwareLimitReached(o))
                 {
+                    // here I should only set the final position (the one in which the hardware limit is reached) to the value indicated in param3 of the calib
+                    // the setting of this offset should be done only once!                  
                     eo_pid_Reset(o->pidP);
-                    eo_trajectory_Init(o->trajectory, pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+                    
+                    o->offset = pos - o->pos_to_reach;
+                    
+                    int32_t new_pos = pos - o->offset;
+                    
+                    //out of bound protection (redundant, but protect from typo inside XML)
+                    if ( new_pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+                        new_pos += TICKS_PER_REVOLUTION;
+                    else if (new_pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+                        new_pos -= TICKS_PER_REVOLUTION;
+                    
+                    //update axis, trajectory pos and...allowed limits?
+                    eo_axisController_SetEncPos(o, new_pos);
+                    eo_axisController_SetEncVel(o, vel);
+                    /*
+                    if (new_pos > 0)
+                    {
+                        eo_axisController_SetPosMin(o, -new_pos);
+                        eo_axisController_SetPosMax(o, new_pos);
+                    }
+                    else
+                    {
+                        eo_axisController_SetPosMin(o, new_pos);
+                        eo_axisController_SetPosMax(o, -new_pos);
+                    }
+                    */
+                    eo_trajectory_Init(o->trajectory, new_pos, vel, 0);
+                    eo_trajectory_Stop(o->trajectory, new_pos);
+                    o->err = 0;
                     
                     eo_axisController_SetCalibrated (o);
                     o->control_mode = eomc_controlmode_position;
-                    // acemor: define how to go back                    
-                    //Set position reference and return
-                    eo_axisController_SetPosRef(o, 0, (pos-0)/2); //how to know the right return position and velocity?
-                    return 0;
                     
+                    // acemor: define how to go back                 
+                    //but the first time also RobotInterface try to set the pos to 0... (it does not seem to be a problem)
+                    eo_axisController_SetPosRef(o, 0, o->goback_vel); // go to 0 with velocity from calib param2                 
+                          
+                    return 0;                    
                 }
                 //if still not calibrated I need to continue my search for the hardware limit
-                if (!eo_axisController_IsCalibrated(o))
+                //important! need to do that only if the encoder has been already initialized
+                if (!eo_axisController_IsCalibrated(o)) 
                 {
                     o->interact_mode = eOmc_interactionmode_stiff;
                     *stiff = eobool_true;
@@ -695,7 +742,40 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
             
             int32_t err = pos_ref - pos;
+            
+            //begin test...the error is gettin smaller and smaller?
+            //
+            /*
+            static uint8_t count = 0;
+            int32_t err_to_check;
+            if (err < 0)
+                err_to_check = -err;
+            else
+                err_to_check = err;
+            
 
+            if (err_to_check > 100)
+            {
+               count++;
+            }
+            else if ((err_to_check > 50) && (err_to_check < 100))
+            {
+               count++;
+            }
+            else if ((err_to_check > 25) && (err_to_check < 50))
+            {
+               count++;
+            }
+            else if ((err_to_check > 10) && (err_to_check < 25))
+            {
+               count++;
+            }
+            else if ((err_to_check > 0) && (err_to_check < 10))
+            {
+               count++;
+            }
+            //end test
+            */
             if (o->interact_mode == eOmc_interactionmode_stiff)
             {
                 *stiff = eobool_true;
@@ -936,7 +1016,23 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     eo_pid_GetStatusInt32(o->pidP, &(pidStatus->output), &(pidStatus->error));    
 }
 
+extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos)
+{
+    int32_t pos = current_pos - o->offset;
+    // out of bound protections
+    //test1
+    //LIMIT2(ems->axis_controller[joint]->pos_min, pos, ems->axis_controller[joint]->pos_max);
+    
+    //test2   
+    if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+        pos += TICKS_PER_REVOLUTION;
+    else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+        pos -= TICKS_PER_REVOLUTION;
 
+    //update axis pos
+    o->position = pos;
+    return;
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -961,24 +1057,26 @@ static void axisMotionReset(EOaxisController *o)
 
 static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
 {
-    static int32_t current_pos = 0, veryold_pos = 0;
-    static uint16_t count = 0;
-    current_pos = GET_AXIS_POSITION();
-    if (current_pos == veryold_pos)
+    //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+    o->calib_count += 1;
+    if (o->calib_count > 1200)
     {
-        count++;
-        //if for 100 consecutive times (~100ms) I'm in the same position, it means that I reached the hardware limit
-        if (count == 100)
+        if (GET_AXIS_POSITION() == o->old_pos)
         {
-            count = 0;
-            return eobool_true;
+            o->calib_stable += 1;
+            if (o->calib_stable == 20)
+            {
+                o->calib_stable = 0;
+                o->calib_count = 0;
+                return eobool_true;
+            }
+        }
+        else
+        {
+            o->calib_stable = 0;
         }
     }
-    else
-    {
-        count = 0;
-    }
-    veryold_pos = current_pos;
+    o->old_pos = GET_AXIS_POSITION();
     return eobool_false;
 }
 

@@ -131,11 +131,12 @@ extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, 
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down);
 
 extern void eo_axisController_StartCalibration_type3(EOaxisController *o);
-extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel);
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int16_t pwmlimit, int16_t vel, int32_t final_position);
 extern void eo_axisController_SetCalibrated(EOaxisController *o);
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o);
 
 extern int32_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *enc_pos); // shoulder joint 2 only
+extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos); //axis controlled by incremental encoders 
 
 /** @}            
     end of group eo_axisController  

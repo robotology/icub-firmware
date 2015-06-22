@@ -48,12 +48,11 @@ typedef struct EOtrajectory_hid EOtrajectory;
 // - declaration of extern public functions ---------------------------------------------------------------------------
  
  
-/** @fn         extern EOtrajectory* eo_trajectory_New(uint8_t id)
-    @param      id the id of the trajectory
+/** @fn         extern EOtrajectory* eo_trajectory_New(void)
     @brief      Creates a new trajectory object 
     @return     The pointer to the required object.
  **/
-extern EOtrajectory* eo_trajectory_New(uint8_t id);
+extern EOtrajectory* eo_trajectory_New(void);
 
 extern void eo_trajectory_SetPosMin(EOtrajectory *o, int32_t pos_min);
 extern void eo_trajectory_SetPosMax(EOtrajectory *o, int32_t pos_max);

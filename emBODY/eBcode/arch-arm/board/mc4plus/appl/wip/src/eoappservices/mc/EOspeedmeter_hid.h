@@ -61,9 +61,6 @@ struct EOabsCalibratedEncoder_hid
     uint8_t  first_valid_data;
     uint16_t invalid_fault_cnt;
     uint16_t timeout_fault_cnt;
-    
-    int32_t ticks_per_revolution;
-	int32_t ticks_per_half_revolution;
 };
 
 struct EOaxleVirtualEncoder_hid

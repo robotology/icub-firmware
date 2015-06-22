@@ -14,10 +14,10 @@ extern "C" {
         
  // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EoCommon.h"
-#include "EOMtheEMSapplCfg_cfg.h"
+//#include "EoCommon.h"
+//#include "EOMtheEMSapplCfg_cfg.h"
     
-#include "EOappEncodersReader.h"
+//#include "EOappEncodersReader.h"
  
  // - public #define  --------------------------------------------------------------------------------------------------
  
@@ -29,13 +29,20 @@ extern "C" {
 //#define SHOULDER_3rd_JOINT_COUPLING
 //#define USE_JACOBIAN
 
-#ifdef ICUB_GENOVA04
+#if     defined(ICUB_MEC_V1) | defined(ICUB_GENOVA04)
     #define V1_MECHANICS
     #define USE_2FOC_FAST_ENCODER
-#else
+#elif   defined(ICUB_MEC_V2) | defined(ICUB_DARMSTADT01)
     #define V2_MECHANICS
     #define USE_2FOC_FAST_ENCODER
+#else
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
 #endif
+
+#if defined(HEAD_V3)
+    #undef USE_2FOC_FAST_ENCODER
+#endif
+//#warning in v3 fare in modo che NON venga definito USE_2FOC_FAST_ENCODER 
 
 #ifdef USE_2FOC_FAST_ENCODER
 //#define USE_4BIT_INC_ENC_PRECISION
@@ -45,16 +52,8 @@ extern "C" {
 #define EMS_FREQUENCY_INT32  1000
 #define EMS_FREQUENCY_FLOAT  1000.0f
 
-// these definitions are obsolete and no more used.
-// these static values are now obtained through the interfaces implemented by EOemsControllerCfg
-#if defined (INC_ENCODERS)
-    #define TICKS_PER_REVOLUTION      28671
-    #define TICKS_PER_HALF_REVOLUTION 14336
-#else    
-    #define TICKS_PER_REVOLUTION      65536
-    #define TICKS_PER_HALF_REVOLUTION 32768
-#endif
-
+#define TICKS_PER_REVOLUTION      65536
+#define TICKS_PER_HALF_REVOLUTION 32768
 #define ENCODER_QUANTIZATION      16
     
 #define VELOCITY_CMD_TIMEOUT      100 // cycles
@@ -66,48 +65,43 @@ extern "C" {
 
 #define MAX_NAXLES 4
 
-#if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 
-    #define ANKLE_BOARD // LEFT
-    #define NAXLES 2
-#elif (9==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define ANKLE_BOARD // RIGHT
-    #define NAXLES 2
-#elif (5==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define WAIST_BOARD
-    #define NAXLES 3
-#elif (1==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define SHOULDER_BOARD // LEFT
-    #define NAXLES 4
-#elif (3==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define SHOULDER_BOARD // RIGHT
-    #define NAXLES 4
-#elif (6==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define UPPERLEG_BOARD // LEFT
-    #define NAXLES 4
-#elif (8==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define UPPERLEG_BOARD // RIGHT
-    #define NAXLES 4
-#elif (2==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (10==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NO_LOCAL_CONTROL
-    #define NAXLES 1
-#elif (12==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NAXLES 2
-    #define DONT_USE_2FOC
-#elif (13==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define NAXLES 2
-    #define DONT_USE_2FOC
-#elif (15==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
-    #define ANKLE_BOARD //it's the most similar to test configuration
-    #define NAXLES 1
-    #define DONT_USE_2FOC      
-#else
-    #error invalid board
-#endif
-
-#ifdef DONT_USE_2FOC
-    #undef USE_2FOC_FAST_ENCODER
-#endif
-
+//#if   (7==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) 
+//    #define ANKLE_BOARD // LEFT
+//    #define NAXLES 2
+//#elif (9==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define ANKLE_BOARD // RIGHT
+//    #define NAXLES 2
+//#elif (5==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define WAIST_BOARD
+//    #define NAXLES 3
+//#elif (1==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define SHOULDER_BOARD // LEFT
+//    #define NAXLES 4
+//#elif (3==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define SHOULDER_BOARD // RIGHT
+//    #define NAXLES 4
+//#elif (6==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define UPPERLEG_BOARD // LEFT
+//    #define NAXLES 4
+//#elif (8==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define UPPERLEG_BOARD // RIGHT
+//    #define NAXLES 4
+//#elif (2==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (4==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (10==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD) || (11==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NO_LOCAL_CONTROL
+//    #define NAXLES 1
+//#elif (12==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NAXLES 2
+//    #define EMSCONTROLLER_DONT_USE_2FOC
+//#elif (13==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NAXLES 2
+//    #define EMSCONTROLLER_DONT_USE_2FOC  
+//#elif (15==EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD)
+//    #define NAXLES 1
+//    #define EMSCONTROLLER_DONT_USE_2FOC  
+//#else
+//    #error invalid board
+//#endif
+ 
 // utilities
     
 #define SET_BITS(mask,bits) mask |=  (bits)
@@ -117,11 +111,11 @@ extern "C" {
 #define LIMIT2(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-
+/* NOT USED
 extern int32_t joint2ticksperrevolution (uint8_t joint_n);
 
 extern eo_appEncReader_enc_type_t joint2encodertype (uint8_t joint_n);
- 
+*/
  #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 

@@ -20,8 +20,6 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 //#include "hal_led.h"
-
-#include "EOemsControllerCfg.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -58,7 +56,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static int32_t normalize_angle(EOabsCalibratedEncoder* o, int32_t a);
+static int32_t normalize_angle(int32_t a);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -96,9 +94,6 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
         o->first_valid_data = 0;
         
         o->state_mask = SM_NOT_READY;
-        
-        o->ticks_per_revolution 		= joint2ticksperrevolution(ID);
-		o->ticks_per_half_revolution 	= o->ticks_per_revolution/2;
     }
 
     return o;
@@ -165,11 +160,11 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         
         if (position < 0)
         {
-            position += o->ticks_per_revolution;
+            position += TICKS_PER_REVOLUTION;
         }
-        else if (position >= o->ticks_per_revolution)
+        else if (position >= TICKS_PER_REVOLUTION)
         {
-            position -= o->ticks_per_revolution;
+            position -= TICKS_PER_REVOLUTION;
         }
         
         o->invalid_fault_cnt = 0;
@@ -223,13 +218,14 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     
     if (!error_mask)
     {        
-        int32_t check = normalize_angle(o,position - o->position_last);
+        int32_t check = normalize_angle(position - o->position_last);
         
         o->position_last = position;
 
+        //make it less sensible! (expecially because incremental encoders has very long steps after the transformation in ICUB degrees)
         if (-MAX_ENC_CHANGE <= check && check <= MAX_ENC_CHANGE)
         {
-            int32_t delta = normalize_angle(o,position - o->position_sure);
+            int32_t delta = normalize_angle(position - o->position_sure);
             
             //if (delta || o->delta)
             if (delta)
@@ -263,7 +259,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
             static uint16_t count = 0;
             count++;
             //we don't want to send up too many messages...
-            if (count == 1000)
+            if (count == 10000)
             {
                 //message "spike encoder error"
                 eOerrmanDescriptor_t descriptor = {0};
@@ -360,11 +356,6 @@ extern int32_t eo_axleVirtualEncoder_GetVel(EOaxleVirtualEncoder* o)
 static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t error_mask)
 {
     if (!o) return;
-    /*
-#ifdef INC_ENCODERS
-    RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
-#endif
-    */
     
     if (error_mask)
     {
@@ -383,12 +374,17 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
         return;
     }
     
-    //for incremental encoders this function has only to set a flag in a bit mask
+	// check if it's working now...
+    // for incremental encoders this function has only to set a flag in a bit mask
+    // how can I detect that the encoder is incremental?
+    
+    //old method using function encoder type dependent
+    /*
     if (joint2encodertype(o->ID) == 2)
     {
         RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
     }
-    
+    */
     // nb: for inc encoders, this part is never executed 
     if (++o->first_valid_data >= 3)
     {
@@ -411,10 +407,10 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
     }
 }
 
-static int32_t normalize_angle(EOabsCalibratedEncoder* o, int32_t a)
+static int32_t normalize_angle(int32_t a)
 {
-    while (a < -o->ticks_per_half_revolution) a += o->ticks_per_revolution;
-    while (a >  o->ticks_per_half_revolution) a -= o->ticks_per_revolution;
+    while (a < -TICKS_PER_HALF_REVOLUTION) a += TICKS_PER_REVOLUTION;
+    while (a >  TICKS_PER_HALF_REVOLUTION) a -= TICKS_PER_REVOLUTION;
 
     return a;
 }

@@ -65,16 +65,16 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOtrajectory* eo_trajectory_New(uint8_t id) 
+extern EOtrajectory* eo_trajectory_New() 
 {
     EOtrajectory *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOtrajectory), 1);
 
     if (o)
     {
         o->pos_min = 0;
-        o->pos_max = joint2ticksperrevolution(id);
-        o->vel_max = o->pos_max/3;
-        o->acc_max = o->pos_max;
+        o->pos_max = TICKS_PER_REVOLUTION;
+        o->vel_max = TICKS_PER_REVOLUTION/3;
+        o->acc_max = TICKS_PER_REVOLUTION;
         
         eo_trajectory_Init(o, 0, 0, 0);
     }
