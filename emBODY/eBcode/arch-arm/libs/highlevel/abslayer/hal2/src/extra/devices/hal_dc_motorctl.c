@@ -406,7 +406,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	TIM8_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Disable; //TIM1 -> TIM_OSSIState_Enable
 	TIM8_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM8_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM8_BDTRInitStructure.TIM_Break = TIM_Break_Enable; // TIM1 -> TIM_Break_Disable
+	TIM8_BDTRInitStructure.TIM_Break =  TIM_Break_Disable; // was enabled with TIM_Break_Enable;
 	TIM8_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_High;
 	TIM8_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
@@ -456,20 +456,20 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     
-    // THIS PROBLEM SEEMS NOT OCCURRING ANYMORE // Don't enable the break interrupt, cause they're always triggered if the motor is not present
-    /* Enable the TIM1 BRK Interrupt */
-    NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure); 
-	
-	/* Enable the TIM8 BRK Interrupt */
-    NVIC_InitStructure.NVIC_IRQChannel = TIM8_BRK_TIM12_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure); 
+//    // THIS PROBLEM SEEMS NOT OCCURRING ANYMORE // Don't enable the break interrupt, cause they're always triggered if the motor is not present
+//    /* Enable the TIM1 BRK Interrupt */
+//    NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//    NVIC_Init(&NVIC_InitStructure); 
+//	
+//	/* Enable the TIM8 BRK Interrupt */
+//    NVIC_InitStructure.NVIC_IRQChannel = TIM8_BRK_TIM12_IRQn;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//    NVIC_Init(&NVIC_InitStructure); 
 	}
     return(hal_res_OK);
 }
@@ -510,7 +510,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int32_t pwmvalue)
     // switch case to set the pwm to the right motor
 	switch (id)
 	{
-		case 0:	   //motor1
+		case 1:	   //motor1
 		{
 			if (pwmvalue>0) 
 			{
@@ -525,7 +525,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int32_t pwmvalue)
 			}
 		}
 		break;
-		case 1:	  //motor2
+		case 0:	  //motor2
 		{
 			if (pwmvalue>0) 
 			{
