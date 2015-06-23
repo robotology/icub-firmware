@@ -333,22 +333,24 @@ extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
   {	
   case 0:
   {
-  temp = TIM_GetCounter(ENCODER1_TIMER);  
+  //temp = TIM_GetCounter(TIM2);  
+      temp = TIM_GetCounter(TIM3);
   }
   break;
   case 1:
   {
-  temp = TIM_GetCounter(ENCODER2_TIMER);  
+  //temp = TIM_GetCounter(TIM3); 
+    temp = TIM_GetCounter(TIM2);      
   }
   break;
   case 2:
   {
-  temp = TIM_GetCounter(ENCODER3_TIMER);  
+  temp = TIM_GetCounter(TIM4);  
   }
   break;
   case 3:
   {
-  temp = TIM_GetCounter(ENCODER4_TIMER);  
+  temp = TIM_GetCounter(TIM5);  
   }
   break;
   default:
@@ -362,6 +364,19 @@ extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
 
 extern void hal_quad_enc_single_init (uint8_t encoder_number)
 {
+#if 0
+    static uint8_t initted = 0;
+    
+    if(1 == initted)
+    {
+        return;
+    }
+    
+    hal_quad_enc_Init();
+    
+    initted = 1;
+    
+#else    
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_ICInitTypeDef TIM_ICInitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -597,6 +612,7 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
         default:
              return;
     }
+#endif    
 }
 
 extern void hal_quad_enc_reset_counter(uint8_t encoder_number)
