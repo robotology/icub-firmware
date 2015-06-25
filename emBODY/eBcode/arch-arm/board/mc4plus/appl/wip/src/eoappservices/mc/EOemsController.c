@@ -304,7 +304,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         
     //#if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) || defined(SHOULDER_BOARD)
     if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_SHOULDER == ems->board) ||
-       (emscontroller_board_FACE_lips == ems->board))  // FACE LIPS has 4 joints that SHOULD be completely independent  
+       (emscontroller_board_FACE_lips == ems->board) || (emscontroller_board_FACE_eyelids_jaw == ems->board))  // FACE LIPS has 4 joints that SHOULD be completely independent  
     {
         uint8_t first = 0;
         uint8_t last = 0;
@@ -651,7 +651,15 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[1] = ems->motor_position[1];
         axle_virt_pos[2] = ems->motor_position[2];
         axle_virt_pos[3] = ems->motor_position[3];
-    }        
+    } 
+    else if(emscontroller_board_FACE_eyelids_jaw == ems->board)
+    {
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = ems->motor_velocity_gbx[1];
+        
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[1];
+    }    
     //#else
         //#error undefined board type
     //#endif
@@ -1020,7 +1028,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         }
         //#endif
         
-        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board))
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board) || (emscontroller_board_FACE_eyelids_jaw == ems->board))
         {
         //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         
@@ -1111,7 +1119,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         //#endif
         }
         
-        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board))
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board) || (emscontroller_board_FACE_eyelids_jaw == ems->board))
         {
         //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
         
@@ -1182,7 +1190,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         //#endif
         }
           
-        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board))
+        if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_lips == ems->board) || (emscontroller_board_FACE_eyelids_jaw == ems->board))
         {
         //#if   defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD)
        
@@ -1319,7 +1327,7 @@ extern void eo_emsController_CheckCalibrations(void)
     
     #else // ! USE_JACOBIAN
     
-    if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board))
+    if((emscontroller_board_UPPERLEG == ems->board) || (emscontroller_board_ANKLE == ems->board) || (emscontroller_board_FACE_eyelids_jaw == ems->board))
     {
     //#if defined(UPPERLEG_BOARD) || defined(ANKLE_BOARD) //|| defined(WAIST_BOARD) || defined(V2_MECHANICS)
         JOINTS(j)

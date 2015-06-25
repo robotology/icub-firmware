@@ -748,6 +748,11 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
             type = emscontroller_board_ANKLE;
         } break;
         
+        case 13:
+        {
+            type = emscontroller_board_FACE_eyelids_jaw;
+        } break;
+        
         case 14:
         {
             type = emscontroller_board_FACE_lips;

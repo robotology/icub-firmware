@@ -674,15 +674,15 @@ extern "C" {
 
 //  <o> RX task stack size <256-4096:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   2048
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_STACKSIZEof   4096
 
 //  <o> DO task stack size <256-4096:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof   2048
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_DO_STACKSIZEof   4096
 
 //  <o> TX task stack size <256-4096:128>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   2048
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_STACKSIZEof   4096
 
 //  </h>stack sizes
 

@@ -404,7 +404,7 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             pwm_motor[3] = pwm_joint[3];
         }
     }        
-    else if(emscontroller_board_ANKLE == o->board)
+    else if((emscontroller_board_ANKLE == o->board) || (emscontroller_board_FACE_eyelids_jaw == o->board))
     {    
     //#elif defined(ANKLE_BOARD)
         {
