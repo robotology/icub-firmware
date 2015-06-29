@@ -508,9 +508,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     {
         //calibration for joint with incremental encoders
         eo_emsController_StartCalibration_type5 (jxx,
-                                                 calibrator->params.any[0],
-                                                 calibrator->params.any[1],
-                                                 calibrator->params.any[2]);
+                                                 calibrator->params.type5.pwmlimit,
+                                                 calibrator->params.type5.velocity,
+                                                 calibrator->params.type5.final_pos);
     }
     else if(calibrator->type == eomc_calibration_type3_abs_sens_digital)
     {
