@@ -159,7 +159,7 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     o->control_mode = eomc_controlmode_calib;
 }
 
-extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int16_t pwmlimit, int16_t vel, int32_t final_position)
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t vel, int32_t final_position)
 {
     if (!o) return;
     

@@ -404,7 +404,7 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             pwm_motor[3] = pwm_joint[3];
         }
     }        
-    else if((emscontroller_board_ANKLE == o->board) || (emscontroller_board_FACE_eyelids_jaw == o->board))
+    else if((emscontroller_board_ANKLE == o->board) || (emscontroller_board_FACE_eyelids_jaw == o->board) || (emscontroller_board_HEAD_neckpitch_neckroll == o->board)) //test
     {    
     //#elif defined(ANKLE_BOARD)
         {
@@ -418,9 +418,15 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         #warning TODO: for head v3
         // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
         // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // mettere formula di disaccoppiamento. probabilmente il neck e' come le prime due righe del waist.         
+        // mettere formula di disaccoppiamento. probabilmente il neck e' come le prime due righe del waist.
+
+        //test, cause some joints are coupled instead
+        pwm_motor[0] = pwm_joint[0];
+        pwm_motor[1] = pwm_joint[1];
+        pwm_motor[2] = pwm_joint[2];
+        pwm_motor[3] = pwm_joint[3];  
     }
-    else if((emscontroller_board_FACE_lips == o->board)) 
+    else if(emscontroller_board_FACE_lips == o->board)
     {
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];
