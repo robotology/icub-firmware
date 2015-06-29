@@ -717,6 +717,7 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
     
     switch(n)
     {
+        // board 2-4-5-10-11 -> NO motion control
         case 1:
         case 3:
         case 9:
@@ -725,50 +726,74 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
             type = emscontroller_board_NO_CONTROL;
         } break;
 
+        /* EMS Boards */
+        
+        // board 1-3 --> shoulders 
         case 0:
         case 2:
         {
             type = emscontroller_board_SHOULDER;
         } break;
 
+        // board 5 --> waist
         case 4:
         {
             type = emscontroller_board_WAIST;
         } break;
 
+        // board 6-8 --> upperlegs
         case 5:
         case 7:
         {
             type = emscontroller_board_UPPERLEG;
         } break;
         
+        // board 7-9 --> ankles
         case 6:
         case 8:
         {
             type = emscontroller_board_ANKLE;
         } break;
         
+        /* MC4plus Boards */
+        
+        // board 12 --> HeadV3: neck (pitch and roll)
+        case 11:
+        {
+            type = emscontroller_board_HEAD_neckpitch_neckroll;
+        } break;
+        
+        // board 13 --> HeadV3: neck (yaw) and eyes
+        case 12:
+        {
+            type = emscontroller_board_HEAD_neckyaw_eyes;
+        } break;
+        
+        // board 14 --> FaceV3: eyelids and jaw
         case 13:
         {
             type = emscontroller_board_FACE_eyelids_jaw;
         } break;
         
+        // board 15 --> FaceV3: lips
         case 14:
         {
             type = emscontroller_board_FACE_lips;
         } break;
-
+        
+        /* experimental boards control */
         case 98:
         {
             type = emscontroller_board_ANKLE;
         } break;
         
+        
         default:
         {
             type = emscontroller_board_NO_CONTROL;
         } break;
+       
     }
-    
     
     return(type);   
 }
