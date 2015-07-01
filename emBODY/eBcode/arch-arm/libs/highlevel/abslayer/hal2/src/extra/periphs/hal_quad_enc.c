@@ -52,8 +52,8 @@
 
 
 #define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
-#define ENCODER1_TIMER TIM2
-#define ENCODER2_TIMER TIM3
+#define ENCODER1_TIMER TIM3
+#define ENCODER2_TIMER TIM2
 #define ENCODER3_TIMER TIM4
 #define ENCODER4_TIMER TIM5
 
@@ -333,24 +333,22 @@ extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
   {	
   case 0:
   {
-  //temp = TIM_GetCounter(TIM2);  
-      temp = TIM_GetCounter(TIM3);
+        temp = TIM_GetCounter(ENCODER1_TIMER);
   }
   break;
   case 1:
   {
-  //temp = TIM_GetCounter(TIM3); 
-    temp = TIM_GetCounter(TIM2);      
+        temp = TIM_GetCounter(ENCODER2_TIMER);      
   }
   break;
   case 2:
   {
-  temp = TIM_GetCounter(TIM4);  
+        temp = TIM_GetCounter(ENCODER3_TIMER);  
   }
   break;
   case 3:
   {
-  temp = TIM_GetCounter(TIM5);  
+        temp = TIM_GetCounter(ENCODER4_TIMER);  
   }
   break;
   default:
@@ -385,8 +383,67 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
     {
         case 0:
         {
-            // Encoder 1 unit connected to TIM2, 4X mode  
-            // ENCODER 1
+            // Encoder 1 unit connected to TIM3, 4X mode  
+            // ENCODER 1 
+            /* TIM3 clock source enable */
+            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+            /* Enable GPIOC, clock */
+            RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOC , ENABLE);
+              
+            GPIO_StructInit(&GPIO_InitStructure);
+            /* Configure PC.06,07 as encoder input */
+            GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6 | GPIO_Pin_7;
+            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+            GPIO_Init(GPIOC, &GPIO_InitStructure);
+              
+            /* Connect TIM pins to AF2 */
+            GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);	
+            GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM3);	
+
+            //#warning -> removed the TIM3 interrupt enable		
+            /* Enable the TIM3 Update Interrupt */
+            //  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+            //  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = TIMx_PRE_EMPTION_PRIORITY;
+            //  NVIC_InitStructure.NVIC_IRQChannelSubPriority = TIMx_SUB_PRIORITY;
+            //  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+            //  NVIC_Init(&NVIC_InitStructure);
+
+            /* Timer configuration in Encoder mode */
+            TIM_DeInit(ENCODER1_TIMER);
+            TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+              
+            TIM_TimeBaseStructure.TIM_Prescaler = 0x0;  // No prescaling 
+            TIM_TimeBaseStructure.TIM_Period = ENCODER_PPR;  
+            TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+            TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   
+            TIM_TimeBaseInit(ENCODER1_TIMER, &TIM_TimeBaseStructure);
+             
+            TIM_EncoderInterfaceConfig(ENCODER1_TIMER, TIM_EncoderMode_TI12, 
+                                         TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+            TIM_ICStructInit(&TIM_ICInitStructure);
+              
+            TIM_ICInitStructure.TIM_ICFilter = ICx_FILTER;
+            TIM_ICInit(ENCODER1_TIMER, &TIM_ICInitStructure);
+              
+            TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+            TIM_ICInit(ENCODER1_TIMER, &TIM_ICInitStructure);
+                  
+            // Clear all pending interrupts
+            // TIM_ClearFlag(ENCODER1_TIMER, TIM_FLAG_Update);
+            // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
+            //Reset counter
+            ENCODER1_TIMER->CNT = 0;
+              
+            TIM_Cmd(ENCODER1_TIMER, ENABLE);
+            break;
+        }
+        case 1:
+        {
+            // Encoder 2 unit connected to TIM2, 4X mode  
+            // ENCODER 2
             /* Configure 
                                      PA0 as PHA 
                                      PB3 as PHB 
@@ -421,65 +478,6 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
             GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_TIM2);	
                 
             /* Timer configuration in Encoder mode */
-            TIM_DeInit(ENCODER1_TIMER);
-            TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-              
-            TIM_TimeBaseStructure.TIM_Prescaler = 0x0;  // No prescaling 
-            TIM_TimeBaseStructure.TIM_Period = ENCODER_PPR;  
-            TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-            TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   
-            TIM_TimeBaseInit(ENCODER1_TIMER, &TIM_TimeBaseStructure);
-             
-            TIM_EncoderInterfaceConfig(ENCODER1_TIMER, TIM_EncoderMode_TI12, 
-                                         TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
-            TIM_ICStructInit(&TIM_ICInitStructure);
-              
-            TIM_ICInitStructure.TIM_ICFilter = ICx_FILTER;
-            TIM_ICInit(ENCODER1_TIMER, &TIM_ICInitStructure);
-              
-            TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-            TIM_ICInit(ENCODER1_TIMER, &TIM_ICInitStructure);
-                  
-            // Clear all pending interrupts
-            // TIM_ClearFlag(ENCODER1_TIMER, TIM_FLAG_Update);
-            // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
-            //Reset counter
-            ENCODER1_TIMER->CNT = 0;
-              
-            TIM_Cmd(ENCODER1_TIMER, ENABLE);
-            break;
-        }
-        case 1:
-        {
-            // Encoder 2 unit connected to TIM3, 4X mode  
-            // ENCODER 2 
-            /* TIM2 clock source enable */
-            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-            /* Enable GPIOC, clock */
-            RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOC , ENABLE);
-              
-            GPIO_StructInit(&GPIO_InitStructure);
-            /* Configure PC.06,07 as encoder input */
-            GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6 | GPIO_Pin_7;
-            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-            GPIO_Init(GPIOC, &GPIO_InitStructure);
-              
-            /* Connect TIM pins to AF2 */
-            GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM3);	
-            GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM3);	
-
-            //#warning -> removed the TIM3 interrupt enable		
-            /* Enable the TIM3 Update Interrupt */
-            //  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-            //  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = TIMx_PRE_EMPTION_PRIORITY;
-            //  NVIC_InitStructure.NVIC_IRQChannelSubPriority = TIMx_SUB_PRIORITY;
-            //  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-            //  NVIC_Init(&NVIC_InitStructure);
-
-            /* Timer configuration in Encoder mode */
             TIM_DeInit(ENCODER2_TIMER);
             TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
               
@@ -500,8 +498,8 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
             TIM_ICInit(ENCODER2_TIMER, &TIM_ICInitStructure);
                   
             // Clear all pending interrupts
-            TIM_ClearFlag(ENCODER2_TIMER, TIM_FLAG_Update);
-            TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
+            // TIM_ClearFlag(ENCODER2_TIMER, TIM_FLAG_Update);
+            // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
             //Reset counter
             ENCODER2_TIMER->CNT = 0;
               

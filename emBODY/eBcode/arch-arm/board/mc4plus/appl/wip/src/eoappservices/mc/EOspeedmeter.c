@@ -374,18 +374,6 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
         return;
     }
     
-	// check if it's working now...
-    // for incremental encoders this function has only to set a flag in a bit mask
-    // how can I detect that the encoder is incremental?
-    
-    //old method using function encoder type dependent
-    /*
-    if (joint2encodertype(o->ID) == 2)
-    {
-        RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
-    }
-    */
-    // nb: for inc encoders, this part is never executed 
     if (++o->first_valid_data >= 3)
     {
         //o->time = 0;
