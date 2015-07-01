@@ -1038,10 +1038,13 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     data[7]=(unsigned char) ((err[triangleN].error_outofrange &0xf)<<4) | err[triangleN].error;
     CAN1_send(PMsgID,1,8,data);
 
-    if ((err[triangleN].error!=error_ok) && (err[triangleN].error != error_notconnected))//do again the configuration since an error has occured
+    if ((err[triangleN].error!=error_ok)  && (err[triangleN].error != error_notconnected))//do again the configuration since an error has occured
     {
         j=(triangleN/4);
-        ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
+        SetCDCoffsetOnAllTriangles(ConValue[0]);
+    //    ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
+	//	board_MODE=CALIB;
+		err[triangleN].error=error_ok;
         return;
     }
 }

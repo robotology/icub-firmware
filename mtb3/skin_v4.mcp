@@ -8,7 +8,7 @@ dir_src=
 dir_bin=../build/
 dir_tmp=
 dir_sin=
-dir_inc=..\canProtocolLib
+dir_inc=..\..\icub-firmware-shared\can\canProtocolLib
 dir_lib=
 dir_lkr=
 [CAT_FILTERS]

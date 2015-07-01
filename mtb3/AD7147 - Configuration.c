@@ -587,7 +587,7 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[STAGE_HIGH_LIMIT_INT]=0x0000;
 	ConfigBuffer[STAGE_COMPLETE_LIMIT_INT]=0xfff;//0x0FFF;
 //	WriteViaI2C(Channel,AD7147_ADD[indexInSet],AMB_COMP_CTRL0, 9, ConfigBuffer, AMB_COMP_CTRL0);
-		WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],PWR_CONTROL, 11, ConfigBuffer, PWR_CONTROL);
+	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],PWR_CONTROL, 11, ConfigBuffer, PWR_CONTROL);
 	// Run data path for all sequences
 	ConfigBuffer[STAGE_CAL_EN]=0x0FFF;//0x0FFF;
 	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);

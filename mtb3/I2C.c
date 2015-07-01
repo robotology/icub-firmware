@@ -833,7 +833,7 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
 	        {
 	            DO_0off;
 	        }
-	    	Wait(0);
+	    	Wait(I2Cbit);
 	        MCO_0 = 1;                //Set SCL
 	        Wait(I2Cbit);//Wait(I2Cbit);
 	        MCO_0 = 0;
@@ -872,7 +872,7 @@ unsigned char SendByteI2CMaster(unsigned char Channel,unsigned char ByteToSend)
 	        {
 	            DO_1off;
 	        }
-	    	Wait(0);
+	    	Wait(I2Cbit); //Wait(0);
 	        MCO_1 = 1;                //Set SCL
 	        Wait(I2Cbit);//Wait(I2Cbit);
 	        MCO_1 = 0;
@@ -935,7 +935,7 @@ unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaN
 	            //DO_0off;
                 SetValReg(sdaNum, 0);
 	        }
-	    	Wait(0);
+	    	Wait(I2Cbit); //Wait(0);
 		
 	     //   Wait(I2Cbit);//Wait(I2Cbit);
 	        MCO_0 = 1;                //Set SCL
