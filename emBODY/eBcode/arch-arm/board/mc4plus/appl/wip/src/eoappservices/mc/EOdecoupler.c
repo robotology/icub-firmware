@@ -393,7 +393,29 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
             if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
         }
-    }        
+    }
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == o->board)
+    {
+        // use following formula:
+        // m0: left motor on neck
+        // m1: rigth motor on neck
+        // j0: pitch (the head moves forward and backwards)
+        // j1: roll (the head moves rigth and left)
+        // j0 = 0.5*m0 - 0.5*m1             (we must move the motors in opposite directions to move head forward or backwards)
+        // j1 = 0.5*m0 + 0.5*m1             (we must move the motors in the same directions to move head left or right)
+        // or:
+        // J = M * A, J = [j0, j1], M = {m0, m1], A = [0.5, -0.5], [0.5, 0.5]]
+        // hence M = J * A^-1, where A^-1 = [[1, 1,], [-1, 1]].
+        // m0 = +j0 + j1
+        // m1 = -j0 + j1
+        
+        // in here i must use the inverse matrix A
+        
+        {
+            if (stiff[0]) {pwm_motor[0] = (+pwm_joint[0]+pwm_joint[1]);} else {pwm_motor[0] = pwm_joint[0];}
+            if (stiff[1]) {pwm_motor[1] = (-pwm_joint[0]+pwm_joint[1]);} else {pwm_motor[1] = pwm_joint[1];}
+        }
+    }   
     else if(emscontroller_board_UPPERLEG == o->board)
     {    
     //#elif defined(UPPERLEG_BOARD)
@@ -404,7 +426,7 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             pwm_motor[3] = pwm_joint[3];
         }
     }        
-    else if((emscontroller_board_ANKLE == o->board) || (emscontroller_board_FACE_eyelids_jaw == o->board) || (emscontroller_board_HEAD_neckpitch_neckroll == o->board)) //test
+    else if((emscontroller_board_ANKLE == o->board) || (emscontroller_board_FACE_eyelids_jaw == o->board)) //test
     {    
     //#elif defined(ANKLE_BOARD)
         {
