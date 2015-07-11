@@ -29,9 +29,9 @@ extern "C" {
 
 //#define ENC_INVALID 0x7FFFFFFF
 
-#define SM_INVALID_FAULT       0x40
-#define SM_TIMEOUT_FAULT       0x80
-#define SM_HARDWARE_FAULT      0xC0
+#define SM_INVALID_FAULT       0x4000
+#define SM_TIMEOUT_FAULT       0x8000
+#define SM_HARDWARE_FAULT      0xC000
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -55,9 +55,9 @@ typedef struct EOaxleVirtualEncoder_hid EOaxleVirtualEncoder;
 extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID);
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder*, int32_t sign);
 extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder*, int32_t pos, uint8_t error_mask);
-extern uint8_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);
-extern uint8_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder*);
-extern uint8_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
+extern uint16_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);
+extern uint16_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder*);
+extern uint16_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o);
 extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder*, int32_t offset);

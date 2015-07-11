@@ -707,7 +707,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //return eo_pid_PWM_piv(o->pidP, o->err, vel_ref-vel);
                 
                 #ifdef EXPERIMENTAL_SPEED_CONTROL
-                return (int16_t)(vel_ref / 10 + err / 2);
+                return (0.1f*vel_ref+0.5f*(float)err);
+                //return eo_pid_experimentalPWM(o->pidP, (float)err, vel_ref);
                 #else
                 return eo_pid_PWM_pid(o->pidP, o->err);
                 #endif
