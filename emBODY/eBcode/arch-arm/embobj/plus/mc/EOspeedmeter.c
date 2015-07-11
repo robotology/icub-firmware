@@ -117,17 +117,17 @@ extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder* o)
     return o->state_mask == SM_OK;
 }
 
-extern uint8_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder* o)
+extern uint16_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder* o)
 {
     return o->state_mask & SM_HARDWARE_FAULT;
 }
 
-extern uint8_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder* o)
+extern uint16_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder* o)
 {
     return o->state_mask & SM_TIMEOUT_FAULT;
 }
 
-extern uint8_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder* o)
+extern uint16_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder* o)
 {
     return o->state_mask & SM_INVALID_FAULT;
 }

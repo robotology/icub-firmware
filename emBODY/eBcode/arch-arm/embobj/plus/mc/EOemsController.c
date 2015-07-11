@@ -70,6 +70,10 @@
 #define AEA_ABS_ENC_INVALID_DATA 0x4000
 #define AEA_ABS_ENC_TIMEOUT      0x8000
 
+//#define SM_INVALID_FAULT       0x4000
+//#define SM_TIMEOUT_FAULT       0x8000
+//#define SM_HARDWARE_FAULT      0xC000
+
 #define MOTOR_EXTERNAL_FAULT     0x00000004
 #define MOTOR_OVERCURRENT_FAULT  0x00000008
 #define MOTOR_I2T_LIMIT_FAULT    0x00020000
@@ -1270,202 +1274,23 @@ __weak extern void eo_emsController_hid_userdef_set_motor_running(EOemsControlle
 
 void config_2FOC(uint8_t motor)
 {
-    //eo_emsController_hid_userdef_config_motor(ems, motor);
-    
-    //if (ems->act != emscontroller_actuation_2FOC) return;
-    
-    //eOmc_i2tParams_t i2t;
-    //icubCanProto_current_t max_current;
-    
-    int8_t KpKiKdKs[7];
-    ((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    ((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-               KpKiKdKs [6] = 10; // shift
-    
-    uint32_t max_current = 5000; // 5A
-    
-    #define HAS_QE      0x0001
-    #define HAS_HALL    0x0002
-    #define HAS_TSENS   0x0004
-
-    uint8_t motor_config[6];
-    motor_config[0] = HAS_QE|HAS_HALL;
-    *(int16_t*)(motor_config+1) = ems->motor_config_rotorencoder[motor];//-14400;//-8192;
-    *(int16_t*)(motor_config+3) = 0; // offset (degrees)
-    motor_config[5] = 8; // num motor poles
-    
-    #if defined(USE_CANCOMM_V2)
-
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    
-    eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
-    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    cmdPid.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
-    
-    eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
-    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    cmdMaxCurrent.value = &max_current;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
-
-    eOcanprot_command_t cmdMotorConfig;
-    cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
-    cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-    cmdMotorConfig.value = motor_config;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);      
-
-    #else
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    eOappTheDB_jointOrMotorCanLocation_t canLoc;
-    eOicubCanProto_msgDestination_t msgdest;
-
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-    
-    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
-    
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-     
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, KpKiKdKs);
-
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &max_current);
-
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, motor_config);
-
-    #endif
-    
-    eo_motors_new_state_req(ems->motors, motor, icubCanProto_controlmode_idle);
+    eo_emsController_hid_userdef_config_motor(ems, motor);
 }
 
 void set_2FOC_idle(uint8_t motor)
 {
-    //eo_emsController_hid_userdef_set_motor_idle(ems, motor);
-    
-    //if (ems->act != emscontroller_actuation_2FOC) return;
-    
-    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_idle;
-
-    #if defined(USE_CANCOMM_V2)
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    command.value = &controlmode_2foc;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-    #else
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()); 
-    eOappTheDB_jointOrMotorCanLocation_t canLoc;
-    eOicubCanProto_msgDestination_t msgdest;
-    
-    eOicubCanProto_msgCommand_t msgCmd =
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-    
-    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
-    
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-    
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE; //+
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
-    #endif
-    
-    eo_motors_new_state_req(ems->motors, motor, icubCanProto_controlmode_idle);
-    
-    // no need
-    //eo_motor_set_motor_status(ems->motors, motor, 0);
+    eo_emsController_hid_userdef_set_motor_idle(ems, motor);
 }
 
 void force_2FOC_idle(uint8_t motor)
 {
-    //eo_emsController_hid_userdef_force_motor_idle(ems, motor);
-    
-    //if (ems->act != emscontroller_actuation_2FOC) return;
-    
-    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_forceIdle;
-    
-    #if defined(USE_CANCOMM_V2)
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    command.value = &controlmode_2foc;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-    #else
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle()); 
-    eOappTheDB_jointOrMotorCanLocation_t canLoc;
-    eOicubCanProto_msgDestination_t msgdest;
-    
-    eOicubCanProto_msgCommand_t msgCmd =
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-    
-    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
-    
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-    
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE; //+
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc); //+
-    #endif
-    
-    eo_motors_new_state_req(ems->motors, motor, icubCanProto_controlmode_idle);
-    
-    // no need
-    //eo_motor_set_motor_status(ems->motors, motor, 0);
+    eo_emsController_hid_userdef_force_motor_idle(ems, motor);
 }
 
 void set_2FOC_running(uint8_t motor)
 {
-    //eo_emsController_hid_userdef_set_motor_running(ems, motor);
+    eo_emsController_hid_userdef_set_motor_running(ems, motor);
     
-    //if (ems->act != emscontroller_actuation_2FOC) return;
-    
-    icubCanProto_controlmode_t controlmode_2foc = icubCanProto_controlmode_openloop;
-    
-    #ifdef EXPERIMENTAL_SPEED_CONTROL
-    controlmode_2foc = icubCanProto_controlmode_velocity;
-    #endif
-    
-    #if defined(USE_CANCOMM_V2)
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    command.value = &controlmode_2foc;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-    #else
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    
-    eOappTheDB_jointOrMotorCanLocation_t canLoc;
-    eOicubCanProto_msgDestination_t msgdest;
-    
-    eOicubCanProto_msgCommand_t msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-    
-    eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), motor,  &canLoc, NULL);
-    
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-   
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
-    #endif
-
-    eo_motors_new_state_req(ems->motors, motor, icubCanProto_controlmode_openloop);
 }
     
 /*
