@@ -87,6 +87,7 @@ struct EOemsController_hid
     eObool_t          motor_config_hasHallSensor[MAX_NAXLES];
     eObool_t          motor_config_hasTempSensor[MAX_NAXLES];
     eObool_t          motor_config_hasRotorEncoder[MAX_NAXLES];
+    eObool_t          motor_config_hasRotorEncoderIndex[MAX_NAXLES];
     
     //float torque_meas[NJOINTS];
 }; 
