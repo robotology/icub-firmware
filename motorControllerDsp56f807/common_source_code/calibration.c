@@ -324,10 +324,21 @@ void helper_calib_abs_digital_coupled_wrist_v2(byte channel, Int16 param1,Int16 
  ****************************************************************/
 void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
 {
+
+//-------------------------------
+// 3.00 4DC
+//-------------------------------
+#if VERSION == 0x0300
+	 
+	if (type==CALIB_ABS_DIGITAL ) 
+	{
+		helper_calib_hall_digital (channel, param1, param2, param3);				
+	}
+	
 //-------------------------------
 // 1.11 4DC
 //-------------------------------
-#if VERSION == 0x0111
+#elif VERSION == 0x0111
 	 
 	if (type==CALIB_HARD_STOPS)	helper_calib_hard_stops (channel, param1, param2,param3);
 

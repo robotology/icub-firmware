@@ -104,6 +104,8 @@ Int16 _version = 0x0215;
 Int16 _version = 0x0228;
 #elif VERSION == 0x0230
 Int16 _version = 0x0230;
+#elif VERSION == 0x0300
+Int16 _version = 0x0300;
 #endif
 #ifndef VERSION
 #	error "No valid version specified"
@@ -384,6 +386,13 @@ void main(void)
 		/* read absolute position sensors*/
 #if VERSION == 0x0119
 		_position[3]= extract_h( compute_filt_pos(get_position_abs_analog(3)>>3,3));	
+#endif
+
+#if VERSION == 0x0300
+		_position[0]=  get_position_abs_analog(0) ;	
+		_position[1]=  get_position_abs_analog(1) ;	
+		_position[2]=  get_position_abs_analog(2) ;	
+		_position[3]=  get_position_abs_analog(3) ;	
 #endif
 
 #if (VERSION == 0x0128 || VERSION == 0x0228) 
