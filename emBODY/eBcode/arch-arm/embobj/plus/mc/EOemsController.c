@@ -151,6 +151,7 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOe
         ems->motor_config_hasHallSensor[j] = eobool_false;
         ems->motor_config_hasRotorEncoder[j] = eobool_false;
         ems->motor_config_hasTempSensor[j] = eobool_false;
+        ems->motor_config_hasRotorEncoderIndex[j] = eobool_false;
         ems->motor_config_maxcurrentofmotor[j] = 0;
         ems->motor_config_maxvelocityofmotor[j] = 0;
         ems->motor_config_motorPoles[j] = 0;
@@ -1209,7 +1210,7 @@ extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t m
 {
     if (ems)
     {
-      ems->motor_config_rotorencoder[joint]=motorconfig.rotorencoder;
+      ems->motor_config_rotorencoder[joint]=motorconfig.rotorEncoderResolution; //@@@ checkme
       ems->motor_config_gearbox_ratio[joint]=motorconfig.gearboxratio;
       //placeholder filler01
       ems->motor_config_maxvelocityofmotor[joint]=motorconfig.maxvelocityofmotor;
@@ -1219,6 +1220,7 @@ extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t m
       ems->motor_config_hasHallSensor[joint]=motorconfig.hasHallSensor;
       ems->motor_config_hasTempSensor[joint]=motorconfig.hasTempSensor;
       ems->motor_config_hasRotorEncoder[joint]=motorconfig.hasRotorEncoder;
+      ems->motor_config_hasRotorEncoderIndex[joint]=motorconfig.hasRotorEncoderIndex;
         
       config_2FOC(joint);
     }
