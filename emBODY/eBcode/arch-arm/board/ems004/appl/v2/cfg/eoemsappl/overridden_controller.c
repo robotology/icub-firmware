@@ -92,7 +92,8 @@ extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint
     ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
                KpKiKdKs [6] = 10; // shift
     
-    uint32_t max_current = 5000; // 5A
+    uint32_t max_current = ctrl->motor_config_maxcurrentofmotor[motor]; 
+    /**/ max_current = 5000; // 5A
     
     #define HAS_QE      0x0001
     #define HAS_HALL    0x0002
@@ -100,10 +101,18 @@ extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint
     #define USE_INDEX   0x0008
 
     uint8_t motor_config[6];
-    motor_config[0] = HAS_QE|HAS_HALL|USE_INDEX;
+    motor_config[0] = 0; // HAS_QE|HAS_HALL;
+    if (ctrl->motor_config_hasRotorEncoder[motor])        motor_config[0] |= HAS_QE;
+    if (ctrl->motor_config_hasHallSensor[motor])          motor_config[0] |= HAS_HALL;
+    if (ctrl->motor_config_hasRotorEncoderIndex[motor])   motor_config[0] |= USE_INDEX;
+    if (ctrl->motor_config_hasTempSensor[motor])          motor_config[0] |= HAS_TSENS;
+    /**/ motor_config[0] = HAS_QE|HAS_HALL;
+    
     *(int16_t*)(motor_config+1) = ctrl->motor_config_rotorencoder[motor];//-14400;//-8192;
     *(int16_t*)(motor_config+3) = 0; // offset (degrees)
-    motor_config[5] = 8; // num motor poles
+    
+    motor_config[5] = ctrl->motor_config_motorPoles[motor];
+    /**/ motor_config[5] = 8;
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     

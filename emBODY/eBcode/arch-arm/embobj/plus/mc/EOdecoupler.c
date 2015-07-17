@@ -104,7 +104,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
     return o;
 }
 
-extern uint8_t eo_motors_getQEError(EOmotors *o, uint8_t motor)
+extern uint32_t eo_motors_getQEError(EOmotors *o, uint8_t motor)
 {
     return o->motor_qe_error[motor];
 }
@@ -142,7 +142,7 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)
 
     o->motor_run_state[m] = state[0];
     o->motor_fault_mask[m] = ((uint32_t*)state)[1];
-    o->motor_qe_error[m] = state[1];
+    o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1];
 }
 
 #include "EoError.h"
