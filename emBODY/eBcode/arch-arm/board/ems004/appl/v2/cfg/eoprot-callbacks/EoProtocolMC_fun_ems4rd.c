@@ -228,7 +228,7 @@ const eOmc_motor_t motor_default_value =
             .filler =                {0xf1, 0xf2, 0xf3}
         },
         .gearboxratio =              0,
-        .rotorencoder =              0,
+        .rotorEncoderResolution =    0,
         .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
