@@ -51,7 +51,9 @@
 #define ICx_FILTER          (u8) 8 // 8<-> 670nsec
 
 
-#define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
+//#define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
+#define ENCODER_PPR (256*1000)
+#define ENCODER_START_VAL (32*1000)
 #define ENCODER1_TIMER TIM3
 #define ENCODER2_TIMER TIM2
 #define ENCODER3_TIMER TIM4
@@ -131,7 +133,7 @@ extern void hal_quad_enc_Init(void)
  // TIM_ClearFlag(ENCODER1_TIMER, TIM_FLAG_Update);
  // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER1_TIMER->CNT = 0;
+  ENCODER1_TIMER->CNT = ENCODER_START_VAL;
   
   TIM_Cmd(ENCODER1_TIMER, ENABLE);
 
@@ -189,7 +191,7 @@ extern void hal_quad_enc_Init(void)
   TIM_ClearFlag(ENCODER2_TIMER, TIM_FLAG_Update);
   TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER2_TIMER->CNT = 0;
+  ENCODER2_TIMER->CNT = ENCODER_START_VAL;
   
   TIM_Cmd(ENCODER2_TIMER, ENABLE);
 }
@@ -238,7 +240,7 @@ extern void hal_quad_enc_Init(void)
  // TIM_ClearFlag(ENCODER3_TIMER, TIM_FLAG_Update);
  // TIM_ITConfig(ENCODER3_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER3_TIMER->CNT = 0;
+  ENCODER3_TIMER->CNT = ENCODER_START_VAL;
   
   TIM_Cmd(ENCODER3_TIMER, ENABLE);
 }
@@ -287,7 +289,7 @@ extern void hal_quad_enc_Init(void)
  // TIM_ClearFlag(ENCODER4_TIMER, TIM_FLAG_Update);
  // TIM_ITConfig(ENCODER4_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER4_TIMER->CNT = 0;
+  ENCODER4_TIMER->CNT = ENCODER_START_VAL;
   
   TIM_Cmd(ENCODER4_TIMER, ENABLE);
 }	
@@ -435,7 +437,7 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
             // TIM_ClearFlag(ENCODER1_TIMER, TIM_FLAG_Update);
             // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
             //Reset counter
-            ENCODER1_TIMER->CNT = 0;
+            ENCODER1_TIMER->CNT = ENCODER_START_VAL;
               
             TIM_Cmd(ENCODER1_TIMER, ENABLE);
             break;
@@ -501,7 +503,7 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
             // TIM_ClearFlag(ENCODER2_TIMER, TIM_FLAG_Update);
             // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
             //Reset counter
-            ENCODER2_TIMER->CNT = 0;
+            ENCODER2_TIMER->CNT = ENCODER_START_VAL;
               
             TIM_Cmd(ENCODER2_TIMER, ENABLE);
             break;
@@ -552,7 +554,7 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
              // TIM_ClearFlag(ENCODER3_TIMER, TIM_FLAG_Update);
              // TIM_ITConfig(ENCODER3_TIMER, TIM_IT_Update, ENABLE);
              //Reset counter
-             ENCODER3_TIMER->CNT = 0;
+             ENCODER3_TIMER->CNT = ENCODER_START_VAL;
               
              TIM_Cmd(ENCODER3_TIMER, ENABLE);
              break;
@@ -602,7 +604,7 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
              // TIM_ClearFlag(ENCODER4_TIMER, TIM_FLAG_Update);
              // TIM_ITConfig(ENCODER4_TIMER, TIM_IT_Update, ENABLE);
              //Reset counter
-             ENCODER4_TIMER->CNT = 0;
+             ENCODER4_TIMER->CNT = ENCODER_START_VAL;
               
              TIM_Cmd(ENCODER4_TIMER, ENABLE);
              break;
