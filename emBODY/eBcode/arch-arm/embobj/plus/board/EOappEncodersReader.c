@@ -43,6 +43,8 @@
 #include "EOemsControllerCfg.h"
 #include "osal.h"
 
+#include "EoProtocol.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -91,6 +93,8 @@ static void s_eo_appEncReader_prepareSPIEncodersList(EOappEncReader *p, EOappEnc
 static void s_eo_appEncReader_configure_initSPIConnectedEncoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
 static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error);
 static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p);
+
+static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t joint_number);
 
 //static void s_eo_appEncReader_check(EOappEncReader *p);
 
@@ -278,6 +282,19 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 //*value <<= 4; // 65536 ticks/revolution normalization;
                 val_raw = (val_raw>>2) & 0xFFF0;
                 *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
+                // marco.accame: hal_encoder_get_value() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
+                // only the 12 most significant bits contain a position reading. to obtain the ticks we should do:
+                // ticks = (val_raw >> 6) & 0x0FFF;
+                // the resolution is now 4096 ticks per revolution.
+                // however, wrong or rigth, historically there has been representation of AEA readings with resolution of 16 bits per revolution, so that they are represented in icub-degrees.
+                // hence a further factor 16 (a shift of 4) is applied:
+                // ticks <<= 4;
+                // all this is equivalent to perform only one shift of 2 and to set to zero the least significant 4 bits
+                // val_raw = (val_raw>>2) & 0xFFF0;
+                
+                // marco.accame: if we want to rescale the aea reading using the GENERAL:Encoders factor, then
+                // instead of the RESCALE_IN...  macro we use the following:
+                // *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);                
                 break;
             }   			
 
@@ -317,8 +334,10 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 *primary_value = 0;
                 #else
                 val_raw = hal_quad_enc_getCounter(this_joint.primary_enc_position);
-                val_raw = val_raw & 0xFFFF;
-                *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                //val_raw = val_raw & 0xFFFF;
+                //*primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                // marco.accame: by this we use the encoder ticks and rescale them in icubdegrees usin the factor in GENERAL:Encoders
+                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);
                 #endif
                 res1 = eores_OK;
                 break;
@@ -794,6 +813,80 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p)
         */
     }
 }
+
+
+#undef TEST_THE_RESCALE
+
+static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t joint_number)
+{
+#if defined(TEST_THE_RESCALE)
+
+// define/undef macros used for test in here
+#define DONT_RESCALE
+
+#if defined(DONT_RESCALE)
+    //return(val_raw);
+    const float tacchePERgrado = 293.333f;
+    const float icubdegreePERgrado = 182.044;
+    float tmp = (float)val_raw;
+    tmp = tmp / tacchePERgrado;
+    
+    tmp *= icubdegreePERgrado;
+    
+    const float factorFROMtaccheTOicubdegree = 0.6206; // [icubdeg/tacche]
+    
+    const float factorFROMicubdegreeTOtacche = 1.611; // [tacche/icubdegree]
+    
+    tmp = val_raw * factorFROMtaccheTOicubdegree;
+    
+    return(tmp);
+    
+#elif defined(OLD_RESCALE)  
+    return(RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]));
+#endif    
+
+#else
+
+    // this is the correct code: we divide by the encoderconversionfactor ...
+    // formulas are:
+    // in xml file there is GENERAL:Encoders = td expressed in [ticks/deg]
+    // robotInterface sets joint->config.encoderconversionfactor = (td / idegconv), expressed in [ticks/icubdeg]
+    // idegconv = 182.044 = (64*1024/360) is the conversion from degrees to icubdeg and is expressed as [icubdeg/deg]
+    // thus, to obtain the icub-degress in here we must divide the reading of the encoder expressed in [ticks] by
+    // divider = joint->config.encoderconversionfactor.
+
+    // this code does apply also to AEA encoders. 
+    // so far the hal_encoder_get_value() has retrieved ticks with a resulution of 64K ticks / 360 degrees (the upscale from 16K to 64 is done internally)
+    // in such a case the GENERAL:Encoders value in xml must be 182.044, so that divider = 1.
+    // in cases where we want to apply a motor-reduction (e.g., in eyelids there is 100/42 between the aea and the joint) we may put it inside this parameter.
+
+
+    uint32_t retval = val_raw;
+    
+    eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint_number);
+    
+    float divider = 1.0f;
+    
+    if(NULL == joint)
+    {
+        return(2000);
+    }
+    
+    divider = eo_common_Q17_14_to_float(joint->config.encoderconversionfactor);
+    
+    if(0.0f == divider)
+    {
+        return(3000);       
+    }
+    
+    retval = (float)val_raw / divider; 
+    
+    return(retval);
+
+#endif
+}
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
