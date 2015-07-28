@@ -1355,14 +1355,14 @@ void set_2FOC_running(uint8_t motor)
 */
 
  void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault_mask_j)
- {            
-    eObool_t managed = eobool_false;
+ {
+    //eObool_t managed = eobool_false;
     uint64_t par64 = (((uint64_t)ems_fault_mask_j)<<32)|(uint64_t)motor_fault_mask_j;
      
     // 2FOC ERRORS
     if (motor_fault_mask_j & MOTOR_EXTERNAL_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j;
         descriptor.par64 = par64;
@@ -1370,11 +1370,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_external_fault);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_EXTERNAL_FAULT;
     }
         
     if (motor_fault_mask_j & MOTOR_OVERCURRENT_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1382,11 +1383,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_overcurrent);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_OVERCURRENT_FAULT;
     }
     
     if (motor_fault_mask_j & MOTOR_I2T_LIMIT_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1394,11 +1396,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_i2t_limit);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_I2T_LIMIT_FAULT;
     }
     
     if (motor_fault_mask_j & MOTOR_HALLSENSORS_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1406,11 +1409,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_hallsensors);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_HALLSENSORS_FAULT;
     }
     
     if (motor_fault_mask_j & MOTOR_QENCODER_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = eo_motors_getQEError(ems->motors, j);
@@ -1418,11 +1422,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_QENCODER_FAULT;
     }
     
     if (motor_fault_mask_j & MOTOR_CAN_GENERIC_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1430,13 +1435,14 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_generic);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_CAN_GENERIC_FAULT;
     }
     
     // BOARD ERRORS
     
     if (ems_fault_mask_j & MOTOR_CAN_NOT_RESPONDING)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1444,11 +1450,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_no_answer);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        ems_fault_mask_j &= ~MOTOR_CAN_NOT_RESPONDING;
     }
     
     if (ems_fault_mask_j & MOTOR_CAN_INVALID_PROT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1456,11 +1463,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_can_invalid_prot);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        ems_fault_mask_j &= ~MOTOR_CAN_INVALID_PROT;
     }
     
     if (ems_fault_mask_j & AXIS_TORQUE_SENS_FAULT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1468,11 +1476,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        ems_fault_mask_j &= ~AXIS_TORQUE_SENS_FAULT;
     }
     
     if (ems_fault_mask_j & AEA_ABS_ENC_INVALID_DATA)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1480,11 +1489,12 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_invalid);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        ems_fault_mask_j &= ~AEA_ABS_ENC_INVALID_DATA;
     }
     
     if (ems_fault_mask_j & AEA_ABS_ENC_TIMEOUT)
     {
-        managed = eobool_true;
+        //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
         descriptor.par64 = par64;
@@ -1492,9 +1502,26 @@ void set_2FOC_running(uint8_t motor)
         descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_timeout);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        ems_fault_mask_j &= ~AEA_ABS_ENC_TIMEOUT;
     }
     
-    if (!managed)
+    if (ems_fault_mask_j & MOTOR_WRONG_STATE)
+    {
+        //managed = eobool_true;
+        eOerrmanDescriptor_t descriptor = {0};
+        descriptor.par16 = j; // unless required
+        uint8_t state; 
+        uint8_t state_req;
+        eo_motor_get_motor_status(ems->motors, j, &state, &state_req);
+        descriptor.par64 = ((((uint64_t)MOTOR_WRONG_STATE))<<32)|(((uint64_t)state_req)<<8)|((uint64_t)state);
+        descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
+        descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
+        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_generic_error);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        ems_fault_mask_j &= ~MOTOR_WRONG_STATE;
+    }
+    
+    if (ems_fault_mask_j || motor_fault_mask_j)
     {
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
