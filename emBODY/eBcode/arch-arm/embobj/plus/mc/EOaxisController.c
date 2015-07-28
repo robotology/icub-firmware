@@ -147,7 +147,7 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     }
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
-    o->control_mode = eomc_controlmode_calib;
+    //o->control_mode = eomc_controlmode_calib;
 }
 
 extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel)
@@ -603,6 +603,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
     
     switch (o->control_mode)
     {
+        case eomc_controlmode_notConfigured:
         case eomc_controlmode_hwFault:
             return 0;
         

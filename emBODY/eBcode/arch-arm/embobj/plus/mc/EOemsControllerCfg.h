@@ -63,7 +63,7 @@ extern "C" {
 #define TORQUE_SENSOR_TIMEOUT     100 // cycles
 #define ENCODER_TIMEOUT            50 // cycles
 
-#define NOMINAL_CURRENT     10000
+#define NOMINAL_CURRENT     30000
 
 #define MAX_NAXLES 4
 
