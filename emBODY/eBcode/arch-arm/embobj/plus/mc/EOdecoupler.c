@@ -112,7 +112,15 @@ extern uint32_t eo_motors_getQEError(EOmotors *o, uint8_t motor)
 extern void eo_motors_new_state_req(EOmotors *o, uint8_t motor, uint8_t control_mode)
 {
     o->motor_run_state_req[motor] = control_mode;
-    o->motor_run_state_req_wdog[motor] = 50;
+    
+    if (o->motor_run_state[motor] == icubCanProto_controlmode_notConfigured)
+    {
+        o->motor_run_state_req_wdog[motor] = 250;
+    }
+    else
+    {
+        o->motor_run_state_req_wdog[motor] = 50;
+    }
 }
 
 extern void eo_motors_rearm_wdog(EOmotors *o, uint8_t motor)
@@ -134,6 +142,12 @@ extern void eo_motors_check_wdog(EOmotors *o)
 extern eObool_t eo_motors_are_coupled(EOmotors *o, uint8_t ma, uint8_t mb)
 {
     return o->J[ma][mb] || o->J[mb][ma];
+}
+
+extern void eo_motor_get_motor_status(EOmotors *o, uint8_t m, uint8_t *state, uint8_t *state_req)
+{
+    *state = o->motor_run_state[m];
+    *state_req = o->motor_run_state_req[m];
 }
 
 extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)
@@ -160,15 +174,7 @@ extern eObool_t eo_motor_check_state_req(EOmotors *o, uint8_t m)
     }
     
     if (o->motor_run_state_last[m] != o->motor_run_state[m])
-    {
-        eOerrmanDescriptor_t descriptor = {0};
-        descriptor.par16 = m; // unless required
-        descriptor.par64 = (((uint16_t)(o->motor_run_state[m]))<<8)||(o->motor_run_state_req[m]);
-        descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
-        descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
-        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_generic_error);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-                
+    {                
         return eobool_true;
     }
     
@@ -177,16 +183,6 @@ extern eObool_t eo_motor_check_state_req(EOmotors *o, uint8_t m)
         --o->motor_run_state_req_wdog[m];
         
         return eobool_false;
-    }
-    
-    {
-        eOerrmanDescriptor_t descriptor = {0};
-        descriptor.par16 = m; // unless required
-        descriptor.par64 = (((uint16_t)(o->motor_run_state[m]))<<8)||(o->motor_run_state_req[m]);
-        descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
-        descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
-        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_generic_error);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
     }
     
     return eobool_true;
