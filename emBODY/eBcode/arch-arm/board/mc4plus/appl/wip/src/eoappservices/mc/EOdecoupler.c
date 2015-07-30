@@ -409,11 +409,12 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         // m0 = +j0 + j1
         // m1 = -j0 + j1
         
-        // in here i must use the inverse matrix A
-        
+        // in here i must use the inverse matrix A ....
+        // however, as for the second joint we use a negative value of encoderconversionfactor in xml files, if we also want to keep the same sign 
+        // of the kp in PID then the matrix is [[-1 -1] [+1 -1]]        
         {
-            if (stiff[0]) {pwm_motor[0] = (+pwm_joint[0]+pwm_joint[1]);} else {pwm_motor[0] = pwm_joint[0];}
-            if (stiff[1]) {pwm_motor[1] = (-pwm_joint[0]+pwm_joint[1]);} else {pwm_motor[1] = pwm_joint[1];}
+            if (stiff[0]) {pwm_motor[0] = (-pwm_joint[0]-pwm_joint[1]);} else {pwm_motor[0] = pwm_joint[0];}
+            if (stiff[1]) {pwm_motor[1] = (+pwm_joint[0]-pwm_joint[1]);} else {pwm_motor[1] = pwm_joint[1];}
         }
     }   
     else if(emscontroller_board_UPPERLEG == o->board)
@@ -437,16 +438,47 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
     }
     else if((emscontroller_board_HEAD_neckyaw_eyes == o->board)) 
     {
-        #warning TODO: for head v3
-        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // mettere formula di disaccoppiamento. probabilmente il neck e' come le prime due righe del waist.
+        // joints 0 and 1 are independent, 2 and 3 are dependent.
 
-        //test, cause some joints are coupled instead
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];
-        pwm_motor[2] = pwm_joint[2];
-        pwm_motor[3] = pwm_joint[3];  
+        
+        // for j2 and j3 ...
+        
+        // use following formula:
+        // m2: motor position of left eye (as read by encoder)              (L)
+        // m3: motor position of rigth eye (as read by encoder)             (R)
+        // e2: version of eyes                                              (Vs)
+        // e3: vergence of eyes                                             (Vg)
+        // e2 = 0.5*m2 + 0.5*m3             (we must move the motors in the same directions to move eyes to follow a direction)
+        // e3 = 1.0*m2 - 1.0*m3             (we must move the motors in the opposite directions to do convergence or divergence)
+        // or:
+        // E = A * M, E = [e2, e3], M = {m2, m3], A = [0.5, +0.5], [1.0, -1.0]]
+        // hence M = E * A^-1, where A^-1 = [[1, 0.5,], [1, -0.5]].
+        // m2 = +e2 + e3
+        // m3 = e2 - 0.5 * e3
+        
+        // in here i must use the inverse matrix A
+        {
+            float pwm2jo = pwm_joint[2];
+            float pwm3jo = pwm_joint[3];
+            uint8_t virtualCalibrationInProgress = 0;
+            // notyetbothcalibrated = (0 == pwm2jo) || (0 == pwm3jo); /// qui non siamo sicuri, meglio forse usare una formula piu' complessa.
+            
+            virtualCalibrationInProgress = eo_emsController_IsVirtualCalibrationInProgress();
+            
+            if(1 == virtualCalibrationInProgress)
+            {
+                pwm_motor[2] = pwm_joint[2];
+                pwm_motor[3] = pwm_joint[3];                
+            }
+            else
+            {
+                // case of mapping: rigth -> [+45, -45], nose, [+45, -45] <- left (the +45 is toward the direction of motor and goes towards the rigth).                
+                if (stiff[2]) {pwm_motor[2] = ( (+1.500f)*pwm2jo + (-1.000f)*pwm3jo);} else {pwm_motor[2] = pwm_joint[2];}
+                if (stiff[3]) {pwm_motor[3] = ( (+1.500f)*pwm2jo + (+1.000f)*pwm3jo);} else {pwm_motor[3] = pwm_joint[3];}   
+            }
+        }  
     }
     else if(emscontroller_board_FACE_lips == o->board)
     {
