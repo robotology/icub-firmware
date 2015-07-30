@@ -78,6 +78,9 @@ typedef struct EOaxisController_hid EOaxisController;
  **/
 extern EOaxisController* eo_axisController_New(uint8_t);
 
+
+extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o);
+
 //extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
@@ -137,6 +140,8 @@ extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o);
 
 extern int32_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *enc_pos); // shoulder joint 2 only
 extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos); //axis controlled by incremental encoders 
+
+extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisController *o2, EOaxisController *o3, int32_t current_pos2, int32_t current_pos3, int joint);
 
 /** @}            
     end of group eo_axisController  

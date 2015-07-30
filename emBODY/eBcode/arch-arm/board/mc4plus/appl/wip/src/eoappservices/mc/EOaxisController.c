@@ -128,9 +128,19 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->pos_to_reach = 0;
         o->offset = 0;
         o->goback_vel = 0;
+        o->isvirtuallycoupled = 0;
+        o->hardwarelimitisreached = 0;
     }
 
     return o;
+}
+
+extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o)
+{   // imposes that this axis is virtually coupled (on the head v3 only rigth and left eyes are virtually coupled)
+    if (!o) return;
+    
+    o->isvirtuallycoupled = 1;    
+    
 }
 
 extern eObool_t eo_axisController_IsOk(EOaxisController* o)
@@ -185,6 +195,9 @@ extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_
     o->offset = 0;
     
     o->control_mode = eomc_controlmode_calib;
+    
+    // reset hwlimit reached
+    o->hardwarelimitisreached =0;
 }
 
 extern void eo_axisController_SetCalibrated(EOaxisController *o)
@@ -627,6 +640,14 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             //calib type 5
             if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
             {
+                if((1 == o->isvirtuallycoupled) && (1 == o->hardwarelimitisreached))
+                {   
+                    // if in here, then it means that the calibration for one eye is terminated but the calib for the
+                    // other eye is not terminated yet.
+                    // TAG-XXX
+                    return 0;                    
+                }
+                
                 if (s_eo_axisController_isHardwareLimitReached(o))
                 {
                     // here I should only set the final position (the one in which the hardware limit is reached) to the value indicated in param3 of the calib
@@ -662,12 +683,24 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     eo_trajectory_Stop(o->trajectory, new_pos);
                     o->err = 0;
                     
-                    eo_axisController_SetCalibrated (o);
-                    o->control_mode = eomc_controlmode_position;
                     
-                    // acemor: define how to go back                 
+                    // we set true this flag, so that for teh case of virtually coupled joint 
+                    // the next time we call the function we just return 0 (see above in TAG-XXX)
+                    // even if we stay in calibration control mode.
+
+                    o->hardwarelimitisreached = 1;
+                    
+                    if(0 == o->isvirtuallycoupled)
+                    {   // we finish the calibration only if there is no virtual coupling (i.e.: if the axis is NOT rigth or left eye).
+                        eo_axisController_SetCalibrated (o);
+                        o->control_mode = eomc_controlmode_position;
+                    }
+
+                    
                     //but the first time also RobotInterface try to set the pos to 0... (it does not seem to be a problem)
-                    eo_axisController_SetPosRef(o, 0, o->goback_vel); // go to 0 with velocity from calib param2                 
+                    #if defined(CALIB5_GOTO_ZERO)
+                    eo_axisController_SetPosRef(o, 0, o->goback_vel); // go to 0 with velocity from calib param2   
+                    #endif                    
                           
                     return 0;                    
                 }
@@ -1033,6 +1066,47 @@ extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t c
     o->position = pos;
     return;
 }
+
+
+extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisController *o2, EOaxisController *o3, int32_t current_pos2, int32_t current_pos3, int joint)
+{    
+    //    joint can be 2 or 3.
+    const float eyesDirectMatrix[] = {+0.333, +0.333, -0.500, +0.500};
+    
+    // apply the offset, so that we are in range [-45, +45]
+    int32_t pos2 = current_pos2 - o2->offset;
+    int32_t pos3 = current_pos3 - o3->offset;
+    
+    
+    // now apply the transformation which maps pos2 and pos3 into virtual joints version and vergence        
+    int32_t pos = 0; // pos is the virtual position of teh joint
+    EOaxisController *o = NULL;
+    
+    if(2 == joint)
+    {   
+        // version: i apply ...
+        pos = (eyesDirectMatrix[0])*pos2 + (eyesDirectMatrix[1])*pos3;    
+        o = o2;
+    }
+    else
+    {   // vergence: i apply ...
+        pos = (eyesDirectMatrix[2])*pos2 + (eyesDirectMatrix[3])*pos3; 
+        o = o3;
+    }
+    
+    
+    if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+        pos += TICKS_PER_REVOLUTION;
+    else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+        pos -= TICKS_PER_REVOLUTION;     
+    
+    //update axis pos
+    o->position = pos;    
+    
+    return;
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
