@@ -1309,7 +1309,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
         } break;
         case eomc_controlmode_cmd_velocity:
         {
-            *icubcanProto_controlmode = icubCanProto_controlmode_speed_voltage;
+            *icubcanProto_controlmode = icubCanProto_controlmode_velocity;
         } break;
         case eomc_controlmode_cmd_torque:
         {
