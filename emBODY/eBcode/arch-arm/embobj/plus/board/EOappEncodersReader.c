@@ -859,6 +859,8 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     // so far the hal_encoder_get_value() has retrieved ticks with a resulution of 64K ticks / 360 degrees (the upscale from 16K to 64 is done internally)
     // in such a case the GENERAL:Encoders value in xml must be 182.044, so that divider = 1.
     // in cases where we want to apply a motor-reduction (e.g., in eyelids there is 100/42 between the aea and the joint) we may put it inside this parameter.
+    
+    // moreover .... if the encoderconversionfactor is negative, then i assume it is positive. because its sign is managed internally in the ems-controller
 
 
     uint32_t retval = val_raw;
@@ -877,6 +879,11 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     if(0.0f == divider)
     {
         return(3000);       
+    }
+    
+    if(divider < 0)
+    {
+        divider = -divider;
     }
     
     retval = (float)val_raw / divider; 
