@@ -437,59 +437,66 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
     hal_can_cfg_t can_cfg = {0};
 
     // can 1
-    can_cfg.runmode                     = hal_can_runmode_isr_1txq1rxq;
-    can_cfg.baudrate                    = hal_can_baudrate_1mbps; 
-    can_cfg.priorx                      = hal_int_priority11;
-    can_cfg.priotx                      = hal_int_priority11;
- 
-    can_cfg.capacityofrxfifoofframes    = p->config.rxqueuesize[hal_can_port1];
-    can_cfg.capacityoftxfifoofframes    = p->config.txqueuesize[hal_can_port1];
-    can_cfg.capacityoftxfifohighprio    = 0;
+    // if queues size is 0, don't enable this can port
+    if ((p->config.rxqueuesize[eOcanport1] != 0) && (p->config.txqueuesize[eOcanport1] != 0))
+    {
+        can_cfg.runmode                     = hal_can_runmode_isr_1txq1rxq;
+        can_cfg.baudrate                    = hal_can_baudrate_1mbps; 
+        can_cfg.priorx                      = hal_int_priority11;
+        can_cfg.priotx                      = hal_int_priority11;
      
-    can_cfg.callback_on_rx              = s_eo_canserv_onrx_can;
-    can_cfg.arg_cb_rx                   = (void*)hal_can_port1;
-    can_cfg.callback_on_tx              = s_eo_canserv_ontx_can;
-    can_cfg.arg_cb_tx                   = (void*)hal_can_port1;
-    can_cfg.callback_on_err             = s_eo_canserv_onerror_can;
-    can_cfg.arg_cb_err                  = (void*)hal_can_port1;
+        can_cfg.capacityofrxfifoofframes    = p->config.rxqueuesize[hal_can_port1];
+        can_cfg.capacityoftxfifoofframes    = p->config.txqueuesize[hal_can_port1];
+        can_cfg.capacityoftxfifohighprio    = 0;
+         
+        can_cfg.callback_on_rx              = s_eo_canserv_onrx_can;
+        can_cfg.arg_cb_rx                   = (void*)hal_can_port1;
+        can_cfg.callback_on_tx              = s_eo_canserv_ontx_can;
+        can_cfg.arg_cb_tx                   = (void*)hal_can_port1;
+        can_cfg.callback_on_err             = s_eo_canserv_onerror_can;
+        can_cfg.arg_cb_err                  = (void*)hal_can_port1;
 
-    if(hal_res_OK != hal_can_init(hal_can_port1, &can_cfg))
-    {
-        return(eores_NOK_generic);
+        if(hal_res_OK != hal_can_init(hal_can_port1, &can_cfg))
+        {
+            return(eores_NOK_generic);
+        }
+        
+        if(hal_res_OK != hal_can_enable(hal_can_port1))
+        {
+            return(eores_NOK_generic);
+        }    
     }
-    
-    if(hal_res_OK != hal_can_enable(hal_can_port1))
-    {
-        return(eores_NOK_generic);
-    }    
-    
-    // can 2    
-    can_cfg.runmode            = hal_can_runmode_isr_1txq1rxq;
-    can_cfg.baudrate           = hal_can_baudrate_1mbps; 
-    can_cfg.priorx             = hal_int_priority11;
-    can_cfg.priotx             = hal_int_priority11;
- 
-    can_cfg.capacityofrxfifoofframes    = p->config.rxqueuesize[hal_can_port2];
-    can_cfg.capacityoftxfifoofframes    = p->config.txqueuesize[hal_can_port2];
-    can_cfg.capacityoftxfifohighprio   = 0;    
- 
-    can_cfg.callback_on_rx              = s_eo_canserv_onrx_can;
-    can_cfg.arg_cb_rx                   = (void*)hal_can_port2;
-    can_cfg.callback_on_tx              = s_eo_canserv_ontx_can;
-    can_cfg.arg_cb_tx                   = (void*)hal_can_port2;
-    can_cfg.callback_on_err             = s_eo_canserv_onerror_can;
-    can_cfg.arg_cb_err                  = (void*)hal_can_port2;
+    // can 2
+    // if queues size is 0, don't enable this can port
+    if ((p->config.rxqueuesize[eOcanport2] != 0) && (p->config.txqueuesize[eOcanport2] != 0))
+    {    
+        can_cfg.runmode            = hal_can_runmode_isr_1txq1rxq;
+        can_cfg.baudrate           = hal_can_baudrate_1mbps; 
+        can_cfg.priorx             = hal_int_priority11;
+        can_cfg.priotx             = hal_int_priority11;
+     
+        can_cfg.capacityofrxfifoofframes    = p->config.rxqueuesize[hal_can_port2];
+        can_cfg.capacityoftxfifoofframes    = p->config.txqueuesize[hal_can_port2];
+        can_cfg.capacityoftxfifohighprio   = 0;    
+     
+        can_cfg.callback_on_rx              = s_eo_canserv_onrx_can;
+        can_cfg.arg_cb_rx                   = (void*)hal_can_port2;
+        can_cfg.callback_on_tx              = s_eo_canserv_ontx_can;
+        can_cfg.arg_cb_tx                   = (void*)hal_can_port2;
+        can_cfg.callback_on_err             = s_eo_canserv_onerror_can;
+        can_cfg.arg_cb_err                  = (void*)hal_can_port2;
 
-    if(hal_res_OK != hal_can_init(hal_can_port2, &can_cfg))
-    {
-        return(eores_NOK_generic);
+        if(hal_res_OK != hal_can_init(hal_can_port2, &can_cfg))
+        {
+            return(eores_NOK_generic);
+        }
+
+        if(hal_res_OK != hal_can_enable(hal_can_port2))
+        {
+            return(eores_NOK_generic);
+        }    
     }
-
-    if(hal_res_OK != hal_can_enable(hal_can_port2))
-    {
-        return(eores_NOK_generic);
-    }    
-
+      
     return(eores_OK);
 }
 
@@ -543,22 +550,30 @@ static void s_eo_canserv_onerror_can(void *arg)
 
 static eOresult_t s_eo_canserv_otherdata_init(EOtheCANservice *p)
 {
-    p->locktilltxall[hal_can_port1].totaltxframes = 0;
-    p->locktilltxall[hal_can_port1].numoftxframes = 0;
-    if(NULL == (p->locktilltxall[hal_can_port1].locksemaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
-    {
-        return(eores_NOK_generic);
-    }
-    //osal_semaphore_set(p->locktilltxall[hal_can_port1].locksemaphore, 0);
+    //instantiate the semaphors only if the can port is used
     
-    p->locktilltxall[hal_can_port2].totaltxframes = 0;
-    p->locktilltxall[hal_can_port2].numoftxframes = 0;
-    if(NULL == (p->locktilltxall[hal_can_port2].locksemaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
-    {
-        return(eores_NOK_generic);
+    if ((p->config.rxqueuesize[eOcanport1] != 0) && (p->config.txqueuesize[eOcanport1] != 0))
+    {  
+        p->locktilltxall[hal_can_port1].totaltxframes = 0;
+        p->locktilltxall[hal_can_port1].numoftxframes = 0;
+        if(NULL == (p->locktilltxall[hal_can_port1].locksemaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
+        {
+            return(eores_NOK_generic);
+        }
+        //osal_semaphore_set(p->locktilltxall[hal_can_port1].locksemaphore, 0);
     }
-    //osal_semaphore_set(p->locktilltxall[hal_can_port2].locksemaphore, 0);
-
+    
+    if ((p->config.rxqueuesize[eOcanport2] != 0) && (p->config.txqueuesize[eOcanport2] != 0))
+    {  
+        p->locktilltxall[hal_can_port2].totaltxframes = 0;
+        p->locktilltxall[hal_can_port2].numoftxframes = 0;
+        if(NULL == (p->locktilltxall[hal_can_port2].locksemaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
+        {
+            return(eores_NOK_generic);
+        }
+        //osal_semaphore_set(p->locktilltxall[hal_can_port2].locksemaphore, 0);
+    }
+        
     return(eores_OK);
 }
 
