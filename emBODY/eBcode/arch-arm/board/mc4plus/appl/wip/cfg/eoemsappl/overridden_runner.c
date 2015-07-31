@@ -122,14 +122,48 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
-    static uint32_t count = 0;
-    count ++;
     
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
+    // we should also handle a skin case in here (see comments at the end of this function), but at the moment we make it work with the mais
+    
+    if (eo_canserv_GetHandle() != NULL)
+    {
+        uint8_t numofRXcanframe = 0;
+        numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), eOcanport1);
+        eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, numofRXcanframe, NULL);
+    }
+    /*
+    for(port=eOcanport1; port<eOcanports_number; port++)
+    {
+        // marco.accame: the following strategy is ok if the bus containing skin does not contain any other board type
+        // the bus has only skin? then i read at most a number of canframes equal to what the skin-data buffer can host
+        // else i read all the content of the rx can buffer.
+        
+        // step 1: decide the max number of can frames to read
+        
+        EOarray *arrayofcandata = s_getSkinDataArray((eOcanport_t)port);
+        if(NULL != arrayofcandata)
+        {   // ok, in this can bus we have a skin 
 
+            // i read from bus at most the number of can frame that the array can host. 
+            // that does not depend on the fact that in this cycle we transmit the regulars.
+            // the array is emptied only after the regulars are transmitted, so that no can frame is lost.
+            // this operation is done in function eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()
+            numofRXcanframe = eo_array_Available(arrayofcandata);
+        }
+        else
+        {   // in this can bus we dont have skin, thus ... i read everything in the rx can buffer
+            numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port);
+        }
+
+        // step 2: read the can frames. this function also parses them and triggers associated action ...
+        
+        eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
+    }
+    */
 }
 
 
@@ -145,14 +179,40 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
-
+    if (eo_canserv_GetHandle() != NULL)
+    {
+        eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
+    }
 }
 
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
-
+    // we should also handle a skin case in here (see comments at the end of this function), but at the moment we make it work with the mais
+    
+    if (eo_canserv_GetHandle() != NULL)
+    {
+        // wait for the can tx to finish. 
+        // diagnostics about tx failure within the specified timeout is managed internally 
+        const uint32_t timeout = 3*osal_reltime1ms;
+        eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
+    }
+    
+    /*
+    uint8_t port = 0;
+    EOarray *arrayofcandata = NULL;
+    for(port=eOcanport1; port<eOcanports_number; port++)
+    {
+        if(NULL != (arrayofcandata = s_getSkinDataArray((eOcanport_t)port)))
+        {   // ok, in this can bus we have a skin   
+            if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
+            {   // ok, we can reset the array of can data
+                eo_array_Reset(arrayofcandata);
+            }            
+        }
+    }
+    */
 }
 
 
