@@ -26,6 +26,7 @@
 
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
+#include "EOMtheEMSconfigurator.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -63,7 +64,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+static void s_eo_theservices_cancbkonrx(void *arg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -73,6 +74,15 @@
 static EOtheServices s_eo_theserv = 
 {
     .initted                 = eobool_false
+};
+
+static eOcanserv_cfg_t eo_canserv_DefaultCfgMc4plus = 
+{    
+    .mode               = eocanserv_mode_straight,
+    .rxqueuesize        = {64, 0},
+    .txqueuesize        = {64, 0},
+    .onrxcallback       = {NULL, NULL},
+    .onrxargument       = {NULL, NULL}
 };
 
 //static const char s_eobj_ownname[] = "EOtheServices";
@@ -115,8 +125,44 @@ extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg)
 }
 
 
+extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg)
+{
+//    eOresult_t res = eores_OK;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    //no config specified
+    if (cancfg == NULL)
+    {
+        //use default config for MC4plus (can1 and NOT can2)
+        cancfg = &eo_canserv_DefaultCfgMc4plus;
+        cancfg->onrxcallback[0]  = s_eo_theservices_cancbkonrx; 
+        cancfg->onrxargument[0]  = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+    }
+    
+    //using the EOtheCANservice to initialize the CAN
+    eo_canserv_Initialise(cancfg);
+    
+    return(eores_OK);
+}
 
 
+/*
+extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    //Init and start the discovery
+    eo_candiscovery_Initialise();
+    eo_candiscovery_Start(eo_candiscovery_GetHandle());
+}
+*/
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,8 +171,11 @@ extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
-
+static void s_eo_theservices_cancbkonrx(void *arg)
+{
+    EOMtask *task = (EOMtask *)arg;
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
