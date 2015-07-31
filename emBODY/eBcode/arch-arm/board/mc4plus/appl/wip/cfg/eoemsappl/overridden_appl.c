@@ -417,8 +417,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     //init the MCService
     eo_serv_ConfigMC(eo_serv_GetHandle(), &mc_config); 
-    //no more useful cause the discovery of CAN boards is in progress to a generic form
-    //eo_mcserv_CheckResources(eo_mcserv_GetHandle());
+    eo_mcserv_CheckResources(eo_mcserv_GetHandle());
     
     //init the CANService    
     //CAN must be activated only for boards: 16,17 (left_lower_arm) 19,20 (right_lower_arm) (skin is still not considered at the moment)
