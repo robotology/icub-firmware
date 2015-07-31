@@ -102,7 +102,7 @@ static EOtheCANprotocol s_eo_canprot_singleton =
 
 
 
-
+#if defined (USE_EMS4RD)    
 const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
 {
     {   // 000      ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE
@@ -584,16 +584,20 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     {   // 119      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG,
         .parser     = NULL
-    }   
+    }
 };  EO_VERIFYsizeof(s_eo_canprot_functions_pollingMotorControl, (ICUBCANPROTO_POL_MC_CMD_MAXNUM)*sizeof(eOcanprot_functions_t));
 
+// MC4plus does not use these functions
+#elif defined (USE_MC4PLUS)
+const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] = { 0 };
+#endif
 
 
 
 static const uint8_t s_eo_canprot_functions_pollingMotorControl_maxnumber = sizeof(s_eo_canprot_functions_pollingMotorControl) / sizeof(eOcanprot_functions_t);
 
 
-
+#if defined (USE_EMS4RD)
 const eOcanprot_functions_t s_eo_canprot_functions_periodicMotorControl[] =
 {
     {   // 000      ICUBCANPROTO_PER_MC_MSG__2FOC
@@ -661,7 +665,10 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicMotorControl[] =
         .parser     = NULL
     }    
 };  EO_VERIFYsizeof(s_eo_canprot_functions_periodicMotorControl, ((eocanprot_classperiodic_msgtypes_maxnumberof))*sizeof(eOcanprot_functions_t));
-
+// MC4plus does not use these functions
+#elif defined (USE_MC4PLUS)
+const eOcanprot_functions_t s_eo_canprot_functions_periodicMotorControl[] = { 0 };
+#endif
 static const uint8_t s_eo_canprot_functions_periodicMotorControl_maxnumber = sizeof(s_eo_canprot_functions_periodicMotorControl) / sizeof(eOcanprot_functions_t);
 
 
@@ -780,8 +787,8 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         .parser     = NULL
     }, 
     {   // 028      ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION
-        .former     = NULL,
-        .parser     = NULL
+        .former     = eocanprotASpolling_former_POL_AS_CMD__GET_FIRMWARE_VERSION,
+        .parser     = eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION
     },  
     {   // 029      
         .former     = NULL,

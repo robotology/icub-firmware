@@ -35,6 +35,7 @@
 #include "EOMtheEMSconfigurator.h"
 
 #include "EOtheCANservice.h"
+#include "EOtheCANdiscovery.h"
 
 #include "EOMtheEMStransceiver.h"
 
@@ -196,6 +197,38 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    eObrd_version_t *reqprot = (eObrd_version_t*)descriptor->cmd.value;
+    
+    s_former_POL_AS_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION);
+    frame->data[1] = reqprot->major;
+    frame->data[2] = reqprot->minor;
+    
+    return(eores_OK);      
+}
+
+extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port)
+{
+    eOcanmap_location_t loc = {0};
+    loc.port                = port;
+    loc.addr                = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex         = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    eObool_t match = (1 == frame->data[7]) ? eobool_true : eobool_false;    
+    
+    eObrd_typeandversions_t detected    = {0};
+    detected.boardtype                  = frame->data[1];
+    detected.firmwareversion.major      = frame->data[2];
+    detected.firmwareversion.minor      = frame->data[3];
+    detected.firmwarebuildnumber        = frame->data[4];
+    detected.protocolversion.major      = frame->data[5];
+    detected.protocolversion.minor      = frame->data[6];   
+    
+    
+    // pass it all to the relevant object, which will do what it needs. everything in one file
+    eo_candiscovery_ManageDetectedBoard(eo_candiscovery_GetHandle(), loc, match, &detected);
+}
 
 
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
