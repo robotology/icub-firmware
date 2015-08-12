@@ -104,7 +104,7 @@ const eOmc_motor_t motor_default_dvalue =
 
         },
         EO_INIT(.gearboxratio)              0,
-        EO_INIT(.rotorencoder)              0,
+        EO_INIT(.rotorEncoderResolution)    0,
         EO_INIT(.filler01)                  0,
         EO_INIT(.maxvelocityofmotor)        0,
         EO_INIT(.maxcurrentofmotor)         0,
@@ -112,7 +112,11 @@ const eOmc_motor_t motor_default_dvalue =
         EO_INIT(.motorPoles)                0,
         EO_INIT(.hasHallSensor)             eobool_false,
         EO_INIT(.hasTempSensor)             eobool_false,
-        EO_INIT(.hasRotorEncoder)           eobool_false
+        EO_INIT(.hasRotorEncoder)           eobool_false,
+        EO_INIT(.hasRotorEncoderIndex)      eobool_false,
+        EO_INIT(.rotorEncoderType)          0,
+        EO_INIT(.filler02)                  0,
+        EO_INIT(.filler03)                  0
     },
     EO_INIT(.status)                       {0}
 }; 

@@ -161,7 +161,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     {
         return;
     }
-    res = eo_appMeasConv_SetJntEncoderConversionOffset(appMeasConv_ptr, jxx, (eOappMeasConv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
+    res = eo_appMeasConv_SetJntEncoderConversionOffset(appMeasConv_ptr, jxx, (eOappMeasConv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->DEPRECATED_encoderconversionoffset));
     if(eores_OK != res)
     {
         return;

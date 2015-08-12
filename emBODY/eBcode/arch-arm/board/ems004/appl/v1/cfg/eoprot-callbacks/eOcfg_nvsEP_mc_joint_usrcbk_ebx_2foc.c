@@ -185,7 +185,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.stiction_up_val*rescaler_trq, 
                                     cfg->pidtorque.stiction_down_val*rescaler_trq);
 
-    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
+    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->DEPRECATED_encoderconversionfactor);
     
     eo_emsController_SetMotorParams((uint8_t)jxx, cfg->motor_params);
     
