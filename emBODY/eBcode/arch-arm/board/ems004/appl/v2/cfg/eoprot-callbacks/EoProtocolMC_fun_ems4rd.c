@@ -169,8 +169,8 @@ const eOmc_joint_t joint_default_value =
        
         .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
         .filler01 =                  0xe0,
-        .encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
-        .encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
+        .DEPRECATED_encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
+        .DEPRECATED_encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
         .motor_params =
         {
             .bemf_value =            0,
@@ -180,7 +180,8 @@ const eOmc_joint_t joint_default_value =
             .filler02 =              {0xf1, 0xf2}
         },
         .tcfiltertype =              0,
-        .filler03 =                  {0xf1, 0xf2, 0xf3}
+        .jntEncoderType =            0,
+        .filler02 =                  {0xf1, 0xf2}
     },
     .status =                       
     {
@@ -234,9 +235,13 @@ const eOmc_motor_t motor_default_value =
         .maxcurrentofmotor =         0,
         .rotorIndexOffset =          0,
         .motorPoles =                0,
-        .hasHallSensor =             0,
-        .hasTempSensor =             0,
-        .hasRotorEncoder =           0  
+        .hasHallSensor =             eobool_false,
+        .hasTempSensor =             eobool_false,
+        .hasRotorEncoder =           eobool_false,
+        .hasRotorEncoderIndex =      eobool_false,
+        .rotorEncoderType =          0,
+        .filler03 =                  0,
+        .filler04 =                  0
     },
     .status =                       {0}
 }; 
@@ -309,7 +314,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                         cfg->pidtorque.stiction_up_val*rescaler_trq, 
                                         cfg->pidtorque.stiction_down_val*rescaler_trq);
 
-        eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
+        //eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->DEPRECATED_encoderconversionfactor);
+        eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->jntEncoderResolution);
         
         eo_emsController_SetMotorParams((uint8_t)jxx, cfg->motor_params);
         
@@ -337,9 +343,11 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 //        eo_measconv_SetJntEncoderConversionFactor(mc4boards, jxx, (eOmeasconv_encConversionFactor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
 //        eo_measconv_SetJntEncoderConversionOffset(mc4boards, jxx, (eOmeasconv_encConversionOffset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
-        eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_factor_t)eo_common_Q17_14_to_float(cfg->encoderconversionfactor));
-        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_offset_t)eo_common_Q17_14_to_float(cfg->encoderconversionoffset));
-        
+//        eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_factor_t)eo_common_Q17_14_to_float(cfg->DEPRECATED_encoderconversionfactor));
+//        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_offset_t)eo_common_Q17_14_to_float(cfg->DEPRECATED_encoderconversionoffset));
+        eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, (float)cfg->jntEncoderResolution/65535.0);
+        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, 0);
+      
         eOcanprot_command_t command = {0};
         command.class = eocanprot_msgclass_pollingMotorControl;
         
