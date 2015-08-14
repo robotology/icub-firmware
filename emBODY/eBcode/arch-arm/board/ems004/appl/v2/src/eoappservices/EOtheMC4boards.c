@@ -266,6 +266,23 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
     return(eores_OK);       
 }
 
+extern void eo_mc4boards_Convert_maxPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
+{
+  p->convencoder[joint].max_mc4_pos=max;
+}
+extern void eo_mc4boards_Convert_minPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
+{
+  p->convencoder[joint].min_mc4_pos=min;
+}
+extern icubCanProto_position_t eo_mc4boards_Convert_maxPos_Get(EOtheMC4boards *p, uint8_t joint)
+{
+  return p->convencoder[joint].max_mc4_pos;
+}
+extern icubCanProto_position_t eo_mc4boards_Convert_minPos_Get(EOtheMC4boards *p, uint8_t joint)
+{
+  return p->convencoder[joint].min_mc4_pos;
+}
+
 extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
 {   
     if(NULL == p)
