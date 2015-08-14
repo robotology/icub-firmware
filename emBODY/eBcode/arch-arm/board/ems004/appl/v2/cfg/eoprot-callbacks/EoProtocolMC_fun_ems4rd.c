@@ -346,7 +346,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
 //        eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_factor_t)eo_common_Q17_14_to_float(cfg->DEPRECATED_encoderconversionfactor));
 //        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, (eOmc4boards_conv_encoder_offset_t)eo_common_Q17_14_to_float(cfg->DEPRECATED_encoderconversionoffset));
         eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, (float)cfg->jntEncoderResolution/65535.0);
-        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, 0);
+        eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, 0); //->>> moved to the calibrators.
       
         eOcanprot_command_t command = {0};
         command.class = eocanprot_msgclass_pollingMotorControl;
@@ -907,6 +907,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     
     if(eobool_true == s_motorcontrol_is2foc_based()) 
     {
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
         eo_emsController_StartCalibration_type3(jxx, 
                                           calibrator->params.type3.position, 
                                           calibrator->params.type3.velocity,
@@ -915,7 +916,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     }
     else // mc4can
     {
-        
+        EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
         icubCanProto_calibrator_t iCubCanProtCalibrator = {.type = icubCanProto_calibration_type0_hard_stops}; // all the rest is 0
         iCubCanProtCalibrator.type = (icubCanProto_calibration_type_t)calibrator->type;
         
@@ -932,7 +933,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             {
                 iCubCanProtCalibrator.params.type0.pwmlimit = calibrator->params.type0.pwmlimit;
     //            iCubCanProtCalibrator.params.type0.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type0.velocity);           
-                iCubCanProtCalibrator.params.type0.velocity = calibrator->params.type0.velocity;  
+                iCubCanProtCalibrator.params.type0.velocity = calibrator->params.type0.velocity;
+                eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type0.calibrationZero);
                 found = eobool_true;            
             } break;
                 
@@ -948,6 +950,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     //             iCubCanProtCalibrator.params.type1.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type1.velocity);
                 iCubCanProtCalibrator.params.type1.position = calibrator->params.type1.position; 
                 iCubCanProtCalibrator.params.type1.velocity =  calibrator->params.type1.velocity;
+                eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type1.calibrationZero);
                 found = eobool_true; 
             } break;
 
@@ -955,7 +958,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
             {
                 iCubCanProtCalibrator.params.type2.pwmlimit = calibrator->params.type2.pwmlimit;
     //            iCubCanProtCalibrator.params.type2.velocity = eo_measconv_jntVelocity_toCAN(mc4boards, jxx, calibrator->params.type2.velocity);           
-                iCubCanProtCalibrator.params.type2.velocity = calibrator->params.type2.velocity;   
+                iCubCanProtCalibrator.params.type2.velocity = calibrator->params.type2.velocity;
+                eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type2.calibrationZero);
                 found = eobool_true;             
             } break;
 
@@ -972,6 +976,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                 iCubCanProtCalibrator.params.type1.position = calibrator->params.type3.position; 
                 iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type3.velocity;            
                 iCubCanProtCalibrator.params.type3.offset = calibrator->params.type3.offset;
+                eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type3.calibrationZero);
                 found = eobool_true; 
             } break;
 
@@ -989,6 +994,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                 iCubCanProtCalibrator.params.type4.position = calibrator->params.type4.position;
                 iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type4.velocity;
                 iCubCanProtCalibrator.params.type4.maxencoder = calibrator->params.type4.maxencoder;
+                eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type4.calibrationZero);
                 found = eobool_true; 
             } break;
             

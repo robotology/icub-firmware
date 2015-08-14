@@ -116,6 +116,7 @@ struct EOaxisController_hid
     
     eOmc_calibration_type_t calibration_type;
     float pwm_limit_calib;
+    int32_t calibration_zero;
 }; 
 
 
