@@ -874,7 +874,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         return(2000);
     }
     
-    divider = eo_common_Q17_14_to_float(joint->config.encoderconversionfactor);
+    /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor);
     
     if(0.0f == divider)
     {
@@ -887,6 +887,9 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     }
     
     retval = (float)val_raw / divider; 
+    */
+    
+    retval = (float)val_raw * 65535.0 / (float)joint->config.jntEncoderResolution;
     
     return(retval);
 

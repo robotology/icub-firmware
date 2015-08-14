@@ -119,6 +119,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->velocity = 0;
         
         o->state_mask = AC_NOT_READY;
+        o->calibration_zero = 0;
     }
 
     return o;
@@ -250,6 +251,19 @@ extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, in
   //eo_trajectory_SetVelMax(o->trajectory, vel_max);
 }
 
+
+extern void eo_axisController_SetAxisCalibrationZero(EOaxisController *o, int32_t zero)
+{
+    if (!o) return;
+    o->calibration_zero = zero;
+}
+
+extern int32_t eo_axisController_GetAxisCalibrationZero(EOaxisController *o)
+{
+    if (!o) return 0;
+    return o->calibration_zero;
+}
+
 extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min)
 {
     if (!o) return;
@@ -310,7 +324,7 @@ extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffne
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
-    if (o) o->position = pos;
+    if (o) o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
 } 
 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
