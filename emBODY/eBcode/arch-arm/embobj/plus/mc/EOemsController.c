@@ -156,6 +156,7 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOe
         ems->motor_config_maxvelocityofmotor[j] = 0;
         ems->motor_config_motorPoles[j] = 0;
         ems->motor_config_rotorIndexOffset[j] = 0;
+        ems->new_motor_msg[j] = eobool_false;
     }
         
     ems->motors = eo_motors_New(ems->naxles, ems->board);
@@ -264,9 +265,11 @@ extern void eo_emsController_CheckFaults()
             
             bNoFaultState = eobool_false;
         }
-        
-        if (bNoFaultState)
+                
+        if (bNoFaultState && ems->new_motor_msg[j])
         {
+            ems->new_motor_msg[j] = eobool_false;
+            
             if (eo_motor_check_state_req(ems->motors,j))
             {
                 ems_fault_mask_new[j] |= MOTOR_WRONG_STATE;
@@ -1205,7 +1208,12 @@ extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state)
 {
-    if (ems) eo_motor_set_motor_status(ems->motors, motor, state);
+    if (ems)
+    {
+        eo_motor_set_motor_status(ems->motors, motor, state);
+        
+        ems->new_motor_msg[motor] = eobool_true;
+    }
 }
 
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status)
@@ -1304,6 +1312,8 @@ void set_2FOC_running(uint8_t motor)
     eo_emsController_hid_userdef_set_motor_running(ems, motor);
     
 }
+
+//#define MOTOR_QENCODER_FAULT     0x00100000
     
 /*
     BYTE 0

@@ -87,7 +87,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
         MOTORS(m)
         {
             o->motor_watchdog[m] = 100;
-            o->motor_run_state_last[m] = icubCanProto_controlmode_notConfigured;
+            //o->motor_run_state_last[m] = icubCanProto_controlmode_notConfigured;
             o->motor_run_state_req[m] = icubCanProto_controlmode_notConfigured;
             o->motor_run_state[m] = icubCanProto_controlmode_notConfigured;
             o->motor_run_state_req_wdog[m] = 100;
@@ -166,18 +166,18 @@ extern eObool_t eo_motor_check_state_req(EOmotors *o, uint8_t m)
 {
     if (o->motor_run_state[m] == o->motor_run_state_req[m])
     {
-        o->motor_run_state_last[m] = o->motor_run_state[m];
+        //o->motor_run_state_last[m] = o->motor_run_state[m];
         
         o->motor_run_state_req_wdog[m] = 50;
     
         return eobool_false;
     }
-    
+    /*
     if (o->motor_run_state_last[m] != o->motor_run_state[m])
     {                
         return eobool_true;
     }
-    
+    */
     if (o->motor_run_state_req_wdog[m]>0)
     {
         --o->motor_run_state_req_wdog[m];

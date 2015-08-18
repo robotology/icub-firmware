@@ -45,7 +45,7 @@ struct EOmotors_hid
     
     eObool_t Jok;
     uint8_t motor_run_state[MAX_NAXLES];
-    uint8_t motor_run_state_last[MAX_NAXLES];
+    //uint8_t motor_run_state_last[MAX_NAXLES];
     uint8_t motor_run_state_req[MAX_NAXLES];
     uint16_t motor_run_state_req_wdog[MAX_NAXLES];
     
