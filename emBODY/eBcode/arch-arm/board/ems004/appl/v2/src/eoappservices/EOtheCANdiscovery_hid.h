@@ -44,9 +44,14 @@ struct EOtheCANdiscovery_hid
 {
     eObool_t            initted;
     EOtimer             *discoverytimer;
-    eObool_t            thereismais;
-    uint8_t             datarate;
-    eOenum08_t          mode;
+    uint32_t            readymask;          // i-th bit correspond to CAN address (16LSB-> CAN1, 16MSB->CAN2)
+    uint32_t            tobecheckedmask;    // ""
+    uint32_t            incorrectprotmask;
+    eObool_t            isMCready;
+    eObool_t            isMAISready;
+    eObool_t            isSTRAINready;
+    uint8_t             numberofattempts;
+    //...
 }; 
 
 

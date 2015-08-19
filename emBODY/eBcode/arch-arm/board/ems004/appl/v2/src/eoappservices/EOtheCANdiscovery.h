@@ -38,7 +38,7 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
-
+#include "EOtheCANmapping.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -58,19 +58,29 @@ extern EOtheCANdiscovery* eo_candiscovery_Initialise(void);
 
 extern EOtheCANdiscovery* eo_candiscovery_GetHandle(void);
 
-
 extern eOresult_t eo_candiscovery_Start(EOtheCANdiscovery *p);
 
 extern eOresult_t eo_candiscovery_Stop(EOtheCANdiscovery *p);
 
-
 extern eOresult_t eo_candiscovery_SignalDetectedCANboards(EOtheCANdiscovery *p);
 
-extern eOresult_t eo_candiscovery_CheckCanBoardsAreReady(EOtheCANdiscovery *p, uint32_t dontaskmask);
+extern eOresult_t eo_candiscovery_ResetAndStartProcedure(EOtheCANdiscovery *p);
 
-extern eObool_t eo_candiscovery_areCanBoardsReady(EOtheCANdiscovery *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
+extern eOresult_t eo_candiscovery_CheckRemainingCanBoards(EOtheCANdiscovery *p);
+
+extern eOresult_t eo_candiscovery_EvaluateDiscoveredResources(EOtheCANdiscovery *p);
 
 extern eOresult_t eo_candiscovery_ManageDetectedBoard(EOtheCANdiscovery *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
+
+extern eObool_t eo_candiscovery_isMCReady(EOtheCANdiscovery *p);
+
+extern eObool_t eo_candiscovery_isMAISReady(EOtheCANdiscovery *p);
+
+extern void eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(EOtheCANdiscovery *p);
+
+/* DEPRECATED APIs */
+extern eOresult_t eo_candiscovery_CheckCanBoardsAreReady(EOtheCANdiscovery *p, uint32_t dontaskmask);
+extern eObool_t eo_candiscovery_areCanBoardsReady(EOtheCANdiscovery *p, uint32_t *canBoardsReady, uint32_t *canBoardsChecked);
 
 /** @}            
     end of group eo_EOtheCANdiscovery
