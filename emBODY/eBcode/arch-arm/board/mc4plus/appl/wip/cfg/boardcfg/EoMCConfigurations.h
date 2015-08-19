@@ -294,7 +294,7 @@ extern eOmcconfig_code_t eOmcconfig_Get_Active_Code(void);
 
 extern const eOmcconfig_jomo_cfg_t* eOmcconfig_board2config(uint8_t board_num, eOmcconfig_type_t type);
 
-extern const uint8_t eOmcconfig_board2jomosnumber(uint8_t board_num);
+extern uint8_t eOmcconfig_board2jomosnumber(uint8_t board_num);
 
 
 /** @}            
