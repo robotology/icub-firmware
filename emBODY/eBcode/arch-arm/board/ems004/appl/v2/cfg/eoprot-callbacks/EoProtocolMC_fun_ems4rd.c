@@ -200,14 +200,14 @@ const eOmc_joint_t joint_default_value =
     },
     .inputs =                        {0},
     .cmmnds =                       
-	{
-		.calibration =               {0},
-		.setpoint =                  {0},
-		.stoptrajectory =            0,
-		.controlmode =				 eomc_controlmode_cmd_switch_everything_off,
+    {
+        .calibration =               {0},
+        .setpoint =                  {0},
+        .stoptrajectory =            0,
+        .controlmode =                 eomc_controlmode_cmd_switch_everything_off,
         .interactionmode =           eomc_imodeval_stiff,
         .filler01 =                  0        
-	}
+    }
 }; 
 
 const eOmc_motor_t motor_default_value =
@@ -651,6 +651,10 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
     }
 }
 
+// marco.accame: the following two functions are not used because there not such tags as:
+// eoprot_tag_mc_joint_config_encoderconversionfactor or eoprot_tag_mc_joint_config_encoderconversionoffset
+// thus i can remove them.
+#if 0
 extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // mc4can only     
     if(eobool_true == s_motorcontrol_is2foc_based())
@@ -686,6 +690,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* 
         return; //error 
     }
 }
+#endif
+
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
