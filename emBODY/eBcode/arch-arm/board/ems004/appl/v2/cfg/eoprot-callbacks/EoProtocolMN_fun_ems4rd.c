@@ -353,6 +353,19 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
+            eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
+            
+            if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
+            {
+                return;
+            }
+            else
+			{
+				eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
+			}
+            
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+            /*
             uint32_t canBoardsReady = 0;
             uint32_t canBoardsChecked = 0;
             if(eobool_false == eo_candiscovery_areCanBoardsReady(eo_candiscovery_GetHandle(), &canBoardsReady, &canBoardsChecked))
@@ -415,6 +428,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             //{   
             //    status->currstate = applstate_running;
             //}
+            */
         } break;
         
         case applstate_error:

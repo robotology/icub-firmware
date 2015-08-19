@@ -113,7 +113,7 @@ static const eOcanmap_board_properties_t s_boardprops[] =
             .port   = eOcanport1,
             .addr   = 14         
         },
-        .requiredprotocol   = {.major = 0, .minor = 0}
+        .requiredprotocol   = {.major = 1, .minor = 0}
     },       
     {
         .type               = eobrd_cantype_skin,

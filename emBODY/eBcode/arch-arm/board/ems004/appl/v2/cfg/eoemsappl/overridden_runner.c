@@ -146,6 +146,7 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
+    /*
     static uint32_t count = 0;
     count ++;
     
@@ -153,7 +154,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
     {
         eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
     }
-    
+    */
 
     #if defined(EVIEWER_ENABLED)   
     if(0 == event_view)
