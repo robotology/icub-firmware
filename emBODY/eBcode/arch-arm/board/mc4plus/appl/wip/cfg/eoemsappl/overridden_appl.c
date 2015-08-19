@@ -426,7 +426,9 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         eo_serv_ConfigCAN(eo_serv_GetHandle(), NULL);
 
         //init and and start the discovery of CANboards
-        //eo_serv_StartCANdiscovery(eo_serv_GetHandle());
+        //davide: now we are doing it once until the board is reset...
+        //it could be nice to have a double-check every time I go in RUN state (a wire can get broken during normal usage of the robot)
+        eo_serv_StartCANdiscovery(eo_serv_GetHandle());
     }
 }
 

@@ -88,6 +88,8 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
 static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_strain_t *strain, uint8_t index);
 static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 
+static eObool_t s_eocanprotASpolling_is_the_other_eth_board(eOcanframe_t *frame);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -210,6 +212,12 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
 
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port)
 {
+    //N.B. in the upper arm V3, we have two MC4plus (eth) connected on the same CAN bus
+    //Since the ID of the reply of the MAIS is the same of the ID of the message (GET_FIRMWARE_VERSION) sent by the other board,
+    //I need to discard those messages, cause I'm only interested on the real mais replies
+    if (s_eocanprotASpolling_is_the_other_eth_board(frame))
+        return eores_OK;
+    
     eOcanmap_location_t loc = {0};
     loc.port                = port;
     loc.addr                = EOCANPROT_FRAME_GET_SOURCE(frame);
@@ -228,6 +236,8 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
     
     // pass it all to the relevant object, which will do what it needs. everything in one file
     eo_candiscovery_ManageDetectedBoard(eo_candiscovery_GetHandle(), loc, match, &detected);
+    
+    return eores_OK;
 }
 
 
@@ -445,6 +455,14 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
     return(res);
 }
 
+static eObool_t s_eocanprotASpolling_is_the_other_eth_board(eOcanframe_t *frame)
+{
+    if (frame->id == 0x20E)
+        return eobool_true;
+    else
+        return eobool_false;
+    
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
