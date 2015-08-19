@@ -358,7 +358,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
         
         // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
-
+        
+        // marco.accame TODO: (tag FIX_CALIB_MC4) manage max and min limits as in new_fw_ems ...
         // 4) set limits
 //        icubCanProto_position_t minpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, cfg->limitsofjoint.min);
 //        icubCanProto_position_t maxpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, cfg->limitsofjoint.max);
@@ -656,6 +657,10 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
     }
 }
 
+// marco.accame: the following two functions are not used because there not such tags as:
+// eoprot_tag_mc_joint_config_encoderconversionfactor or eoprot_tag_mc_joint_config_encoderconversionoffset
+// thus i can remove them.
+#if 0
 extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // mc4can only     
     if(eobool_true == s_motorcontrol_is2foc_based())
@@ -691,6 +696,8 @@ extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* 
         return; //error 
     }
 }
+#endif
+
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -892,7 +899,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t *calibrator = (eOmc_calibrator_t*)rd->data;    
     
-    
     if(eobool_true == s_motorcontrol_is2foc_based()) 
     {
         
@@ -931,6 +937,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     }
     else // mc4can
     {
+        // marco.accame-TODO: manage in here the case of tag FIX_CALIB_MC4
         
         icubCanProto_calibrator_t iCubCanProtCalibrator = {.type = icubCanProto_calibration_type0_hard_stops}; // all the rest is 0
         iCubCanProtCalibrator.type = (icubCanProto_calibration_type_t)calibrator->type;
