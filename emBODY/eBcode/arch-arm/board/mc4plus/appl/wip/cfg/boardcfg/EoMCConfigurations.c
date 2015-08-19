@@ -393,7 +393,7 @@ extern const eOmcconfig_jomo_cfg_t* eOmcconfig_board2config(uint8_t board_num, e
     return NULL;  
 }
 
-extern const uint8_t eOmcconfig_board2jomosnumber(uint8_t board_num)
+extern uint8_t eOmcconfig_board2jomosnumber(uint8_t board_num)
 {
     for (uint8_t i=0; i<eOmcconfig_boardjomosnumberof; i++)
     {
