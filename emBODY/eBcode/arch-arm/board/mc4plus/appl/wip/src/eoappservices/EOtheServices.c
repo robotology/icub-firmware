@@ -150,7 +150,6 @@ extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg)
 }
 
 
-/*
 extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
 {
     if(NULL == p)
@@ -162,7 +161,6 @@ extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
     eo_candiscovery_Initialise();
     eo_candiscovery_Start(eo_candiscovery_GetHandle());
 }
-*/
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
