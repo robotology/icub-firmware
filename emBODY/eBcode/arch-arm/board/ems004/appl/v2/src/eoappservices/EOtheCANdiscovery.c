@@ -128,7 +128,10 @@ extern EOtheCANdiscovery* eo_candiscovery_Initialise(void)
 
 extern EOtheCANdiscovery* eo_candiscovery_GetHandle(void)
 {
-    return(eo_candiscovery_Initialise());
+    if (s_eo_thecandiscovery.initted == eobool_false)
+        return NULL;
+    
+    return(&s_eo_thecandiscovery);
 }
 
 

@@ -350,6 +350,25 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
+            //if it's not initted at this point, it means that no CANdiscovery is needed
+            if (eo_candiscovery_GetHandle() != NULL)
+            {
+                eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
+                
+                if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
+                {
+                    return;
+                }
+                else
+                {
+                    eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
+                }
+            }
+            
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+                        
+            //old version
+            /*
             uint32_t canBoardsReady = 0;
             uint32_t canBoardsChecked = 0;
             char str[60];
