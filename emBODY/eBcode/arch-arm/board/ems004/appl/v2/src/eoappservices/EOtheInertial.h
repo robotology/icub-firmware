@@ -54,14 +54,15 @@ typedef struct EOtheInertial_hid EOtheInertial;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheInertial* eo_inertial_Initialise(void);
+// only one fixed 
+extern EOtheInertial* eo_inertial_Initialise(eOas_inertialidentifier_t id);
 
 extern EOtheInertial* eo_inertial_GetHandle(void);
 
 
 extern eOresult_t eo_inertial_Config(EOtheInertial *p, eOas_inertial_config_t* inertialcfg);
 
-extern eOresult_t eo_inertial_Start(EOtheInertial *p);
+extern eOresult_t eo_inertial_Start(EOtheInertial *p, eOas_inertial_enableflags_t enableflags);
 
 extern eOresult_t eo_inertial_Stop(EOtheInertial *p);
 

@@ -187,26 +187,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14(eOcanframe_t *
 }
 
 
-extern eOresult_t eocanprotASperiodic_parser_00(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
-
-extern eOresult_t eocanprotASperiodic_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
-
-extern eOresult_t eocanprotASperiodic_parser_01(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
-
-extern eOresult_t eocanprotASperiodic_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

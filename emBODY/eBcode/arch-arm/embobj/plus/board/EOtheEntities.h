@@ -79,6 +79,11 @@ extern eOas_mais_t * eo_entities_GetMais(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_mais_config_t * eo_entities_GetMaisConfig(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIndex_t id);
 
+extern uint8_t eo_entities_NumOfInertials(EOtheEntities *p);
+extern eOas_inertial_t * eo_entities_GetInertial(EOtheEntities *p, eOprotIndex_t id);
+extern eOas_inertial_config_t * eo_entities_GetInertialConfig(EOtheEntities *p, eOprotIndex_t id);
+extern eOas_inertial_status_t * eo_entities_GetInertialStatus(EOtheEntities *p, eOprotIndex_t id);
+
 extern uint8_t eo_entities_NumOfStrains(EOtheEntities *p);
 extern eOas_strain_t * eo_entities_GetStrain(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_strain_config_t * eo_entities_GetStrainConfig(EOtheEntities *p, eOprotIndex_t id);

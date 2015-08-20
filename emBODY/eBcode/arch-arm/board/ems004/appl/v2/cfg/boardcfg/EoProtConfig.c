@@ -91,7 +91,7 @@
         },     
         {        
             .endpoint           = eoprot_endpoint_analogsensors,
-            .numberofentities  = {0, 1, 0, 0, 0, 0, 0}        
+            .numberofentities  = {0, 1, 0, 1, 0, 0, 0}        
         },
         {           
             .endpoint           = eoprot_endpoint_skin,

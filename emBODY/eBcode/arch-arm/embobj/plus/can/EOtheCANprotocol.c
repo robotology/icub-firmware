@@ -991,7 +991,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         .parser     = NULL
     },  
     {   // 079      ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP
-        .former     = NULL,
+        .former     = eocanprotASpolling_former_POL_SK_CMD__ACC_GYRO_SETUP,
         .parser     = NULL
     },
     {   // 080      ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG 
@@ -1123,7 +1123,7 @@ static const uint8_t s_eo_canprot_functions_periodicAnalogSensor_maxnumber = siz
 
 
 const eOcanprot_functions_t s_eo_canprot_functions_periodicSkin[] =
-{
+{   // so far we manage every skin messages with only one parser function ...
     {
         .former     = NULL,
         .parser     = eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG
@@ -1134,13 +1134,87 @@ static const uint8_t s_eo_canprot_functions_periodicSkin_maxnumber = sizeof(s_eo
 
 
 
+const eOcanprot_functions_t s_eo_canprot_functions_periodicInertialSensor[] =
+{
+    {   // 000      ICUBCANPROTO_PER_IS_MSG__DIGITAL_GYROSCOPE
+        .former     = NULL,
+        .parser     = eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE
+    },
+    {   // 001      ICUBCANPROTO_PER_IS_MSG__DIGITAL_ACCELEROMETER
+        .former     = NULL,
+        .parser     = eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER
+    }, 
+    {   // 002      ICUBCANPROTO_PER_IS_MSG__ANALOG_ACCELEROMETER
+        .former     = NULL,
+        .parser     = NULL, //eocanprotINperiodic_parser_PER_IS_MSG__ANALOG_ACCELEROMETER
+    },
+    {   // 003
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 004
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 005
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 006
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 007
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 008      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 009      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 010      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 011      
+        .former     = NULL,
+        .parser     = NULL
+    }, 
+    {   // 012      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 013      
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 014
+        .former     = NULL,
+        .parser     = NULL
+    },
+    {   // 015
+        .former     = NULL,
+        .parser     = NULL
+    } 
+};   EO_VERIFYsizeof(s_eo_canprot_functions_periodicInertialSensor, ((eocanprot_classperiodic_msgtypes_maxnumberof))*sizeof(eOcanprot_functions_t));
+
+static const uint8_t s_eo_canprot_functions_periodicInertialSensor_maxnumber = sizeof(s_eo_canprot_functions_periodicInertialSensor) / sizeof(eOcanprot_functions_t);
+
+
+
+
 const eOcanprot_functions_t * const eo_canprot_lut_functions[] =
 {   
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_pollingMotorControl,   
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicMotorControl,        
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_pollingAnalogSensor,
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicAnalogSensor,
-    (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicSkin
+    (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicSkin,
+    (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicInertialSensor
 };  EO_VERIFYsizeof(eo_canprot_lut_functions, (eocanprot_msgclass_maxvalue+1)*sizeof(const eOcanprot_functions_t *));  
 
 
@@ -1501,6 +1575,26 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
             }             
         } break;
         
+        case eocanprot_msgclass_periodicInertialSensor:
+        {
+            *index0 = msgclass;
+            if(eobool_true == parsemode)
+            {
+                msgtype = EOCANPROT_FRAME_PERIODIC_GET_TYPE(frame); 
+            }
+            else
+            {
+                msgtype = des->cmd.type;
+            }              
+            
+            *index1 = msgtype;    
+            // marco.accame: at most they are 16 ... we don't remap. if any hole we manage with NULL function pointers. 
+            res = eores_OK;   
+            if(*index1 >= s_eo_canprot_functions_periodicInertialSensor_maxnumber)
+            {   // extra check
+                res = eores_NOK_generic;
+            }             
+        } break;
         
         default:
         {
