@@ -350,16 +350,21 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-            eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
-            
-            if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
+            //if it's not initted at this point, it means that no CANdiscovery is needed
+            if (eo_candiscovery_GetHandle() != NULL)
             {
-                return;
+                eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
+                
+                if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
+                {
+                    return;
+                }
+                else
+                {
+                    eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
+                }
             }
-            else
-			{
-				eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-			}
+            
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
                         
             //old version
