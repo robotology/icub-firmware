@@ -394,6 +394,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
             // the new currstate is set inside the relevant on-entry of the state machine
+            */
         } break;
         
         case applstate_error:

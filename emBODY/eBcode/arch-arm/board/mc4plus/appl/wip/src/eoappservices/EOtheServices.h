@@ -45,7 +45,7 @@
 #include "EOmcService.h"
 #include "EOtheMAIS.h"
 #include "EOtheCANservice.h"
-//#include "EOtheCANdiscovery.h"
+#include "EOtheCANdiscovery.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -76,7 +76,7 @@ extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg);
 
 extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg);
 
-//extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
+extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
 
 
 
