@@ -593,8 +593,8 @@ int CAN1_handleRx (unsigned int board_id)
 					{
 						LISInit(l3a,0,2);
 					}						
-					board_MODE=CALIB;
-					EnableIntT1;
+		//			board_MODE=CALIB;
+		//			EnableIntT1;
                 }
                 break;
                 //VALE: removed because unused
