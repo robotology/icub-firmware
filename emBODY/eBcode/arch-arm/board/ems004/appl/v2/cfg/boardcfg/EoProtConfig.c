@@ -82,7 +82,23 @@
         }      
     };
  
-
+#if defined(TEST_EB2_EB4_WITHOUT_MC)
+    static const eOprot_EPcfg_t s_theEPcfgsOthersEB2EB4[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {0, 0, 0, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {0, 0, 0, 1, 0, 0, 0}        
+        },
+        {           
+            .endpoint           = eoprot_endpoint_skin,
+            .numberofentities  = {1, 0, 0, 0, 0, 0, 0}     
+        }          
+    };
+#else   // normal case
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB2EB4[] =
     {  
         {           
@@ -98,7 +114,7 @@
             .numberofentities  = {1, 0, 0, 0, 0, 0, 0}     
         }          
     };
- 
+#endif
 
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB5[] =
     {  

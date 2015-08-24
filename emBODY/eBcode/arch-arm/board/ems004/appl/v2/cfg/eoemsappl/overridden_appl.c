@@ -283,7 +283,7 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
      }
 }
 
-#define DEBUG_INERTIAL
+//#define DEBUG_INERTIAL
 // marco.accame: this function is called inside eom_emsappl_Initialise() just before to run the state machine
 // which enters in the CFG state. it is the place where to launch new services
 
@@ -320,17 +320,21 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // now i load mc-joints, mc-motors, as-strain, as-mais, as-inertial, sk-skin
         EOconstvector *entitydes = NULL;
         // mc-joint
+#if defined(TEST_EB2_EB4_WITHOUT_MC)
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
         // mc-motor
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, entitydes); 
+#endif        
         // as-strain
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, entitydes);
+#if defined(TEST_EB2_EB4_WITHOUT_MC)        
         // as-mais
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
+#endif        
         // as-inertial
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, entitydes);        
@@ -402,7 +406,13 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 #if defined(DEBUG_INERTIAL)
     // test inertial
     
+    //#define TEST_NUM_1
+    #define TEST_NUM_2
+    
     eOas_inertial_config_t inertialconfig = {0};
+    eOas_inertial_enableflags_t enableflags = eoas_inertial_enable_none;
+ 
+#if defined(TEST_NUM_1)   
     
     inertialconfig.datarate = 11;
     inertialconfig.id = eoas_inertial_id_foot_palm;
@@ -414,7 +424,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     eo_inertial_Stop(eo_inertial_GetHandle());
     
-    eOas_inertial_enableflags_t enableflags = eoas_inertial_enable_none;
+   
     
     eo_inertial_Start(eo_inertial_GetHandle(), enableflags);
     
@@ -425,7 +435,25 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_inertial_Start(eo_inertial_GetHandle(), enableflags);
     
     enableflags = eoas_inertial_enable_none;
-    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);    
+    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);  
+
+#endif // defined(TEST_NUM_1)
+
+
+#if defined(TEST_NUM_2)
+
+    inertialconfig.datarate = 10;
+    inertialconfig.id = eoas_inertial_id_foot_palm;
+    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
+    
+    enableflags = eoas_inertial_enable_accelgyro;
+    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);  
+    
+    
+    eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+
+#endif // defined(TEST_NUM_2)
+
 #endif
 }
 
