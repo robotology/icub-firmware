@@ -292,9 +292,9 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 // all this is equivalent to perform only one shift of 2 and to set to zero the least significant 4 bits
                 // val_raw = (val_raw>>2) & 0xFFF0;
                 
-                // marco.accame: if we want to rescale the aea reading using the GENERAL:Encoders factor, then
-                // instead of the RESCALE_IN...  macro we use the following:
-                // *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);                
+                #warning: marco.accame: if we want to rescale the aea reading using the GENERAL:Encoders factor, then instead of the RESCALE_IN...  macro we use the following:
+                //val_raw = (val_raw >> 6) & 0x0FFF;
+                //*primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);                
                 break;
             }   			
 
@@ -874,8 +874,8 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         return(2000);
     }
     
-    /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor);
-    
+    /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor); NO MORE NEEDED */
+    divider = joint->config.jntEncoderResolution;
     if(0.0f == divider)
     {
         return(3000);       
@@ -885,11 +885,8 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     {
         divider = -divider;
     }
-    
-    retval = (float)val_raw / divider; 
-    */
-    
-    retval = (float)val_raw * 65535.0 / (float)joint->config.jntEncoderResolution;
+
+    retval = (float)val_raw * 65535.0 / divider;
     
     return(retval);
 
