@@ -124,6 +124,8 @@ struct EOaxisController_hid
     int32_t goback_vel;
     uint8_t isvirtuallycoupled;
     uint8_t hardwarelimitisreached;
+    
+    int32_t calibration_zero;
 }; 
 
 

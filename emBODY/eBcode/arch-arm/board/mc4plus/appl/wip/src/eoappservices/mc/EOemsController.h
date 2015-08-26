@@ -71,6 +71,8 @@ extern void eo_emsController_set_Jacobian(int32_t **Ji32);
 // encoders
 
 extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign);
+extern void eo_emsController_SetAxisCalibrationZero(uint8_t joint, int32_t sign);
+extern int32_t eo_emsController_GetAxisCalibrationZero(uint8_t joint);
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask);
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position);
 

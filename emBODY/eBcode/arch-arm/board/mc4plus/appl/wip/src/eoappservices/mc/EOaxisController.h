@@ -83,6 +83,9 @@ extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o);
 
 //extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
+extern void    eo_axisController_SetAxisCalibrationZero (EOaxisController* o, int32_t calibration_zero);
+extern int32_t eo_axisController_GetAxisCalibrationZero (EOaxisController* o);
+
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
 extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);

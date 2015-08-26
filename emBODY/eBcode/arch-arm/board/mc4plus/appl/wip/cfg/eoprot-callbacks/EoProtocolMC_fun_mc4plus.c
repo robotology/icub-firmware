@@ -151,6 +151,7 @@ const eOmc_joint_t joint_default_value =
         .filler01 =                  0xe0,
         .DEPRECATED_encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
         .DEPRECATED_encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
+		.jntEncoderResolution =		 0,
         .motor_params =
         {
             .bemf_value =            0,
@@ -511,8 +512,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     if(calibrator->type == eomc_calibration_type4_abs_and_incremental)
     {
         // calibration for joint with incremental encoders
-        #warning TODO: add eo_emsController_SetAxisCalibrationZero() in calib_type5
-        // eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type5.calibrationZero);
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type5.calibrationZero);
         eo_emsController_StartCalibration_type5 (jxx,
                                                  calibrator->params.type5.pwmlimit,
                                                  calibrator->params.type5.velocity,
@@ -521,8 +521,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     else if(calibrator->type == eomc_calibration_type3_abs_sens_digital)
     {
         // calibration for joint with abs encoders
-        #warning TODO: add eo_emsController_SetAxisCalibrationZero() in calib_type3
-        // eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
         eo_emsController_StartCalibration_type3(jxx, 
                                                 calibrator->params.type3.position, 
                                                 calibrator->params.type3.velocity,

@@ -173,6 +173,16 @@ extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign)
     eo_absCalibratedEncoder_SetSign(ems->abs_calib_encoder[joint], sign);
 }
 
+extern void eo_emsController_SetAxisCalibrationZero(uint8_t joint, int32_t calibration_zero)
+{
+    eo_axisController_SetAxisCalibrationZero(ems->axis_controller[joint], calibration_zero);
+}
+
+extern int32_t eo_emsController_GetAxisCalibrationZero(uint8_t joint)
+{
+    return eo_axisController_GetAxisCalibrationZero(ems->axis_controller[joint]);
+}
+
 //             | 1     0       0   |
 // J = dq/dm = | 1   40/65     0   |
 //             | 0  -40/65   40/65 | 
