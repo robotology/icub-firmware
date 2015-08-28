@@ -1051,13 +1051,13 @@ static const uint8_t s_eo_canprot_functions_pollingAnalogSensor_maxnumber = size
 
 const eOcanprot_functions_t s_eo_canprot_functions_periodicAnalogSensor[] =
 {
-    {   // 000
+    {   // 000      ICUBCANPROTO_PER_AS_MSG__DIGITAL_GYROSCOPE
         .former     = NULL,
-        .parser     = NULL
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_GYROSCOPE
     },
-    {   // 001
+    {   // 001      ICUBCANPROTO_PER_AS_MSG__DIGITAL_ACCELEROMETER
         .former     = NULL,
-        .parser     = NULL
+        .parser     = eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_ACCELEROMETER
     }, 
     {   // 002
         .former     = NULL,

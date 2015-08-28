@@ -100,6 +100,12 @@ extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descripto
 
 // - analog sensors: periodic
 
+
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_GYROSCOPE(eOcanframe_t *frame, eOcanport_t port);
+
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_ACCELEROMETER(eOcanframe_t *frame, eOcanport_t port);
+
+
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port);
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port);
