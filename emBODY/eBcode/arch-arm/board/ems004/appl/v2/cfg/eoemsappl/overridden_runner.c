@@ -207,7 +207,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
-#if defined(TEST_EB2_EB4_WITHOUT_MC)
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
 

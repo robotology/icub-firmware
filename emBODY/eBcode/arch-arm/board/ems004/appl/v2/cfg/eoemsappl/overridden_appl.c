@@ -320,7 +320,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // now i load mc-joints, mc-motors, as-strain, as-mais, as-inertial, sk-skin
         EOconstvector *entitydes = NULL;
         // mc-joint
-#if defined(TEST_EB2_EB4_WITHOUT_MC)
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
         // mc-motor
@@ -330,7 +330,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // as-strain
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, entitydes);
-#if defined(TEST_EB2_EB4_WITHOUT_MC)        
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)        
         // as-mais
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
