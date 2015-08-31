@@ -49,6 +49,7 @@ extern "C" {
 #include "EOconstvector.h"
 #include "EoProtocol.h"
 #include "EOappEncodersReader.h"
+#include "EOtheInertial.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -76,7 +77,9 @@ extern const eOappEncReader_cfg_t * eoboardconfig_code2encoderconfig(uint32_t co
 // of eOprot_EPcfg_t
 extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
 
-extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code);
+//extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code);
+
+extern const eOinertial_cfg_t * eoboardconfig_code2inertialCFG(uint32_t code);
 
 
 /** @}            

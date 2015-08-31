@@ -29,6 +29,7 @@
 
 #include "EoCommon.h"
 #include "EOtheCANprotocol.h"
+#include "EOvector.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -38,19 +39,19 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef enum 
-{
-    gyro_none       = 0,
-    gyro_ext        = 2
-} eOinertial_gyro_type_t;
+//typedef enum 
+//{
+//    gyro_none       = 0,
+//    gyro_ext        = 2
+//} eOinertial_gyro_type_t;
 
-typedef enum 
-{
-    accel_none      = 0,
-    accel_int       = 1,
-    accel_ext       = 2,
-    accel_intext    = 3
-} eOinertial_accel_type_t;
+//typedef enum 
+//{
+//    accel_none      = 0,
+//    accel_int       = 1,
+//    accel_ext       = 2,
+//    accel_intext    = 3
+//} eOinertial_accel_type_t;
 
 
 struct EOtheInertial_hid
@@ -58,14 +59,23 @@ struct EOtheInertial_hid
     eObool_t                    initted;
     eObool_t                    thereisinertial;
     uint8_t                     protindex;
-    eOas_inertialidentifier_t   id;
-    uint8_t                     supportedsensors;
-    eOinertial_accel_type_t     acceltype;
-    eOinertial_gyro_type_t      gyrotype;
+//    eOas_inertialidentifier_t   id;
+//    uint8_t                     supportedsensors;
+//    eOinertial_accel_type_t     acceltype;
+//    eOinertial_gyro_type_t      gyrotype;
     eObool_t                    istransmitting;
-    eOprotID32_t                id32;
-    eOas_inertial_config_t      config;
+//    eOprotID32_t                id32;
+//    eOas_inertial_config_t      config;
+    eOas_inertial_config_t     config2;
     eOcanprot_command_t         command;
+    eOinertial_cfg_t            configuration;
+    uint64_t                    supportedmask64;
+//    uint32_t                    supportedleft;
+//    uint32_t                    supportedrigth;
+//    uint32_t                    supportedcentral;
+//    eOinertial_sensor_config_t  sensorconfiguration;
+    eOas_inertial_t            *inertial2;
+    EOvector                    *fifo;
 }; 
 
 

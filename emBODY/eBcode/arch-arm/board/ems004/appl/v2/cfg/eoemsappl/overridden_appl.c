@@ -319,8 +319,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         eo_canmap_LoadBoards(canmap, canboards);
         // now i load mc-joints, mc-motors, as-strain, as-mais, as-inertial, sk-skin
         EOconstvector *entitydes = NULL;
-        // mc-joint
 #if !defined(TEST_EB2_EB4_WITHOUT_MC)
+        // mc-joint
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
         // mc-motor
@@ -389,7 +389,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_mais_Initialise();
     eo_skin_Initialise();
     // the intertial needs to know what kind of inertial we have ... that depends on the board
-    eo_inertial_Initialise(eoboardconfig_code2inertialID(s_boardnum));
+    eo_inertial_Initialise2(eoboardconfig_code2inertialCFG(s_boardnum));
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
@@ -410,44 +410,43 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     #define TEST_NUM_2
     
     eOas_inertial_config_t inertialconfig = {0};
-    eOas_inertial_enableflags_t enableflags = eoas_inertial_enable_none;
+    inertialconfig.datarate = 10;
+    inertialconfig.enabled = 0;
+    
+    
  
 #if defined(TEST_NUM_1)   
     
-    inertialconfig.datarate = 11;
-    inertialconfig.id = eoas_inertial_id_foot_palm;
-    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
+    inertialconfig.datarate = 50;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
+    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);
 
     inertialconfig.datarate = 9;
-    inertialconfig.id = eoas_inertial_id_hand_palm;    
-    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand) | EOAS_ENABLEPOS(eoas_inertial_pos_l_forearm_1);    
+    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);
     
-    eo_inertial_Stop(eo_inertial_GetHandle());
+    eo_inertial_Stop2(eo_inertial_GetHandle());
     
+    
+    inertialconfig.datarate = 50;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
    
+    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);   
+    eo_inertial_Start2(eo_inertial_GetHandle());
     
-    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);
-    
-    enableflags = eoas_inertial_enable_accelerometer;
-    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);
-    
-    enableflags = eoas_inertial_enable_accelgyro;
-    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);
-    
-    enableflags = eoas_inertial_enable_none;
-    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);  
-
 #endif // defined(TEST_NUM_1)
 
 
 #if defined(TEST_NUM_2)
 
-    inertialconfig.datarate = 10;
-    inertialconfig.id = eoas_inertial_id_foot_palm;
-    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
+
+    inertialconfig.datarate = 250;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
+    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);
     
-    enableflags = eoas_inertial_enable_accelgyro;
-    eo_inertial_Start(eo_inertial_GetHandle(), enableflags);  
+    eo_inertial_Start2(eo_inertial_GetHandle());  
+    
+    
     
     
     eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
@@ -533,7 +532,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     eo_strain_DisableTX(eo_strain_GetHandle());    
 
     // stop tx of inertial. the check whether to stop skin or not is done internally.
-    eo_inertial_Stop(eo_inertial_GetHandle());
+    eo_inertial_Stop2(eo_inertial_GetHandle());
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)

@@ -84,7 +84,7 @@
  
 #if defined(TEST_EB2_EB4_WITHOUT_MC)
     
-    lamaledizionedelloscorpionedigiada
+    // lamaledizionedelloscorpionedigiada
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB2EB4[] =
     {  
         {           

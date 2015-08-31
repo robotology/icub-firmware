@@ -500,27 +500,64 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
 }
 
 
-extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code)
+//extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code)
+//{
+//    eOas_inertialidentifier_t ret = eoas_inertial_id_none;
+//    
+//    switch(code)
+//    {
+//        case 1:
+//        case 3: 
+//        {   // board eb2 or eb4   
+//            ret = eoas_inertial_id_hand_palm; 
+//        } break;  
+
+//        
+//        default:    
+//        {   // all the others
+//            ret = eoas_inertial_id_none;
+//        } break;
+//    
+//    }
+
+//    return(ret);        
+//}
+
+extern const eOinertial_cfg_t * eoboardconfig_code2inertialCFG(uint32_t code)
 {
-    eOas_inertialidentifier_t ret = eoas_inertial_id_none;
+    const eOinertial_cfg_t *ret = NULL;
     
     switch(code)
     {
         case 1:
+        {
+            ret = &eo_inertial_cfg_eb2;
+        } break;
+        
         case 3: 
-        {   // board eb2 or eb4   
-            ret = eoas_inertial_id_hand_palm; 
+        {     
+            ret = &eo_inertial_cfg_eb4;
         } break;  
 
+
+        case 9:
+        {
+            ret = &eo_inertial_cfg_eb10;
+        } break;
+        
+        case 10: 
+        {     
+            ret = &eo_inertial_cfg_eb11;
+        } break; 
         
         default:    
         {   // all the others
-            ret = eoas_inertial_id_none;
+            ret = NULL;
         } break;
     
     }
 
-    return(ret);        
+    return(ret);   
 }
     
 
