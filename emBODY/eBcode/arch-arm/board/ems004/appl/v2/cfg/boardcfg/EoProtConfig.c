@@ -165,7 +165,11 @@
 
 
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB10EB11[] =
-    {  
+    { 
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {0, 0, 0, 1, 0, 0, 0}        
+        },        
         {           
             .endpoint           = eoprot_endpoint_skin,
             .numberofentities  = {2, 0, 0, 0, 0, 0, 0}     
