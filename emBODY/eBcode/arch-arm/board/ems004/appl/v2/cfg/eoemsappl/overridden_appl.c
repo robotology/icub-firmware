@@ -334,10 +334,15 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // as-mais
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
-#endif        
-        // as-inertial
-        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
-        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, entitydes);        
+#endif   
+        // the entity as-inertial is not associated to one can board or a set of can boards. it is a ram-mapped entity. as we can use only one
+        // for the limitations of the udp packet, we let the object EOtheInertial manage the proper decoding of the can messages coming from the mtb boards. 
+        // THUS, we dont need to call eo_canmap_ConfigEntity(). 
+        // in short: if we dont use a eo_canmap_GetEntityIndex() or a eo_canmap_GetEntityLocation() we dont need to call eo_canmap_ConfigEntity() now.
+//        // as-inertial
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, entitydes);     
+
         // sk-skin
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
@@ -388,8 +393,10 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_strain_Initialise();
     eo_mais_Initialise();
     eo_skin_Initialise();
-    // the intertial needs to know what kind of inertial we have ... that depends on the board
-    eo_inertial_Initialise2(eoboardconfig_code2inertialCFG(s_boardnum));
+    // the inertial is initted but does not know yet which can network it supports
+    eo_inertial_Initialise();
+    // the can network is loaded in runtime. we need 2x15 values, which for now are taken from its ip address. later on they will be taken from a UDP message
+    eo_inertial_ServiceConfig(eo_inertial_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
@@ -409,7 +416,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     //#define TEST_NUM_1
     #define TEST_NUM_2
     
-    eOas_inertial_config_t inertialconfig = {0};
+    eOas_inertial_sensorsconfig_t inertialconfig = {0};
     inertialconfig.datarate = 10;
     inertialconfig.enabled = 0;
     
@@ -419,20 +426,20 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     inertialconfig.datarate = 50;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
-    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);
+    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
 
     inertialconfig.datarate = 9;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand) | EOAS_ENABLEPOS(eoas_inertial_pos_l_forearm_1);    
-    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);
     
-    eo_inertial_Stop2(eo_inertial_GetHandle());
+    eo_inertial_Stop(eo_inertial_GetHandle());
     
     
     inertialconfig.datarate = 50;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
    
-    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);   
-    eo_inertial_Start2(eo_inertial_GetHandle());
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);   
+    eo_inertial_Start(eo_inertial_GetHandle());
     
 #endif // defined(TEST_NUM_1)
 
@@ -442,9 +449,9 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
     inertialconfig.datarate = 250;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
-    eo_inertial_Config2(eo_inertial_GetHandle(), &inertialconfig);
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);
     
-    eo_inertial_Start2(eo_inertial_GetHandle());  
+    eo_inertial_Start(eo_inertial_GetHandle());  
     
     
     
@@ -532,7 +539,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     eo_strain_DisableTX(eo_strain_GetHandle());    
 
     // stop tx of inertial. the check whether to stop skin or not is done internally.
-    eo_inertial_Stop2(eo_inertial_GetHandle());
+    eo_inertial_Stop(eo_inertial_GetHandle());
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)

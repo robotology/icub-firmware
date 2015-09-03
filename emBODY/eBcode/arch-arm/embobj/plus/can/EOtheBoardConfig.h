@@ -79,7 +79,7 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
 
 //extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code);
 
-extern const eOinertial_cfg_t * eoboardconfig_code2inertialCFG(uint32_t code);
+extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code);
 
 
 /** @}            

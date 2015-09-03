@@ -84,7 +84,7 @@ extern EOconstvector s_eo_vectorof_des_mais_eb1;
 extern EOconstvector s_eo_vectorof_des_jomo_eb2;
 extern EOconstvector s_eo_vectorof_des_strain_eb2;
 extern EOconstvector s_eo_vectorof_des_mais_eb2;
-extern EOconstvector s_eo_vectorof_des_inertial_eb2;
+//extern EOconstvector s_eo_vectorof_des_inertial_eb2;
 extern EOconstvector s_eo_vectorof_des_skin_eb2; 
 
 
@@ -165,7 +165,7 @@ const EOconstvector * const entitiesmapB2[eoprot_endpoints_numberof][eoboardconf
     }, 
 
     { // as
-        &s_eo_vectorof_des_strain_eb2, &s_eo_vectorof_des_mais_eb2, &s_eo_empty_constvector_entity, &s_eo_vectorof_des_inertial_eb2
+        &s_eo_vectorof_des_strain_eb2, &s_eo_vectorof_des_mais_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
         &s_eo_vectorof_des_skin_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
@@ -310,8 +310,8 @@ extern EOconstvector * eoboardconfig_code2canboards(uint32_t code)
 } 
 
 // of eOcanmap_entitydescriptor_t
-// teh constnector contains reference to the boards used to offer service to a given entity.
-// or ... is empty in case of no such an entity on teh board or entity being served not by can
+// the const vector contains reference to the boards used to offer service to a given entity.
+// or ... is empty in case of there is not such an entity on the board or the entity is not served by can
 extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOprotEndpoint_t ep, eOprotEntity_t entity)
 {
     EOconstvector *ret = (EOconstvector*) &s_eo_empty_constvector_entity;
@@ -523,9 +523,9 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
 //    return(ret);        
 //}
 
-extern const eOinertial_cfg_t * eoboardconfig_code2inertialCFG(uint32_t code)
+extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code)
 {
-    const eOinertial_cfg_t *ret = NULL;
+    const eOas_inertial_serviceconfig_t *ret = NULL;
     
     switch(code)
     {

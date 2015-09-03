@@ -375,12 +375,17 @@ extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv,
 //    s_signalGetFullScales(rd->id32, *signaloncefullscale);
 }
 
-
-
-extern void eoprot_fun_UPDT_as_inertial_config(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_as_inertial_config_service(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOas_inertial_config_t *cfg = (eOas_inertial_config_t*)rd->data;    
-    eo_inertial_Config2(eo_inertial_GetHandle(), cfg);    
+    eOas_inertial_serviceconfig_t *cfg = (eOas_inertial_serviceconfig_t*)rd->data;    
+    eo_inertial_ServiceConfig(eo_inertial_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_inertial_config_sensors(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_inertial_sensorsconfig_t *cfg = (eOas_inertial_sensorsconfig_t*)rd->data;    
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), cfg);    
 }
 
 
@@ -390,11 +395,11 @@ extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOro
 
     if(0 == cmd->enable)
     {
-        eo_inertial_Stop2(eo_inertial_GetHandle());    
+        eo_inertial_Stop(eo_inertial_GetHandle());    
     }
     else
     {
-        eo_inertial_Start2(eo_inertial_GetHandle());    
+        eo_inertial_Start(eo_inertial_GetHandle());    
     }
 }
 

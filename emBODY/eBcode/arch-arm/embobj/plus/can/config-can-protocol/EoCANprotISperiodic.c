@@ -96,7 +96,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE(eOcan
         return(eores_OK);
     }
     
-    eo_inertial_Receive2(eo_inertial_GetHandle(), eoas_inertial_type_gyroscope, frame, port);
+    eo_inertial_Receive(eo_inertial_GetHandle(), eoas_inertial_type_gyroscope, frame, port);
     
     return(eores_OK);
     
@@ -126,7 +126,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
         return(eores_OK);
     }
     
-    eo_inertial_Receive2(eo_inertial_GetHandle(), eoas_inertial_type_accelerometer, frame, port);
+    eo_inertial_Receive(eo_inertial_GetHandle(), eoas_inertial_type_accelerometer, frame, port);
     
     return(eores_OK);
     

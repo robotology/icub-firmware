@@ -364,30 +364,30 @@ EOconstvector s_eo_vectorof_des_mais_eb2 =
 EOconstvector* eo_vectorof_descriptor_mais_eb2 = &s_eo_vectorof_des_mais_eb2;
 
 
-static const eOcanmap_entitydescriptor_t s_des_inertial[] = 
-{
-    {   // inertial 0: the palm of the hand
-        .location   =
-        {
-            .port           = eOcanport2,
-            .addr           = 14,
-            .insideindex    = eocanmap_insideindex_none
-        },
-        .index      = entindex00
-    }  
-};
+//static const eOcanmap_entitydescriptor_t s_des_inertial[] = 
+//{
+//    {   // inertial 0: the palm of the hand
+//        .location   =
+//        {
+//            .port           = eOcanport2,
+//            .addr           = 14,
+//            .insideindex    = eocanmap_insideindex_none
+//        },
+//        .index      = entindex00
+//    }  
+//};
 
-EOconstvector s_eo_vectorof_des_inertial_eb2 = 
-{
-    .capacity       = sizeof(s_des_inertial)/sizeof(eOcanmap_entitydescriptor_t),
-    .size           = sizeof(s_des_inertial)/sizeof(eOcanmap_entitydescriptor_t),
-    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
-    .dummy          = 0,
-    .stored_items   = (void*)s_des_inertial,
-    .functions      = NULL   
-};
+//EOconstvector s_eo_vectorof_des_inertial_eb2 = 
+//{
+//    .capacity       = sizeof(s_des_inertial)/sizeof(eOcanmap_entitydescriptor_t),
+//    .size           = sizeof(s_des_inertial)/sizeof(eOcanmap_entitydescriptor_t),
+//    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+//    .dummy          = 0,
+//    .stored_items   = (void*)s_des_inertial,
+//    .functions      = NULL   
+//};
 
-EOconstvector* eo_vectorof_descriptor_inertial_eb2 = &s_eo_vectorof_des_inertial_eb2;
+//EOconstvector* eo_vectorof_descriptor_inertial_eb2 = &s_eo_vectorof_des_inertial_eb2;
 
 
 // in case, as in eb10 / eb11, there are two skins, in here we put in .index: entindex00 or entindex00 depending on the cases. 

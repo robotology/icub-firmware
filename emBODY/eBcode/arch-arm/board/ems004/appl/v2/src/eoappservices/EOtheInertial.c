@@ -66,107 +66,110 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOinertial_cfg_t eo_inertial_cfg_eb2 = 
+// marco.accame: we can later on retrieve the canmapofsupportedsensors[][] from a config message coming from robotInterface.
+//               now, for short we dont do it and we store the configurations inside here.
+
+const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb2 = 
 {
     .canmapofsupportedsensors =
     {
         {   // can1   
-            eoas_inertial_pos_none,             // adr 00 
+            eoas_inertial_pos_none,                 // adr 00 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none       
         },
         {   // can2
-            eoas_inertial_pos_none,             // adr 00 
+            eoas_inertial_pos_none,                 // adr 00 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none,
-            eoas_inertial_pos_l_upperarm_4,     // adr 08
-            eoas_inertial_pos_l_upperarm_3,     // adr 09
-            eoas_inertial_pos_l_upperarm_2,     // adr 10
-            eoas_inertial_pos_l_upperarm_1,     // adr 11
-            eoas_inertial_pos_l_forearm_2,      // adr 12
-            eoas_inertial_pos_l_forearm_1,      // adr 13
-            eoas_inertial_pos_l_hand            // adr 14        
+            eoas_inertial_pos_l_upper_arm_4,        // adr 08
+            eoas_inertial_pos_l_upper_arm_1,        // adr 09
+            eoas_inertial_pos_l_upper_arm_3,        // adr 10
+            eoas_inertial_pos_l_upper_arm_2,        // adr 11           
+            eoas_inertial_pos_l_forearm_1,          // adr 12
+            eoas_inertial_pos_l_forearm_2,          // adr 13
+            eoas_inertial_pos_l_hand                // adr 14        
         }  
     }    
 };
 
-const eOinertial_cfg_t eo_inertial_cfg_eb4 = 
+const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb4 = 
 {
     .canmapofsupportedsensors =
     {
         {   // can1  
-            eoas_inertial_pos_none,             // adr 00 
+            eoas_inertial_pos_none,                 // adr 00 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none       
         },
         {   // can2
-            eoas_inertial_pos_none,             // adr 00 
+            eoas_inertial_pos_none,                 // adr 00 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none,
-            eoas_inertial_pos_r_upperarm_4,     // adr 08
-            eoas_inertial_pos_r_upperarm_3,     // adr 09
-            eoas_inertial_pos_r_upperarm_2,     // adr 10
-            eoas_inertial_pos_r_upperarm_1,     // adr 11
-            eoas_inertial_pos_r_forearm_2,      // adr 12
-            eoas_inertial_pos_r_forearm_1,      // adr 13
-            eoas_inertial_pos_r_hand            // adr 14        
+            eoas_inertial_pos_r_upper_arm_4,        // adr 08
+            eoas_inertial_pos_r_upper_arm_1,        // adr 09
+            eoas_inertial_pos_r_upper_arm_3,        // adr 10
+            eoas_inertial_pos_r_upper_arm_2,        // adr 11           
+            eoas_inertial_pos_r_forearm_1,          // adr 12
+            eoas_inertial_pos_r_forearm_2,          // adr 13
+            eoas_inertial_pos_r_hand                // adr 14        
         }  
     }   
 };
 
 
-const eOinertial_cfg_t eo_inertial_cfg_eb10 = 
+const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb10 = 
 {
     .canmapofsupportedsensors =
     {
         {   // can1  
             eoas_inertial_pos_none,                 // adr 00 
-            eoas_inertial_pos_l_upperleg_front_1,   // adr 01
-            eoas_inertial_pos_l_upperleg_front_2,   // adr 02
-            eoas_inertial_pos_l_upperleg_front_3,   // adr 03
-            eoas_inertial_pos_l_upperleg_front_4,   // adr 04 
-            eoas_inertial_pos_l_upperleg_front_5,   // adr 05 
-            eoas_inertial_pos_l_upperleg_back_1,    // adr 06 
-            eoas_inertial_pos_l_upperleg_back_2,    // adr 07 
+            eoas_inertial_pos_l_upper_leg_1,        // adr 01
+            eoas_inertial_pos_l_upper_leg_2,        // adr 02
+            eoas_inertial_pos_l_upper_leg_3,        // adr 03
+            eoas_inertial_pos_l_upper_leg_4,        // adr 04 
+            eoas_inertial_pos_l_upper_leg_5,        // adr 05 
+            eoas_inertial_pos_l_upper_leg_6,        // adr 06 
+            eoas_inertial_pos_l_upper_leg_7,        // adr 07 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none       
         },
         {   // can2
             eoas_inertial_pos_none,                 // adr 00 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none,
-            eoas_inertial_pos_l_lowerleg_2,         // adr 08
-            eoas_inertial_pos_l_lowerleg_3,         // adr 09
-            eoas_inertial_pos_l_lowerleg_1,         // adr 10
-            eoas_inertial_pos_l_lowerleg_4,         // adr 11
-            eoas_inertial_pos_l_foot_1,             // adr 12
-            eoas_inertial_pos_l_foot_2,             // adr 13   
+            eoas_inertial_pos_l_lower_leg_1,        // adr 08
+            eoas_inertial_pos_l_lower_leg_2,        // adr 09
+            eoas_inertial_pos_l_lower_leg_3,        // adr 10
+            eoas_inertial_pos_l_lower_leg_4,        // adr 11
+            eoas_inertial_pos_l_foot_2,             // adr 12
+            eoas_inertial_pos_l_foot_1,             // adr 13   
             eoas_inertial_pos_none                  // adr 14
         }  
     }       
 };
 
 
-const eOinertial_cfg_t eo_inertial_cfg_eb11 = 
+const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb11 = 
 {
     .canmapofsupportedsensors =
     {
         {   // can1  
             eoas_inertial_pos_none,                 // adr 00 
-            eoas_inertial_pos_r_upperleg_front_1,   // adr 01
-            eoas_inertial_pos_r_upperleg_front_2,   // adr 02
-            eoas_inertial_pos_r_upperleg_front_3,   // adr 03
-            eoas_inertial_pos_r_upperleg_front_5,   // adr 04 
-            eoas_inertial_pos_r_upperleg_front_4,   // adr 05 
-            eoas_inertial_pos_r_upperleg_back_1,    // adr 06 
-            eoas_inertial_pos_r_upperleg_back_2,    // adr 07 
+            eoas_inertial_pos_r_upper_leg_1,        // adr 01
+            eoas_inertial_pos_r_upper_leg_2,        // adr 02
+            eoas_inertial_pos_r_upper_leg_3,        // adr 03
+            eoas_inertial_pos_r_upper_leg_4,        // adr 04 
+            eoas_inertial_pos_r_upper_leg_5,        // adr 05 
+            eoas_inertial_pos_r_upper_leg_6,        // adr 06 
+            eoas_inertial_pos_r_upper_leg_7,        // adr 07 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none       
         },
         {   // can2
             eoas_inertial_pos_none,                 // adr 00 
             eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none, eoas_inertial_pos_none,
-            eoas_inertial_pos_r_lowerleg_2,         // adr 08
-            eoas_inertial_pos_r_lowerleg_3,         // adr 09
-            eoas_inertial_pos_r_lowerleg_1,         // adr 10
-            eoas_inertial_pos_r_lowerleg_4,         // adr 11
-            eoas_inertial_pos_r_foot_1,             // adr 12
-            eoas_inertial_pos_r_foot_2,             // adr 13   
+            eoas_inertial_pos_r_lower_leg_1,        // adr 08
+            eoas_inertial_pos_r_lower_leg_2,        // adr 09
+            eoas_inertial_pos_r_lower_leg_3,        // adr 10
+            eoas_inertial_pos_r_lower_leg_4,        // adr 11
+            eoas_inertial_pos_r_foot_2,             // adr 12
+            eoas_inertial_pos_r_foot_1,             // adr 13   
             eoas_inertial_pos_none                  // adr 14
         }  
     } 
@@ -182,12 +185,7 @@ const eOinertial_cfg_t eo_inertial_cfg_eb11 =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//static void s_eo_inertial_configcanmessage(icubCanProto_inertial_config_t *canprotoconfig, eOas_inertial_enableflags_t enableflags);
-
-//static void* s_eo_inertial_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
-//static void* s_eo_inertial_get_entity2(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
-
-static void s_eo_inertial_build_maps(void);
+static void s_eo_inertial_build_maps(const eOas_inertial_serviceconfig_t* cfg);
 
 static eObool_t s_eo_inertial_get_canlocation(eOas_inertial_position_t targetposition, eOcanmap_location_t *loc);
 
@@ -197,14 +195,7 @@ static eObool_t s_eo_inertial_get_sensor(eOcanmap_location_t location, eOas_iner
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const eOas_inertial_config_t s_eo_default_inertialconfig =
-//{
-//    .id         = eoas_inertial_id_hand_palm,
-//    .datarate   = 10,
-//    .filler     = {0}
-//};
-
-static const eOas_inertial_config_t s_eo_default_inertialconfig2 =
+static const eOas_inertial_sensorsconfig_t s_eo_default_inertialsensorsconfig =
 {
     .enabled    = 0,
     .datarate   = 50,
@@ -216,25 +207,14 @@ static const eOas_inertial_config_t s_eo_default_inertialconfig2 =
 static EOtheInertial s_eo_theinertial = 
 {
     .initted                = eobool_false,
+    .configured             = eobool_false,
     .thereisinertial        = eobool_false,
     .protindex              = 0,
-//    .id                     = eoas_inertial_id_hand_palm,
-//    .acceltype              = accel_intext,
-//    .gyrotype               = gyro_ext,
     .istransmitting         = eobool_false,
-//    .supportedsensors       = icubCanProto_inertial_sensorflag_internaldigitalaccelerometer | 
-//                              icubCanProto_inertial_sensorflag_externaldigitalgyroscope | 
-//                              icubCanProto_inertial_sensorflag_externaldigitalaccelerometer,
-//    .id32                   = eo_prot_ID32dummy,
-//    .config                 = {0},
-    .config2                = {0},
+    .sensorsconfig          = {0},
     .command                = {0},
-//    .configuration          = {0},
+    .serviceconfig          = {0},
     .supportedmask64        = 0,
-//    .supportedleft          = 0,
-//    .supportedrigth         = 0,
-//    .supportedcentral       = 0,
-//    .sensorconfiguration    = 0,
     .inertial2              = NULL,
     .fifo                   = NULL
 };
@@ -248,57 +228,74 @@ static EOtheInertial s_eo_theinertial =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern EOtheInertial* eo_inertial_Initialise(void)
+{
+    if(eobool_true == s_eo_theinertial.initted)
+    {
+        return(&s_eo_theinertial);
+    }
+    
+
+    if(0 == eo_entities_NumOfInertials(eo_entities_GetHandle()))
+    {
+        s_eo_theinertial.thereisinertial = eobool_false;
+    }
+    else
+    {
+        s_eo_theinertial.thereisinertial = eobool_true;
+        s_eo_theinertial.protindex = 0;
+        
+        s_eo_theinertial.istransmitting = eobool_false;
+               
+        memcpy(&s_eo_theinertial.sensorsconfig, &s_eo_default_inertialsensorsconfig, sizeof(eOas_inertial_sensorsconfig_t));
+        s_eo_theinertial.inertial2 = eo_entities_GetInertial(eo_entities_GetHandle(), s_eo_theinertial.protindex);       
+        s_eo_theinertial.fifo = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
+    }
+    
+
+    s_eo_theinertial.initted = eobool_true;
+    s_eo_theinertial.configured = eobool_false;
+    
+    return(&s_eo_theinertial);   
+}
 
 
-//extern EOtheInertial* eo_inertial_Initialise(eOas_inertialidentifier_t id, const eOinertial_cfg_t* cfg)
-//{
-//    if(eobool_true == s_eo_theinertial.initted)
-//    {
-//        return(&s_eo_theinertial);
-//    }
-//    
-
-//    if((eoas_inertial_id_none == id) || (NULL == cfg) || (0 == eo_entities_NumOfInertials(eo_entities_GetHandle())))
-//    {
-//        s_eo_theinertial.thereisinertial = eobool_false;
-//    }
-//    else
-//    {
-//        s_eo_theinertial.thereisinertial = eobool_true;
-//        s_eo_theinertial.protindex = 0;
-//        
-//        s_eo_theinertial.id = id;
-//        if((eoas_inertial_id_hand_palm == id) || (eoas_inertial_id_foot_palm == id))
-//        {
-//            s_eo_theinertial.gyrotype           = gyro_ext;
-//            s_eo_theinertial.acceltype          = accel_intext;
-//            s_eo_theinertial.supportedsensors   = icubCanProto_inertial_sensorflag_internaldigitalaccelerometer | 
-//                                                  icubCanProto_inertial_sensorflag_externaldigitalgyroscope | 
-//                                                  icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-//        }
-//        else
-//        {   // any other future inertial sensor, for instance a eoas_inertial_id_arm_wrist or eoas_inertial_id_arm_elbow
-//            s_eo_theinertial.gyrotype           = gyro_none;
-//            s_eo_theinertial.acceltype          = accel_int;
-//            s_eo_theinertial.supportedsensors   = icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-//        }
-//        
-//        s_eo_theinertial.istransmitting = eobool_false;
-//        
-//        s_eo_theinertial.id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, s_eo_theinertial.protindex, eoprot_tag_none);
-//        memcpy(&s_eo_theinertial.config, &s_eo_default_inertialconfig, sizeof(eOas_inertial_config_t));
-//        memcpy(&s_eo_theinertial.configuration, cfg, sizeof(eOinertial_cfg_t));
-//        s_eo_inertial_build_maps();
-//    }
-//    
-
-//    s_eo_theinertial.initted = eobool_true;
-//    
-//    return(&s_eo_theinertial);   
-//}
+extern eOresult_t eo_inertial_ServiceConfig(EOtheInertial *p, const eOas_inertial_serviceconfig_t* cfg)
+{    
+    // we can configure the service how many times we want. however the object must be initted and must there be an inertial entity
+ 
+    if((NULL == p) || (NULL == cfg))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theinertial.initted)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    if(eobool_false == s_eo_theinertial.thereisinertial)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    if(eobool_true == s_eo_theinertial.istransmitting)
+    {
+        eo_inertial_Stop(p);
+    }
+    
+    // ok, now we can build the maps.
+    s_eo_inertial_build_maps(cfg);
+    
+    // and set it configured
+    s_eo_theinertial.configured = eobool_false;
+    
+    return(eores_OK);  
+}
 
 
-extern EOtheInertial* eo_inertial_Initialise2(const eOinertial_cfg_t* cfg)
+
+extern EOtheInertial* eo_inertial_Initialise2(const eOas_inertial_serviceconfig_t* cfg)
 {
     if(eobool_true == s_eo_theinertial.initted)
     {
@@ -317,14 +314,14 @@ extern EOtheInertial* eo_inertial_Initialise2(const eOinertial_cfg_t* cfg)
         
         s_eo_theinertial.istransmitting = eobool_false;
         
-//        s_eo_theinertial.id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, s_eo_theinertial.protindex, eoprot_tag_none);
         
-        memcpy(&s_eo_theinertial.config2, &s_eo_default_inertialconfig2, sizeof(eOas_inertial_config_t));
-        memcpy(&s_eo_theinertial.configuration, cfg, sizeof(eOinertial_cfg_t));
-        s_eo_inertial_build_maps();
-        s_eo_theinertial.inertial2 = eo_entities_GetInertial(eo_entities_GetHandle(), s_eo_theinertial.protindex);
+        memcpy(&s_eo_theinertial.sensorsconfig, &s_eo_default_inertialsensorsconfig, sizeof(eOas_inertial_sensorsconfig_t));
+
+        s_eo_theinertial.inertial2 = eo_entities_GetInertial(eo_entities_GetHandle(), s_eo_theinertial.protindex);        
+        s_eo_theinertial.fifo = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);        
         
-        s_eo_theinertial.fifo = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
+        s_eo_inertial_build_maps(cfg);
+        s_eo_theinertial.configured = eobool_true;
     }
     
 
@@ -346,59 +343,8 @@ extern EOtheInertial* eo_inertial_GetHandle(void)
 }
 
 
-//extern eOresult_t eo_inertial_Config(EOtheInertial *p, eOas_inertial_config_t* inertialcfg)
-//{
-//    if((NULL == p) || (NULL == inertialcfg))
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertial.thereisinertial)
-//    {   // nothing to do because we dont have a inertial board
-//        // send up diagnostics
-//        // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."         
-//        return(eores_OK);
-//    }  
 
-//    // ok, now we do something. 
-//    
-//    
-//    // the mtb does not have a can message which just configures the inertial sensor. it only has a start message with some parameters.
-//    // thus in here we just copy the config into the local copy of the object. we dont prepare the canframe
-//    
-//    s_eo_theinertial.config.id          = inertialcfg->id;
-//    s_eo_theinertial.config.datarate    = inertialcfg->datarate;
-//    
-//    // however we do some sanity checks
-//    
-//    if(s_eo_theinertial.id != s_eo_theinertial.config.id)
-//    {
-//        s_eo_theinertial.config.id = s_eo_theinertial.id;
-//        // and also change the configuration of the inertial ...
-//        eOas_inertial_config_t *cfg = eo_entities_GetInertialConfig(eo_entities_GetHandle(), s_eo_theinertial.protindex);
-//        cfg->id = s_eo_theinertial.id;
-//        
-//        // send up diagnostics about the fact that we support a different inertial ...
-//        // error -> "Object EOtheInertial does not not support the requested inertial. The supported will be used instead. In param16 msb there is the supported one and in lsb the requested"             
-//    }
-//    
-//    if((0 == s_eo_theinertial.config.datarate) || (s_eo_theinertial.config.datarate > 10))
-//    {
-//        s_eo_theinertial.config.datarate = 10;
-//        // and also change the configuration of the inertial ...
-//        eOas_inertial_config_t *cfg = eo_entities_GetInertialConfig(eo_entities_GetHandle(), s_eo_theinertial.protindex);
-//        cfg->datarate = 10;
-//        
-//        // send up diagnostics about the fact that we support a different datarate ...
-//        // error -> "Object EOtheInertial does not not support the requested datarate. The supported will be used instead. in param16 msb there is the supported one and in lsb the requested"                     
-//    }
-
-//    
-//    return(eores_OK);     
-//}
-
-
-extern eOresult_t eo_inertial_Config2(EOtheInertial *p, eOas_inertial_config_t* config)
+extern eOresult_t eo_inertial_SensorsConfig(EOtheInertial *p, eOas_inertial_sensorsconfig_t* config)
 {
     if((NULL == p) || (NULL == config))
     {
@@ -411,112 +357,64 @@ extern eOresult_t eo_inertial_Config2(EOtheInertial *p, eOas_inertial_config_t* 
         // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."         
         return(eores_OK);
     }  
+    
+    if(eobool_false == s_eo_theinertial.configured)
+    {
+        // nothing to do because we dont have a configured object et
+        // send up diagnostics
+        // error -> "Object EOtheInertial is not yet configured, thus will NOT process any command."   
+        return(eores_OK);
+    }
 
     // ok, now we do something. 
     
     // at first we copy the target config into the local config
     
-    s_eo_theinertial.config2.datarate   = config->datarate;
-    s_eo_theinertial.config2.enabled    = config->enabled;
+    s_eo_theinertial.sensorsconfig.datarate   = config->datarate;
+    s_eo_theinertial.sensorsconfig.enabled    = config->enabled;
     
     // then we check enabled mask and datarate
     
     // the enabled must be in bitwise AND with the supported ones
-    s_eo_theinertial.config2.enabled    &= s_eo_theinertial.supportedmask64;
-    if(s_eo_theinertial.config2.enabled != config->enabled)
+    s_eo_theinertial.sensorsconfig.enabled    &= s_eo_theinertial.supportedmask64;
+    if(s_eo_theinertial.sensorsconfig.enabled != config->enabled)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertial does not not support some of the inertials."               
     }
     
-    if(0 == s_eo_theinertial.config2.enabled)
+    if(0 == s_eo_theinertial.sensorsconfig.enabled)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertial does not have a valid configuration."            
     }
 
     
-    if(s_eo_theinertial.config2.datarate < 10)
+    if(s_eo_theinertial.sensorsconfig.datarate < 10)
     {
-        s_eo_theinertial.config2.datarate = 10;
+        s_eo_theinertial.sensorsconfig.datarate = 10;
         // send up diagnostics
         // warning -> "Object EOtheInertial has changed the requested datarate."         
     }
     
-    if(s_eo_theinertial.config2.datarate > 200)
+    if(s_eo_theinertial.sensorsconfig.datarate > 200)
     {
-        s_eo_theinertial.config2.datarate = 200;
+        s_eo_theinertial.sensorsconfig.datarate = 200;
         // send up diagnostics
         // warning -> "Object EOtheInertial has changed the requested datarate."             
     }
     
  
     // ok guys: now we transmit the configuration to each one of the sensors which have a non-zero bit inside teh s_eo_theinertial.config2.enabled mask.
-    // WAIT A MINUTE: we do it inside eo_inertial_Start2() !!!!!!!!!!!!
+    // WAIT A MINUTE: we do it inside eo_inertial_Start() !!!!!!!!!!!!
 
     
     return(eores_OK);           
 }
 
 
-//extern eOresult_t eo_inertial_Start(EOtheInertial *p, eOas_inertial_enableflags_t enableflags)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertial.thereisinertial)
-//    {   // nothing to do because we dont have an inertial board
-//        // send up diagnostics
-//        // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."          
-//        return(eores_OK);
-//    }  
 
-//    // ok, now we do something.    
-
-//    if(eobool_true == s_eo_theinertial.istransmitting)
-//    {   // if transmitting we stop before
-//        eo_inertial_Stop(p);
-//    }       
-// 
-//    icubCanProto_inertial_config_t canprotoconfig = {0};
-
-//    
-//    // -- config the mode
-//    
-//    s_eo_inertial_configcanmessage(&canprotoconfig, enableflags);
-
-
-//    // -- send command 
-//    //    .... even if we have a canprotoconfig.enabledsensors equal to zero 
-//    //    .... in such a case we send twice the command over can (once with eo_inertial_Stop() and another time in here) 
-//    
-//    s_eo_theinertial.command.class = eocanprot_msgclass_pollingAnalogSensor;
-//    s_eo_theinertial.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-//    s_eo_theinertial.command.value = &canprotoconfig;
-//    
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_theinertial.command, s_eo_theinertial.id32);  
-
-
-//    if(0 == canprotoconfig.enabledsensors)
-//    {
-//        s_eo_theinertial.istransmitting = eobool_false;
-//    }
-//    else
-//    {
-//        s_eo_theinertial.istransmitting = eobool_true;
-//    }
-//    
-//    // send up diagnostics
-//    // debug -> "Object EOtheInertial has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"  
-//    
-//    return(eores_OK);  
-//    
-//}
-
-
-extern eOresult_t eo_inertial_Start2(EOtheInertial *p)
+extern eOresult_t eo_inertial_Start(EOtheInertial *p)
 {
     if(NULL == p)
     {
@@ -528,17 +426,25 @@ extern eOresult_t eo_inertial_Start2(EOtheInertial *p)
         // send up diagnostics
         // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."          
         return(eores_OK);
-    }  
+    } 
+
+    if(eobool_false == s_eo_theinertial.configured)
+    {
+        // nothing to do because we dont have a configured object et
+        // send up diagnostics
+        // error -> "Object EOtheInertial is not yet configured, thus will NOT process any command."   
+        return(eores_OK);
+    }    
 
     // ok, now we do something.    
 
     if(eobool_true == s_eo_theinertial.istransmitting)
     {   // if transmitting we stop before
-        eo_inertial_Stop2(p);
+        eo_inertial_Stop(p);
     }       
     
     
-    if(0 == s_eo_theinertial.config2.enabled)
+    if(0 == s_eo_theinertial.sensorsconfig.enabled)
     {
         // send up diagnostics
         // error -> "Object EOtheInertial does not contain a valid configuration, thus will NOT activate any sensor."         
@@ -549,7 +455,7 @@ extern eOresult_t eo_inertial_Start2(EOtheInertial *p)
  
     icubCanProto_inertial_config_t canprotoconfig = {0};
     
-    canprotoconfig.period           = s_eo_theinertial.config2.datarate;
+    canprotoconfig.period           = s_eo_theinertial.sensorsconfig.datarate;
     canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_internaldigitalaccelerometer; // unless it is a hand board ....
     
     s_eo_theinertial.command.class = eocanprot_msgclass_pollingAnalogSensor;
@@ -557,13 +463,13 @@ extern eOresult_t eo_inertial_Start2(EOtheInertial *p)
     s_eo_theinertial.command.value = &canprotoconfig;
 
     uint8_t i = 0;
-    const uint8_t maxsensors = 8*sizeof(s_eo_theinertial.config2.enabled);
+    const uint8_t maxsensors = 8*sizeof(s_eo_theinertial.sensorsconfig.enabled);
     eOcanmap_location_t location = {0};
     
     for(i=0; i<maxsensors; i++)
     {
 
-        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.config2.enabled, i))
+        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.enabled, i))
         {
             
             eOas_inertial_position_t position = (eOas_inertial_position_t)i;
@@ -605,53 +511,9 @@ extern eOresult_t eo_inertial_Start2(EOtheInertial *p)
     
 }
 
-//extern eOresult_t eo_inertial_Stop(EOtheInertial *p)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertial.thereisinertial)
-//    {   // nothing to do because we dont have an inertial board
-//        
-//        // send up diagnostics
-//        // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."
-//        return(eores_OK);
-//    }  
-
-//    // ok, now we do something.    
-
-//    // if it is not transmitting we dont send a useless command on can.
-//    
-//    if(eobool_false == s_eo_theinertial.istransmitting)
-//    {
-//         return(eores_OK);
-//    }
-
-//    icubCanProto_inertial_config_t canprotoconfig = {0};
-//    
-//    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
-//    canprotoconfig.period           = s_eo_theinertial.config.datarate;
-
-//    s_eo_theinertial.command.class = eocanprot_msgclass_pollingAnalogSensor;
-//    s_eo_theinertial.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-//    s_eo_theinertial.command.value = &canprotoconfig;
-//    
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_theinertial.command, s_eo_theinertial.id32);    
-//    
-//    
-//    s_eo_theinertial.istransmitting = eobool_false;
-// 
-//    // send up diagnostics
-//    // debug -> "Object EOtheInertial has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"
-//    
-//    return(eores_OK);  
-//    
-//}
 
 
-extern eOresult_t eo_inertial_Stop2(EOtheInertial *p)
+extern eOresult_t eo_inertial_Stop(EOtheInertial *p)
 {
     if(NULL == p)
     {
@@ -665,6 +527,14 @@ extern eOresult_t eo_inertial_Stop2(EOtheInertial *p)
         // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."
         return(eores_OK);
     }  
+    
+    if(eobool_false == s_eo_theinertial.configured)
+    {
+        // nothing to do because we dont have a configured object et
+        // send up diagnostics
+        // error -> "Object EOtheInertial is not yet configured, thus will NOT process any command."   
+        return(eores_OK);
+    }    
 
     // ok, now we do something.    
 
@@ -678,7 +548,7 @@ extern eOresult_t eo_inertial_Stop2(EOtheInertial *p)
     icubCanProto_inertial_config_t canprotoconfig = {0};
     
     canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
-    canprotoconfig.period           = s_eo_theinertial.config2.datarate;
+    canprotoconfig.period           = s_eo_theinertial.sensorsconfig.datarate;
 
     s_eo_theinertial.command.class = eocanprot_msgclass_pollingAnalogSensor;
     s_eo_theinertial.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
@@ -686,27 +556,23 @@ extern eOresult_t eo_inertial_Stop2(EOtheInertial *p)
     
     
     uint8_t i = 0;
-    const uint8_t maxsensors = 8*sizeof(s_eo_theinertial.config2.enabled);
+    const uint8_t maxsensors = 8*sizeof(s_eo_theinertial.sensorsconfig.enabled);
     eOcanmap_location_t location = {0};
     
     for(i=0; i<maxsensors; i++)
     {
-        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.config2.enabled, i))
-        {
-            
+        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.enabled, i))
+        {            
             eOas_inertial_position_t position = (eOas_inertial_position_t)i;            
 
             // fill location and send 
             if(eobool_true == s_eo_inertial_get_canlocation(position, &location))
             {
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theinertial.command, location);  
-            }                           
-            
-        }      
-        
+            }                                       
+        }             
     }    
-    
-       
+           
     
     s_eo_theinertial.istransmitting = eobool_false;
  
@@ -733,53 +599,7 @@ extern eObool_t eo_inertial_IsTransmitting(EOtheInertial *p)
 }    
 
 
-
-//extern eOresult_t eo_inertial_Receive(EOtheInertial *p, eOinertial_sensor_type_t type, eOcanframe_t *frame, eOcanport_t port)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertial.thereisinertial)
-//    {   // nothing to do because we dont have an inertial board
-//        
-//        // send up diagnostics
-//        // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."
-//        return(eores_OK);
-//    }  
-
-//    // i retrieve the inertial entity related to the frame    
-//    eOas_inertial_t *inertial = NULL;
-//    eOprotIndex_t index = EOK_uint08dummy;
-//    
-//    if(NULL == (inertial = s_eo_inertial_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, frame, port, &index)))
-//    {
-//        return(eores_OK);  
-//    }   
-//    
-//    if(eoinertial_sensor_accelerometer == type)
-//    {
-//        inertial->status.accelerometer.x = (int16_t)((frame->data[1]<<8) + frame->data[0]);
-//        inertial->status.accelerometer.y = (int16_t)((frame->data[3]<<8) + frame->data[2]);
-//        inertial->status.accelerometer.z = (int16_t)((frame->data[5]<<8) + frame->data[4]);
-//        inertial->status.accelerometer.ffu = 1; // i set it true.                
-//    }    
-//    else if(eoinertial_sensor_gyroscope == type)
-//    {
-//        inertial->status.gyroscope.x = (int16_t)((frame->data[1]<<8) + frame->data[0]);
-//        inertial->status.gyroscope.y = (int16_t)((frame->data[3]<<8) + frame->data[2]);
-//        inertial->status.gyroscope.z = (int16_t)((frame->data[5]<<8) + frame->data[4]);
-//        inertial->status.gyroscope.ffu = 1; // i set it true.                       
-//    }
-
-//    
-//    return(eores_OK);      
-//}
-
-
-
-extern eOresult_t eo_inertial_Receive2(EOtheInertial *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port)
+extern eOresult_t eo_inertial_Receive(EOtheInertial *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port)
 {
     if(NULL == p)
     {
@@ -794,6 +614,15 @@ extern eOresult_t eo_inertial_Receive2(EOtheInertial *p, eOas_inertial_type_t ty
         return(eores_OK);
     }  
 
+    if(eobool_false == s_eo_theinertial.configured)
+    {
+        // nothing to do because we dont have a configured object yet
+        // send up diagnostics
+        // error -> "Object EOtheInertial is not yet configured, thus will NOT process any command."   
+        return(eores_OK);
+    }
+    
+    
     // teh inertial entity is in ...
     s_eo_theinertial.inertial2 = s_eo_theinertial.inertial2; 
     
@@ -869,6 +698,14 @@ extern eOresult_t eo_inertial_RefreshStatusOfEntity(EOtheInertial *p)
         // error -> "Object EOtheInertial does not not support any inertial, thus will NOT process any command."
         return(eores_OK);
     }  
+    
+    if(eobool_false == s_eo_theinertial.configured)
+    {
+        // nothing to do because we dont have a configured object yet
+        // send up diagnostics
+        // error -> "Object EOtheInertial is not yet configured, thus will NOT process any command."   
+        return(eores_OK);
+    }    
 
     // the inertial entity is in ...
     eOas_inertial_data_t *data = &s_eo_theinertial.inertial2->status.data;
@@ -915,8 +752,10 @@ extern void eoprot_fun_INIT_as_inertial_config(const EOnv* nv)
 {
     eOas_inertial_config_t* config = eo_nv_RAM(nv);
     
-    config->enabled     = s_eo_default_inertialconfig2.enabled;
-    config->datarate    = s_eo_default_inertialconfig2.datarate;
+    memset(&config->service, 0, sizeof(eOas_inertial_serviceconfig_t));
+    
+    config->sensors.enabled     = s_eo_default_inertialsensorsconfig.enabled;
+    config->sensors.datarate    = s_eo_default_inertialsensorsconfig.datarate;
 }
 
 
@@ -935,8 +774,7 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
     if(NULL == frame)
     {
         return(eobool_true);
-    }
-    
+    }    
     
     // marco.accame:        
     // i dont want to put data in the fifo when we are not in the control loop.
@@ -957,174 +795,16 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//static void s_eo_inertial_configcanmessage(icubCanProto_inertial_config_t *canprotoconfig, eOas_inertial_enableflags_t enableflags)
-//{
-//    
-//    // -- config the period
-//    
-//    canprotoconfig->period           = s_eo_theinertial.config.datarate;   
 
-
-//    // config the enabled sensors
-//    
-//    canprotoconfig->enabledsensors = 0;
-//    
-//    // enableflags is: now, accel only, gyro only or both.
-//    // let us see
-//    switch(enableflags)
-//    {
-//        case eoas_inertial_enable_none: 
-//        {
-//            canprotoconfig->enabledsensors = 0;
-//            
-//        } break;
-
-//        case eoas_inertial_enable_accelerometer: 
-//        {
-//            canprotoconfig->enabledsensors = 0;
-//            
-//            // must see if accel is internal or external.
-//            if((s_eo_theinertial.supportedsensors & icubCanProto_inertial_sensorflag_externaldigitalaccelerometer) == icubCanProto_inertial_sensorflag_externaldigitalaccelerometer)
-//            {   // we have the external
-//                canprotoconfig->enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-//            }
-//            else if((s_eo_theinertial.supportedsensors & icubCanProto_inertial_sensorflag_internaldigitalaccelerometer) == icubCanProto_inertial_sensorflag_internaldigitalaccelerometer)
-//            {   // we have the internal
-//                canprotoconfig->enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-//            }
-//            else
-//            {
-//                // send up diagnostics
-//                // error -> "Object EOtheInertial supports an inertial which does not have this mode. In param16 ..."  
-//            }
-//            
-//        } break;
-//        
-//        case eoas_inertial_enable_gyroscope: 
-//        {
-//            canprotoconfig->enabledsensors = 0;
-//            
-//            // must see if gyro is external.
-//            if((s_eo_theinertial.supportedsensors & icubCanProto_inertial_sensorflag_externaldigitalgyroscope) == icubCanProto_inertial_sensorflag_externaldigitalgyroscope)
-//            {   // we have the external
-//                canprotoconfig->enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
-//            }
-//            else
-//            {
-//                // send up diagnostics
-//                // error -> "Object EOtheInertial supports an inertial which does not have this mode. In param16 ..."  
-//            }
-//            
-//        } break;  
-//        
-//        case eoas_inertial_enable_accelgyro: 
-//        {
-//            canprotoconfig->enabledsensors = 0;
-//            
-//            // must see if accel is internal or external.
-//            if((s_eo_theinertial.supportedsensors & icubCanProto_inertial_sensorflag_externaldigitalaccelerometer) == icubCanProto_inertial_sensorflag_externaldigitalaccelerometer)
-//            {   // we have the external
-//                canprotoconfig->enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-//            }
-//            else if((s_eo_theinertial.supportedsensors & icubCanProto_inertial_sensorflag_internaldigitalaccelerometer) == icubCanProto_inertial_sensorflag_internaldigitalaccelerometer)
-//            {   // we have the internal
-//                canprotoconfig->enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-//            }
-//            else
-//            {
-//                // send up diagnostics
-//                // error -> "Object EOtheInertial supports an inertial which does not have this mode. In param16 ..."  
-//            }
-//            
-//            // must see if gyro is external.
-//            if((s_eo_theinertial.supportedsensors & icubCanProto_inertial_sensorflag_externaldigitalgyroscope) == icubCanProto_inertial_sensorflag_externaldigitalgyroscope)
-//            {   // we have the external
-//                canprotoconfig->enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
-//            }
-//            else
-//            {
-//                // send up diagnostics
-//                // error -> "Object EOtheInertial supports an inertial which does not have this mode. In param16 ..."  
-//            }
-//            
-//        } break;     
-
-//        default: 
-//        {
-//            canprotoconfig->enabledsensors = 0;
-//            // send up diagnostics
-//            // error -> "Object EOtheInertial does not recognise this mode. In param16 ..."  
-//        } break;
-//        
-//    }
-//    
-//}
-
-
-
-
-//static void* s_eo_inertial_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index)
-//{
-//    void * ret = NULL;
-//    uint8_t ii = 0;
-//    eOcanmap_location_t loc = {0};
-//    
-//    loc.port = port;
-//    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-//    loc.insideindex = eocanmap_insideindex_none;
-//    
-//    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
-//    if(EOK_uint08dummy == ii)
-//    {     
-//        #warning -> TODO: add diagnostics about not found board
-//        return(NULL);
-//    }
-//    
-//    ret = eoprot_entity_ramof_get(eoprot_board_localboard, endpoint, entity, ii);
-//    
-//    if(NULL != index)
-//    {
-//        *index = ii;        
-//    }  
-
-//    return(ret);   
-//}
-
-
-
-//static void* s_eo_inertial_get_entity2(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index)
-//{
-//    void * ret = NULL;
-//    uint8_t ii = 0;
-//    eOcanmap_location_t loc = {0};
-//    
-//    loc.port = port;
-//    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-//    loc.insideindex = eocanmap_insideindex_none;
-//    
-//    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
-//    if(EOK_uint08dummy == ii)
-//    {     
-//        #warning -> TODO: add diagnostics about not found board
-//        return(NULL);
-//    }
-//    
-//    ret = eoprot_entity_ramof_get(eoprot_board_localboard, endpoint, entity, ii);
-//    
-//    if(NULL != index)
-//    {
-//        *index = ii;        
-//    }  
-
-//    return(ret);   
-//}
-
-static void s_eo_inertial_build_maps(void)
+static void s_eo_inertial_build_maps(const eOas_inertial_serviceconfig_t* cfg)
 {
+    // copy the new service configuration
+    memcpy(&s_eo_theinertial.serviceconfig, cfg, sizeof(eOas_inertial_serviceconfig_t));
+    
     // at first i reset the supported mask
     s_eo_theinertial.supportedmask64 = 0;
         
-    // then i search for in can1 and can2 which sensor we are asked to support
+    // then i search for in can1 and can2 which sensors we are asked to support
     uint8_t i = 0;
     uint8_t j = 0;
     
@@ -1132,7 +812,7 @@ static void s_eo_inertial_build_maps(void)
     {
         for(j=0; j<15; j++)
         {
-            eOas_inertial_position_t position = s_eo_theinertial.configuration.canmapofsupportedsensors[i][j];
+            eOas_inertial_position_t position = (eOas_inertial_position_t)s_eo_theinertial.serviceconfig.canmapofsupportedsensors[i][j];
             if(eoas_inertial_pos_none != position)
             {
                 // ok, we add this position to tthe supported mask
@@ -1161,7 +841,7 @@ static eObool_t s_eo_inertial_get_canlocation(eOas_inertial_position_t targetpos
     {
         for(j=0; j<15; j++)
         {
-            eOas_inertial_position_t position = s_eo_theinertial.configuration.canmapofsupportedsensors[i][j];
+            eOas_inertial_position_t position = (eOas_inertial_position_t)s_eo_theinertial.serviceconfig.canmapofsupportedsensors[i][j];
             if(targetposition == position)
             {
                 loc->port = i;
@@ -1180,7 +860,7 @@ static eObool_t s_eo_inertial_get_canlocation(eOas_inertial_position_t targetpos
 
 static eObool_t s_eo_inertial_get_sensor(eOcanmap_location_t location, eOas_inertial_position_t *position)
 {       
-    eOas_inertial_position_t internalposition = s_eo_theinertial.configuration.canmapofsupportedsensors[location.port][location.addr];
+    eOas_inertial_position_t internalposition = (eOas_inertial_position_t)s_eo_theinertial.serviceconfig.canmapofsupportedsensors[location.port][location.addr];
     
     if(eoas_inertial_pos_none == internalposition)
     {
