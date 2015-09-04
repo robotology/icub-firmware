@@ -288,7 +288,7 @@ extern eOresult_t eo_inertial_ServiceConfig(EOtheInertial *p, const eOas_inertia
     s_eo_inertial_build_maps(cfg);
     
     // and set it configured
-    s_eo_theinertial.configured = eobool_false;
+    s_eo_theinertial.configured = eobool_true;
     
     return(eores_OK);  
 }
@@ -360,7 +360,7 @@ extern eOresult_t eo_inertial_SensorsConfig(EOtheInertial *p, eOas_inertial_sens
     
     if(eobool_false == s_eo_theinertial.configured)
     {
-        // nothing to do because we dont have a configured object et
+        // nothing to do because we dont have a configured object yet
         // send up diagnostics
         // error -> "Object EOtheInertial is not yet configured, thus will NOT process any command."   
         return(eores_OK);
