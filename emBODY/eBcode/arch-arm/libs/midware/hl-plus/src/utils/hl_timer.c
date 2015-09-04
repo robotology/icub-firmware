@@ -721,7 +721,7 @@ extern hl_result_t hl_timer_remainingtime_get(hl_timer_t id, hl_reltime_t *remai
 // use the following xxx_IRQHandlers only if xxx is in the mpu and if the user does not prefer using the handler for another purpose 
 
 
-#if     (defined(HL_TIMER_INTERNAL_HAS_TIMER01) || defined(HL_TIMER_INTERNAL_HAS_TIMER10))
+#if     (defined(HL_TIMER_INTERNAL_HAS_TIMER01) && defined(HL_TIMER_INTERNAL_HAS_TIMER10))
 void TIM1_IRQHandler(void)
 {
     if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Update))
@@ -820,7 +820,7 @@ void TIM7_IRQHandler(void)
 #endif
 
 
-#if     (defined(HL_TIMER_INTERNAL_HAS_TIMER08) || defined(HL_TIMER_INTERNAL_HAS_TIMER13))
+#if     (defined(HL_TIMER_INTERNAL_HAS_TIMER08) && defined(HL_TIMER_INTERNAL_HAS_TIMER13))
 void TIM8_IRQHandler(void)
 { 
     // Clear TIMx update interrupt 
@@ -849,17 +849,7 @@ void TIM9_IRQHandler(void)
     {
         TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
         s_hl_timer_callback(hl_timer9);
-    }
-    if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
-    {
-        /*
-        hal_motor_disable(motor1);
-        hal_motor_disable(motor2); 
-        hal_motor_disable(motor3);
-        hal_motor_disable(motor4);
-        */
-        TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-    }
+    }   
 }
 #else
     #warning HL says: user, you must define your own TIM1_BRK_TIM9_IRQHandler()
@@ -886,17 +876,6 @@ void TIM12_IRQHandler(void)
         TIM_ClearITPendingBit(TIM12, TIM_IT_Update);
         s_hl_timer_callback(hl_timer12);
     }
-    
-    if(SET == TIM_GetFlagStatus(TIM8, TIM_FLAG_Break))
-    {
-        /*
-        hal_motor_disable(motor1);
-        hal_motor_disable(motor2);
-        hal_motor_disable(motor3);
-        hal_motor_disable(motor4);
-        */
-        TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
-    }      
 }
 #else
     #warning HL says: user, you must define your own TIM8_BRK_TIM12_IRQHandler()
