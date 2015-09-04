@@ -231,8 +231,12 @@ extern hal_result_t hal_pwm_interrupt_disable(hal_motor_t id);
 
 extern int16_t hal_motor_pwmget(hal_motor_t id);
 
+extern hal_bool_t hal_motor_isfault(void);
+
 extern hal_result_t hal_motor_enable(hal_motor_t id);
 extern hal_result_t hal_motor_disable(hal_motor_t id);
+
+extern hal_result_t hal_motor_reenable_break_interrupts(void);
 /** @}            
     end of group doxy_group_hal_pwm  
  **/

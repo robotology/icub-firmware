@@ -57,6 +57,12 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#define EN1 	GPIO_Pin_12
+#define EN2 	GPIO_Pin_13
+#define EN3 	GPIO_Pin_14
+#define EN4 	GPIO_Pin_15
+
+#define ACTIVE_INTERRUPTS_CHANNELS 1
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -74,10 +80,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-#define EN1 	GPIO_Pin_12
-#define EN2 	GPIO_Pin_13
-#define EN3 	GPIO_Pin_14
-#define EN4 	GPIO_Pin_15
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -92,7 +94,7 @@ static hal_boolval_t s_hal_device_motor_initted_is(hal_motor_t id);
 // --------------------------------------------------------------------------------------------------------------------
 
 static uint16_t s_hal_device_motor_initted = 0;
-
+static hal_bool_t s_hal_device_motor_fault = hal_false;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -334,7 +336,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	TIM1_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
 	TIM1_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM1_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Disable;
+	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Enable; //needed cause enables the input
 	TIM1_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_High;
 	TIM1_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
@@ -406,7 +408,11 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	TIM8_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Disable; //TIM1 -> TIM_OSSIState_Enable
 	TIM8_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
 	TIM8_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM8_BDTRInitStructure.TIM_Break =  TIM_Break_Disable; // was enabled with TIM_Break_Enable;
+#if (ACTIVE_INTERRUPTS_CHANNELS == 2)
+	TIM8_BDTRInitStructure.TIM_Break =  TIM_Break_Enable; //needed cause enables the input
+#else
+    TIM8_BDTRInitStructure.TIM_Break =  TIM_Break_Disable;
+#endif
 	TIM8_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_High;
 	TIM8_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
 	
@@ -428,13 +434,13 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	/* TIM1 counter enable */
 	TIM_Cmd(TIM1, ENABLE);
 	/* Main PWM Output Enable */
-    TIM_CtrlPWMOutputs(TIM1,ENABLE);
+    TIM_CtrlPWMOutputs(TIM1,DISABLE); //now disabled at the beginning
     
 	TIM_ITConfig(TIM8, TIM_IT_Update, DISABLE);    
 	/* TIM8 counter enable */
 	TIM_Cmd(TIM8, ENABLE);
 	/* Main PWM Output Enable */
-    TIM_CtrlPWMOutputs(TIM8,ENABLE);
+    TIM_CtrlPWMOutputs(TIM8,DISABLE); //now disabled at the beginning
 
     // Init the ADC to have current values
 	hal_adc_ADC1_ADC3_current_init();
@@ -455,21 +461,30 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
+      
+    // this part was previously commented, now reactivated
+
+    //Set the motor not in fault before activating the interrupts
+    s_hal_device_motor_fault = hal_false;
     
-//    // THIS PROBLEM SEEMS NOT OCCURRING ANYMORE // Don't enable the break interrupt, cause they're always triggered if the motor is not present
-//    /* Enable the TIM1 BRK Interrupt */
-//    NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
-//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//    NVIC_Init(&NVIC_InitStructure); 
-//	
-//	/* Enable the TIM8 BRK Interrupt */
-//    NVIC_InitStructure.NVIC_IRQChannel = TIM8_BRK_TIM12_IRQn;
-//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//    NVIC_Init(&NVIC_InitStructure); 
+    /* Enable the TIM1 BRK Interrupt */
+    NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure); 
+	
+	/* Enable the TIM8 BRK Interrupt */
+    // I'm not enabling it...why?
+    // The hardware supports two different faults channels...but phisically (on the robot) we decided to use only one wire (corresponding to TIM1Break);
+    // in this situation, if I enable the TIM8Break IRQ it detects ALWAYS a fault situation, preventing the normal behaviour of the board
+#if (ACTIVE_INTERRUPTS_CHANNELS == 2)
+    NVIC_InitStructure.NVIC_IRQChannel = TIM8_BRK_TIM12_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+#endif
 	}
     return(hal_res_OK);
 }
@@ -617,7 +632,10 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
  	return pwm;
 }
 
-
+extern hal_bool_t hal_motor_isfault(void)
+{
+    return s_hal_device_motor_fault;
+}
 
 
 /*******************************************************************************
@@ -627,19 +645,30 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-//it's already defined in hl_timer.c --> put this function there, checking the right flag
-/*
 void TIM1_BRK_TIM9_IRQHandler(void)
 {
+  /* TO DO HERE:
+  - deactivate the interrupt on TIM1 Break
+  - disable motors 1-2
+  - if only this interrupt channel is enabled, disable also motors 3-4
+  - set the flag signalling the fault
+  - clear pending bit
+  */    
   // write somewhere disable due to external fault 
-  hal_motor_disable(motor1);
-  hal_motor_disable(motor2); 
-  hal_motor_disable(motor3);
-  hal_motor_disable(motor4);
-  TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-;
+  if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
+  {
+      TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
+      hal_motor_disable(motor1);
+      hal_motor_disable(motor2);
+#if (ACTIVE_INTERRUPTS_CHANNELS == 1)
+      hal_motor_disable(motor3);
+      hal_motor_disable(motor4);
+#endif
+      s_hal_device_motor_fault = hal_true;
+      TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+  }
 }
-*/
+#if (ACTIVE_INTERRUPTS_CHANNELS == 2)
 /*******************************************************************************
 * Function Name  : TIM8_BRK_IRQHandler
 * Description    : This function handles TIM8 Break interrupt request.
@@ -647,18 +676,25 @@ void TIM1_BRK_TIM9_IRQHandler(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-//it's already defined in hl_timer.c --> put this function there, checking the right flag
-/*
 void TIM8_BRK_TIM12_IRQHandler(void)
 {
+  /* TO DO HERE:
+  - deactivate the interrupt on TIM1 Break
+  - disable motors 3-4
+  - set the flag signalling the fault
+  - clear pending bit
+  */    
   // write somewhere disable due to external fault 
-  hal_motor_disable(motor1);
-  hal_motor_disable(motor2);
-  hal_motor_disable(motor3);
-  hal_motor_disable(motor4);
-  TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
+  if(SET == TIM_GetFlagStatus(TIM8, TIM_FLAG_Break))
+  {
+      TIM_ITConfig(TIM8, TIM_IT_Break, DISABLE);
+      hal_motor_disable(motor3);
+      hal_motor_disable(motor4);
+      s_hal_device_motor_fault = hal_true;
+      TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
+  }
 }
-*/
+#endif
 /*******************************************************************************
 * Function Name  : hal_motor_enable
 * Description    : This function enables the motors 
@@ -715,31 +751,50 @@ extern hal_result_t hal_motor_disable(hal_motor_t id)
 		case 1:
 		{
 		    TIM_CtrlPWMOutputs(TIM1,DISABLE);
-//			GPIO_ResetBits(GPIOE, EN1);
-//			GPIO_ResetBits(GPIOE, EN2);
+			GPIO_ResetBits(GPIOE, EN1);
+			GPIO_ResetBits(GPIOE, EN2);
 		}
 		break;
 	    case 2:
 		case 3:
 		{
 		    TIM_CtrlPWMOutputs(TIM8,DISABLE);
-//			GPIO_ResetBits(GPIOE, EN3);
-//			GPIO_ResetBits(GPIOE, EN4);
+			GPIO_ResetBits(GPIOE, EN3);
+			GPIO_ResetBits(GPIOE, EN4);
 		}
 		break;
 		default:
 		{
 			TIM_CtrlPWMOutputs(TIM1,DISABLE);
 		    TIM_CtrlPWMOutputs(TIM8,DISABLE);
-//			GPIO_ResetBits(GPIOE, EN1);
-//			GPIO_ResetBits(GPIOE, EN2);
-//			GPIO_ResetBits(GPIOE, EN3);
-//			GPIO_ResetBits(GPIOE, EN4);
+			GPIO_ResetBits(GPIOE, EN1);
+			GPIO_ResetBits(GPIOE, EN2);
+			GPIO_ResetBits(GPIOE, EN3);
+			GPIO_ResetBits(GPIOE, EN4);
 		}
 		break;
 	}
 	return hal_res_OK;
 }
+
+extern hal_result_t hal_motor_reenable_break_interrupts(void)
+{
+    //calling this function, I presume that the fault is no more occurring
+    s_hal_device_motor_fault = hal_false;
+    
+    //reenables the interrupts
+    TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+    TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
+    
+#if (ACTIVE_INTERRUPTS_CHANNELS == 2)
+    TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
+    TIM_ITConfig(TIM8, TIM_IT_Break, ENABLE);
+#endif
+    return hal_res_OK;
+}
+    
+
+
 #endif//HAL_USE_DEVICE_MOTORCL
 
 // --------------------------------------------------------------------------------------------------------------------
