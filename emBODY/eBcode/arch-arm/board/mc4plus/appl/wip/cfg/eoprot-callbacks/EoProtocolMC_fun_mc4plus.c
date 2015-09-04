@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor);
 
 
 
@@ -506,6 +506,12 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     // commento: la calib tipo 3 ha solo offset (in xml e' il calibration3. il calibration2 etc non viene usato).
     // per calib 3: viene usato solo il calibration3.
     
+    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) //or motors still faulted OR state (and so PWM) still need to be enabled
+    {
+        s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+    }
+
     //check for the type of calibration required
     
     #warning this should change to calibrationtype5, but in robotInterface this is still not handled. now it's type4 (because it also have 3 params) to test it
@@ -522,7 +528,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     {
         // calibration for joint with abs encoders
         eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
-        eo_emsController_StartCalibration_type3(jxx, 
+        eo_emsController_StartCalibration_type3 (jxx, 
                                                 calibrator->params.type3.position, 
                                                 calibrator->params.type3.velocity,
                                                 calibrator->params.type3.offset);
@@ -543,6 +549,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 {
     eOmc_controlmode_command_t *controlmode = (eOmc_controlmode_command_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+
+    //if this joint was in external fault or the state (and so PWM) is not updated, reenable it
+    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
+    {
+       s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+    }
         
     eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));       
 }
@@ -695,7 +708,14 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor)
+{
+     eo_mcserv_EnableMotor(eo_mcserv_GetHandle(), motor);
+     eo_mcserv_EnableFaultDetection(eo_mcserv_GetHandle());
+        
+     uint8_t fault_mask[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
+     eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, fault_mask);
+}
 
 
 
