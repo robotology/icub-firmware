@@ -308,6 +308,9 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 #if defined(DEBUG_INERTIAL)        
         s_boardnum = 1; //it imposes that the board is the eb2
 #endif
+#if defined(TEST_EB2_EB4_WITHOUT_MC)        
+        s_boardnum = 1; //it imposes that the board is the eb2
+#endif
     }
     
     {   // CAN-MAPPING
@@ -396,7 +399,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     // the inertial is initted but does not know yet which can network it supports
     eo_inertial_Initialise();
     // the can network is loaded in runtime. we need 2x15 values, which for now are taken from its ip address. later on they will be taken from a UDP message
-    eo_inertial_ServiceConfig(eo_inertial_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
+    //eo_inertial_ServiceConfig(eo_inertial_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
