@@ -197,9 +197,10 @@ static eObool_t s_eo_inertial_get_sensor(eOcanmap_location_t location, eOas_iner
 
 static const eOas_inertial_sensorsconfig_t s_eo_default_inertialsensorsconfig =
 {
-    .enabled    = 0,
-    .datarate   = 50,
-    .filler     = {0}
+    .accelerometers         = 0,
+    .gyroscopes             = 0,
+    .datarate               = 50,
+    .filler                 = {0}
 };
 
 
@@ -370,25 +371,38 @@ extern eOresult_t eo_inertial_SensorsConfig(EOtheInertial *p, eOas_inertial_sens
     
     // at first we copy the target config into the local config
     
-    s_eo_theinertial.sensorsconfig.datarate   = config->datarate;
-    s_eo_theinertial.sensorsconfig.enabled    = config->enabled;
+    s_eo_theinertial.sensorsconfig.datarate         = config->datarate;
+    s_eo_theinertial.sensorsconfig.accelerometers   = config->accelerometers;
+    s_eo_theinertial.sensorsconfig.gyroscopes       = config->gyroscopes;
     
     // then we check enabled mask and datarate
     
     // the enabled must be in bitwise AND with the supported ones
-    s_eo_theinertial.sensorsconfig.enabled    &= s_eo_theinertial.supportedmask64;
-    if(s_eo_theinertial.sensorsconfig.enabled != config->enabled)
+    s_eo_theinertial.sensorsconfig.accelerometers   &= s_eo_theinertial.supportedmask64;
+    if(s_eo_theinertial.sensorsconfig.accelerometers != config->accelerometers)
     {
         // send up diagnostics
-        // warning -> "Object EOtheInertial does not not support some of the inertials."               
+        // warning -> "Object EOtheInertial does not not support some accelerometers."               
     }
     
-    if(0 == s_eo_theinertial.sensorsconfig.enabled)
+    if(0 == s_eo_theinertial.sensorsconfig.accelerometers)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertial does not have a valid configuration."            
     }
-
+    
+    s_eo_theinertial.sensorsconfig.gyroscopes   &= s_eo_theinertial.supportedmask64;
+    if(s_eo_theinertial.sensorsconfig.gyroscopes != config->gyroscopes)
+    {
+        // send up diagnostics
+        // warning -> "Object EOtheInertial does not not support some gyroscopes."               
+    }
+    
+    if(0 == s_eo_theinertial.sensorsconfig.gyroscopes)
+    {
+        // send up diagnostics
+        // warning -> "Object EOtheInertial does not have a valid configuration."            
+    }
     
     if(s_eo_theinertial.sensorsconfig.datarate < 10)
     {
@@ -444,7 +458,7 @@ extern eOresult_t eo_inertial_Start(EOtheInertial *p)
     }       
     
     
-    if(0 == s_eo_theinertial.sensorsconfig.enabled)
+    if((0 == s_eo_theinertial.sensorsconfig.accelerometers) && (0 == s_eo_theinertial.sensorsconfig.gyroscopes))
     {
         // send up diagnostics
         // error -> "Object EOtheInertial does not contain a valid configuration, thus will NOT activate any sensor."         
@@ -456,42 +470,40 @@ extern eOresult_t eo_inertial_Start(EOtheInertial *p)
     icubCanProto_inertial_config_t canprotoconfig = {0};
     
     canprotoconfig.period           = s_eo_theinertial.sensorsconfig.datarate;
-    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_internaldigitalaccelerometer; // unless it is a hand board ....
+    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
     
     s_eo_theinertial.command.class = eocanprot_msgclass_pollingAnalogSensor;
     s_eo_theinertial.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
     s_eo_theinertial.command.value = &canprotoconfig;
 
     uint8_t i = 0;
-    const uint8_t maxsensors = 8*sizeof(s_eo_theinertial.sensorsconfig.enabled);
     eOcanmap_location_t location = {0};
     
-    for(i=0; i<maxsensors; i++)
+    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
     {
+        canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
 
-        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.enabled, i))
+        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.accelerometers, i))
         {
-            
-            eOas_inertial_position_t position = (eOas_inertial_position_t)i;
-            
-            if((eoas_inertial_pos_l_hand == position) || (eoas_inertial_pos_r_hand == position))
-            {
-                canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_externaldigitalgyroscope | icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-            }
-            else
-            {
-                canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-            }
+            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
+        }
 
-            // fill location and send 
+        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.gyroscopes, i))
+        {
+            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
+        } 
+
+        if(icubCanProto_inertial_sensorflag_none != canprotoconfig.enabledsensors)
+        {
+            // ok, we have at least a gyro or an accel or them both. thus we send the config to the can location
+            eOas_inertial_position_t position = (eOas_inertial_position_t)i;
             if(eobool_true == s_eo_inertial_get_canlocation(position, &location))
             {
                 sentconfig = eobool_true;
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theinertial.command, location);  
-            }                           
+            } 
             
-        }      
-        
+        }       
     }
 
 
@@ -556,12 +568,11 @@ extern eOresult_t eo_inertial_Stop(EOtheInertial *p)
     
     
     uint8_t i = 0;
-    const uint8_t maxsensors = 8*sizeof(s_eo_theinertial.sensorsconfig.enabled);
     eOcanmap_location_t location = {0};
     
-    for(i=0; i<maxsensors; i++)
+    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
     {
-        if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.enabled, i))
+        if((1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.accelerometers, i)) || (1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.gyroscopes, i)))
         {            
             eOas_inertial_position_t position = (eOas_inertial_position_t)i;            
 
@@ -754,8 +765,9 @@ extern void eoprot_fun_INIT_as_inertial_config(const EOnv* nv)
     
     memset(&config->service, 0, sizeof(eOas_inertial_serviceconfig_t));
     
-    config->sensors.enabled     = s_eo_default_inertialsensorsconfig.enabled;
-    config->sensors.datarate    = s_eo_default_inertialsensorsconfig.datarate;
+    config->sensors.accelerometers  = s_eo_default_inertialsensorsconfig.accelerometers;
+    config->sensors.gyroscopes      = s_eo_default_inertialsensorsconfig.gyroscopes;
+    config->sensors.datarate        = s_eo_default_inertialsensorsconfig.datarate;
 }
 
 
@@ -768,6 +780,7 @@ extern void eoprot_fun_INIT_as_inertial_status(const EOnv* nv)
     status->data.timestamp = 0;
     status->data.x = status->data.y = status->data.z = 0;
 }
+
 
 extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(eOcanframe_t *frame, eOcanport_t port)
 {    
