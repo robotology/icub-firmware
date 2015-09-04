@@ -5,7 +5,7 @@
     @date       07/05/2012
 **/
 
-//ciao
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -63,6 +63,7 @@ static char invert_matrix(float** M, float** I, char n);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static EOmotors *o = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -73,7 +74,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
     if (!nMotors) return NULL;
     if (nMotors > MAX_NAXLES) nMotors = MAX_NAXLES;
     
-    EOmotors *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
+    o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
 
     if (o)
     {
@@ -94,6 +95,14 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
     }
 
     return o;
+}
+
+extern EOmotors* eo_motors_GetHandle()
+{
+    if(o)
+        return o;
+    else
+        return NULL;
 }
 
 extern void eo_motors_reset_wdog(EOmotors *o, uint8_t motor)

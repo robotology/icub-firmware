@@ -79,6 +79,7 @@
 void config_2FOC(uint8_t joint);
 void set_2FOC_idle(uint8_t joint);
 void set_2FOC_running(uint8_t joint);
+static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -1638,6 +1639,8 @@ extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, 
     //Set the right calibration type
     ems->axis_controller[joint] ->calibration_type = eomc_calibration_type3_abs_sens_digital;
     
+    //in case of coupled joints, I reset the calibration state of the others...they must always their state together
+    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
     
     eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
@@ -1655,6 +1658,8 @@ extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmli
     //Set the right calibration type
     ems->axis_controller[joint] ->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
     
+    //in case of coupled joints, I reset the calibration state of the others...they must always their state together
+    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
     //offset is 0 in this case
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
     eo_axisController_StartCalibration_type5(ems->axis_controller[joint], pwmlimit, vel, final_position);
@@ -1819,6 +1824,17 @@ extern void eo_emsController_CheckCalibrations(void)
     }
     
     #endif // ! USE_JACOBIAN        
+}
+
+extern void eo_emsController_ResetCalibrationValues(uint8_t joint)
+{
+    if(ems)
+    {
+        eo_axisController_ResetCalibration(ems->axis_controller[joint]);
+        eo_absCalibratedEncoder_ResetCalibration(ems->abs_calib_encoder[joint]);
+    }
+    
+    return;
 }
 
 extern void eo_emsController_Stop(uint8_t joint)
@@ -2218,6 +2234,52 @@ void set_2FOC_running(uint8_t motor)
     */
 }
 
+static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint)
+{
+    uint8_t i;
+    
+    //check coupled joints
+    if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))    
+    {
+      if (joint < 3)
+      {
+          for(i = 0; i < 3; i++)
+          {
+              if ((joint != i) && (eo_axisController_IsCalibrated(ems->axis_controller[i])))
+              {
+                  eo_emsController_ResetCalibrationValues(i);
+              }   
+          }
+      }
+    }
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)  
+    {
+      if ((joint == 0) || (joint == 1))
+      {
+          for(i = 0; i < 2; i++)
+          {
+              if ((joint != i) && (eo_axisController_IsCalibrated(ems->axis_controller[i])))
+              {
+                   eo_emsController_ResetCalibrationValues(i);
+              }   
+          }
+      }
+    }
+    else if(emscontroller_board_HEAD_neckyaw_eyes == ems->board) 
+    {
+      if ((joint == 2) || (joint == 3))
+      {
+          for(i = 2; i < 4; i++)
+          {
+              if ((joint != i) && (eo_axisController_IsCalibrated(ems->axis_controller[i])))
+              {
+                  eo_emsController_ResetCalibrationValues(i);
+              }   
+          }
+      }
+    }
+    return;
+}
 
 #ifdef EXPERIMENTAL_MOTOR_TORQUE
 

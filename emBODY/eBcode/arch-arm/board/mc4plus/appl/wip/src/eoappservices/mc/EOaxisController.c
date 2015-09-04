@@ -120,7 +120,8 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         
         o->state_mask = AC_NOT_READY;
         o->calibration_zero = 0;
-        o->calibration_type = eomc_calibration_type3_abs_sens_digital; //default behaviour (AEA abs encoders)
+        //o->calibration_type = eomc_calibration_type3_abs_sens_digital; //default behaviour (AEA abs encoders)
+        o->calibration_type = eomc_calibration_typeUndefined;
         o->pwm_limit_calib = 0;
         o->calib_count = 0;
         o->calib_stable = 0;
@@ -205,6 +206,14 @@ extern void eo_axisController_SetCalibrated(EOaxisController *o)
     if (!o) return;
     
     RST_BITS(o->state_mask, AC_NOT_CALIBRATED);
+}
+
+extern void eo_axisController_ResetCalibration(EOaxisController *o)
+{
+    if (!o) return;
+    
+    axisMotionReset(o);
+    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
 }
 
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o)
@@ -518,8 +527,24 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     
     if (NOT_READY())
     {
-        //o->control_mode = eomc_controlmode_notConfigured;
-        
+        //if the AXIS is not calibrated (not configured or in calib phase), I go back (or remain in) to notConfigured (safe) state (probably an EXTfault has occurred)
+        //N.B. at the moment only for calibration5 cause calibration3 applies only an offset to the encoder raw values (no risks)
+        if ((!IS_CALIBRATED()))
+        {    
+            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
+            {
+                //if the joint was calibrating, I reset its calibration values
+                if (o->control_mode == eomc_controlmode_calib)
+                {
+                    eo_emsController_ResetCalibrationValues(o->axisID);
+                }
+                o->control_mode = eomc_controlmode_notConfigured;
+            }
+            else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
+            {
+                o->control_mode = eomc_controlmode_idle;
+            }
+        }
         return eobool_false;
     }
     

@@ -60,6 +60,7 @@ extern uint8_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder*);
 extern uint8_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o);
 extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder*);
+extern void eo_absCalibratedEncoder_ResetCalibration(EOabsCalibratedEncoder* o);
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder*, int32_t offset);
 #ifndef USE_2FOC_FAST_ENCODER
 extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o);
