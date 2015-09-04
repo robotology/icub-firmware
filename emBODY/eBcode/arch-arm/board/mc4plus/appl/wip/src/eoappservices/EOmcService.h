@@ -43,6 +43,7 @@
 #include "EoSkin.h"
 
 #include "EoMCConfigurations.h"
+#include "EOemsController.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -92,7 +93,15 @@ extern eOresult_t eo_mcserv_Stop(EOmcService *p);
 // call it inside the protocol callbacks ... to be refined along the way.
 extern eOresult_t eo_mcserv_Set(EOmcService *p, uint8_t jomo, uint32_t whatisrequired);
 
+extern eOresult_t eo_mcserv_EnableMotor(EOmcService *p, uint8_t joint_index);
 
+extern eOresult_t eo_mcserv_EnableFaultDetection(EOmcService *p);
+
+extern eObool_t eo_mcserv_AreMotorsExtFaulted(EOmcService *p);
+
+extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uint8_t* fault_mask);
+
+extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor);
 
 // call it inside the DO step of run mode
 // it performs differently according to its eOmcserv_type_t type.

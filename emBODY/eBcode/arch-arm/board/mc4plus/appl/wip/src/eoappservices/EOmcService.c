@@ -33,7 +33,6 @@
 
 #include "EOtheMemoryPool.h"
 
-#include "EOemsController.h"
 #include "EOappEncodersReader.h"
 #include "EOMtheEMStransceiver.h"
 
@@ -81,13 +80,25 @@ static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p);
 
+static void s_eo_mcserv_enable_all_motors(EOmcService *p);
+
+static void s_eo_mcserv_disable_all_motors(EOmcService *p);
+
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p);
 
 static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void);
 
+static void myhal_pwm_enable(uint8_t i);
+
+static void myhal_pwm_disable(uint8_t i);
+
 static void myhal_pwm_set(uint8_t i, int16_t v);
+
+static eObool_t myhal_are_motors_ext_faulted(void);
+
+static void myhal_reenable_external_fault_isr(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -289,6 +300,7 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
         {
             // must start the first reading of encoders and ... enable the joints and...?
             eo_appEncReader_StartRead(p->thelocalencoderreader);
+            s_eo_mcserv_enable_all_motors(p);
             res = eores_OK;            
         } break;
         case eOmcconfig_type_mc4can:
@@ -310,6 +322,138 @@ extern eOresult_t eo_mcserv_Start(EOmcService *p)
     return(res);
 }
 
+extern eOresult_t eo_mcserv_EnableMotor(EOmcService *p, uint8_t joint_index)
+{
+    eOresult_t res = eores_NOK_generic;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
+    
+    //check coupled joints
+    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control))    
+    {
+      if (joint_index <3) 
+      {
+        myhal_pwm_enable(p->config.jomos[0].actuator.local.index);
+        myhal_pwm_enable(p->config.jomos[1].actuator.local.index);
+        myhal_pwm_enable(p->config.jomos[2].actuator.local.index);
+      }
+      else
+      {
+        myhal_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
+      }
+    }
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == board_control)  
+    {
+       myhal_pwm_enable(p->config.jomos[0].actuator.local.index);
+       myhal_pwm_enable(p->config.jomos[1].actuator.local.index);
+    }
+    else if(emscontroller_board_HEAD_neckyaw_eyes == board_control) 
+    {
+      if((joint_index == 2) || (joint_index == 3) ) 
+      {
+        myhal_pwm_enable(p->config.jomos[2].actuator.local.index);
+        myhal_pwm_enable(p->config.jomos[3].actuator.local.index);
+      }
+      else
+      {
+         myhal_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
+      }      
+    }
+    else  //the joint is not coupled to any other joint 
+    { 
+         myhal_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
+    }      
+    
+    return eores_OK;
+}
+extern eOresult_t eo_mcserv_EnableFaultDetection(EOmcService *p)
+{
+    eOresult_t res = eores_NOK_generic;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    myhal_reenable_external_fault_isr();
+
+    return eores_OK;
+}
+extern eObool_t eo_mcserv_AreMotorsExtFaulted(EOmcService *p)
+{    
+    if(NULL == p)
+    {
+        return eobool_false;
+    }
+    
+    return myhal_are_motors_ext_faulted();
+}
+
+extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uint8_t* fault_mask)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
+    
+    //check coupled joints
+    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control))    
+    {
+      if (motor <3) 
+      {
+        // don't need to use p->config.jomos[motor].actuator.local.index, cause the emsController (and related objs) use the same indexing of the highlevel
+        eo_motor_set_motor_status(eo_motors_GetHandle(),0, fault_mask);
+        eo_motor_set_motor_status(eo_motors_GetHandle(),1, fault_mask);
+        eo_motor_set_motor_status(eo_motors_GetHandle(),2, fault_mask);
+      }
+      else
+      {
+        eo_motor_set_motor_status(eo_motors_GetHandle(),motor, fault_mask);
+      }
+    }
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == board_control)  
+    {
+       eo_motor_set_motor_status(eo_motors_GetHandle(),0, fault_mask);
+       eo_motor_set_motor_status(eo_motors_GetHandle(),1, fault_mask);
+    }
+    else if(emscontroller_board_HEAD_neckyaw_eyes == board_control) 
+    {
+      if((motor == 2) || (motor == 3) ) 
+      {
+        eo_motor_set_motor_status(eo_motors_GetHandle(),2, fault_mask);
+        eo_motor_set_motor_status(eo_motors_GetHandle(),3, fault_mask);
+      }
+      else
+      {
+         eo_motor_set_motor_status(eo_motors_GetHandle(),motor, fault_mask);
+      }      
+    }
+    else  // marco.accame: the joint is not coupled to any other joint 
+    { 
+         eo_motor_set_motor_status(eo_motors_GetHandle(),motor, fault_mask);
+    }      
+    
+    return eores_OK;
+}
+
+extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+    
+    // don't need to use p->config.jomos[motor].actuator.local.index, cause the emsController (and related objs) use the same indexing of the highlevel
+    uint16_t state_mask = eo_get_motor_fault_mask(eo_motors_GetHandle(), motor);
+    return state_mask;
+}
 
 extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
 {
@@ -364,7 +508,8 @@ extern eOresult_t eo_mcserv_Stop(EOmcService *p)
     {
         case eOmcconfig_type_mc4plus:
         {
-            #warning TBD: maybe stop pwm , disable teh joints and ??? see what 2foc does 
+            #warning TBD: maybe stop pwm , disable teh joints and ??? see what 2foc does
+            s_eo_mcserv_disable_all_motors(p);
             res = eores_OK;        
         } break;
         case eOmcconfig_type_mc4can:
@@ -536,16 +681,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // actuator
     // reserve some memory for pwm values
     p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
-    
-    for(jm=0; jm<p->config.jomosnumber; jm++)
-    {
-        if(1 == p->config.jomos[jm].actuator.local.type)
-        {   // on board
-            #warning TBD: init the hal pwm
-            uint8_t pwm = p->config.jomos[jm].actuator.local.index;
-            pwm = pwm;
-        }
-    }
+   
     //currently the motors are initialized all together and without config
     hal_motor_and_adc_init(motor1, NULL);
     
@@ -570,7 +706,38 @@ static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
     return(res);
 }
 
-void myhal_pwm_set(uint8_t i, int16_t v)
+static void s_eo_mcserv_enable_all_motors(EOmcService *p)
+{
+    //enable PWM of the motors (if not faulted)
+    if (!myhal_are_motors_ext_faulted())
+    {
+        for(uint8_t jm=0; jm<p->config.jomosnumber; jm++)
+        {
+            if(1 == p->config.jomos[jm].actuator.local.type)
+            {   // on board 
+                myhal_pwm_enable(p->config.jomos[jm].actuator.local.index);
+            }
+        }
+    }
+    
+    return;
+}
+
+static void s_eo_mcserv_disable_all_motors(EOmcService *p)
+{
+     for(uint8_t jm=0; jm<p->config.jomosnumber; jm++)
+     {
+        if(1 == p->config.jomos[jm].actuator.local.type)
+        {   // on board 
+            myhal_pwm_set(p->config.jomos[jm].actuator.local.index, 0);
+            myhal_pwm_disable(p->config.jomos[jm].actuator.local.index);
+        }
+     }
+     
+     return;
+}
+
+static void myhal_pwm_set(uint8_t i, int16_t v)
 {
     //out of bound
     if (i > 3)
@@ -580,10 +747,40 @@ void myhal_pwm_set(uint8_t i, int16_t v)
     hal_motor_pwmset(i, v);
 }
 
-void myhal_pwm_init(uint8_t i)
+static void myhal_pwm_enable(uint8_t i)
 {
+    //out of bound
+    if (i > 3)
+        return;
     
+    hal_motor_enable(i);
 }
+
+static void myhal_pwm_disable(uint8_t i)
+{
+    //out of bound
+    if (i > 3)
+        return;
+    
+    hal_motor_disable(i);
+}
+
+
+static eObool_t myhal_are_motors_ext_faulted(void)
+{
+    if (hal_motor_isfault())
+    {
+        return eobool_true;
+    }
+       
+    return eobool_false;
+}
+
+static void myhal_reenable_external_fault_isr(void)
+{
+    hal_motor_reenable_break_interrupts();
+}
+
 
 extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
 {
