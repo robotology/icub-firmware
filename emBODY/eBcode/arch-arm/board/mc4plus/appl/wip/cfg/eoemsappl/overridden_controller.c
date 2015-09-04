@@ -83,19 +83,28 @@
 
 extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint8_t motor)
 {
-    // do nothing at the moment
+    // this is used by the EMS application to initialize the 2FOCs controller (the first time eo_emsController_SetControlMode is called)
+    
+    // for MC4plus: in case of calibration type 5 (with PWM applied till the hard stops), we need to enable the PWM for the motor... 
+    
 }
 
 
 extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,uint8_t motor)
 {
-    // do nothing at the moment
+    // this is used by the EMS application to set the 2FOC in idle state
+    
+    // for MC4plus: we could disable the specified motor
+    
 }
 
 
 extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor)
 {
-   // do nothing at the moment
+    // this is used by the EMS application to set the 2FOC in running state
+
+    // for MC4plus: we could enable the specified motor
+    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
