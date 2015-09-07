@@ -84,6 +84,7 @@ extern EOconstvector s_eo_vectorof_des_mais_eb1;
 extern EOconstvector s_eo_vectorof_des_jomo_eb2;
 extern EOconstvector s_eo_vectorof_des_strain_eb2;
 extern EOconstvector s_eo_vectorof_des_mais_eb2;
+//extern EOconstvector s_eo_vectorof_des_inertial_eb2;
 extern EOconstvector s_eo_vectorof_des_skin_eb2; 
 
 
@@ -135,112 +136,112 @@ const EOconstvector s_eo_empty_constvector_entity =
 };
 
 
-const EOconstvector * const entitiesmapB1[eoprot_endpoints_numberof][3] =
+const EOconstvector * const entitiesmapB1[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
 {
     { // mn
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
    
     { // mc
-        &s_eo_vectorof_des_jomo_eb1, &s_eo_vectorof_des_jomo_eb1, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_jomo_eb1, &s_eo_vectorof_des_jomo_eb1, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }, 
 
     { // as
-        &s_eo_vectorof_des_strain_eb1, &s_eo_vectorof_des_mais_eb1, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_strain_eb1, &s_eo_vectorof_des_mais_eb1, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }
 };
 
-const EOconstvector * const entitiesmapB2[eoprot_endpoints_numberof][3] =
+const EOconstvector * const entitiesmapB2[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
 {
     { // mn
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
    
     { // mc
-        &s_eo_vectorof_des_jomo_eb2, &s_eo_vectorof_des_jomo_eb2, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_jomo_eb2, &s_eo_vectorof_des_jomo_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }, 
 
     { // as
-        &s_eo_vectorof_des_strain_eb2, &s_eo_vectorof_des_mais_eb2, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_strain_eb2, &s_eo_vectorof_des_mais_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
-        &s_eo_vectorof_des_skin_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_skin_eb2, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }
 };
 
-const EOconstvector * const entitiesmapB5[eoprot_endpoints_numberof][3] =
+const EOconstvector * const entitiesmapB5[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
 {
     { // mn
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
    
     { // mc
-        &s_eo_vectorof_des_jomo_eb5, &s_eo_vectorof_des_jomo_eb5, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_jomo_eb5, &s_eo_vectorof_des_jomo_eb5, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }, 
 
     { // as
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }
 };
 
-const EOconstvector * const entitiesmapB6[eoprot_endpoints_numberof][3] =
+const EOconstvector * const entitiesmapB6[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
 {
     { // mn
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
    
     { // mc
-        &s_eo_vectorof_des_jomo_eb6, &s_eo_vectorof_des_jomo_eb6, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_jomo_eb6, &s_eo_vectorof_des_jomo_eb6, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }, 
 
     { // as
-        &s_eo_vectorof_des_strain_eb6, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_strain_eb6, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }
 };
 
 
-const EOconstvector * const entitiesmapB7[eoprot_endpoints_numberof][3] =
+const EOconstvector * const entitiesmapB7[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
 {
     { // mn
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
    
     { // mc
-        &s_eo_vectorof_des_jomo_eb7, &s_eo_vectorof_des_jomo_eb7, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_jomo_eb7, &s_eo_vectorof_des_jomo_eb7, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }, 
 
     { // as
-        &s_eo_vectorof_des_strain_eb7, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_strain_eb7, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }
 };
 
-const EOconstvector * const entitiesmapB10[eoprot_endpoints_numberof][3] =
+const EOconstvector * const entitiesmapB10[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
 {
     { // mn
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
    
     { // mc
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }, 
 
     { // as
-        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     },
     { // sk
-        &s_eo_vectorof_des_skin_eb10, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+        &s_eo_vectorof_des_skin_eb10, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
     }
 };
 
@@ -309,11 +310,16 @@ extern EOconstvector * eoboardconfig_code2canboards(uint32_t code)
 } 
 
 // of eOcanmap_entitydescriptor_t
-// teh constnector contains reference to the boards used to offer service to a given entity.
-// or ... is empty in case of no such an entity on teh board or entity being served not by can
+// the const vector contains reference to the boards used to offer service to a given entity.
+// or ... is empty in case of there is not such an entity on the board or the entity is not served by can
 extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOprotEndpoint_t ep, eOprotEntity_t entity)
 {
     EOconstvector *ret = (EOconstvector*) &s_eo_empty_constvector_entity;
+    
+    if(entity > eoboardconfig_maxvalueofsupportedentity)
+    {
+        return(ret);
+    }
     
     // so far the code is just an index equal to board number but starting from 0. eb1 is 0, etc....
     switch(code)
@@ -358,6 +364,11 @@ extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOpro
             ret = ret;
         } break;
     
+    }
+
+    if(NULL == ret)
+    {   // it can be NULL if someone forgets to fill in a proper way entitiesmapBxx with the empty vector pointer up to position eoboardconfig_maxvalueofsupportedentity
+        ret = (EOconstvector*) &s_eo_empty_constvector_entity;
     }
 
     return(ret);
@@ -457,7 +468,7 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
 
         case 4:
         {   
-            ret = ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb5; 
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb5; 
         } break;          
 
         case 5:
@@ -489,6 +500,66 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
 }
 
 
+//extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code)
+//{
+//    eOas_inertialidentifier_t ret = eoas_inertial_id_none;
+//    
+//    switch(code)
+//    {
+//        case 1:
+//        case 3: 
+//        {   // board eb2 or eb4   
+//            ret = eoas_inertial_id_hand_palm; 
+//        } break;  
+
+//        
+//        default:    
+//        {   // all the others
+//            ret = eoas_inertial_id_none;
+//        } break;
+//    
+//    }
+
+//    return(ret);        
+//}
+
+extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code)
+{
+    const eOas_inertial_serviceconfig_t *ret = NULL;
+    
+    switch(code)
+    {
+        case 1:
+        {
+            ret = &eo_inertial_cfg_eb2;
+        } break;
+        
+        case 3: 
+        {     
+            ret = &eo_inertial_cfg_eb4;
+        } break;  
+
+
+        case 9:
+        {
+            ret = &eo_inertial_cfg_eb10;
+        } break;
+        
+        case 10: 
+        {     
+            ret = &eo_inertial_cfg_eb11;
+        } break; 
+        
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);   
+}
+    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

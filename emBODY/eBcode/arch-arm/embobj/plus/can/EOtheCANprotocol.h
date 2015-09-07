@@ -103,10 +103,11 @@ typedef enum
     eocanprot_msgclass_pollingAnalogSensor          = ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR,          // 2
     eocanprot_msgclass_periodicAnalogSensor         = ICUBCANPROTO_CLASS_PERIODIC_ANALOGSENSOR,         // 3
     eocanprot_msgclass_pollingSkin                  = ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR,          // 2
-    eocanprot_msgclass_periodicSkin                 = ICUBCANPROTO_CLASS_PERIODIC_SKIN                  // 4
+    eocanprot_msgclass_periodicSkin                 = ICUBCANPROTO_CLASS_PERIODIC_SKIN,                 // 4
+    eocanprot_msgclass_periodicInertialSensor       = ICUBCANPROTO_CLASS_PERIODIC_INERTIALSENSOR        // 5
 } eOcanprot_msgclass_t;
 
-enum { eocanprot_msgclass_maxvalue = 4 };
+enum { eocanprot_msgclass_maxvalue = 5 };
 
 enum { eocanprot_classperiodic_msgtypes_maxnumberof = 16, eocanprot_classpolling_msgtypes_maxnumberof = 128 };
 

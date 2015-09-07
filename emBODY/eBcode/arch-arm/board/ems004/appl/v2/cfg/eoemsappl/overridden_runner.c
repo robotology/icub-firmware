@@ -60,6 +60,8 @@
 #include "EOtheMotionDone.h"
 #include "EOtheVirtualStrain.h"
 
+#include "EOtheInertial.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -208,6 +210,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
 
@@ -235,7 +238,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
         } break;
     }
-  
+#endif
 }
 
 
@@ -263,6 +266,15 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
             }            
         }
     }
+    
+    
+    
+    // we could refresh status in here ... but only if we have just sent to robotinterface the previous status
+    if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
+    {
+        eo_inertial_RefreshStatusOfEntity(eo_inertial_GetHandle());
+    }
+    
     
     // now we wait for the can tx to finish. 
     // diagnostics about tx failure within the specified timeout is managed internally 

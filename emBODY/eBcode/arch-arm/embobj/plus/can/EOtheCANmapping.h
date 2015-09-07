@@ -64,6 +64,7 @@ enum
     eocanmap_motors_maxnumberof     = eocanmap_joints_maxnumberof, 
     eocanmap_strains_maxnumberof    = 1, 
     eocanmap_maises_maxnumberof     = 1,
+    eocanmap_inertials_maxnumberof  = 1,
     eocanmap_skins_maxnumberof      = 2
 };
     
@@ -73,6 +74,7 @@ enum
     eocanmap_motor_index_boards_maxnumberof     = 1,
     eocanmap_strain_index_boards_maxnumberof    = 1,
     eocanmap_mais_index_boards_maxnumberof      = 1,
+    eocanmap_inertial_index_boards_maxnumberof  = 1,
     eocanmap_skin_index_boards_maxnumberof      = 8     // it tells that we can use up to 8 can boards to represent a single skin index
 };
 

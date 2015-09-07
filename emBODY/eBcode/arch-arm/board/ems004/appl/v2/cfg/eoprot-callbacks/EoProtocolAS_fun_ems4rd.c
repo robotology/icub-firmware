@@ -53,6 +53,7 @@
 
 #include "EOtheMAIS.h"
 #include "EOtheSTRAIN.h"
+#include "EOtheInertial.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -373,6 +374,35 @@ extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv,
 //    eObool_t *signaloncefullscale = (eObool_t*)rd->data;
 //    s_signalGetFullScales(rd->id32, *signaloncefullscale);
 }
+
+extern void eoprot_fun_UPDT_as_inertial_config_service(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_inertial_serviceconfig_t *cfg = (eOas_inertial_serviceconfig_t*)rd->data;    
+    eo_inertial_ServiceConfig(eo_inertial_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_inertial_config_sensors(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_inertial_sensorsconfig_t *cfg = (eOas_inertial_sensorsconfig_t*)rd->data;    
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_inertial_commands_t *cmd = (eOmc_inertial_commands_t*)rd->data;  
+
+    if(0 == cmd->enable)
+    {
+        eo_inertial_Stop(eo_inertial_GetHandle());    
+    }
+    else
+    {
+        eo_inertial_Start(eo_inertial_GetHandle());    
+    }
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

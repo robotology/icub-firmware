@@ -138,7 +138,7 @@ extern EOtheCANservice * eo_canserv_Initialise(const eOcanserv_cfg_t *cfg)
         #warning --> put diagnostics .... maybe return NULL
     }
     else
-    {    
+    {                 
         s_eo_canserv_singleton.initted = eobool_true;
         ret = &s_eo_canserv_singleton;        
     }
@@ -496,6 +496,10 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
             return(eores_NOK_generic);
         }    
     }
+    
+    // added a wait time so that all can boards which are switched on by hal_can_init() are surely off the bootloader phase
+    osal_task_wait(5*OSAL_reltime1sec + 1000*OSAL_reltime1ms); // 5 seconds for bootloader permanence plus some more time for powerup and starting application
+
       
     return(eores_OK);
 }
