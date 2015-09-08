@@ -1645,7 +1645,7 @@ extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, 
     
     eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
 }
-extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t vel, int32_t final_position)
+extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position)
 {
     if (!ems) return;
     
@@ -1662,7 +1662,7 @@ extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmli
     s_eo_emsController_ResetCalibrationCoupledJoints(joint);
     //offset is 0 in this case
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
-    eo_axisController_StartCalibration_type5(ems->axis_controller[joint], pwmlimit, vel, final_position);
+    eo_axisController_StartCalibration_type5(ems->axis_controller[joint], pwmlimit,final_position);
     
 }
     

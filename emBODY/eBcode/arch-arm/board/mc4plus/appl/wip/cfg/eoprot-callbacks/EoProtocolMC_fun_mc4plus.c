@@ -513,15 +513,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     }
 
     //check for the type of calibration required
-    
-    #warning this should change to calibrationtype5, but in robotInterface this is still not handled. now it's type4 (because it also have 3 params) to test it
-    if(calibrator->type == eomc_calibration_type4_abs_and_incremental)
+
+    if(calibrator->type == eomc_calibration_type5_hard_stops_mc4plus)
     {
         // calibration for joint with incremental encoders
         eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type5.calibrationZero);
         eo_emsController_StartCalibration_type5 (jxx,
                                                  calibrator->params.type5.pwmlimit,
-                                                 calibrator->params.type5.velocity,
                                                  calibrator->params.type5.final_pos);
     }
     else if(calibrator->type == eomc_calibration_type3_abs_sens_digital)

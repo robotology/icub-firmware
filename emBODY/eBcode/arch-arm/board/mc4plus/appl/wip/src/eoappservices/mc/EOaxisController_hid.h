@@ -121,7 +121,6 @@ struct EOaxisController_hid
     int32_t old_pos;
     int32_t pos_to_reach;
     int32_t offset;
-    int32_t goback_vel;
     uint8_t isvirtuallycoupled;
     uint8_t hardwarelimitisreached;
     

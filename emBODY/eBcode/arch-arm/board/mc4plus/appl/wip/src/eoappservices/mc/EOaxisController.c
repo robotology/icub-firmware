@@ -128,7 +128,6 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->old_pos = o->pos_max;
         o->pos_to_reach = 0;
         o->offset = 0;
-        o->goback_vel = 0;
         o->isvirtuallycoupled = 0;
         o->hardwarelimitisreached = 0;
     }
@@ -170,7 +169,7 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     o->control_mode = eomc_controlmode_calib;
 }
 
-extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t vel, int32_t final_position)
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position)
 {
     if (!o) return;
     
@@ -189,9 +188,7 @@ extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_
         o->pos_to_reach = final_position;
     else
         o->pos_to_reach = -final_position;
-    
-    o->goback_vel = vel;
-
+ 
     //reset the offset
     o->offset = 0;
     
@@ -744,7 +741,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     
                     //but the first time also RobotInterface try to set the pos to 0... (it does not seem to be a problem)
                     #if defined(CALIB5_GOTO_ZERO)
-                    eo_axisController_SetPosRef(o, 0, o->goback_vel); // go to 0 with velocity from calib param2   
+                    eo_axisController_SetPosRef(o, 0, vel); // go to 0 with velocity from calib param2   
                     #endif                    
                           
                     return 0;                    
