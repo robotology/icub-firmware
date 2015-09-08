@@ -844,6 +844,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheInertial.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1158,6 +1163,11 @@
               <FileName>EoCANprotSKperiodic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANprotISperiodic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotISperiodic.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2079,6 +2089,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheInertial.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2393,6 +2408,11 @@
               <FileName>EoCANprotSKperiodic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANprotISperiodic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotISperiodic.c</FilePath>
             </File>
           </Files>
         </Group>
