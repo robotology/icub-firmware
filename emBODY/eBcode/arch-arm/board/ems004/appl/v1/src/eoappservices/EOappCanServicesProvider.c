@@ -387,16 +387,24 @@ extern eOresult_t eo_appCanSP_SendCmd2Motor(EOappCanSP *p, eOmc_motorId_t mId, e
     eOresult_t                                  res;
     eOappTheDB_jointOrMotorCanLocation_t        canLoc;
     eOicubCanProto_msgDestination_t             msgdest;
+    eObrd_cantype_t                         boardType;
 
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
 
-    res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mId,  &canLoc, NULL);
+    res = eo_appTheDB_GetMotorCanLocation(eo_appTheDB_GetHandle(), mId,  &canLoc, &boardType);
     if(eores_OK != res)
     {
         return(res);
+    }
+    
+    if(eobrd_cantype_1foc == boardType)
+    {
+        #warning ALE: not to be managed directly
+            
+        return eores_OK;
     }
 
     // set destination of message 

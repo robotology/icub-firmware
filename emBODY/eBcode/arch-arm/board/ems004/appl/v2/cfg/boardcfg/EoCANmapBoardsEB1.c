@@ -79,7 +79,7 @@ static const eOcanmap_board_properties_t s_boardprops[] =
             .port   = eOcanport1,
             .addr   = 1         
         },
-        .requiredprotocol   = {.major = 1, .minor = 2}
+        .requiredprotocol   = {.major = 1, .minor = 3}
     },  
     {
         .type               = eobrd_cantype_1foc,
@@ -88,7 +88,7 @@ static const eOcanmap_board_properties_t s_boardprops[] =
             .port   = eOcanport1,
             .addr   = 2         
         },
-        .requiredprotocol   = {.major = 1, .minor = 2}
+        .requiredprotocol   = {.major = 1, .minor = 3}
     },
     {
         .type               = eobrd_cantype_1foc,
@@ -97,7 +97,7 @@ static const eOcanmap_board_properties_t s_boardprops[] =
             .port   = eOcanport1,
             .addr   = 3         
         },
-        .requiredprotocol   = {.major = 1, .minor = 2}
+        .requiredprotocol   = {.major = 1, .minor = 3}
     },
     {
         .type               = eobrd_cantype_1foc,
@@ -106,7 +106,7 @@ static const eOcanmap_board_properties_t s_boardprops[] =
             .port   = eOcanport1,
             .addr   = 4         
         },
-        .requiredprotocol   = {.major = 1, .minor = 2}
+        .requiredprotocol   = {.major = 1, .minor = 3}
     },
     {
         .type               = eobrd_cantype_strain,

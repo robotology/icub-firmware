@@ -139,6 +139,14 @@ extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o)
     RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
 }
 
+extern void eo_absCalibratedEncoder_ResetCalibration(EOabsCalibratedEncoder* o)
+{
+    //o->offset = 0; --> dangerous, cause the axis position sharply change (even if I'm in position ctrl mode)
+    SET_BITS(o->state_mask, SM_NOT_CALIBRATED);
+    RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
+    //should I clear the faults too?
+    RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
+}
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder* o, int32_t offset)
 {
     o->offset = offset;

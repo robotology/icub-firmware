@@ -119,6 +119,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->velocity = 0;
         
         o->state_mask = AC_NOT_READY;
+        o->calibration_zero = 0;
     }
 
     return o;
@@ -147,7 +148,7 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     }
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
-    o->control_mode = eomc_controlmode_calib;
+    //o->control_mode = eomc_controlmode_calib;
 }
 
 extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel)
@@ -250,6 +251,19 @@ extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, in
   //eo_trajectory_SetVelMax(o->trajectory, vel_max);
 }
 
+
+extern void eo_axisController_SetAxisCalibrationZero(EOaxisController *o, int32_t zero)
+{
+    if (!o) return;
+    o->calibration_zero = zero;
+}
+
+extern int32_t eo_axisController_GetAxisCalibrationZero(EOaxisController *o)
+{
+    if (!o) return 0;
+    return o->calibration_zero;
+}
+
 extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min)
 {
     if (!o) return;
@@ -310,7 +324,7 @@ extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffne
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
-    if (o) o->position = pos;
+    if (o) o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
 } 
 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
@@ -440,6 +454,8 @@ extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq)
 
 extern void eo_axisController_SetHardwareFault(EOaxisController *o)
 {
+        axisMotionReset(o);
+    
 		o->control_mode = eomc_controlmode_hwFault;
 }
 
@@ -513,6 +529,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         if (o->control_mode == eomc_controlmode_position) return eobool_true;
         o->control_mode = eomc_controlmode_position;
         eo_pid_Reset(o->pidP);
+        eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), 0, 0);
         eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
         o->velocity_timer = 0; //VELOCITY_TIMEOUT;
         o->torque_ref_jnt = 0;
@@ -600,6 +617,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
     
     switch (o->control_mode)
     {
+        case eomc_controlmode_notConfigured:
         case eomc_controlmode_hwFault:
             return 0;
         
@@ -631,8 +649,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     return o->pwm_limit_calib;
                 }
             }
-            // calib type 3
-            else
+            /*
+            else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
                 if (IS_CALIBRATED())
                 {
@@ -646,6 +664,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 o->err = 0;
                 return 0;
             }
+            */
+            return 0;
         }
         case eomc_controlmode_idle:
         {
@@ -702,7 +722,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //return eo_pid_PWM_piv(o->pidP, o->err, vel_ref-vel);
                 
                 #ifdef EXPERIMENTAL_SPEED_CONTROL
-                return (int16_t)(vel_ref / 10 + err / 2);
+                return (0.04f*vel_ref+0.2f*(float)err);
+                //return eo_pid_experimentalPWM(o->pidP, (float)err, vel_ref);
                 #else
                 return eo_pid_PWM_pid(o->pidP, o->err);
                 #endif

@@ -119,15 +119,15 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->velocity = 0;
         
         o->state_mask = AC_NOT_READY;
-        
-        o->calibration_type = eomc_calibration_type3_abs_sens_digital; //default behaviour (AEA abs encoders)
+        o->calibration_zero = 0;
+        //o->calibration_type = eomc_calibration_type3_abs_sens_digital; //default behaviour (AEA abs encoders)
+        o->calibration_type = eomc_calibration_typeUndefined;
         o->pwm_limit_calib = 0;
         o->calib_count = 0;
         o->calib_stable = 0;
         o->old_pos = o->pos_max;
         o->pos_to_reach = 0;
         o->offset = 0;
-        o->goback_vel = 0;
         o->isvirtuallycoupled = 0;
         o->hardwarelimitisreached = 0;
     }
@@ -169,7 +169,7 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     o->control_mode = eomc_controlmode_calib;
 }
 
-extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t vel, int32_t final_position)
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position)
 {
     if (!o) return;
     
@@ -188,9 +188,7 @@ extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_
         o->pos_to_reach = final_position;
     else
         o->pos_to_reach = -final_position;
-    
-    o->goback_vel = vel;
-
+ 
     //reset the offset
     o->offset = 0;
     
@@ -205,6 +203,14 @@ extern void eo_axisController_SetCalibrated(EOaxisController *o)
     if (!o) return;
     
     RST_BITS(o->state_mask, AC_NOT_CALIBRATED);
+}
+
+extern void eo_axisController_ResetCalibration(EOaxisController *o)
+{
+    if (!o) return;
+    
+    axisMotionReset(o);
+    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
 }
 
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o)
@@ -282,6 +288,19 @@ extern void eo_axisController_SetLimits(EOaxisController *o, int32_t pos_min, in
   //eo_trajectory_SetVelMax(o->trajectory, vel_max);
 }
 
+
+extern void eo_axisController_SetAxisCalibrationZero(EOaxisController *o, int32_t zero)
+{
+    if (!o) return;
+    o->calibration_zero = zero;
+}
+
+extern int32_t eo_axisController_GetAxisCalibrationZero(EOaxisController *o)
+{
+    if (!o) return 0;
+    return o->calibration_zero;
+}
+
 extern void eo_axisController_SetPosMin(EOaxisController *o, int32_t pos_min)
 {
     if (!o) return;
@@ -342,7 +361,13 @@ extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffne
 
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
-    if (o) o->position = pos;
+    //if (o) o->position = pos;
+	if (!o) return;
+    
+    if((o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) && !(eo_axisController_IsCalibrated(o)))
+        o->position = pos;
+    else 
+        o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
 } 
 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
@@ -499,8 +524,24 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     
     if (NOT_READY())
     {
-        //o->control_mode = eomc_controlmode_notConfigured;
-        
+        //if the AXIS is not calibrated (not configured or in calib phase), I go back (or remain in) to notConfigured (safe) state (probably an EXTfault has occurred)
+        //N.B. at the moment only for calibration5 cause calibration3 applies only an offset to the encoder raw values (no risks)
+        if ((!IS_CALIBRATED()))
+        {    
+            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
+            {
+                //if the joint was calibrating, I reset its calibration values
+                if (o->control_mode == eomc_controlmode_calib)
+                {
+                    eo_emsController_ResetCalibrationValues(o->axisID);
+                }
+                o->control_mode = eomc_controlmode_notConfigured;
+            }
+            else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
+            {
+                o->control_mode = eomc_controlmode_idle;
+            }
+        }
         return eobool_false;
     }
     
@@ -664,8 +705,9 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     else if (new_pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
                         new_pos -= TICKS_PER_REVOLUTION;
                     
-                    //update axis, trajectory pos and...allowed limits?
-                    eo_axisController_SetEncPos(o, new_pos);
+                    //update axis, trajectory pos
+                    //eo_axisController_SetEncPos(o, new_pos);
+                    o->position = new_pos -  o->calibration_zero;
                     eo_axisController_SetEncVel(o, vel);
                     /*
                     if (new_pos > 0)
@@ -679,8 +721,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                         eo_axisController_SetPosMax(o, -new_pos);
                     }
                     */
-                    eo_trajectory_Init(o->trajectory, new_pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, new_pos);
+                    eo_trajectory_Init(o->trajectory, new_pos - o->calibration_zero, vel, 0);
+                    eo_trajectory_Stop(o->trajectory, new_pos - o->calibration_zero);
                     o->err = 0;
                     
                     
@@ -699,7 +741,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     
                     //but the first time also RobotInterface try to set the pos to 0... (it does not seem to be a problem)
                     #if defined(CALIB5_GOTO_ZERO)
-                    eo_axisController_SetPosRef(o, 0, o->goback_vel); // go to 0 with velocity from calib param2   
+                    eo_axisController_SetPosRef(o, 0, vel); // go to 0 with velocity from calib param2   
                     #endif                    
                           
                     return 0;                    
@@ -775,40 +817,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
             
             int32_t err = pos_ref - pos;
-            
-            //begin test...the error is gettin smaller and smaller?
-            //
-            /*
-            static uint8_t count = 0;
-            int32_t err_to_check;
-            if (err < 0)
-                err_to_check = -err;
-            else
-                err_to_check = err;
-            
 
-            if (err_to_check > 100)
-            {
-               count++;
-            }
-            else if ((err_to_check > 50) && (err_to_check < 100))
-            {
-               count++;
-            }
-            else if ((err_to_check > 25) && (err_to_check < 50))
-            {
-               count++;
-            }
-            else if ((err_to_check > 10) && (err_to_check < 25))
-            {
-               count++;
-            }
-            else if ((err_to_check > 0) && (err_to_check < 10))
-            {
-               count++;
-            }
-            //end test
-            */
             if (o->interact_mode == eOmc_interactionmode_stiff)
             {
                 *stiff = eobool_true;
@@ -1051,19 +1060,18 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 
 extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos)
 {
-    int32_t pos = current_pos - o->offset;
-    // out of bound protections
-    //test1
-    //LIMIT2(ems->axis_controller[joint]->pos_min, pos, ems->axis_controller[joint]->pos_max);
+    if (!o) return;
     
-    //test2   
+    int32_t pos = current_pos - o->offset;
+    
+    // out of bound protections
     if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
         pos += TICKS_PER_REVOLUTION;
     else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
         pos -= TICKS_PER_REVOLUTION;
 
     //update axis pos
-    o->position = pos;
+    o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
     return;
 }
 
@@ -1101,7 +1109,7 @@ extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisControl
         pos -= TICKS_PER_REVOLUTION;     
     
     //update axis pos
-    o->position = pos;    
+    o->position = pos - eo_axisController_GetAxisCalibrationZero(o);    
     
     return;
 }

@@ -120,6 +120,45 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
 {
+    static uint32_t count_times = 0;
+    count_times++;
+
+    //  davide on 25 feb 2015:
+    //  it seems that the problem of the 2foc is due to the high frequency of the messages sent via CAN.
+    //  Now the messages are sent with a frequency of 4HZ (timer countdown = 250ms), and the problem should be fixed without
+    //  a fixed delay of 5 seconds from the beginning of the application
+    
+    // The first time I only send the request...from that point on, I continue to check if the boards are ready, and if
+    // not I re-send the request for the firmware version
+    if(count_times == 1)
+    {
+        eo_candiscovery_ResetAndStartProcedure(eo_candiscovery_GetHandle());
+        return;
+    }
+          
+    // verifico che le board mc4, 1foc gli analog sensors siano ready, ovvero che abbiano mandato la loro fw version
+    eo_candiscovery_EvaluateDiscoveredResources(eo_candiscovery_GetHandle());
+    
+    // true only if both MC and MAIS are ready
+    if ((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true))
+    {
+        count_times = 0;
+        //stoppo il timer canBoardsReady_timer da 10 milli e segnalo le schede trovate coi loro protocolli
+        eo_candiscovery_Stop(eo_candiscovery_GetHandle());
+        // poi, nel caso mc4:  mando la configurazione alle board e abilito MAIS e BCastPolicy
+        if(eobool_true == eo_mc4boards_AreThere(eo_mc4boards_GetHandle()))
+        {
+            eo_mc4boards_Config(eo_mc4boards_GetHandle());
+            eo_mais_Start(eo_mais_GetHandle());          
+        }
+    }
+    else
+    {  
+        // I check again if the can boards are ready. however, i dont check the boards already ok
+        eo_candiscovery_CheckRemainingCanBoards(eo_candiscovery_GetHandle());
+    }
+
+    /*
     uint32_t readyCanBoardsMask = 0;    // keeps the boards that are ready. if bit pos i-th is 1, then the board in list i-th is OK   
     uint32_t checkedmask = 0;           // keeps the boards that are checked
     static uint32_t count_times = 0;
@@ -158,7 +197,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfi
         // i check again if the can boards are ready. however, i dont check the boards already ready
         eo_candiscovery_CheckCanBoardsAreReady(eo_candiscovery_GetHandle(), readyCanBoardsMask);
     }
-    
+    */
 }
 
 // marco.accame on Nov 26 2014: this function is triggered if function eom_emssocket_Transmit() fails

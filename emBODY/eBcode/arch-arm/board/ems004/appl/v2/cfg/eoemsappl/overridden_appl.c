@@ -44,8 +44,11 @@
 #include "EOtheCANservice.h"
 #include "EOtheCANprotocol.h"
 
+#include "EOtheEntities.h"
 #include "EOtheSTRAIN.h"
+#include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
+#include "EOtheInertial.h"
 
 #include "EOtheBoardConfig.h"
 
@@ -280,7 +283,7 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
      }
 }
 
-
+//#define DEBUG_INERTIAL
 // marco.accame: this function is called inside eom_emsappl_Initialise() just before to run the state machine
 // which enters in the CFG state. it is the place where to launch new services
 
@@ -302,8 +305,12 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
             //return;
             s_boardnum = 0;
         }
-        
-        //s_boardnum = 0; //it imposes that the board is the eb1
+#if defined(DEBUG_INERTIAL)        
+        s_boardnum = 1; //it imposes that the board is the eb2
+#endif
+#if defined(TEST_EB2_EB4_WITHOUT_MC)        
+        s_boardnum = 1; //it imposes that the board is the eb2
+#endif
     }
     
     {   // CAN-MAPPING
@@ -313,19 +320,33 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // now i load the map of can boards
         EOconstvector *canboards = eoboardconfig_code2canboards(s_boardnum);
         eo_canmap_LoadBoards(canmap, canboards);
-        // now i load mc-joints, mc-motors, as-strain, as-mais, sk-skin
+        // now i load mc-joints, mc-motors, as-strain, as-mais, as-inertial, sk-skin
         EOconstvector *entitydes = NULL;
-        // mc
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)
+        // mc-joint
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, entitydes);
+        // mc-motor
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, entitydes); 
-        // as
+#endif        
+        // as-strain
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, entitydes);
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)        
+        // as-mais
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, entitydes);
-        // sk
+#endif   
+        // the entity as-inertial is not associated to one can board or a set of can boards. it is a ram-mapped entity. as we can use only one
+        // for the limitations of the udp packet, we let the object EOtheInertial manage the proper decoding of the can messages coming from the mtb boards. 
+        // THUS, we dont need to call eo_canmap_ConfigEntity(). 
+        // in short: if we dont use a eo_canmap_GetEntityIndex() or a eo_canmap_GetEntityLocation() we dont need to call eo_canmap_ConfigEntity() now.
+//        // as-inertial
+//        entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
+//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, entitydes);     
+
+        // sk-skin
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
         eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
     }
@@ -365,8 +386,20 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         {
             eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_b02_b04_mc_isproxied);
         }
-    }    
+    }   
+
+
+    // now we can initialise the entities object
+    eo_entities_Initialise();      
         
+    // initialise some other objects such as STRAIN, MAIS, SKIN, Inertial    
+    eo_strain_Initialise();
+    eo_mais_Initialise();
+    eo_skin_Initialise();
+    // the inertial is initted but does not know yet which can network it supports
+    eo_inertial_Initialise();
+    // the can network is loaded in runtime. we need 2x15 values, which for now are taken from its ip address. later on they will be taken from a UDP message
+    //eo_inertial_ServiceConfig(eo_inertial_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
@@ -378,7 +411,59 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     const eOappEncReader_cfg_t *enccfg = eoboardconfig_code2encoderconfig(s_boardnum);
     memcpy(&applbodyconfig.encoderreaderconfig, enccfg, sizeof(eOappEncReader_cfg_t)); 
     
-    eo_emsapplBody_Initialise(&applbodyconfig);       
+    eo_emsapplBody_Initialise(&applbodyconfig);   
+
+#if defined(DEBUG_INERTIAL)
+    // test inertial
+    
+    //#define TEST_NUM_1
+    #define TEST_NUM_2
+    
+    eOas_inertial_sensorsconfig_t inertialconfig = {0};
+    inertialconfig.datarate = 10;
+    inertialconfig.enabled = 0;
+    
+    
+ 
+#if defined(TEST_NUM_1)   
+    
+    inertialconfig.datarate = 50;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
+    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
+
+    inertialconfig.datarate = 9;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand) | EOAS_ENABLEPOS(eoas_inertial_pos_l_forearm_1);    
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);
+    
+    eo_inertial_Stop(eo_inertial_GetHandle());
+    
+    
+    inertialconfig.datarate = 50;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
+   
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);   
+    eo_inertial_Start(eo_inertial_GetHandle());
+    
+#endif // defined(TEST_NUM_1)
+
+
+#if defined(TEST_NUM_2)
+
+
+    inertialconfig.datarate = 250;
+    inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
+    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);
+    
+    eo_inertial_Start(eo_inertial_GetHandle());  
+    
+    
+    
+    
+    eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+
+#endif // defined(TEST_NUM_2)
+
+#endif
 }
 
 
@@ -454,7 +539,10 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     }
     
     // stop tx of strain, if present
-    eo_strain_DisableTX(eo_strain_GetHandle());        
+    eo_strain_DisableTX(eo_strain_GetHandle());    
+
+    // stop tx of inertial. the check whether to stop skin or not is done internally.
+    eo_inertial_Stop(eo_inertial_GetHandle());
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)

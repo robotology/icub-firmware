@@ -78,11 +78,13 @@ static EOtheEntities s_eo_theentities =
     .skins          = {NULL},
     .strains        = {NULL},
     .maises         = {NULL},
+    .inertials      = {NULL},
     .numofjoints    = 0,
     .numofmotors    = 0,
     .numofskins     = 0,
     .numofstrains   = 0,
-    .numofmaises    = 0
+    .numofmaises    = 0,
+    .numofinertials = 0
 };
 
 //static const char s_eobj_ownname[] = "EOtheEntities";
@@ -124,6 +126,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     memset(s_eo_theentities.skins, 0, sizeof(s_eo_theentities.skins));
     memset(s_eo_theentities.strains, 0, sizeof(s_eo_theentities.strains));
     memset(s_eo_theentities.maises, 0, sizeof(s_eo_theentities.maises));
+    memset(s_eo_theentities.inertials, 0, sizeof(s_eo_theentities.inertials));
     
     // joints
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
@@ -169,6 +172,16 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     {
         s_eo_theentities.maises[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)i);
     }    
+
+
+    // inertials
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
+    s_eo_theentities.numofinertials = max;
+    if(max>eoprotwrap_max_inertials) max = eoprotwrap_max_inertials;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theentities.inertials[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, (eOprotIndex_t)i);
+    } 
     
     return(eores_OK);
 }
@@ -286,6 +299,50 @@ extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIn
 
     return(ret);
 }
+
+
+extern uint8_t eo_entities_NumOfInertials(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofinertials);    
+}
+
+extern eOas_inertial_t * eo_entities_GetInertial(EOtheEntities *p, eOprotIndex_t id)
+{
+    if(id >= eoprotwrap_max_inertials)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theentities.inertials[id]);
+}
+
+extern eOas_inertial_config_t * eo_entities_GetInertialConfig(EOtheEntities *p, eOprotIndex_t id)
+{
+    eOas_inertial_config_t *ret = NULL;    
+    eOas_inertial_t *in = eo_entities_GetInertial(p, id);
+    
+    if(NULL != in)
+    {
+        ret = &(in->config);
+    }
+
+    return(ret);
+}
+
+
+extern eOas_inertial_status_t * eo_entities_GetInertialStatus(EOtheEntities *p, eOprotIndex_t id)
+{
+    eOas_inertial_status_t *ret = NULL;    
+    eOas_inertial_t *in = eo_entities_GetInertial(p, id);
+    
+    if(NULL != in)
+    {
+        ret = &(in->status);
+    }
+
+    return(ret);
+}
+
 
 extern uint8_t eo_entities_NumOfStrains(EOtheEntities *p)
 {

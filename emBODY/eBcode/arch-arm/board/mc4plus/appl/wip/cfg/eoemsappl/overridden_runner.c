@@ -100,7 +100,7 @@ void userDef_hwErrCntr(void){}
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-
+static void overriden_runner_CheckAndUpdateExtFaults(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -172,6 +172,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {  
+    #warning: here we should check if a fault is occurred to the motors, and notify the EOemsController in this case
+    overriden_runner_CheckAndUpdateExtFaults();
     
     eo_mcserv_Actuate(eo_mcserv_GetHandle());    
 }
@@ -242,6 +244,23 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void overriden_runner_CheckAndUpdateExtFaults(void)
+{
+    if (eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle()))
+    {      
+        //set the fault mask for ALL the motors
+        for (uint8_t i = 0; i<eo_mcserv_GetMotionControlConfig(eo_mcserv_GetHandle())->jomosnumber; i++)
+        {
+            uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
+            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit
+            {
+                uint8_t fault_mask[6] = {0x4, 0x0, 0x0, 0x0, 0x0, 0x0}; //setting only the external fault bit
+                eo_motor_set_motor_status(eo_motors_GetHandle(),i, fault_mask);
+            }
+        }
+    }
+    return;
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -83,6 +83,9 @@ extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o);
 
 //extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
+extern void    eo_axisController_SetAxisCalibrationZero (EOaxisController* o, int32_t calibration_zero);
+extern int32_t eo_axisController_GetAxisCalibrationZero (EOaxisController* o);
+
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
 extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
@@ -134,8 +137,9 @@ extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, 
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down);
 
 extern void eo_axisController_StartCalibration_type3(EOaxisController *o);
-extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t vel, int32_t final_position);
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position);
 extern void eo_axisController_SetCalibrated(EOaxisController *o);
+extern void eo_axisController_ResetCalibration(EOaxisController *o);
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o);
 
 extern int32_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *enc_pos); // shoulder joint 2 only

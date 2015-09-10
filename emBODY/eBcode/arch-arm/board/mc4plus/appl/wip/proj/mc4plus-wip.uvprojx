@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -84,8 +84,6 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
-            <nStopA1X>0</nStopA1X>
-            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -147,6 +145,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -363,8 +362,6 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>0</v6Lang>
-            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>ICUB_HEAD_V3</Define>
@@ -847,6 +844,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheInertial.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -895,8 +897,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1109,6 +1109,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_mc4plus.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtocolAS_fun_mc4plus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_mc4plus.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1158,6 +1163,11 @@
               <FileName>EoCANprotSKperiodic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANprotISperiodic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotISperiodic.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1212,8 +1222,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1251,7 +1259,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1321,8 +1329,6 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
-            <nStopA1X>0</nStopA1X>
-            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -1384,6 +1390,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1600,8 +1607,6 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>0</v6Lang>
-            <v6LangP>0</v6LangP>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
@@ -2084,6 +2089,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheInertial.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2132,8 +2142,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2346,6 +2354,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolMC_fun_mc4plus.c</FilePath>
             </File>
+            <File>
+              <FileName>EoProtocolAS_fun_mc4plus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_mc4plus.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2395,6 +2408,11 @@
               <FileName>EoCANprotSKperiodic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotSKperiodic.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANprotISperiodic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotISperiodic.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2449,8 +2467,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>

@@ -140,6 +140,8 @@ static eOcanmap_board_extended_t ** s_eo_canmap_canmapcfg_boards[2] =
 static eOcanmap_board_extended_t * s_eo_canmap_boards_mc_jomo[eocanmap_joints_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_strain[eocanmap_strains_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_mais[eocanmap_maises_maxnumberof] = {NULL};
+static eOcanmap_board_extended_t * s_eo_canmap_boards_as_extorque[1] = {NULL};
+static eOcanmap_board_extended_t * s_eo_canmap_boards_as_inertial[eocanmap_inertials_maxnumberof] = {NULL};
 //static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin[eocanmap_skins_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin_00[eocanmap_skin_index_boards_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin_01[eocanmap_skin_index_boards_maxnumberof] = {NULL};
@@ -153,7 +155,9 @@ static eOcanmap_board_extended_t ** s_eo_canmap_boards_mc[] =
 static eOcanmap_board_extended_t ** s_eo_canmap_boards_as[] =
 {   
     s_eo_canmap_boards_as_strain,       // strain
-    s_eo_canmap_boards_as_mais          // mais
+    s_eo_canmap_boards_as_mais,         // mais
+    s_eo_canmap_boards_as_extorque,     // extorque are not managed ...
+    s_eo_canmap_boards_as_inertial      // inertial
 };
 
 //static eOcanmap_board_extended_t ** s_eo_canmap_boards_sk[] =
@@ -317,21 +321,26 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
         // 1. set the boardext with the index of the entity.
         // 2. fill the entity array        
         if(eoprot_endpoint_motioncontrol == ep)
-        {
+        {   // for motion control the board can be 1foc or mc4. 1foc manages 1 joint only and is placed in position 0 of indexofentity[]. mc4 manages two joints which are placed in position 0 and position 1
             boardext->board.indexofentity[loc->insideindex] = des->index;
             s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_joint][des->index] = boardext;
             s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_motor][des->index] = boardext;
         }   
         else if(eoprot_endpoint_skin == ep)
-        {
-            boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = des->index; 
+        {   // for skin endpoint the board is a mtb. for entity of type skin we use position 0 of indexofentity[]
+            boardext->board.indexofentity[0] = des->index;  // as described in NOTE-123454321 we use position 0    
             uint8_t pos = s_eo_canmap_singleton.numofskinboardsindex[des->index];
             s_eo_canmap_singleton.skinlocation[des->index][pos] = boardext; 
             s_eo_canmap_singleton.numofskinboardsindex[des->index] ++;            
         }
+        else if((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_inertial == entity))
+        {   // NOTE-123454321: for analog sensor endpoint and inertial entity the board is a mtb. we use position 1 of indexofentity[] because position 0 is reserved to skin entity managed by the same board
+            boardext->board.indexofentity[1] = des->index; // as described in NOTE-123454321 we use position 1
+            s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = boardext;            
+        }
         else 
-        {
-            boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = des->index;
+        {   // all other cases are managed by a board only which manages only one entity. we use position 0 of indexofentity[]
+            boardext->board.indexofentity[0] = des->index;
             s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = boardext;
         }
     }
@@ -503,7 +512,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
         
         
         case eoprot_endpoint_analogsensors:
-        {   // either strain or mais
+        {   // strain or mais or inertial
             if(eoprot_entity_as_strain == entity)
             {   // the board can be only a strain ... the index is always on board.indexofentity[0]
                 if(theboard->board.props.type == eobrd_cantype_strain) 
@@ -517,7 +526,14 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
                 {
                     index = theboard->board.indexofentity[0];
                 }
-            }                                
+            } 
+            else if(eoprot_entity_as_inertial == entity)
+            {   // the board can be only a skin ... the index is always on board.indexofentity[1] !!!!!! SEE NOTE-123454321 in FUNCTION eo_canmap_ConfigEntity()
+                if(theboard->board.props.type == eobrd_cantype_skin) 
+                {
+                    index = theboard->board.indexofentity[1]; // as described in NOTE-123454321 we use position 1
+                }
+            } 
         } break;
  
 
@@ -527,7 +543,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
             {   // the board can be only a skin board ... the index is on board.indexofentity[0]
                 if(theboard->board.props.type == eobrd_cantype_skin) 
                 {
-                    index = theboard->board.indexofentity[0];
+                    index = theboard->board.indexofentity[0]; // as described in NOTE-123454321 we use position 0
                 }
             }
         } break;        
@@ -682,7 +698,38 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                         }
                     }                    
                 }                
-            }            
+            }
+            else if(eoprot_entity_as_inertial == entity)
+            {
+                if(index < eocanmap_inertials_maxnumberof)
+                {
+                    theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
+                    if(NULL != theboard)
+                    {
+                        if(eobrd_cantype_skin == theboard->board.props.type)
+                        {   // ok, correct board. we retrieve the info
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
+                            loc->port = theboard->board.props.location.port;
+                            loc->addr = theboard->board.props.location.addr;             
+                            if(index == theboard->board.indexofentity[1]) // as described in NOTE-123454321 we use position 1
+                            {
+                                loc->insideindex = eocanmap_insideindex_none; // if it is a skin board we dont care about the inside index
+                                res = eores_OK;
+                            }
+                            //else
+                            //{   // the board is correct but the insideindex0 does not match the target index. cannot give ok result                        
+                            //}  
+                            if(NULL != boardtype)
+                            {
+                                *boardtype = (eObrd_cantype_t)theboard->board.props.type;
+                            }                            
+                        }
+                    }                    
+                }                
+            }             
         } break;  
         
         case eoprot_endpoint_skin:
@@ -832,7 +879,7 @@ static eObool_t s_eocanmap_is_entity_supported(eOprotEndpoint_t ep, eOprotEntity
         
         case eoprot_endpoint_analogsensors:
         {
-            if((eoprot_entity_as_strain == entity) || (eoprot_entity_as_mais == entity))
+            if((eoprot_entity_as_strain == entity) || (eoprot_entity_as_mais == entity) || (eoprot_entity_as_inertial == entity))
             {
                 ret = eobool_true;
             }                         
@@ -877,6 +924,10 @@ static uint8_t s_eo_canmap_max_entities(eOprotEndpoint_t ep, eOprotEntity_t enti
             else if(eoprot_entity_as_mais == entity)
             {
                 max = eocanmap_maises_maxnumberof;
+            }   
+            else if(eoprot_entity_as_inertial == entity)
+            {
+                max = eocanmap_inertials_maxnumberof;
             }             
         } break;
         

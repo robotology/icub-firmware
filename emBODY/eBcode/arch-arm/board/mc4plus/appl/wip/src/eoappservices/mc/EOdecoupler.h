@@ -72,6 +72,7 @@ typedef struct EOmotors_hid EOmotors;
     @return     The pointer to the required object.
  **/
 extern EOmotors* eo_motors_New(uint8_t nmotors, eOemscontroller_board_t board);
+extern EOmotors* eo_motors_GetHandle(void);
 extern void eo_motors_reset_wdog(EOmotors *o, uint8_t motor);
 extern void eo_motors_check_wdog(EOmotors *o);
 extern void eo_motors_set_Jacobian(EOmotors *o, int32_t **Ji32);

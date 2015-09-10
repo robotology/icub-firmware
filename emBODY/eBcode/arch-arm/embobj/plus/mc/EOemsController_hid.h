@@ -77,8 +77,18 @@ struct EOemsController_hid
     int32_t motor_velocity[MAX_NAXLES];
     int32_t motor_velocity_gbx[MAX_NAXLES];
     int32_t motor_position[MAX_NAXLES];
-    int32_t gearbox_ratio[MAX_NAXLES];
-    int32_t rotorencoder[MAX_NAXLES];
+  
+    int32_t           motor_config_gearbox_ratio[MAX_NAXLES];
+    int32_t           motor_config_rotorencoder[MAX_NAXLES];
+    eOmeas_velocity_t motor_config_maxvelocityofmotor[MAX_NAXLES];
+    eOmeas_current_t  motor_config_maxcurrentofmotor[MAX_NAXLES];
+    uint16_t          motor_config_rotorIndexOffset[MAX_NAXLES];
+    uint8_t           motor_config_motorPoles[MAX_NAXLES];
+    eObool_t          motor_config_hasHallSensor[MAX_NAXLES];
+    eObool_t          motor_config_hasTempSensor[MAX_NAXLES];
+    eObool_t          motor_config_hasRotorEncoder[MAX_NAXLES];
+    eObool_t          motor_config_hasRotorEncoderIndex[MAX_NAXLES];
+    eObool_t          new_motor_msg[MAX_NAXLES];
     
     //float torque_meas[NJOINTS];
 }; 
@@ -96,6 +106,8 @@ extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint
 
 extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,uint8_t motor);
     
+extern void eo_emsController_hid_userdef_force_motor_idle(EOemsController* ctrl,uint8_t motor);
+
 extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor);
 
 #ifdef __cplusplus

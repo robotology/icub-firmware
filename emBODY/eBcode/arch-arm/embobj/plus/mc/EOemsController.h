@@ -71,12 +71,16 @@ extern void eo_emsController_set_Jacobian(int32_t **Ji32);
 // encoders
 
 extern void eo_emsController_SetAbsEncoderSign(uint8_t joint, int32_t sign);
+extern void eo_emsController_SetAxisCalibrationZero(uint8_t joint, int32_t sign);
+extern int32_t eo_emsController_GetAxisCalibrationZero(uint8_t joint);
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask);
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position);
 
-
+extern void set_2FOC_idle(uint8_t joint);
+extern void set_2FOC_running(uint8_t joint);
 
 extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure);
+extern void eo_emsController_CheckFaults(void);
 extern void eo_emsController_PWM(int16_t* pwm);
 
 extern void eo_emsController_SetOutput(uint8_t joint, int16_t out);
@@ -95,6 +99,7 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
 extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interactionmode_t mode);
 //extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint);
 
+extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t motorconfig);
 extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder);
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state);
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status);
