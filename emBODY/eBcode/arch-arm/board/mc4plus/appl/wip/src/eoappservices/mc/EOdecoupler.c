@@ -483,9 +483,10 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             }
             else
             {
-                // case of mapping: rigth -> [+45, -45], nose, [+45, -45] <- left (the +45 is toward the direction of motor and goes towards the rigth).                
-                if (stiff[2]) {pwm_motor[2] = ( (+1.500f)*pwm2jo + (-1.000f)*pwm3jo);} else {pwm_motor[2] = pwm_joint[2];}
-                if (stiff[3]) {pwm_motor[3] = ( (+1.500f)*pwm2jo + (+1.000f)*pwm3jo);} else {pwm_motor[3] = pwm_joint[3];}   
+                // we need to use the inverse of eyesDirectMatrix[] = {+0.500, +0.500, -0.500, +0.500} which is:
+                // const float eyesInverseMatrix[] = {+1.000, -1.000, +1.000, +1.000};
+                if (stiff[2]) {pwm_motor[2] = ( (+1.000f)*pwm2jo + (-1.000f)*pwm3jo);} else {pwm_motor[2] = pwm_joint[2];}
+                if (stiff[3]) {pwm_motor[3] = ( (+1.000f)*pwm2jo + (+1.000f)*pwm3jo);} else {pwm_motor[3] = pwm_joint[3];}                 
             }
         }  
     }

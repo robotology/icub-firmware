@@ -1079,7 +1079,16 @@ extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t c
 extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisController *o2, EOaxisController *o3, int32_t current_pos2, int32_t current_pos3, int joint)
 {    
     //    joint can be 2 or 3.
-    const float eyesDirectMatrix[] = {+0.333, +0.333, -0.500, +0.500};
+    // marco.accame: this matrix maps independent position of eyes into version and vergence as follows:
+    // ( o )( o ) into vers = 0, verg = 0
+    // (  o)(o  ) into vers = 0, verg = 45 deg
+    // (o  )(o  ) into vers = 45 deg, verg = 0
+    // given that independent position of eyes is measured as follows:
+    // ( o ) gives 0 deg
+    // (o  ) gives 45 deg
+    // (  o) gives -45 deg
+    const float eyesDirectMatrix[] = {+0.500, +0.500, -0.500, +0.500};
+    // const float eyesInverseMatrix[] = {+1.000, -1.000, +1.000, +1.000};
     
     // apply the offset, so that we are in range [-45, +45]
     int32_t pos2 = current_pos2 - o2->offset;
