@@ -301,12 +301,12 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__getOpenLoopParams
     }
     
-//     {   // 116  ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
-//         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
-//     },
-//     
-//     {   // 117  ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE
-//         EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+ //   {   // 116  ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE
+ //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
+ //   },
+ //   
+ //   {   // 117  ICUBCANPROTO_POL_MC_CMD__GET_INTERACTION_MODE
+ //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_unexpected_cmd
  //   },
  //   
  //   {   // 118  ICUBCANPROTO_POL_MC_CMD__SET_TCFILTER_TYPE
@@ -314,7 +314,7 @@ static const eo_icubCanProto_hid_LUTbl_item_parserFnHandling_t  s_pollingMotorBo
  //   },
  //   {   // 119  ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG
  //       EO_INIT(.parser)    eo_icubCanProto_parser_pol_mb_cmd__setMotorConfig
-//     }
+ //   }     
 };        
 
 /* DECLARATION OF POLLING MOTOR BOARD PARSER LOOKUP TBL */
@@ -553,7 +553,7 @@ static const eo_icubCanProto_hid_LUTbl_item_formerFnHandling_t  s_pollingMotorBo
     {   // 118  ICUBCANPROTO_POL_MC_CMD__SET_TCFILTER_TYPE
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_unexpected_cmd
     },
-
+    
     {   // 119  ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG
         EO_INIT(.former)    eo_icubCanProto_former_pol_mb_cmd__setMotorConfig
     }    

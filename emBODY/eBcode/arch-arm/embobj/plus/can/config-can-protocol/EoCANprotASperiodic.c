@@ -99,6 +99,56 @@ static void s_former_PER_AS_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 // --------------------------------------------------------------------------------------------------------------------
 
 
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_GYROSCOPE(eOcanframe_t *frame, eOcanport_t port)
+{
+    //  marco.accame on 28aug15: here is support for reception of a fake inertial message in class 3. 
+    //  i return nok just to avoid problems, but the commented code is ok at this date.  
+    return(eores_NOK_generic); 
+    
+//    // this can frame is from mtb only ... i dont do the check that the board must be a mbt
+//    // i retrieve the inertial entity related to the frame    
+//    eOas_inertial_t *inertial = NULL;
+//    eOprotIndex_t index = EOK_uint08dummy;
+//    
+//    if(NULL == (inertial = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, frame, port, &index)))
+//    {
+//        return(eores_OK);  
+//    }    
+//    
+//    inertial->status.gyroscope.x = (int16_t)((frame->data[1]<<8) + frame->data[0]);
+//    inertial->status.gyroscope.y = (int16_t)((frame->data[3]<<8) + frame->data[2]);
+//    inertial->status.gyroscope.z = (int16_t)((frame->data[5]<<8) + frame->data[4]);
+//    inertial->status.gyroscope.ffu = 1; // i set it true.
+
+//    return(eores_OK);      
+}
+
+
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_ACCELEROMETER(eOcanframe_t *frame, eOcanport_t port)
+{
+    //  marco.accame on 28aug15: here is support for reception of a fake inertial message in class 3. 
+    //  i return nok just to avoid problems, but the commented code is ok at this date.  
+    return(eores_NOK_generic); 
+    
+//    // this can frame is from mtb only ... i dont do the check that the board must be a mbt
+//    // i retrieve the inertial entity related to the frame    
+//    eOas_inertial_t *inertial = NULL;
+//    eOprotIndex_t index = EOK_uint08dummy;
+//    
+//    if(NULL == (inertial = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, frame, port, &index)))
+//    {
+//        return(eores_OK);  
+//    }    
+//    
+//    inertial->status.accelerometer.x = (int16_t)((frame->data[1]<<8) + frame->data[0]);
+//    inertial->status.accelerometer.y = (int16_t)((frame->data[3]<<8) + frame->data[2]);
+//    inertial->status.accelerometer.z = (int16_t)((frame->data[5]<<8) + frame->data[4]);
+//    inertial->status.accelerometer.ffu = 1; // i set it true.
+//    
+//    return(eores_OK);
+}
+
+
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port)
 {
     // this can frame is from strain only ... i dont do the check that the board must be a strain
@@ -186,26 +236,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14(eOcanframe_t *
     return(eores_OK);    
 }
 
-
-extern eOresult_t eocanprotASperiodic_parser_00(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
-
-extern eOresult_t eocanprotASperiodic_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
-
-extern eOresult_t eocanprotASperiodic_parser_01(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
-
-extern eOresult_t eocanprotASperiodic_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
 
 
 // --------------------------------------------------------------------------------------------------------------------

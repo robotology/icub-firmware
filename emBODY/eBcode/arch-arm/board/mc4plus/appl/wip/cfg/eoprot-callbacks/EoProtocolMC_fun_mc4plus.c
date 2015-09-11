@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor);
 
 
 
@@ -149,8 +149,9 @@ const eOmc_joint_t joint_default_value =
        
         .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
         .filler01 =                  0xe0,
-        .encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
-        .encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
+        .DEPRECATED_encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
+        .DEPRECATED_encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
+		.jntEncoderResolution =		 0,
         .motor_params =
         {
             .bemf_value =            0,
@@ -160,7 +161,8 @@ const eOmc_joint_t joint_default_value =
             .filler02 =              {0xf1, 0xf2}
         },
         .tcfiltertype =              0,
-        .filler03 =                  {0xf1, 0xf2, 0xf3}
+        .jntEncoderType =            0,
+        .filler02 =                  {0xf1, 0xf2}
     },
     .status =                       
     {
@@ -179,14 +181,14 @@ const eOmc_joint_t joint_default_value =
     },
     .inputs =                        {0},
     .cmmnds =                       
-	{
-		.calibration =               {0},
-		.setpoint =                  {0},
-		.stoptrajectory =            0,
-		.controlmode =				 eomc_controlmode_cmd_switch_everything_off,
+    {
+        .calibration =               {0},
+        .setpoint =                  {0},
+        .stoptrajectory =            0,
+        .controlmode =                 eomc_controlmode_cmd_switch_everything_off,
         .interactionmode =           eomc_imodeval_stiff,
         .filler01 =                  0        
-	}
+    }
 }; 
 
 const eOmc_motor_t motor_default_value =
@@ -208,10 +210,19 @@ const eOmc_motor_t motor_default_value =
             .filler =                {0xf1, 0xf2, 0xf3}
         },
         .gearboxratio =              0,
-        .rotorencoder =              0,
+        .rotorEncoderResolution =    0,
+        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
-        .filler02 =                  {0}
+        .rotorIndexOffset =          0,
+        .motorPoles =                0,
+        .hasHallSensor =             eobool_false,
+        .hasTempSensor =             eobool_false,
+        .hasRotorEncoder =           eobool_false,
+        .hasRotorEncoderIndex =      eobool_false,
+        .rotorEncoderType =          0,
+        .filler03 =                  0,
+        .filler04 =                  0
     },
     .status =                       {0}
 }; 
@@ -248,8 +259,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jxx);
-	
-	// now we see if it is a mc4can or a 2foc or a mc4plus
+    
+    // now we see if it is a mc4can or a 2foc or a mc4plus
 
     float rescaler_pos = 0;
     float rescaler_trq = 0;    
@@ -285,7 +296,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.stiction_up_val*rescaler_trq, 
                                     cfg->pidtorque.stiction_down_val*rescaler_trq);
 
-    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
+    //eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->DEPRECATED_encoderconversionfactor);
+    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->jntEncoderResolution);
     
     eo_emsController_SetMotorParams((uint8_t)jxx, cfg->motor_params);
     
@@ -356,7 +368,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     eOmc_motor_params_t *params_ptr = (eOmc_motor_params_t*)rd->data;
-    eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);
+    eOmc_jointId_t  jxx = eoprot_ID2index(rd->id32);    
     eo_emsController_SetMotorParams ((uint8_t)jxx, *params_ptr);
 }
 
@@ -364,7 +376,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const e
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_impedance_t *impedance = (eOmc_impedance_t*)rd->data;
-    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32); 
     eo_emsController_SetImpedance(jxx, impedance->stiffness, impedance->damping, impedance->offset);
 }
 
@@ -373,7 +385,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
 {
     eOmeas_position_limits_t *limitsofjoint = (eOmeas_position_limits_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-
+    
     eo_emsController_SetPosMin(jxx, limitsofjoint->min);
     eo_emsController_SetPosMax(jxx, limitsofjoint->max);
 }
@@ -417,7 +429,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 {
     eOmc_setpoint_t *setpoint = (eOmc_setpoint_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    eOmc_joint_t *joint = eo_entities_GetJoint(eo_entities_GetHandle(), jxx);  
+    eOmc_joint_t *joint = eo_entities_GetJoint(eo_entities_GetHandle(), jxx); 
 
     if(NULL == joint)
     {
@@ -494,21 +506,27 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     // commento: la calib tipo 3 ha solo offset (in xml e' il calibration3. il calibration2 etc non viene usato).
     // per calib 3: viene usato solo il calibration3.
     
-    //check for the type of calibration required
-    
-    #warning this should change to calibrationtype5, but in robotInterface this is still not handled. now it's type4 (because it also have 3 params) to test it
-    if(calibrator->type == eomc_calibration_type4_abs_and_incremental)
+    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) //or motors still faulted OR state (and so PWM) still need to be enabled
     {
-        //calibration for joint with incremental encoders
+        s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+    }
+
+    //check for the type of calibration required
+
+    if(calibrator->type == eomc_calibration_type5_hard_stops_mc4plus)
+    {
+        // calibration for joint with incremental encoders
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type5.calibrationZero);
         eo_emsController_StartCalibration_type5 (jxx,
                                                  calibrator->params.type5.pwmlimit,
-                                                 calibrator->params.type5.velocity,
                                                  calibrator->params.type5.final_pos);
     }
     else if(calibrator->type == eomc_calibration_type3_abs_sens_digital)
     {
-        //calibration for joint with abs encoders
-        eo_emsController_StartCalibration_type3(jxx, 
+        // calibration for joint with abs encoders
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
+        eo_emsController_StartCalibration_type3 (jxx, 
                                                 calibrator->params.type3.position, 
                                                 calibrator->params.type3.velocity,
                                                 calibrator->params.type3.offset);
@@ -529,6 +547,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 {
     eOmc_controlmode_command_t *controlmode = (eOmc_controlmode_command_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+
+    //if this joint was in external fault or the state (and so PWM) is not updated, reenable it
+    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
+    {
+       s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+    }
         
     eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));       
 }
@@ -635,16 +660,16 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
 
     cfg_ptr = cfg_ptr;
-	#warning -> in her ethe 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
+    #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
 }
 
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid_ptr = (eOmc_PID_t*)rd->data;
-
+    
     pid_ptr = pid_ptr;
-	#warning -> in her ethe 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID etc. what about mc4plus?
+    #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID etc. what about mc4plus?
 }
 
 
@@ -666,7 +691,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     
 
     curr_ptr = curr_ptr;
-    #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???
+    #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
 }
 
 
@@ -681,7 +706,14 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor)
+{
+     eo_mcserv_EnableMotor(eo_mcserv_GetHandle(), motor);
+     eo_mcserv_EnableFaultDetection(eo_mcserv_GetHandle());
+        
+     uint8_t fault_mask[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
+     eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, fault_mask);
+}
 
 
 

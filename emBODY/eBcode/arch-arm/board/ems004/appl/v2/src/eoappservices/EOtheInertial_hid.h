@@ -19,47 +19,41 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHEENTITIES_HID_H_
-#define _EOTHEENTITIES_HID_H_
+#ifndef _EOTHEInertial_HID_H_
+#define _EOTHEInertial_HID_H_
 
 
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-// empty-section
+
+#include "EoCommon.h"
+#include "EOtheCANprotocol.h"
+#include "EOvector.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheEntities.h"
+#include "EOtheInertial.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-enum 
-{  
-    eoprotwrap_max_joints       = 12, 
-    eoprotwrap_max_motors       = 12, 
-    eoprotwrap_max_skins        = 2,
-    eoprotwrap_max_strains      = 2,
-    eoprotwrap_max_maises       = 1,
-    eoprotwrap_max_inertials    = 2
-};
 
-struct EOtheEntities_hid
+
+struct EOtheInertial_hid
 {
-    eObool_t        initted;
-    eOmc_joint_t*   joints[eoprotwrap_max_joints];
-    eOmc_motor_t*   motors[eoprotwrap_max_motors];
-    eOsk_skin_t*    skins[eoprotwrap_max_skins];
-    eOas_strain_t*  strains[eoprotwrap_max_strains];
-    eOas_mais_t*    maises[eoprotwrap_max_maises];
-    eOas_inertial_t* inertials[eoprotwrap_max_inertials];
-    uint8_t         numofjoints;
-    uint8_t         numofmotors;
-    uint8_t         numofskins;
-    uint8_t         numofstrains;
-    uint8_t         numofmaises;
-    uint8_t         numofinertials;
+    eObool_t                        initted;
+    eObool_t                        configured;
+    eObool_t                        thereisinertial;
+    uint8_t                         protindex;
+    eObool_t                        istransmitting;
+    eOas_inertial_sensorsconfig_t   sensorsconfig;
+    eOcanprot_command_t             command;
+    eOas_inertial_serviceconfig_t   serviceconfig;
+    uint64_t                        supportedmask64;
+    eOas_inertial_t                 *inertial2;
+    EOvector                        *fifo;
 }; 
 
 

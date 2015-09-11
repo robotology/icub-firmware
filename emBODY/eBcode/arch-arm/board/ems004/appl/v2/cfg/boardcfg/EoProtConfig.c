@@ -82,7 +82,25 @@
         }      
     };
  
-
+#if defined(TEST_EB2_EB4_WITHOUT_MC)
+    
+    // lamaledizionedelloscorpionedigiada
+    static const eOprot_EPcfg_t s_theEPcfgsOthersEB2EB4[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {0, 0, 0, 0, 0, 0, 0}     
+        },     
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {0, 0, 0, 1, 0, 0, 0}        
+        },
+        {           
+            .endpoint           = eoprot_endpoint_skin,
+            .numberofentities  = {1, 0, 0, 0, 0, 0, 0}     
+        }          
+    };
+#else   // normal case
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB2EB4[] =
     {  
         {           
@@ -91,14 +109,14 @@
         },     
         {        
             .endpoint           = eoprot_endpoint_analogsensors,
-            .numberofentities  = {0, 1, 0, 0, 0, 0, 0}        
+            .numberofentities  = {0, 1, 0, 1, 0, 0, 0}        
         },
         {           
             .endpoint           = eoprot_endpoint_skin,
             .numberofentities  = {1, 0, 0, 0, 0, 0, 0}     
         }          
     };
- 
+#endif
 
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB5[] =
     {  
@@ -147,7 +165,11 @@
 
 
     static const eOprot_EPcfg_t s_theEPcfgsOthersEB10EB11[] =
-    {  
+    { 
+        {        
+            .endpoint           = eoprot_endpoint_analogsensors,
+            .numberofentities  = {0, 0, 0, 1, 0, 0, 0}        
+        },        
         {           
             .endpoint           = eoprot_endpoint_skin,
             .numberofentities  = {2, 0, 0, 0, 0, 0, 0}     

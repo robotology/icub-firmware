@@ -168,6 +168,19 @@
 #define MC4PLUS_USE_MICREL_AS_MANAGED_DEVICE
 #endif
 
+/*
+force the application to not use this timer, cause they are reserved for:
+QUAD_ENC :              2-5
+DC_MOTORCTL and ADC:    1-8
+*/
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER01
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER02
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER03
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER04
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER05
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER08
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER09 //handler in common with TIM1 Break
+#define HL_CFG_UTIL_TIMER_DONTUSE_TIMER12 //handler in common with TIM8 Break
 
 //#define HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK
 //#define HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK

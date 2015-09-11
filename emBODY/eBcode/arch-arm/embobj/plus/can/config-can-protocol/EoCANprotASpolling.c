@@ -286,6 +286,17 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP2(eOcanprot_de
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__ACC_GYRO_SETUP(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP);    
+
+    icubCanProto_inertial_config_t *config = (icubCanProto_inertial_config_t*)descriptor->cmd.value;
+    frame->data[1] = config->enabledsensors;  
+    frame->data[2] = config->period;
+       
+    return(eores_OK);
+}
+
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_AS_prepare_frame(descriptor, frame, 7, ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG);    

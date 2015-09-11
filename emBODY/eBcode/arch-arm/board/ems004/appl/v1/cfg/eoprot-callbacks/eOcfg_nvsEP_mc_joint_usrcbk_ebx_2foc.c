@@ -185,7 +185,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
                                     cfg->pidtorque.stiction_up_val*rescaler_trq, 
                                     cfg->pidtorque.stiction_down_val*rescaler_trq);
 
-    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->encoderconversionfactor);
+    eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->DEPRECATED_encoderconversionfactor);
     
     eo_emsController_SetMotorParams((uint8_t)jxx, cfg->motor_params);
     
@@ -521,45 +521,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOresult_t                              res;
     eOmc_jointId_t                          jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t                       *calibrator = (eOmc_calibrator_t*)nv->ram;
-    eOappTheDB_jointOrMotorCanLocation_t    canLoc = {.emscanport = eOcanport1, .addr = 0, .indexinsidecanboard = eo_icubCanProto_jm_index_first};
-    
-    #ifdef EXPERIMENTAL_SPEED_CONTROL
-    icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_velocity;
-    #else
-    icubCanProto_controlmode_t              controlmode_2foc = icubCanProto_controlmode_openloop;
-    #endif
-    
-    eOicubCanProto_msgDestination_t         msgdest;
-    eOicubCanProto_msgCommand_t             msgCmd = 
-    {
-        EO_INIT(.class) icubCanProto_msgCmdClass_pollingMotorControl,
-        EO_INIT(.cmdId) 0
-    };
-
-    
-    EOappCanSP *appCanSP_ptr = eo_emsapplBody_GetCanServiceHandle(eo_emsapplBody_GetHandle());
-    // 1) send current control mode and pwm ena to 2foc
-    res = eo_appTheDB_GetJointCanLocation(eo_appTheDB_GetHandle(), jxx,  &canLoc, NULL);
-    if(eores_OK != res)
-    {
-        return;
-    }
-    
-
-    //set destination of all messages 
-    msgdest.dest = ICUBCANPROTO_MSGDEST_CREATE(canLoc.indexinsidecanboard, canLoc.addr);
-    
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
-
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, NULL);
-    
-    msgCmd.cmdId = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    eo_appCanSP_SendCmd(appCanSP_ptr, (eOcanport_t)canLoc.emscanport, msgdest, msgCmd, &controlmode_2foc);
-    
-
-// TOBEADDED_new_fw_ems: remove the above
+        
     eo_emsController_StartCalibration_type3(jxx, 
                                       calibrator->params.type3.position, 
                                       calibrator->params.type3.velocity,
@@ -653,21 +615,21 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     eo_emsController_ReadTorque(jxx, *(eOmeas_torque_t*)nv->ram);
 }
-// TOBEADDED_new_fw_ems: remove function
+/*
 extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     int32_t      *gbx_ptr = (int32_t*)nv->ram;
     eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
 }
-// TOBEADDED_new_fw_ems: remove function
+
 extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_jointId_t jxx = eoprot_ID2index(rd->id32);
     int32_t      *gbx_ptr = (int32_t*)nv->ram;
     eo_emsController_SetRotorEncoder(jxx, *gbx_ptr);
 }
-
+*/
 #if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
     #warning --> EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
 #else
