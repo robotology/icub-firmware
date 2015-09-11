@@ -628,11 +628,6 @@ if (DIG_EXT_GYRO || DIG_ACC || DIG_EXT_ACC)
                 {
                 case CONFIG_SINGLE:
                 {
-/*                     for (i=0;i<4;i++)
-                    {
-                        ConfigAD7147(CH0,i,PW_CONTROL,ConValue); //0 is the number of the device
-                    } */
-                    
                     for(i=0; i<triangles_max_num;i++)
                     {
                         if(triangle_cfg_list[i].isToUpdate)
@@ -647,33 +642,16 @@ if (DIG_EXT_GYRO || DIG_ACC || DIG_EXT_ACC)
                     counter=0;
 					calib_timeout==0;
                     while (flag==0)					
-					{
-/*						calib_timeout +=1;
-						if (calib_timeout>=10000) 
-						{
-							EnableIntT1;
-							calib_timeout=0;	
-							break;
- 						}
-*/					}
-				
+					{	
+					}			
                     // Calibration
                     ServiceAD7147Isr(CH0);
                     flag=0;					
                     WriteTimer1(0);
                     while (flag==0)					
 					{
-/*						calib_timeout +=1;
-						if (calib_timeout>=10000) 
-						{
-							EnableIntT1;
-							calib_timeout=0;	
-							break;
- 						}
-*/					}
-					
-                    TrianglesInit(CH0);
-                    
+					}
+                    TrianglesInit(CH0); 
                     if(!transmission_was_enabled)
                         can_enaDisa_transmission_messages(1);
                 }
@@ -828,7 +806,10 @@ static void ServiceAD7147Isr_fingertip(unsigned char Channel)
 void Wait(unsigned int value)    
 {
    while (value>0)
-        value--;
+{
+   value--;
+}
+        
 }//Wait();
 
 void TrianglesInit(unsigned char Channel)
@@ -939,7 +920,7 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
         if (((_pCapOffset[triangleN][i]!=0) && ((AD7147Registers[triangleN][ADCRESULT_S0+i]==0)))) //reading error
         {
             err[triangleN].error |=error_noack;
-//			    ERROR_COUNTER++;
+			    
         }
         if (TEMP_COMPENSATION==1)
         {
@@ -1041,25 +1022,47 @@ static void FillCanMessages8bit(unsigned char Channel,unsigned char triangleN)
     if ((err[triangleN].error!=error_ok)  && (err[triangleN].error != error_notconnected))//do again the configuration since an error has occured
     {
         j=(triangleN/4);
-        SetCDCoffsetOnAllTriangles(ConValue[0]);
+   //     SetCDCoffsetOnAllTriangles(ConValue[0]);
     //    ConfigAD7147(CH0,j,PW_CONTROL,ConValue); //0 is the number of the device
 	//	board_MODE=CALIB;
 		err[triangleN].error=error_ok;
-        return;
+		ERROR_COUNTER++;
+        
     }
+	if (ERROR_COUNTER==5)  //after x errors I do the CALIB of the board
+	{
+		triangle_cfg_list[triangleN].isToUpdate=1;
+		board_MODE=CALIB;
+		ERROR_COUNTER=0; 
+		return;
+	}
 }
 
 
 
 
 
+
+void SetCDCoffsetOnSingleTriangle(uint16_t cdcOffset, unsigned char triangleN)
+{
+//    uint16_t cdcOffset_aux = cdcOffset;
+    ConfigAD7147_onSdaX(CH0, triangle_cfg_list[triangleN].setNum, triangle_cfg_list[triangleN].indexInSet,  PW_CONTROL, cdcOffset/*&cdcOffset_aux*/);
+    
+    //ConfigAD7147(CH0,triangle_cfg_list[triangleN].indexInSet,PW_CONTROL, &cdcOffset_aux); 
+}
+
+void SetCDCoffsetOnAllTriangles(uint16_t cdcOffset)
+{
+    uint8_t i;
+    uint16_t cdcOffset_aux = cdcOffset; 
+    for (i=0;i<4;i++)
+    {
+        ConfigAD7147(CH0,i,PW_CONTROL, &cdcOffset_aux); //0 is the number of the device
+    }
+}
 static void FillCanMessages8bit_test(unsigned char Channel,unsigned char triangleN)
 {
     unsigned char data[8];
-    unsigned int i,j;
-    int value; //difference of the current measurement and the initial value (_pCapOffset)
-    unsigned int txdata[12];
-
     PMsgID=0x300;
     PMsgID |= ((triangleN) | BoardConfig.EE_CAN_BoardAddress<<4);
     
@@ -1163,22 +1166,4 @@ void FillCanMessages8bit_three(unsigned char Channel,unsigned char triangleN)
 		    data[i]    = (unsigned char)   (txdata[i-1] & 0xFF); 
 	 	}  	
 	    CAN1_send(PMsgID,1,4,data); 
-}
-
-void SetCDCoffsetOnSingleTriangle(uint16_t cdcOffset, unsigned char triangleN)
-{
-//    uint16_t cdcOffset_aux = cdcOffset;
-    ConfigAD7147_onSdaX(CH0, triangle_cfg_list[triangleN].setNum, triangle_cfg_list[triangleN].indexInSet,  PW_CONTROL, cdcOffset/*&cdcOffset_aux*/);
-    
-    //ConfigAD7147(CH0,triangle_cfg_list[triangleN].indexInSet,PW_CONTROL, &cdcOffset_aux); 
-}
-
-void SetCDCoffsetOnAllTriangles(uint16_t cdcOffset)
-{
-    uint8_t i;
-    uint16_t cdcOffset_aux = cdcOffset; 
-    for (i=0;i<4;i++)
-    {
-        ConfigAD7147(CH0,i,PW_CONTROL, &cdcOffset_aux); //0 is the number of the device
-    }
 }
