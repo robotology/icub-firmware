@@ -39,24 +39,24 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    uint8_t                     discoverynumretries;
+    eObool_t                    forcestop;
+    eObool_t                    searching;
+    eObool_t                    tickingenabled;    
+} eOcandiscovery_searchstatus_t;
+
 
 struct EOtheCANdiscovery2_hid
 {
-    eObool_t                initted;
-    eo_candiscovery_cfg_t   config;
-    EOtimer                 *discoverytimer;    
-    uint8_t                 discoverymaxretries;
-    uint8_t                 discoverynumretries;
-    eObool_t                allfound;
-    eObool_t                forcestop;
-    eObool_t                searching;
-    eObool_t                tickingenabled;
-    eObool_t                atleastoneboardisincompatible;
-    eo_candiscovery_set_t   setofboards;
-    uint16_t                canreplies[2];
-    uint16_t                canincompatibilities[2];
-    eObrd_typeandversions_t candetected[2][15];
-
+    eObool_t                        initted;
+    eOcandiscovery_cfg_t            config;
+    EOtimer                         *discoverytimer;    
+    uint8_t                         discoverymaxretries;
+    eOcandiscovery_searchstatus_t   searchstatus;
+    eOcandiscovery_target_t         target;
+    eOcandiscovery_detection_t      detection;
 }; 
 
 

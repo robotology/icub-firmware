@@ -51,30 +51,42 @@ typedef struct
 {
     eOreltime_t             period;     /**< period of sending the get-fw-version can messages, expressed in microsec */
     eOreltime_t             timeout;    /**< timeout of a search procedure stared by eo_candiscovery2_Start(), expressed in microsec */
-} eo_candiscovery_cfg_t;   
+} eOcandiscovery_cfg_t;  
+
+typedef void (*eOcandiscovery_onstop_t) (EOtheCANdiscovery2* p, eObool_t searchisok);
 
 typedef struct
 {
-    uint8_t                 type;               // use eObrd_cantype_t
-    uint8_t                 filler[3];
-    eObrd_version_t         firmwareversion;
-    eObrd_version_t         protocolversion;    
-    uint16_t                canmap[2];          // use bitmap of required can addresses.
-} eo_candiscovery_set_t;    EO_VERIFYsizeof(eo_candiscovery_set_t, 12);
+    uint8_t                     type;                       // use eObrd_cantype_t
+    uint8_t                     filler[3];
+    eObrd_version_t             firmwareversion;
+    eObrd_version_t             protocolversion;    
+    uint16_t                    canmap[eOcanports_number];  // use bitmap of required can addresses.
+    eOcandiscovery_onstop_t     onStop;                     // called by the _Stop() method with the pointer of the object and the search result
+} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 16);
+
+typedef struct
+{
+    eObool_t                    allhavereplied;                     // tells if all boards in target have replied to the get-fw-error.
+    eObool_t                    atleastonereplyisincompatible;      // tells if at least one board which has replied is not compatible with the target
+    uint16_t                    replies[eOcanports_number];         // bit mask of the boards which have replies: replies[eOcanport1] & 0x0080 == 0x0080 means board 3 on CAN1 has replies
+    uint16_t                    incompatibilities[eOcanports_number]; // bit mask of board which have replies but are incompatible     
+    eObrd_typeandversions_t     boards[eOcanports_number][15];      // contains the board information as given by the the get-fw-version replies
+} eOcandiscovery_detection_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 
-extern const eo_candiscovery_cfg_t eo_candiscovery_default_cfg; // = { .period = 100*1000, .timeout = 3*1000*1000 };
+extern const eOcandiscovery_cfg_t eo_candiscovery_default_cfg; // = { .period = 100*1000, .timeout = 3*1000*1000 };
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheCANdiscovery2* eo_candiscovery2_Initialise(const eo_candiscovery_cfg_t* cfg);
+extern EOtheCANdiscovery2* eo_candiscovery2_Initialise(const eOcandiscovery_cfg_t* cfg);
 
 extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void);
 
 
 // call it to start the discovery procedure on a given set of can boards which share tyep, fw version, prot version
-extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eo_candiscovery_set_t *set);
+extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *set);
 
 //  call it in the can parser when a board replies to the get-fw-version request
 extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
@@ -87,9 +99,12 @@ extern eOresult_t eo_candiscovery2_Tick(EOtheCANdiscovery2 *p);
 extern eOresult_t eo_candiscovery2_Stop(EOtheCANdiscovery2 *p);
 
 
+extern eObool_t eo_candiscovery2_IsSearchOK(EOtheCANdiscovery2 *p);
+
+extern const eOcandiscovery_target_t* eo_candiscovery2_GetTarget(EOtheCANdiscovery2 *p);
 
 
-
+extern const eOcandiscovery_detection_t* eo_candiscovery2_GetDetection(EOtheCANdiscovery2 *p);
 
 /** @}            
     end of group eo_EOtheCANdiscovery2
