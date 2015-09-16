@@ -185,9 +185,9 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void)
 }
 
 
-extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *set)
+extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target)
 {
-    if((NULL == p) || (NULL == set))
+    if((NULL == p) || (NULL == target))
     {
         return(eores_NOK_nullpointer);
     }  
@@ -210,8 +210,8 @@ extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandisco
     
     
     
-    // copy the new set of boards
-    memcpy(&s_eo_thecandiscovery2.target, set, sizeof(eOcandiscovery_target_t));    
+    // copy the new target of boards
+    memcpy(&s_eo_thecandiscovery2.target, target, sizeof(eOcandiscovery_target_t));    
     
     // now start the procedure
     s_eo_thecandiscovery2.searchstatus.searching = eobool_true;
@@ -383,6 +383,13 @@ extern eOresult_t eo_candiscovery2_Stop(EOtheCANdiscovery2 *p)
         s_eo_candiscovery2_sendResultToHost(s_eo_thecandiscovery2.detection.allhavereplied, allboardsareok);
         s_eo_candiscovery2_resetSearchStatus();        
     }
+    
+    // put it in heres, so that we can call a _Start() inside the callback ....
+    if(NULL != s_eo_thecandiscovery2.target.onStop)
+    {  
+        eObool_t allisok = s_eo_thecandiscovery2.detection.allhavereplied && allboardsareok;
+        s_eo_thecandiscovery2.target.onStop(&s_eo_thecandiscovery2, allisok);
+    }
         
     return(eores_OK); 
 }
@@ -402,12 +409,6 @@ extern eOresult_t eo_candiscovery2_Stop(EOtheCANdiscovery2 *p)
 
 static void s_eo_candiscovery2_sendResultToHost(eObool_t allboardsfound, eObool_t allboardsareok)
 {
-    if(NULL != s_eo_thecandiscovery2.target.onStop)
-    {  
-        eObool_t allisok = allboardsfound && allboardsareok;
-        s_eo_thecandiscovery2.target.onStop(&s_eo_thecandiscovery2, allisok);
-    }
-    
     if((eobool_true == allboardsfound) && (eobool_true == allboardsareok))
     {
 
@@ -473,13 +474,20 @@ static void s_eo_candiscovery2_sendResultToHost(eObool_t allboardsfound, eObool_
                             {
                                 nib |= 0x1;
                             }
-                            if(0 != memcmp(&s_eo_thecandiscovery2.target.firmwareversion, &s_eo_thecandiscovery2.detection.boards[i][n].firmwareversion, sizeof(eObrd_version_t)))
-                            {
-                                nib |= 0x2;
+                            if((0 != s_eo_thecandiscovery2.target.firmwareversion.major) && (0 != s_eo_thecandiscovery2.target.firmwareversion.minor))
+                            {   // dont signal error if fw version is (0, 0)
+                                if(0 != memcmp(&s_eo_thecandiscovery2.target.firmwareversion, &s_eo_thecandiscovery2.detection.boards[i][n].firmwareversion, sizeof(eObrd_version_t)))
+                                {
+                                    nib |= 0x2;
+                                }
                             }
-                            if(0 != memcmp(&s_eo_thecandiscovery2.target.protocolversion, &s_eo_thecandiscovery2.detection.boards[i][n].protocolversion, sizeof(eObrd_version_t)))
-                            {
-                                nib |= 0x4;
+                            if((0 != s_eo_thecandiscovery2.target.protocolversion.major) && (0 != s_eo_thecandiscovery2.target.protocolversion.minor))
+                            {   // dont signal error if fw prot is (0, 0)   
+                                if((s_eo_thecandiscovery2.detection.boards[i][n].protocolversion.major != s_eo_thecandiscovery2.target.protocolversion.major) || (s_eo_thecandiscovery2.detection.boards[i][n].protocolversion.minor < s_eo_thecandiscovery2.target.protocolversion.minor))
+                                //if(0 != memcmp(&s_eo_thecandiscovery2.target.protocolversion, &s_eo_thecandiscovery2.detection.boards[i][n].protocolversion, sizeof(eObrd_version_t)))
+                                {
+                                    nib |= 0x4;
+                                }
                             }
                             nibbles64 |= (nib<<(4*n));
                         }
@@ -540,16 +548,17 @@ static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap
     }
 
     // if((required->major == detected->major) && (required->minor <= detected->minor)): formerly the rule for correct version was this one.
-    if ((0 == s_eo_thecandiscovery2.target.protocolversion.major == 0) && (0 == s_eo_thecandiscovery2.target.protocolversion.minor))
+    if ((0 == s_eo_thecandiscovery2.target.protocolversion.major) && (0 == s_eo_thecandiscovery2.target.protocolversion.minor))
     {   // if the required protocol version is 0.0, i don't care about the answer
     }
-    else if((detected->protocolversion.major != s_eo_thecandiscovery2.target.protocolversion.major) || (detected->protocolversion.minor != s_eo_thecandiscovery2.target.protocolversion.minor))
+    //else if((detected->protocolversion.major != s_eo_thecandiscovery2.target.protocolversion.major) || (detected->protocolversion.minor != s_eo_thecandiscovery2.target.protocolversion.minor))
+    else if((detected->protocolversion.major != s_eo_thecandiscovery2.target.protocolversion.major) || (detected->protocolversion.minor < s_eo_thecandiscovery2.target.protocolversion.minor))
     {   // there must be the very same protocol version. if not i must return false
         return(eobool_false);
     }
     
     
-    if ((0 == s_eo_thecandiscovery2.target.firmwareversion.major == 0) && (0 == s_eo_thecandiscovery2.target.firmwareversion.minor))
+    if ((0 == s_eo_thecandiscovery2.target.firmwareversion.major) && (0 == s_eo_thecandiscovery2.target.firmwareversion.minor))
     {   // if the required firmware version is 0.0, i don't care about the answer
     }
     else if((detected->firmwareversion.major != s_eo_thecandiscovery2.target.firmwareversion.major) || (detected->firmwareversion.minor != s_eo_thecandiscovery2.target.firmwareversion.minor))

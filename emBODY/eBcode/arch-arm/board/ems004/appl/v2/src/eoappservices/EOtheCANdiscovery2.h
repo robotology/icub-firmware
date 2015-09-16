@@ -86,7 +86,7 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void);
 
 
 // call it to start the discovery procedure on a given set of can boards which share tyep, fw version, prot version
-extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *set);
+extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *eo_candiscovery2_Initialise);
 
 //  call it in the can parser when a board replies to the get-fw-version request
 extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
