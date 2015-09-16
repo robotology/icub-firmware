@@ -104,8 +104,14 @@ typedef struct
     eOappEncReader_cfg_t    encoderreaderconfig;
 } eOemsapplbody_cfg_t;
 
+typedef enum
+{
+    eoMCtype_none               = 0,
+    eoMCtype_2focbased          = 1,
+    eoMCtype_mc4maisbased       = 2,
+    eoMCtype_mc4plusbased       = 3
+} eOemsapplbody_MCtype;  
 
-   
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
@@ -131,7 +137,20 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p);
 extern eOmn_appl_runMode_t eo_emsapplBody_GetAppRunMode(EOtheEMSapplBody *p);
 
 
-//extern eOresult_t eo_emsapplBody_sendConfig2canboards(EOtheEMSapplBody *p);
+
+
+extern eOemsapplbody_MCtype eo_emsapplBody_GetMCtype(EOtheEMSapplBody *p);
+
+extern eObool_t eo_emsapplBody_isMCready(EOtheEMSapplBody *p);
+
+extern eObool_t eo_emsapplBody_isMAISready(EOtheEMSapplBody *p);
+
+extern eObool_t eo_emsapplBody_isSTRAINready(EOtheEMSapplBody *p);
+
+extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p);
+
+extern eObool_t eo_emsapplBody_isreadyforcontrolloop(EOtheEMSapplBody *p);
+
 
 
 /** @}            

@@ -43,7 +43,7 @@
 
 #include "EOtheEntities.h"
 
-#include "EOtheCANdiscovery.h"
+//#include "EOtheCANdiscovery.h"
 
 #include "EOemsController_hid.h" 
 #include "OPCprotocolManager_Cfg.h" 
@@ -148,16 +148,6 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
-    /*
-    static uint32_t count = 0;
-    count ++;
-    
-    if(1 == count)
-    {
-        eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-    }
-    */
-
     #if defined(EVIEWER_ENABLED)   
     if(0 == event_view)
     {   
@@ -165,8 +155,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
         event_view = 1;
     }
     #endif    
-
-
 }
 
 

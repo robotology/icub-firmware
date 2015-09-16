@@ -69,10 +69,14 @@
 
 #include "EOtheSTRAIN.h"
 
-#include "EOtheCANdiscovery.h"
+#include "EOtheCANdiscovery2.h"
 
 
 #include "EOtheMC4boards.h"
+
+#include "EOtheBoardConfig.h"
+
+#include "EOtheMAIS.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -122,6 +126,10 @@ static void s_eo_emsapplBody_hid_canSP_cbkonrx(void *arg);
 
 static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev);
 
+static void s_onstop_search42foc(EOtheCANdiscovery2* p, eObool_t searchisok);
+static void s_onstop_search4mc4(EOtheCANdiscovery2* p, eObool_t searchisok);
+static void s_onstop_search4mais(EOtheCANdiscovery2* p, eObool_t searchisok);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,7 +141,13 @@ static EOtheEMSapplBody s_applBody =
     .appRunMode             = applrunMode__default,
     .appEncReader           = NULL,
     .emsController          = NULL,
-    .hasdevice              = {eobool_false, eobool_false, eobool_false}
+    .hasdevice              = {eobool_false, eobool_false, eobool_false},
+    
+    .mctype                 = eoMCtype_none,
+    .isMCall_ready          = eobool_false,
+    .isASstrain_ready       = eobool_false,
+    .isASmais_ready         = eobool_false,
+    .BOARDisreadyforcontrolloop = eobool_false
 };
 
 static const char s_eobj_ownname[] = "EOtheEMSapplBody";
@@ -165,24 +179,38 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
 
     
     s_eo_emsapplBody_computeRunMode(p); // the run mode depends on connected can board (mc4, 2foc, only skin, etc)
-        
-
-    eo_mc4boards_Initialise(NULL);
     
+    // compute mctype
+    p->mctype = eoMCtype_none;
+    if((applrunMode__mc4Only == p->appRunMode) || (applrunMode__skinAndMc4 == p->appRunMode))
+    {
+        p->mctype = eoMCtype_mc4maisbased;        
+    }
+    else if(applrunMode__2foc == p->appRunMode)
+    {
+        p->mctype = eoMCtype_2focbased;  
+    } 
 
     
     s_eo_emsapplBody_CanServices_Init(p);
-    s_eo_emsapplBody_encodersReader_init(p);        
-    s_eo_emsapplBody_emsController_init(p);
+    
+    
+    eo_mc4boards_Initialise(NULL);
+            
+    
+//    s_eo_emsapplBody_encodersReader_init(p);        
+//    s_eo_emsapplBody_emsController_init(p);
     
     // now i set the appl body as initted
     p->st = eo_emsApplBody_st__initted;
     
-
+    eo_candiscovery2_Initialise(NULL);
+    
+    eo_emsapplBody_StartResourceCheck(p);
     
     // and i start some services   
-    eo_candiscovery_Initialise();
-    eo_candiscovery_Start(eo_candiscovery_GetHandle());
+//    eo_candiscovery_Initialise();
+//    eo_candiscovery_Start(eo_candiscovery_GetHandle());
             
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, "EOtheEMSapplBody started", s_eobj_ownname, &eo_errman_DescrRunningHappily);
        
@@ -282,18 +310,108 @@ extern eOresult_t eo_emsapplBody_DisableTxAllJointOnCan(EOtheEMSapplBody *p)
 }
 
 
-static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev)
+
+
+extern eOemsapplbody_MCtype eo_emsapplBody_GetMCtype(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eoMCtype_none);
+    }
+    
+    return(p->mctype);
+}
+
+
+
+extern eObool_t eo_emsapplBody_isMCready(EOtheEMSapplBody *p)
 {
     if(NULL == p)
     {
         return(eobool_false);
     }
     
-    return(p->hasdevice[dev]);
+    return(p->isMCall_ready);    
+}
+
+extern eObool_t eo_emsapplBody_isMAISready(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
+    
+    return(p->isASmais_ready);    
 }
 
 
+extern eObool_t eo_emsapplBody_isSTRAINready(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
+    
+    return(p->isASstrain_ready);    
+}
 
+
+extern eObool_t eo_emsapplBody_isreadyforcontrolloop(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
+    
+    return(p->BOARDisreadyforcontrolloop);    
+}
+
+
+extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
+{    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+        
+    p->BOARDisreadyforcontrolloop = eobool_false;
+    
+    // that is an intermediate code. so far, at the date of 15sept15, we check only the mc boards (and the mais).
+    
+    if(eoMCtype_none == p->mctype)
+    {
+        p->BOARDisreadyforcontrolloop = eobool_true;
+        return(eores_OK);
+    }
+
+    if(eoMCtype_2focbased == p->mctype)
+    {
+        // start the discovery on the 2foc boards. 
+        // as callback we just set BOARDisreadyforcontrolloop true
+        
+        eOcandiscovery_target_t target = {0};
+        const eOcandiscovery_target_t *t = eoboardconfig_code2mcdiscoverytarget(eoprot_board_local_get());
+        memcpy(&target, t, sizeof(eOcandiscovery_target_t));
+        target.onStop = s_onstop_search42foc;
+        
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);
+        
+    }
+    else if(eoMCtype_mc4maisbased == p->mctype)
+    {
+        // start the discovery on the mc4 boards.
+        // as callback we start discovery on mais. as further callback we start the mais, activate broadcast on mc4 boards, and then we set BOARDisreadyforcontrolloop true
+      
+        eOcandiscovery_target_t target = {0};
+        const eOcandiscovery_target_t *t = eoboardconfig_code2mcdiscoverytarget(eoprot_board_local_get());
+        memcpy(&target, t, sizeof(eOcandiscovery_target_t));
+        target.onStop = s_onstop_search4mc4;
+        
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);      
+    }
+    
+    return(eores_OK);       
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -305,7 +423,64 @@ static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_d
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_onstop_search42foc(EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    if(eobool_true == searchisok)
+    {
+        s_applBody.isMCall_ready = eobool_true;
+        s_applBody.BOARDisreadyforcontrolloop = eobool_true;
+        
+        // start the services for 2foc ...
+        s_eo_emsapplBody_encodersReader_init(&s_applBody);        
+        s_eo_emsapplBody_emsController_init(&s_applBody);        
+        
+    }
+    
+}
 
+static void s_onstop_search4mc4(EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    if(eobool_true == searchisok)
+    {
+        s_applBody.isMCall_ready = eobool_true;
+
+        eOcandiscovery_target_t target = {0};
+        const eOcandiscovery_target_t *t = eoboardconfig_code2maisdiscoverytarget(eoprot_board_local_get());
+        memcpy(&target, t, sizeof(eOcandiscovery_target_t));
+        target.onStop = s_onstop_search4mais;
+        
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);         
+    }
+    
+}
+
+
+static void s_onstop_search4mais(EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    if(eobool_true == searchisok)
+    {
+        s_applBody.isASmais_ready = eobool_true;
+        s_applBody.BOARDisreadyforcontrolloop = eobool_true;
+
+        if(eobool_true == eo_mc4boards_AreThere(eo_mc4boards_GetHandle()))
+        {
+            eo_mc4boards_Config(eo_mc4boards_GetHandle());
+            eo_mais_Start(eo_mais_GetHandle());          
+        }     
+    }
+    
+}
+
+
+static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
+    
+    return(p->hasdevice[dev]);
+}
 
 static void s_eo_emsapplBody_hid_canSP_cbkonrx(void *arg)
 {

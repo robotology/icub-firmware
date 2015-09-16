@@ -245,9 +245,187 @@ const EOconstvector * const entitiesmapB10[eoprot_endpoints_numberof][eoboardcon
     }
 };
 
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb1 =
+{   
+    .type               = eobrd_cantype_1foc,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 3},
+    .canmap             = {0x001e, 0x0000},
+    .onStop             = NULL
+};
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb2 =
+{   
+    .type               = eobrd_cantype_mc4,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 2},
+    .canmap             = {0x01f8, 0x0000},
+    .onStop             = NULL
+};
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb5 =
+{   
+    .type               = eobrd_cantype_1foc,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 3},
+    .canmap             = {0x001a, 0x0000},
+    .onStop             = NULL
+};
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb6 =
+{   
+    .type               = eobrd_cantype_1foc,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 3},
+    .canmap             = {0x001e, 0x0000},
+    .onStop             = NULL
+};
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb7 =
+{   
+    .type               = eobrd_cantype_1foc,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 3},
+    .canmap             = {0x0006, 0x0000},
+    .onStop             = NULL
+};
+
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mais_eb2 =
+{   
+    .type               = eobrd_cantype_mais,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 0},
+    .canmap             = {0x4000, 0x0000},
+    .onStop             = NULL
+};
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+
+extern const eOcandiscovery_target_t * eoboardconfig_code2mcdiscoverytarget(uint32_t code) 
+{
+    const eOcandiscovery_target_t *ret = NULL;
+    
+    switch(code)
+    {
+        case 0:    
+        case 2:
+        {            
+            ret = &s_candiscoverytarget_mc_eb1; 
+        } break;
+        
+        case 1:     
+        case 3:
+        {
+            ret = &s_candiscoverytarget_mc_eb2; 
+        } break;  
+
+        case 4:     
+        {
+            ret = &s_candiscoverytarget_mc_eb5; 
+        } break;      
+
+        case 5: 
+        case 7:             
+        {
+            ret = &s_candiscoverytarget_mc_eb6; 
+        } break;         
+    
+        case 6: 
+        case 8:             
+        {
+            ret = &s_candiscoverytarget_mc_eb7; 
+        } break; 
+        
+        case 9: 
+        case 10:             
+        {
+            ret = NULL; 
+        } break;         
+
+        default:    
+        {
+            ret = ret;
+        } break;    
+    }
+    
+    
+    return(ret);
+       
+}
+
+
+extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(uint32_t code) 
+{
+    const eOcandiscovery_target_t *ret = NULL;
+    
+    switch(code)
+    {
+        case 0:    
+        case 2:
+        {            
+            ret = NULL; 
+        } break;
+        
+        case 1:     
+        case 3:
+        {
+            ret = &s_candiscoverytarget_mais_eb2; 
+        } break;  
+
+        case 4:     
+        {
+            ret = NULL; 
+        } break;      
+
+        case 5: 
+        case 7:             
+        {
+            ret = NULL; 
+        } break;         
+    
+        case 6: 
+        case 8:             
+        {
+            ret = NULL; 
+        } break; 
+        
+        case 9: 
+        case 10:             
+        {
+            ret = NULL; 
+        } break;         
+
+        default:    
+        {
+            ret = ret;
+        } break;    
+    }
+    
+    
+    return(ret);
+       
+}
+
+
+//{
+//    uint8_t                     type;                       // use eObrd_cantype_t
+//    uint8_t                     filler[3];
+//    eObrd_version_t             firmwareversion;
+//    eObrd_version_t             protocolversion;    
+//    uint16_t                    canmap[eOcanports_number];  // use bitmap of required can addresses.
+//    eOcandiscovery_onstop_t     onStop;                     // called by the _Stop() method with the pointer of the object and the search result
+//} eOcandiscovery_target_t;
 
 extern EOconstvector* eo_vectorof_boardprops_eb1;   // eb1/2
 extern EOconstvector* eo_vectorof_boardprops_eb2;   // eb2/4

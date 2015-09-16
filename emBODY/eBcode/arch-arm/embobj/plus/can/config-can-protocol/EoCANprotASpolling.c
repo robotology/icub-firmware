@@ -35,7 +35,7 @@
 #include "EOMtheEMSconfigurator.h"
 
 #include "EOtheCANservice.h"
-#include "EOtheCANdiscovery.h"
+#include "EOtheCANdiscovery2.h"
 
 #include "EOMtheEMStransceiver.h"
 
@@ -234,8 +234,7 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
     detected.protocolversion.minor      = frame->data[6];   
     
     
-    // pass it all to the relevant object, which will do what it needs. everything in one file
-    eo_candiscovery_ManageDetectedBoard(eo_candiscovery_GetHandle(), loc, match, &detected);
+    eo_candiscovery2_OneBoardIsFound(eo_candiscovery2_GetHandle(), loc, match, &detected);
     
     return eores_OK;
 }

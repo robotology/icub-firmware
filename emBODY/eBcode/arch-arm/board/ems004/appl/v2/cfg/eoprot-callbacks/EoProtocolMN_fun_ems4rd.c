@@ -48,7 +48,6 @@
 
 #include "eEsharedServices.h"
 
-#include "EOtheCANdiscovery.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -353,82 +352,24 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-            eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
+//            eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
+//            
+//            if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
+//            {
+//                return;
+//            }
+//            else
+//			{
+//				eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
+//			}
             
-            if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
+            if(eobool_false == eo_emsapplBody_isreadyforcontrolloop(eo_emsapplBody_GetHandle()))
             {
                 return;
             }
-            else
-			{
-				eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-			}
             
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-            /*
-            uint32_t canBoardsReady = 0;
-            uint32_t canBoardsChecked = 0;
-            if(eobool_false == eo_candiscovery_areCanBoardsReady(eo_candiscovery_GetHandle(), &canBoardsReady, &canBoardsChecked))
-            //if(eobool_false == eo_emsapplBody_areCanBoardsReady(eo_emsapplBody_GetHandle(), &canBoardsReady, &canBoardsChecked))
-            {
-                //#warning marco.accame: put a dedicated diagnostics message with list of missing can boards
-                //snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
-                
-                 
-                // the new currstate is set inside the on-entry of the state machine               
-                //status->currstate = applstate_error;
-                // it MUST NOT be fatal error because we want to give the ems time to find the boards ready
-                
-                eOerrmanDescriptor_t errdes = {0};
-                errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_missing);
-                errdes.par16                = 0;
-                errdes.par64                = (uint64_t)canBoardsReady | (((uint64_t)canBoardsChecked) << 32);            
-                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress        = 0;       
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);   
-                {
-                    #warning -> marco.accame: send the 4 messages with the searched and found on can1 and can2                   
-                }
-                
-                //eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-                
-                return;
-            }
-            else
-            {
-                // marco.accame: if i send diagnostics messages just before going to running mode ... the application crashes. TO BE UNDERSTOOD WHY !
-                //eo_emsapplBody_SignalDetectedCANboards(eo_emsapplBody_GetHandle());
-//                // maybe in here we can put an info diagnostics message    
-//                // send message about the ready boards
-//                uint8_t numcanboards = eo_appTheDB_GetNumberOfCanboards(eo_appTheDB_GetHandle());
-//                uint8_t i = 0;
-//                eOappTheDB_board_canlocation_t loc = {0};
-//                eObrd_cantype_t exptype = eobrd_cantype_unknown;
-//                eObrd_typeandversions_t detected = {0};
-//                
-//                eOerrmanDescriptor_t des = {0};
-//                des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
-//                
-//                for(i=0; i<numcanboards; i++)
-//                {
-//                    if(eores_OK == eo_appTheDB_GetCanDetectedInfo(eo_appTheDB_GetHandle(), i, &loc, &exptype, &detected))
-//                    {
-//                        // fill the message. so far i use a debug with can-id-typedetected-typeexpectde
-//                        des.sourcedevice    = (eOcanport1 == loc.emscanport) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//                        des.sourceaddress   = loc.addr;
-//                        des.param           = (exptype << 8) | (detected.boardtype); 
-//                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
-//                    }                    
-//                }
-            }
-            
-            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-            // the new currstate is set inside the on-entry of the state machine
-            //if(eores_OK == res)
-            //{   
-            //    status->currstate = applstate_running;
-            //}
-            */
+
         } break;
         
         case applstate_error:

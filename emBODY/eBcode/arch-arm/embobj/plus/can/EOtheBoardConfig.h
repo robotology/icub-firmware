@@ -51,6 +51,8 @@ extern "C" {
 #include "EOappEncodersReader.h"
 #include "EOtheInertial.h"
 
+#include "EOtheCANdiscovery2.h"
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
@@ -60,6 +62,10 @@ extern "C" {
 enum { eoboardconfig_maxvalueofsupportedentity = 3 };  // with value of 3 we support also eoprot_entity_as_inertial
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+extern const eOcandiscovery_target_t * eoboardconfig_code2mcdiscoverytarget(uint32_t code);
+
+extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(uint32_t code);
 
 // of eOcanmap_board_properties_t
 // the constvector contains all the boards in can1 and can2. or ... is empty.
