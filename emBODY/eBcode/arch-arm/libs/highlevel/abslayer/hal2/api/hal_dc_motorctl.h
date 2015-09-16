@@ -207,7 +207,7 @@ extern hal_motor_status_t hal_motor_status_get(hal_motor_t id);
 	@param      pwmvalue   the value of the dutycycle of the PWM. it could be positive or negative and is truncated to PWMPERIOD 
     @return     ok
  **/
-extern hal_result_t hal_motor_pwmset(hal_motor_t id, int32_t pwmvalue);
+extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue);
 
  /** @fn         extern hal_result_t hal_pwm_interrupt_enable(hal_pwm_t id);
     @brief      enables pwm interrupt

@@ -43,7 +43,7 @@
 #define ADC1_DR_ADDRESS          ((uint32_t)0x4001204C)	//ADC1BASE +0x4C							
 #define ADC2_DR_ADDRESS          ((uint32_t)0x4001214C)
 #define ADC3_DR_ADDRESS          ((uint32_t)0x4001224C)
-#define ADC_CDR_ADDRESS          ((uint32_t)0x40012308) // it's the common data registers??
+#define ADC_CDR_ADDRESS          ((uint32_t)0x40012308) // common data register?
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------

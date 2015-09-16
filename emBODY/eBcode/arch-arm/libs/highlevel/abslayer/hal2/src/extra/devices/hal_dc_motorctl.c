@@ -442,18 +442,20 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 	/* Main PWM Output Enable */
     TIM_CtrlPWMOutputs(TIM8,DISABLE); //now disabled at the beginning
 
-    // Init the ADC to have current values
-	hal_adc_ADC1_ADC3_current_init();
+    // Init the ADC to have current values: now disabled cause this feedback is not needed 
+	//hal_adc_ADC1_ADC3_current_init();
     
 	/* Configure one bit for preemption priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
   
-    /* Enable the ADC Interrupt */
+    /* Enable the ADC Interrupt: now disabled cause this feedback is not needed */
+    /*
     NVIC_InitStructure.NVIC_IRQChannel = ADC_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
+    */
   
     /* Enable the Update Interrupt */
     NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_TIM10_IRQn;
@@ -492,7 +494,7 @@ extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *
 
 
 
-extern hal_result_t hal_motor_pwmset(hal_motor_t id, int32_t pwmvalue)
+extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 {
     // choose the right pwm to assign
 	if (pwmvalue>=0) 
