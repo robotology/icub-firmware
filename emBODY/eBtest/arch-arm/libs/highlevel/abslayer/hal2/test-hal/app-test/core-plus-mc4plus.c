@@ -76,11 +76,10 @@
 #undef  USE_EVENTVIEWER
 #define USE_EVENTVIEWER
 
+//define TEST that you want to perform on the board
 
 #undef  EXECUTE_TEST_FLASH
 //#define EXECUTE_TEST_FLASH
-
-
 
 #undef  EXECUTE_TEST_SYS_DELAY
 //#define EXECUTE_TEST_SYS_DELAY
@@ -91,7 +90,6 @@
 #undef  EXECUTE_TEST_EEPROM
 //#define EXECUTE_TEST_EEPROM
 
-
 #undef  EXECUTE_TEST_TIMER
 //#define EXECUTE_TEST_TIMER
 
@@ -101,17 +99,14 @@
 #undef EXECUTE_TEST_UNIQUEID
 //#define EXECUTE_TEST_UNIQUEID
 
-
 #undef EXECUTE_TEST_ENCODER
 //#define EXECUTE_TEST_ENCODER
-
 
 #undef EXECUTE_TEST_CAN
 //#define EXECUTE_TEST_CAN
 
-
 #undef EXECUTE_TEST_ENCODER_SPI
-#define EXECUTE_TEST_ENCODER_SPI
+//#define EXECUTE_TEST_ENCODER_SPI
 
 
 #define haLcAn1    hal_can1
@@ -132,12 +127,11 @@
 #undef EXECUTE_TEST_SWITCH
 //#define EXECUTE_TEST_SWITCH
 
-
 #undef EXECUTE_TEST_ETH
 //#define EXECUTE_TEST_ETH
 
 #undef EXECUTE_TEST_ADC
-#define EXECUTE_TEST_ADC
+//#define EXECUTE_TEST_ADC
 
 #undef EXECUTE_TEST_DEVICE_MOTORCTL
 //#define EXECUTE_TEST_DEVICE_MOTORCTL
@@ -198,6 +192,7 @@ static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH);
 #endif//defined(EXECUTE_TEST_ADC)
 
 static void info_about_core_plus_led(void);
+static void print_tag_utility (const char *tag, const char *str);
 
 
 #if     defined(EXECUTE_TEST_FLASH)    
@@ -250,6 +245,10 @@ static void test_quad_enc(void);
 
 #if     defined(EXECUTE_TEST_ADC)    
 static void test_periph_adc(void);
+static void test_periph_adc_trace(void);
+static void test_periph_adc2_curr_custom (void);
+static void test_periph_adc_new_api (void);
+static void test_periph_adc_motors(void);
 #endif//defined(EXECUTE_TEST_ADC) 
 
 #if     defined(EXECUTE_TEST_ETH)    
@@ -389,6 +388,8 @@ int main(void)
     test_message(" ------------------------------------------ ");
     test_message("");
     
+    hal_sys_delay(2*hal_RELTIME_1second);
+    
 #if     defined(EXECUTE_TEST_FLASH)    
     test_flash();
     hal_sys_delay(2*hal_RELTIME_1second);
@@ -428,8 +429,6 @@ int main(void)
     hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_ETH)
     
-
-
 #if     defined(EXECUTE_TEST_WATCHDOG)    
     test_periph_watchdog();
     hal_sys_delay(2*hal_RELTIME_1second);
@@ -454,7 +453,11 @@ int main(void)
 #endif//defined(EXECUTE_TEST_CAN)
 
 #if     defined(EXECUTE_TEST_ADC)    
-    test_periph_adc();
+    //test_periph_adc();
+    //test_periph_adc_trace();
+    //test_periph_adc2_curr_custom ();
+    //test_periph_adc_new_api();
+    test_periph_adc_motors();
     hal_sys_delay(2*hal_RELTIME_1second);
 		
 #if     defined(EXECUTE_TEST_ENCODER_SPI)
@@ -466,8 +469,8 @@ int main(void)
 #endif//defined(EXECUTE_TEST_ADC) 
 
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
-    test_device_motorctl_2();
     //test_device_motorctl_1();
+    test_device_motorctl_2();
 #endif//defined(EXECUTE_TEST_DEVICE_MOTORCL) 
 
 // it also contains a forever loop. you cannot ping it. just use the two ports
@@ -809,6 +812,16 @@ static void info_about_core_plus_led(void)
     
 }
 
+static void print_tag_utility (const char *tag, const char *str)
+{
+    char concat_str[strlen(tag)+2+strlen(str)];
+    strcat (concat_str, tag);
+    strcat (concat_str, ": ");
+    strcat (concat_str, str);
+#if !defined(DONT_USE_TRACE) 
+    hal_trace_puts(concat_str);
+#endif
+}   
 // -- the tests ----
 
 #if     defined(EXECUTE_TEST_FLASH)    
@@ -1084,7 +1097,7 @@ static void test_quad_enc(void)
     hal_quad_enc_single_init(10);
     
     char str_quad_enc[64];
-    for(;;)
+    for(uint8_t i = 0; i< 50; i++)
     {
         uint32_t cnt =  0;
         static uint16_t step = 0;
@@ -1103,6 +1116,7 @@ static void test_quad_enc(void)
             cnt = hal_quad_enc_getCounter(i);
             snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d", i+1, cnt);
             test_message(str_quad_enc);
+            //print_tag_utility("QUADRATURE ENC", str_quad_enc);
         }
         test_message("\n");
         hal_sys_delay(500*hal_RELTIME_1millisec);
@@ -1475,7 +1489,7 @@ typedef struct
 #if     defined(EXECUTE_TEST_CAN_TX1_REGULAR)
 static hal_result_t can_transmit_regular(hal_can_frame_t* frametx, uint32_t cnt)
 {   
-		static hal_result_t r;
+	static hal_result_t r;
     ((can_message_format_t*)frametx->data)->sequencenumber = cnt;
     
     frametx->data[0] = cnt & 0xff;    
@@ -1629,9 +1643,7 @@ static void test_device_switch(void)
 #include "pid.h"
 
 static void test_device_motorctl_1(void)
-{
-
-    
+{    
 	// init the CAN
 	hal_can_frame_t canframe;
 	hal_can_t CAN_PERIPH=hal_can1;
@@ -1639,17 +1651,11 @@ static void test_device_motorctl_1(void)
 	hal_motor_t id=motor1;
     hal_pwm_cfg_t *cfg=NULL;
 	uint8_t finished=0;
-
-
 	uint8_t remaining=0;
-
-
 	int16_t pwm=0; 
 	test_is_beginning("TEST MOTORS");
-    
-    
+   
     // init the Motors 1 and 2 
-
 	res=hal_motor_init(id , cfg);
 
     if(hal_res_OK != res)
@@ -1665,6 +1671,7 @@ static void test_device_motorctl_1(void)
 		{
 			switch (canframe.data[0]) //in data 0 there is the command: 0..3 pwm for motor 0..3, F= finished  
 			{
+            // switch off all the motors
 			case 0xF: 
 			{
 				pwm=0; 	
@@ -1676,94 +1683,106 @@ static void test_device_motorctl_1(void)
 				finished=1;
 			}
 			break;
+            // set the pwm written in data[1] and data[2]
 			default:
 			{
-				pwm=canframe.data[1]+ ( canframe.data[2]<<8); 	
+				pwm=canframe.data[1] + ( canframe.data[2]<<8);
+                // in data[0] there's the ID of the motor
 				hal_motor_pwmset((hal_motor_t) canframe.data[0],(int32_t)pwm);
+                
+                // send (1) can frame with the specified PWM and (4) canframes reporting the ADC detected
 				canframe.id=1;
 				canframe.data[1]=((uint16_t)pwm & 0xFF);
-				canframe.data[2]=((uint16_t)pwm & 0xFF00)>>8;
-				  
+				canframe.data[2]=((uint16_t)pwm & 0xFF00)>>8;  
 				hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now); 
 				send_adcTocan(canframe,CAN_PERIPH);
 			}
 			break;
 			}		
-		}
-					
+		}				
 	} 
   
     test_was_successful("CAN: check if you have receive the message in the CANREAL");
 
     
     test_was_successful("MOTOR: test done");
-
-    
-
-
 }
 
 
 static void test_device_motorctl_2(void)
 {
-  
-  volatile int16_t current_P[4]={0,0,0,0};
-  volatile int16_t current_I[4]={0,0,0,0};  
-	// init the CAN
-	hal_can_frame_t canframe;
-	hal_can_frame_t canreceived;
-	hal_can_t CAN_PERIPH=hal_can1;
-	static hal_result_t res;
-	hal_motor_t id=motor1;
+    static int16_t current_P[4]={0,0,0,0};
+    static int16_t current_I[4]={0,0,0,0};
+    static int16_t current[4]={0,0,0,0};
+    char str[96];
+    // CAN variables
+    hal_can_frame_t canframe;
+    hal_can_frame_t canreceived;
+    hal_can_t CAN_PERIPH=hal_can1;
+    // missing the init --> delegates to CAN test
+    //hal_can_init(CAN_PERIPH, &canxconfig);
+    //hal_can_enable(CAN_PERIPH);   
+    
+    static hal_result_t res;
+    hal_motor_t id=motor1;
     hal_pwm_cfg_t *cfg=NULL;
-	uint8_t finished=0;
-	uint8_t CURRENT_MODE=0;
-	hal_motor_t channel=motor1;
-	int16_t desired_current[4]={0,0,0,0};
-	uint8_t remaining=0;
-	PID_Struct_t TorquePID0;
-	PID_Struct_t TorquePID1;
-	PID_Struct_t TorquePID2;
-	PID_Struct_t TorquePID3;
-	PID_Struct_t SpeedPID0;
-	PID_Struct_t SpeedPID1;
-	PID_Struct_t SpeedPID2;
-	PID_Struct_t SpeedPID3;
-	int32_t enc[4]={0,0,0,0};
-	int16_t pwm[4]={0,0,0,0};
+    uint8_t finished=0;
+    uint8_t CURRENT_MODE=0;
+    hal_motor_t channel=motor1;
+    int16_t desired_current[4]={0,0,0,0};
+    uint8_t remaining=0;
+    PID_Struct_t TorquePID0;
+    PID_Struct_t TorquePID1;
+    PID_Struct_t TorquePID2;
+    PID_Struct_t TorquePID3;
+    PID_Struct_t SpeedPID0;
+    PID_Struct_t SpeedPID1;
+    PID_Struct_t SpeedPID2;
+    PID_Struct_t SpeedPID3;
+    int32_t enc[4]={0,0,0,0};
+    static int32_t pwm[4]={0,0,0,0};
 	
 	TorquePID0.wLower_Limit_Integral=-16000;
 	TorquePID0.wUpper_Limit_Integral=+16000;
 	TorquePID0.hLower_Limit_Output=-3500;
 	TorquePID0.hUpper_Limit_Output=3500;
 	test_is_beginning("TEST MOTORS");
-    
-    
-    // init the Motors 1 and 2 
-
+      
+    // init the Motors 1 and 2 and the adc to have a current measurement
 	res=hal_motor_and_adc_init(id , cfg);
-
+   
     if(hal_res_OK != res)
     {			
 		test_message("MOTORS DEVICE INIT FAILED");
         return;
     }
-	
+    
 	PID_Init(&TorquePID0,&SpeedPID0);	
 	PID_Init(&TorquePID1,&SpeedPID1);
 	PID_Init(&TorquePID2,&SpeedPID2);
 	PID_Init(&TorquePID3,&SpeedPID3);
-	hal_quad_enc_Init();
+	
+    //init the quadrature encoder, for feedback on angular position
+    hal_quad_enc_single_init(0);
+    hal_quad_enc_single_init(1);
+    hal_quad_enc_single_init(2);
+    hal_quad_enc_single_init(3);
 
+    test_message("Entering in DC MOTOR CTRL LOOP");
 	while(finished==0)
 	{
+        static uint16_t loop_count = 0;
+        loop_count ++;
 //		send_currentTocan(canframe,CAN_PERIPH);
 //   	hal_sys_delay(1000*hal_RELTIME_1microsec);
-		res=hal_can_get(CAN_PERIPH, &canreceived, &remaining); 
+		res=hal_can_get(CAN_PERIPH, &canreceived, &remaining);
+        
+        //If I received something on CAN bus
 		if (res==hal_res_OK) 
 		{
 			switch (canreceived.data[0]) //in data 0 there is the command: 0..3 pwm for motor 0..3, F= finished  
 			{
+            // set the pwm to 0 and block the motors
 			case 0xF: 
 			{
 				pwm[0]=0; 	
@@ -1774,16 +1793,18 @@ static void test_device_motorctl_2(void)
 				hal_motor_pwmset(motor2,pwm[1]);
 				hal_motor_pwmset(motor3,pwm[2]);
 				hal_motor_pwmset(motor4,pwm[3]);
-				CURRENT_MODE=0;	
+				CURRENT_MODE=0;
+                test_message("Setting to 0 all the PWMs, closing the test...");
 				finished=1;
 			}
 			break;
+            // set a loop based on current
 			case 0xC:   //current loop
 			{
 				channel=canreceived.data[1]; 
-				desired_current[channel]=canreceived.data[2]+ ( canreceived.data[3]<<8);
-				current_P[channel]=canreceived.data[4]+ ( canreceived.data[5]<<8);
-				current_I[channel]=canreceived.data[6]+ ( canreceived.data[7]<<8);
+				desired_current[channel]    = canreceived.data[2] + (canreceived.data[3]<<8);
+				current_P[channel]          = canreceived.data[4] + (canreceived.data[5]<<8);
+				current_I[channel]          = canreceived.data[6] + (canreceived.data[7]<<8);
 				TorquePID0.hKp_Gain=current_P[0];
 				TorquePID0.hKi_Gain=current_I[0];
 				TorquePID1.hKp_Gain=current_P[1];
@@ -1792,15 +1813,42 @@ static void test_device_motorctl_2(void)
 				TorquePID2.hKi_Gain=current_I[2];
 				TorquePID3.hKp_Gain=current_P[3];
 				TorquePID3.hKi_Gain=current_I[3];
+                
+                snprintf (str, sizeof(str), "Setting a PID on motor %d with desired current: %d, proportional gain: %d, integrator gain: %d", channel+1,
+                                                                                                                                              desired_current[channel],
+                                                                                                                                              current_P[channel],
+                                                                                                                                              current_I[channel]);
+                hal_trace_puts(str);
 				CURRENT_MODE=1;					   	
 			}
 			break;
+            // set a pwm open loop
 			case 0x01:     //pwm openloop
 			{
-				channel=canreceived.data[1]; 
-				pwm[channel]=canreceived.data[2]+ ( canreceived.data[3]<<8);				
+                //set the pwm using: data[1] (motor id), data[2] + data[3]<<8 (pwm value)
+                // added by davide: sign control on data[4]
+				channel=canreceived.data[1];
+                
+                //positive value (clockwise direction)
+                if (canreceived.data[4] == 0)
+                {
+                    pwm[channel]=canreceived.data[2] + (canreceived.data[3]<<8);
+                }
+                
+                //negative value (counterclockwise direction)
+                else if (canreceived.data[4] == 1)
+                {
+                    pwm[channel]=-(canreceived.data[2] + (canreceived.data[3]<<8));
+                }
+                
 				hal_motor_pwmset(channel,pwm[channel]);
 
+                snprintf (str, sizeof(str), "Setting an open loop PWM on motor %d with value: %d", channel+1,
+                                                                                                   pwm[channel]);
+                                                                                                                                             
+                hal_trace_puts(str);
+                
+                // send a return message with the actual pwm via can
 				pwm[channel]=hal_motor_pwmget(channel);
 				canreceived.id=0x200;
 				canreceived.data[0]=((uint16_t)pwm[0] & 0xFF);
@@ -1820,13 +1868,22 @@ static void test_device_motorctl_2(void)
 			break;
 			}		
 		}
+        // if I didn't receive anything on CAN bus
 		else
 		{
-			send_currentTocan(canframe,CAN_PERIPH);
+            // notify the current values on CAN
+			//send_currentTocan(canframe,CAN_PERIPH);
+            // if the mode is a ctrl loop based on current
 			if (CURRENT_MODE==1)
 			{
 			//	pwm[channel]=((current_P[channel]*(desired_current[channel]-current[channel]))>>4);
-
+                //set the actual current value
+                current[0] = hal_adc_get_current(0);
+                current[1] = hal_adc_get_current(1);
+                current[2] = hal_adc_get_current(2);
+                current[3] = hal_adc_get_current(3);
+                
+                // calculate the actual pwm using the regulator and set it
 				pwm[0]=PID_Regulator(desired_current[0], current[0], &TorquePID0);
 				pwm[1]=PID_Regulator(desired_current[1], current[1], &TorquePID1);
 				pwm[2]=PID_Regulator(desired_current[2], current[2], &TorquePID2);
@@ -1835,6 +1892,8 @@ static void test_device_motorctl_2(void)
 				hal_motor_pwmset(1,pwm[1]);
 				hal_motor_pwmset(2,pwm[2]);
 				hal_motor_pwmset(3,pwm[3]);
+                
+                // store the actual pwm values and send a can message with them
 				pwm[0]=hal_motor_pwmget(0);
 				pwm[1]=hal_motor_pwmget(1);
 				pwm[2]=hal_motor_pwmget(2);
@@ -1853,14 +1912,15 @@ static void test_device_motorctl_2(void)
 			}
 			else
 			{
-		        hal_sys_delay(500*hal_RELTIME_1microsec);
-				
+		        hal_sys_delay(500*hal_RELTIME_1microsec);		
 			}
 			
-		  enc[0]=hal_quad_enc_getCounter(0);
+            // send a can message with the actual position of the quadrature encoder
+            enc[0]=hal_quad_enc_getCounter(0);
 			enc[1]=hal_quad_enc_getCounter(1); 
 			enc[2]=hal_quad_enc_getCounter(2);
-			enc[3]=hal_quad_enc_getCounter(3); 
+			enc[3]=hal_quad_enc_getCounter(3);
+            
 			canreceived.id=0x300;
 			canreceived.data[0]=((uint16_t)enc[0] & 0xFF);
 			canreceived.data[1]=((uint16_t)enc[0] & 0xFF00)>>8;
@@ -1871,42 +1931,67 @@ static void test_device_motorctl_2(void)
 			canreceived.data[6]=((uint16_t)enc[3] & 0xFF);
 			canreceived.data[7]=((uint16_t)enc[3] & 0xFF00)>>8;	
 			hal_can_put(CAN_PERIPH, &canreceived, hal_can_send_normprio_now); 
-			 
+			
+            //Feedback on actual PWMs and ENCODERs Position
+            if (loop_count == 1000)
+            {
+                for(uint8_t i = 0; i<4; i++)
+                {
+                    current[i] = hal_adc_get_current(i);
+                    pwm[i] = hal_motor_pwmget(i);
+                    snprintf(str, sizeof(str), "JOINT%d -> ENCODER:%d PWM:%d, CURRENT:%d",i,enc[i], pwm[i], current[i]);
+                    hal_trace_puts(str);
+                }
+                hal_trace_puts("\n");
+                loop_count = 0;
+            }
 			hal_sys_delay(250*hal_RELTIME_1microsec);
-		}
-					
+		}		
 	} 
   
-    test_was_successful("CAN: check if you have receive the message in the CANREAL");
-
-    
+    test_was_successful("CAN: check if you have received the messages in the CANREAL");
     test_was_successful("MOTOR: test done");
-
-    
-
-
-}
+} 
 #endif//EXECUTE_TEST_DEVICE_MOTORCTL
 
 #if     defined(EXECUTE_TEST_ADC)
 
-#include "hal_adc.h"
+static hal_can_cfg_t canconfigbase_adc =
+{
+    .runmode                    = hal_can_runmode_isr_1txq1rxq,
+    .baudrate                   = hal_can_baudrate_1mbps,
+    .priorx                     = hal_int_priority10,
+    .priotx                     = hal_int_priority11,
+    .capacityofrxfifoofframes   = 8,
+    .capacityoftxfifoofframes   = 8,
+    .capacityoftxfifohighprio   = 0,
+    .callback_on_rx             = NULL,
+    .arg_cb_rx                  = NULL,
+    .callback_on_tx             = NULL,
+    .arg_cb_tx                  = NULL
+};
 
 static uint16_t ADC_result[12];
-
-
-
+static uint16_t ADC2_result[3];
+static int16_t current_res[4]={0,0,0,0};
+static int16_t current_P[4]={0,0,0,0};
+static int16_t current_I[4]={0,0,0,0};
+static uint16_t temperature = 0;
+static int16_t c_logic = 0;
 static void test_periph_adc(void)
 {
     test_is_beginning("ADC");
+    
+    //init CAN
     hal_can_frame_t canframe;
 	hal_can_t CAN_PERIPH=hal_can1;
+    hal_can_init(CAN_PERIPH, &canconfigbase_adc);
+    hal_can_enable(CAN_PERIPH);
+    
     hal_result_t res;
 	uint8_t message_received=0;
 	uint8_t remaining=0;
-
-
-     
+    
     canframe.id = 0x1AD;
     canframe.id_type = hal_can_frameID_std;
     canframe.frame_type = hal_can_frame_data;
@@ -1917,7 +2002,7 @@ static void test_periph_adc(void)
 
 	hal_adc_dma_init();
 
-//	while(message_received==0)
+	while(message_received == 0)
 	{
 		res=hal_can_get(CAN_PERIPH, &canframe, &remaining); 
 		send_adcTocan(canframe,CAN_PERIPH);
@@ -1925,21 +2010,247 @@ static void test_periph_adc(void)
 	}
 		  
     test_was_successful("ADC: test finished %d");
+}
 
+static void test_periph_adc_trace(void)
+{
+    test_is_beginning("ADC");
+#define PRINT_ADC
+#define PRINT_CURRENT
+    hal_adc_dma_init();
+    //hal_adc_dma_common_init();
+    //hal_adc_dma_single_init(hal_adc1);
+    //hal_adc_dma_single_init(hal_adc2);
+    //hal_adc_dma_single_init(hal_adc3);
+    //hal_adc_ADC1_ADC3_current_init();
+    //hal_adc_dma_init_ADC2_tvaux_tvin_temperature();
+    //hal_motor_and_adc_init(motor1, NULL);
+    char str[96];
+    for(;;)
+    {
+#if defined(PRINT_ADC)
+        ADC_result[0]=hal_adc_get(1,0);
+        ADC_result[1]=hal_adc_get(1,1);
+        ADC_result[2]=hal_adc_get(1,2);
+        
+        ADC_result[3]=hal_adc_get(2,0);
+        ADC_result[4]=hal_adc_get(2,1);
+        ADC_result[5]=hal_adc_get(2,2);
+        
+        ADC_result[6]=hal_adc_get(3,0);
+        ADC_result[7]=hal_adc_get(3,1);
+        ADC_result[8]=hal_adc_get(3,2);
+        
+        ADC_result[9]=hal_adc_get(1,3);
+        ADC_result[10]=hal_adc_get(2,3);
+        ADC_result[11]=hal_adc_get(3,3);
+        
+        snprintf(str, sizeof(str), "ADC1 channels 0,1,2 results detected: %d, %d, %d",ADC_result[0], ADC_result[1], ADC_result[2]);
+        hal_trace_puts(str);
+        
+        snprintf(str, sizeof(str), "ADC2 channels 0,1,2 results detected: %d, %d, %d",ADC_result[3], ADC_result[4], ADC_result[5]);
+        hal_trace_puts(str);
+        
+        snprintf(str, sizeof(str), "ADC3 channels 0,1,2 results detected: %d, %d, %d",ADC_result[6], ADC_result[7], ADC_result[8]);
+        hal_trace_puts(str);
+        
+        snprintf(str, sizeof(str), "ADC1,2,3 dummy channels results detected: %d, %d, %d",ADC_result[9], ADC_result[10], ADC_result[11]);
+        hal_trace_puts(str);
+        
+        //formula: T = (V25-AD_value)/Avg_Slope+25); // values found on micro datasheet
+        if (ADC_result[6] != 0)
+        {
+            temperature = (760-ADC_result[10])/(25+2.5);
+        }
+        else
+        {
+            temperature = 0;
+        }
+        snprintf(str, sizeof(str), "Supposed temperature...: %d degrees",temperature);
+        hal_trace_puts(str);
+#endif
+#if defined(PRINT_CURRENT)
+        for (uint8_t i = 0; i<4; i++)
+        {
+            current_res[i] = hal_adc_get_current(i);
+            snprintf(str, sizeof(str), "Current node %d detected: %d", i, current_res[i]);
+            hal_trace_puts(str);
+        }
+#endif
+        hal_trace_puts("\n");
+        hal_sys_delay (1*hal_RELTIME_1second);
+    }
+}
 
+static void test_periph_adc2_curr_custom (void)
+{
+    char str[96];
+    hal_adc_dma_init_ADC2_tvaux_tvin_temperature();
+    hal_motor_and_adc_init(motor1, NULL);
+    for(;;)
+    {  
+     for (uint8_t i = 0; i<3; i++)
+     {
+        ADC2_result[i] = hal_adc_get_tvaux_tvin_temperature_raw(i);
+        snprintf(str, sizeof(str), "ADC2 result[%d]: %d",i,ADC2_result[i]);
+        hal_trace_puts(str);
+     }
+
+     for (uint8_t i = 0; i<4; i++)
+     {
+        current_res [i] = hal_adc_get_current(i);
+        snprintf(str, sizeof(str), "Current result[%d]: %d",i,current_res[i]);
+        hal_trace_puts(str);    
+     }
+     hal_trace_puts("\n");
+     hal_sys_delay(500*hal_RELTIME_1millisec);
+    }
+}
+
+//this should test the reading of the adc channels while the motors are running and changing the PWM
+static void test_periph_adc_motors (void)
+{   
+    //init ADCs channels
+    //hal_adc_dma_init();
+    hal_adc_common_structure_init(); //it initializes all the ADCs as indipendent
+    hal_adc_dma_init_ADC1_ADC3_hall_sensor_current(); //ADC1 and ADC3 configured to convert regurarly AN1-4 and CUR1-4
+    hal_adc_dma_init_ADC2_tvaux_tvin_temperature();//ADC2 configured to convert regurarly TvAux - TVIn - Temperature
+    
+    //init motors and enable them
+    hal_motor_and_adc_init(motor1, NULL);
+    hal_motor_enable(motor1);
+    hal_motor_enable(motor2);
+    hal_motor_enable(motor3);
+    hal_motor_enable(motor4);
+    
+    // init the CAN
+	hal_can_frame_t canframe;
+    hal_can_init(hal_can1, &canconfigbase_adc);
+    hal_can_enable(hal_can1);
+    
+    test_is_beginning("ADC-MOTORS test begun");
+    
+    hal_bool_t finished = hal_false;
+    hal_result_t res;
+    uint8_t remaining = 0;
+    int16_t pwm=0; 
+    float temperature = 0.0;
+    
+    //creating a loop to control in openloop the motors and in the meanwhile reading the ADCs (don't know yet the association, if it occurs)
+    while(finished == hal_false)
+	{
+		res = hal_can_get(hal_can1, &canframe, &remaining); 
+		if (res==hal_res_OK) 
+		{
+			switch (canframe.data[0]) //in data 0 there is the command: 0..3 pwm for motor 0..3, F= finished  
+			{
+                // switch off all the motors
+                case 0xF: 
+                {
+                    pwm=0; 	
+                    hal_motor_pwmset(motor1,pwm);
+                    hal_motor_pwmset(motor2,pwm);
+                    hal_motor_pwmset(motor3,pwm);
+                    hal_motor_pwmset(motor4,pwm);
+                    
+                    finished = hal_true;
+                }
+                break;
+                // set the pwm written in data[1] and data[2]
+                default:
+                {
+                    pwm=canframe.data[1] + ( canframe.data[2]<<8);
+                    // in data[0] there's the ID of the motor
+                    hal_motor_pwmset((hal_motor_t) canframe.data[0],(int32_t)pwm);
+                }
+                break;
+			}
+            
+		}
+   
+        //print the ADC values
+        char str[196];
+        
+        //Motors analog values
+        /*
+        uint16_t mv1 = (1000.0 * (5.0/3.0)* 3.3 * hal_adc_get_hall_sensor_analog_input(0)) / 4096; // 3/5: reduction factor
+        uint16_t mv2 = (1000.0 * (5.0/3.0)* 3.3 * hal_adc_get_hall_sensor_analog_input(1)) / 4096;
+        uint16_t mv3 = (1000.0 * (5.0/3.0)* 3.3 * hal_adc_get_hall_sensor_analog_input(2)) / 4096;
+        uint16_t mv4 = (1000.0 * (5.0/3.0)* 3.3 * hal_adc_get_hall_sensor_analog_input(3)) / 4096;
+        */
+        snprintf(str, sizeof(str), "MOTOR_0 AN: %dmV (raw: %d), MOTOR_1 AN: %dmV (raw: %d), MOTOR_2 AN: %dmV (raw: %d), MOTOR_3 AN: %dmV (raw: %d)",
+                                    hal_adc_get_hall_sensor_analog_input_mV(0), hal_adc_get_hall_sensor_analog_input_raw(0),
+                                    hal_adc_get_hall_sensor_analog_input_mV(1), hal_adc_get_hall_sensor_analog_input_raw(1),
+                                    hal_adc_get_hall_sensor_analog_input_mV(2), hal_adc_get_hall_sensor_analog_input_raw(2),
+                                    hal_adc_get_hall_sensor_analog_input_mV(3), hal_adc_get_hall_sensor_analog_input_raw(3));
+        hal_trace_puts(str);
+        
+        //Motors analog current
+        /*
+        current_res[0] = ((5.0/3.2) * 5000 * (hal_adc_get_current_motor(0) - 2048))/2048;
+        current_res[1] = ((5.0/3.2) * 5000 * (hal_adc_get_current_motor(1) - 2048))/2048;
+        current_res[2] = ((5.0/3.2) * 5000 * (hal_adc_get_current_motor(2) - 2048))/2048;
+        current_res[3] = ((5.0/3.2) * 5000 * (hal_adc_get_current_motor(3) - 2048))/2048;
+        */
+        
+        c_logic = hal_adc_get_current_motor_mA(2);
+        snprintf(str, sizeof(str), "MOTOR_0 CUR: %dmA (raw: %d), MOTOR_1 CUR: %dmA (raw: %d), MOTOR_2 CUR: %dmA (raw: %d), MOTOR_3 CUR: %dmA (raw: %d)",
+                                    hal_adc_get_current_motor_mA(0),hal_adc_get_current_motor_raw(0),
+                                    hal_adc_get_current_motor_mA(1),hal_adc_get_current_motor_raw(1),
+                                    hal_adc_get_current_motor_mA(2),hal_adc_get_current_motor_raw(2),
+                                    hal_adc_get_current_motor_mA(3),hal_adc_get_current_motor_raw(3));
+        hal_trace_puts(str);
+        
+        //ADC2 analog values
+        /*
+        uint16_t tvaux = (1000 * (5.0/3.0)  * 3.3 * hal_adc_get_ADC2_conversions(0)) / 4096;
+        uint16_t vin   = (1000 * (21.0)     * 3.3 * hal_adc_get_ADC2_conversions(1)) / 4096;
+        */
+        temperature = (float) (760-hal_adc_get_tvaux_tvin_temperature_raw(2))/(25+2.5);
+        
+        snprintf(str, sizeof(str), "TV AUX: %d (raw: %d), TV_IN: %d (raw: %d), TEMP: %3.2f degrees (raw: %d)",
+                                    hal_adc_get_tvaux_tvin_mV(0), hal_adc_get_tvaux_tvin_temperature_raw(0),
+                                    hal_adc_get_tvaux_tvin_mV(1), hal_adc_get_tvaux_tvin_temperature_raw(1),
+                                    temperature,                  hal_adc_get_tvaux_tvin_temperature_raw(2));
+        
+        hal_trace_puts(str);
+        
+        
+        hal_trace_puts("\n\n");
+        hal_sys_delay(500*hal_RELTIME_1millisec);
+	}
+    test_was_successful("ADC-MOTORS test ended");
+}
+
+static void test_periph_adc_new_api (void)
+{
+    char str[96];
+    hal_adc_cfg_t adc_cfg;
+    adc_cfg.init_mode = hal_adc_indipendent;
+    
+    hal_adc_init(hal_adc2, &adc_cfg);
+    
+    for(;;)
+    {  
+     for (uint8_t i = 0; i<3; i++)
+     {
+        ADC2_result[i] = hal_adc_get_tvaux_tvin_temperature_raw(i);
+        snprintf(str, sizeof(str), "ADC2 result[%d]: %d",i,ADC2_result[i]);
+        hal_trace_puts(str);
+     }
+     hal_trace_puts("\n");
+     hal_sys_delay(500*hal_RELTIME_1millisec);
+    }
+    
 }
 
 
-static uint16_t ADC_result[12];
-//volatile int16_t current[4]={0,0,0,0};
-volatile int16_t current_P[4]={0,0,0,0};
-volatile int16_t current_I[4]={0,0,0,0};
-
 static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 {	
-	ADC_result[0]=hal_get_adc(1,0);
-	ADC_result[1]=hal_get_adc(1,1);
-	ADC_result[2]=hal_get_adc(1,2);
+    // Get 3 ADC channels, then form and send the CAN frame
+	ADC_result[0]=hal_adc_get(1,0);
+	ADC_result[1]=hal_adc_get(1,1);
+	ADC_result[2]=hal_adc_get(1,2);
 	canframe.id = 0x1AD; 
 	canframe.data[1] = ADC_result[0] & 0xFF;
 	canframe.data[2] = (ADC_result[0] & 0xFF00)>>8;
@@ -1947,11 +2258,12 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 	canframe.data[4] = (ADC_result[1] & 0xFF00)>>8;
 	canframe.data[5] = ADC_result[2] & 0xFF;
 	canframe.data[6] = (ADC_result[2] & 0xFF00)>>8;
-
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
-	ADC_result[3]=hal_get_adc(2,0);
-	ADC_result[4]=hal_get_adc(2,1);
-	ADC_result[5]=hal_get_adc(2,2);
+    
+    // Get 3 ADC channels, then form and send the CAN frame
+	ADC_result[3]=hal_adc_get(2,0);
+	ADC_result[4]=hal_adc_get(2,1);
+	ADC_result[5]=hal_adc_get(2,2);
 	canframe.id = 0x1AE;
 	canframe.data[1] = ADC_result[3] & 0xFF;
 	canframe.data[2] = (ADC_result[3] & 0xFF00)>>8;
@@ -1959,12 +2271,12 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 	canframe.data[4] = (ADC_result[4] & 0xFF00)>>8;
 	canframe.data[5] = ADC_result[5] & 0xFF;
 	canframe.data[6] = (ADC_result[5] & 0xFF00)>>8;
-	
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
-  ADC_result[6]=hal_get_adc(3,0);
-	ADC_result[7]=hal_get_adc(3,1);
-	ADC_result[8]=hal_get_adc(3,2);
-
+    
+    // Get 3 ADC channels, then form and send the CAN frame
+    ADC_result[6]=hal_adc_get(3,0);
+	ADC_result[7]=hal_adc_get(3,1);
+	ADC_result[8]=hal_adc_get(3,2);
 	canframe.id = 0x1AF;
 	canframe.data[1] = ADC_result[6] & 0xFF;
 	canframe.data[2] = (ADC_result[6] & 0xFF00)>>8;
@@ -1972,12 +2284,12 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 	canframe.data[4] = (ADC_result[7] & 0xFF00)>>8;
 	canframe.data[5] = ADC_result[8] & 0xFF;
 	canframe.data[6] = (ADC_result[8] & 0xFF00)>>8;
-	
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
 	  
-	ADC_result[9]=hal_get_adc(1,3);
-	ADC_result[10]=hal_get_adc(2,3);
-	ADC_result[11]=hal_get_adc(3,3);
+    // Get 3 ADC channels, then form and send the CAN frame  
+	ADC_result[9]=hal_adc_get(1,3);
+	ADC_result[10]=hal_adc_get(2,3);
+	ADC_result[11]=hal_adc_get(3,3);
 	canframe.id = 0x1AC;
 	canframe.data[1] = ADC_result[9] & 0xFF;
 	canframe.data[2] = (ADC_result[9] & 0xFF00)>>8;
@@ -1985,7 +2297,6 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 	canframe.data[4] = (ADC_result[10] & 0xFF00)>>8;
 	canframe.data[5] = ADC_result[11] & 0xFF;
 	canframe.data[6] = (ADC_result[11] & 0xFF00)>>8;
-	
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
 	
 	hal_sys_delay(1000*hal_RELTIME_1microsec);
@@ -1993,21 +2304,19 @@ static void send_adcTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 
 static void send_currentTocan(hal_can_frame_t canframe, hal_can_t CAN_PERIPH )
 {	
-	/*
-	current[0]=ADC_result[0]=hal_get_current(0);
-	current[1]=ADC_result[1]=hal_get_current(1);
-	current[2]=ADC_result[2]=hal_get_current(2);
-	current[3]=ADC_result[3]=hal_get_current(3);
-	*/
+	ADC_result[0]=hal_adc_get_current(0);
+	ADC_result[1]=hal_adc_get_current(1);
+	ADC_result[2]=hal_adc_get_current(2);
+	ADC_result[3]=hal_adc_get_current(3);
+	
 	canframe.id = 0x1AD; 
 	canframe.size= 8;
 	canframe.data[1] = ADC_result[0] & 0xFF;
 	canframe.data[2] = (ADC_result[0] & 0xFF00)>>8;
  	canframe.data[3] = ADC_result[1] & 0xFF;
 	canframe.data[4] = (ADC_result[1] & 0xFF00)>>8;
-	canframe.data[5] = 0;// ADC_result[2] & 0xFF;
-	canframe.data[6] = 0;//(ADC_result[2] & 0xFF00)>>8;
-
+	canframe.data[5] = 0;
+	canframe.data[6] = 0;
 	hal_can_put(CAN_PERIPH, &canframe, hal_can_send_normprio_now);
 
 	canframe.id = 0x1AF;

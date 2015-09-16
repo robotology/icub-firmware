@@ -624,6 +624,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_quad_enc.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_5v.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_5v.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -946,6 +951,16 @@
               <FileName>hl_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_adc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1662,6 +1677,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_quad_enc.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_5v.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_5v.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1941,6 +1961,16 @@
               <FileName>hl_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_adc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2657,6 +2687,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_quad_enc.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_5v.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_5v.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2936,6 +2971,16 @@
               <FileName>hl_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_adc.c</FilePath>
             </File>
           </Files>
         </Group>

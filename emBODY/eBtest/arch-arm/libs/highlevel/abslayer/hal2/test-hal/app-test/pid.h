@@ -37,9 +37,9 @@ typedef struct
   int16_t hKi_Gain;
   uint16_t hKi_Divisor;  
   int16_t hLower_Limit_Output;     //Lower Limit for Output limitation
-  int16_t hUpper_Limit_Output;     //Lower Limit for Output limitation
+  int16_t hUpper_Limit_Output;     //Upper Limit for Output limitation
   int32_t wLower_Limit_Integral;   //Lower Limit for Integral term limitation
-  int32_t wUpper_Limit_Integral;   //Lower Limit for Integral term limitation
+  int32_t wUpper_Limit_Integral;   //Upper Limit for Integral term limitation
   int32_t wIntegral;
   // Actually used only if DIFFERENTIAL_TERM_ENABLED is enabled in
   //stm32f10x_MCconf.h

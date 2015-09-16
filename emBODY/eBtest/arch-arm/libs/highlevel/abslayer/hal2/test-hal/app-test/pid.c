@@ -162,10 +162,10 @@ int16_t PID_Regulator(int16_t hReference, int16_t hPresentFeedback, PID_Struct_t
 #ifdef DIFFERENTIAL_TERM_ENABLED    
   int32_t wDifferential_Term;
 #endif    
-  // error computation
+  /* error computation */
   wError= (int32_t)(hReference - hPresentFeedback);
  
-  // Proportional term computation
+  // Proportional term computation: Kp*Error
   wProportional_Term = PID_Struct->hKp_Gain * wError;
 
   // Integral term computation
@@ -178,47 +178,56 @@ int16_t PID_Regulator(int16_t hReference, int16_t hPresentFeedback, PID_Struct_t
     wIntegral_Term = PID_Struct->hKi_Gain * wError;
     dwAux = PID_Struct->wIntegral + (int64_t)(wIntegral_Term);
     
+    // if the term is above the integral upper limit, then set the upper limit itself
     if (dwAux > PID_Struct->wUpper_Limit_Integral)
     {
       PID_Struct->wIntegral = PID_Struct->wUpper_Limit_Integral;
     }
+    // if the term is below the integral lower limit, then set the lower limit itself
     else if (dwAux < PID_Struct->wLower_Limit_Integral)
-          { 
-            PID_Struct->wIntegral = PID_Struct->wLower_Limit_Integral;
-          }
-          else
-          {
-           PID_Struct->wIntegral = (int32_t)(dwAux);
-          }
+    { 
+       PID_Struct->wIntegral = PID_Struct->wLower_Limit_Integral;
+    }
+    
+    // in all the other case the integral is the incremental value just set
+    else
+    {
+       PID_Struct->wIntegral = (int32_t)(dwAux);
+    }
   }
+  
   // Differential term computation
 #ifdef DIFFERENTIAL_TERM_ENABLED
   {
   int32_t wtemp;
-  
+  // compute difference between error(i) - error(i-1)
   wtemp = wError - PID_Struct->wPreviousError;
   wDifferential_Term = PID_Struct->hKd_Gain * wtemp;
-  PID_Struct->wPreviousError = wError;    // store value 
+  PID_Struct->wPreviousError = wError;    // store value for the next cycle 
   }
+  
+  //output in case of differential term activated
   houtput_32 = (wProportional_Term/PID_Struct->hKp_Divisor+ 
                 PID_Struct->wIntegral/PID_Struct->hKi_Divisor + 
                 wDifferential_Term/PID_Struct->hKd_Divisor); 
 
-#else  
+#else
+  //output in case of differential term NOT activated
   houtput_32 = (wProportional_Term/PID_Struct->hKp_Divisor+ 
                 PID_Struct->wIntegral/PID_Struct->hKi_Divisor);
 #endif
   
-    if (houtput_32 >= PID_Struct->hUpper_Limit_Output)
-      {
-      return(PID_Struct->hUpper_Limit_Output);		  			 	
-      }
-    else if (houtput_32 < PID_Struct->hLower_Limit_Output)
-      {
-      return(PID_Struct->hLower_Limit_Output);
-      }
-    else 
-      {
-        return((int16_t)(houtput_32)); 		
-      }
+ // check PWM output limits
+ if (houtput_32 >= PID_Struct->hUpper_Limit_Output)
+ {
+    return(PID_Struct->hUpper_Limit_Output);		  			 	
+ }
+ else if (houtput_32 < PID_Struct->hLower_Limit_Output)
+ {
+    return(PID_Struct->hLower_Limit_Output);
+ }
+ else 
+ {
+   return((int16_t)(houtput_32)); 		
+ }
 }		   
