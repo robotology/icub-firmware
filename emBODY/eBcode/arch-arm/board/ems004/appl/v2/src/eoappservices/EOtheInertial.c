@@ -485,7 +485,20 @@ extern eOresult_t eo_inertial_Start(EOtheInertial *p)
 
         if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.accelerometers, i))
         {
+            // for jorhabib: he needs the external accelerometer on feet. long term solution is to introduce an externalaccelerometers mask and an internalgyroscope mask
+            //#define FOR_JORHABIB
+            #if defined(FOR_JORHABIB)
+            if((eoas_inertial_pos_l_foot_1 == i) || (eoas_inertial_pos_l_foot_2 == i) || (eoas_inertial_pos_r_foot_1 == i) || (eoas_inertial_pos_r_foot_2 == i))
+            {
+                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
+            }
+            else
+            {
+                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
+            }
+            #else
             canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
+            #endif
         }
 
         if(1 == EOAS_ISPOSENABLED(s_eo_theinertial.sensorsconfig.gyroscopes, i))
