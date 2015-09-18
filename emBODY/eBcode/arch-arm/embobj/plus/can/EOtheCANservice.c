@@ -64,11 +64,12 @@
 
 const eOcanserv_cfg_t eo_canserv_DefaultCfg = 
 {    
-    .mode               = eocanserv_mode_ondemand,
-    .rxqueuesize        = {64, 64},
-    .txqueuesize        = {64, 64},
-    .onrxcallback       = {NULL, NULL},
-    .onrxargument       = {NULL, NULL}
+    .mode                   = eocanserv_mode_ondemand,
+    .canstabilizationtime   = 7*OSAL_reltime1sec,
+    .rxqueuesize            = {64, 64},
+    .txqueuesize            = {64, 64},
+    .onrxcallback           = {NULL, NULL},
+    .onrxargument           = {NULL, NULL}
 };
 
 
@@ -497,8 +498,14 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
         }    
     }
     
+    eOreltime_t stabilizationtime = p->config.canstabilizationtime;
+    if(stabilizationtime > 10*OSAL_reltime1sec)
+    {
+        stabilizationtime = eo_canserv_DefaultCfg.canstabilizationtime;
+    }
+
     // added a wait time so that all can boards which are switched on by hal_can_init() are surely off the bootloader phase
-    osal_task_wait(5*OSAL_reltime1sec + 1000*OSAL_reltime1ms); // 5 seconds for bootloader permanence plus some more time for powerup and starting application
+    osal_task_wait(stabilizationtime); // 5 seconds for bootloader permanence plus some more time for powerup and starting application
 
       
     return(eores_OK);

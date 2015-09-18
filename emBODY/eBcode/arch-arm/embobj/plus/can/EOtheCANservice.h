@@ -74,6 +74,14 @@ typedef enum
 typedef struct
 {    
     eOcanserv_mode_t    mode;
+    eOreltime_t         canstabilizationtime;           /**< in usec [0, 10*OSAL_reltime1sec], it is the time required for can boards to stabilize
+                                                             so that they are able to process can messages. 
+                                                             for sensor boards which are powered on by the CAN bus: 5 seconds for bootloader permanence 
+                                                             plus some more time for powerup and starting application (use 7*OSAL_reltime1sec).
+                                                             for mc boards which are powered on externally: the same as before minus the bootloader time.
+                                                             
+                                                             function eo_canserv_Initialise() locks the calling task for all this time.
+                                                         **/    
     uint8_t             rxqueuesize[eOcanports_number];
     uint8_t             txqueuesize[eOcanports_number];
     eOcallback_t        onrxcallback[eOcanports_number];
@@ -92,7 +100,7 @@ extern const eOcanserv_cfg_t eo_canserv_DefaultCfg;
 
 
 /** @fn         extern EOtheCANservice * eo_canserv_Initialise(const eOcanserv_cfg_t *canprotcfg)
-    @brief      Initialise the EOtheCANservice singleton 
+    @brief      Initialise the EOtheCANservice singleton. It also powers on the CAN bus.
     @arg        canprotcfg       The configuration. NULL is OK.
     @return     The handle to the EOtheCANservice
  **/
