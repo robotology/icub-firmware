@@ -248,7 +248,7 @@ const EOconstvector * const entitiesmapB10[eoprot_endpoints_numberof][eoboardcon
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb1 =
 {   
-    .type               = eobrd_cantype_1foc,
+    .boardtype          = eobrd_cantype_1foc,
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
@@ -258,7 +258,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb1 =
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb2 =
 {   
-    .type               = eobrd_cantype_mc4,
+    .boardtype          = eobrd_cantype_mc4,
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 2},
@@ -268,7 +268,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb2 =
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb5 =
 {   
-    .type               = eobrd_cantype_1foc,
+    .boardtype          = eobrd_cantype_1foc,
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
@@ -278,7 +278,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb5 =
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb6 =
 {   
-    .type               = eobrd_cantype_1foc,
+    .boardtype          = eobrd_cantype_1foc,
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
@@ -288,7 +288,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb6 =
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb7 =
 {   
-    .type               = eobrd_cantype_1foc,
+    .boardtype               = eobrd_cantype_1foc,
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
@@ -299,7 +299,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb7 =
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mais_eb2 =
 {   
-    .type               = eobrd_cantype_mais,
+    .boardtype          = eobrd_cantype_mais,
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 0},
@@ -418,14 +418,6 @@ extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(ui
 }
 
 
-//{
-//    uint8_t                     type;                       // use eObrd_cantype_t
-//    uint8_t                     filler[3];
-//    eObrd_version_t             firmwareversion;
-//    eObrd_version_t             protocolversion;    
-//    uint16_t                    canmap[eOcanports_number];  // use bitmap of required can addresses.
-//    eOcandiscovery_onstop_t     onStop;                     // called by the _Stop() method with the pointer of the object and the search result
-//} eOcandiscovery_target_t;
 
 extern EOconstvector* eo_vectorof_boardprops_eb1;   // eb1/2
 extern EOconstvector* eo_vectorof_boardprops_eb2;   // eb2/4

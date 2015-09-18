@@ -130,6 +130,8 @@ static void s_onstop_search42foc(EOtheCANdiscovery2* p, eObool_t searchisok);
 static void s_onstop_search4mc4(EOtheCANdiscovery2* p, eObool_t searchisok);
 static void s_onstop_search4mais(EOtheCANdiscovery2* p, eObool_t searchisok);
 
+//static void s_onstop_search4test(EOtheCANdiscovery2* p, eObool_t searchisok);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -376,6 +378,27 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
         
     p->BOARDisreadyforcontrolloop = eobool_false;
     
+
+#if 0
+
+    // test code with a strain board
+
+    
+    eOcandiscovery_target_t target = {0};
+
+    target.boardtype = eobrd_cantype_strain; //eobrd_cantype_mais;//eobrd_cantype_strain;
+    target.canmap[0] = 0x0008; //0x0018;
+    target.protocolversion.major = 1; // 1.0
+    target.protocolversion.minor = 0;
+    target.firmwareversion.major = 3; // 3.0
+    target.firmwareversion.minor = 0;    
+    
+    target.onStop = s_onstop_search4test;
+
+    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);    
+
+#else
+
     // that is an intermediate code. so far, at the date of 15sept15, we check only the mc boards (and the mais).
     
     if(eoMCtype_none == p->mctype)
@@ -383,7 +406,7 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
         p->BOARDisreadyforcontrolloop = eobool_true;
         return(eores_OK);
     }
-
+    
     if(eoMCtype_2focbased == p->mctype)
     {
         // start the discovery on the 2foc boards. 
@@ -406,9 +429,11 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
         const eOcandiscovery_target_t *t = eoboardconfig_code2mcdiscoverytarget(eoprot_board_local_get());
         memcpy(&target, t, sizeof(eOcandiscovery_target_t));
         target.onStop = s_onstop_search4mc4;
-        
+
         eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);      
     }
+
+#endif
     
     return(eores_OK);       
 }
@@ -422,6 +447,22 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+#if 0
+static void s_onstop_search4test(EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    
+    static uint8_t ciao = 0;
+    const eOcandiscovery_detection_t *detection = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
+    const eOcandiscovery_target_t* target = eo_candiscovery2_GetTarget(eo_candiscovery2_GetHandle());
+    if((detection->atleastonereplyisincompatible == eobool_true) || (target->boardtype == eobrd_cantype_strain))
+    {
+        ciao = 1;
+    } 
+    
+//    for(;;);
+}
+#endif
 
 static void s_onstop_search42foc(EOtheCANdiscovery2* p, eObool_t searchisok)
 {
@@ -494,15 +535,16 @@ static void s_eo_emsapplBody_CanServices_Init(EOtheEMSapplBody *p)
 {
     eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};
     
-    config.mode             = eocanserv_mode_straight;
-    config.rxqueuesize[0]   = 64;
-    config.rxqueuesize[1]   = 64;
-    config.txqueuesize[0]   = 64;
-    config.txqueuesize[1]   = 64;  
-    config.onrxcallback[0]  = s_eo_emsapplBody_hid_canSP_cbkonrx; 
-    config.onrxargument[0]  = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
-    config.onrxcallback[1]  = s_eo_emsapplBody_hid_canSP_cbkonrx; 
-    config.onrxargument[1]  = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+    config.mode                 = eocanserv_mode_straight;
+    config.canstabilizationtime = 7*OSAL_reltime1sec;
+    config.rxqueuesize[0]       = 64;
+    config.rxqueuesize[1]       = 64;
+    config.txqueuesize[0]       = 64;
+    config.txqueuesize[1]       = 64;  
+    config.onrxcallback[0]      = s_eo_emsapplBody_hid_canSP_cbkonrx; 
+    config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+    config.onrxcallback[1]      = s_eo_emsapplBody_hid_canSP_cbkonrx; 
+    config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
         
     eo_canserv_Initialise(&config);   
 }
