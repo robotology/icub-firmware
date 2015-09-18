@@ -90,15 +90,17 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p);
 
 static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void);
 
-static void myhal_pwm_enable(uint8_t i);
+static eOresult_t s_eo_mcserv_MaisValues2Pos(eOprotID32_t maisID, uint8_t motor, uint8_t joint, uint32_t* val);
 
-static void myhal_pwm_disable(uint8_t i);
+static void s_eo_mcserv_pwm_enable(uint8_t i);
 
-static void myhal_pwm_set(uint8_t i, int16_t v);
+static void s_eo_mcserv_pwm_disable(uint8_t i);
 
-static eObool_t myhal_are_motors_ext_faulted(void);
+static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v);
 
-static void myhal_reenable_external_fault_isr(void);
+static eObool_t s_eo_mcserv_are_motors_ext_faulted(void);
+
+static void s_eo_mcserv_reenable_external_fault_isr(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -338,35 +340,35 @@ extern eOresult_t eo_mcserv_EnableMotor(EOmcService *p, uint8_t joint_index)
     {
       if (joint_index <3) 
       {
-        myhal_pwm_enable(p->config.jomos[0].actuator.local.index);
-        myhal_pwm_enable(p->config.jomos[1].actuator.local.index);
-        myhal_pwm_enable(p->config.jomos[2].actuator.local.index);
+        s_eo_mcserv_pwm_enable(p->config.jomos[0].actuator.local.index);
+        s_eo_mcserv_pwm_enable(p->config.jomos[1].actuator.local.index);
+        s_eo_mcserv_pwm_enable(p->config.jomos[2].actuator.local.index);
       }
       else
       {
-        myhal_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
+        s_eo_mcserv_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
       }
     }
     else if(emscontroller_board_HEAD_neckpitch_neckroll == board_control)  
     {
-       myhal_pwm_enable(p->config.jomos[0].actuator.local.index);
-       myhal_pwm_enable(p->config.jomos[1].actuator.local.index);
+       s_eo_mcserv_pwm_enable(p->config.jomos[0].actuator.local.index);
+       s_eo_mcserv_pwm_enable(p->config.jomos[1].actuator.local.index);
     }
     else if(emscontroller_board_HEAD_neckyaw_eyes == board_control) 
     {
       if((joint_index == 2) || (joint_index == 3) ) 
       {
-        myhal_pwm_enable(p->config.jomos[2].actuator.local.index);
-        myhal_pwm_enable(p->config.jomos[3].actuator.local.index);
+        s_eo_mcserv_pwm_enable(p->config.jomos[2].actuator.local.index);
+        s_eo_mcserv_pwm_enable(p->config.jomos[3].actuator.local.index);
       }
       else
       {
-         myhal_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
+         s_eo_mcserv_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
       }      
     }
     else  //the joint is not coupled to any other joint 
     { 
-         myhal_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
+         s_eo_mcserv_pwm_enable(p->config.jomos[joint_index].actuator.local.index);
     }      
     
     return eores_OK;
@@ -380,7 +382,7 @@ extern eOresult_t eo_mcserv_EnableFaultDetection(EOmcService *p)
         return(eores_NOK_nullpointer);
     }
     
-    myhal_reenable_external_fault_isr();
+    s_eo_mcserv_reenable_external_fault_isr();
 
     return eores_OK;
 }
@@ -391,7 +393,7 @@ extern eObool_t eo_mcserv_AreMotorsExtFaulted(EOmcService *p)
         return eobool_false;
     }
     
-    return myhal_are_motors_ext_faulted();
+    return s_eo_mcserv_are_motors_ext_faulted();
 }
 
 extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uint8_t* fault_mask)
@@ -573,6 +575,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
 {
     eOresult_t res = eores_OK;
     uint8_t jm = 0;
+    eOemscontroller_board_t board_control = emscontroller_board_NO_CONTROL;
     
     // in here we must init whatever is needed for the management of joint-motor.
     // in the future: eth-protocol, can-mapping maybe, 
@@ -596,7 +599,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
     {
       
-        eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
+        board_control = s_eo_mcserv_getboardcontrol();
         
         //use the ankle for test experimental setup
         p->thelocalcontroller = eo_emsController_Init(board_control, emscontroller_actuation_LOCAL, p->config.jomosnumber);        
@@ -666,6 +669,12 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                     }
                 }
             }
+            // here I could check if it's a MAIS encoder. If it's the case, I could set as a primary encoder a quad enc, so that I can get it's value
+            // in the control loop and apply the limit
+            else
+            {
+                
+            }
         }
         
         // in here we init the encoder reader
@@ -685,6 +694,15 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     //currently the motors are initialized all together and without config
     hal_motor_and_adc_init(motor1, NULL);
     
+    /*
+    probably it's better to embed this init in the encoder reader, so that we can read the value as a normal joint
+    //init the ADC to read position data from the HALL SENSOR
+    if ((board_control == emscontroller_board_HAND_2) || (board_control == emscontroller_board_FOREARM))
+    {
+        
+        //hal_adc_dma_init_ADC1_ADC3_hall_sensor();
+    }
+    */
     return(res);
 }
 
@@ -709,13 +727,13 @@ static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
 static void s_eo_mcserv_enable_all_motors(EOmcService *p)
 {
     //enable PWM of the motors (if not faulted)
-    if (!myhal_are_motors_ext_faulted())
+    if (!s_eo_mcserv_are_motors_ext_faulted())
     {
         for(uint8_t jm=0; jm<p->config.jomosnumber; jm++)
         {
             if(1 == p->config.jomos[jm].actuator.local.type)
             {   // on board 
-                myhal_pwm_enable(p->config.jomos[jm].actuator.local.index);
+                s_eo_mcserv_pwm_enable(p->config.jomos[jm].actuator.local.index);
             }
         }
     }
@@ -729,15 +747,15 @@ static void s_eo_mcserv_disable_all_motors(EOmcService *p)
      {
         if(1 == p->config.jomos[jm].actuator.local.type)
         {   // on board 
-            myhal_pwm_set(p->config.jomos[jm].actuator.local.index, 0);
-            myhal_pwm_disable(p->config.jomos[jm].actuator.local.index);
+            s_eo_mcserv_pwm_set(p->config.jomos[jm].actuator.local.index, 0);
+            s_eo_mcserv_pwm_disable(p->config.jomos[jm].actuator.local.index);
         }
      }
      
      return;
 }
 
-static void myhal_pwm_set(uint8_t i, int16_t v)
+static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v)
 {
     //out of bound
     if (i > 3)
@@ -747,7 +765,7 @@ static void myhal_pwm_set(uint8_t i, int16_t v)
     hal_motor_pwmset(i, v);
 }
 
-static void myhal_pwm_enable(uint8_t i)
+static void s_eo_mcserv_pwm_enable(uint8_t i)
 {
     //out of bound
     if (i > 3)
@@ -756,7 +774,7 @@ static void myhal_pwm_enable(uint8_t i)
     hal_motor_enable(i);
 }
 
-static void myhal_pwm_disable(uint8_t i)
+static void s_eo_mcserv_pwm_disable(uint8_t i)
 {
     //out of bound
     if (i > 3)
@@ -766,7 +784,7 @@ static void myhal_pwm_disable(uint8_t i)
 }
 
 
-static eObool_t myhal_are_motors_ext_faulted(void)
+static eObool_t s_eo_mcserv_are_motors_ext_faulted(void)
 {
     if (hal_motor_isfault())
     {
@@ -776,7 +794,7 @@ static eObool_t myhal_are_motors_ext_faulted(void)
     return eobool_false;
 }
 
-static void myhal_reenable_external_fault_isr(void)
+static void s_eo_mcserv_reenable_external_fault_isr(void)
 {
     hal_motor_reenable_break_interrupts();
 }
@@ -833,14 +851,24 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
                                                     &p->valuesencoder[jm],
                                                     &dummy_extra,
                                                     &fl);
-                //fill the errormask
-                if (res != eores_OK)
-                    errormask |= 1<<(jm<<1);
             }
-            else
+            else if (p->config.jomos[jm].encoder.etype == 4) //MAIS
             {
-            // handle the encoders not supported yet (remote)   
+            /* it should be a MAIS encoder! So here:
+                - call a function to convert the last MAIS values into iCubDegrees
+                - copy inside p->valuesencoder[jm] the right position value
+            */
+                
+                //using encoder.index as prot index for getting the mais entity inside the function
+                res = s_eo_mcserv_MaisValues2Pos(p->config.jomos[jm].encoder.index,
+                                                 p->config.jomos[jm].actuator.local.index,
+                                                 jm,
+                                                 &p->valuesencoder[jm]);
             }
+            
+             //fill the errormask
+             if (res != eores_OK)
+                errormask |= 1<<(jm<<1);
         }
     }   
     else
@@ -854,13 +882,14 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     // 4. apply the readings to localcontroller
     eo_emsController_AcquireAbsEncoders((int32_t*)p->valuesencoder, errormask);
     
+    // for MAIS-controlled joints...do a check on the limits (see MC4 firmware) before entering here or inside the controller?
     // 5. compute the pwm using pid
     eo_emsController_PWM(p->valuespwm);
     
     // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
     for(jm=0; jm<p->config.jomosnumber; jm++)
     {
-        myhal_pwm_set(p->config.jomos[jm].actuator.local.index, p->valuespwm[jm]);
+        s_eo_mcserv_pwm_set(p->config.jomos[jm].actuator.local.index, p->valuespwm[jm]);
     }
 
     // 7. propagate the status of joint motors locally computed in localcontroller to the joints / motors in ram
@@ -978,7 +1007,32 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
             type = emscontroller_board_FACE_lips;
         } break;
         
+        // board 16 --> HandV3: middle (proximal, distal), index distal, little fingers
+        case 15:
+        {
+            type = emscontroller_board_HAND_1;
+        } break;
+        
+        // board 17 --> HandV3: thumb (proximal, abduction, distal), index proximal
+        case 16:
+        {
+            type = emscontroller_board_HAND_2;
+        } break;
+        
+       
+        // board 17 --> ForeArmV3: wrist (differential coupling, pronosupination), finger abduction
+        case 17:
+        {
+            type = emscontroller_board_FOREARM;
+        } break;
+        
+        
         /* experimental boards control */
+        case 97:
+        {
+            //type = emscontroller_board_HEAD_neckpitch_neckroll;   //2 coupled joints
+            type = emscontroller_board_ANKLE;                       //2 indipendent joints
+        } break;
         case 98:
         {
             type = emscontroller_board_ANKLE;
@@ -993,6 +1047,111 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
     }
     
     return(type);   
+}
+
+static eOresult_t s_eo_mcserv_MaisValues2Pos(eOprotID32_t maisID, uint8_t motor, uint8_t joint, uint32_t* val)
+{
+    //how can I follow a rule based on the joint number? it seems that the rule is hardware-cabled
+    
+    eOmc_joint_t *joint_ref = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint);
+    float divider = joint_ref->config.jntEncoderResolution;
+    if(divider < 0)
+        divider = -divider;
+
+    uint32_t temp_val;
+    uint8_t n = eoprot_board_local_get();
+    
+    eOas_mais_status_t *status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), maisID);
+    if ((status == NULL) || (joint_ref == NULL))
+    {
+        *val = 0;
+        return eores_NOK_generic;        
+    }
+    
+    //board 16 - 1b4 : index distal (m0), middle proximal (m1), middle distal (m2), little fingers (m3)
+    if (n == 15)
+    {
+        switch (motor)
+        {
+            //index distal
+            case 0:
+            {
+                temp_val = status->the15values.data[4] + status->the15values.data[5];
+                
+            } break;
+            
+            // middle proximal
+            case 1:
+            {
+                temp_val = status->the15values.data[6];
+                
+            } break;
+            
+            //middle distal
+            case 2:
+            {
+                temp_val = status->the15values.data[7] + status->the15values.data[8];
+                
+            } break;
+            
+            //little fingers
+            case 3:
+            {
+                temp_val = status->the15values.data[11] + status->the15values.data[12] + status->the15values.data[13];
+                
+            } break;
+            
+            default:
+            {
+                *val = 0;
+                return eores_NOK_generic;
+                
+            } break;
+        }
+        
+    }
+    
+    //board 17 - 1b3 : thumb abduction (m0 - NO MAIS), thumb proximal (m1), thumb distal (m2), index proximal (m3)
+    else if (n == 16)
+    {
+        switch (motor)
+        {
+            // motor 0 is not controlled using mais position data
+            
+            // thumb proximal
+            case 1:
+            {
+                temp_val = status->the15values.data[0];
+                
+            } break;
+            
+            // thumb distal
+            case 2:
+            {
+                temp_val = status->the15values.data[1] + status->the15values.data[2];
+                
+            } break;
+            
+            // index proximal
+            case 3:
+            {
+                temp_val = status->the15values.data[3];
+                
+            } break;
+            
+            default:
+            {
+                *val = 0;
+                return eores_NOK_generic;
+                
+            } break;
+        }
+        
+    }
+    
+    *val = (float) temp_val * 65535.0 / divider; //position in iCubDegrees = (MAIS_raw * ICUB_DEGREES_full_scales) / encoder_resolution
+    
+    return eores_OK;
 }
 
 // --------------------------------------------------------------------------------------------------------------------

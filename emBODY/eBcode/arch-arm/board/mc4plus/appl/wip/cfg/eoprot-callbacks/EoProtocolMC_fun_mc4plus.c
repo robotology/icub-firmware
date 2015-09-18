@@ -516,6 +516,23 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 
     //check for the type of calibration required
 
+    if(calibrator->type == eomc_calibration_type6_mais_mc4plus)
+    {
+        // calibration for joint controlled with MAIS
+        
+        //params for the calib still need to be discussed
+        /*
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type6.calibrationZero);
+        // the StartCalib for type6 should:
+        // 1 - (set the params of position, velocity) and maxencoder
+        // 2 - SetTrajectory with final position and velocity (p1,p2)
+         eo_emsController_StartCalibration_type6 (jxx,
+                                                 calibrator->params.type6.position,
+                                                 calibrator->params.type6.velocity,
+                                                 calibrator->params.type6.maxencoder);
+        */
+    }
+    
     if(calibrator->type == eomc_calibration_type5_hard_stops_mc4plus)
     {
         // calibration for joint with incremental encoders

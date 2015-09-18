@@ -133,14 +133,15 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_unspecified},
     /* experimental configurations */
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 3, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  3
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  2
     },
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_aea1joint,
         EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  0, EO_INIT(.jomos[0].encoder.index)  0
     },
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint, 
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 0, EO_INIT(.jomos[1].encoder.etype)  2, EO_INIT(.jomos[1].encoder.index)  0,
         EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  2,
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 3, EO_INIT(.jomos[1].encoder.etype)  2, EO_INIT(.jomos[1].encoder.index)  3
+
     },
     
     /* v3 icub head configs */
@@ -204,29 +205,50 @@ const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
 
 
 //MC config for boards
-enum { eOmcconfig_boardjomosnumberof = 5 };
+enum { eOmcconfig_boardjomosnumberof = 9 };
 const eomcconfig_boardjomos_t eomcconfig_boardjomos_MC4PLUS[] =
 {
-    /* v3 icub head boards */
-    {EO_INIT(.board_num) 11,  EO_INIT (.joints) 2}, //board 12, b0
-    {EO_INIT(.board_num) 12,  EO_INIT (.joints) 4}, //board 13, b1
-    {EO_INIT(.board_num) 13,  EO_INIT (.joints) 2}, //board 14, b7
-    {EO_INIT(.board_num) 14,  EO_INIT (.joints) 4}, //board 15, b9
-    
-    /* others */
+    /* experimentals */
+    {EO_INIT(.board_num) 97,  EO_INIT (.joints) 2}, // experimental board
     {EO_INIT(.board_num) 98,  EO_INIT (.joints) 1}, // experimental board
+    
+    /* v3 icub head boards */
+    {EO_INIT(.board_num) 11,  EO_INIT (.joints) 2}, //board 12, 0b0
+    {EO_INIT(.board_num) 12,  EO_INIT (.joints) 4}, //board 13, 0b1
+    {EO_INIT(.board_num) 13,  EO_INIT (.joints) 2}, //board 14, 0b7
+    {EO_INIT(.board_num) 14,  EO_INIT (.joints) 4}, //board 15, 0b9
+    
+    /* v3 icub left-forearm boards */
+    {EO_INIT(.board_num) 15,  EO_INIT (.joints) 4}, //board 16, 1b4
+    {EO_INIT(.board_num) 16,  EO_INIT (.joints) 4}, //board 17, 1b3
+    {EO_INIT(.board_num) 17,  EO_INIT (.joints) 4}, //board 18, 1b2
+    
+    /* v3 icub right-forearm boards */
+    //TBA
+
 }; EO_VERIFYsizeof(eomcconfig_boardjomos_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardjomos_t));
 
 const eomcconfig_boardcode_t eomcconfig_boardcode_MC4PLUS[] =
 {
-    /* v3 icub head boards */
-    {EO_INIT(.board_num) 11,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b0}, //board 12, b0
-    {EO_INIT(.board_num) 12,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b1}, //board 13, b1
-    {EO_INIT(.board_num) 13,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b7}, //board 14, b7
-    {EO_INIT(.board_num) 14,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b9}, //board 15, b9
-    
-    /* others */
+    /* experimentals */
+    {EO_INIT(.board_num) 97,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint}, // experimental board
     {EO_INIT(.board_num) 98,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental}, // experimental board
+    
+    /* v3 icub head boards */
+    {EO_INIT(.board_num) 11,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b0}, //board 12, 0b0
+    {EO_INIT(.board_num) 12,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b1}, //board 13, 0b1
+    {EO_INIT(.board_num) 13,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b7}, //board 14, 0b7
+    {EO_INIT(.board_num) 14,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b9}, //board 15, 0b9
+    
+    /* v3 icub left-forearm boards */
+    {EO_INIT(.board_num) 15,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 16, 1b4
+    {EO_INIT(.board_num) 16,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 17, 1b3
+    {EO_INIT(.board_num) 17,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 18, 1b2
+    
+    
+    /* v3 icub right-forearm boards */
+    //TBA
+
 }; EO_VERIFYsizeof(eomcconfig_boardcode_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardcode_t));
 
 //const pointer reference to const structures
