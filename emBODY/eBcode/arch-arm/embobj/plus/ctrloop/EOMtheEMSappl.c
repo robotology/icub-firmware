@@ -675,7 +675,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         char strdes[64] = {0};
         if(NULL != des)
         {
-            snprintf(strdes, sizeof(strdes), "code 0x%x, p16 %d, p64 %lld, dev %d, adr %d", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress);
+            snprintf(strdes, sizeof(strdes), "code 0x%x, p16 0x%04x, p64 0x%016llx, dev %d, adr %d", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress);
         }
         if(NULL != info)
         {
