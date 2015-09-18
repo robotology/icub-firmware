@@ -57,7 +57,7 @@ typedef void (*eOcandiscovery_onstop_t) (EOtheCANdiscovery2* p, eObool_t searchi
 
 typedef struct
 {
-    uint8_t                     type;                       // use eObrd_cantype_t
+    uint8_t                     boardtype;              // use eObrd_cantype_t
     uint8_t                     filler[3];
     eObrd_version_t             firmwareversion;
     eObrd_version_t             protocolversion;    
@@ -67,12 +67,22 @@ typedef struct
 
 typedef struct
 {
+    eObrd_typeandversions_t     info;       // the board info as give by the get-fw-version-reply message
+    uint16_t                    time;       // the time in ms after the start of search when the get-fw-version-reply message has arrived
+} eOcandiscovery_board_t;       EO_VERIFYsizeof(eOcandiscovery_board_t, 8);
+
+typedef struct
+{
     eObool_t                    allhavereplied;                     // tells if all boards in target have replied to the get-fw-error.
     eObool_t                    atleastonereplyisincompatible;      // tells if at least one board which has replied is not compatible with the target
+    uint16_t                    duration;                           // in ms   
     uint16_t                    replies[eOcanports_number];         // bit mask of the boards which have replies: replies[eOcanport1] & 0x0080 == 0x0080 means board 3 on CAN1 has replies
-    uint16_t                    incompatibilities[eOcanports_number]; // bit mask of board which have replies but are incompatible     
-    eObrd_typeandversions_t     boards[eOcanports_number][15];      // contains the board information as given by the the get-fw-version replies
-} eOcandiscovery_detection_t;
+    uint16_t                    incompatibilities[eOcanports_number]; // bit mask of board which have replies but are incompatible   
+    uint16_t                    differentboardtype[eOcanports_number]; // contain the bitmask of not equal board type (there is a 1 if and only if detected board != board required
+    uint16_t                    differentfirmwareversion[eOcanports_number]; // contain the bitmask of not equal fw version (there is a 1 if and only if fw detected != fw required
+    uint16_t                    differentprotocolversion[eOcanports_number]; // contain the bitmask of not equal prot version (there is a 1 if and only if prot detected != prot required   
+    eOcandiscovery_board_t      boards[eOcanports_number][15];      // contains the board information as given by the the get-fw-version replies + detection relative time in ms
+} eOcandiscovery_detection_t;   EO_VERIFYsizeof(eOcandiscovery_detection_t, 264);
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 

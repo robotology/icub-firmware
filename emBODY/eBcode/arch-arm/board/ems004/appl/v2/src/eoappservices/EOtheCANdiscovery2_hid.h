@@ -41,6 +41,7 @@
 
 typedef struct
 {
+    eOabstime_t                 timeofstart;
     uint8_t                     discoverynumretries;
     eObool_t                    forcestop;
     eObool_t                    searching;
