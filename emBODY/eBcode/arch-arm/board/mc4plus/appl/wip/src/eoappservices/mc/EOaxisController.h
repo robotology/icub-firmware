@@ -86,6 +86,8 @@ extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o);
 extern void    eo_axisController_SetAxisCalibrationZero (EOaxisController* o, int32_t calibration_zero);
 extern int32_t eo_axisController_GetAxisCalibrationZero (EOaxisController* o);
 
+extern int32_t eo_axisController_GetAxisPos (EOaxisController *o);
+extern int32_t eo_axisController_GetAxisVel (EOaxisController *o);
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
 extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
@@ -127,6 +129,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_t* jointStatus);
 extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 
+extern EOtrajectory* eo_axisController_GetTraj (EOaxisController *o);
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 

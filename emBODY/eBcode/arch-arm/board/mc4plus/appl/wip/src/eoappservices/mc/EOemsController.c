@@ -80,6 +80,7 @@ void config_2FOC(uint8_t joint);
 void set_2FOC_idle(uint8_t joint);
 void set_2FOC_running(uint8_t joint);
 static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint);
+static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -1000,7 +1001,10 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
             eo_axisController_SetCalibrated (ems->axis_controller[2]);       
             eo_axisController_SetCalibrated (ems->axis_controller[3]);
             eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
-            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position); 
+            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
+
+            s_eo_emsController_InitTrajectoryVersionVergence(2);
+            s_eo_emsController_InitTrajectoryVersionVergence(3);
         }            
     }
  
@@ -2281,6 +2285,33 @@ static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint)
     return;
 }
 
+static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j)
+{
+    int32_t axis_pos2 = eo_axisController_GetAxisPos(ems->axis_controller[2]);
+    int32_t axis_pos3 = eo_axisController_GetAxisPos(ems->axis_controller[3]);
+    
+    //version --> (pos3 + pos2)/2
+    if (j == 2)   
+    {
+         eo_trajectory_Init(eo_axisController_GetTraj (ems->axis_controller[2]), (axis_pos3 + axis_pos2)/2, eo_axisController_GetAxisVel(ems->axis_controller[2]), 0);
+         eo_trajectory_Stop(eo_axisController_GetTraj (ems->axis_controller[2]), (axis_pos3 + axis_pos2)/2);
+         //set reference point to mantain --> it's the actual position! this seems to resolve the issue related to the eyes calibration
+         eo_axisController_SetPosRef(ems->axis_controller[2],  (axis_pos3 + axis_pos2)/2,  eo_axisController_GetAxisVel(ems->axis_controller[2]));
+         return;
+    }
+    
+    //vergence --> (pos3 - pos2)/2
+    if (j == 3)   
+    {
+         eo_trajectory_Init(eo_axisController_GetTraj (ems->axis_controller[3]), (axis_pos3 - axis_pos2)/2, eo_axisController_GetAxisVel(ems->axis_controller[3]), 0);
+         eo_trajectory_Stop(eo_axisController_GetTraj (ems->axis_controller[3]), (axis_pos3 - axis_pos2)/2); // /2 or not?
+         //set reference point to mantain --> it's the actual position! this seems to resolve the issue related to the eyes calibration
+         eo_axisController_SetPosRef(ems->axis_controller[3], (axis_pos3 - axis_pos2)/2, eo_axisController_GetAxisVel(ems->axis_controller[3]));
+         return;
+    }
+    
+    #warning does it worth to put the virtually coupled joints in 0? it's a choice, discuss it 
+}
 #ifdef EXPERIMENTAL_MOTOR_TORQUE
 
     #if defined(SHOULDER_BOARD)

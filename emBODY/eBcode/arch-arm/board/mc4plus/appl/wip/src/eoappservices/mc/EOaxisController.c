@@ -359,6 +359,22 @@ extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffne
     }
 }
 
+extern int32_t eo_axisController_GetAxisPos (EOaxisController *o)
+{
+    if (o) 
+        return o->position;
+    else 
+        return 0;
+}
+
+extern int32_t eo_axisController_GetAxisVel (EOaxisController *o)
+{
+    if (o) 
+        return o->velocity;
+    else 
+        return 0;
+}
+
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
     //if (o) o->position = pos;
@@ -941,6 +957,11 @@ extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o)
 extern void eo_axisController_Stop(EOaxisController *o)
 {
     if (o) eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+}
+
+extern EOtrajectory* eo_axisController_GetTraj (EOaxisController *o)
+{
+    if (o) return o->trajectory;
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
