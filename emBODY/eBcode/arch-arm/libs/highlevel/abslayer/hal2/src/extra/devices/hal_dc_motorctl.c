@@ -232,8 +232,8 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
     return(hal_res_OK);
 }
 
-// Motor init with ADC for currents feedback
-extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
+// Motor init with active interrupts on external fault channels
+extern hal_result_t hal_motors_extfault_handling_init(void)
 {
     /*   const hal_gpio_map_t *gm = NULL;		  */
     hal_result_t res = hal_res_NOK_generic;
