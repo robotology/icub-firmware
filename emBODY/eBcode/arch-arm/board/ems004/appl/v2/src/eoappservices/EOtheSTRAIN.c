@@ -311,6 +311,27 @@ extern eOresult_t eo_strain_FullScale_StartRequest(EOtheSTRAIN *p)
     return(eores_OK); 
 }
 
+extern eOresult_t eo_strain_OnDiscoveryStop(EOtheSTRAIN *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok)
+{   
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    // wip part. we should: 
+    // 1. send up a ok result about the strain ...
+    // 2. call eo_strain_Initialise()
+    // 3. return OK
+    
+    
+    if(NULL == p)
+    {
+        eo_strain_Initialise();
+    }
+
+    return(eores_OK); 
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

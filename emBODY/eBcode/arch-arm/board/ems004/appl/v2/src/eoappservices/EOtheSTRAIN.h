@@ -38,6 +38,7 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
+#include "EOtheCANdiscovery2.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -71,6 +72,8 @@ extern eOresult_t eo_strain_ConfigMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
 extern eOresult_t eo_strain_ConfigDataRate(EOtheSTRAIN *p, uint8_t datarate);
 
 extern eOresult_t eo_strain_FullScale_StartRequest(EOtheSTRAIN *p);
+
+extern eOresult_t eo_strain_OnDiscoveryStop(EOtheSTRAIN *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok);
 
 
 /** @}            
