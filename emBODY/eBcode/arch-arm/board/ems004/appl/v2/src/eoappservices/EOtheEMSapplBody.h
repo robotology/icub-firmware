@@ -47,6 +47,8 @@
 
 #include "EOtheCANmapping.h"
 
+//#include "EOtheCANdiscovery2.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -150,6 +152,10 @@ extern eObool_t eo_emsapplBody_isSTRAINready(EOtheEMSapplBody *p);
 extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p);
 
 extern eObool_t eo_emsapplBody_isreadyforcontrolloop(EOtheEMSapplBody *p);
+
+extern eOresult_t eo_emsapplBody_SendDiscoveryFailureReport(EOtheEMSapplBody *p);
+
+//extern const eOcandiscovery_detection_t* eo_emsapplBody_GetFailedDetection(EOtheEMSapplBody *p);
 
 
 

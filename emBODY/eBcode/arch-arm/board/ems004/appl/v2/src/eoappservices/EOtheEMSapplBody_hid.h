@@ -34,7 +34,7 @@
 #include "EoManagement.h"
 #include "EOtimer.h"
 
-
+#include "EOtheCANdiscovery2.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -66,6 +66,7 @@ struct EOtheEMSapplBody_hid
     eObool_t                            isASmais_ready;
     
     eObool_t                            BOARDisreadyforcontrolloop;
+    //eOcandiscovery_detection_t          failedDetection;
 }; 
 
 

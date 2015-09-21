@@ -126,11 +126,12 @@ static void s_eo_emsapplBody_hid_canSP_cbkonrx(void *arg);
 
 static eObool_t s_eo_emsapplBody_HasDevice(EOtheEMSapplBody *p, eo_emsapplbody_deviceid_t dev);
 
-static void s_onstop_search42foc(EOtheCANdiscovery2* p, eObool_t searchisok);
-static void s_onstop_search4mc4(EOtheCANdiscovery2* p, eObool_t searchisok);
-static void s_onstop_search4mais(EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_onstop_search42foc(void* par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_onstop_search4mc4(void* par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_onstop_search4mais(void* par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_onstop_search4strain(void* par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
-//static void s_onstop_search4test(EOtheCANdiscovery2* p, eObool_t searchisok);
+//static eOresult_t s_onstop_search4test(void* par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -150,6 +151,7 @@ static EOtheEMSapplBody s_applBody =
     .isASstrain_ready       = eobool_false,
     .isASmais_ready         = eobool_false,
     .BOARDisreadyforcontrolloop = eobool_false
+//    .failedDetection        = {0}
 };
 
 static const char s_eobj_ownname[] = "EOtheEMSapplBody";
@@ -197,7 +199,7 @@ extern EOtheEMSapplBody* eo_emsapplBody_Initialise(const eOemsapplbody_cfg_t *cf
     s_eo_emsapplBody_CanServices_Init(p);
     
     
-    eo_mc4boards_Initialise(NULL);
+//    eo_mc4boards_Initialise(NULL);
             
     
 //    s_eo_emsapplBody_encodersReader_init(p);        
@@ -368,6 +370,31 @@ extern eObool_t eo_emsapplBody_isreadyforcontrolloop(EOtheEMSapplBody *p)
     return(p->BOARDisreadyforcontrolloop);    
 }
 
+extern eOresult_t eo_emsapplBody_SendDiscoveryFailureReport(EOtheEMSapplBody *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
+    
+    return(eores_OK);    
+}
+
+//extern const eOcandiscovery_detection_t* eo_emsapplBody_GetFailedDetection(EOtheEMSapplBody *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(NULL);
+//    }   
+//    
+//    if(eobool_false == p->BOARDisreadyforcontrolloop)
+//    {
+//        return(&p->failedDetection);
+//    }     
+//}
+
 
 extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
 {    
@@ -412,12 +439,12 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
         // start the discovery on the 2foc boards. 
         // as callback we just set BOARDisreadyforcontrolloop true
         
-        eOcandiscovery_target_t target = {0};
         const eOcandiscovery_target_t *t = eoboardconfig_code2mcdiscoverytarget(eoprot_board_local_get());
-        memcpy(&target, t, sizeof(eOcandiscovery_target_t));
-        target.onStop = s_onstop_search42foc;
+        eOcandiscovery_onstop_t onstop = {0};
+        onstop.function = s_onstop_search42foc;
+        onstop.parameter = NULL;
         
-        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), t, &onstop);
         
     }
     else if(eoMCtype_mc4maisbased == p->mctype)
@@ -425,12 +452,12 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
         // start the discovery on the mc4 boards.
         // as callback we start discovery on mais. as further callback we start the mais, activate broadcast on mc4 boards, and then we set BOARDisreadyforcontrolloop true
       
-        eOcandiscovery_target_t target = {0};
         const eOcandiscovery_target_t *t = eoboardconfig_code2mcdiscoverytarget(eoprot_board_local_get());
-        memcpy(&target, t, sizeof(eOcandiscovery_target_t));
-        target.onStop = s_onstop_search4mc4;
+        eOcandiscovery_onstop_t onstop = {0};
+        onstop.function = s_onstop_search4mc4;
+        onstop.parameter = NULL;
 
-        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);      
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), t, &onstop);      
     }
 
 #endif
@@ -449,7 +476,7 @@ extern eOresult_t eo_emsapplBody_StartResourceCheck(EOtheEMSapplBody *p)
 // --------------------------------------------------------------------------------------------------------------------
 
 #if 0
-static void s_onstop_search4test(EOtheCANdiscovery2* p, eObool_t searchisok)
+static eOresult_t s_onstop_search4test(void* par, EOtheCANdiscovery2* p, eObool_t searchisok)
 {
     
     static uint8_t ciao = 0;
@@ -461,55 +488,119 @@ static void s_onstop_search4test(EOtheCANdiscovery2* p, eObool_t searchisok)
     } 
     
 //    for(;;);
+    
+    return(eores_OK);
 }
 #endif
 
-static void s_onstop_search42foc(EOtheCANdiscovery2* p, eObool_t searchisok)
+static eOresult_t s_onstop_search42foc(void* par, EOtheCANdiscovery2* p, eObool_t searchisok)
 {
     if(eobool_true == searchisok)
     {
         s_applBody.isMCall_ready = eobool_true;
-        s_applBody.BOARDisreadyforcontrolloop = eobool_true;
         
+        // see if we have a strain and if we need to start its discovery as well
+        const eOcandiscovery_target_t *t = eoboardconfig_code2straindiscoverytarget(eoprot_board_local_get());
+        if(NULL == t)
+        {   // if we dont have a strain to check, i start teh 2foc straight away
+            
+            s_applBody.BOARDisreadyforcontrolloop = eobool_true;
+        
+            // start the services for 2foc ...
+            s_eo_emsapplBody_encodersReader_init(&s_applBody);        
+            s_eo_emsapplBody_emsController_init(&s_applBody);  
+        }  
+        else
+        {   // if i have a strain to search, at first i search for it. then, if i find it i shall start the 2foc ... inside s_onstop_search4strain()
+            eOcandiscovery_onstop_t onstop = {0};
+            onstop.function = s_onstop_search4strain;
+            onstop.parameter = NULL;
+
+            eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), t, &onstop);  
+        }  
+    }
+    else
+    {
+//        const eOcandiscovery_detection_t* det = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
+//        memcpy(&s_applBody.failedDetection, det, sizeof(eOcandiscovery_detection_t));        
+    }
+    
+    return(eores_OK);
+}
+
+
+static eOresult_t s_onstop_search4strain(void* par, EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    if(eobool_true == searchisok)
+    {
+        s_applBody.isASstrain_ready = eobool_true;
+        // marco.accame: the code in here 
+        eo_strain_Initialise();     
+
+        
+        s_applBody.BOARDisreadyforcontrolloop = eobool_true;
+    
         // start the services for 2foc ...
         s_eo_emsapplBody_encodersReader_init(&s_applBody);        
-        s_eo_emsapplBody_emsController_init(&s_applBody);        
-        
+        s_eo_emsapplBody_emsController_init(&s_applBody);       
+    }
+    else
+    {
+//        const eOcandiscovery_detection_t* det = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
+//        memcpy(&s_applBody.failedDetection, det, sizeof(eOcandiscovery_detection_t));        
     }
     
+    return(eores_OK);
 }
 
-static void s_onstop_search4mc4(EOtheCANdiscovery2* p, eObool_t searchisok)
+
+static eOresult_t s_onstop_search4mc4(void* par, EOtheCANdiscovery2* p, eObool_t searchisok)
 {
     if(eobool_true == searchisok)
     {
         s_applBody.isMCall_ready = eobool_true;
 
-        eOcandiscovery_target_t target = {0};
         const eOcandiscovery_target_t *t = eoboardconfig_code2maisdiscoverytarget(eoprot_board_local_get());
-        memcpy(&target, t, sizeof(eOcandiscovery_target_t));
-        target.onStop = s_onstop_search4mais;
-        
-        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &target);         
+        eOcandiscovery_onstop_t onstop = {0};
+        onstop.function = s_onstop_search4mais;
+        onstop.parameter = NULL;
+
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), t, &onstop);         
+    }
+    else
+    {
+//        const eOcandiscovery_detection_t* det = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
+//        memcpy(&s_applBody.failedDetection, det, sizeof(eOcandiscovery_detection_t));        
     }
     
+    return(eores_OK);
 }
 
 
-static void s_onstop_search4mais(EOtheCANdiscovery2* p, eObool_t searchisok)
+static eOresult_t s_onstop_search4mais(void* par, EOtheCANdiscovery2* p, eObool_t searchisok)
 {
     if(eobool_true == searchisok)
     {
         s_applBody.isASmais_ready = eobool_true;
         s_applBody.BOARDisreadyforcontrolloop = eobool_true;
-
+        
+        // marco.accame: the code in here 
+        eo_mc4boards_Initialise(NULL);
         if(eobool_true == eo_mc4boards_AreThere(eo_mc4boards_GetHandle()))
-        {
+        {    
             eo_mc4boards_Config(eo_mc4boards_GetHandle());
+
+            eo_mais_Initialise();
             eo_mais_Start(eo_mais_GetHandle());          
         }     
     }
+    else
+    {
+//        const eOcandiscovery_detection_t* det = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
+//        memcpy(&s_applBody.failedDetection, det, sizeof(eOcandiscovery_detection_t));        
+    }
     
+    return(eores_OK);
 }
 
 

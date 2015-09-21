@@ -252,8 +252,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb1 =
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
-    .canmap             = {0x001e, 0x0000},
-    .onStop             = NULL
+    .canmap             = {0x001e, 0x0000}
 };
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb2 =
@@ -262,8 +261,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb2 =
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 2},
-    .canmap             = {0x01f8, 0x0000},
-    .onStop             = NULL
+    .canmap             = {0x01f8, 0x0000}
 };
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb5 =
@@ -272,8 +270,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb5 =
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
-    .canmap             = {0x001a, 0x0000},
-    .onStop             = NULL
+    .canmap             = {0x001a, 0x0000}
 };
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb6 =
@@ -282,8 +279,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb6 =
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
-    .canmap             = {0x001e, 0x0000},
-    .onStop             = NULL
+    .canmap             = {0x001e, 0x0000}
 };
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb7 =
@@ -292,8 +288,7 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb7 =
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 3},
-    .canmap             = {0x0006, 0x0000},
-    .onStop             = NULL
+    .canmap             = {0x0006, 0x0000}
 };
 
 
@@ -303,9 +298,39 @@ static const eOcandiscovery_target_t s_candiscoverytarget_mais_eb2 =
     .filler             = {0},
     .firmwareversion    = {0, 0},
     .protocolversion    = {1, 0},
-    .canmap             = {0x4000, 0x0000},
-    .onStop             = NULL
+    .canmap             = {0x4000, 0x0000}
 };
+
+
+static const eOcandiscovery_target_t s_candiscoverytarget_strain_eb1 =
+{   
+    .boardtype          = eobrd_cantype_strain,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 0},
+    .canmap             = {0x0000, 0x2000}
+};
+
+
+static const eOcandiscovery_target_t s_candiscoverytarget_strain_eb6 =
+{   
+    .boardtype          = eobrd_cantype_strain,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 0},
+    .canmap             = {0x0000, 0x2000}
+};
+
+
+static const eOcandiscovery_target_t s_candiscoverytarget_strain_eb7 =
+{   
+    .boardtype          = eobrd_cantype_strain,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 0},
+    .canmap             = {0x0000, 0x0002}
+};
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -417,6 +442,63 @@ extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(ui
        
 }
 
+
+extern const eOcandiscovery_target_t * eoboardconfig_code2straindiscoverytarget(uint32_t code) 
+{
+    const eOcandiscovery_target_t *ret = NULL;
+    
+    switch(code)
+    {
+        case 0:    
+        case 2:
+        {            
+            ret = &s_candiscoverytarget_strain_eb1; 
+        } break;
+        
+        case 1:     
+        case 3:
+        {
+            ret = NULL; 
+        } break;  
+
+        case 4:     
+        {
+            ret = NULL; 
+        } break;      
+
+        case 5: 
+        case 7:             
+        {
+            ret = &s_candiscoverytarget_strain_eb6; 
+        } break;         
+    
+        case 6: 
+        case 8:             
+        {
+#if     defined(ICUB_MEC_V1)
+            ret = NULL;
+#else
+            
+            ret = &s_candiscoverytarget_strain_eb7; 
+#endif            
+        } break; 
+        
+        case 9: 
+        case 10:             
+        {
+            ret = NULL; 
+        } break;         
+
+        default:    
+        {
+            ret = ret;
+        } break;    
+    }
+    
+    
+    return(ret);
+       
+}
 
 
 extern EOconstvector* eo_vectorof_boardprops_eb1;   // eb1/2

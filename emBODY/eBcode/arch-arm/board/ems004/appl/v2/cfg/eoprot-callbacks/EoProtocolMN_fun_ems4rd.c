@@ -365,6 +365,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
             
             if(eobool_false == eo_emsapplBody_isreadyforcontrolloop(eo_emsapplBody_GetHandle()))
             {
+                eo_emsapplBody_SendDiscoveryFailureReport(eo_emsapplBody_GetHandle());
                 return;
             }
             
