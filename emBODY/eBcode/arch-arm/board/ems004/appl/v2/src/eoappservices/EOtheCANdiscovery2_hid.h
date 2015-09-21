@@ -57,6 +57,7 @@ struct EOtheCANdiscovery2_hid
     uint8_t                         discoverymaxretries;
     eOcandiscovery_searchstatus_t   searchstatus;
     eOcandiscovery_target_t         target;
+    eOcandiscovery_onstop_t         onstop;
     eOcandiscovery_detection_t      detection;
 }; 
 

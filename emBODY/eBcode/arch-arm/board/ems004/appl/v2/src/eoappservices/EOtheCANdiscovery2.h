@@ -53,7 +53,14 @@ typedef struct
     eOreltime_t             timeout;    /**< timeout of a search procedure stared by eo_candiscovery2_Start(), expressed in microsec */
 } eOcandiscovery_cfg_t;  
 
-typedef void (*eOcandiscovery_onstop_t) (EOtheCANdiscovery2* p, eObool_t searchisok);
+
+typedef eOresult_t (*eOcandiscovery_onstop_fun_t) (void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
+
+typedef struct
+{
+    eOcandiscovery_onstop_fun_t function;
+    void*                       parameter;    
+} eOcandiscovery_onstop_t;
 
 typedef struct
 {
@@ -62,8 +69,7 @@ typedef struct
     eObrd_version_t             firmwareversion;
     eObrd_version_t             protocolversion;    
     uint16_t                    canmap[eOcanports_number];  // use bitmap of required can addresses.
-    eOcandiscovery_onstop_t     onStop;                     // called by the _Stop() method with the pointer of the object and the search result
-} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 16);
+} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 12);
 
 typedef struct
 {
@@ -96,7 +102,7 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void);
 
 
 // call it to start the discovery procedure on a given set of can boards which share tyep, fw version, prot version
-extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *eo_candiscovery2_Initialise);
+extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target, eOcandiscovery_onstop_t* onstop);
 
 //  call it in the can parser when a board replies to the get-fw-version request
 extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
@@ -108,6 +114,8 @@ extern eOresult_t eo_candiscovery2_Tick(EOtheCANdiscovery2 *p);
 // call it only if you want to force a stop of the discovery .... Tick() and OneBoardisFound() already call it on timeout or on all board found.
 extern eOresult_t eo_candiscovery2_Stop(EOtheCANdiscovery2 *p);
 
+
+extern eOresult_t eo_candiscovery2_SendLatestSearchResults(EOtheCANdiscovery2 *p);
 
 extern eObool_t eo_candiscovery2_IsSearchOK(EOtheCANdiscovery2 *p);
 

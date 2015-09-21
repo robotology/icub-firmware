@@ -129,6 +129,7 @@ static EOtheCANdiscovery2 s_eo_thecandiscovery2 =
     
     .searchstatus                       = {0},
     .target                             = {0},
+    .onstop                             = {0},
     .detection                          =
     {
         .allhavereplied                 = eobool_false,        
@@ -203,7 +204,7 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void)
 }
 
 
-extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target)
+extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target, eOcandiscovery_onstop_t* onstop)
 {
     if((NULL == p) || (NULL == target))
     {
@@ -228,6 +229,9 @@ extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandisco
         
     // copy the new target of boards
     memcpy(&s_eo_thecandiscovery2.target, target, sizeof(eOcandiscovery_target_t));    
+    
+    // copy onstop
+    memcpy(&s_eo_thecandiscovery2.onstop, onstop, sizeof(eOcandiscovery_onstop_t));
     
     // now start the procedure
     s_eo_thecandiscovery2.searchstatus.searching = eobool_true;
@@ -431,17 +435,28 @@ snprintf(s_trace_string, sizeof(s_trace_string), "EOtheCANdiscovery2: stop() aft
     }
     
     // put it in heres, so that we can call a _Start() inside the callback ....
-    if(NULL != s_eo_thecandiscovery2.target.onStop)
+    if(NULL != s_eo_thecandiscovery2.onstop.function)
     {  
         eObool_t allisok = s_eo_thecandiscovery2.detection.allhavereplied && allboardsareok;
-        s_eo_thecandiscovery2.target.onStop(&s_eo_thecandiscovery2, allisok);
+        s_eo_thecandiscovery2.onstop.function(s_eo_thecandiscovery2.onstop.parameter, &s_eo_thecandiscovery2, allisok);
     }
         
     return(eores_OK); 
 }
 
 
-
+extern eOresult_t eo_candiscovery2_SendLatestSearchResults(EOtheCANdiscovery2 *p)
+{   
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eObool_t allboardsareok = (eobool_false == s_eo_thecandiscovery2.detection.atleastonereplyisincompatible) ? (eobool_true) : (eobool_false);
+    s_eo_candiscovery2_sendDiagnosticsToHost(s_eo_thecandiscovery2.detection.allhavereplied, allboardsareok);
+    
+    return(eores_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -614,7 +629,9 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
 static void s_eo_candiscovery2_resetTarget(void)
 {
     // reset results of previous detections
-    memset(&s_eo_thecandiscovery2.target, 0, sizeof(s_eo_thecandiscovery2.target));     
+    memset(&s_eo_thecandiscovery2.target, 0, sizeof(s_eo_thecandiscovery2.target));    
+
+    memset(&s_eo_thecandiscovery2.onstop, 0, sizeof(eOcandiscovery_onstop_t));
 }
 
 static void s_eo_candiscovery2_resetDetection(void)
