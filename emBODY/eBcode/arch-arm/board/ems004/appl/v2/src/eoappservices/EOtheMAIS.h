@@ -38,6 +38,7 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
+#include "EOtheCANdiscovery2.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -71,6 +72,7 @@ extern eOresult_t eo_mais_ConfigDataRate(EOtheMAIS *p, uint8_t datarate);
 extern eOresult_t eo_mais_ConfigResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
 
 
+extern eOresult_t eo_mais_OnDiscoveryStop(EOtheMAIS *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok);
 
 
 /** @}            

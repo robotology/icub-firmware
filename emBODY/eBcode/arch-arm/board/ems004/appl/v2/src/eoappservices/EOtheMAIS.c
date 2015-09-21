@@ -299,6 +299,28 @@ extern eOresult_t eo_mais_ConfigResolution(EOtheMAIS *p, eOas_maisresolution_t r
     return(eores_OK);          
 }
 
+
+extern eOresult_t eo_mais_OnDiscoveryStop(EOtheMAIS *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok)
+{   
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    // wip part. we should: 
+    // 1. send up a ok result about the strain ...
+    // 2. call eo_mais_Initialise()
+    // 3. return OK
+    
+    
+    if(NULL == p)
+    {
+        eo_mais_Initialise();
+    }
+
+    return(eores_OK); 
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
