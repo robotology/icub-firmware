@@ -34,8 +34,10 @@
 #include "stdlib.h"
 #include "string.h"
 #include "hal_encoder.h"
+#if     defined(USE_MC4PLUS)
 #include "hal_quad_enc.h"
 #include "hal_adc.h"
+#endif
 
 #include "EOtheMemoryPool.h"
 
@@ -345,6 +347,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_ADH:
             {
+                #if defined(USE_MC4PLUS)
                 //get the voltage from the motor port (0 - 3300mV)
                 val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_joint.primary_enc_position);
                 
@@ -353,7 +356,10 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 
                 if(val_raw != 0)
                     res1 = eores_OK;
-                
+                #elif defined (USE_EMS4RD)
+                *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                res1 = eores_NOK_generic;
+                #endif
                 break;
             }
                 
@@ -458,6 +464,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
             }
             case eo_appEncReader_enc_type_ADH:
             {
+                #if     defined(USE_MC4PLUS)
                  //get the voltage from the motor port (0 - 3300mV)
                 val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_joint.extra_enc_position);
                 
@@ -466,7 +473,10 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 
                 if(val_raw != 0)
                     res2 = eores_OK;
-                
+                #elif defined (USE_EMS4RD)
+                *extra_value = ENCODER_VALUE_NOT_SUPPORTED;
+                res2 = eores_NOK_generic;
+                #endif
                 break;
             }
             default:
