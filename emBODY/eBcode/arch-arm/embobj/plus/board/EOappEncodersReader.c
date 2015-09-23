@@ -33,8 +33,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "stdlib.h"
 #include "string.h"
-#include "hal.h"
+#include "hal_encoder.h"
 #include "hal_quad_enc.h"
+#include "hal_adc.h"
 
 #include "EOtheMemoryPool.h"
 
@@ -342,6 +343,20 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 res1 = eores_OK;
                 break;
             }
+            case eo_appEncReader_enc_type_ADH:
+            {
+                //get the voltage from the motor port (0 - 3300mV)
+                val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_joint.primary_enc_position);
+                
+                //convert to iCubDegrees
+                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);
+                
+                if(val_raw != 0)
+                    res1 = eores_OK;
+                
+                break;
+            }
+                
             default:
             {
                 *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
@@ -439,6 +454,19 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
                 #endif
                 res2 = eores_OK;
+                break;
+            }
+            case eo_appEncReader_enc_type_ADH:
+            {
+                 //get the voltage from the motor port (0 - 3300mV)
+                val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_joint.extra_enc_position);
+                
+                //convert to iCubDegrees
+                *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);
+                
+                if(val_raw != 0)
+                    res2 = eores_OK;
+                
                 break;
             }
             default:
