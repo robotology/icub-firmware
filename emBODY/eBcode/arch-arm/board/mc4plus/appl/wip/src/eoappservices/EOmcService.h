@@ -103,6 +103,8 @@ extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uin
 
 extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor);
 
+extern int16_t eo_mcserv_GetMotorCurrent(EOmcService *p, uint8_t joint);
+
 // call it inside the DO step of run mode
 // it performs differently according to its eOmcserv_type_t type.
 // basically: it reads encoders, compute target pwm, send pwm to actuators (pwm peripherals or put inside can tx buffer 2foc boards), update jomo status

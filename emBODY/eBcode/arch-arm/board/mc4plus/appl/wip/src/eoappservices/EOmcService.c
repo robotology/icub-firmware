@@ -24,9 +24,9 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "hal_dc_motorctl.h"
 #include "hal_sys.h"
-
+#include "hal_dc_motorctl.h"
+#include "hal_adc.h"
 
 #include "eOcommon.h"
 #include "EOtheErrorManager.h"
@@ -79,6 +79,10 @@
 static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p);
 
 static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p);
+
+static void s_eo_mcserv_init_motors_adc_feedbacks(void);
+
+static int16_t s_eo_mcserv_get_current_adc(uint8_t motor);
 
 static void s_eo_mcserv_enable_all_motors(EOmcService *p);
 
@@ -457,6 +461,29 @@ extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor)
     return state_mask;
 }
 
+extern int16_t eo_mcserv_GetMotorCurrent(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+   
+    int16_t curr_val = 0;
+    
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        curr_val = s_eo_mcserv_get_current_adc (p->config.jomos[joint].actuator.local.index);
+    }
+    
+    // if remote (EMS4rd-2foc or mc4) --> should return what's inside the array ems->motor_current [motor]
+    // the structure is filled with the CAN callbacks
+    else if (0 == p->config.jomos[joint].actuator.local.type)
+    {
+    }
+    return curr_val;
+}
+
 extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
 {
     eOresult_t res = eores_NOK_generic;
@@ -691,22 +718,26 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
     // reserve some memory for pwm values
     p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
    
-    //currently the motors are initialized all together and without config
-    hal_motor_and_adc_init(motor1, NULL);
+    //low level init for motors and adc
+    s_eo_mcserv_init_motors_adc_feedbacks();
     
-    /*
-    probably it's better to embed this init in the encoder reader, so that we can read the value as a normal joint
-    //init the ADC to read position data from the HALL SENSOR
-    if ((board_control == emscontroller_board_HAND_2) || (board_control == emscontroller_board_FOREARM))
-    {
-        
-        //hal_adc_dma_init_ADC1_ADC3_hall_sensor();
-    }
-    */
     return(res);
 }
 
+static void s_eo_mcserv_init_motors_adc_feedbacks(void)
+{
+    //currently the motors are initialized all together and without config
+    hal_motors_extfault_handling_init();
+        
+    // init the ADC to read the (4) current values of the motor and (4) analog inputs (hall_sensors, if any) using ADC1/ADC3
+    // always initialized at the moment, but if interested in reading the hall_sensor we could add a proper interface inside the encoder reader
+    hal_adc_dma_init_ADC1_ADC3_hall_sensor_current();
+}
 
+static int16_t s_eo_mcserv_get_current_adc(uint8_t motor)
+{
+    return hal_adc_get_current_motor_mA(motor);
+}
 
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
 {
@@ -847,15 +878,15 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             if (LOCAL_ENCODER(p->config.jomos[jm].encoder.etype))
             {
                 res = eo_appEncReader_GetJointValue (app_enc_reader,
-                                                    (eo_appEncReader_joint_position_t)p->config.jomos[jm].encoder.enc_joint,
-                                                    &p->valuesencoder[jm],
-                                                    &dummy_extra,
-                                                    &fl);
+                                                     (eo_appEncReader_joint_position_t)p->config.jomos[jm].encoder.enc_joint,
+                                                     &p->valuesencoder[jm],
+                                                     &dummy_extra,
+                                                     &fl);
             }
             else if (p->config.jomos[jm].encoder.etype == 4) //MAIS
             {
             /* it should be a MAIS encoder! So here:
-                - call a function to convert the last MAIS values into iCubDegrees
+                - call a function to convert the last MAIS values (saved into the 15values array) to iCubDegrees
                 - copy inside p->valuesencoder[jm] the right position value
             */
                 
