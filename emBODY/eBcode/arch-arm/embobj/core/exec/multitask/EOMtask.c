@@ -330,10 +330,14 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
 
     s_eom_task_count ++;
 
-    //osal_task_id_get(retptr->osaltask, &id);
-    //snprintf(str, sizeof(str), "#%d: %s, id %d, pr %d, %s", s_eom_task_count, name, id, priority, typestr);
-    //eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
-   
+    /*
+    char str[128] = {0};
+    osal_task_id_t id = 0;
+    osal_task_id_get(retptr->osaltask, &id);
+    snprintf(str, sizeof(str), "#%d: %s, id %d, pr %d", s_eom_task_count, name, id, priority);
+    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
+    */
+    
     // ok. everything is done. when the rtos will start, then the run function of the task will be executed
     
     return(retptr);
