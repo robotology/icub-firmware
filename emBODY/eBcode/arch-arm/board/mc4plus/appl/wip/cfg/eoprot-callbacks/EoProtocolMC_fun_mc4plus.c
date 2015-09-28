@@ -221,8 +221,11 @@ const eOmc_motor_t motor_default_value =
         .hasRotorEncoder =           eobool_false,
         .hasRotorEncoderIndex =      eobool_false,
         .rotorEncoderType =          0,
-        .filler03 =                  0,
-        .filler04 =                  0
+        .limitsofrotor =
+        {
+            .max = 0,
+            .min = 0
+        }
     },
     .status =                       {0}
 }; 
