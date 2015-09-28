@@ -34,6 +34,7 @@
 #include "EOtheCANmapping.h"
 #include "EOappEncodersReader.h"
 
+#include "EOmcController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -812,6 +813,234 @@ extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint
     return(ret);   
 }
     
+
+
+const eOmn_serv_configuration_t serv_config_as_strain[] =
+{
+    
+    {   // eb1
+        .type       = eomn_serv_AS_strain,
+        .filler     = {0},
+        .data.as.strain = 
+        {
+            .versionofstrain    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 0}
+            },
+            .canloc         =
+            {
+                .port           = eOcanport2,
+                .addr           = 13,
+                .insideindex    = eomn_serv_caninsideindex_none                   
+            }
+        }    
+    },
+    
+    {   // eb2
+        .type       = eomn_serv_NONE,
+        .filler     = {0},
+        .data       = {0}        
+    },
+    
+    {   // eb3
+        .type       = eomn_serv_AS_strain,
+        .filler     = {0},
+        .data.as.strain = 
+        {
+            .versionofstrain    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 0}
+            },
+            .canloc         =
+            {
+                .port           = eOcanport2,
+                .addr           = 13,
+                .insideindex    = eomn_serv_caninsideindex_none             
+            }
+        }    
+    },
+    
+    {   // eb4
+        .type       = eomn_serv_NONE,
+        .filler     = {0},
+        .data       = {0}           
+    }
+ 
+};
+
+
+const eOmn_serv_configuration_t serv_config_mc[] =
+{
+    
+    {   // eb1
+        .type       = eomn_serv_MC_foc,
+        .filler     = {0},
+        .data.mc.foc_based = 
+        {
+            .boardtype4mccontroller = emscontroller_board_SHOULDER,
+            .filler                 = {0},
+            .versionoffoc    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 3}
+            },
+            .arrayofjomodescriptors =
+            {
+                .head   = 
+                {
+                    .capacity       = 4,
+                    .itemsize       = 3,
+                    .size           = 4,
+                    .internalmem    = 0                    
+                },
+                .data   =
+                {
+                    { // joint 0
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 1,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = 0 // hal_encoder1                          
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = 0      
+                        }
+                    },
+                    { // joint 1
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 2,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = 3 // hal_encoder4                          
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = 0      
+                        }
+                    },                    
+                    { // joint 2
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 3,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = 1 // hal_encoder2                          
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = 0      
+                        }
+                    },               
+                    { // joint 3
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 4,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = 4 // hal_encoder5                          
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = 0      
+                        }
+                    }                    
+                }
+                
+                
+            }
+        }
+    },
+    
+    {   // eb2
+        .type       = eomn_serv_NONE,
+        .filler     = {0},
+        .data       = {0}        
+    },
+    
+    {   // eb3
+        .type       = eomn_serv_NONE,
+        .filler     = {0},
+        .data       = {0}         },
+    
+    {   // eb4
+        .type       = eomn_serv_NONE,
+        .filler     = {0},
+        .data       = {0}           
+    }
+ 
+};
+
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code)
+{
+    const eOmn_serv_configuration_t * ret = NULL;
+    
+    switch(code)
+    {
+        case 0:
+        {   // board eb1   
+            ret = &serv_config_mc[0]; 
+        } break;  
+
+      
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);        
+}
+
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configuration(uint32_t code)
+{
+    const eOmn_serv_configuration_t * ret = NULL;
+    
+    switch(code)
+    {
+        case 0:
+        {   // board eb1   
+            ret = &serv_config_as_strain[0]; 
+        } break;  
+
+      
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);        
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

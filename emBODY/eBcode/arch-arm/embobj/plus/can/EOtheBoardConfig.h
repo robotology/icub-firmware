@@ -89,6 +89,10 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
 
 extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code);
 
+extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configuration(uint32_t code);
+
 
 /** @}            
     end of group eo_EOtheBoardConfig  
