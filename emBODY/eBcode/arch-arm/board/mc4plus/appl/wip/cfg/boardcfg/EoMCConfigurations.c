@@ -188,6 +188,16 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
         EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 3, EO_INIT(.jomos[3].encoder.etype)  2, EO_INIT(.jomos[3].encoder.index)  3  // j3-> lip-bottom, motor3, incremental-encoder
     },
     
+    /* v3 icub left-forearm boards */
+    //board 16 - 1b4
+    //right order of the joint (for high-level) must be checked
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_1b4, 
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.etype)  4, EO_INIT(.jomos[0].encoder.index)  0, // j0-> index-distal,       motor0, mais, 0 stands for 1st mais entity
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.etype)  4, EO_INIT(.jomos[1].encoder.index)  0, // j1-> middle-proximal,    motor1, mais
+        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 2, EO_INIT(.jomos[2].encoder.etype)  4, EO_INIT(.jomos[2].encoder.index)  0, // j2-> middle-distal,      motor2, mais
+        EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 3, EO_INIT(.jomos[3].encoder.etype)  4, EO_INIT(.jomos[3].encoder.index)  0  // j3-> little-fingers,     motor3, mais
+    },
+    
 }; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t)); 
 
 const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
@@ -199,7 +209,8 @@ const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b0,                       EO_INIT(.string) "MC4plus_b0"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b1,                       EO_INIT(.string) "MC4plus_b1"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b7,                       EO_INIT(.string) "MC4plus_b7"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b9,                       EO_INIT(.string) "MC4plus_b9"}
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b9,                       EO_INIT(.string) "MC4plus_b9"},
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_1b4,                      EO_INIT(.string) "MC4plus_1b4"}
 };
 
 
@@ -241,7 +252,7 @@ const eomcconfig_boardcode_t eomcconfig_boardcode_MC4PLUS[] =
     {EO_INIT(.board_num) 14,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b9}, //board 15, 0b9
     
     /* v3 icub left-forearm boards */
-    {EO_INIT(.board_num) 15,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 16, 1b4
+    {EO_INIT(.board_num) 15,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_1b4},         //board 16, 1b4
     {EO_INIT(.board_num) 16,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 17, 1b3
     {EO_INIT(.board_num) 17,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 18, 1b2
     

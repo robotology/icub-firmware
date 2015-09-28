@@ -139,11 +139,12 @@ typedef enum
     eOmcconfig_value_MC4PLUS_b0	            = 4,
     eOmcconfig_value_MC4PLUS_b1	            = 5, 
     eOmcconfig_value_MC4PLUS_b7	            = 6,
-    eOmcconfig_value_MC4PLUS_b9	            = 7
+    eOmcconfig_value_MC4PLUS_b9	            = 7,
+    eOmcconfig_value_MC4PLUS_1b4            = 8
 	
 } eOmcconfig_value_MC4PLUS_t;
 
-enum { eOmcconfig_value_MC4PLUS_numberof = 8 };
+enum { eOmcconfig_value_MC4PLUS_numberof = 9 };
 /*
 typedef enum
 {
