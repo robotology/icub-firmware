@@ -28,6 +28,7 @@
 #include "EOtheErrorManager.h"
 #include "EOMtheEMSconfigurator.h"
 
+#include "osal.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -78,11 +79,12 @@ static EOtheServices s_eo_theserv =
 
 static eOcanserv_cfg_t eo_canserv_DefaultCfgMc4plus = 
 {    
-    .mode               = eocanserv_mode_straight,
-    .rxqueuesize        = {64, 0},
-    .txqueuesize        = {64, 0},
-    .onrxcallback       = {NULL, NULL},
-    .onrxargument       = {NULL, NULL}
+    .mode                   = eocanserv_mode_straight,
+    .canstabilizationtime   = 7*OSAL_reltime1sec,
+    .rxqueuesize            = {64, 0},
+    .txqueuesize            = {64, 0},
+    .onrxcallback           = {NULL, NULL},
+    .onrxargument           = {NULL, NULL}
 };
 
 //static const char s_eobj_ownname[] = "EOtheServices";
