@@ -2086,7 +2086,7 @@ static void test_periph_adc2_curr_custom (void)
 {
     char str[96];
     hal_adc_dma_init_ADC2_tvaux_tvin_temperature();
-    hal_motor_and_adc_init(motor1, NULL);
+    hal_motors_extfault_handling_init();
     for(;;)
     {  
      for (uint8_t i = 0; i<3; i++)
@@ -2117,7 +2117,7 @@ static void test_periph_adc_motors (void)
     hal_adc_dma_init_ADC2_tvaux_tvin_temperature();//ADC2 configured to convert regurarly TvAux - TVIn - Temperature
     
     //init motors and enable them
-    hal_motor_and_adc_init(motor1, NULL);
+    hal_motors_extfault_handling_init();
     hal_motor_enable(motor1);
     hal_motor_enable(motor2);
     hal_motor_enable(motor3);
