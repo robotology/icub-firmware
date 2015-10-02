@@ -49,31 +49,64 @@
 typedef struct EOtheSTRAIN_hid EOtheSTRAIN;
 
 
+
+typedef eOresult_t (*eOstrain_onendofoperation_fun_t) (EOtheSTRAIN* p, eObool_t operationisok);
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+
 extern EOtheSTRAIN* eo_strain_Initialise(void);
 
 extern EOtheSTRAIN* eo_strain_GetHandle(void);
 
-// it sets the strain tx mode according to the mode is kept in ram
+extern eOprotID32_t eo_strain_GetID32(EOtheSTRAIN *p, eOprotTag_t tag);
+
+
+// it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
+// (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_strain_Activate().
+extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOstrain_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+
+// it activates the strain service by loading the service configuration
+extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg);
+
+// it deactivates service.
+extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p);
+
+
+// i can call the following only if ... service is activated.
+
+extern eOresult_t eo_strain_TXstart(EOtheSTRAIN *p, uint8_t datarate, eOas_strainmode_t mode);
+
+extern eOresult_t eo_strain_TXstop(EOtheSTRAIN *p);
+
+
+// DOES eo_strain_GetFullScale() works if the strain is in not in tx mode? I try it.
+// IT DOES send back values but teh fullscales are all zero.
+// the object ask to teh strain board the fullscales. after all values are received it executes the callback.
+// put in thei callback any transmission back to robotInterface
+extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t onfullscaleready);
+
+
+// the following are more tricky funtions .... shall we keep tehm?
+
+// it sets the strain tx mode according to the mode is kept in the ram of the entity.
+// this function is used only in RUN:on-entry. 
+// i suggest to remove this thing.
 extern eOresult_t eo_strain_SendTXmode(EOtheSTRAIN *p);
 
-// it disables the tx mode ..
-extern eOresult_t eo_strain_DisableTX(EOtheSTRAIN *p);
 
-extern eOresult_t eo_strain_Config(EOtheSTRAIN *p, eOas_strain_config_t *cfg);
+// following funtions apply the settings in argument by sending proper messages to the strain board
+extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg, eOstrain_onendofoperation_fun_t onfullscaleready);
 
-extern eOresult_t eo_strain_ConfigMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
+extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
 
-extern eOresult_t eo_strain_ConfigDataRate(EOtheSTRAIN *p, uint8_t datarate);
+extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate);
 
-extern eOresult_t eo_strain_FullScale_StartRequest(EOtheSTRAIN *p);
 
-extern eOresult_t eo_strain_OnDiscoveryStop(EOtheSTRAIN *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok);
+//extern eOresult_t eo_strain_OnDiscoveryStop(EOtheSTRAIN *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok);
 
 
 /** @}            

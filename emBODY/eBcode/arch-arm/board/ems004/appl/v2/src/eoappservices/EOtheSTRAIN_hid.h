@@ -41,11 +41,21 @@
 
 struct EOtheSTRAIN_hid
 {
-    eObool_t            initted;
-    eObool_t            thereisstrain;
-    uint8_t             protindex;
-    eOprotID32_t        id32;
-    eOcanprot_command_t command;
+    eObool_t                    initted;
+    eObool_t                    active;
+    eObool_t                    thereisstrain;
+    uint8_t                     protindex;
+    eOprotID32_t                id32;
+    eOcanprot_command_t         command;
+    EOvector*                   canboardproperties;
+    EOvector*                   canentitydescriptor;
+    eOmn_serv_configuration_t   servconfig;
+    eOcandiscovery_target_t     candiscoverytarget;
+    eOstrain_onendofoperation_fun_t     onverify;
+    eObool_t                    activateafterverify;
+    eObool_t                    itistransmitting;
+    eOas_strain_t*              strain;
+    eOstrain_onendofoperation_fun_t onfullscaleready;
 }; 
 
 
