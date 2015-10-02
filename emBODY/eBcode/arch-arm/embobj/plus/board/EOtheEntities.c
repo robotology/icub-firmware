@@ -103,7 +103,7 @@ extern EOtheEntities* eo_entities_Initialise(void)
         return(&s_eo_theentities);
     }
     
-    eo_entities_Refresh(&s_eo_theentities);
+    eo_entities_Reset(&s_eo_theentities);
     
     s_eo_theentities.initted = eobool_true;   
     
@@ -116,7 +116,7 @@ extern EOtheEntities* eo_entities_GetHandle(void)
     return(eo_entities_Initialise());
 }
 
-extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
+extern eOresult_t eo_entities_Reset(EOtheEntities *p)
 {
     uint8_t i=0;
     uint8_t max = 0;
@@ -131,7 +131,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     // joints
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(max>eoprotwrap_max_joints) max = eoprotwrap_max_joints;
-    s_eo_theentities.numofjoints = max;
+    s_eo_theentities.numofjoints = 0;
     for(i=0; i<max; i++)
     {
         s_eo_theentities.joints[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)i);
@@ -139,7 +139,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // motors
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
-    s_eo_theentities.numofmotors = max;
+    s_eo_theentities.numofmotors = 0;
     if(max>eoprotwrap_max_motors) max = eoprotwrap_max_motors;
     for(i=0; i<max; i++)
     {
@@ -148,7 +148,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // skins
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-    s_eo_theentities.numofskins = max;
+    s_eo_theentities.numofskins = 0;
     if(max>eoprotwrap_max_skins) max = eoprotwrap_max_skins;
     for(i=0; i<max; i++)
     {
@@ -157,7 +157,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // strains
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain);
-    s_eo_theentities.numofstrains = max;
+    s_eo_theentities.numofstrains = 0;
     if(max>eoprotwrap_max_strains) max = eoprotwrap_max_strains;
     for(i=0; i<max; i++)
     {
@@ -166,7 +166,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     
     // maises
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais);
-    s_eo_theentities.numofmaises = max;
+    s_eo_theentities.numofmaises = 0;
     if(max>eoprotwrap_max_maises) max = eoprotwrap_max_maises;
     for(i=0; i<max; i++)
     {
@@ -176,7 +176,7 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
 
     // inertials
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
-    s_eo_theentities.numofinertials = max;
+    s_eo_theentities.numofinertials = 0;
     if(max>eoprotwrap_max_inertials) max = eoprotwrap_max_inertials;
     for(i=0; i<max; i++)
     {
@@ -186,6 +186,19 @@ extern eOresult_t eo_entities_Refresh(EOtheEntities *p)
     return(eores_OK);
 }
 
+extern eOresult_t eo_entities_SetNumOfJoints(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_joints)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofjoints = num;
+    
+    return(eores_OK);   
+}
+
+
 extern uint8_t eo_entities_NumOfJoints(EOtheEntities *p)
 {
     return(s_eo_theentities.numofjoints);    
@@ -193,7 +206,7 @@ extern uint8_t eo_entities_NumOfJoints(EOtheEntities *p)
     
 extern eOmc_joint_t * eo_entities_GetJoint(EOtheEntities *p, eOprotIndex_t id)
 {
-    if(id >= eoprotwrap_max_joints)
+    if(id >= s_eo_theentities.numofjoints)
     {
         return(NULL);
     }
@@ -228,6 +241,17 @@ extern eOmc_joint_status_t * eo_entities_GetJointStatus(EOtheEntities *p, eOprot
     return(ret);    
 }
 
+extern eOresult_t eo_entities_SetNumOfMotors(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_motors)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofmotors = num;
+    
+    return(eores_OK);   
+}
 
 extern uint8_t eo_entities_NumOfMotors(EOtheEntities *p)
 {
@@ -236,7 +260,7 @@ extern uint8_t eo_entities_NumOfMotors(EOtheEntities *p)
 
 extern eOmc_motor_t * eo_entities_GetMotor(EOtheEntities *p, eOprotIndex_t id)
 {
-    if(id >= eoprotwrap_max_motors)
+    if(id >= s_eo_theentities.numofmotors)
     {
         return(NULL);
     }
@@ -258,6 +282,19 @@ extern eOmc_motor_status_t * eo_entities_GetMotorStatus(EOtheEntities *p, eOprot
 }
 
 
+extern eOresult_t eo_entities_SetNumOfMaises(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_maises)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofmaises = num;
+    
+    return(eores_OK);   
+}
+
+
 extern uint8_t eo_entities_NumOfMaises(EOtheEntities *p)
 {
     return(s_eo_theentities.numofmaises);    
@@ -265,7 +302,7 @@ extern uint8_t eo_entities_NumOfMaises(EOtheEntities *p)
 
 extern eOas_mais_t * eo_entities_GetMais(EOtheEntities *p, eOprotIndex_t id)
 {
-    if(id >= eoprotwrap_max_maises)
+    if(id >= s_eo_theentities.numofmaises)
     {
         return(NULL);
     }
@@ -301,6 +338,18 @@ extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIn
 }
 
 
+extern eOresult_t eo_entities_SetNumOfInertials(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_inertials)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofinertials = num;
+    
+    return(eores_OK);   
+}
+
 extern uint8_t eo_entities_NumOfInertials(EOtheEntities *p)
 {
     return(s_eo_theentities.numofinertials);    
@@ -308,7 +357,7 @@ extern uint8_t eo_entities_NumOfInertials(EOtheEntities *p)
 
 extern eOas_inertial_t * eo_entities_GetInertial(EOtheEntities *p, eOprotIndex_t id)
 {
-    if(id >= eoprotwrap_max_inertials)
+    if(id >= s_eo_theentities.numofinertials)
     {
         return(NULL);
     }
@@ -344,6 +393,18 @@ extern eOas_inertial_status_t * eo_entities_GetInertialStatus(EOtheEntities *p, 
 }
 
 
+extern eOresult_t eo_entities_SetNumOfStrains(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_strains)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofstrains = num;
+    
+    return(eores_OK);   
+}
+
 extern uint8_t eo_entities_NumOfStrains(EOtheEntities *p)
 {
     return(s_eo_theentities.numofstrains);    
@@ -351,7 +412,7 @@ extern uint8_t eo_entities_NumOfStrains(EOtheEntities *p)
 
 extern eOas_strain_t * eo_entities_GetStrain(EOtheEntities *p, eOprotIndex_t id)
 {
-    if(id >= eoprotwrap_max_strains)
+    if(id >= s_eo_theentities.numofstrains)
     {
         return(NULL);
     }
@@ -387,6 +448,18 @@ extern eOas_strain_status_t * eo_entities_GetStrainStatus(EOtheEntities *p, eOpr
 }
 
 
+extern eOresult_t eo_entities_SetNumOfSkins(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_skins)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofskins = num;
+    
+    return(eores_OK);   
+}
+
 extern uint8_t eo_entities_NumOfSkins(EOtheEntities *p)
 {
     return(s_eo_theentities.numofskins);    
@@ -394,7 +467,7 @@ extern uint8_t eo_entities_NumOfSkins(EOtheEntities *p)
 
 extern eOsk_skin_t * eo_entities_GetSkin(EOtheEntities *p, eOprotIndex_t id)
 {
-    if(id >= eoprotwrap_max_skins)
+    if(id >= s_eo_theentities.numofskins)
     {
         return(NULL);
     }
