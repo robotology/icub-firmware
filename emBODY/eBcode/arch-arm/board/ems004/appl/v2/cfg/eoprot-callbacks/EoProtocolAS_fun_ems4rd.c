@@ -45,6 +45,8 @@
 
 #include "EoProtocol.h"
 
+#include "EoProtocolAS.h"
+
 
 #include "EOtheEntities.h"
 
@@ -54,6 +56,10 @@
 #include "EOtheMAIS.h"
 #include "EOtheSTRAIN.h"
 #include "EOtheInertial.h"
+
+#include "EOMtheEMSconfigurator.h"
+
+#include "EOMtheEMStransceiver.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -84,6 +90,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_on_fullscaleofstrain_received(EOtheSTRAIN* p, eObool_t operationisok);
+    
 //static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status);
 //static void s_signalGetFullScales(uint32_t id32, eObool_t signaloncefullscale);
 
@@ -291,75 +299,25 @@ extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOro
 //}
 
 
+
+
 extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_strain_config_t *cfg = (eOas_strain_config_t*)rd->data;
-    eo_strain_Config(eo_strain_GetHandle(), cfg);
-    
-//    uint8_t number = eoprot_ID2index(rd->id32);
-//    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
-//    eOas_strain_config_t *straincfg = (eOas_strain_config_t*)rd->data;
-//    eOcanprot_command_t command = {0};
-//    command.class = eocanprot_msgclass_pollingAnalogSensor;
-//    
-
-//    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-//    if(eo_sm_emsappl_STrun == currentstate)
-//    {
-//        command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-//        command.value = &(straincfg->mode);
-//        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-//    }
-//     
-//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-//    command.value = &(straincfg->datarate);
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-//    
-//    s_signalGetFullScales(rd->id32, straincfg->signaloncefullscale);          
+    eo_strain_Set(eo_strain_GetHandle(), cfg, s_on_fullscaleofstrain_received);       
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_strainmode_t *mode = (eOas_strainmode_t*)rd->data;
-    eo_strain_ConfigMode(eo_strain_GetHandle(), *mode);
-    
-//    uint8_t number = eoprot_ID2index(rd->id32);
-//    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
-//    eOas_strainmode_t *strainmode = (eOas_strainmode_t*)rd->data;
-//    eOcanprot_command_t command = {0};
-//    command.class = eocanprot_msgclass_pollingAnalogSensor;
-//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-//    command.value = strainmode;
-
-//    
-//    if(eoas_strainmode_acquirebutdonttx == *strainmode) 
-//    {
-//        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-//    }
-//    else //if pc104 configures strain mode to send data
-//    {
-//        //only if the appl is in RUN state enable mais tx
-//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-//        if(eo_sm_emsappl_STrun == currentstate)
-//        {
-//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-//        }
-//    }   
+    eo_strain_SetMode(eo_strain_GetHandle(), *mode);
     
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     uint8_t *datarate = (uint8_t*)rd->data;
-    eo_strain_ConfigDataRate(eo_strain_GetHandle(), *datarate);
-    
-//    uint8_t *straindatarate = (uint8_t*)rd->data;
-//    eOcanprot_command_t command = {0};
-//    command.class = eocanprot_msgclass_pollingAnalogSensor;
-//    command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-//    command.value = straindatarate;
-//    
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);   
+    eo_strain_SetDataRate(eo_strain_GetHandle(), *datarate);  
 }
 
 
@@ -368,11 +326,8 @@ extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv,
     eObool_t *signaloncefullscale = (eObool_t*)rd->data;
     if(eobool_true == *signaloncefullscale)
     {
-        eo_strain_FullScale_StartRequest(eo_strain_GetHandle());
+        eo_strain_GetFullScale(eo_strain_GetHandle(), s_on_fullscaleofstrain_received);
     }
-    
-//    eObool_t *signaloncefullscale = (eObool_t*)rd->data;
-//    s_signalGetFullScales(rd->id32, *signaloncefullscale);
 }
 
 extern void eoprot_fun_UPDT_as_inertial_config_service(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -415,70 +370,95 @@ extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOro
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//static void s_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status)
+//static eOresult_t s_eo_thestrain_loadFullscalelikeoccasionalrop(void)
 //{
-//    uint8_t size = 0;
-//    uint8_t itemsize = 1;
-//    uint8_t capacity = 0;
-//    
-//    if(eoas_maisresolution_08 == resolution)
+//    eOresult_t res;
+//    eOropdescriptor_t ropdesc;
+
+//    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+
+//    ropdesc.ropcode                 = eo_ropcode_sig;
+//    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
+//    ropdesc.id32                    = eo_strain_GetID32(eo_strain_GetHandle(), eoprot_tag_as_strain_status_fullscale); 
+//    ropdesc.data                    = NULL;
+
+//   
+//    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
+//    if(eores_OK != res)
 //    {
-//        capacity    = 15;
-//        itemsize    = 1;
-//        size        = 15;
-//        //#warning acemor-> nella mais nel caso di risoluzione a 8 bit perche' la capacity di the15values e' 16 e non 15?
-//        // penso sia un errore. metto a 15. anche perche' nel parser dei pacchetti can la size viene messa a 15
-//        //status->the15values.head.capacity = 16;
-//        //status->the15values.head.itemsize = 1;
-//        //status->the15values.head.size = 16;
-//    }
-//    else if(eoas_maisresolution_16 == resolution)
-//    {
-//        capacity    = 15;
-//        itemsize    = 2;
-//        size        = 15;
-//        //#warning acemor-> nella mais ho messo la capacity di the15values a 15 anche nel caso di risoluzione a 16 bit
-//        //status->the15values.head.capacity = 16;
-//        //status->the15values.head.itemsize = 2;
-//        //status->the15values.head.size = 16;
-//    } 
-
-//    EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
-//    eo_array_Resize(array, size);    
-//}
-
-
-//static void s_signalGetFullScales(uint32_t id32, eObool_t signaloncefullscale)
-//{
-//    if(eobool_true == signaloncefullscale)
-//    {
-//        //clear array in strainstatus
-//        //uint8_t number = eoprot_ID2index(id32);        
-//        eOas_strain_status_t* status = eo_entities_GetStrainStatus(eo_entities_GetHandle(), eoprot_ID2index(id32));
-//        if(NULL != status)
-//        {
-//            // impose that fullscale is an empty array of itemsize 2 and capacity 6. 
-//            // we have already done it inside the eoprot_fun_INIT_as_strain_status() function, but we do it again with eo_array_New()
-//            EOarray *array = eo_array_New(6, 2, &status->fullscale);
-//            
-//            // then we send a command to strain to send us the value of channel 0. 
-//            // this operation triggers a new request until we receive all the 6 values
-//            uint8_t channel = 0;
-//            eOcanprot_command_t command = {0};
-//            command.class = eocanprot_msgclass_pollingAnalogSensor;
-//            command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
-//            command.value = &channel;
-
-//            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-//             
-//            //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 2);                     
-//        }
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
 //    }
 //    else
 //    {
-//        //s_send_diagnostics(eo_errortype_debug, eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01), 4);
+//        //eOerrmanDescriptor_t des = {0};
+//        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+//        //des.param = 0x1111;
+//        //des.sourceaddress = 0;
+//        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+//        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
 //    }
+
+
+//    return(res);
 //}
+
+
+static eOresult_t s_on_fullscaleofstrain_received(EOtheSTRAIN* p, eObool_t operationisok)
+{
+    eOresult_t res = eores_OK;
+    
+    if(eobool_false == operationisok)
+    {
+        // send diagnostics
+        return(eores_NOK_generic);
+    }
+    
+    // signal the fullscale only once.
+    
+    // load a rop to tx and then alert someone to tx the ropframe
+        
+    // 1. prepare occasional rop to send    
+    
+    eOropdescriptor_t ropdesc = {0};
+
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+
+    ropdesc.ropcode                 = eo_ropcode_sig;
+    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
+    ropdesc.id32                    = eo_strain_GetID32(eo_strain_GetHandle(), eoprot_tag_as_strain_status_fullscale); 
+    ropdesc.data                    = NULL;
+
+   
+    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
+    if(eores_OK != res)
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);        
+        return(res);
+    }
+    else
+    {
+        //eOerrmanDescriptor_t des = {0};
+        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+        //des.param = 0x1111;
+        //des.sourceaddress = 0;
+        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+    }
+    
+
+    // 2. now i alert someone to transmit it
+    
+    eOsmStatesEMSappl_t status;
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &status);
+    
+    // if application is in cfg state, then we send a request to configurator to send ropframe out. otherwise, if in RUN mode, the control-loop wills end it 
+    if(eo_sm_emsappl_STcfg == status)
+    {
+        eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
+    }
+    
+    return(eores_OK);
+}
 
 
 // useful for any debug activity. comment it out if not used
