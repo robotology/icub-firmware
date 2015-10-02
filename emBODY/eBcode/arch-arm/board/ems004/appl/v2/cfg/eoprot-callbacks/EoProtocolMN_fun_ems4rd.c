@@ -352,22 +352,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-//            eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
-//            
-//            if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
-//            {
-//                return;
-//            }
-//            else
-//			{
-//				eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-//			}
-            
-            if(eobool_false == eo_emsapplBody_isreadyforcontrolloop(eo_emsapplBody_GetHandle()))
-            {
-                eo_emsapplBody_SendDiscoveryFailureReport(eo_emsapplBody_GetHandle());
-                return;
-            }
+            // we always allow entering the control loop. to be in control loop does nothing unless the service is activated.
             
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
 
