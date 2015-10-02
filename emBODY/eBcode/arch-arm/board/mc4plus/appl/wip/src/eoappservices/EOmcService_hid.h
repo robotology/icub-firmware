@@ -49,6 +49,7 @@ struct EOmcService_hid
     EOemsController*    thelocalcontroller;
     EOappEncReader*     thelocalencoderreader;
     uint32_t*           valuesencoder;
+    uint32_t*           valuesencoder_extra;
     int16_t*            valuespwm;
 }; 
 
